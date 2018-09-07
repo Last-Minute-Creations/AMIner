@@ -3,26 +3,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "game.h"
-#include <ace/managers/key.h> // Keyboard processing
-#include <ace/managers/game.h> // For using gameClose
-#include <ace/managers/system.h> // For systemUnuse and systemUse
-#include <ace/managers/viewport/simplebuffer.h> // Simple buffer
+#include <ace/managers/key.h>
+#include <ace/managers/game.h>
+#include <ace/managers/system.h>
+#include <ace/managers/viewport/simplebuffer.h>
 #include <ace/utils/palette.h>
 #include <ace/utils/custom.h>
 #include <ace/managers/blit.h>
 #include <ace/managers/rand.h>
 #include "bob_new.h"
 #include "vehicle.h"
+#include "hud.h"
 
-// All variables outside fns are global - can be accessed in any fn
-// Static means here that given var is only for this file, hence 's_' prefix
-// You can have many variables with same name in different files and they'll be
-// independent as long as they're static
-// * means pointer, hence 'p' prefix
-static tView *s_pView; // View containing all the viewports
-static tVPort *s_pVpScore; // Viewport for score
-static tSimpleBufferManager *s_pScoreBuffer;
-static tVPort *s_pVpMain; // Viewport for playfield
+static tView *s_pView;
+static tVPort *s_pVpMain;
 static tSimpleBufferManager *s_pMainBuffer;
 
 static tBitMap *s_pTiles;
@@ -45,15 +39,7 @@ void gameGsCreate(void) {
     TAG_VIEW_GLOBAL_CLUT, 1,
   TAG_END);
 
-  s_pVpScore = vPortCreate(0,
-    TAG_VPORT_VIEW, s_pView,
-    TAG_VPORT_BPP, 4,
-    TAG_VPORT_HEIGHT, 32,
-  TAG_END);
-  s_pScoreBuffer = simpleBufferCreate(0,
-    TAG_SIMPLEBUFFER_VPORT, s_pVpScore,
-    TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
-  TAG_END);
+	hudCreate(s_pView);
 
   s_pVpMain = vPortCreate(0,
     TAG_VPORT_VIEW, s_pView,
@@ -67,7 +53,6 @@ void gameGsCreate(void) {
   TAG_END);
 
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
-	paletteLoad("data/aminer.plt", s_pVpScore->pPalette, 16);
 	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
 
   // We don't need anything from OS anymore
@@ -132,8 +117,10 @@ void gameGsLoop(void) {
 	bobNewBegin();
 	gameProcessInput();
 	vehicleProcess();
+	hudSetDepth(g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_HEIGHT);
 	bobNewPushingDone();
 	bobNewEnd();
+	hudUpdate();
 
 	cameraCenterAt(
 		s_pMainBuffer->pCameraManager,
@@ -154,6 +141,6 @@ void gameGsDestroy(void) {
 	vehicleDestroy();
 	bobNewManagerDestroy();
 
-  // This will also destroy all associated viewports and viewport managers
+  hudDestroy();
   viewDestroy(s_pView);
 }
