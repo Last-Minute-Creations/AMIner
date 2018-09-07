@@ -12,6 +12,7 @@
 #include <ace/managers/blit.h>
 #include <ace/managers/rand.h>
 #include "bob_new.h"
+#include "vehicle.h"
 
 // All variables outside fns are global - can be accessed in any fn
 // Static means here that given var is only for this file, hence 's_' prefix
@@ -26,9 +27,6 @@ static tSimpleBufferManager *s_pMainBuffer;
 
 static tBitMap *s_pTiles;
 
-static tBobNew s_sBobDrill;
-static tBitMap *s_pDrillBitmap, *s_pDrillMask;
-
 #define TILE_ROCK 0
 #define TILE_GOLD 1
 #define TILE_COPPER 2
@@ -37,8 +35,6 @@ static tBitMap *s_pDrillBitmap, *s_pDrillMask;
 #define TILE_RUBY 5
 #define TILE_DIRT 6
 
-#define DRILL_WIDTH 32
-#define DRILL_HEIGHT 23
 // TODO sapphire, emerald, topaz
 
 // 32px: 1 << 5
@@ -114,13 +110,10 @@ void gameGsCreate(void) {
 	}
 
 	bobNewManagerCreate(
-		1, DRILL_HEIGHT*(DRILL_WIDTH/16 + 1),
+		1, VEHICLE_HEIGHT * (VEHICLE_WIDTH/16 + 1),
 		s_pMainBuffer->pFront, s_pMainBuffer->pBack
 	);
-
-	s_pDrillBitmap = bitmapCreateFromFile("data/drill/drill.bm");
-	s_pDrillMask = bitmapCreateFromFile("data/drill/drill_mask.bm");
-	bobNewInit(&s_sBobDrill, DRILL_WIDTH, DRILL_HEIGHT, 1, s_pDrillBitmap, s_pDrillMask, 0, 0);
+	vehicleCreate();
 
   // Load the view
   viewLoad(s_pView);
@@ -134,15 +127,15 @@ void gameGsLoop(void) {
   }
 
 	bobNewBegin();
+	BYTE bDirX = 0, bDirY = 0;
 	if(keyCheck(KEY_D)) {
-		s_sBobDrill.sPos.sUwCoord.uwX += 2;
-		bobNewSetBitMapOffset(&s_sBobDrill, 0);
+		bDirX += 1;
 	}
-	else if(keyCheck(KEY_A)) {
-		s_sBobDrill.sPos.sUwCoord.uwX -= 2;
-		bobNewSetBitMapOffset(&s_sBobDrill, DRILL_HEIGHT);
+	if(keyCheck(KEY_A)) {
+		bDirX -= 1;
 	}
-	bobNewPush(&s_sBobDrill);
+	vehicleMove(bDirX, bDirY);
+	vehicleProcess();
 	bobNewPushingDone();
 	bobNewEnd();
 
@@ -157,9 +150,7 @@ void gameGsDestroy(void) {
   systemUse();
 
 	bitmapDestroy(s_pTiles);
-	bitmapDestroy(s_pDrillBitmap);
-	bitmapDestroy(s_pDrillMask);
-
+	vehicleDestroy();
 	bobNewManagerDestroy();
 
   // This will also destroy all associated viewports and viewport managers
