@@ -41,44 +41,30 @@ static tBitMap *s_pTiles;
 #define TILE_SIZE 5
 
 void gameGsCreate(void) {
-  // Create a view - first arg is always zero, then it's option-value
   s_pView = viewCreate(0,
-    TAG_VIEW_GLOBAL_CLUT, 1, // Same Color LookUp Table for all viewports
-  TAG_END); // Must always end with TAG_END or synonym: TAG_DONE
+    TAG_VIEW_GLOBAL_CLUT, 1,
+  TAG_END);
 
-  // Viewport for score bar - on top of screen
   s_pVpScore = vPortCreate(0,
-    TAG_VPORT_VIEW, s_pView, // Required: specify parent view
-    TAG_VPORT_BPP, 4, // Optional: 2 bits per pixel, 4 colors
-    TAG_VPORT_HEIGHT, 32, // Optional: let's make it 32px high
-  TAG_END); // same syntax as view creation
-
-  // Create simple buffer manager with bitmap exactly as large as viewport
+    TAG_VPORT_VIEW, s_pView,
+    TAG_VPORT_BPP, 4,
+    TAG_VPORT_HEIGHT, 32,
+  TAG_END);
   s_pScoreBuffer = simpleBufferCreate(0,
-    TAG_SIMPLEBUFFER_VPORT, s_pVpScore, // Required: parent viewport
-    // Optional: buffer bitmap creation flags
-    // we'll use them to initially clear the bitmap
+    TAG_SIMPLEBUFFER_VPORT, s_pVpScore,
     TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
   TAG_END);
 
-  // Now let's do the same for main playfield
   s_pVpMain = vPortCreate(0,
     TAG_VPORT_VIEW, s_pView,
-    TAG_VPORT_BPP, 4, // 2 bits per pixel, 4 colors
-    // We won't specify height here - viewport will take remaining space.
+    TAG_VPORT_BPP, 4,
   TAG_END);
   s_pMainBuffer = simpleBufferCreate(0,
-    TAG_SIMPLEBUFFER_VPORT, s_pVpMain, // Required: parent viewport
+    TAG_SIMPLEBUFFER_VPORT, s_pVpMain,
     TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
+		TAG_SIMPLEBUFFER_BOUND_HEIGHT, 1024,
 		TAG_SIMPLEBUFFER_IS_DBLBUF, 1,
   TAG_END);
-
-  // Since we've set up global CLUT, palette will be loaded from first viewport
-  // Colors are 0x0RGB, each channel accepts values from 0 to 15 (0 to F).
-  s_pVpScore->pPalette[0] = 0x0000; // First color is also border color
-  s_pVpScore->pPalette[1] = 0x0888; // Gray
-  s_pVpScore->pPalette[2] = 0x0800; // Red - not max, a bit dark
-  s_pVpScore->pPalette[3] = 0x0008; // Blue - same brightness as red
 
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
 	paletteLoad("data/aminer.plt", s_pVpScore->pPalette, 16);
@@ -97,7 +83,7 @@ void gameGsCreate(void) {
 			s_pTiles, 0, TILE_DIRT << TILE_SIZE, s_pMainBuffer->pFront,
 			x << TILE_SIZE, 2 << TILE_SIZE, 32, 32
 		);
-		for(UBYTE y = 3; y < 7; ++y) {
+		for(UBYTE y = 3; y < 32; ++y) {
 			blitCopyAligned(
 				s_pTiles, 0, TILE_ROCK << TILE_SIZE, s_pMainBuffer->pBack,
 				x << TILE_SIZE, y << TILE_SIZE, 32, 32
@@ -119,6 +105,23 @@ void gameGsCreate(void) {
   viewLoad(s_pView);
 }
 
+static void gameProcessInput(void) {
+	BYTE bDirX = 0, bDirY = 0;
+	if(keyCheck(KEY_D)) {
+		bDirX += 1;
+	}
+	if(keyCheck(KEY_A)) {
+		bDirX -= 1;
+	}
+	if(keyCheck(KEY_S)) {
+		bDirY += 1;
+	}
+	if(keyCheck(KEY_W)) {
+		bDirY -= 1;
+	}
+	vehicleMove(bDirX, bDirY);
+}
+
 void gameGsLoop(void) {
 	g_pCustom->color[0] = 0x800;
   if(keyCheck(KEY_ESCAPE)) {
@@ -127,18 +130,16 @@ void gameGsLoop(void) {
   }
 
 	bobNewBegin();
-	BYTE bDirX = 0, bDirY = 0;
-	if(keyCheck(KEY_D)) {
-		bDirX += 1;
-	}
-	if(keyCheck(KEY_A)) {
-		bDirX -= 1;
-	}
-	vehicleMove(bDirX, bDirY);
+	gameProcessInput();
 	vehicleProcess();
 	bobNewPushingDone();
 	bobNewEnd();
 
+	cameraCenterAt(
+		s_pMainBuffer->pCameraManager,
+		g_sVehicle.sBob.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
+		g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_WIDTH/2
+	);
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
 	g_pCustom->color[0] = 0x000;
