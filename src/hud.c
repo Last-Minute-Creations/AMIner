@@ -8,6 +8,7 @@
 #include <ace/utils/palette.h>
 
 typedef enum _tHudDraw {
+	HUD_PREPARE_DEPTH,
 	HUD_DRAW_DEPTH,
 	HUD_DRAW_END
 } tHudDraw;
@@ -49,12 +50,21 @@ void hudSetDepth(UWORD uwDepth) {
 
 void hudUpdate(void) {
 	char szBfr[20];
-	if(s_eDraw == HUD_DRAW_DEPTH) {
+	static UBYTE isDepthPrepared = 0;
+	if(s_eDraw == HUD_PREPARE_DEPTH) {
 		if(s_uwDepth != s_uwOldDepth) {
 			sprintf(szBfr, "Depth: %5u", s_uwDepth);
 			fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
-			fontDrawTextBitMap(s_pHudBuffer->pBack, s_pLinebuffer, 0, 0, 15, FONT_LAZY);
 			s_uwOldDepth = s_uwDepth;
+			isDepthPrepared = 1;
+		}
+	}
+	else if(s_eDraw == HUD_DRAW_DEPTH) {
+		if(isDepthPrepared) {
+			fontDrawTextBitMap(
+				s_pHudBuffer->pBack, s_pLinebuffer, 0, 0, 15, FONT_LAZY
+			);
+			isDepthPrepared = 0;
 		}
 	}
 	++s_eDraw;

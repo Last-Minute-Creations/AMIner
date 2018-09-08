@@ -61,6 +61,14 @@ void gameGsCreate(void) {
 
 	for(UBYTE x = 0; x < 10; ++x) {
 		blitCopyAligned(
+			s_pTiles, 0, TILE_DIAMOND << TILE_SIZE, s_pMainBuffer->pBack,
+			x << TILE_SIZE, 0 << TILE_SIZE, 32, 32
+		);
+		blitCopyAligned(
+			s_pTiles, 0, TILE_DIAMOND << TILE_SIZE, s_pMainBuffer->pFront,
+			x << TILE_SIZE, 0 << TILE_SIZE, 32, 32
+		);
+		blitCopyAligned(
 			s_pTiles, 0, TILE_DIRT << TILE_SIZE, s_pMainBuffer->pBack,
 			x << TILE_SIZE, 2 << TILE_SIZE, 32, 32
 		);
