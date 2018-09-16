@@ -7,6 +7,7 @@
 #include <ace/managers/game.h>
 #include <ace/managers/system.h>
 #include <ace/managers/viewport/simplebuffer.h>
+#include <ace/managers/viewport/tilebuffer.h>
 #include <ace/utils/palette.h>
 #include <ace/utils/custom.h>
 #include <ace/managers/blit.h>
@@ -17,7 +18,7 @@
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
-static tSimpleBufferManager *s_pMainBuffer;
+static tTileBufferManager *s_pMainBuffer;
 
 static tBitMap *s_pTiles;
 
@@ -31,70 +32,51 @@ static tBitMap *s_pTiles;
 
 // TODO sapphire, emerald, topaz
 
-// 32px: 1 << 5
-#define TILE_SIZE 5
-
 void gameGsCreate(void) {
   s_pView = viewCreate(0,
     TAG_VIEW_GLOBAL_CLUT, 1,
   TAG_END);
 
 	hudCreate(s_pView);
+	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
 
   s_pVpMain = vPortCreate(0,
     TAG_VPORT_VIEW, s_pView,
     TAG_VPORT_BPP, 4,
   TAG_END);
-  s_pMainBuffer = simpleBufferCreate(0,
-    TAG_SIMPLEBUFFER_VPORT, s_pVpMain,
-    TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
-		TAG_SIMPLEBUFFER_BOUND_HEIGHT, 1024,
-		TAG_SIMPLEBUFFER_IS_DBLBUF, 1,
+  s_pMainBuffer = tileBufferCreate(0,
+		TAG_TILEBUFFER_VPORT, s_pVpMain,
+		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
+		TAG_TILEBUFFER_BOUND_TILE_X, 10,
+		TAG_TILEBUFFER_BOUND_TILE_Y, 2047,
+		TAG_TILEBUFFER_IS_DBLBUF, 1,
+		TAG_TILEBUFFER_TILE_SHIFT, 5,
+		TAG_TILEBUFFER_REDRAW_QUEUE_LENGTH, 100,
+		TAG_TILEBUFFER_TILESET, s_pTiles,
   TAG_END);
 
-	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
 	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
 
-  // We don't need anything from OS anymore
   systemUnuse();
 	randInit(2184);
 
-	for(UBYTE x = 0; x < 10; ++x) {
-		blitCopyAligned(
-			s_pTiles, 0, TILE_DIAMOND << TILE_SIZE, s_pMainBuffer->pBack,
-			x << TILE_SIZE, 0 << TILE_SIZE, 32, 32
-		);
-		blitCopyAligned(
-			s_pTiles, 0, TILE_DIAMOND << TILE_SIZE, s_pMainBuffer->pFront,
-			x << TILE_SIZE, 0 << TILE_SIZE, 32, 32
-		);
-		blitCopyAligned(
-			s_pTiles, 0, TILE_DIRT << TILE_SIZE, s_pMainBuffer->pBack,
-			x << TILE_SIZE, 2 << TILE_SIZE, 32, 32
-		);
-		blitCopyAligned(
-			s_pTiles, 0, TILE_DIRT << TILE_SIZE, s_pMainBuffer->pFront,
-			x << TILE_SIZE, 2 << TILE_SIZE, 32, 32
-		);
-		for(UBYTE y = 3; y < 32; ++y) {
-			blitCopyAligned(
-				s_pTiles, 0, TILE_ROCK << TILE_SIZE, s_pMainBuffer->pBack,
-				x << TILE_SIZE, y << TILE_SIZE, 32, 32
-			);
-			blitCopyAligned(
-				s_pTiles, 0, TILE_ROCK << TILE_SIZE, s_pMainBuffer->pFront,
-				x << TILE_SIZE, y << TILE_SIZE, 32, 32
-			);
+	for(UWORD x = 0; x < s_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
+		s_pMainBuffer->pTileData[x][0] = TILE_DIAMOND;
+		s_pMainBuffer->pTileData[x][2] = TILE_DIRT;
+		for(UWORD y = 3; y < s_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
+			s_pMainBuffer->pTileData[x][y] = y % 6;
 		}
 	}
 
 	bobNewManagerCreate(
 		1, VEHICLE_HEIGHT * (VEHICLE_WIDTH/16 + 1),
-		s_pMainBuffer->pFront, s_pMainBuffer->pBack
+		s_pMainBuffer->pScroll->pFront, s_pMainBuffer->pScroll->pBack,
+		s_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	vehicleCreate();
 
   // Load the view
+	tileBufferInitialDraw(s_pMainBuffer);
   viewLoad(s_pView);
 }
 
@@ -131,7 +113,7 @@ void gameGsLoop(void) {
 	hudUpdate();
 
 	cameraCenterAt(
-		s_pMainBuffer->pCameraManager,
+		s_pMainBuffer->pCamera,
 		g_sVehicle.sBob.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 		g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_WIDTH/2
 	);

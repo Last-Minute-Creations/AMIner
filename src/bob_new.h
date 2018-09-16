@@ -24,7 +24,7 @@ typedef struct _tBobNew {
 
 void bobNewManagerCreate(
 	UBYTE ubMaxBobCount, UWORD uwBgBufferLength,
-	tBitMap *pFront, tBitMap *pBack
+	tBitMap *pFront, tBitMap *pBack, UWORD uwAvailHeight
 );
 
 void bobNewManagerDestroy(void);

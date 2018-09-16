@@ -26,7 +26,7 @@ void hudCreate(tView *pView) {
   s_pVpHud = vPortCreate(0,
     TAG_VPORT_VIEW, pView,
     TAG_VPORT_BPP, 4,
-    TAG_VPORT_HEIGHT, 32,
+    TAG_VPORT_HEIGHT, 16,
   TAG_END);
 
   s_pHudBuffer = simpleBufferCreate(0,
@@ -38,6 +38,8 @@ void hudCreate(tView *pView) {
 
 	s_pFont = fontCreate("data/silkscreen5.fnt");
 	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, 5);
+
+	blitLine(s_pHudBuffer->pBack, 0, 15, s_pVpHud->uwWidth, 15, 1, 0xF0F0, 0);
 
 	s_uwOldDepth = 0xFFFF;
 	s_uwDepth = 0;

@@ -29,12 +29,13 @@ static UBYTE s_ubBpp;
 static UBYTE s_ubBobsPushed;
 static UBYTE s_ubBobsDrawn;
 static UBYTE s_ubBobsSaved;
+static UWORD s_uwAvailHeight;
 
 tBobQueue s_pQueues[2];
 
 void bobNewManagerCreate(
 	UBYTE ubMaxBobCount, UWORD uwBgBufferLength,
-	tBitMap *pFront, tBitMap *pBack
+	tBitMap *pFront, tBitMap *pBack, UWORD uwAvailHeight
 ) {
 	s_ubBpp = pFront->Depth;
 	s_ubMaxBobCount = ubMaxBobCount;
@@ -55,6 +56,7 @@ void bobNewManagerCreate(
 	s_ubBobsDrawn = 0;
 	s_pQueues[0].ubUndrawCount = 0;
 	s_pQueues[1].ubUndrawCount = 0;
+	s_uwAvailHeight = uwAvailHeight;
 }
 
 void bobNewManagerDestroy(void) {
@@ -122,13 +124,24 @@ UBYTE bobNewProcessNext(void) {
 		++s_ubBobsSaved;
 		if(pBob->isUndrawRequired) {
 			ULONG ulSrcOffs = (
-				pQueue->pDst->BytesPerRow * pBob->sPos.sUwCoord.uwY +
+				pQueue->pDst->BytesPerRow * (pBob->sPos.sUwCoord.uwY % s_uwAvailHeight) +
 				pBob->sPos.sUwCoord.uwX/8
 			);
 			ULONG ulA = (ULONG)(pQueue->pDst->Planes[0]) + ulSrcOffs;
 			g_pCustom->bltamod = pBob->_wModuloUndrawSave;
 			g_pCustom->bltapt = (APTR)ulA;
-			g_pCustom->bltsize = pBob->_uwBlitSize;
+			UWORD uwPartHeight = s_uwAvailHeight - (pBob->sPos.sUwCoord.uwY % s_uwAvailHeight);
+			if(uwPartHeight >= pBob->uwHeight) {
+				g_pCustom->bltsize = pBob->_uwBlitSize;
+			}
+			else {
+				UWORD uwBlitWords = (pBob->uwWidth+15)/16 + 1;
+				g_pCustom->bltsize =((uwPartHeight * s_ubBpp) << 6) | uwBlitWords;
+				ulA = (ULONG)(pQueue->pDst->Planes[0]) + pBob->sPos.sUwCoord.uwX/8;
+				blitWait();
+				g_pCustom->bltapt = (APTR)ulA;
+				g_pCustom->bltsize =(((pBob->uwHeight - uwPartHeight) * s_ubBpp) << 6) | uwBlitWords;
+			}
 		}
 		return 1;
 	}
@@ -144,16 +157,8 @@ UBYTE bobNewProcessNext(void) {
 			const tUwCoordYX * pPos = &pBob->sPos;
 			++s_ubBobsDrawn;
 
-			if(!blitCheck(
-				pBob->pBitmap, 0, pBob->uwOffsetY / pBob->pBitmap->BytesPerRow,
-				pQueue->pDst, pPos->sUwCoord.uwX, pPos->sUwCoord.uwY,
-				pBob->uwWidth, pBob->uwHeight, __LINE__, __FILE__
-			)) {
-				return 1;
-			}
-
 			UBYTE ubDstOffs = pPos->sUwCoord.uwX & 0xF;
-			UWORD uwBlitWidth = (pBob->uwWidth +ubDstOffs+15) & 0xFFF0;
+			UWORD uwBlitWidth = (pBob->uwWidth + ubDstOffs + 15) & 0xFFF0;
 			UWORD uwBlitWords = uwBlitWidth >> 4;
 			UWORD uwBlitSize = ((pBob->uwHeight * s_ubBpp) << 6) | uwBlitWords;
 			WORD wSrcModulo = (pBob->uwWidth >> 3) - (uwBlitWords<<1);
@@ -170,7 +175,7 @@ UBYTE bobNewProcessNext(void) {
 			}
 			ULONG ulSrcOffs = pBob->uwOffsetY;
 			ULONG ulDstOffs = (
-				pQueue->pDst->BytesPerRow * pPos->sUwCoord.uwY + (pPos->sUwCoord.uwX>>3)
+				pQueue->pDst->BytesPerRow * (pPos->sUwCoord.uwY % s_uwAvailHeight) + pPos->sUwCoord.uwX / 8
 			);
 
 			WORD wDstModulo = bitmapGetByteWidth(pQueue->pDst) - (uwBlitWords<<1);
@@ -191,7 +196,18 @@ UBYTE bobNewProcessNext(void) {
 			g_pCustom->bltbpt = (APTR)ulB;
 			g_pCustom->bltcpt = (APTR)ulCD;
 			g_pCustom->bltdpt = (APTR)ulCD;
-			g_pCustom->bltsize = uwBlitSize;
+			UWORD uwPartHeight = s_uwAvailHeight - (pBob->sPos.sUwCoord.uwY % s_uwAvailHeight);
+			if(uwPartHeight >= pBob->uwHeight) {
+				g_pCustom->bltsize = uwBlitSize;
+			}
+			else {
+				g_pCustom->bltsize =((uwPartHeight * s_ubBpp) << 6) | uwBlitWords;
+				ulCD = (ULONG)(pQueue->pDst->Planes[0]) + pBob->sPos.sUwCoord.uwX / 8;
+				blitWait();
+				g_pCustom->bltcpt = (APTR)ulCD;
+				g_pCustom->bltdpt = (APTR)ulCD;
+				g_pCustom->bltsize =(((pBob->uwHeight - uwPartHeight) * s_ubBpp) << 6) | uwBlitWords;
+			}
 
 			pBob->pOldPositions[s_ubBufferCurr].ulYX = pPos->ulYX;
 
@@ -223,13 +239,24 @@ void bobNewBegin(void) {
 		if(pBob->isUndrawRequired) {
 			// Undraw next
 			ULONG ulDstOffs = (
-				pQueue->pDst->BytesPerRow * pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwY +
-				pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwX/8
+				pQueue->pDst->BytesPerRow * (pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwY % s_uwAvailHeight) +
+				pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwX / 8
 			);
-			ULONG ulCD = (ULONG)(pQueue->pDst->Planes[0]) + ulDstOffs;
+			ULONG ulD = (ULONG)(pQueue->pDst->Planes[0]) + ulDstOffs;
 			g_pCustom->bltdmod = pBob->_wModuloUndrawSave;
-			g_pCustom->bltdpt = (APTR)ulCD;
-			g_pCustom->bltsize = pBob->_uwBlitSize;
+			g_pCustom->bltdpt = (APTR)ulD;
+			UWORD uwPartHeight = s_uwAvailHeight - (pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwY % s_uwAvailHeight);
+			if(uwPartHeight >= pBob->uwHeight) {
+				g_pCustom->bltsize = pBob->_uwBlitSize;
+			}
+			else {
+				UWORD uwBlitWords = (pBob->uwWidth+15)/16 + 1;
+				g_pCustom->bltsize =((uwPartHeight * s_ubBpp) << 6) | uwBlitWords;
+				ulD = (ULONG)(pQueue->pDst->Planes[0]) + pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwX / 8;
+				blitWait();
+				g_pCustom->bltdpt = (APTR)ulD;
+				g_pCustom->bltsize =(((pBob->uwHeight - uwPartHeight) * s_ubBpp) << 6) | uwBlitWords;
+			}
 
 #ifdef GAME_DEBUG
 			UWORD uwBlitWords = (pBob->uwWidth+15)/16 + 1;
