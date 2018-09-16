@@ -124,13 +124,13 @@ UBYTE bobNewProcessNext(void) {
 		++s_ubBobsSaved;
 		if(pBob->isUndrawRequired) {
 			ULONG ulSrcOffs = (
-				pQueue->pDst->BytesPerRow * (pBob->sPos.sUwCoord.uwY % s_uwAvailHeight) +
+				pQueue->pDst->BytesPerRow * (pBob->sPos.sUwCoord.uwY & (s_uwAvailHeight-1)) +
 				pBob->sPos.sUwCoord.uwX/8
 			);
 			ULONG ulA = (ULONG)(pQueue->pDst->Planes[0]) + ulSrcOffs;
 			g_pCustom->bltamod = pBob->_wModuloUndrawSave;
 			g_pCustom->bltapt = (APTR)ulA;
-			UWORD uwPartHeight = s_uwAvailHeight - (pBob->sPos.sUwCoord.uwY % s_uwAvailHeight);
+			UWORD uwPartHeight = s_uwAvailHeight - (pBob->sPos.sUwCoord.uwY & (s_uwAvailHeight-1));
 			if(uwPartHeight >= pBob->uwHeight) {
 				g_pCustom->bltsize = pBob->_uwBlitSize;
 			}
@@ -175,7 +175,7 @@ UBYTE bobNewProcessNext(void) {
 			}
 			ULONG ulSrcOffs = pBob->uwOffsetY;
 			ULONG ulDstOffs = (
-				pQueue->pDst->BytesPerRow * (pPos->sUwCoord.uwY % s_uwAvailHeight) + pPos->sUwCoord.uwX / 8
+				pQueue->pDst->BytesPerRow * (pPos->sUwCoord.uwY & (s_uwAvailHeight-1)) + pPos->sUwCoord.uwX / 8
 			);
 
 			WORD wDstModulo = bitmapGetByteWidth(pQueue->pDst) - (uwBlitWords<<1);
@@ -196,7 +196,7 @@ UBYTE bobNewProcessNext(void) {
 			g_pCustom->bltbpt = (APTR)ulB;
 			g_pCustom->bltcpt = (APTR)ulCD;
 			g_pCustom->bltdpt = (APTR)ulCD;
-			UWORD uwPartHeight = s_uwAvailHeight - (pBob->sPos.sUwCoord.uwY % s_uwAvailHeight);
+			UWORD uwPartHeight = s_uwAvailHeight - (pBob->sPos.sUwCoord.uwY & (s_uwAvailHeight-1));
 			if(uwPartHeight >= pBob->uwHeight) {
 				g_pCustom->bltsize = uwBlitSize;
 			}
@@ -239,13 +239,13 @@ void bobNewBegin(void) {
 		if(pBob->isUndrawRequired) {
 			// Undraw next
 			ULONG ulDstOffs = (
-				pQueue->pDst->BytesPerRow * (pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwY % s_uwAvailHeight) +
+				pQueue->pDst->BytesPerRow * (pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwY & (s_uwAvailHeight-1)) +
 				pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwX / 8
 			);
 			ULONG ulD = (ULONG)(pQueue->pDst->Planes[0]) + ulDstOffs;
 			g_pCustom->bltdmod = pBob->_wModuloUndrawSave;
 			g_pCustom->bltdpt = (APTR)ulD;
-			UWORD uwPartHeight = s_uwAvailHeight - (pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwY % s_uwAvailHeight);
+			UWORD uwPartHeight = s_uwAvailHeight - (pBob->pOldPositions[s_ubBufferCurr].sUwCoord.uwY & (s_uwAvailHeight-1));
 			if(uwPartHeight >= pBob->uwHeight) {
 				g_pCustom->bltsize = pBob->_uwBlitSize;
 			}
