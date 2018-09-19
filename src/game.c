@@ -7,7 +7,6 @@
 #include <ace/managers/game.h>
 #include <ace/managers/system.h>
 #include <ace/managers/viewport/simplebuffer.h>
-#include <ace/managers/viewport/tilebuffer.h>
 #include <ace/utils/palette.h>
 #include <ace/utils/custom.h>
 #include <ace/managers/blit.h>
@@ -18,17 +17,20 @@
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
-static tTileBufferManager *s_pMainBuffer;
+tTileBufferManager *g_pMainBuffer;
 
 static tBitMap *s_pTiles;
 
-#define TILE_ROCK 0
-#define TILE_GOLD 1
-#define TILE_COPPER 2
-#define TILE_COAL 3
-#define TILE_DIAMOND 4
-#define TILE_RUBY 5
-#define TILE_DIRT 6
+#define TILE_NONE 0
+#define TILE_ROCK 1
+#define TILE_GOLD 2
+#define TILE_COPPER 3
+#define TILE_COAL 4
+#define TILE_DIAMOND 5
+#define TILE_RUBY 6
+#define TILE_DIRT 7
+
+static UBYTE s_isDebug = 0;
 
 // TODO sapphire, emerald, topaz
 
@@ -44,7 +46,7 @@ void gameGsCreate(void) {
     TAG_VPORT_VIEW, s_pView,
     TAG_VPORT_BPP, 4,
   TAG_END);
-  s_pMainBuffer = tileBufferCreate(0,
+  g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
 		TAG_TILEBUFFER_BOUND_TILE_X, 10,
@@ -57,26 +59,29 @@ void gameGsCreate(void) {
 
 	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
 
-  systemUnuse();
 	randInit(2184);
 
-	for(UWORD x = 0; x < s_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
-		s_pMainBuffer->pTileData[x][0] = TILE_DIAMOND;
-		s_pMainBuffer->pTileData[x][2] = TILE_DIRT;
-		for(UWORD y = 3; y < s_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
-			s_pMainBuffer->pTileData[x][y] = y % 6;
+	for(UWORD x = 0; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
+		g_pMainBuffer->pTileData[x][0] = TILE_NONE;
+		g_pMainBuffer->pTileData[x][1] = TILE_NONE;
+		g_pMainBuffer->pTileData[x][2] = TILE_DIRT;
+		for(UWORD y = 3; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
+			g_pMainBuffer->pTileData[x][y] = TILE_ROCK;
 		}
 	}
 
 	bobNewManagerCreate(
 		1, VEHICLE_HEIGHT * (VEHICLE_WIDTH/16 + 1),
-		s_pMainBuffer->pScroll->pFront, s_pMainBuffer->pScroll->pBack,
-		s_pMainBuffer->pScroll->uwBmAvailHeight
+		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
+		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	vehicleCreate();
+	systemUnuse();
+
+	s_isDebug = 0;
+	tileBufferInitialDraw(g_pMainBuffer);
 
   // Load the view
-	tileBufferInitialDraw(s_pMainBuffer);
   viewLoad(s_pView);
 }
 
@@ -98,13 +103,20 @@ static void gameProcessInput(void) {
 }
 
 void gameGsLoop(void) {
-	g_pCustom->color[0] = 0x800;
   if(keyCheck(KEY_ESCAPE)) {
     gameClose();
 		return;
   }
+	if(keyUse(KEY_B)) {
+		s_isDebug = !s_isDebug;
+	}
+
+	if(s_isDebug) {
+		g_pCustom->color[0] = 0x008;
+	}
 
 	bobNewBegin();
+	tileBufferQueueProcess(g_pMainBuffer);
 	gameProcessInput();
 	vehicleProcess();
 	hudSetDepth(g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_HEIGHT);
@@ -113,10 +125,13 @@ void gameGsLoop(void) {
 	hudUpdate();
 
 	cameraCenterAt(
-		s_pMainBuffer->pCamera,
+		g_pMainBuffer->pCamera,
 		g_sVehicle.sBob.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 		g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_WIDTH/2
 	);
+	if(s_isDebug) {
+		g_pCustom->color[0] = 0x800;
+	}
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
 	g_pCustom->color[0] = 0x000;
