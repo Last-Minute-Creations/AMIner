@@ -34,6 +34,8 @@ void vehicleMove(BYTE bDirX, BYTE bDirY) {
 }
 
 void vehicleProcess(void) {
+	UBYTE isOnGround = 0;
+	// Limit X movement
 	g_sVehicle.sBob.sPos.sUwCoord.uwX = CLAMP(
 		g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sSteer.bX * 2,
 		0, 320 - g_sVehicle.sBob.uwWidth
@@ -49,7 +51,19 @@ void vehicleProcess(void) {
 			0, g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sSteer.bY * 2
 		);
 	}
-	else if(g_sVehicle.sSteer.bY > 0) {
+	else {
+		if(!g_pMainBuffer->pTileData[uwTileCenter][uwTileBottom]) {
+			// Gravity
+			g_sVehicle.sBob.sPos.sUwCoord.uwY += 2;
+		}
+		else {
+			// Collision with ground
+			isOnGround = 1;
+			g_sVehicle.sBob.sPos.sUwCoord.uwY = (uwTileBottom << 5) - g_sVehicle.sBob.uwHeight;
+		}
+	}
+
+	if(isOnGround && g_sVehicle.sSteer.bY > 0) {
 		// Drilling
 		if(g_pMainBuffer->pTileData[uwTileCenter][uwTileBottom]) {
 			// Move to center of closer tile
@@ -57,17 +71,6 @@ void vehicleProcess(void) {
 			g_pMainBuffer->pTileData[uwTileCenter][uwTileBottom] = 0;
 			tileBufferInvalidateTile(g_pMainBuffer, uwTileCenter, uwTileBottom);
 			g_sVehicle.sBob.sPos.sUwCoord.uwY += 16;
-		}
-	}
-	else {
-		// Gravity
-		if(
-			!g_pMainBuffer->pTileData[uwTileCenter][uwTileBottom]
-		) {
-			g_sVehicle.sBob.sPos.sUwCoord.uwY += 2;
-		}
-		else {
-			g_sVehicle.sBob.sPos.sUwCoord.uwY = (uwTileBottom << 5) - g_sVehicle.sBob.uwHeight;
 		}
 	}
 	bobNewPush(&g_sVehicle.sBob);
