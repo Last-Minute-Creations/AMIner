@@ -41,9 +41,25 @@ void vehicleProcess(void) {
 		0, 320 - g_sVehicle.sBob.uwWidth
 	);
 
+	UWORD uwCenterX = g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sBob.uwWidth / 2;
 	UWORD uwTileBottom = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight) >> 5;
-	UWORD uwTileMid = uwTileBottom-1;
-	UWORD uwTileCenter = (g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sBob.uwWidth/2) >> 5;
+	UWORD uwTileMid = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight /2) >> 5;
+	UWORD uwTileCenter = uwCenterX >> 5;
+	UBYTE isTouchingLeft = 0, isTouchingRight = 0;
+	UWORD uwTileLeft = (uwCenterX - 1) >> 5;
+	UWORD uwTileRight = (uwCenterX + 2) >> 5;
+
+	if(g_sVehicle.sSteer.bX) {
+		if(g_pMainBuffer->pTileData[uwTileLeft][uwTileMid]) {
+			g_sVehicle.sBob.sPos.sUwCoord.uwX = uwCenterX - g_sVehicle.sBob.uwWidth / 2 + 2;
+			isTouchingLeft = 1;
+		}
+		else if(g_pMainBuffer->pTileData[uwTileRight][uwTileMid]) {
+			g_sVehicle.sBob.sPos.sUwCoord.uwX = uwCenterX - g_sVehicle.sBob.uwWidth / 2 - 2;
+			isTouchingRight = 1;
+		}
+	}
+
 	if(g_sVehicle.sSteer.bY < 0) {
 		UWORD uwTileTop = (g_sVehicle.sBob.sPos.sUwCoord.uwY - 1) >> 5;
 		// Flying
@@ -66,32 +82,27 @@ void vehicleProcess(void) {
 		}
 	}
 
-	if(g_sVehicle.sSteer.bX) {
-		UWORD uwTileLeft = (g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sBob.uwWidth / 2 - 1) >> 5;
-		UWORD uwTileRight = (g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sBob.uwWidth / 2 + 1) >> 5;
-		if(g_sVehicle.sSteer.bX < 0 && g_pMainBuffer->pTileData[uwTileLeft][uwTileMid]) {
-			g_sVehicle.sBob.sPos.sUwCoord.uwX = (uwTileLeft << 5) + g_sVehicle.sBob.uwWidth / 2 + 2;
-		}
-		else if(g_pMainBuffer->pTileData[uwTileRight][uwTileMid]) {
-			g_sVehicle.sBob.sPos.sUwCoord.uwX = (uwTileRight << 5) - g_sVehicle.sBob.uwWidth / 2 - 4;
-		}
-	}
-
 	if(isOnGround) {
-		if(g_sVehicle.sSteer.bX && g_pMainBuffer->pTileData[uwTileCenter][uwTileMid]) {
-			// Drilling horizontal
-			g_pMainBuffer->pTileData[uwTileCenter][uwTileMid] = 0;
-			tileBufferInvalidateTile(g_pMainBuffer, uwTileCenter, uwTileMid);
+		if(g_sVehicle.sSteer.bX > 0 && isTouchingRight) {
+			// Drilling right
+			g_pMainBuffer->pTileData[uwTileRight][uwTileMid] = 0;
+			tileBufferInvalidateTile(g_pMainBuffer, uwTileRight, uwTileMid);
 		}
-		else if(g_sVehicle.sSteer.bY > 0) {
+		else if(g_sVehicle.sSteer.bX < 0 && isTouchingLeft) {
+			// Drilling left
+			g_pMainBuffer->pTileData[uwTileLeft][uwTileMid] = 0;
+			tileBufferInvalidateTile(g_pMainBuffer, uwTileLeft, uwTileMid);
+		}
+		else if(
+			g_sVehicle.sSteer.bY > 0 &&
+			g_pMainBuffer->pTileData[uwTileCenter][uwTileBottom]
+		) {
 			// Drilling down
-			if(g_pMainBuffer->pTileData[uwTileCenter][uwTileBottom]) {
-				// Move to center of closer tile
-				g_sVehicle.sBob.sPos.sUwCoord.uwX = uwTileCenter << 5;
-				g_pMainBuffer->pTileData[uwTileCenter][uwTileBottom] = 0;
-				tileBufferInvalidateTile(g_pMainBuffer, uwTileCenter, uwTileBottom);
-				g_sVehicle.sBob.sPos.sUwCoord.uwY += 16;
-			}
+			// Move to center of tile
+			g_sVehicle.sBob.sPos.sUwCoord.uwX = uwTileCenter << 5;
+			g_pMainBuffer->pTileData[uwTileCenter][uwTileBottom] = 0;
+			tileBufferInvalidateTile(g_pMainBuffer, uwTileCenter, uwTileBottom);
+			g_sVehicle.sBob.sPos.sUwCoord.uwY += 16;
 		}
 	}
 	bobNewPush(&g_sVehicle.sBob);
