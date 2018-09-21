@@ -22,13 +22,14 @@ tTileBufferManager *g_pMainBuffer;
 static tBitMap *s_pTiles;
 
 #define TILE_NONE 0
-#define TILE_ROCK 1
-#define TILE_GOLD 2
-#define TILE_COPPER 3
-#define TILE_COAL 4
-#define TILE_DIAMOND 5
-#define TILE_RUBY 6
-#define TILE_DIRT 7
+#define TILE_ROCK_1 1
+#define TILE_ROCK_2 2
+#define TILE_STONE_1 3
+#define TILE_STONE_2 4
+#define TILE_GOLD_1 5
+#define TILE_GOLD_2 6
+#define TILE_GOLD_3 7
+#define TILE_GOLD_4 8
 
 static UBYTE s_isDebug = 0;
 
@@ -64,9 +65,17 @@ void gameGsCreate(void) {
 	for(UWORD x = 0; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
 		g_pMainBuffer->pTileData[x][0] = TILE_NONE;
 		g_pMainBuffer->pTileData[x][1] = TILE_NONE;
-		g_pMainBuffer->pTileData[x][2] = TILE_DIRT;
+		g_pMainBuffer->pTileData[x][2] = TILE_NONE;
 		for(UWORD y = 3; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
-			g_pMainBuffer->pTileData[x][y] = TILE_ROCK;
+			if(ubRandMax(100) < 10) {
+				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_GOLD_1, TILE_GOLD_4);
+			}
+			else if(ubRandMax(100) < 5) {
+				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_2);
+			}
+			else {
+				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_ROCK_1, TILE_ROCK_2);
+			}
 		}
 	}
 
