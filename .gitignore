@@ -1,7 +1,10 @@
 
 aminer
+_res/placeholders
 
 build/
+data/*
+!data/silkscreen5.fnt
 
 *.log
 

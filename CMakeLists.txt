@@ -27,14 +27,69 @@ if(ACE_DEBUG)
 endif()
 
 # ACE
-# If you cloned ACE into subdirectory, e.g. to `deps/ace` folder, use following:
 add_subdirectory(deps/ace ace)
 include_directories(deps/ace/include)
-# If you installed ACE, use following:
-# find_package(ace REQUIRED)
-# include_directories(${ace_INCLUDE_DIRS})
 
 # Linux/other UNIX get a lower-case binary name
 set(TARGET_NAME ${PROJECT_NAME_LOWER})
 add_executable(${TARGET_NAME} ${SOURCES} ${HEADERS})
 target_link_libraries(${TARGET_NAME} ace)
+
+# Palette
+SET(data_path "${CMAKE_CURRENT_SOURCE_DIR}/data")
+file(MAKE_DIRECTORY ${data_path})
+SET(TOOLS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/ace/tools")
+SET(PALETTE_CONV "${TOOLS_PATH}/palette_conv/palette_conv")
+SET(BITMAP_CONV "${TOOLS_PATH}/bitmap_conv/bitmap_conv")
+
+file(GLOB palette_gimp _res/aminer.gpl)
+set(palette_plt data/aminer.plt)
+add_custom_command(
+	OUTPUT ${palette_plt}
+	COMMAND ${PALETTE_CONV}
+		${palette_gimp}
+		${palette_plt}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	DEPENDS ${palette_gimp}
+)
+target_sources(${TARGET_NAME} PUBLIC ${palette_plt})
+
+# Non-alpha bitmaps
+file(GLOB bitmaps _res/tiles.png)
+foreach(bitmap_path ${bitmaps}) # /path/file.png
+	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png
+	STRING(REPLACE ".png" ".bm" bitmap_file_bm ${bitmap_file_png}) # file.bm
+	SET(bitmap_out_name "${data_path}/${bitmap_file_bm}") # data/file.bm
+	add_custom_command(
+		OUTPUT ${bitmap_out_name}
+		COMMAND ${BITMAP_CONV}
+			${palette_plt}
+			${bitmap_path}
+			-o ${bitmap_out_name} -i
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		DEPENDS ${bitmap_path} ${palette_plt}
+	)
+	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name})
+endforeach()
+
+# Alpha bitmaps
+file(GLOB bitmaps _res/drill.png)
+set(color_transparent "\\#993399")
+foreach(bitmap_path ${bitmaps}) # /path/file.png
+	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png
+	STRING(REPLACE ".png" ".bm" bitmap_file_bm ${bitmap_file_png}) # file.bm
+	STRING(REPLACE ".png" "_mask.bm" bitmap_file_mask ${bitmap_file_png}) # file.bm
+	SET(bitmap_out_name "${data_path}/${bitmap_file_bm}") # data/file.bm
+	SET(bitmap_out_mask "${data_path}/${bitmap_file_mask}") # data/file.bm
+	add_custom_command(
+		OUTPUT ${bitmap_out_name} ${bitmap_out_mask}
+		COMMAND ${BITMAP_CONV}
+			${palette_plt}
+			${bitmap_path}
+			-o ${bitmap_out_name} -i -mc ${color_transparent}
+			-mo ${bitmap_out_mask}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		DEPENDS ${bitmap_path} ${palette_plt}
+	)
+	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name} ${bitmap_out_mask})
+endforeach()
