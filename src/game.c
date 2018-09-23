@@ -15,6 +15,8 @@
 #include "vehicle.h"
 #include "hud.h"
 #include "tile.h"
+#include "window.h"
+#include "vendor.h"
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
@@ -57,6 +59,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
+	windowInit();
 	vehicleCreate();
 	systemUnuse();
 
@@ -92,6 +95,10 @@ void gameGsLoop(void) {
 	if(keyUse(KEY_B)) {
 		s_isDebug = !s_isDebug;
 	}
+	if(keyUse(KEY_L)) {
+		gamePushState(vendorGsCreate, vendorGsLoop, vendorGsDestroy);
+		return;
+	}
 
 	if(s_isDebug) {
 		g_pCustom->color[0] = 0x008;
@@ -108,8 +115,8 @@ void gameGsLoop(void) {
 
 	cameraCenterAt(
 		g_pMainBuffer->pCamera,
-		g_sVehicle.sBob.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
-		g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_WIDTH/2
+		g_sVehicle.sBob.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2,
+		g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_HEIGHT / 2
 	);
 	if(s_isDebug) {
 		g_pCustom->color[0] = 0x800;
@@ -126,6 +133,7 @@ void gameGsDestroy(void) {
 
 	bitmapDestroy(s_pTiles);
 	vehicleDestroy();
+	windowDeinit();
 	bobNewManagerDestroy();
 
   hudDestroy();
