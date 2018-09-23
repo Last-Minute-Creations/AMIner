@@ -61,10 +61,12 @@ void tileInit(void) {
 		g_pMainBuffer->pTileData[x][1] = TILE_NONE;
 		g_pMainBuffer->pTileData[x][2] = TILE_GRASS_1 + (x & 1);
 		for(UWORD y = 3; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
-			if(ubRandMax(100) < 10) {
+			UBYTE ubChance = (ubRand() * 100) / 255;
+			UBYTE ubChanceRock = CLAMP(y * 50 / 2000, 0, 50);
+			if(ubChance < 20) {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_GOLD_1, TILE_GOLD_4);
 			}
-			else if(ubRandMax(100) < 5) {
+			else if(ubChance < 20 + ubChanceRock) {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_2);
 			}
 			else {
