@@ -69,6 +69,9 @@ void tileInit(void) {
 			else if(ubChance < 20 + ubChanceRock) {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_2);
 			}
+			else if(ubChance < 20 + ubChanceRock + 5 && (!x || tileIsSolid(x-1,y)) && tileIsSolid(x,y-1)) {
+				g_pMainBuffer->pTileData[x][y] = TILE_CAVE_BG+15;
+			}
 			else {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_ROCK_1, TILE_ROCK_2);
 			}
@@ -77,7 +80,6 @@ void tileInit(void) {
 }
 
 void tileExcavate(UWORD uwX, UWORD uwY) {
-	logWrite("tileExcavate(%hu,%hu)\n", uwX, uwY);
 	UBYTE ubBg = TILE_CAVE_BG;
 
 	// up
