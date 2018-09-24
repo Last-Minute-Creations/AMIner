@@ -13,4 +13,6 @@ UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void tileInit(void);
 
+void tileExcavate(UWORD uwX, UWORD uwY);
+
 #endif // _TILE_H_

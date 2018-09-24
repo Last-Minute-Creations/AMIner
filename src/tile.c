@@ -15,7 +15,8 @@ typedef enum _tTile {
 	TILE_GRASS_LEFT,
 	TILE_GRASS_RIGHT,
 	TILE_GRASS_BOTH,
-	TILE_ROCK_1,
+	TILE_CAVE_BG,
+	TILE_ROCK_1 = TILE_CAVE_BG + 16,
 	TILE_ROCK_2,
 	TILE_STONE_1,
 	TILE_STONE_2,
@@ -25,7 +26,6 @@ typedef enum _tTile {
 	TILE_GOLD_4
 } tTile;
 // TODO sapphire, emerald, topaz
-
 
 void tileRefreshGrass(UWORD uwX) {
 	UBYTE ubCurrTile = TILE_GRASS_NONE;
@@ -74,4 +74,46 @@ void tileInit(void) {
 			}
 		}
 	}
+}
+
+void tileExcavate(UWORD uwX, UWORD uwY) {
+	logWrite("tileExcavate(%hu,%hu)\n", uwX, uwY);
+	UBYTE ubBg = TILE_CAVE_BG;
+
+	// up
+	if(tileIsSolid(uwX, uwY-1)) {
+		ubBg += 1;
+	}
+	else {
+		g_pMainBuffer->pTileData[uwX][uwY-1] -= 2;
+		tileBufferInvalidateTile(g_pMainBuffer, uwX, uwY-1);
+	}
+
+	// down
+	if(tileIsSolid(uwX, uwY+1)) {
+		ubBg += 2;
+	}
+	else {
+		g_pMainBuffer->pTileData[uwX][uwY+1] -= 1;
+		tileBufferInvalidateTile(g_pMainBuffer, uwX, uwY+1);
+	}
+
+	// right
+	if(uwX >= 9 || tileIsSolid(uwX+1, uwY)) {
+		ubBg += 4;
+	}
+	else if(uwX < 9) {
+		g_pMainBuffer->pTileData[uwX+1][uwY] -= 8;
+		tileBufferInvalidateTile(g_pMainBuffer, uwX+1, uwY);
+	}
+
+	// left
+	if(!uwX || tileIsSolid(uwX-1, uwY)) {
+		ubBg += 8;
+	}
+	else if(uwX) {
+		g_pMainBuffer->pTileData[uwX-1][uwY] -= 4;
+		tileBufferInvalidateTile(g_pMainBuffer, uwX-1, uwY);
+	}
+	tileBufferSetTile(g_pMainBuffer, uwX, uwY, ubBg);
 }
