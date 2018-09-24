@@ -6,6 +6,7 @@
 #define _TILE_H_
 
 #include <ace/types.h>
+#include "vehicle.h"
 
 void tileRefreshGrass(UWORD uwX);
 
@@ -13,6 +14,6 @@ UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void tileInit(void);
 
-void tileExcavate(UWORD uwX, UWORD uwY);
+void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
 
 #endif // _TILE_H_

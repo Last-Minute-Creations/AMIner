@@ -14,6 +14,10 @@ void vehicleCreate(void) {
 		&g_sVehicle.sBob, VEHICLE_WIDTH, VEHICLE_HEIGHT, 1,
 		g_sVehicle.pFrames, g_sVehicle.pMask, 0, 0
 	);
+	g_sVehicle.ubPayloadCurr = 0;
+	g_sVehicle.ubPayloadMax = 10;
+	g_sVehicle.uwPayloadScore = 0;
+	g_sVehicle.ulScore = 0;
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -86,7 +90,7 @@ void vehicleProcess(void) {
 	if(isOnGround) {
 		if(g_sVehicle.sSteer.bX > 0 && isTouchingRight) {
 			// Drilling right
-			tileExcavate(uwTileRight, uwTileMid);
+			tileExcavate(&g_sVehicle, uwTileRight, uwTileMid);
 			if(uwTileMid == 3) {
 				// Drilling beneath a grass - refresh it
 				tileRefreshGrass(uwTileRight);
@@ -94,7 +98,7 @@ void vehicleProcess(void) {
 		}
 		else if(g_sVehicle.sSteer.bX < 0 && isTouchingLeft) {
 			// Drilling left
-			tileExcavate(uwTileLeft, uwTileMid);
+			tileExcavate(&g_sVehicle, uwTileLeft, uwTileMid);
 			if(uwTileMid == 3) {
 				// Drilling beneath a grass - refresh it
 				tileRefreshGrass(uwTileLeft);
@@ -106,7 +110,7 @@ void vehicleProcess(void) {
 			// Drilling down
 			// Move to center of tile
 			g_sVehicle.sBob.sPos.sUwCoord.uwX = uwTileCenter << 5;
-			tileExcavate(uwTileCenter, uwTileBottom);
+			tileExcavate(&g_sVehicle, uwTileCenter, uwTileBottom);
 			g_sVehicle.sBob.sPos.sUwCoord.uwY += 16;
 			if(uwTileBottom == 3) {
 				// Drilling beneath a grass - refresh it

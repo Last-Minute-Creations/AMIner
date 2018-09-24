@@ -79,7 +79,7 @@ void tileInit(void) {
 	}
 }
 
-void tileExcavate(UWORD uwX, UWORD uwY) {
+void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	UBYTE ubBg = TILE_CAVE_BG;
 
 	// up
@@ -117,5 +117,18 @@ void tileExcavate(UWORD uwX, UWORD uwY) {
 		g_pMainBuffer->pTileData[uwX-1][uwY] -= 4;
 		tileBufferInvalidateTile(g_pMainBuffer, uwX-1, uwY);
 	}
+
+	// Load stuff to vehicle
+	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
+	UBYTE ubScorePerSlot = 0;
+	UBYTE ubSlots = 0;
+	if(TILE_GOLD_1 <= ubTile && ubTile <= TILE_GOLD_4) {
+		ubScorePerSlot = 5;
+		ubSlots = (ubTile == TILE_GOLD_4 ? 5 : ubTile - TILE_GOLD_1 + 1);
+	}
+	ubSlots = MIN(ubSlots, pVehicle->ubPayloadMax - pVehicle->ubPayloadCurr);
+	pVehicle->ulScore += ubScorePerSlot * ubSlots;
+	// pVehicle->ubPayloadCurr += ubSlots;
+
 	tileBufferSetTile(g_pMainBuffer, uwX, uwY, ubBg);
 }

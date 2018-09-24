@@ -14,6 +14,8 @@ typedef enum _tHudDraw {
 	HUD_DRAW_FUEL,
 	HUD_PREPARE_HEALTH,
 	HUD_DRAW_HEALTH,
+	HUD_PREPARE_SCORE,
+	HUD_DRAW_SCORE,
 	HUD_DRAW_END
 } tHudDraw;
 
@@ -23,6 +25,7 @@ static tFont *s_pFont;
 static tTextBitMap *s_pLinebuffer;
 
 static UWORD s_uwDepth, s_uwOldDepth;
+static ULONG s_ulScore, s_ulOldScore;
 
 tHudDraw s_eDraw;
 
@@ -49,6 +52,8 @@ void hudCreate(tView *pView) {
 
 	s_uwOldDepth = 0xFFFF;
 	s_uwDepth = 0;
+	s_ulOldScore = 0xFFFFFFFF;
+	s_ulScore = 0;
 	s_eDraw = 0;
 }
 
@@ -56,16 +61,18 @@ void hudSetDepth(UWORD uwDepth) {
 	s_uwDepth = uwDepth;
 }
 
+void hudSetScore(ULONG ulScore) {
+	s_ulScore = ulScore;
+}
+
 void hudUpdate(void) {
 	char szBfr[20];
-	static UBYTE isDepthPrepared = 0;
 	switch(s_eDraw) {
 		case HUD_PREPARE_DEPTH:{
 			if(s_uwDepth != s_uwOldDepth) {
 				sprintf(szBfr, "Depth: %5u", s_uwDepth);
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
 				s_uwOldDepth = s_uwDepth;
-				isDepthPrepared = 1;
 			}
 			else {
 				// Skip drawing
@@ -73,12 +80,9 @@ void hudUpdate(void) {
 			}
 		} break;
 		case HUD_DRAW_DEPTH: {
-			if(isDepthPrepared) {
-				fontDrawTextBitMap(
-					s_pHudBuffer->pBack, s_pLinebuffer, 0, 0, 15, FONT_LAZY
-				);
-				isDepthPrepared = 0;
-			}
+			fontDrawTextBitMap(
+				s_pHudBuffer->pBack, s_pLinebuffer, 0, 0, 15, FONT_LAZY
+			);
 		} break;
 		case HUD_PREPARE_FUEL: {
 			if(0) {
@@ -103,6 +107,22 @@ void hudUpdate(void) {
 		} break;
 		case HUD_DRAW_HEALTH: {
 
+		} break;
+		case HUD_PREPARE_SCORE: {
+			if(s_ulScore != s_ulOldScore) {
+				sprintf(szBfr, "Score: %5u", s_ulScore);
+				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
+				s_uwOldDepth = s_uwDepth;
+			}
+			else {
+				// Skip drawing
+				++s_eDraw;
+			}
+		} break;
+		case HUD_DRAW_SCORE: {
+			fontDrawTextBitMap(
+				s_pHudBuffer->pBack, s_pLinebuffer, 0, 8, 15, FONT_LAZY
+			);
 		} break;
 		default: {
 

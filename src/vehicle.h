@@ -16,6 +16,10 @@ typedef struct _tVehicle {
 	tBobNew sBob;
 	tBitMap *pFrames;
 	tBitMap *pMask;
+	UBYTE ubPayloadMax;
+	UBYTE ubPayloadCurr;
+	UWORD uwPayloadScore;
+	ULONG ulScore;
 } tVehicle;
 
 void vehicleCreate(void);

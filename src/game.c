@@ -109,6 +109,7 @@ void gameGsLoop(void) {
 	gameProcessInput();
 	vehicleProcess();
 	hudSetDepth(g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_HEIGHT);
+	hudSetScore(g_sVehicle.ulScore);
 	bobNewPushingDone();
 	bobNewEnd();
 	hudUpdate();
