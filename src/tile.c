@@ -29,22 +29,22 @@ typedef enum _tTile {
 
 void tileRefreshGrass(UWORD uwX) {
 	UBYTE ubCurrTile = TILE_GRASS_NONE;
-	if(!uwX || g_pMainBuffer->pTileData[uwX-1][2] <= TILE_GRASS_2) {
+	if(!uwX || g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
 		ubCurrTile += 1; // Promote to TILE_GRASS_LEFT
 	}
 	else if(uwX){
 		// left neighbor is _RIGHT or _BOTH - decrease to _NONE or _LEFT
 		tileBufferSetTile(
-			g_pMainBuffer, uwX-1, 2, g_pMainBuffer->pTileData[uwX-1][2] - 2
+			g_pMainBuffer, uwX-1, 2, g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] - 2
 		);
 	}
-	if(uwX >= 9 || g_pMainBuffer->pTileData[uwX+1][2] <= TILE_GRASS_2) {
+	if(uwX >= 9 || g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
 		ubCurrTile += 2; // Promote to TILE_GRASS_RIGHT or _BOTH
 	}
 	else if(uwX < 9) {
 		// right neighbor is _LEFT or _BOTH - decrease to _NONE or _RIGHT
 		tileBufferSetTile(
-			g_pMainBuffer, uwX+1, 2, g_pMainBuffer->pTileData[uwX+1][2] - 1
+			g_pMainBuffer, uwX+1, 2, g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] - 1
 		);
 	}
 
@@ -70,7 +70,10 @@ void tileInit(void) {
 			else if(ubChance < 20 + ubChanceRock) {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_2);
 			}
-			else if(ubChance < 20 + ubChanceRock + 5 && (!x || tileIsSolid(x-1,y)) && tileIsSolid(x,y-1)) {
+			else if(
+				ubChance < 20 + ubChanceRock + 5 &&
+				(!x || tileIsSolid(x-1,y)) && tileIsSolid(x,y-1)
+			) {
 				g_pMainBuffer->pTileData[x][y] = TILE_CAVE_BG+15;
 			}
 			else {

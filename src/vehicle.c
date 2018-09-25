@@ -46,22 +46,23 @@ void vehicleProcess(void) {
 		0, 320 - g_sVehicle.sBob.uwWidth
 	);
 	UBYTE ubAdd = g_sVehicle.sBob.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32 ? 4 : 8;
+	UBYTE ubHalfWidth = 12;
 
 	UWORD uwCenterX = g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sBob.uwWidth / 2;
 	UWORD uwTileBottom = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight + ubAdd) >> 5;
 	UWORD uwTileMid = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight /2) >> 5;
 	UWORD uwTileCenter = uwCenterX >> 5;
 	UBYTE isTouchingLeft = 0, isTouchingRight = 0;
-	UWORD uwTileLeft = (uwCenterX - 1) >> 5;
-	UWORD uwTileRight = (uwCenterX + 2) >> 5;
+	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> 5;
+	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> 5;
 
 	if(g_sVehicle.sSteer.bX) {
 		if(tileIsSolid(uwTileLeft, uwTileMid)) {
-			g_sVehicle.sBob.sPos.sUwCoord.uwX = uwCenterX - g_sVehicle.sBob.uwWidth / 2 + 2;
+			g_sVehicle.sBob.sPos.sUwCoord.uwX = ((uwTileLeft+1) << 5) - g_sVehicle.sBob.uwWidth / 2 + ubHalfWidth;
 			isTouchingLeft = 1;
 		}
 		else if(tileIsSolid(uwTileRight, uwTileMid)) {
-			g_sVehicle.sBob.sPos.sUwCoord.uwX = uwCenterX - g_sVehicle.sBob.uwWidth / 2 - 2;
+			g_sVehicle.sBob.sPos.sUwCoord.uwX = (uwTileRight << 5) - g_sVehicle.sBob.uwWidth / 2 - ubHalfWidth;
 			isTouchingRight = 1;
 		}
 	}
