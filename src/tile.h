@@ -8,6 +8,8 @@
 #include <ace/types.h>
 #include "vehicle.h"
 
+#define TILE_ROW_GRASS 2
+
 void tileRefreshGrass(UWORD uwX);
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);

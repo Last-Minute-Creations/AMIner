@@ -45,9 +45,10 @@ void vehicleProcess(void) {
 		g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sSteer.bX * 2,
 		0, 320 - g_sVehicle.sBob.uwWidth
 	);
+	UBYTE ubAdd = g_sVehicle.sBob.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32 ? 4 : 8;
 
 	UWORD uwCenterX = g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sBob.uwWidth / 2;
-	UWORD uwTileBottom = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight) >> 5;
+	UWORD uwTileBottom = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight + ubAdd) >> 5;
 	UWORD uwTileMid = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight /2) >> 5;
 	UWORD uwTileCenter = uwCenterX >> 5;
 	UBYTE isTouchingLeft = 0, isTouchingRight = 0;
@@ -83,7 +84,7 @@ void vehicleProcess(void) {
 		else {
 			// Collision with ground
 			isOnGround = 1;
-			g_sVehicle.sBob.sPos.sUwCoord.uwY = (uwTileBottom << 5) - g_sVehicle.sBob.uwHeight;
+			g_sVehicle.sBob.sPos.sUwCoord.uwY = (uwTileBottom << 5) - g_sVehicle.sBob.uwHeight - ubAdd;
 		}
 	}
 

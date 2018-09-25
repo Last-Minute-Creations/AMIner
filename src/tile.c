@@ -57,10 +57,11 @@ UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
 
 void tileInit(void) {
 	for(UWORD x = 0; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
-		g_pMainBuffer->pTileData[x][0] = TILE_NONE;
-		g_pMainBuffer->pTileData[x][1] = TILE_NONE;
-		g_pMainBuffer->pTileData[x][2] = TILE_GRASS_1 + (x & 1);
-		for(UWORD y = 3; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
+		for(UWORD y = 0; y < TILE_ROW_GRASS; ++y) {
+			g_pMainBuffer->pTileData[x][y] = TILE_NONE;
+		}
+		g_pMainBuffer->pTileData[x][TILE_ROW_GRASS] = TILE_GRASS_1 + (x & 1);
+		for(UWORD y = TILE_ROW_GRASS + 1; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
 			UBYTE ubChance = (ubRand() * 100) / 255;
 			UBYTE ubChanceRock = CLAMP(y * 50 / 2000, 0, 50);
 			if(ubChance < 20) {
