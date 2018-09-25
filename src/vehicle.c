@@ -18,6 +18,10 @@ void vehicleCreate(void) {
 	g_sVehicle.ubPayloadMax = 10;
 	g_sVehicle.uwPayloadScore = 0;
 	g_sVehicle.ulScore = 0;
+	g_sVehicle.fX = 0;
+	g_sVehicle.fY = 0;
+	g_sVehicle.fDx = 0;
+	g_sVehicle.fDy = 0;
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -40,11 +44,27 @@ void vehicleMove(BYTE bDirX, BYTE bDirY) {
 
 void vehicleProcess(void) {
 	UBYTE isOnGround = 0;
+
+	if(g_sVehicle.sSteer.bX) {
+		if(g_sVehicle.sSteer.bX > 0) {
+			g_sVehicle.fDx = MIN(g_sVehicle.fDx + fix16_one/8, 4*fix16_one);
+		}
+		else {
+			g_sVehicle.fDx = MAX(g_sVehicle.fDx - fix16_one/8, -4*fix16_one);
+		}
+	}
+	else {
+		if(g_sVehicle.fDx > 0) {
+			g_sVehicle.fDx = MAX(0, g_sVehicle.fDx - fix16_one / 12);
+		}
+		else {
+			g_sVehicle.fDx = MIN(0, g_sVehicle.fDx + fix16_one / 12);
+		}
+	}
+
 	// Limit X movement
-	g_sVehicle.sBob.sPos.sUwCoord.uwX = CLAMP(
-		g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sSteer.bX * 2,
-		0, 320 - g_sVehicle.sBob.uwWidth
-	);
+	g_sVehicle.fX = CLAMP(g_sVehicle.fX + g_sVehicle.fDx, 0, fix16_one * (320 - g_sVehicle.sBob.uwWidth));
+	g_sVehicle.sBob.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
 	UBYTE ubAdd = g_sVehicle.sBob.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32 ? 4 : 8;
 	UBYTE ubHalfWidth = 12;
 
@@ -56,44 +76,50 @@ void vehicleProcess(void) {
 	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> 5;
 	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> 5;
 
-	if(g_sVehicle.sSteer.bX) {
-		if(tileIsSolid(uwTileLeft, uwTileMid)) {
-			g_sVehicle.sBob.sPos.sUwCoord.uwX = ((uwTileLeft+1) << 5) - g_sVehicle.sBob.uwWidth / 2 + ubHalfWidth;
-			isTouchingLeft = 1;
-		}
-		else if(tileIsSolid(uwTileRight, uwTileMid)) {
-			g_sVehicle.sBob.sPos.sUwCoord.uwX = (uwTileRight << 5) - g_sVehicle.sBob.uwWidth / 2 - ubHalfWidth;
-			isTouchingRight = 1;
-		}
+	if(tileIsSolid(uwTileLeft, uwTileMid)) {
+		g_sVehicle.fX = fix16_from_int(((uwTileLeft+1) << 5) - g_sVehicle.sBob.uwWidth / 2 + ubHalfWidth);
+		isTouchingLeft = 1;
+	}
+	else if(tileIsSolid(uwTileRight, uwTileMid)) {
+		g_sVehicle.fX = fix16_from_int((uwTileRight << 5) - g_sVehicle.sBob.uwWidth / 2 - ubHalfWidth);
+		isTouchingRight = 1;
 	}
 
 	if(g_sVehicle.sSteer.bY < 0) {
-		UWORD uwTileTop = (g_sVehicle.sBob.sPos.sUwCoord.uwY - 1) >> 5;
+		g_sVehicle.fDy = MAX(-3*fix16_one, g_sVehicle.fDy - fix16_one/12);
+	}
+	else {
+		g_sVehicle.fDy = MIN(4*fix16_one, g_sVehicle.fDy + fix16_one/8);
+	}
+
+	if(g_sVehicle.fDy < 0) {
+		UWORD uwTileTop = (fix16_to_int(g_sVehicle.fY) - 1) >> 5;
 		// Flying
-		g_sVehicle.sBob.sPos.sUwCoord.uwY = MAX(
-			0, g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sSteer.bY * 2
-		);
+		g_sVehicle.fY = MAX(0, g_sVehicle.fY + g_sVehicle.fDy);
 		if(tileIsSolid(uwTileCenter, uwTileTop)) {
-			g_sVehicle.sBob.sPos.sUwCoord.uwY = (uwTileTop+1) << 5;
+			g_sVehicle.fY = fix16_from_int((uwTileTop+1) << 5);
+			g_sVehicle.fDy = 0;
 		}
 	}
 	else {
 		if(!tileIsSolid(uwTileCenter, uwTileBottom)) {
 			// Gravity
-			g_sVehicle.sBob.sPos.sUwCoord.uwY += 2;
+			g_sVehicle.fY += g_sVehicle.fDy;
 		}
 		else {
 			// Collision with ground
 			isOnGround = 1;
-			g_sVehicle.sBob.sPos.sUwCoord.uwY = (uwTileBottom << 5) - g_sVehicle.sBob.uwHeight - ubAdd;
+			g_sVehicle.fY = fix16_from_int((uwTileBottom << 5) - g_sVehicle.sBob.uwHeight - ubAdd);
+			g_sVehicle.fDy = 0;
 		}
 	}
+	g_sVehicle.sBob.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 
 	if(isOnGround) {
 		if(g_sVehicle.sSteer.bX > 0 && isTouchingRight) {
 			// Drilling right
 			tileExcavate(&g_sVehicle, uwTileRight, uwTileMid);
-			if(uwTileMid == 3) {
+			if(uwTileMid == TILE_ROW_GRASS + 1) {
 				// Drilling beneath a grass - refresh it
 				tileRefreshGrass(uwTileRight);
 			}
@@ -101,7 +127,7 @@ void vehicleProcess(void) {
 		else if(g_sVehicle.sSteer.bX < 0 && isTouchingLeft) {
 			// Drilling left
 			tileExcavate(&g_sVehicle, uwTileLeft, uwTileMid);
-			if(uwTileMid == 3) {
+			if(uwTileMid == TILE_ROW_GRASS + 1) {
 				// Drilling beneath a grass - refresh it
 				tileRefreshGrass(uwTileLeft);
 			}
@@ -111,15 +137,14 @@ void vehicleProcess(void) {
 		) {
 			// Drilling down
 			// Move to center of tile
-			g_sVehicle.sBob.sPos.sUwCoord.uwX = uwTileCenter << 5;
+			g_sVehicle.fX = fix16_from_int(uwTileCenter << 5);
 			tileExcavate(&g_sVehicle, uwTileCenter, uwTileBottom);
-			g_sVehicle.sBob.sPos.sUwCoord.uwY += 16;
-			if(uwTileBottom == 3) {
+			g_sVehicle.fY += fix16_from_int(16);
+			if(uwTileBottom == TILE_ROW_GRASS + 1) {
 				// Drilling beneath a grass - refresh it
 				tileRefreshGrass(uwTileCenter);
 			}
 		}
-
 	}
 	bobNewPush(&g_sVehicle.sBob);
 }

@@ -6,6 +6,7 @@
 #define _VEHICLE_H_
 
 #include <ace/types.h>
+#include <fixmath/fix16.h>
 #include "bob_new.h"
 
 #define VEHICLE_WIDTH 32
@@ -16,6 +17,10 @@ typedef struct _tVehicle {
 	tBobNew sBob;
 	tBitMap *pFrames;
 	tBitMap *pMask;
+	fix16_t fX;
+	fix16_t fY;
+	fix16_t fDx;
+	fix16_t fDy;
 	UBYTE ubPayloadMax;
 	UBYTE ubPayloadCurr;
 	UWORD uwPayloadScore;
