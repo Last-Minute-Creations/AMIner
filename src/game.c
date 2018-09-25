@@ -24,6 +24,7 @@ tTileBufferManager *g_pMainBuffer;
 
 static tBitMap *s_pTiles;
 static UBYTE s_isDebug = 0;
+static UWORD s_uwColorBg;
 
 void gameGsCreate(void) {
   s_pView = viewCreate(0,
@@ -49,6 +50,7 @@ void gameGsCreate(void) {
   TAG_END);
 
 	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
+	s_uwColorBg = s_pVpMain->pPalette[0];
 
 	randInit(2184);
 
@@ -124,7 +126,7 @@ void gameGsLoop(void) {
 	}
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
-	g_pCustom->color[0] = 0x000;
+	g_pCustom->color[0] = s_uwColorBg;
 	vPortWaitForEnd(s_pVpMain);
 }
 
