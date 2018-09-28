@@ -57,12 +57,12 @@ void gameGsCreate(void) {
 	tileInit();
 
 	bobNewManagerCreate(
-		1, VEHICLE_HEIGHT * (VEHICLE_WIDTH/16 + 1),
-		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
+		1, g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	windowInit();
 	vehicleCreate();
+	bobNewAllocateBgBuffers();
 	systemUnuse();
 
 	s_isDebug = 0;
