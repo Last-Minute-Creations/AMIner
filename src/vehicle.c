@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "vehicle.h"
+#include <ace/managers/rand.h>
 #include "game.h"
 #include "tile.h"
 
@@ -22,6 +23,7 @@ void vehicleCreate(void) {
 	g_sVehicle.fY = 0;
 	g_sVehicle.fDx = 0;
 	g_sVehicle.fDy = 0;
+	g_sVehicle.ubDrillDir = 0;
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -42,7 +44,7 @@ void vehicleMove(BYTE bDirX, BYTE bDirY) {
 	}
 }
 
-void vehicleProcess(void) {
+static void vehicleProcessMovement(void) {
 	UBYTE isOnGround = 0;
 
 	if(g_sVehicle.sSteer.bX) {
@@ -117,34 +119,84 @@ void vehicleProcess(void) {
 
 	if(isOnGround) {
 		if(g_sVehicle.sSteer.bX > 0 && isTouchingRight) {
-			// Drilling right
-			tileExcavate(&g_sVehicle, uwTileRight, uwTileMid);
-			if(uwTileMid == TILE_ROW_GRASS + 1) {
-				// Drilling beneath a grass - refresh it
-				tileRefreshGrass(uwTileRight);
-			}
+			// Drill right
+			g_sVehicle.ubDrillDir = DRILL_DIR_H;
+			g_sVehicle.fDestX = fix16_from_int(uwTileRight << 5);
+			g_sVehicle.fDestY = g_sVehicle.fY;
 		}
 		else if(g_sVehicle.sSteer.bX < 0 && isTouchingLeft) {
 			// Drilling left
-			tileExcavate(&g_sVehicle, uwTileLeft, uwTileMid);
-			if(uwTileMid == TILE_ROW_GRASS + 1) {
-				// Drilling beneath a grass - refresh it
-				tileRefreshGrass(uwTileLeft);
-			}
+			g_sVehicle.ubDrillDir = DRILL_DIR_H;
+			g_sVehicle.fDestX = fix16_from_int(uwTileLeft << 5);
+			g_sVehicle.fDestY = g_sVehicle.fY;
 		}
 		else if(
 			g_sVehicle.sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom)
 		) {
-			// Drilling down
-			// Move to center of tile
-			g_sVehicle.fX = fix16_from_int(uwTileCenter << 5);
-			tileExcavate(&g_sVehicle, uwTileCenter, uwTileBottom);
-			g_sVehicle.fY += fix16_from_int(16);
-			if(uwTileBottom == TILE_ROW_GRASS + 1) {
-				// Drilling beneath a grass - refresh it
-				tileRefreshGrass(uwTileCenter);
-			}
+			// Drilling down - move X to center of tile
+			g_sVehicle.ubDrillDir = DRILL_DIR_V;
+			g_sVehicle.fDestX = fix16_from_int(uwTileCenter << 5);
+			g_sVehicle.fDestY = fix16_from_int(uwTileBottom << 5);
 		}
 	}
 	bobNewPush(&g_sVehicle.sBob);
+}
+
+static void vehicleProcessDrilling(void) {
+	const fix16_t fDelta = (fix16_one*3)/4;
+	UBYTE isDoneX = 0, isDoneY = 0;
+	if(fix16_abs(g_sVehicle.fX - g_sVehicle.fDestX) <= fDelta) {
+		g_sVehicle.fX = g_sVehicle.fDestX;
+		isDoneX = 1;
+	}
+	else if (g_sVehicle.fX < g_sVehicle.fDestX){
+		g_sVehicle.fX += fDelta;
+	}
+	else {
+		g_sVehicle.fX -= fDelta;
+	}
+
+	if(fix16_abs(g_sVehicle.fY - g_sVehicle.fDestY) <= fDelta) {
+		g_sVehicle.fY = g_sVehicle.fDestY;
+		isDoneY = 1;
+	}
+	else if (g_sVehicle.fY < g_sVehicle.fDestY){
+		g_sVehicle.fY += fDelta;
+	}
+	else {
+		g_sVehicle.fY -= fDelta;
+	}
+
+	if(isDoneX && isDoneY) {
+		g_sVehicle.ubDrillDir = DRILL_DIR_NONE;
+		// Center is on tile to excavate
+		UWORD uwTileX = (fix16_to_int(g_sVehicle.fX) + VEHICLE_WIDTH/2) >> 5;
+		UWORD uwTileY = (fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT/2) >> 5;
+
+		tileExcavate(&g_sVehicle, uwTileX, uwTileY);
+		if(uwTileY == TILE_ROW_GRASS + 1) {
+			// Drilling beneath a grass - refresh it
+			tileRefreshGrass(uwTileX);
+		}
+	}
+
+	g_sVehicle.sBob.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
+	g_sVehicle.sBob.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
+	if(g_sVehicle.ubDrillDir != DRILL_DIR_NONE) {
+		WORD wX = g_sVehicle.sBob.sPos.sUwCoord.uwX -2 + (ubRand() % 5);
+		g_sVehicle.sBob.sPos.sUwCoord.uwX = CLAMP(
+			wX, 0, 320 - VEHICLE_WIDTH
+		);
+		g_sVehicle.sBob.sPos.sUwCoord.uwY += -2 + (ubRand() % 5);
+	}
+	bobNewPush(&g_sVehicle.sBob);
+}
+
+void vehicleProcess(void) {
+	if(g_sVehicle.ubDrillDir) {
+		vehicleProcessDrilling();
+	}
+	else {
+		vehicleProcessMovement();
+	}
 }

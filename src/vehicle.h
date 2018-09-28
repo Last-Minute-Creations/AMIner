@@ -12,6 +12,12 @@
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 23
 
+typedef enum _tDrillDir {
+	DRILL_DIR_NONE = 0,
+	DRILL_DIR_H,
+	DRILL_DIR_V
+} tDrillDir;
+
 typedef struct _tVehicle {
 	tBCoordYX sSteer;
 	tBobNew sBob;
@@ -21,6 +27,9 @@ typedef struct _tVehicle {
 	fix16_t fY;
 	fix16_t fDx;
 	fix16_t fDy;
+	fix16_t fDestX;
+	fix16_t fDestY;
+	UBYTE ubDrillDir;
 	UBYTE ubPayloadMax;
 	UBYTE ubPayloadCurr;
 	UWORD uwPayloadScore;

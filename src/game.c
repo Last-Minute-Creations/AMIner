@@ -118,8 +118,8 @@ void gameGsLoop(void) {
 
 	cameraCenterAt(
 		g_pMainBuffer->pCamera,
-		g_sVehicle.sBob.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2,
-		g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_HEIGHT / 2
+		fix16_to_int(g_sVehicle.fX) + VEHICLE_WIDTH / 2,
+		fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT / 2
 	);
 	if(s_isDebug) {
 		g_pCustom->color[0] = 0x800;
