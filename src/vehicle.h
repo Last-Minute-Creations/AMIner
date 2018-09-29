@@ -36,6 +36,7 @@ typedef struct _tVehicle {
 	UBYTE ubJetShowFrame;
 	UBYTE ubJetAnimFrame;
 	UBYTE ubJetAnimCnt;
+	UBYTE ubToolAnimCnt;
 	UBYTE ubDrillDir;
 	UBYTE ubPayloadMax;
 	UBYTE ubPayloadCurr;

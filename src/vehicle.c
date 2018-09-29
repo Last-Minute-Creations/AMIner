@@ -67,6 +67,7 @@ void vehicleCreate(void) {
 	g_sVehicle.ubJetShowFrame = 0;
 	g_sVehicle.ubJetAnimFrame = 0;
 	g_sVehicle.ubJetAnimCnt = 0;
+	g_sVehicle.ubToolAnimCnt = 0;
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -249,6 +250,15 @@ static void vehicleProcessMovement(void) {
 		}
 	}
 	bobNewPush(&g_sVehicle.sBobBody);
+
+	// Tool
+	g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
+	if(!g_sVehicle.sBobBody.uwOffsetY) {
+		// Facing right
+		g_sVehicle.sBobTool.sPos.sUwCoord.uwX += 24;
+	}
+	bobNewSetBitMapOffset(&g_sVehicle.sBobTool, 0);
+	bobNewPush(&g_sVehicle.sBobTool);
 }
 
 static void vehicleProcessDrilling(void) {
@@ -292,19 +302,41 @@ static void vehicleProcessDrilling(void) {
 	g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
 	g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 	if(g_sVehicle.ubDrillDir != DRILL_DIR_NONE) {
-		WORD wX = g_sVehicle.sBobBody.sPos.sUwCoord.uwX -2 + (ubRand() % 5);
+		WORD wX = g_sVehicle.sBobBody.sPos.sUwCoord.uwX -2 + (ubRand() & 3);
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwX = CLAMP(
 			wX, 0, 320 - VEHICLE_WIDTH
 		);
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += -2 + (ubRand() % 5);
+		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += -2 + (ubRand() & 3);
 	}
 
-	g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 	g_sVehicle.sBobTrack.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
 	g_sVehicle.sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
 	bobNewPush(&g_sVehicle.sBobTrack);
 
 	bobNewPush(&g_sVehicle.sBobBody);
+
+	// Tool
+	g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
+	UBYTE ubAnim = 0;
+	++g_sVehicle.ubToolAnimCnt;
+	if(g_sVehicle.ubToolAnimCnt >= 4) {
+		g_sVehicle.ubToolAnimCnt = 0;
+	}
+	else if(g_sVehicle.ubToolAnimCnt >= 2) {
+		ubAnim = 1;
+	}
+	if(!g_sVehicle.sBobBody.uwOffsetY) {
+		// Facing right
+		g_sVehicle.sBobTool.sPos.sUwCoord.uwX += 24+3;
+		bobNewSetBitMapOffset(&g_sVehicle.sBobTool, (1+ubAnim)*VEHICLE_TOOL_HEIGHT);
+	}
+	else {
+		// Facing left
+		g_sVehicle.sBobTool.sPos.sUwCoord.uwX += -13+3;
+		bobNewSetBitMapOffset(&g_sVehicle.sBobTool, (3+ubAnim)*VEHICLE_TOOL_HEIGHT);
+	}
+	g_sVehicle.sBobTool.sPos.sUwCoord.uwY += 3;
+	bobNewPush(&g_sVehicle.sBobTool);
 }
 
 void vehicleProcess(void) {
