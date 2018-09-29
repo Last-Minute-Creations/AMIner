@@ -20,9 +20,10 @@ typedef enum _tDrillDir {
 
 typedef struct _tVehicle {
 	tBCoordYX sSteer;
-	tBobNew sBob;
-	tBitMap *pFrames;
-	tBitMap *pMask;
+	tBobNew sBobBody;
+	tBobNew sBobTrack;
+	tBobNew sBobJet;
+	tBobNew sBobTool;
 	fix16_t fX;
 	fix16_t fY;
 	fix16_t fDx;

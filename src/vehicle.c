@@ -7,14 +7,48 @@
 #include "game.h"
 #include "tile.h"
 
+#define VEHICLE_BODY_HEIGHT 18
+#define VEHICLE_TRACK_HEIGHT 5
+#define VEHICLE_JET_HEIGHT 7
+#define VEHICLE_TOOL_WIDTH 16
+#define VEHICLE_TOOL_HEIGHT 17
+
+tBitMap *s_pBodyFrames, *s_pBodyMask;
+tBitMap *s_pTrackFrames, *s_pTrackMask;
+tBitMap *s_pJetFrames, *s_pJetMask;
+tBitMap *s_pToolFrames, *s_pToolMask;
+
 void vehicleCreate(void) {
 	logBlockBegin("vehicleCreate()");
-	g_sVehicle.pFrames = bitmapCreateFromFile("data/drill.bm");
-	g_sVehicle.pMask = bitmapCreateFromFile("data/drill_mask.bm");
+	// Load gfx
+	s_pBodyFrames = bitmapCreateFromFile("data/drill.bm");
+	s_pBodyMask = bitmapCreateFromFile("data/drill_mask.bm");
+	s_pTrackFrames = bitmapCreateFromFile("data/track.bm");
+	s_pTrackMask = bitmapCreateFromFile("data/track_mask.bm");
+	s_pJetFrames = bitmapCreateFromFile("data/jet.bm");
+	s_pJetMask = bitmapCreateFromFile("data/jet_mask.bm");
+	s_pToolFrames = bitmapCreateFromFile("data/tool.bm");
+	s_pToolMask = bitmapCreateFromFile("data/tool_mask.bm");
+
+	// Setup bobs
 	bobNewInit(
-		&g_sVehicle.sBob, VEHICLE_WIDTH, VEHICLE_HEIGHT, 1,
-		g_sVehicle.pFrames, g_sVehicle.pMask, 0, 0
+		&g_sVehicle.sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
+		s_pBodyFrames, s_pBodyMask, 0, 0
 	);
+	bobNewInit(
+		&g_sVehicle.sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
+		s_pTrackFrames, s_pTrackMask, 0, 0
+	);
+	bobNewInit(
+		&g_sVehicle.sBobJet, VEHICLE_WIDTH, VEHICLE_JET_HEIGHT, 1,
+		s_pJetFrames, s_pJetMask, 0, 0
+	);
+	bobNewInit(
+		&g_sVehicle.sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
+		s_pToolFrames, s_pToolMask, 0, 0
+	);
+
+	// Initial values
 	g_sVehicle.ubPayloadCurr = 0;
 	g_sVehicle.ubPayloadMax = 10;
 	g_sVehicle.uwPayloadScore = 0;
@@ -24,12 +58,19 @@ void vehicleCreate(void) {
 	g_sVehicle.fDx = 0;
 	g_sVehicle.fDy = 0;
 	g_sVehicle.ubDrillDir = 0;
+
 	logBlockEnd("vehicleCreate()");
 }
 
 void vehicleDestroy(void) {
-	bitmapDestroy(g_sVehicle.pFrames);
-	bitmapDestroy(g_sVehicle.pMask);
+	bitmapDestroy(s_pBodyFrames);
+	bitmapDestroy(s_pBodyMask);
+	bitmapDestroy(s_pTrackFrames);
+	bitmapDestroy(s_pTrackMask);
+	bitmapDestroy(s_pJetFrames);
+	bitmapDestroy(s_pJetMask);
+	bitmapDestroy(s_pToolFrames);
+	bitmapDestroy(s_pToolMask);
 }
 
 void vehicleMove(BYTE bDirX, BYTE bDirY) {
@@ -37,61 +78,69 @@ void vehicleMove(BYTE bDirX, BYTE bDirY) {
 	g_sVehicle.sSteer.bY = bDirY;
 
 	if(bDirX > 0) {
-		bobNewSetBitMapOffset(&g_sVehicle.sBob, 0);
+		bobNewSetBitMapOffset(&g_sVehicle.sBobBody, 0);
 	}
 	else if(bDirX < 0) {
-		bobNewSetBitMapOffset(&g_sVehicle.sBob, VEHICLE_HEIGHT);
+		bobNewSetBitMapOffset(&g_sVehicle.sBobBody, VEHICLE_BODY_HEIGHT);
 	}
 }
 
 static void vehicleProcessMovement(void) {
 	UBYTE isOnGround = 0;
+	const fix16_t fMaxDx = 4 * fix16_one;
+	const fix16_t fAccX = fix16_one / 8;
+	const fix16_t fFrictX = fix16_one / 12;
 
 	if(g_sVehicle.sSteer.bX) {
 		if(g_sVehicle.sSteer.bX > 0) {
-			g_sVehicle.fDx = MIN(g_sVehicle.fDx + fix16_one/8, 4*fix16_one);
+			g_sVehicle.fDx = MIN(g_sVehicle.fDx + fAccX, fMaxDx);
 		}
 		else {
-			g_sVehicle.fDx = MAX(g_sVehicle.fDx - fix16_one/8, -4*fix16_one);
+			g_sVehicle.fDx = MAX(g_sVehicle.fDx - fAccX, -fMaxDx);
 		}
 	}
 	else {
 		if(g_sVehicle.fDx > 0) {
-			g_sVehicle.fDx = MAX(0, g_sVehicle.fDx - fix16_one / 12);
+			g_sVehicle.fDx = MAX(0, g_sVehicle.fDx - fFrictX);
 		}
 		else {
-			g_sVehicle.fDx = MIN(0, g_sVehicle.fDx + fix16_one / 12);
+			g_sVehicle.fDx = MIN(0, g_sVehicle.fDx + fFrictX);
 		}
 	}
 
 	// Limit X movement
-	g_sVehicle.fX = CLAMP(g_sVehicle.fX + g_sVehicle.fDx, 0, fix16_one * (320 - g_sVehicle.sBob.uwWidth));
-	g_sVehicle.sBob.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
-	UBYTE ubAdd = g_sVehicle.sBob.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32 ? 4 : 8;
+	const fix16_t fMaxPosX = fix16_one * (320 - VEHICLE_WIDTH);
+	g_sVehicle.fX = CLAMP(g_sVehicle.fX + g_sVehicle.fDx, 0, fMaxPosX);
+	g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
+	UBYTE ubAdd = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32) ? 4 : 8;
 	UBYTE ubHalfWidth = 12;
 
-	UWORD uwCenterX = g_sVehicle.sBob.sPos.sUwCoord.uwX + g_sVehicle.sBob.uwWidth / 2;
-	UWORD uwTileBottom = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight + ubAdd) >> 5;
-	UWORD uwTileMid = (g_sVehicle.sBob.sPos.sUwCoord.uwY + g_sVehicle.sBob.uwHeight /2) >> 5;
+	UWORD uwCenterX = g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
+	UWORD uwTileBottom = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
+	UWORD uwTileMid = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT / 2) >> 5;
 	UWORD uwTileCenter = uwCenterX >> 5;
 	UBYTE isTouchingLeft = 0, isTouchingRight = 0;
 	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> 5;
 	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> 5;
 
 	if(tileIsSolid(uwTileLeft, uwTileMid)) {
-		g_sVehicle.fX = fix16_from_int(((uwTileLeft+1) << 5) - g_sVehicle.sBob.uwWidth / 2 + ubHalfWidth);
+		g_sVehicle.fX = fix16_from_int(((uwTileLeft+1) << 5) - VEHICLE_WIDTH / 2 + ubHalfWidth);
 		isTouchingLeft = 1;
 	}
 	else if(tileIsSolid(uwTileRight, uwTileMid)) {
-		g_sVehicle.fX = fix16_from_int((uwTileRight << 5) - g_sVehicle.sBob.uwWidth / 2 - ubHalfWidth);
+		g_sVehicle.fX = fix16_from_int((uwTileRight << 5) - VEHICLE_WIDTH / 2 - ubHalfWidth);
 		isTouchingRight = 1;
 	}
 
+	const fix16_t fMaxFlightDy = 3 * fix16_one;
+	const fix16_t fAccFlight = fix16_one / 12;
+	const fix16_t fMaxGravDy = 4 * fix16_one;
+	const fix16_t fAccGrav = fix16_one / 8;
 	if(g_sVehicle.sSteer.bY < 0) {
-		g_sVehicle.fDy = MAX(-3*fix16_one, g_sVehicle.fDy - fix16_one/12);
+		g_sVehicle.fDy = MAX(-fMaxFlightDy, g_sVehicle.fDy - fAccFlight);
 	}
 	else {
-		g_sVehicle.fDy = MIN(4*fix16_one, g_sVehicle.fDy + fix16_one/8);
+		g_sVehicle.fDy = MIN(fMaxGravDy, g_sVehicle.fDy + fAccGrav);
 	}
 
 	if(g_sVehicle.fDy < 0) {
@@ -111,21 +160,28 @@ static void vehicleProcessMovement(void) {
 		else {
 			// Collision with ground
 			isOnGround = 1;
-			g_sVehicle.fY = fix16_from_int((uwTileBottom << 5) - g_sVehicle.sBob.uwHeight - ubAdd);
+			g_sVehicle.fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
 			g_sVehicle.fDy = 0;
 		}
 	}
-	g_sVehicle.sBob.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 
+	// Update track bob
+	if(g_sVehicle.sSteer.bX) {
+
+	}
+	g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
+	g_sVehicle.sBobTrack.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
+	g_sVehicle.sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
+	bobNewPush(&g_sVehicle.sBobTrack);
+
+	// Drilling
 	if(isOnGround) {
 		if(g_sVehicle.sSteer.bX > 0 && isTouchingRight) {
-			// Drill right
 			g_sVehicle.ubDrillDir = DRILL_DIR_H;
 			g_sVehicle.fDestX = fix16_from_int(uwTileRight << 5);
 			g_sVehicle.fDestY = g_sVehicle.fY;
 		}
 		else if(g_sVehicle.sSteer.bX < 0 && isTouchingLeft) {
-			// Drilling left
 			g_sVehicle.ubDrillDir = DRILL_DIR_H;
 			g_sVehicle.fDestX = fix16_from_int(uwTileLeft << 5);
 			g_sVehicle.fDestY = g_sVehicle.fY;
@@ -133,13 +189,12 @@ static void vehicleProcessMovement(void) {
 		else if(
 			g_sVehicle.sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom)
 		) {
-			// Drilling down - move X to center of tile
 			g_sVehicle.ubDrillDir = DRILL_DIR_V;
 			g_sVehicle.fDestX = fix16_from_int(uwTileCenter << 5);
 			g_sVehicle.fDestY = fix16_from_int(uwTileBottom << 5);
 		}
 	}
-	bobNewPush(&g_sVehicle.sBob);
+	bobNewPush(&g_sVehicle.sBobBody);
 }
 
 static void vehicleProcessDrilling(void) {
@@ -180,16 +235,16 @@ static void vehicleProcessDrilling(void) {
 		}
 	}
 
-	g_sVehicle.sBob.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
-	g_sVehicle.sBob.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
+	g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
+	g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 	if(g_sVehicle.ubDrillDir != DRILL_DIR_NONE) {
-		WORD wX = g_sVehicle.sBob.sPos.sUwCoord.uwX -2 + (ubRand() % 5);
-		g_sVehicle.sBob.sPos.sUwCoord.uwX = CLAMP(
+		WORD wX = g_sVehicle.sBobBody.sPos.sUwCoord.uwX -2 + (ubRand() % 5);
+		g_sVehicle.sBobBody.sPos.sUwCoord.uwX = CLAMP(
 			wX, 0, 320 - VEHICLE_WIDTH
 		);
-		g_sVehicle.sBob.sPos.sUwCoord.uwY += -2 + (ubRand() % 5);
+		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += -2 + (ubRand() % 5);
 	}
-	bobNewPush(&g_sVehicle.sBob);
+	bobNewPush(&g_sVehicle.sBobBody);
 }
 
 void vehicleProcess(void) {

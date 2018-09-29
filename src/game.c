@@ -57,7 +57,7 @@ void gameGsCreate(void) {
 	tileInit();
 
 	bobNewManagerCreate(
-		1, g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
+		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	windowInit();
@@ -110,7 +110,7 @@ void gameGsLoop(void) {
 	tileBufferQueueProcess(g_pMainBuffer);
 	gameProcessInput();
 	vehicleProcess();
-	hudSetDepth(g_sVehicle.sBob.sPos.sUwCoord.uwY + VEHICLE_HEIGHT);
+	hudSetDepth(fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT);
 	hudSetScore(g_sVehicle.ulScore);
 	bobNewPushingDone();
 	bobNewEnd();

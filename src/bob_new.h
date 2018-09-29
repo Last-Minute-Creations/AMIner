@@ -22,10 +22,7 @@ typedef struct _tBobNew {
 	WORD _wModuloUndrawSave;
 } tBobNew;
 
-void bobNewManagerCreate(
-	UBYTE ubMaxBobCount,
-	tBitMap *pFront, tBitMap *pBack, UWORD uwAvailHeight
-);
+void bobNewManagerCreate(tBitMap *pFront, tBitMap *pBack, UWORD uwAvailHeight);
 
 void bobNewAllocateBgBuffers(void);
 
