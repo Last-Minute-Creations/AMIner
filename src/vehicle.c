@@ -59,6 +59,9 @@ void vehicleCreate(void) {
 	g_sVehicle.fDy = 0;
 	g_sVehicle.ubDrillDir = 0;
 
+	g_sVehicle.ubTrackAnimCnt = 0;
+	g_sVehicle.ubTrackFrame = 0;
+	g_sVehicle.ubBodyShakeCnt = 0;
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -74,6 +77,9 @@ void vehicleDestroy(void) {
 }
 
 void vehicleMove(BYTE bDirX, BYTE bDirY) {
+	if(g_sVehicle.ubDrillDir != DRILL_DIR_NONE) {
+		return;
+	}
 	g_sVehicle.sSteer.bX = bDirX;
 	g_sVehicle.sSteer.bY = bDirY;
 
@@ -125,10 +131,12 @@ static void vehicleProcessMovement(void) {
 
 	if(tileIsSolid(uwTileLeft, uwTileMid)) {
 		g_sVehicle.fX = fix16_from_int(((uwTileLeft+1) << 5) - VEHICLE_WIDTH / 2 + ubHalfWidth);
+		g_sVehicle.fDx = 0;
 		isTouchingLeft = 1;
 	}
 	else if(tileIsSolid(uwTileRight, uwTileMid)) {
 		g_sVehicle.fX = fix16_from_int((uwTileRight << 5) - VEHICLE_WIDTH / 2 - ubHalfWidth);
+		g_sVehicle.fDx = 0;
 		isTouchingRight = 1;
 	}
 
@@ -166,13 +174,27 @@ static void vehicleProcessMovement(void) {
 	}
 
 	// Update track bob
-	if(g_sVehicle.sSteer.bX) {
-
+	if(g_sVehicle.fDx) {
+		++g_sVehicle.ubTrackAnimCnt;
+		if(g_sVehicle.ubTrackAnimCnt >= (5 - fix16_to_int(fix16_abs(g_sVehicle.fDx)))) {
+			g_sVehicle.ubTrackFrame = !g_sVehicle.ubTrackFrame;
+			bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, g_sVehicle.ubTrackFrame * VEHICLE_TRACK_HEIGHT);
+			g_sVehicle.ubTrackAnimCnt = 0;
+		}
 	}
 	g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 	g_sVehicle.sBobTrack.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
 	g_sVehicle.sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
 	bobNewPush(&g_sVehicle.sBobTrack);
+
+	++g_sVehicle.ubBodyShakeCnt;
+	UBYTE ubShakeSpeed = (g_sVehicle.fDx ? 5 : 10);
+	if(g_sVehicle.ubBodyShakeCnt >= 2 * ubShakeSpeed) {
+		g_sVehicle.ubBodyShakeCnt = 0;
+	}
+	if(g_sVehicle.ubBodyShakeCnt >= ubShakeSpeed) {
+		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += 1;
+	}
 
 	// Drilling
 	if(isOnGround) {
@@ -244,6 +266,12 @@ static void vehicleProcessDrilling(void) {
 		);
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += -2 + (ubRand() % 5);
 	}
+
+	g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
+	g_sVehicle.sBobTrack.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
+	g_sVehicle.sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
+	bobNewPush(&g_sVehicle.sBobTrack);
+
 	bobNewPush(&g_sVehicle.sBobBody);
 }
 

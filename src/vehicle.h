@@ -30,6 +30,9 @@ typedef struct _tVehicle {
 	fix16_t fDy;
 	fix16_t fDestX;
 	fix16_t fDestY;
+	UBYTE ubTrackFrame;
+	UBYTE ubTrackAnimCnt;
+	UBYTE ubBodyShakeCnt;
 	UBYTE ubDrillDir;
 	UBYTE ubPayloadMax;
 	UBYTE ubPayloadCurr;
