@@ -18,6 +18,8 @@ tBitMap *s_pTrackFrames, *s_pTrackMask;
 tBitMap *s_pJetFrames, *s_pJetMask;
 tBitMap *s_pToolFrames, *s_pToolMask;
 
+UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {0,1,2,3,4,5,4,3,2,1,0};
+
 void vehicleCreate(void) {
 	logBlockBegin("vehicleCreate()");
 	// Load gfx
@@ -62,6 +64,9 @@ void vehicleCreate(void) {
 	g_sVehicle.ubTrackAnimCnt = 0;
 	g_sVehicle.ubTrackFrame = 0;
 	g_sVehicle.ubBodyShakeCnt = 0;
+	g_sVehicle.ubJetShowFrame = 0;
+	g_sVehicle.ubJetAnimFrame = 0;
+	g_sVehicle.ubJetAnimCnt = 0;
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -145,9 +150,17 @@ static void vehicleProcessMovement(void) {
 	const fix16_t fMaxGravDy = 4 * fix16_one;
 	const fix16_t fAccGrav = fix16_one / 8;
 	if(g_sVehicle.sSteer.bY < 0) {
-		g_sVehicle.fDy = MAX(-fMaxFlightDy, g_sVehicle.fDy - fAccFlight);
+		if(g_sVehicle.ubJetShowFrame == 10) {
+			g_sVehicle.fDy = MAX(-fMaxFlightDy, g_sVehicle.fDy - fAccFlight);
+		}
+		else {
+			++g_sVehicle.ubJetShowFrame;
+		}
 	}
 	else {
+		if(g_sVehicle.ubJetShowFrame) {
+			--g_sVehicle.ubJetShowFrame;
+		}
 		g_sVehicle.fDy = MIN(fMaxGravDy, g_sVehicle.fDy + fAccGrav);
 	}
 
@@ -174,27 +187,46 @@ static void vehicleProcessMovement(void) {
 	}
 
 	// Update track bob
-	if(g_sVehicle.fDx) {
-		++g_sVehicle.ubTrackAnimCnt;
-		if(g_sVehicle.ubTrackAnimCnt >= (5 - fix16_to_int(fix16_abs(g_sVehicle.fDx)))) {
-			g_sVehicle.ubTrackFrame = !g_sVehicle.ubTrackFrame;
-			bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, g_sVehicle.ubTrackFrame * VEHICLE_TRACK_HEIGHT);
-			g_sVehicle.ubTrackAnimCnt = 0;
-		}
-	}
 	g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 	g_sVehicle.sBobTrack.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
 	g_sVehicle.sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
-	bobNewPush(&g_sVehicle.sBobTrack);
+	if(g_sVehicle.ubJetShowFrame == 0) {
+		// Jet hidden
+		if(g_sVehicle.fDx) {
+			++g_sVehicle.ubTrackAnimCnt;
+			if(g_sVehicle.ubTrackAnimCnt >= (5 - fix16_to_int(fix16_abs(g_sVehicle.fDx)))) {
+				g_sVehicle.ubTrackFrame = !g_sVehicle.ubTrackFrame;
+				bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, g_sVehicle.ubTrackFrame * VEHICLE_TRACK_HEIGHT);
+				g_sVehicle.ubTrackAnimCnt = 0;
+			}
+		}
 
-	++g_sVehicle.ubBodyShakeCnt;
-	UBYTE ubShakeSpeed = (g_sVehicle.fDx ? 5 : 10);
-	if(g_sVehicle.ubBodyShakeCnt >= 2 * ubShakeSpeed) {
-		g_sVehicle.ubBodyShakeCnt = 0;
+		++g_sVehicle.ubBodyShakeCnt;
+		UBYTE ubShakeSpeed = (g_sVehicle.fDx ? 5 : 10);
+		if(g_sVehicle.ubBodyShakeCnt >= 2 * ubShakeSpeed) {
+			g_sVehicle.ubBodyShakeCnt = 0;
+		}
+		if(g_sVehicle.ubBodyShakeCnt >= ubShakeSpeed) {
+			g_sVehicle.sBobBody.sPos.sUwCoord.uwY += 1;
+		}
 	}
-	if(g_sVehicle.ubBodyShakeCnt >= ubShakeSpeed) {
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += 1;
+	else {
+		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += s_pJetAnimOffsets[g_sVehicle.ubJetShowFrame];
+		if(g_sVehicle.ubJetShowFrame == 5) {
+			bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, g_sVehicle.sSteer.bY ? 2*VEHICLE_TRACK_HEIGHT : 0);
+		}
+		else if(g_sVehicle.ubJetShowFrame == 10) {
+			// Update jet pos
+			g_sVehicle.ubJetAnimCnt = (g_sVehicle.ubJetAnimCnt + 1) & 15;
+			bobNewSetBitMapOffset(
+				&g_sVehicle.sBobJet, VEHICLE_JET_HEIGHT * (g_sVehicle.ubJetAnimCnt / 4)
+			);
+			g_sVehicle.sBobJet.sPos.ulYX = g_sVehicle.sBobTrack.sPos.ulYX;
+			g_sVehicle.sBobJet.sPos.sUwCoord.uwY += VEHICLE_TRACK_HEIGHT;
+			bobNewPush(&g_sVehicle.sBobJet);
+		}
 	}
+	bobNewPush(&g_sVehicle.sBobTrack);
 
 	// Drilling
 	if(isOnGround) {
