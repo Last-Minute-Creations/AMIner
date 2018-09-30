@@ -113,13 +113,15 @@ void hudUpdate(void) {
 		} break;
 		case HUD_DRAW_CARGO: {
 			if(s_ubOldCargo != s_ubCargo) {
-				UBYTE ubColor, ubDraw = s_ubOldCargo;
+				UBYTE ubColor, ubDraw;
 				if(s_ubCargo > s_ubOldCargo) {
+					ubDraw = s_ubOldCargo;
 					++s_ubOldCargo;
 					ubColor = COLOR_ACTIVE;
 				}
 				else {
 					--s_ubOldCargo;
+					ubDraw = s_ubOldCargo;
 					ubColor = COLOR_NACTIVE;
 				}
 				blitRect(

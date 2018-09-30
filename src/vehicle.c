@@ -4,6 +4,7 @@
 
 #include "vehicle.h"
 #include <ace/managers/rand.h>
+#include "hud.h"
 #include "game.h"
 #include "tile.h"
 
@@ -296,6 +297,18 @@ static void vehicleProcessMovement(void) {
 	g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
 	vehicleSetTool(TOOL_STATE_IDLE, 0);
 	bobNewPush(&g_sVehicle.sBobTool);
+
+	if(
+		7*32 <= g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
+		g_sVehicle.sBobBody.sPos.sUwCoord.uwX <= 9*32 + VEHICLE_HEIGHT/2 &&
+		1*32 <= g_sVehicle.sBobBody.sPos.sUwCoord.uwY &&
+		g_sVehicle.sBobBody.sPos.sUwCoord.uwY <= 3*32
+	) {
+		g_sVehicle.ubPayloadCurr = 0;
+		g_sVehicle.ulScore += g_sVehicle.uwPayloadScore;
+		g_sVehicle.uwPayloadScore = 0;
+		hudSetCargo(0);
+	}
 }
 
 static void vehicleProcessDrilling(void) {
