@@ -59,7 +59,7 @@ void vehicleCreate(void) {
 
 	// Initial values
 	g_sVehicle.ubPayloadCurr = 0;
-	g_sVehicle.ubPayloadMax = 10;
+	g_sVehicle.ubPayloadMax = 50;
 	g_sVehicle.uwPayloadScore = 0;
 	g_sVehicle.ulScore = 0;
 	g_sVehicle.fX = 0;

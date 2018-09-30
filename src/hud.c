@@ -6,14 +6,17 @@
 #include <ace/managers/viewport/simplebuffer.h>
 #include <ace/utils/font.h>
 #include <ace/utils/palette.h>
+#include <ace/utils/chunky.h>
+
+#define COLOR_ACTIVE 15
+#define COLOR_NACTIVE 4
 
 typedef enum _tHudDraw {
 	HUD_PREPARE_DEPTH,
 	HUD_DRAW_DEPTH,
-	HUD_PREPARE_FUEL,
 	HUD_DRAW_FUEL,
-	HUD_PREPARE_HEALTH,
 	HUD_DRAW_HEALTH,
+	HUD_DRAW_CARGO,
 	HUD_PREPARE_SCORE,
 	HUD_DRAW_SCORE,
 	HUD_DRAW_END
@@ -26,6 +29,7 @@ static tTextBitMap *s_pLinebuffer;
 
 static UWORD s_uwDepth, s_uwOldDepth;
 static ULONG s_ulScore, s_ulOldScore;
+static UBYTE s_ubCargo, s_ubOldCargo;
 
 tHudDraw s_eDraw;
 
@@ -46,14 +50,27 @@ void hudCreate(tView *pView) {
 	s_pFont = fontCreate("data/silkscreen5.fnt");
 	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, 5);
 
-	fontDrawStr(s_pHudBuffer->pBack, s_pFont, 80, 0, "Fuel:", 15, FONT_LAZY);
-	fontDrawStr(s_pHudBuffer->pBack, s_pFont, 200, 0, "Hull:", 15, FONT_LAZY);
-	blitLine(s_pHudBuffer->pBack, 0, 15, s_pVpHud->uwWidth, 15, 1, 0xF0F0, 0);
+	fontDrawStr(s_pHudBuffer->pBack, s_pFont, 65, 0, "Fuel:", COLOR_ACTIVE, FONT_LAZY);
+	fontDrawStr(s_pHudBuffer->pBack, s_pFont, 64, 8, "Hull:", COLOR_ACTIVE, FONT_LAZY);
+	fontDrawStr(s_pHudBuffer->pBack, s_pFont, 110, 0, "Cargo:", COLOR_ACTIVE, FONT_LAZY);
+
+	// Fuel inactive gauge
+	for(UBYTE i = 0; i < 30; ++i) {
+		chunkyToPlanar(COLOR_NACTIVE, 85 + 2 * (i % 10), 2 * (i / 10), s_pHudBuffer->pBack);
+	}
+	for(UBYTE i = 0; i < 30; ++i) {
+		chunkyToPlanar(COLOR_NACTIVE, 85 + 2 * (i % 10), 8 + 2 * (i / 10), s_pHudBuffer->pBack);
+	}
+	for(UBYTE i = 0; i < 50; ++i) {
+		blitRect(s_pHudBuffer->pBack, 138 + 3 * (i % 10), 3 * (i / 10), 2, 2, COLOR_NACTIVE);
+	}
 
 	s_uwOldDepth = 0xFFFF;
 	s_uwDepth = 0;
 	s_ulOldScore = 0xFFFFFFFF;
 	s_ulScore = 0;
+	s_ubOldCargo = 0;
+	s_ubCargo = 0;
 	s_eDraw = 0;
 }
 
@@ -63,6 +80,10 @@ void hudSetDepth(UWORD uwDepth) {
 
 void hudSetScore(ULONG ulScore) {
 	s_ulScore = ulScore;
+}
+
+void hudSetCargo(UBYTE ubCargo) {
+	s_ubCargo = ubCargo;
 }
 
 void hudUpdate(void) {
@@ -81,32 +102,31 @@ void hudUpdate(void) {
 		} break;
 		case HUD_DRAW_DEPTH: {
 			fontDrawTextBitMap(
-				s_pHudBuffer->pBack, s_pLinebuffer, 0, 0, 15, FONT_LAZY
+				s_pHudBuffer->pBack, s_pLinebuffer, 1, 0, COLOR_ACTIVE, FONT_LAZY
 			);
 		} break;
-		case HUD_PREPARE_FUEL: {
-			if(0) {
-
-			}
-			else {
-				// Skip drawing
-				++s_eDraw;
-			}
-		} break;
 		case HUD_DRAW_FUEL: {
-
-		} break;
-		case HUD_PREPARE_HEALTH: {
-			if(0) {
-
-			}
-			else {
-				// Skip drawing
-				++s_eDraw;
-			}
+			// chunkyToPlanar(15, 300, 5, s_pHudBuffer->pBack);
 		} break;
 		case HUD_DRAW_HEALTH: {
 
+		} break;
+		case HUD_DRAW_CARGO: {
+			if(s_ubOldCargo != s_ubCargo) {
+				UBYTE ubColor, ubDraw = s_ubOldCargo;
+				if(s_ubCargo > s_ubOldCargo) {
+					++s_ubOldCargo;
+					ubColor = COLOR_ACTIVE;
+				}
+				else {
+					--s_ubOldCargo;
+					ubColor = COLOR_NACTIVE;
+				}
+				blitRect(
+					s_pHudBuffer->pBack,
+					138 + 3 * ((ubDraw) % 10), 3 * ((ubDraw) / 10), 2, 2, ubColor
+				);
+			}
 		} break;
 		case HUD_PREPARE_SCORE: {
 			if(s_ulScore != s_ulOldScore) {
@@ -121,7 +141,7 @@ void hudUpdate(void) {
 		} break;
 		case HUD_DRAW_SCORE: {
 			fontDrawTextBitMap(
-				s_pHudBuffer->pBack, s_pLinebuffer, 0, 8, 15, FONT_LAZY
+				s_pHudBuffer->pBack, s_pLinebuffer, 0, 8, COLOR_ACTIVE, FONT_LAZY
 			);
 		} break;
 		default: {

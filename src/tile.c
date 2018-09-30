@@ -3,12 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "tile.h"
-#include "game.h"
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/managers/rand.h>
+#include "game.h"
+#include "hud.h"
 
 typedef enum _tTile {
 	TILE_NONE = 0,
+	TILE_SHOP_1,
+	TILE_SHOP_2,
+	TILE_SHOP_3,
+	TILE_SHOP_4,
 	TILE_GRASS_1,
 	TILE_GRASS_2,
 	TILE_GRASS_NONE,
@@ -81,6 +86,11 @@ void tileInit(void) {
 			}
 		}
 	}
+	// Shop
+	g_pMainBuffer->pTileData[7][1] = TILE_SHOP_1;
+	g_pMainBuffer->pTileData[8][1] = TILE_SHOP_2;
+	g_pMainBuffer->pTileData[7][2] = TILE_SHOP_3;
+	g_pMainBuffer->pTileData[8][2] = TILE_SHOP_4;
 }
 
 void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
@@ -132,7 +142,8 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	}
 	ubSlots = MIN(ubSlots, pVehicle->ubPayloadMax - pVehicle->ubPayloadCurr);
 	pVehicle->ulScore += ubScorePerSlot * ubSlots;
-	// pVehicle->ubPayloadCurr += ubSlots;
+	pVehicle->ubPayloadCurr += ubSlots;
+	hudSetCargo(pVehicle->ubPayloadCurr);
 
 	tileBufferSetTile(g_pMainBuffer, uwX, uwY, ubBg);
 }

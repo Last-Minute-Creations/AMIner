@@ -15,6 +15,8 @@ void hudSetDepth(UWORD uwDepth);
 
 void hudSetScore(ULONG ulScore);
 
+void hudSetCargo(UBYTE ubCargo);
+
 void hudUpdate(void);
 
 #endif // _HUD_H_
