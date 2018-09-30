@@ -275,12 +275,16 @@ static void vehicleProcessMovement(void) {
 			g_sVehicle.fDestX = fix16_from_int(uwTileRight << 5);
 			g_sVehicle.fDestY = g_sVehicle.fY;
 			g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
+			g_sVehicle.fDx = 0;
+			g_sVehicle.fDy = 0;
 		}
 		else if(g_sVehicle.sSteer.bX < 0 && isTouchingLeft) {
 			g_sVehicle.ubDrillDir = DRILL_DIR_H;
 			g_sVehicle.fDestX = fix16_from_int(uwTileLeft << 5);
 			g_sVehicle.fDestY = g_sVehicle.fY;
 			g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
+			g_sVehicle.fDx = 0;
+			g_sVehicle.fDy = 0;
 		}
 		else if(
 			g_sVehicle.sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom)
@@ -289,6 +293,8 @@ static void vehicleProcessMovement(void) {
 			g_sVehicle.fDestX = fix16_from_int(uwTileCenter << 5);
 			g_sVehicle.fDestY = fix16_from_int(((uwTileBottom + 1) << 5) - VEHICLE_HEIGHT - 4);
 			g_sVehicle.ubDrillState = DRILL_STATE_ANIM_IN;
+			g_sVehicle.fDx = 0;
+			g_sVehicle.fDy = 0;
 		}
 	}
 	bobNewPush(&g_sVehicle.sBobBody);
