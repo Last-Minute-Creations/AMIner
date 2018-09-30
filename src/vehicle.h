@@ -18,6 +18,17 @@ typedef enum _tDrillDir {
 	DRILL_DIR_V
 } tDrillDir;
 
+typedef enum _tDrillState {
+	DRILL_STATE_ANIM_IN = 0,
+	DRILL_STATE_DRILLING,
+	DRILL_STATE_ANIM_OUT
+} tDrillState;
+
+typedef enum _tToolState {
+	TOOL_STATE_IDLE,
+	TOOL_STATE_DRILL
+} tToolState;
+
 typedef struct _tVehicle {
 	tBCoordYX sSteer;
 	tBobNew sBobBody;
@@ -38,6 +49,8 @@ typedef struct _tVehicle {
 	UBYTE ubJetAnimCnt;
 	UBYTE ubToolAnimCnt;
 	UBYTE ubDrillDir;
+	UBYTE ubDrillVAnimCnt;
+	UBYTE ubDrillState;
 	UBYTE ubPayloadMax;
 	UBYTE ubPayloadCurr;
 	UWORD uwPayloadScore;
