@@ -333,6 +333,8 @@ static void vehicleProcessDrilling(void) {
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += pTrackAnimOffs[g_sVehicle.ubDrillVAnimCnt];
+		g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
+		vehicleSetTool(TOOL_STATE_IDLE, 0);
 	}
 	else if(g_sVehicle.ubDrillState == DRILL_STATE_DRILLING) {
 		// Movement
@@ -440,6 +442,8 @@ static void vehicleProcessDrilling(void) {
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += pTrackAnimOffs[g_sVehicle.ubDrillVAnimCnt];
+		g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
+		vehicleSetTool(TOOL_STATE_IDLE, 0);
 	}
 
 	bobNewPush(&g_sVehicle.sBobTrack);
