@@ -321,13 +321,27 @@ static void vehicleProcessDrilling(void) {
 	const UBYTE pTrackAnimOffs[DRILL_V_ANIM_LEN] = {
 		0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0
 	};
-	if(g_sVehicle.ubDrillState == DRILL_STATE_ANIM_IN) {
-		++g_sVehicle.ubDrillVAnimCnt;
-		if(g_sVehicle.ubDrillVAnimCnt >= DRILL_V_ANIM_LEN - 1) {
-			g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
+	if(
+		g_sVehicle.ubDrillState == DRILL_STATE_ANIM_IN ||
+		g_sVehicle.ubDrillState == DRILL_STATE_ANIM_OUT
+	) {
+		if(g_sVehicle.ubDrillState == DRILL_STATE_ANIM_IN) {
+			++g_sVehicle.ubDrillVAnimCnt;
+			if(g_sVehicle.ubDrillVAnimCnt >= DRILL_V_ANIM_LEN - 1) {
+				g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
+			}
+			else if(g_sVehicle.ubDrillVAnimCnt == 5) {
+				bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, TRACK_OFFSET_DRILL);
+			}
 		}
-		else if(g_sVehicle.ubDrillVAnimCnt == 5) {
-			bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, TRACK_OFFSET_DRILL);
+		else {
+			--g_sVehicle.ubDrillVAnimCnt;
+			if(!g_sVehicle.ubDrillVAnimCnt) {
+				g_sVehicle.ubDrillDir = DRILL_DIR_NONE;
+			}
+			else if(g_sVehicle.ubDrillVAnimCnt == 5) {
+				bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, TRACK_OFFSET_TRACK);
+			}
 		}
 
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
@@ -429,21 +443,6 @@ static void vehicleProcessDrilling(void) {
 				);
 			}
 		}
-	}
-	else if(g_sVehicle.ubDrillState == DRILL_STATE_ANIM_OUT) {
-		--g_sVehicle.ubDrillVAnimCnt;
-		if(!g_sVehicle.ubDrillVAnimCnt) {
-			g_sVehicle.ubDrillDir = DRILL_DIR_NONE;
-		}
-		else if(g_sVehicle.ubDrillVAnimCnt == 5) {
-			bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, TRACK_OFFSET_TRACK);
-		}
-
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += pTrackAnimOffs[g_sVehicle.ubDrillVAnimCnt];
-		g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
-		vehicleSetTool(TOOL_STATE_IDLE, 0);
 	}
 
 	bobNewPush(&g_sVehicle.sBobTrack);
