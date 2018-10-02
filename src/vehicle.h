@@ -51,10 +51,14 @@ typedef struct _tVehicle {
 	UBYTE ubDrillDir;
 	UBYTE ubDrillVAnimCnt;
 	UBYTE ubDrillState;
-	UBYTE ubPayloadMax;
-	UBYTE ubPayloadCurr;
-	UWORD uwPayloadScore;
-	ULONG ulScore;
+	// Cargo
+	UBYTE ubCargoMax;
+	UBYTE ubCargoCurr;
+	UWORD uwCargoScore;
+	// Score, fuel, hull
+	ULONG ulCash;
+	UWORD uwFuelCurr;
+	UWORD uwFuelMax;
 } tVehicle;
 
 void vehicleCreate(void);

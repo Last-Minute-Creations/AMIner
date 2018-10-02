@@ -59,10 +59,12 @@ void vehicleCreate(void) {
 	);
 
 	// Initial values
-	g_sVehicle.ubPayloadCurr = 0;
-	g_sVehicle.ubPayloadMax = 50;
-	g_sVehicle.uwPayloadScore = 0;
-	g_sVehicle.ulScore = 0;
+	g_sVehicle.ubCargoCurr = 0;
+	g_sVehicle.ubCargoMax = 50;
+	g_sVehicle.uwCargoScore = 0;
+	g_sVehicle.ulCash = 0;
+	g_sVehicle.uwFuelMax = 1000;
+	g_sVehicle.uwFuelCurr = 1000;
 	g_sVehicle.fX = 0;
 	g_sVehicle.fY = 0;
 	g_sVehicle.fDx = 0;
@@ -134,6 +136,29 @@ static inline void vehicleSetTool(tToolState eToolState, UBYTE ubFrame) {
 			);
 		}
 	}
+}
+
+static inline UBYTE vehicleStartDrilling(
+	UWORD uwTileX, UWORD uwTileY, UBYTE ubDrillDir
+) {
+	if(g_sVehicle.uwFuelCurr < 30) {
+		return 0;
+	}
+
+	if(ubDrillDir == DRILL_DIR_V) {
+		g_sVehicle.ubDrillState = DRILL_STATE_ANIM_IN;
+	}
+	else {
+		g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
+	}
+	g_sVehicle.ubDrillDir = ubDrillDir;
+	g_sVehicle.fDestX = fix16_from_int(uwTileX << 5);
+	g_sVehicle.fDestY = fix16_from_int(((uwTileY + 1) << 5) - VEHICLE_HEIGHT - 4);
+	g_sVehicle.fDx = 0;
+	g_sVehicle.fDy = 0;
+
+	g_sVehicle.uwFuelCurr -= 30;
+	return 1;
 }
 
 static void vehicleProcessMovement(void) {
@@ -271,30 +296,15 @@ static void vehicleProcessMovement(void) {
 	// Drilling
 	if(isOnGround) {
 		if(g_sVehicle.sSteer.bX > 0 && isTouchingRight) {
-			g_sVehicle.ubDrillDir = DRILL_DIR_H;
-			g_sVehicle.fDestX = fix16_from_int(uwTileRight << 5);
-			g_sVehicle.fDestY = g_sVehicle.fY;
-			g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
-			g_sVehicle.fDx = 0;
-			g_sVehicle.fDy = 0;
+			vehicleStartDrilling(uwTileRight, uwTileMid, DRILL_DIR_H);
 		}
 		else if(g_sVehicle.sSteer.bX < 0 && isTouchingLeft) {
-			g_sVehicle.ubDrillDir = DRILL_DIR_H;
-			g_sVehicle.fDestX = fix16_from_int(uwTileLeft << 5);
-			g_sVehicle.fDestY = g_sVehicle.fY;
-			g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
-			g_sVehicle.fDx = 0;
-			g_sVehicle.fDy = 0;
+			vehicleStartDrilling(uwTileLeft, uwTileMid, DRILL_DIR_H);
 		}
 		else if(
 			g_sVehicle.sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom)
 		) {
-			g_sVehicle.ubDrillDir = DRILL_DIR_V;
-			g_sVehicle.fDestX = fix16_from_int(uwTileCenter << 5);
-			g_sVehicle.fDestY = fix16_from_int(((uwTileBottom + 1) << 5) - VEHICLE_HEIGHT - 4);
-			g_sVehicle.ubDrillState = DRILL_STATE_ANIM_IN;
-			g_sVehicle.fDx = 0;
-			g_sVehicle.fDy = 0;
+			vehicleStartDrilling(uwTileCenter, uwTileBottom, DRILL_DIR_V);
 		}
 	}
 	bobNewPush(&g_sVehicle.sBobBody);
@@ -310,10 +320,20 @@ static void vehicleProcessMovement(void) {
 		1*32 <= g_sVehicle.sBobBody.sPos.sUwCoord.uwY &&
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwY <= 3*32
 	) {
-		g_sVehicle.ubPayloadCurr = 0;
-		g_sVehicle.ulScore += g_sVehicle.uwPayloadScore;
-		g_sVehicle.uwPayloadScore = 0;
+		g_sVehicle.ubCargoCurr = 0;
+		g_sVehicle.ulCash += g_sVehicle.uwCargoScore;
+		g_sVehicle.uwCargoScore = 0;
 		hudSetCargo(0);
+		const UBYTE ubFuelPrice = 5;
+		const UBYTE ubFuelDiv = 100;
+		UWORD uwRefuelUnits = MIN(
+			(g_sVehicle.ulCash / ubFuelPrice),
+			(UWORD)(g_sVehicle.uwFuelMax - g_sVehicle.uwFuelCurr + ubFuelDiv-1) / ubFuelDiv
+		);
+		g_sVehicle.uwFuelCurr = MIN(
+			g_sVehicle.uwFuelCurr + uwRefuelUnits * ubFuelDiv, g_sVehicle.uwFuelMax
+		);
+		g_sVehicle.ulCash -= uwRefuelUnits * ubFuelPrice;
 	}
 }
 
@@ -391,11 +411,9 @@ static void vehicleProcessDrilling(void) {
 				UWORD uwCenterX = g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
 				UWORD uwTileCenter = uwCenterX >> 5;
 				if(
-					g_sVehicle.sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom)
+					g_sVehicle.sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom) &&
+					vehicleStartDrilling(uwTileCenter, uwTileBottom, DRILL_DIR_V)
 				) {
-					g_sVehicle.ubDrillDir = DRILL_DIR_V;
-					g_sVehicle.fDestX = fix16_from_int(uwTileCenter << 5);
-					g_sVehicle.fDestY = fix16_from_int(((uwTileBottom + 1) << 5) - VEHICLE_HEIGHT - 4);
 					g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
 				}
 				else {
@@ -457,4 +475,5 @@ void vehicleProcess(void) {
 	else {
 		vehicleProcessMovement();
 	}
+	hudSetFuel(g_sVehicle.uwFuelCurr);
 }

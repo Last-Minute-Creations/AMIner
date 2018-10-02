@@ -13,9 +13,11 @@ void hudDestroy(void);
 
 void hudSetDepth(UWORD uwDepth);
 
-void hudSetScore(ULONG ulScore);
+void hudSetScore(ULONG ulCash);
 
 void hudSetCargo(UBYTE ubCargo);
+
+void hudSetFuel(UWORD uwFuel);
 
 void hudUpdate(void);
 

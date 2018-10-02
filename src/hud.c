@@ -17,8 +17,8 @@ typedef enum _tHudDraw {
 	HUD_DRAW_FUEL,
 	HUD_DRAW_HEALTH,
 	HUD_DRAW_CARGO,
-	HUD_PREPARE_SCORE,
-	HUD_DRAW_SCORE,
+	HUD_PREPARE_CASH,
+	HUD_DRAW_CASH,
 	HUD_DRAW_END
 } tHudDraw;
 
@@ -28,7 +28,8 @@ static tFont *s_pFont;
 static tTextBitMap *s_pLinebuffer;
 
 static UWORD s_uwDepth, s_uwOldDepth;
-static ULONG s_ulScore, s_ulOldScore;
+static UWORD s_uwFuel, s_uwOldFuel;
+static ULONG s_ulCash, s_ulOldScore;
 static UBYTE s_ubCargo, s_ubOldCargo;
 
 tHudDraw s_eDraw;
@@ -58,19 +59,25 @@ void hudCreate(tView *pView) {
 	for(UBYTE i = 0; i < 30; ++i) {
 		chunkyToPlanar(COLOR_NACTIVE, 85 + 2 * (i % 10), 2 * (i / 10), s_pHudBuffer->pBack);
 	}
+	// Hull
 	for(UBYTE i = 0; i < 30; ++i) {
 		chunkyToPlanar(COLOR_NACTIVE, 85 + 2 * (i % 10), 8 + 2 * (i / 10), s_pHudBuffer->pBack);
 	}
+	// Cargo
 	for(UBYTE i = 0; i < 50; ++i) {
 		blitRect(s_pHudBuffer->pBack, 138 + 3 * (i % 10), 3 * (i / 10), 2, 2, COLOR_NACTIVE);
 	}
 
+	// Values to display
 	s_uwOldDepth = 0xFFFF;
 	s_uwDepth = 0;
 	s_ulOldScore = 0xFFFFFFFF;
-	s_ulScore = 0;
+	s_ulCash = 0;
 	s_ubOldCargo = 0;
 	s_ubCargo = 0;
+	s_uwOldFuel = 0;
+	s_uwFuel = 0;
+	// Restart state machine
 	s_eDraw = 0;
 }
 
@@ -78,12 +85,16 @@ void hudSetDepth(UWORD uwDepth) {
 	s_uwDepth = uwDepth;
 }
 
-void hudSetScore(ULONG ulScore) {
-	s_ulScore = ulScore;
+void hudSetScore(ULONG ulCash) {
+	s_ulCash = ulCash;
 }
 
 void hudSetCargo(UBYTE ubCargo) {
 	s_ubCargo = ubCargo;
+}
+
+void hudSetFuel(UWORD uwFuel) {
+	s_uwFuel = (uwFuel+100-30) / 100;
 }
 
 void hudUpdate(void) {
@@ -102,11 +113,28 @@ void hudUpdate(void) {
 		} break;
 		case HUD_DRAW_DEPTH: {
 			fontDrawTextBitMap(
-				s_pHudBuffer->pBack, s_pLinebuffer, 1, 0, COLOR_ACTIVE, FONT_LAZY
+				s_pHudBuffer->pBack, s_pLinebuffer, 0, 0, COLOR_ACTIVE, FONT_LAZY
 			);
 		} break;
 		case HUD_DRAW_FUEL: {
-			// chunkyToPlanar(15, 300, 5, s_pHudBuffer->pBack);
+			if(s_uwOldFuel != s_uwFuel) {
+				UBYTE ubColor, ubDraw;
+				if(s_uwFuel > s_uwOldFuel) {
+					ubDraw = s_uwOldFuel;
+					++s_uwOldFuel;
+					ubColor = COLOR_ACTIVE;
+				}
+				else {
+					--s_uwOldFuel;
+					ubDraw = s_uwOldFuel;
+					ubColor = COLOR_NACTIVE;
+				}
+
+				chunkyToPlanar(
+					ubColor,
+					85 + 2 * (ubDraw % 10), 2 * (ubDraw / 10), s_pHudBuffer->pBack
+				);
+			}
 		} break;
 		case HUD_DRAW_HEALTH: {
 
@@ -130,9 +158,9 @@ void hudUpdate(void) {
 				);
 			}
 		} break;
-		case HUD_PREPARE_SCORE: {
-			if(s_ulScore != s_ulOldScore) {
-				sprintf(szBfr, "Score: %5u", s_ulScore);
+		case HUD_PREPARE_CASH: {
+			if(s_ulCash != s_ulOldScore) {
+				sprintf(szBfr, "Cash: %5u", s_ulCash);
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
 				s_uwOldDepth = s_uwDepth;
 			}
@@ -141,9 +169,9 @@ void hudUpdate(void) {
 				++s_eDraw;
 			}
 		} break;
-		case HUD_DRAW_SCORE: {
+		case HUD_DRAW_CASH: {
 			fontDrawTextBitMap(
-				s_pHudBuffer->pBack, s_pLinebuffer, 0, 8, COLOR_ACTIVE, FONT_LAZY
+				s_pHudBuffer->pBack, s_pLinebuffer, 3, 8, COLOR_ACTIVE, FONT_LAZY
 			);
 		} break;
 		default: {

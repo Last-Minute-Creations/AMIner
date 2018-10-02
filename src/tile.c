@@ -140,10 +140,10 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		ubScorePerSlot = 5;
 		ubSlots = (ubTile == TILE_GOLD_4 ? 5 : ubTile - TILE_GOLD_1 + 1);
 	}
-	ubSlots = MIN(ubSlots, pVehicle->ubPayloadMax - pVehicle->ubPayloadCurr);
-	pVehicle->uwPayloadScore += ubScorePerSlot * ubSlots;
-	pVehicle->ubPayloadCurr += ubSlots;
-	hudSetCargo(pVehicle->ubPayloadCurr);
+	ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
+	pVehicle->uwCargoScore += ubScorePerSlot * ubSlots;
+	pVehicle->ubCargoCurr += ubSlots;
+	hudSetCargo(pVehicle->ubCargoCurr);
 
 	tileBufferSetTile(g_pMainBuffer, uwX, uwY, ubBg);
 }

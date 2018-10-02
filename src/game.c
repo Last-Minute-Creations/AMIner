@@ -111,7 +111,7 @@ void gameGsLoop(void) {
 	gameProcessInput();
 	vehicleProcess();
 	hudSetDepth(MAX(0, fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT - 3*32));
-	hudSetScore(g_sVehicle.ulScore);
+	hudSetScore(g_sVehicle.ulCash);
 	bobNewPushingDone();
 	bobNewEnd();
 	hudUpdate();
