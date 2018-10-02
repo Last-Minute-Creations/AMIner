@@ -110,7 +110,7 @@ void gameGsLoop(void) {
 	tileBufferQueueProcess(g_pMainBuffer);
 	gameProcessInput();
 	vehicleProcess();
-	hudSetDepth(fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT);
+	hudSetDepth(MAX(0, fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT - 3*32));
 	hudSetScore(g_sVehicle.ulScore);
 	bobNewPushingDone();
 	bobNewEnd();
