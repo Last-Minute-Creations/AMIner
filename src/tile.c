@@ -21,10 +21,10 @@ typedef enum _tTile {
 	TILE_GRASS_RIGHT,
 	TILE_GRASS_BOTH,
 	TILE_CAVE_BG,
-	TILE_ROCK_1 = TILE_CAVE_BG + 16,
-	TILE_ROCK_2,
-	TILE_STONE_1,
+	TILE_STONE_1 = TILE_CAVE_BG + 16,
 	TILE_STONE_2,
+	TILE_ROCK_1,
+	TILE_ROCK_2,
 	TILE_GOLD_1,
 	TILE_GOLD_2,
 	TILE_GOLD_3,
@@ -34,19 +34,19 @@ typedef enum _tTile {
 
 void tileRefreshGrass(UWORD uwX) {
 	UBYTE ubCurrTile = TILE_GRASS_NONE;
-	if(!uwX || g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
+	if(g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
 		ubCurrTile += 1; // Promote to TILE_GRASS_LEFT
 	}
-	else if(uwX){
+	else {
 		// left neighbor is _RIGHT or _BOTH - decrease to _NONE or _LEFT
 		tileBufferSetTile(
 			g_pMainBuffer, uwX-1, 2, g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] - 2
 		);
 	}
-	if(uwX >= 9 || g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
+	if(uwX >= 10 || g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
 		ubCurrTile += 2; // Promote to TILE_GRASS_RIGHT or _BOTH
 	}
-	else if(uwX < 9) {
+	else if(uwX < 10) {
 		// right neighbor is _LEFT or _BOTH - decrease to _NONE or _RIGHT
 		tileBufferSetTile(
 			g_pMainBuffer, uwX+1, 2, g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] - 1
@@ -57,11 +57,15 @@ void tileRefreshGrass(UWORD uwX) {
 }
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
+	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_STONE_1;
+}
+
+UBYTE tileIsDrillable(UWORD uwX, UWORD uwY) {
 	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_ROCK_1;
 }
 
 void tileInit(void) {
-	for(UWORD x = 0; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
+	for(UWORD x = 1; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
 		for(UWORD y = 0; y < TILE_ROW_GRASS; ++y) {
 			g_pMainBuffer->pTileData[x][y] = TILE_NONE;
 		}
@@ -77,7 +81,7 @@ void tileInit(void) {
 			}
 			else if(
 				ubChance < 20 + ubChanceRock + 5 &&
-				(!x || tileIsSolid(x-1,y)) && tileIsSolid(x,y-1)
+				tileIsSolid(x - 1, y) && tileIsSolid(x, y - 1)
 			) {
 				g_pMainBuffer->pTileData[x][y] = TILE_CAVE_BG+15;
 			}
@@ -85,6 +89,9 @@ void tileInit(void) {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_ROCK_1, TILE_ROCK_2);
 			}
 		}
+	}
+	for(UWORD y = 0; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
+		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
 	}
 	// Shop
 	g_pMainBuffer->pTileData[7][1] = TILE_SHOP_1;
@@ -115,24 +122,24 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	}
 
 	// right
-	if(uwX >= 9 || tileIsSolid(uwX+1, uwY)) {
+	if(uwX >= 10 || tileIsSolid(uwX+1, uwY)) {
 		ubBg += 4;
 	}
-	else if(uwX < 9) {
+	else if(uwX < 10) {
 		g_pMainBuffer->pTileData[uwX+1][uwY] -= 8;
 		tileBufferInvalidateTile(g_pMainBuffer, uwX+1, uwY);
 	}
 
 	// left
-	if(!uwX || tileIsSolid(uwX-1, uwY)) {
+	if(tileIsSolid(uwX-1, uwY)) {
 		ubBg += 8;
 	}
-	else if(uwX) {
+	else {
 		g_pMainBuffer->pTileData[uwX-1][uwY] -= 4;
 		tileBufferInvalidateTile(g_pMainBuffer, uwX-1, uwY);
 	}
 
-	// Load stuff to vehicle
+	// Load mineral to vehicle
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	UBYTE ubScorePerSlot = 0;
 	UBYTE ubSlots = 0;

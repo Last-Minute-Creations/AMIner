@@ -14,6 +14,8 @@ void tileRefreshGrass(UWORD uwX);
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
+UBYTE tileIsDrillable(UWORD uwX, UWORD uwY);
+
 void tileInit(void);
 
 void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY);

@@ -65,8 +65,8 @@ void vehicleCreate(void) {
 	g_sVehicle.ulCash = 0;
 	g_sVehicle.uwFuelMax = 1000;
 	g_sVehicle.uwFuelCurr = 1000;
-	g_sVehicle.fX = 0;
-	g_sVehicle.fY = 0;
+	g_sVehicle.fX = fix16_from_int(64);
+	g_sVehicle.fY = fix16_from_int(32);
 	g_sVehicle.fDx = 0;
 	g_sVehicle.fDy = 0;
 	g_sVehicle.ubDrillDir = 0;
@@ -185,8 +185,8 @@ static void vehicleProcessMovement(void) {
 	}
 
 	// Limit X movement
-	const fix16_t fMaxPosX = fix16_one * (320 - VEHICLE_WIDTH);
-	g_sVehicle.fX = CLAMP(g_sVehicle.fX + g_sVehicle.fDx, 0, fMaxPosX);
+	const fix16_t fMaxPosX = fix16_one * (11*32 - VEHICLE_WIDTH);
+	g_sVehicle.fX = CLAMP(g_sVehicle.fX + g_sVehicle.fDx, fix16_from_int(32), fMaxPosX);
 	g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
 	UBYTE ubAdd = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32) ? 4 : 8;
 	UBYTE ubHalfWidth = 12;
@@ -195,19 +195,16 @@ static void vehicleProcessMovement(void) {
 	UWORD uwTileBottom = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
 	UWORD uwTileMid = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT / 2) >> 5;
 	UWORD uwTileCenter = uwCenterX >> 5;
-	UBYTE isTouchingLeft = 0, isTouchingRight = 0;
 	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> 5;
 	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> 5;
 
 	if(tileIsSolid(uwTileLeft, uwTileMid)) {
 		g_sVehicle.fX = fix16_from_int(((uwTileLeft+1) << 5) - VEHICLE_WIDTH / 2 + ubHalfWidth);
 		g_sVehicle.fDx = 0;
-		isTouchingLeft = 1;
 	}
 	else if(tileIsSolid(uwTileRight, uwTileMid)) {
 		g_sVehicle.fX = fix16_from_int((uwTileRight << 5) - VEHICLE_WIDTH / 2 - ubHalfWidth);
 		g_sVehicle.fDx = 0;
-		isTouchingRight = 1;
 	}
 
 	const fix16_t fMaxFlightDy = 3 * fix16_one;
@@ -295,14 +292,14 @@ static void vehicleProcessMovement(void) {
 
 	// Drilling
 	if(isOnGround) {
-		if(g_sVehicle.sSteer.bX > 0 && isTouchingRight) {
+		if(g_sVehicle.sSteer.bX > 0 && tileIsDrillable(uwTileRight, uwTileMid)) {
 			vehicleStartDrilling(uwTileRight, uwTileMid, DRILL_DIR_H);
 		}
-		else if(g_sVehicle.sSteer.bX < 0 && isTouchingLeft) {
+		else if(g_sVehicle.sSteer.bX < 0 && tileIsDrillable(uwTileLeft, uwTileMid)) {
 			vehicleStartDrilling(uwTileLeft, uwTileMid, DRILL_DIR_H);
 		}
 		else if(
-			g_sVehicle.sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom)
+			g_sVehicle.sSteer.bY > 0 && tileIsDrillable(uwTileCenter, uwTileBottom)
 		) {
 			vehicleStartDrilling(uwTileCenter, uwTileBottom, DRILL_DIR_V);
 		}
@@ -433,10 +430,7 @@ static void vehicleProcessDrilling(void) {
 		else {
 			g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
 			// Body shake
-			WORD wX = g_sVehicle.sBobBody.sPos.sUwCoord.uwX + (ubRand() & 1);
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwX = CLAMP(
-				wX, 0, 320 - VEHICLE_WIDTH
-			);
+			g_sVehicle.sBobBody.sPos.sUwCoord.uwX += ubRand() & 1;
 			g_sVehicle.sBobBody.sPos.sUwCoord.uwY += ubRand() & 1;
 
 			// Anim counter for Tool / track drill

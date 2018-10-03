@@ -41,7 +41,7 @@ void gameGsCreate(void) {
   g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
-		TAG_TILEBUFFER_BOUND_TILE_X, 10,
+		TAG_TILEBUFFER_BOUND_TILE_X, 11,
 		TAG_TILEBUFFER_BOUND_TILE_Y, 2047,
 		TAG_TILEBUFFER_IS_DBLBUF, 1,
 		TAG_TILEBUFFER_TILE_SHIFT, 5,
@@ -121,6 +121,9 @@ void gameGsLoop(void) {
 		fix16_to_int(g_sVehicle.fX) + VEHICLE_WIDTH / 2,
 		fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT / 2
 	);
+	if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < 32) {
+		g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
+	}
 	if(s_isDebug) {
 		g_pCustom->color[0] = 0x800;
 	}
