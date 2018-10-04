@@ -63,14 +63,14 @@ typedef struct _tVehicle {
 	UWORD uwFuelMax;
 } tVehicle;
 
-void vehicleCreate(void);
+void vehicleCreate(tVehicle *pVehicle);
 
-void vehicleDestroy(void);
+void vehicleDestroy(tVehicle *pVehicle);
 
-void vehicleMove(BYTE bDirX, BYTE bDirY);
+void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);
 
-void vehicleProcess(void);
+void vehicleProcess(tVehicle *pVehicle);
 
-tVehicle g_sVehicle;
+tVehicle g_pVehicles[2];
 
 #endif // _VEHICLE_H_

@@ -28,7 +28,7 @@ tBitMap *s_pToolFrames, *s_pToolMask;
 
 UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {0,1,2,3,4,5,4,3,2,1,0};
 
-void vehicleCreate(void) {
+void vehicleCreate(tVehicle *pVehicle) {
 	logBlockBegin("vehicleCreate()");
 	// Load gfx
 	s_pBodyFrames = bitmapCreateFromFile("data/drill.bm");
@@ -42,49 +42,49 @@ void vehicleCreate(void) {
 
 	// Setup bobs
 	bobNewInit(
-		&g_sVehicle.sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
+		&pVehicle->sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
 		s_pBodyFrames, s_pBodyMask, 0, 0
 	);
 	bobNewInit(
-		&g_sVehicle.sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
+		&pVehicle->sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
 		s_pTrackFrames, s_pTrackMask, 0, 0
 	);
 	bobNewInit(
-		&g_sVehicle.sBobJet, VEHICLE_WIDTH, VEHICLE_FLAME_HEIGHT, 1,
+		&pVehicle->sBobJet, VEHICLE_WIDTH, VEHICLE_FLAME_HEIGHT, 1,
 		s_pJetFrames, s_pJetMask, 0, 0
 	);
 	bobNewInit(
-		&g_sVehicle.sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
+		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
 		s_pToolFrames, s_pToolMask, 0, 0
 	);
 
 	// Initial values
-	g_sVehicle.ubCargoCurr = 0;
-	g_sVehicle.ubCargoMax = 50;
-	g_sVehicle.uwCargoScore = 0;
-	g_sVehicle.ulCash = 0;
-	g_sVehicle.uwFuelMax = 1000;
-	g_sVehicle.uwFuelCurr = 1000;
-	g_sVehicle.fX = fix16_from_int(64);
-	g_sVehicle.fY = fix16_from_int(32);
-	g_sVehicle.fDx = 0;
-	g_sVehicle.fDy = 0;
-	g_sVehicle.ubDrillDir = 0;
+	pVehicle->ubCargoCurr = 0;
+	pVehicle->ubCargoMax = 50;
+	pVehicle->uwCargoScore = 0;
+	pVehicle->ulCash = 0;
+	pVehicle->uwFuelMax = 1000;
+	pVehicle->uwFuelCurr = 1000;
+	pVehicle->fX = fix16_from_int(64);
+	pVehicle->fY = fix16_from_int(32);
+	pVehicle->fDx = 0;
+	pVehicle->fDy = 0;
+	pVehicle->ubDrillDir = 0;
 
-	g_sVehicle.ubTrackAnimCnt = 0;
-	g_sVehicle.ubTrackFrame = 0;
-	g_sVehicle.ubBodyShakeCnt = 0;
-	g_sVehicle.ubJetShowFrame = 0;
-	g_sVehicle.ubJetAnimFrame = 0;
-	g_sVehicle.ubJetAnimCnt = 0;
-	g_sVehicle.ubToolAnimCnt = 0;
-	g_sVehicle.ubDrillVAnimCnt = 0;
+	pVehicle->ubTrackAnimCnt = 0;
+	pVehicle->ubTrackFrame = 0;
+	pVehicle->ubBodyShakeCnt = 0;
+	pVehicle->ubJetShowFrame = 0;
+	pVehicle->ubJetAnimFrame = 0;
+	pVehicle->ubJetAnimCnt = 0;
+	pVehicle->ubToolAnimCnt = 0;
+	pVehicle->ubDrillVAnimCnt = 0;
 
-	textBobCreate(&g_sVehicle.sTextBob, g_pFont);
+	textBobCreate(&pVehicle->sTextBob, g_pFont);
 	logBlockEnd("vehicleCreate()");
 }
 
-void vehicleDestroy(void) {
+void vehicleDestroy(tVehicle *pVehicle) {
 	bitmapDestroy(s_pBodyFrames);
 	bitmapDestroy(s_pBodyMask);
 	bitmapDestroy(s_pTrackFrames);
@@ -93,65 +93,67 @@ void vehicleDestroy(void) {
 	bitmapDestroy(s_pJetMask);
 	bitmapDestroy(s_pToolFrames);
 	bitmapDestroy(s_pToolMask);
-	textBobDestroy(&g_sVehicle.sTextBob);
+	textBobDestroy(&pVehicle->sTextBob);
 }
 
-void vehicleMove(BYTE bDirX, BYTE bDirY) {
+void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 	// Always register steer requests so that vehicle can continuously drill down
-	g_sVehicle.sSteer.bX = bDirX;
-	g_sVehicle.sSteer.bY = bDirY;
+	pVehicle->sSteer.bX = bDirX;
+	pVehicle->sSteer.bY = bDirY;
 
 	// No vehicle rotating when drilling
-	if(g_sVehicle.ubDrillDir != DRILL_DIR_NONE) {
+	if(pVehicle->ubDrillDir != DRILL_DIR_NONE) {
 		return;
 	}
 	if(bDirX > 0) {
-		bobNewSetBitMapOffset(&g_sVehicle.sBobBody, 0);
+		bobNewSetBitMapOffset(&pVehicle->sBobBody, 0);
 	}
 	else if(bDirX < 0) {
-		bobNewSetBitMapOffset(&g_sVehicle.sBobBody, VEHICLE_BODY_HEIGHT);
+		bobNewSetBitMapOffset(&pVehicle->sBobBody, VEHICLE_BODY_HEIGHT);
 	}
 }
 
-static inline void vehicleSetTool(tToolState eToolState, UBYTE ubFrame) {
+static inline void vehicleSetTool(
+	tVehicle *pVehicle, tToolState eToolState, UBYTE ubFrame
+) {
 	if(eToolState == TOOL_STATE_IDLE) {
-		if(!g_sVehicle.sBobBody.uwOffsetY) {
+		if(!pVehicle->sBobBody.uwOffsetY) {
 			// Facing right
-			g_sVehicle.sBobTool.sPos.sUwCoord.uwX += 24;
+			pVehicle->sBobTool.sPos.sUwCoord.uwX += 24;
 		}
 		// Vertical drill anim
-		bobNewSetBitMapOffset(&g_sVehicle.sBobTool, 0);
+		bobNewSetBitMapOffset(&pVehicle->sBobTool, 0);
 	}
 	else { // if(eToolState == TOOL_STATE_DRILL)
-		g_sVehicle.sBobTool.sPos.sUwCoord.uwY += 3;
-		if(!g_sVehicle.sBobBody.uwOffsetY) {
+		pVehicle->sBobTool.sPos.sUwCoord.uwY += 3;
+		if(!pVehicle->sBobBody.uwOffsetY) {
 			// Facing right
-			g_sVehicle.sBobTool.sPos.sUwCoord.uwX += 24+3;
+			pVehicle->sBobTool.sPos.sUwCoord.uwX += 24+3;
 			bobNewSetBitMapOffset(
-				&g_sVehicle.sBobTool, (1 + ubFrame) * VEHICLE_TOOL_HEIGHT
+				&pVehicle->sBobTool, (1 + ubFrame) * VEHICLE_TOOL_HEIGHT
 			);
 		}
 		else {
 			// Facing left
-			g_sVehicle.sBobTool.sPos.sUwCoord.uwX += -13+3;
+			pVehicle->sBobTool.sPos.sUwCoord.uwX += -13+3;
 			bobNewSetBitMapOffset(
-				&g_sVehicle.sBobTool, (3 + ubFrame) * VEHICLE_TOOL_HEIGHT
+				&pVehicle->sBobTool, (3 + ubFrame) * VEHICLE_TOOL_HEIGHT
 			);
 		}
 	}
 }
 
 static inline UBYTE vehicleStartDrilling(
-	UWORD uwTileX, UWORD uwTileY, UBYTE ubDrillDir
+	tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY, UBYTE ubDrillDir
 ) {
 	static UBYTE ubCooldown = 0;
-	if(g_sVehicle.uwFuelCurr < 30) {
+	if(pVehicle->uwFuelCurr < 30) {
 		if(!ubCooldown) {
 			textBobSet(
-				&g_sVehicle.sTextBob, "No fuel!", 6,
-				g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
-				g_sVehicle.sBobBody.sPos.sUwCoord.uwY,
-				g_sVehicle.sBobBody.sPos.sUwCoord.uwY - 32
+				&pVehicle->sTextBob, "No fuel!", 6,
+				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+				pVehicle->sBobBody.sPos.sUwCoord.uwY,
+				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
 			);
 			ubCooldown = 25;
 		}
@@ -162,344 +164,344 @@ static inline UBYTE vehicleStartDrilling(
 	}
 
 	if(ubDrillDir == DRILL_DIR_V) {
-		g_sVehicle.ubDrillState = DRILL_STATE_ANIM_IN;
+		pVehicle->ubDrillState = DRILL_STATE_ANIM_IN;
 	}
 	else {
-		g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
+		pVehicle->ubDrillState = DRILL_STATE_DRILLING;
 	}
-	g_sVehicle.ubDrillDir = ubDrillDir;
-	g_sVehicle.fDestX = fix16_from_int(uwTileX << 5);
-	g_sVehicle.fDestY = fix16_from_int(((uwTileY + 1) << 5) - VEHICLE_HEIGHT - 4);
-	g_sVehicle.fDx = 0;
-	g_sVehicle.fDy = 0;
+	pVehicle->ubDrillDir = ubDrillDir;
+	pVehicle->fDestX = fix16_from_int(uwTileX << 5);
+	pVehicle->fDestY = fix16_from_int(((uwTileY + 1) << 5) - VEHICLE_HEIGHT - 4);
+	pVehicle->fDx = 0;
+	pVehicle->fDy = 0;
 
-	g_sVehicle.uwFuelCurr -= 30;
+	pVehicle->uwFuelCurr -= 30;
 	return 1;
 }
 
-static void vehicleProcessMovement(void) {
+static void vehicleProcessMovement(tVehicle *pVehicle) {
 	UBYTE isOnGround = 0;
 	const fix16_t fMaxDx = 4 * fix16_one;
 	const fix16_t fAccX = fix16_one / 8;
 	const fix16_t fFrictX = fix16_one / 12;
 
-	if(g_sVehicle.sSteer.bX) {
-		if(g_sVehicle.sSteer.bX > 0) {
-			g_sVehicle.fDx = MIN(g_sVehicle.fDx + fAccX, fMaxDx);
+	if(pVehicle->sSteer.bX) {
+		if(pVehicle->sSteer.bX > 0) {
+			pVehicle->fDx = MIN(pVehicle->fDx + fAccX, fMaxDx);
 		}
 		else {
-			g_sVehicle.fDx = MAX(g_sVehicle.fDx - fAccX, -fMaxDx);
+			pVehicle->fDx = MAX(pVehicle->fDx - fAccX, -fMaxDx);
 		}
 	}
 	else {
-		if(g_sVehicle.fDx > 0) {
-			g_sVehicle.fDx = MAX(0, g_sVehicle.fDx - fFrictX);
+		if(pVehicle->fDx > 0) {
+			pVehicle->fDx = MAX(0, pVehicle->fDx - fFrictX);
 		}
 		else {
-			g_sVehicle.fDx = MIN(0, g_sVehicle.fDx + fFrictX);
+			pVehicle->fDx = MIN(0, pVehicle->fDx + fFrictX);
 		}
 	}
 
 	// Limit X movement
 	const fix16_t fMaxPosX = fix16_one * (11*32 - VEHICLE_WIDTH);
-	g_sVehicle.fX = CLAMP(g_sVehicle.fX + g_sVehicle.fDx, fix16_from_int(32), fMaxPosX);
-	g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
-	UBYTE ubAdd = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32) ? 4 : 8;
+	pVehicle->fX = CLAMP(pVehicle->fX + pVehicle->fDx, fix16_from_int(32), fMaxPosX);
+	pVehicle->sBobBody.sPos.sUwCoord.uwX = fix16_to_int(pVehicle->fX);
+	UBYTE ubAdd = (pVehicle->sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32) ? 4 : 8;
 	UBYTE ubHalfWidth = 12;
 
-	UWORD uwCenterX = g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
-	UWORD uwTileBottom = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
-	UWORD uwTileMid = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT / 2) >> 5;
+	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
+	UWORD uwTileBottom = (pVehicle->sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
+	UWORD uwTileMid = (pVehicle->sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT / 2) >> 5;
 	UWORD uwTileCenter = uwCenterX >> 5;
 	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> 5;
 	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> 5;
 
 	if(tileIsSolid(uwTileLeft, uwTileMid)) {
-		g_sVehicle.fX = fix16_from_int(((uwTileLeft+1) << 5) - VEHICLE_WIDTH / 2 + ubHalfWidth);
-		g_sVehicle.fDx = 0;
+		pVehicle->fX = fix16_from_int(((uwTileLeft+1) << 5) - VEHICLE_WIDTH / 2 + ubHalfWidth);
+		pVehicle->fDx = 0;
 	}
 	else if(tileIsSolid(uwTileRight, uwTileMid)) {
-		g_sVehicle.fX = fix16_from_int((uwTileRight << 5) - VEHICLE_WIDTH / 2 - ubHalfWidth);
-		g_sVehicle.fDx = 0;
+		pVehicle->fX = fix16_from_int((uwTileRight << 5) - VEHICLE_WIDTH / 2 - ubHalfWidth);
+		pVehicle->fDx = 0;
 	}
 
 	const fix16_t fMaxFlightDy = 3 * fix16_one;
 	const fix16_t fAccFlight = fix16_one / 12;
 	const fix16_t fMaxGravDy = 4 * fix16_one;
 	const fix16_t fAccGrav = fix16_one / 8;
-	if(g_sVehicle.sSteer.bY < 0) {
-		if(g_sVehicle.ubJetShowFrame == 10) {
-			g_sVehicle.fDy = MAX(-fMaxFlightDy, g_sVehicle.fDy - fAccFlight);
+	if(pVehicle->sSteer.bY < 0) {
+		if(pVehicle->ubJetShowFrame == 10) {
+			pVehicle->fDy = MAX(-fMaxFlightDy, pVehicle->fDy - fAccFlight);
 		}
 		else {
-			++g_sVehicle.ubJetShowFrame;
+			++pVehicle->ubJetShowFrame;
 		}
 	}
 	else {
-		if(g_sVehicle.ubJetShowFrame) {
-			--g_sVehicle.ubJetShowFrame;
+		if(pVehicle->ubJetShowFrame) {
+			--pVehicle->ubJetShowFrame;
 		}
-		g_sVehicle.fDy = MIN(fMaxGravDy, g_sVehicle.fDy + fAccGrav);
+		pVehicle->fDy = MIN(fMaxGravDy, pVehicle->fDy + fAccGrav);
 	}
 
-	if(g_sVehicle.fDy < 0) {
-		UWORD uwTileTop = (fix16_to_int(g_sVehicle.fY) - 1) >> 5;
+	if(pVehicle->fDy < 0) {
+		UWORD uwTileTop = (fix16_to_int(pVehicle->fY) - 1) >> 5;
 		// Flying
-		g_sVehicle.fY = MAX(0, g_sVehicle.fY + g_sVehicle.fDy);
+		pVehicle->fY = MAX(0, pVehicle->fY + pVehicle->fDy);
 		if(tileIsSolid(uwTileCenter, uwTileTop)) {
-			g_sVehicle.fY = fix16_from_int((uwTileTop+1) << 5);
-			g_sVehicle.fDy = 0;
+			pVehicle->fY = fix16_from_int((uwTileTop+1) << 5);
+			pVehicle->fDy = 0;
 		}
 	}
 	else {
 		if(!tileIsSolid(uwTileCenter, uwTileBottom)) {
 			// Gravity
-			g_sVehicle.fY += g_sVehicle.fDy;
+			pVehicle->fY += pVehicle->fDy;
 		}
 		else {
 			// Collision with ground
 			isOnGround = 1;
-			g_sVehicle.fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
-			g_sVehicle.fDy = 0;
+			pVehicle->fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
+			pVehicle->fDy = 0;
 		}
 	}
 
 	// Update track bob
-	g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
-	g_sVehicle.sBobTrack.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
-	g_sVehicle.sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
-	if(g_sVehicle.ubJetShowFrame == 0) {
+	pVehicle->sBobBody.sPos.sUwCoord.uwY = fix16_to_int(pVehicle->fY);
+	pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
+	pVehicle->sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
+	if(pVehicle->ubJetShowFrame == 0) {
 		// Jet hidden
-		if(g_sVehicle.fDx) {
-			++g_sVehicle.ubTrackAnimCnt;
-			if(g_sVehicle.ubTrackAnimCnt >= (5 - fix16_to_int(fix16_abs(g_sVehicle.fDx)))) {
-				g_sVehicle.ubTrackFrame = !g_sVehicle.ubTrackFrame;
-				bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, g_sVehicle.ubTrackFrame * VEHICLE_TRACK_HEIGHT);
-				g_sVehicle.ubTrackAnimCnt = 0;
+		if(pVehicle->fDx) {
+			++pVehicle->ubTrackAnimCnt;
+			if(pVehicle->ubTrackAnimCnt >= (5 - fix16_to_int(fix16_abs(pVehicle->fDx)))) {
+				pVehicle->ubTrackFrame = !pVehicle->ubTrackFrame;
+				bobNewSetBitMapOffset(&pVehicle->sBobTrack, pVehicle->ubTrackFrame * VEHICLE_TRACK_HEIGHT);
+				pVehicle->ubTrackAnimCnt = 0;
 			}
 		}
 
-		++g_sVehicle.ubBodyShakeCnt;
-		UBYTE ubShakeSpeed = (g_sVehicle.fDx ? 5 : 10);
-		if(g_sVehicle.ubBodyShakeCnt >= 2 * ubShakeSpeed) {
-			g_sVehicle.ubBodyShakeCnt = 0;
+		++pVehicle->ubBodyShakeCnt;
+		UBYTE ubShakeSpeed = (pVehicle->fDx ? 5 : 10);
+		if(pVehicle->ubBodyShakeCnt >= 2 * ubShakeSpeed) {
+			pVehicle->ubBodyShakeCnt = 0;
 		}
-		if(g_sVehicle.ubBodyShakeCnt >= ubShakeSpeed) {
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwY += 1;
+		if(pVehicle->ubBodyShakeCnt >= ubShakeSpeed) {
+			pVehicle->sBobBody.sPos.sUwCoord.uwY += 1;
 		}
 	}
 	else {
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += s_pJetAnimOffsets[g_sVehicle.ubJetShowFrame];
-		if(g_sVehicle.ubJetShowFrame == 5) {
-			bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, g_sVehicle.sSteer.bY ? 2*VEHICLE_TRACK_HEIGHT : 0);
+		pVehicle->sBobBody.sPos.sUwCoord.uwY += s_pJetAnimOffsets[pVehicle->ubJetShowFrame];
+		if(pVehicle->ubJetShowFrame == 5) {
+			bobNewSetBitMapOffset(&pVehicle->sBobTrack, pVehicle->sSteer.bY ? 2*VEHICLE_TRACK_HEIGHT : 0);
 		}
-		else if(g_sVehicle.ubJetShowFrame == 10) {
+		else if(pVehicle->ubJetShowFrame == 10) {
 			// Update jet pos
-			g_sVehicle.ubJetAnimCnt = (g_sVehicle.ubJetAnimCnt + 1) & 15;
+			pVehicle->ubJetAnimCnt = (pVehicle->ubJetAnimCnt + 1) & 15;
 			bobNewSetBitMapOffset(
-				&g_sVehicle.sBobJet, VEHICLE_FLAME_HEIGHT * (g_sVehicle.ubJetAnimCnt / 4)
+				&pVehicle->sBobJet, VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 4)
 			);
-			g_sVehicle.sBobJet.sPos.ulYX = g_sVehicle.sBobTrack.sPos.ulYX;
-			g_sVehicle.sBobJet.sPos.sUwCoord.uwY += VEHICLE_TRACK_JET_HEIGHT;
-			bobNewPush(&g_sVehicle.sBobJet);
+			pVehicle->sBobJet.sPos.ulYX = pVehicle->sBobTrack.sPos.ulYX;
+			pVehicle->sBobJet.sPos.sUwCoord.uwY += VEHICLE_TRACK_JET_HEIGHT;
+			bobNewPush(&pVehicle->sBobJet);
 		}
 	}
-	bobNewPush(&g_sVehicle.sBobTrack);
+	bobNewPush(&pVehicle->sBobTrack);
 
 	// Drilling
 	if(isOnGround) {
-		if(g_sVehicle.sSteer.bX > 0 && tileIsDrillable(uwTileRight, uwTileMid)) {
-			vehicleStartDrilling(uwTileRight, uwTileMid, DRILL_DIR_H);
+		if(pVehicle->sSteer.bX > 0 && tileIsDrillable(uwTileRight, uwTileMid)) {
+			vehicleStartDrilling(pVehicle, uwTileRight, uwTileMid, DRILL_DIR_H);
 		}
-		else if(g_sVehicle.sSteer.bX < 0 && tileIsDrillable(uwTileLeft, uwTileMid)) {
-			vehicleStartDrilling(uwTileLeft, uwTileMid, DRILL_DIR_H);
+		else if(pVehicle->sSteer.bX < 0 && tileIsDrillable(uwTileLeft, uwTileMid)) {
+			vehicleStartDrilling(pVehicle, uwTileLeft, uwTileMid, DRILL_DIR_H);
 		}
 		else if(
-			g_sVehicle.sSteer.bY > 0 && tileIsDrillable(uwTileCenter, uwTileBottom)
+			pVehicle->sSteer.bY > 0 && tileIsDrillable(uwTileCenter, uwTileBottom)
 		) {
-			vehicleStartDrilling(uwTileCenter, uwTileBottom, DRILL_DIR_V);
+			vehicleStartDrilling(pVehicle, uwTileCenter, uwTileBottom, DRILL_DIR_V);
 		}
 	}
-	bobNewPush(&g_sVehicle.sBobBody);
+	bobNewPush(&pVehicle->sBobBody);
 
 	// Tool
-	g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
-	vehicleSetTool(TOOL_STATE_IDLE, 0);
-	bobNewPush(&g_sVehicle.sBobTool);
+	pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
+	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
+	bobNewPush(&pVehicle->sBobTool);
 
 	if(
-		7*32 <= g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwX <= 9*32 + VEHICLE_HEIGHT/2 &&
-		1*32 <= g_sVehicle.sBobBody.sPos.sUwCoord.uwY &&
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY <= 3*32 &&
-		(g_sVehicle.ubCargoCurr  || (g_sVehicle.uwFuelMax - g_sVehicle.uwFuelCurr > 100))
+		7*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwX <= 9*32 + VEHICLE_HEIGHT/2 &&
+		1*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwY <= 3*32 &&
+		(pVehicle->ubCargoCurr  || (pVehicle->uwFuelMax - pVehicle->uwFuelCurr > 100))
 	) {
-		g_sVehicle.ubCargoCurr = 0;
-		g_sVehicle.ulCash += g_sVehicle.uwCargoScore;
-		WORD wScoreNow = g_sVehicle.uwCargoScore;
-		g_sVehicle.uwCargoScore = 0;
+		pVehicle->ubCargoCurr = 0;
+		pVehicle->ulCash += pVehicle->uwCargoScore;
+		WORD wScoreNow = pVehicle->uwCargoScore;
+		pVehicle->uwCargoScore = 0;
 		hudSetCargo(0);
 		const UBYTE ubFuelPrice = 5;
 		const UBYTE ubFuelDiv = 100;
 		UWORD uwRefuelUnits = MIN(
-			(g_sVehicle.ulCash / ubFuelPrice),
-			(UWORD)(g_sVehicle.uwFuelMax - g_sVehicle.uwFuelCurr + ubFuelDiv-1) / ubFuelDiv
+			(pVehicle->ulCash / ubFuelPrice),
+			(UWORD)(pVehicle->uwFuelMax - pVehicle->uwFuelCurr + ubFuelDiv-1) / ubFuelDiv
 		);
-		g_sVehicle.uwFuelCurr = MIN(
-			g_sVehicle.uwFuelCurr + uwRefuelUnits * ubFuelDiv, g_sVehicle.uwFuelMax
+		pVehicle->uwFuelCurr = MIN(
+			pVehicle->uwFuelCurr + uwRefuelUnits * ubFuelDiv, pVehicle->uwFuelMax
 		);
-		g_sVehicle.ulCash -= uwRefuelUnits * ubFuelPrice;
+		pVehicle->ulCash -= uwRefuelUnits * ubFuelPrice;
 		wScoreNow -= uwRefuelUnits * ubFuelPrice;
 		UBYTE ubColor = 12;
 		if(wScoreNow < 0) {
 			ubColor = 6;
 		}
 		textBobSet(
-			&g_sVehicle.sTextBob, "", ubColor,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwY,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwY - 24
+			&pVehicle->sTextBob, "", ubColor,
+			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY - 24
 		);
-		sprintf(g_sVehicle.sTextBob.szText, "%+hd$", wScoreNow);
+		sprintf(pVehicle->sTextBob.szText, "%+hd$", wScoreNow);
 	}
 }
 
-static void vehicleProcessDrilling(void) {
+static void vehicleProcessDrilling(tVehicle *pVehicle) {
 	const UBYTE pTrackAnimOffs[DRILL_V_ANIM_LEN] = {
 		0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0
 	};
 	if(
-		g_sVehicle.ubDrillState == DRILL_STATE_ANIM_IN ||
-		g_sVehicle.ubDrillState == DRILL_STATE_ANIM_OUT
+		pVehicle->ubDrillState == DRILL_STATE_ANIM_IN ||
+		pVehicle->ubDrillState == DRILL_STATE_ANIM_OUT
 	) {
-		if(g_sVehicle.ubDrillState == DRILL_STATE_ANIM_IN) {
-			++g_sVehicle.ubDrillVAnimCnt;
-			if(g_sVehicle.ubDrillVAnimCnt >= DRILL_V_ANIM_LEN - 1) {
-				g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
+		if(pVehicle->ubDrillState == DRILL_STATE_ANIM_IN) {
+			++pVehicle->ubDrillVAnimCnt;
+			if(pVehicle->ubDrillVAnimCnt >= DRILL_V_ANIM_LEN - 1) {
+				pVehicle->ubDrillState = DRILL_STATE_DRILLING;
 			}
-			else if(g_sVehicle.ubDrillVAnimCnt == 5) {
-				bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, TRACK_OFFSET_DRILL);
+			else if(pVehicle->ubDrillVAnimCnt == 5) {
+				bobNewSetBitMapOffset(&pVehicle->sBobTrack, TRACK_OFFSET_DRILL);
 			}
 		}
 		else {
-			--g_sVehicle.ubDrillVAnimCnt;
-			if(!g_sVehicle.ubDrillVAnimCnt) {
-				g_sVehicle.ubDrillDir = DRILL_DIR_NONE;
+			--pVehicle->ubDrillVAnimCnt;
+			if(!pVehicle->ubDrillVAnimCnt) {
+				pVehicle->ubDrillDir = DRILL_DIR_NONE;
 			}
-			else if(g_sVehicle.ubDrillVAnimCnt == 5) {
-				bobNewSetBitMapOffset(&g_sVehicle.sBobTrack, TRACK_OFFSET_TRACK);
+			else if(pVehicle->ubDrillVAnimCnt == 5) {
+				bobNewSetBitMapOffset(&pVehicle->sBobTrack, TRACK_OFFSET_TRACK);
 			}
 		}
 
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY += pTrackAnimOffs[g_sVehicle.ubDrillVAnimCnt];
-		g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
-		vehicleSetTool(TOOL_STATE_IDLE, 0);
+		pVehicle->sBobBody.sPos.sUwCoord.uwX = fix16_to_int(pVehicle->fX);
+		pVehicle->sBobBody.sPos.sUwCoord.uwY = fix16_to_int(pVehicle->fY);
+		pVehicle->sBobBody.sPos.sUwCoord.uwY += pTrackAnimOffs[pVehicle->ubDrillVAnimCnt];
+		pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
+		vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 	}
-	else if(g_sVehicle.ubDrillState == DRILL_STATE_DRILLING) {
+	else if(pVehicle->ubDrillState == DRILL_STATE_DRILLING) {
 		// Movement
 		const fix16_t fDelta = (fix16_one*3)/4;
 		UBYTE isDoneX = 0, isDoneY = 0;
-		if(fix16_abs(g_sVehicle.fX - g_sVehicle.fDestX) <= fDelta) {
-			g_sVehicle.fX = g_sVehicle.fDestX;
+		if(fix16_abs(pVehicle->fX - pVehicle->fDestX) <= fDelta) {
+			pVehicle->fX = pVehicle->fDestX;
 			isDoneX = 1;
 		}
-		else if (g_sVehicle.fX < g_sVehicle.fDestX) {
-			g_sVehicle.fX += fDelta;
+		else if (pVehicle->fX < pVehicle->fDestX) {
+			pVehicle->fX += fDelta;
 		}
 		else {
-			g_sVehicle.fX -= fDelta;
+			pVehicle->fX -= fDelta;
 		}
 
-		if(fix16_abs(g_sVehicle.fY - g_sVehicle.fDestY) <= fDelta) {
-			g_sVehicle.fY = g_sVehicle.fDestY;
+		if(fix16_abs(pVehicle->fY - pVehicle->fDestY) <= fDelta) {
+			pVehicle->fY = pVehicle->fDestY;
 			isDoneY = 1;
 		}
-		else if (g_sVehicle.fY < g_sVehicle.fDestY) {
-			g_sVehicle.fY += fDelta;
+		else if (pVehicle->fY < pVehicle->fDestY) {
+			pVehicle->fY += fDelta;
 		}
 		else {
-			g_sVehicle.fY -= fDelta;
+			pVehicle->fY -= fDelta;
 		}
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwX = fix16_to_int(g_sVehicle.fX);
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY = fix16_to_int(g_sVehicle.fY);
+		pVehicle->sBobBody.sPos.sUwCoord.uwX = fix16_to_int(pVehicle->fX);
+		pVehicle->sBobBody.sPos.sUwCoord.uwY = fix16_to_int(pVehicle->fY);
 		// Pos for tool & track
-		g_sVehicle.sBobTrack.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
-		g_sVehicle.sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
+		pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
+		pVehicle->sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
 
 		if(isDoneX && isDoneY) {
-			if(g_sVehicle.ubDrillDir == DRILL_DIR_H) {
-				g_sVehicle.ubDrillDir = DRILL_DIR_NONE;
+			if(pVehicle->ubDrillDir == DRILL_DIR_H) {
+				pVehicle->ubDrillDir = DRILL_DIR_NONE;
 			}
 			else {
 				const UBYTE ubAdd = 4; // No grass past this point
-				UWORD uwTileBottom = (g_sVehicle.sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
-				UWORD uwCenterX = g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
+				UWORD uwTileBottom = (pVehicle->sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
+				UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
 				UWORD uwTileCenter = uwCenterX >> 5;
 				if(
-					g_sVehicle.sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom) &&
-					vehicleStartDrilling(uwTileCenter, uwTileBottom, DRILL_DIR_V)
+					pVehicle->sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom) &&
+					vehicleStartDrilling(pVehicle, uwTileCenter, uwTileBottom, DRILL_DIR_V)
 				) {
-					g_sVehicle.ubDrillState = DRILL_STATE_DRILLING;
+					pVehicle->ubDrillState = DRILL_STATE_DRILLING;
 				}
 				else {
-					g_sVehicle.ubDrillState = DRILL_STATE_ANIM_OUT;
+					pVehicle->ubDrillState = DRILL_STATE_ANIM_OUT;
 				}
 			}
 			// Center is on tile to excavate
-			UWORD uwTileX = (fix16_to_int(g_sVehicle.fX) + VEHICLE_WIDTH / 2) >> 5;
-			UWORD uwTileY = (fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT / 2) >> 5;
+			UWORD uwTileX = (fix16_to_int(pVehicle->fX) + VEHICLE_WIDTH / 2) >> 5;
+			UWORD uwTileY = (fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT / 2) >> 5;
 
-			tileExcavate(&g_sVehicle, uwTileX, uwTileY);
+			tileExcavate(pVehicle, uwTileX, uwTileY);
 			if(uwTileY == TILE_ROW_GRASS + 1) {
 				// Drilling beneath a grass - refresh it
 				tileRefreshGrass(uwTileX);
 			}
 		}
 		else {
-			g_sVehicle.sBobTool.sPos.ulYX = g_sVehicle.sBobBody.sPos.ulYX;
+			pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 			// Body shake
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwX += ubRand() & 1;
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwY += ubRand() & 1;
+			pVehicle->sBobBody.sPos.sUwCoord.uwX += ubRand() & 1;
+			pVehicle->sBobBody.sPos.sUwCoord.uwY += ubRand() & 1;
 
 			// Anim counter for Tool / track drill
 			UBYTE ubAnim = 0;
-			++g_sVehicle.ubToolAnimCnt;
-			if(g_sVehicle.ubToolAnimCnt >= 4) {
-				g_sVehicle.ubToolAnimCnt = 0;
+			++pVehicle->ubToolAnimCnt;
+			if(pVehicle->ubToolAnimCnt >= 4) {
+				pVehicle->ubToolAnimCnt = 0;
 			}
-			else if(g_sVehicle.ubToolAnimCnt >= 2) {
+			else if(pVehicle->ubToolAnimCnt >= 2) {
 				ubAnim = 1;
 			}
 
 			// Anim for Tool / track drill
-			if(g_sVehicle.ubDrillDir == DRILL_DIR_H) {
-				vehicleSetTool(TOOL_STATE_DRILL, ubAnim);
+			if(pVehicle->ubDrillDir == DRILL_DIR_H) {
+				vehicleSetTool(pVehicle, TOOL_STATE_DRILL, ubAnim);
 			}
 			else {
-				vehicleSetTool(TOOL_STATE_IDLE, 0);
+				vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 				bobNewSetBitMapOffset(
-					&g_sVehicle.sBobTrack,
+					&pVehicle->sBobTrack,
 					TRACK_OFFSET_DRILL + (ubAnim ?  VEHICLE_TRACK_HEIGHT : 0)
 				);
 			}
 		}
 	}
 
-	bobNewPush(&g_sVehicle.sBobTrack);
-	bobNewPush(&g_sVehicle.sBobBody);
-	bobNewPush(&g_sVehicle.sBobTool);
+	bobNewPush(&pVehicle->sBobTrack);
+	bobNewPush(&pVehicle->sBobBody);
+	bobNewPush(&pVehicle->sBobTool);
 }
 
-void vehicleProcess(void) {
-	textBobUpdate(&g_sVehicle.sTextBob); // MUST BE BEFORE ANY BOB PUSH
-	if(g_sVehicle.ubDrillDir) {
-		vehicleProcessDrilling();
+void vehicleProcess(tVehicle *pVehicle) {
+	textBobUpdate(&pVehicle->sTextBob); // MUST BE BEFORE ANY BOB PUSH
+	if(pVehicle->ubDrillDir) {
+		vehicleProcessDrilling(pVehicle);
 	}
 	else {
-		vehicleProcessMovement();
+		vehicleProcessMovement(pVehicle);
 	}
-	hudSetFuel(g_sVehicle.uwFuelCurr);
-	textBobAnimate(&g_sVehicle.sTextBob);
+	hudSetFuel(pVehicle->uwFuelCurr);
+	textBobAnimate(&pVehicle->sTextBob);
 }

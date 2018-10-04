@@ -63,7 +63,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	windowInit();
-	vehicleCreate();
+	vehicleCreate(&g_pVehicles[0]);
 	bobNewAllocateBgBuffers();
 	systemUnuse();
 
@@ -88,7 +88,7 @@ static void gameProcessInput(void) {
 	if(keyCheck(KEY_W)) {
 		bDirY -= 1;
 	}
-	vehicleMove(bDirX, bDirY);
+	vehicleMove(&g_pVehicles[0], bDirX, bDirY);
 }
 
 void gameGsLoop(void) {
@@ -111,17 +111,17 @@ void gameGsLoop(void) {
 	bobNewBegin();
 	tileBufferQueueProcess(g_pMainBuffer);
 	gameProcessInput();
-	vehicleProcess();
-	hudSetDepth(MAX(0, fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT - 3*32));
-	hudSetScore(g_sVehicle.ulCash);
+	vehicleProcess(&g_pVehicles[0]);
+	hudSetDepth(MAX(0, fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT - 3*32));
+	hudSetScore(g_pVehicles[0].ulCash);
 	bobNewPushingDone();
 	bobNewEnd();
 	hudUpdate();
 
 	cameraCenterAt(
 		g_pMainBuffer->pCamera,
-		fix16_to_int(g_sVehicle.fX) + VEHICLE_WIDTH / 2,
-		fix16_to_int(g_sVehicle.fY) + VEHICLE_HEIGHT / 2
+		fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2,
+		fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2
 	);
 	if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < 32) {
 		g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
@@ -141,7 +141,7 @@ void gameGsDestroy(void) {
 
 	bitmapDestroy(s_pTiles);
 	fontDestroy(g_pFont);
-	vehicleDestroy();
+	vehicleDestroy(&g_pVehicles[0]);
 	windowDeinit();
 	bobNewManagerDestroy();
 

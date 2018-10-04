@@ -165,10 +165,10 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			ubColor = 14;
 		}
 		textBobSet(
-			&g_sVehicle.sTextBob, szMessage, ubColor,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwY,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwY - 32
+			&pVehicle->sTextBob, szMessage, ubColor,
+			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
 		);
 
 	}
