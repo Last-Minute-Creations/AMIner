@@ -6,6 +6,7 @@
 #define _GAME_H_
 
 #include <ace/managers/viewport/tilebuffer.h>
+#include <ace/utils/font.h>
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
@@ -18,5 +19,6 @@ void gameGsLoop(void);
 void gameGsDestroy(void);
 
 extern tTileBufferManager *g_pMainBuffer;
+extern tFont *g_pFont;
 
 #endif // _GAME_H_

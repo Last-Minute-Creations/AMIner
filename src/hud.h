@@ -6,8 +6,9 @@
 #define _HUD_H_
 
 #include <ace/utils/extview.h>
+#include <ace/utils/font.h>
 
-void hudCreate(tView *pView);
+void hudCreate(tView *pView, tFont *pFont);
 
 void hudDestroy(void);
 

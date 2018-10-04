@@ -79,6 +79,8 @@ void vehicleCreate(void) {
 	g_sVehicle.ubJetAnimCnt = 0;
 	g_sVehicle.ubToolAnimCnt = 0;
 	g_sVehicle.ubDrillVAnimCnt = 0;
+
+	textBobCreate(&g_sVehicle.sTextBob, g_pFont);
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -91,6 +93,7 @@ void vehicleDestroy(void) {
 	bitmapDestroy(s_pJetMask);
 	bitmapDestroy(s_pToolFrames);
 	bitmapDestroy(s_pToolMask);
+	textBobDestroy(&g_sVehicle.sTextBob);
 }
 
 void vehicleMove(BYTE bDirX, BYTE bDirY) {
@@ -141,7 +144,20 @@ static inline void vehicleSetTool(tToolState eToolState, UBYTE ubFrame) {
 static inline UBYTE vehicleStartDrilling(
 	UWORD uwTileX, UWORD uwTileY, UBYTE ubDrillDir
 ) {
+	static UBYTE ubCooldown = 0;
 	if(g_sVehicle.uwFuelCurr < 30) {
+		if(!ubCooldown) {
+			textBobSet(
+				&g_sVehicle.sTextBob, "No fuel!", 6,
+				g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+				g_sVehicle.sBobBody.sPos.sUwCoord.uwY,
+				g_sVehicle.sBobBody.sPos.sUwCoord.uwY - 32
+			);
+			ubCooldown = 25;
+		}
+		else {
+			--ubCooldown;
+		}
 		return 0;
 	}
 
@@ -315,10 +331,12 @@ static void vehicleProcessMovement(void) {
 		7*32 <= g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
 		g_sVehicle.sBobBody.sPos.sUwCoord.uwX <= 9*32 + VEHICLE_HEIGHT/2 &&
 		1*32 <= g_sVehicle.sBobBody.sPos.sUwCoord.uwY &&
-		g_sVehicle.sBobBody.sPos.sUwCoord.uwY <= 3*32
+		g_sVehicle.sBobBody.sPos.sUwCoord.uwY <= 3*32 &&
+		(g_sVehicle.ubCargoCurr  || (g_sVehicle.uwFuelMax - g_sVehicle.uwFuelCurr > 100))
 	) {
 		g_sVehicle.ubCargoCurr = 0;
 		g_sVehicle.ulCash += g_sVehicle.uwCargoScore;
+		WORD wScoreNow = g_sVehicle.uwCargoScore;
 		g_sVehicle.uwCargoScore = 0;
 		hudSetCargo(0);
 		const UBYTE ubFuelPrice = 5;
@@ -331,6 +349,18 @@ static void vehicleProcessMovement(void) {
 			g_sVehicle.uwFuelCurr + uwRefuelUnits * ubFuelDiv, g_sVehicle.uwFuelMax
 		);
 		g_sVehicle.ulCash -= uwRefuelUnits * ubFuelPrice;
+		wScoreNow -= uwRefuelUnits * ubFuelPrice;
+		UBYTE ubColor = 12;
+		if(wScoreNow < 0) {
+			ubColor = 6;
+		}
+		textBobSet(
+			&g_sVehicle.sTextBob, "", ubColor,
+			g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+			g_sVehicle.sBobBody.sPos.sUwCoord.uwY,
+			g_sVehicle.sBobBody.sPos.sUwCoord.uwY - 24
+		);
+		sprintf(g_sVehicle.sTextBob.szText, "%+hd$", wScoreNow);
 	}
 }
 
@@ -463,6 +493,7 @@ static void vehicleProcessDrilling(void) {
 }
 
 void vehicleProcess(void) {
+	textBobUpdate(&g_sVehicle.sTextBob); // MUST BE BEFORE ANY BOB PUSH
 	if(g_sVehicle.ubDrillDir) {
 		vehicleProcessDrilling();
 	}
@@ -470,4 +501,5 @@ void vehicleProcess(void) {
 		vehicleProcessMovement();
 	}
 	hudSetFuel(g_sVehicle.uwFuelCurr);
+	textBobAnimate(&g_sVehicle.sTextBob);
 }

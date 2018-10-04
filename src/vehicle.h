@@ -8,6 +8,7 @@
 #include <ace/types.h>
 #include <fixmath/fix16.h>
 #include "bob_new.h"
+#include "text_bob.h"
 
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 23
@@ -31,6 +32,7 @@ typedef enum _tToolState {
 
 typedef struct _tVehicle {
 	tBCoordYX sSteer;
+	tTextBob sTextBob;
 	tBobNew sBobBody;
 	tBobNew sBobTrack;
 	tBobNew sBobJet;

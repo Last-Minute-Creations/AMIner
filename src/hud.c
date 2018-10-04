@@ -4,7 +4,6 @@
 
 #include "hud.h"
 #include <ace/managers/viewport/simplebuffer.h>
-#include <ace/utils/font.h>
 #include <ace/utils/palette.h>
 #include <ace/utils/chunky.h>
 
@@ -34,7 +33,7 @@ static UBYTE s_ubCargo, s_ubOldCargo;
 
 tHudDraw s_eDraw;
 
-void hudCreate(tView *pView) {
+void hudCreate(tView *pView, tFont *pFont) {
   s_pVpHud = vPortCreate(0,
     TAG_VPORT_VIEW, pView,
     TAG_VPORT_BPP, 4,
@@ -48,7 +47,7 @@ void hudCreate(tView *pView) {
 
 	paletteLoad("data/aminer.plt", s_pVpHud->pPalette, 16);
 
-	s_pFont = fontCreate("data/silkscreen5.fnt");
+	s_pFont = pFont;
 	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, 5);
 
 	fontDrawStr(s_pHudBuffer->pBack, s_pFont, 65, 0, "Fuel:", COLOR_ACTIVE, FONT_LAZY);
@@ -186,5 +185,4 @@ void hudUpdate(void) {
 
 void hudDestroy(void) {
 	fontDestroyTextBitMap(s_pLinebuffer);
-	fontDestroy(s_pFont);
 }

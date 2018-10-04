@@ -25,14 +25,16 @@ tTileBufferManager *g_pMainBuffer;
 static tBitMap *s_pTiles;
 static UBYTE s_isDebug = 0;
 static UWORD s_uwColorBg;
+tFont *g_pFont;
 
 void gameGsCreate(void) {
   s_pView = viewCreate(0,
     TAG_VIEW_GLOBAL_CLUT, 1,
   TAG_END);
 
-	hudCreate(s_pView);
+	g_pFont = fontCreate("data/silkscreen5.fnt");
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
+	hudCreate(s_pView, g_pFont);
 
   s_pVpMain = vPortCreate(0,
     TAG_VPORT_VIEW, s_pView,
@@ -138,6 +140,7 @@ void gameGsDestroy(void) {
   systemUse();
 
 	bitmapDestroy(s_pTiles);
+	fontDestroy(g_pFont);
 	vehicleDestroy();
 	windowDeinit();
 	bobNewManagerDestroy();

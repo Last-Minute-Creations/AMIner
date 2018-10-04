@@ -140,6 +140,8 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	}
 
 	// Load mineral to vehicle
+	static const char * const pMessages[] = {"GOLD x1", "GOLD x2", "GOLD x3", "GOLD x4", "GOLD x5"};
+	static const char * const szMessageFull = "Cargo full!";
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	UBYTE ubScorePerSlot = 0;
 	UBYTE ubSlots = 0;
@@ -147,10 +149,29 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		ubScorePerSlot = 5;
 		ubSlots = (ubTile == TILE_GOLD_4 ? 5 : ubTile - TILE_GOLD_1 + 1);
 	}
-	ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
-	pVehicle->uwCargoScore += ubScorePerSlot * ubSlots;
-	pVehicle->ubCargoCurr += ubSlots;
-	hudSetCargo(pVehicle->ubCargoCurr);
+	if(ubSlots) {
+		ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
+		pVehicle->uwCargoScore += ubScorePerSlot * ubSlots;
+		pVehicle->ubCargoCurr += ubSlots;
+		hudSetCargo(pVehicle->ubCargoCurr);
+		const char *szMessage;
+		UBYTE ubColor;
+		if(pVehicle->ubCargoCurr == pVehicle->ubCargoMax) {
+			szMessage = szMessageFull;
+			ubColor = 6;
+		}
+		else {
+			szMessage = pMessages[ubSlots-1];
+			ubColor = 14;
+		}
+		textBobSet(
+			&g_sVehicle.sTextBob, szMessage, ubColor,
+			g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+			g_sVehicle.sBobBody.sPos.sUwCoord.uwY,
+			g_sVehicle.sBobBody.sPos.sUwCoord.uwY - 32
+		);
+
+	}
 
 	tileBufferSetTile(g_pMainBuffer, uwX, uwY, ubBg);
 }
