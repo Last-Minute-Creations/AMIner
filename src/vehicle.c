@@ -440,7 +440,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
 				UWORD uwTileCenter = uwCenterX >> 5;
 				if(
-					pVehicle->sSteer.bY > 0 && tileIsSolid(uwTileCenter, uwTileBottom) &&
+					pVehicle->sSteer.bY > 0 && tileIsDrillable(uwTileCenter, uwTileBottom) &&
 					vehicleStartDrilling(pVehicle, uwTileCenter, uwTileBottom, DRILL_DIR_V)
 				) {
 					pVehicle->ubDrillState = DRILL_STATE_DRILLING;
