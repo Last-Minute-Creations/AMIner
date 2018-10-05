@@ -13,10 +13,14 @@
 #define FUEL_LABEL_X 58
 #define HULL_LABEL_X 57
 #define CARGO_LABEL_X 101
+#define DEPTH_LABEL_X 0
+#define CASH_LABEL_X 3
 
 #define FUEL_GAUGE_X 78
 #define HULL_GAUGE_X 78
 #define CARGO_GAUGE_X 129
+#define DEPTH_GAUGE_X 26
+#define CASH_GAUGE_X 26
 
 #define ROW_1_Y 0
 #define ROW_2_Y 8
@@ -68,16 +72,24 @@ void hudCreate(tView *pView, const tFont *pFont) {
 
 	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
 		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + FUEL_LABEL_X, 0,
+			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + FUEL_LABEL_X, ROW_1_Y,
 			"Fuel:", COLOR_ACTIVE, FONT_LAZY
 		);
 		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + HULL_LABEL_X, 8,
+			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + HULL_LABEL_X, ROW_2_Y,
 			"Hull:", COLOR_ACTIVE, FONT_LAZY
 		);
 		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + CARGO_LABEL_X, 0,
+			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + CARGO_LABEL_X, ROW_1_Y,
 			"Cargo:", COLOR_ACTIVE, FONT_LAZY
+		);
+		fontDrawStr(
+			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + DEPTH_LABEL_X, ROW_1_Y,
+			"Depth:", COLOR_ACTIVE, FONT_LAZY
+		);
+		fontDrawStr(
+			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + CASH_LABEL_X, ROW_2_Y,
+			"Cash:", COLOR_ACTIVE, FONT_LAZY
 		);
 
 		// Fuel inactive gauge
@@ -148,7 +160,7 @@ void hudUpdate(void) {
 	switch(s_eDraw) {
 		case HUD_PREPARE_DEPTH:{
 			if(pData->uwDepth != pData->uwOldDepth) {
-				sprintf(szBfr, "Depth: %5u", pData->uwDepth);
+				sprintf(szBfr, "%5u", pData->uwDepth);
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
 				pData->uwOldDepth = pData->uwDepth;
 			}
@@ -158,10 +170,10 @@ void hudUpdate(void) {
 			}
 		} break;
 		case HUD_DRAW_DEPTH: {
-			blitRect(s_pHudBuffer->pBack, s_uwHudOffsX, ROW_1_Y, 54, 5, 0);
+			blitRect(s_pHudBuffer->pBack, s_uwHudOffsX + DEPTH_GAUGE_X, ROW_1_Y, 28, 5, 0);
 			fontDrawTextBitMap(
 				s_pHudBuffer->pBack, s_pLinebuffer,
-				s_uwHudOffsX, ROW_1_Y, COLOR_ACTIVE, FONT_LAZY | FONT_COOKIE
+				s_uwHudOffsX + DEPTH_GAUGE_X, ROW_1_Y, COLOR_ACTIVE, FONT_LAZY | FONT_COOKIE
 			);
 		} break;
 		case HUD_DRAW_FUEL: {
@@ -207,7 +219,7 @@ void hudUpdate(void) {
 		} break;
 		case HUD_PREPARE_CASH: {
 			if(pData->ulCash != pData->ulOldCash) {
-				sprintf(szBfr, "Cash: %5u", pData->ulCash);
+				sprintf(szBfr, "%5u", pData->ulCash);
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
 				pData->ulOldCash = pData->ulCash;
 			}
@@ -217,10 +229,10 @@ void hudUpdate(void) {
 			}
 		} break;
 		case HUD_DRAW_CASH: {
-			blitRect(s_pHudBuffer->pBack, s_uwHudOffsX + 3, ROW_2_Y, 51, 5, 0);
+			blitRect(s_pHudBuffer->pBack, s_uwHudOffsX + CASH_GAUGE_X, ROW_2_Y, 28, 5, 0);
 			fontDrawTextBitMap(
 				s_pHudBuffer->pBack, s_pLinebuffer,
-				s_uwHudOffsX + 3, ROW_2_Y, COLOR_ACTIVE, FONT_LAZY | FONT_COOKIE
+				s_uwHudOffsX + CASH_GAUGE_X, ROW_2_Y, COLOR_ACTIVE, FONT_LAZY | FONT_COOKIE
 			);
 		} break;
 		default: {
