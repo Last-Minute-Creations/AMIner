@@ -522,8 +522,9 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 
 void vehicleProcessText(void) {
 	// MUST BE BEFORE ANY BOB PUSH
-	textBobUpdate(&g_pVehicles[0].sTextBob);
-	textBobUpdate(&g_pVehicles[1].sTextBob);
+	static UBYTE ubPlayer = 0;
+	textBobUpdate(&g_pVehicles[ubPlayer].sTextBob);
+	ubPlayer = !ubPlayer;
 }
 
 void vehicleProcess(tVehicle *pVehicle) {
