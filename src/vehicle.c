@@ -178,6 +178,17 @@ static inline UBYTE vehicleStartDrilling(
 		return 0;
 	}
 
+	// Check if other player drills the same tile
+	const tVehicle * const pOther = &g_pVehicles[!pVehicle->ubPlayerIdx];
+	if(
+		pOther->ubDrillDir &&
+		pOther->uwDrillTileX == uwTileX && pOther->uwDrillTileY == uwTileY
+	) {
+		return 0;
+	}
+	pVehicle->uwDrillTileX = uwTileX;
+	pVehicle->uwDrillTileY = uwTileY;
+
 	if(ubDrillDir == DRILL_DIR_V) {
 		pVehicle->ubDrillState = DRILL_STATE_ANIM_IN;
 	}
