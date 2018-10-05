@@ -99,6 +99,8 @@ void tileInit(void) {
 	g_pMainBuffer->pTileData[8][1] = TILE_SHOP_2;
 	g_pMainBuffer->pTileData[7][2] = TILE_SHOP_3;
 	g_pMainBuffer->pTileData[8][2] = TILE_SHOP_4;
+	g_pMainBuffer->pTileData[7][3] = TILE_STONE_1;
+	g_pMainBuffer->pTileData[8][3] = TILE_STONE_2;
 }
 
 void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
