@@ -158,6 +158,7 @@ void hudUpdate(void) {
 			}
 		} break;
 		case HUD_DRAW_DEPTH: {
+			blitRect(s_pHudBuffer->pBack, s_uwHudOffsX, ROW_1_Y, 54, 5, 0);
 			fontDrawTextBitMap(
 				s_pHudBuffer->pBack, s_pLinebuffer,
 				s_uwHudOffsX, ROW_1_Y, COLOR_ACTIVE, FONT_LAZY | FONT_COOKIE
@@ -216,6 +217,7 @@ void hudUpdate(void) {
 			}
 		} break;
 		case HUD_DRAW_CASH: {
+			blitRect(s_pHudBuffer->pBack, s_uwHudOffsX + 3, ROW_2_Y, 51, 5, 0);
 			fontDrawTextBitMap(
 				s_pHudBuffer->pBack, s_pLinebuffer,
 				s_uwHudOffsX + 3, ROW_2_Y, COLOR_ACTIVE, FONT_LAZY | FONT_COOKIE
