@@ -76,6 +76,8 @@ void vehicleDestroy(tVehicle *pVehicle);
 
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);
 
+void vehicleProcessText(void);
+
 void vehicleProcess(tVehicle *pVehicle);
 
 tVehicle g_pVehicles[2];

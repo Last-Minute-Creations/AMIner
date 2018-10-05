@@ -520,8 +520,13 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 	bobNewPush(&pVehicle->sBobTool);
 }
 
+void vehicleProcessText(void) {
+	// MUST BE BEFORE ANY BOB PUSH
+	textBobUpdate(&g_pVehicles[0].sTextBob);
+	textBobUpdate(&g_pVehicles[1].sTextBob);
+}
+
 void vehicleProcess(tVehicle *pVehicle) {
-	textBobUpdate(&pVehicle->sTextBob); // MUST BE BEFORE ANY BOB PUSH
 	if(pVehicle->ubDrillDir) {
 		vehicleProcessDrilling(pVehicle);
 	}

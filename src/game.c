@@ -132,6 +132,7 @@ void gameGsLoop(void) {
 	bobNewBegin();
 	tileBufferQueueProcess(g_pMainBuffer);
 	gameProcessInput();
+	vehicleProcessText();
 	debugColor(0x080);
 	vehicleProcess(&g_pVehicles[0]);
 	debugColor(0x880);
@@ -141,11 +142,19 @@ void gameGsLoop(void) {
 	bobNewEnd();
 	hudUpdate();
 
+	UWORD uwCamX, uwCamY;
+	if(0) {
+		// One player only
+		uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
+		uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
+	}
+	else {
+		// Two players
+		uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
+		uwCamY = (fix16_to_int(g_pVehicles[0].fY) + fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT) / 2;
+	}
 	cameraCenterAt(
-		g_pMainBuffer->pCamera,
-		fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2,
-		fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2
-	);
+		g_pMainBuffer->pCamera, uwCamX, uwCamY);
 	if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < 32) {
 		g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
 	}
