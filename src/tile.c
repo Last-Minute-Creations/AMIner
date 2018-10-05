@@ -93,6 +93,7 @@ void tileInit(void) {
 	for(UWORD y = 0; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
 		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
 	}
+	g_pMainBuffer->pTileData[0][TILE_ROW_GRASS] = TILE_GRASS_1;
 	// Shop
 	g_pMainBuffer->pTileData[7][1] = TILE_SHOP_1;
 	g_pMainBuffer->pTileData[8][1] = TILE_SHOP_2;
