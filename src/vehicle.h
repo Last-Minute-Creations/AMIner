@@ -61,16 +61,25 @@ typedef struct _tVehicle {
 	ULONG ulCash;
 	UWORD uwFuelCurr;
 	UWORD uwFuelMax;
+	UWORD uwDrillTileX;
+	UWORD uwDrillTileY;
+	UBYTE ubPlayerIdx;
 } tVehicle;
 
-void vehicleCreate(void);
+void vehicleBitmapsCreate(void);
 
-void vehicleDestroy(void);
+void vehicleBitmapsDestroy(void);
 
-void vehicleMove(BYTE bDirX, BYTE bDirY);
+void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx);
 
-void vehicleProcess(void);
+void vehicleDestroy(tVehicle *pVehicle);
 
-tVehicle g_sVehicle;
+void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);
+
+void vehicleProcessText(void);
+
+void vehicleProcess(tVehicle *pVehicle);
+
+tVehicle g_pVehicles[2];
 
 #endif // _VEHICLE_H_

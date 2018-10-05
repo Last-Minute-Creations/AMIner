@@ -8,17 +8,22 @@
 #include <ace/utils/extview.h>
 #include <ace/utils/font.h>
 
-void hudCreate(tView *pView, tFont *pFont);
+typedef enum _tHudPlayer {
+	PLAYER_1 = 0,
+	PLAYER_2
+} tHudPlayer;
+
+void hudCreate(tView *pView, const tFont *pFont);
 
 void hudDestroy(void);
 
-void hudSetDepth(UWORD uwDepth);
+void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth);
 
-void hudSetScore(ULONG ulCash);
+void hudSetScore(UBYTE ubPlayer, ULONG ulCash);
 
-void hudSetCargo(UBYTE ubCargo);
+void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo);
 
-void hudSetFuel(UWORD uwFuel);
+void hudSetFuel(UBYTE ubPlayer, UWORD uwFuel);
 
 void hudUpdate(void);
 

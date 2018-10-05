@@ -93,11 +93,14 @@ void tileInit(void) {
 	for(UWORD y = 0; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
 		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
 	}
+	g_pMainBuffer->pTileData[0][TILE_ROW_GRASS] = TILE_GRASS_1;
 	// Shop
 	g_pMainBuffer->pTileData[7][1] = TILE_SHOP_1;
 	g_pMainBuffer->pTileData[8][1] = TILE_SHOP_2;
 	g_pMainBuffer->pTileData[7][2] = TILE_SHOP_3;
 	g_pMainBuffer->pTileData[8][2] = TILE_SHOP_4;
+	g_pMainBuffer->pTileData[7][3] = TILE_STONE_1;
+	g_pMainBuffer->pTileData[8][3] = TILE_STONE_2;
 }
 
 void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
@@ -153,7 +156,7 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
 		pVehicle->uwCargoScore += ubScorePerSlot * ubSlots;
 		pVehicle->ubCargoCurr += ubSlots;
-		hudSetCargo(pVehicle->ubCargoCurr);
+		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr);
 		const char *szMessage;
 		UBYTE ubColor;
 		if(pVehicle->ubCargoCurr == pVehicle->ubCargoMax) {
@@ -165,10 +168,10 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			ubColor = 14;
 		}
 		textBobSet(
-			&g_sVehicle.sTextBob, szMessage, ubColor,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwY,
-			g_sVehicle.sBobBody.sPos.sUwCoord.uwY - 32
+			&pVehicle->sTextBob, szMessage, ubColor,
+			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
 		);
 
 	}
