@@ -20,5 +20,6 @@ void gameGsDestroy(void);
 
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
+extern UBYTE g_is2pPlaying;
 
 #endif // _GAME_H_

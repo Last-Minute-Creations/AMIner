@@ -26,6 +26,7 @@ static tBitMap *s_pTiles;
 static UBYTE s_isDebug = 0;
 static UWORD s_uwColorBg;
 tFont *g_pFont;
+UBYTE g_is2pPlaying;
 
 void gameGsCreate(void) {
   s_pView = viewCreate(0,
@@ -70,6 +71,7 @@ void gameGsCreate(void) {
 	systemUnuse();
 
 	s_isDebug = 0;
+	g_is2pPlaying = 0;
 	tileBufferInitialDraw(g_pMainBuffer);
 
   // Load the view
@@ -135,15 +137,17 @@ void gameGsLoop(void) {
 	vehicleProcessText();
 	debugColor(0x080);
 	vehicleProcess(&g_pVehicles[0]);
-	debugColor(0x880);
-	vehicleProcess(&g_pVehicles[1]);
+	if(g_is2pPlaying) {
+		debugColor(0x880);
+		vehicleProcess(&g_pVehicles[1]);
+	}
 	debugColor(0x088);
 	bobNewPushingDone();
 	bobNewEnd();
 	hudUpdate();
 
 	UWORD uwCamX, uwCamY;
-	if(0) {
+	if(!g_is2pPlaying) {
 		// One player only
 		uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
 		uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
