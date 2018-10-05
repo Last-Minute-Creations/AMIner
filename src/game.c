@@ -63,7 +63,9 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	windowInit();
-	vehicleCreate(&g_pVehicles[0]);
+	vehicleBitmapsCreate();
+	vehicleCreate(&g_pVehicles[0], PLAYER_1);
+	vehicleCreate(&g_pVehicles[1], PLAYER_2);
 	bobNewAllocateBgBuffers();
 	systemUnuse();
 
@@ -89,6 +91,28 @@ static void gameProcessInput(void) {
 		bDirY -= 1;
 	}
 	vehicleMove(&g_pVehicles[0], bDirX, bDirY);
+
+	bDirX = 0;
+	bDirY = 0;
+	if(keyCheck(KEY_RIGHT)) {
+		bDirX += 1;
+	}
+	if(keyCheck(KEY_LEFT)) {
+		bDirX -= 1;
+	}
+	if(keyCheck(KEY_DOWN)) {
+		bDirY += 1;
+	}
+	if(keyCheck(KEY_UP)) {
+		bDirY -= 1;
+	}
+	vehicleMove(&g_pVehicles[1], bDirX, bDirY);
+}
+
+static inline void debugColor(UWORD uwColor) {
+	if(s_isDebug) {
+		g_pCustom->color[0] = uwColor;
+	}
 }
 
 void gameGsLoop(void) {
@@ -104,16 +128,15 @@ void gameGsLoop(void) {
 		return;
 	}
 
-	if(s_isDebug) {
-		g_pCustom->color[0] = 0x008;
-	}
-
+	debugColor(0x008);
 	bobNewBegin();
 	tileBufferQueueProcess(g_pMainBuffer);
 	gameProcessInput();
+	debugColor(0x080);
 	vehicleProcess(&g_pVehicles[0]);
-	hudSetDepth(MAX(0, fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT - 3*32));
-	hudSetScore(g_pVehicles[0].ulCash);
+	debugColor(0x880);
+	vehicleProcess(&g_pVehicles[1]);
+	debugColor(0x088);
 	bobNewPushingDone();
 	bobNewEnd();
 	hudUpdate();
@@ -126,12 +149,10 @@ void gameGsLoop(void) {
 	if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < 32) {
 		g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
 	}
-	if(s_isDebug) {
-		g_pCustom->color[0] = 0x800;
-	}
+	debugColor(0x800);
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
-	g_pCustom->color[0] = s_uwColorBg;
+	debugColor(s_uwColorBg);
 	vPortWaitForEnd(s_pVpMain);
 }
 
@@ -142,6 +163,8 @@ void gameGsDestroy(void) {
 	bitmapDestroy(s_pTiles);
 	fontDestroy(g_pFont);
 	vehicleDestroy(&g_pVehicles[0]);
+	vehicleDestroy(&g_pVehicles[1]);
+	vehicleBitmapsDestroy();
 	windowDeinit();
 	bobNewManagerDestroy();
 

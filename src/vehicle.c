@@ -28,8 +28,7 @@ tBitMap *s_pToolFrames, *s_pToolMask;
 
 UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {0,1,2,3,4,5,4,3,2,1,0};
 
-void vehicleCreate(tVehicle *pVehicle) {
-	logBlockBegin("vehicleCreate()");
+void vehicleBitmapsCreate(void) {
 	// Load gfx
 	s_pBodyFrames = bitmapCreateFromFile("data/drill.bm");
 	s_pBodyMask = bitmapCreateFromFile("data/drill_mask.bm");
@@ -39,6 +38,21 @@ void vehicleCreate(tVehicle *pVehicle) {
 	s_pJetMask = bitmapCreateFromFile("data/jet_mask.bm");
 	s_pToolFrames = bitmapCreateFromFile("data/tool.bm");
 	s_pToolMask = bitmapCreateFromFile("data/tool_mask.bm");
+}
+
+void vehicleBitmapsDestroy(void) {
+	bitmapDestroy(s_pBodyFrames);
+	bitmapDestroy(s_pBodyMask);
+	bitmapDestroy(s_pTrackFrames);
+	bitmapDestroy(s_pTrackMask);
+	bitmapDestroy(s_pJetFrames);
+	bitmapDestroy(s_pJetMask);
+	bitmapDestroy(s_pToolFrames);
+	bitmapDestroy(s_pToolMask);
+}
+
+void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
+	logBlockBegin("vehicleCreate()");
 
 	// Setup bobs
 	bobNewInit(
@@ -57,6 +71,7 @@ void vehicleCreate(tVehicle *pVehicle) {
 		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
 		s_pToolFrames, s_pToolMask, 0, 0
 	);
+	pVehicle->ubPlayerIdx = ubIdx;
 
 	// Initial values
 	pVehicle->ubCargoCurr = 0;
@@ -65,10 +80,7 @@ void vehicleCreate(tVehicle *pVehicle) {
 	pVehicle->ulCash = 0;
 	pVehicle->uwFuelMax = 1000;
 	pVehicle->uwFuelCurr = 1000;
-	pVehicle->fX = fix16_from_int(64);
-	pVehicle->fY = fix16_from_int(32);
-	pVehicle->fDx = 0;
-	pVehicle->fDy = 0;
+
 	pVehicle->ubDrillDir = 0;
 
 	pVehicle->ubTrackAnimCnt = 0;
@@ -80,19 +92,22 @@ void vehicleCreate(tVehicle *pVehicle) {
 	pVehicle->ubToolAnimCnt = 0;
 	pVehicle->ubDrillVAnimCnt = 0;
 
+	pVehicle->fY = fix16_from_int(32);
+	pVehicle->fDx = 0;
+	pVehicle->fDy = 0;
+	if(ubIdx == PLAYER_1) {
+		pVehicle->fX = fix16_from_int(64);
+		vehicleMove(pVehicle, 1, 0);
+	}
+	else {
+		pVehicle->fX = fix16_from_int(320-32);
+		vehicleMove(pVehicle, -1, 0);
+	}
 	textBobCreate(&pVehicle->sTextBob, g_pFont);
 	logBlockEnd("vehicleCreate()");
 }
 
 void vehicleDestroy(tVehicle *pVehicle) {
-	bitmapDestroy(s_pBodyFrames);
-	bitmapDestroy(s_pBodyMask);
-	bitmapDestroy(s_pTrackFrames);
-	bitmapDestroy(s_pTrackMask);
-	bitmapDestroy(s_pJetFrames);
-	bitmapDestroy(s_pJetMask);
-	bitmapDestroy(s_pToolFrames);
-	bitmapDestroy(s_pToolMask);
 	textBobDestroy(&pVehicle->sTextBob);
 }
 
@@ -340,7 +355,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->ulCash += pVehicle->uwCargoScore;
 		WORD wScoreNow = pVehicle->uwCargoScore;
 		pVehicle->uwCargoScore = 0;
-		hudSetCargo(0);
+		hudSetCargo(pVehicle->ubPlayerIdx, 0);
 		const UBYTE ubFuelPrice = 5;
 		const UBYTE ubFuelDiv = 100;
 		UWORD uwRefuelUnits = MIN(
@@ -502,6 +517,8 @@ void vehicleProcess(tVehicle *pVehicle) {
 	else {
 		vehicleProcessMovement(pVehicle);
 	}
-	hudSetFuel(pVehicle->uwFuelCurr);
+	hudSetFuel(pVehicle->ubPlayerIdx, pVehicle->uwFuelCurr);
 	textBobAnimate(&pVehicle->sTextBob);
+	hudSetDepth(pVehicle->ubPlayerIdx, MAX(0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - 3*32));
+	hudSetScore(pVehicle->ubPlayerIdx, pVehicle->ulCash);
 }

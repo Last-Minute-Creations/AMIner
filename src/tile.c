@@ -153,7 +153,7 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
 		pVehicle->uwCargoScore += ubScorePerSlot * ubSlots;
 		pVehicle->ubCargoCurr += ubSlots;
-		hudSetCargo(pVehicle->ubCargoCurr);
+		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr);
 		const char *szMessage;
 		UBYTE ubColor;
 		if(pVehicle->ubCargoCurr == pVehicle->ubCargoMax) {

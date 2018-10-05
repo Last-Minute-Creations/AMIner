@@ -61,9 +61,14 @@ typedef struct _tVehicle {
 	ULONG ulCash;
 	UWORD uwFuelCurr;
 	UWORD uwFuelMax;
+	UBYTE ubPlayerIdx;
 } tVehicle;
 
-void vehicleCreate(tVehicle *pVehicle);
+void vehicleBitmapsCreate(void);
+
+void vehicleBitmapsDestroy(void);
+
+void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx);
 
 void vehicleDestroy(tVehicle *pVehicle);
 
