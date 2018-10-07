@@ -28,9 +28,37 @@ typedef enum _tTile {
 	TILE_GOLD_1,
 	TILE_GOLD_2,
 	TILE_GOLD_3,
-	TILE_GOLD_4
+	TILE_SILVER_1,
+	TILE_SILVER_2,
+	TILE_SILVER_3,
+	TILE_URANIUM_1,
+	TILE_URANIUM_2,
+	TILE_URANIUM_3,
+	TILE_COAL_1,
+	TILE_COAL_2,
+	TILE_COAL_3
 } tTile;
 // TODO sapphire, emerald, topaz
+
+typedef struct _tTileDef {
+	const char *szMsg;
+	UBYTE ubReward;
+	UBYTE ubSlots;
+	UBYTE ubColor;
+} tTileDef;
+
+static const tTileDef const s_pTileDefs[] = {
+	{.szMsg = 0, .ubReward = 0, .ubSlots = 0},
+	[TILE_SILVER_1] = {.szMsg = "Silver x1", .ubReward = 5, .ubSlots = 1, .ubColor = 15},
+	[TILE_SILVER_2] = {.szMsg = "Silver x2", .ubReward = 5, .ubSlots = 2, .ubColor = 15},
+	[TILE_SILVER_3] = {.szMsg = "Silver x3", .ubReward = 5, .ubSlots = 3, .ubColor = 15},
+	[TILE_GOLD_1] = {.szMsg = "Gold x1", .ubReward = 10, .ubSlots = 1, .ubColor = 14},
+	[TILE_GOLD_2] = {.szMsg = "Gold x2", .ubReward = 10, .ubSlots = 2, .ubColor = 14},
+	[TILE_GOLD_3] = {.szMsg = "Gold x3", .ubReward = 10, .ubSlots = 3, .ubColor = 14},
+	[TILE_URANIUM_1] = {.szMsg = "Uranium x1", .ubReward = 20, .ubSlots = 1, .ubColor = 12},
+	[TILE_URANIUM_2] = {.szMsg = "Uranium x2", .ubReward = 20, .ubSlots = 2, .ubColor = 12},
+	[TILE_URANIUM_3] = {.szMsg = "Uranium x3", .ubReward = 20, .ubSlots = 3, .ubColor = 12}
+};
 
 void tileRefreshGrass(UWORD uwX) {
 	UBYTE ubCurrTile = TILE_GRASS_NONE;
@@ -64,6 +92,26 @@ UBYTE tileIsDrillable(UWORD uwX, UWORD uwY) {
 	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_ROCK_1;
 }
 
+static UWORD chanceTrapezoid(
+	UWORD uwCurr, UWORD uwStart, UWORD uwPeakStart, UWORD uwPeakEnd, UWORD uwEnd,
+	UWORD uwMin, UWORD uwMax
+) {
+	if(uwStart < uwCurr && uwCurr < uwPeakStart) {
+		// Ascending ramp
+		return uwMin + ((uwMax - uwMin) * (uwCurr - uwStart)) / (uwPeakStart - uwStart);
+	}
+	if(uwPeakStart <= uwCurr && uwCurr <= uwPeakEnd) {
+		// Peak
+		return uwMax;
+	}
+	if(uwPeakEnd < uwCurr && uwCurr < uwEnd) {
+		// Descending ramp
+		return uwMax - ((uwMax - uwMin) * (uwCurr - uwPeakEnd)) / (uwEnd - uwPeakEnd);
+	}
+	// Out of range
+	return uwMin;
+}
+
 void tileInit(void) {
 	for(UWORD x = 1; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
 		for(UWORD y = 0; y < TILE_ROW_GRASS; ++y) {
@@ -71,19 +119,31 @@ void tileInit(void) {
 		}
 		g_pMainBuffer->pTileData[x][TILE_ROW_GRASS] = TILE_GRASS_1 + (x & 1);
 		for(UWORD y = TILE_ROW_GRASS + 1; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
-			UBYTE ubChance = (ubRand() * 100) / 255;
-			UBYTE ubChanceRock = CLAMP(y * 50 / 2000, 0, 50);
-			if(ubChance < 20) {
-				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_GOLD_1, TILE_GOLD_4);
-			}
-			else if(ubChance < 20 + ubChanceRock) {
+			// 2000 is max
+			UWORD uwWhat = (uwRand() * 1000) / 65535;
+			UWORD uwChanceAir = 50;
+			UWORD uwChanceRock = CLAMP(y * 500 / 2000, 0, 500);
+			UWORD uwChanceSilver = chanceTrapezoid(y, 10, 30, 50, 100, 5, 200);
+			UWORD uwChanceGold = chanceTrapezoid(y, 60, 120, 150, 250, 2, 200);
+			UWORD uwChanceUranium = chanceTrapezoid(y, 175, 400, 450, 600, 1, 200);
+			UWORD uwChance;
+			if(uwWhat < (uwChance = uwChanceRock)) {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_2);
 			}
 			else if(
-				ubChance < 20 + ubChanceRock + 5 &&
+				uwWhat < (uwChance += uwChanceAir) &&
 				tileIsSolid(x - 1, y) && tileIsSolid(x, y - 1)
 			) {
 				g_pMainBuffer->pTileData[x][y] = TILE_CAVE_BG+15;
+			}
+			else if(uwWhat < (uwChance += uwChanceSilver)) {
+				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_SILVER_1, TILE_SILVER_3);
+			}
+			else if(uwWhat < (uwChance += uwChanceGold)) {
+				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_GOLD_1, TILE_GOLD_3);
+			}
+			else if(uwWhat < (uwChance += uwChanceUranium)) {
+				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_URANIUM_1, TILE_URANIUM_3);
 			}
 			else {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_ROCK_1, TILE_ROCK_2);
@@ -143,18 +203,13 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	}
 
 	// Load mineral to vehicle
-	static const char * const pMessages[] = {"GOLD x1", "GOLD x2", "GOLD x3", "GOLD x4", "GOLD x5"};
 	static const char * const szMessageFull = "Cargo full!";
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
-	UBYTE ubScorePerSlot = 0;
 	UBYTE ubSlots = 0;
-	if(TILE_GOLD_1 <= ubTile && ubTile <= TILE_GOLD_4) {
-		ubScorePerSlot = 5;
-		ubSlots = (ubTile == TILE_GOLD_4 ? 5 : ubTile - TILE_GOLD_1 + 1);
-	}
-	if(ubSlots) {
+	if(s_pTileDefs[ubTile].szMsg) {
+		ubSlots = s_pTileDefs[ubTile].ubSlots;
 		ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
-		pVehicle->uwCargoScore += ubScorePerSlot * ubSlots;
+		pVehicle->uwCargoScore += s_pTileDefs[ubTile].ubReward * ubSlots;
 		pVehicle->ubCargoCurr += ubSlots;
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr);
 		const char *szMessage;
@@ -164,8 +219,8 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			ubColor = 6;
 		}
 		else {
-			szMessage = pMessages[ubSlots-1];
-			ubColor = 14;
+			szMessage = s_pTileDefs[ubTile].szMsg;
+			ubColor = s_pTileDefs[ubTile].ubColor;
 		}
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, ubColor,
@@ -173,7 +228,6 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			pVehicle->sBobBody.sPos.sUwCoord.uwY,
 			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
 		);
-
 	}
 
 	tileBufferSetTile(g_pMainBuffer, uwX, uwY, ubBg);

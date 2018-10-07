@@ -71,7 +71,7 @@ void gameGsCreate(void) {
 	systemUnuse();
 
 	s_isDebug = 0;
-	g_is2pPlaying = 0;
+	g_is2pPlaying = 1;
 	tileBufferInitialDraw(g_pMainBuffer);
 
   // Load the view
