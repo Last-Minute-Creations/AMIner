@@ -103,7 +103,7 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 		pVehicle->fX = fix16_from_int(320-32);
 		vehicleMove(pVehicle, -1, 0);
 	}
-	textBobCreate(&pVehicle->sTextBob, g_pFont);
+	textBobCreate(&pVehicle->sTextBob, g_pFont, "Uranium x200");
 	logBlockEnd("vehicleCreate()");
 }
 

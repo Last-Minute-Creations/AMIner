@@ -5,12 +5,13 @@
 #include "text_bob.h"
 
 void textBobCreate(
-	tTextBob *pTextBob, const tFont *pFont
+	tTextBob *pTextBob, const tFont *pFont, const char *szMaxText
 ) {
+	tUwCoordYX sBounds = fontMeasureText(pFont, szMaxText);
 	pTextBob->pFont = pFont;
-	pTextBob->uwWidth = 64;
+	pTextBob->uwWidth = ((sBounds.sUwCoord.uwX + 3 + 15) / 16) * 16;
 	pTextBob->pTextBitmap = fontCreateTextBitMap(pTextBob->uwWidth, pFont->uwHeight);
-	UWORD uwHeight = pFont->uwHeight + 3;
+	UWORD uwHeight = sBounds.sUwCoord.uwY + 3;
 	tBitMap *pTextBm = bitmapCreate(
 		pTextBob->uwWidth, uwHeight, 4, BMF_INTERLEAVED | BMF_CLEAR
 	);
@@ -39,31 +40,32 @@ void textBobUpdate(tTextBob *pTextBob) {
 	if(!pTextBob->isUpdateRequired) {
 		return;
 	}
+	UWORD uwWidth = pTextBob->uwWidth;
 	fontFillTextBitMap(pTextBob->pFont, pTextBob->pTextBitmap, pTextBob->szText);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pBitmap, pTextBob->pTextBitmap, 64/2 + 1, 1,
+		pTextBob->sBob.pBitmap, pTextBob->pTextBitmap, uwWidth/2 + 1, 1,
 		pTextBob->ubColor, FONT_HCENTER
 	);
 	// Mask outline
-	blitRect(pTextBob->sBob.pMask, 0, 0, 64, pTextBob->sBob.pMask->Rows, 0);
+	blitRect(pTextBob->sBob.pMask, 0, 0, uwWidth, pTextBob->sBob.pMask->Rows, 0);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 64/2+1, 1, 15,
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+1, 1, 15,
 		FONT_HCENTER
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 64/2+1, 0, 15,
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+1, 0, 15,
 		FONT_COOKIE | FONT_HCENTER
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 64/2+1, 2, 15,
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+1, 2, 15,
 		FONT_COOKIE | FONT_HCENTER
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 64/2+0, 1, 15,
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+0, 1, 15,
 		FONT_COOKIE | FONT_HCENTER
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 64/2+2, 1, 15,
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+2, 1, 15,
 		FONT_COOKIE | FONT_HCENTER
 	);
 	pTextBob->isUpdateRequired = 0;

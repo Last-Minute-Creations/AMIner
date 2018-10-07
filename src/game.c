@@ -17,6 +17,7 @@
 #include "tile.h"
 #include "window.h"
 #include "vendor.h"
+#include "menu.h"
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
@@ -29,19 +30,19 @@ tFont *g_pFont;
 UBYTE g_is2pPlaying;
 
 void gameGsCreate(void) {
-  s_pView = viewCreate(0,
-    TAG_VIEW_GLOBAL_CLUT, 1,
-  TAG_END);
+	s_pView = viewCreate(0,
+		TAG_VIEW_GLOBAL_CLUT, 1,
+	TAG_END);
 
 	g_pFont = fontCreate("data/silkscreen5.fnt");
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
 	hudCreate(s_pView, g_pFont);
 
-  s_pVpMain = vPortCreate(0,
-    TAG_VPORT_VIEW, s_pView,
-    TAG_VPORT_BPP, 4,
-  TAG_END);
-  g_pMainBuffer = tileBufferCreate(0,
+	s_pVpMain = vPortCreate(0,
+		TAG_VPORT_VIEW, s_pView,
+		TAG_VPORT_BPP, 4,
+	TAG_END);
+	g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
 		TAG_TILEBUFFER_BOUND_TILE_X, 11,
@@ -50,7 +51,7 @@ void gameGsCreate(void) {
 		TAG_TILEBUFFER_TILE_SHIFT, 5,
 		TAG_TILEBUFFER_REDRAW_QUEUE_LENGTH, 100,
 		TAG_TILEBUFFER_TILESET, s_pTiles,
-  TAG_END);
+	TAG_END);
 
 	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
 	s_uwColorBg = s_pVpMain->pPalette[0];
@@ -67,15 +68,19 @@ void gameGsCreate(void) {
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
+	menuPreload();
 	bobNewAllocateBgBuffers();
 	systemUnuse();
+
+	g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
 
 	s_isDebug = 0;
 	g_is2pPlaying = 0;
 	tileBufferInitialDraw(g_pMainBuffer);
 
-  // Load the view
-  viewLoad(s_pView);
+	// Load the view
+	viewLoad(s_pView);
+	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
 }
 
 static void gameProcessInput(void) {
@@ -173,6 +178,7 @@ void gameGsDestroy(void) {
   // Cleanup when leaving this gamestate
   systemUse();
 
+	menuUnload();
 	bitmapDestroy(s_pTiles);
 	fontDestroy(g_pFont);
 	vehicleDestroy(&g_pVehicles[0]);

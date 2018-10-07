@@ -19,7 +19,9 @@ typedef struct _tTextBob {
 	UBYTE ubColor;
 } tTextBob;
 
-void textBobCreate(tTextBob *pTextBob, const tFont *pFont);
+void textBobCreate(
+	tTextBob *pTextBob, const tFont *pFont, const char *szMaxText
+);
 
 void textBobDestroy(tTextBob *pTextBob);
 
