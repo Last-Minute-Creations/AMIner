@@ -21,33 +21,37 @@
 #define TRACK_OFFSET_DRILL 21
 #define DRILL_V_ANIM_LEN (VEHICLE_TRACK_HEIGHT + VEHICLE_TRACK_DRILL_HEIGHT - 1)
 
-tBitMap *s_pBodyFrames, *s_pBodyMask;
+tBitMap *s_pBodyFrames[2], *s_pBodyMask;
 tBitMap *s_pTrackFrames, *s_pTrackMask;
 tBitMap *s_pJetFrames, *s_pJetMask;
-tBitMap *s_pToolFrames, *s_pToolMask;
+tBitMap *s_pToolFrames[2], *s_pToolMask;
 
 UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {0,1,2,3,4,5,4,3,2,1,0};
 
 void vehicleBitmapsCreate(void) {
 	// Load gfx
-	s_pBodyFrames = bitmapCreateFromFile("data/drill.bm");
+	s_pBodyFrames[0] = bitmapCreateFromFile("data/drill.bm");
+	s_pBodyFrames[1] = bitmapCreateFromFile("data/drill_2.bm");
 	s_pBodyMask = bitmapCreateFromFile("data/drill_mask.bm");
 	s_pTrackFrames = bitmapCreateFromFile("data/track.bm");
 	s_pTrackMask = bitmapCreateFromFile("data/track_mask.bm");
 	s_pJetFrames = bitmapCreateFromFile("data/jet.bm");
 	s_pJetMask = bitmapCreateFromFile("data/jet_mask.bm");
-	s_pToolFrames = bitmapCreateFromFile("data/tool.bm");
+	s_pToolFrames[0] = bitmapCreateFromFile("data/tool.bm");
+	s_pToolFrames[1] = bitmapCreateFromFile("data/tool_2.bm");
 	s_pToolMask = bitmapCreateFromFile("data/tool_mask.bm");
 }
 
 void vehicleBitmapsDestroy(void) {
-	bitmapDestroy(s_pBodyFrames);
+	bitmapDestroy(s_pBodyFrames[0]);
+	bitmapDestroy(s_pBodyFrames[1]);
 	bitmapDestroy(s_pBodyMask);
 	bitmapDestroy(s_pTrackFrames);
 	bitmapDestroy(s_pTrackMask);
 	bitmapDestroy(s_pJetFrames);
 	bitmapDestroy(s_pJetMask);
-	bitmapDestroy(s_pToolFrames);
+	bitmapDestroy(s_pToolFrames[0]);
+	bitmapDestroy(s_pToolFrames[1]);
 	bitmapDestroy(s_pToolMask);
 }
 
@@ -57,7 +61,7 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 	// Setup bobs
 	bobNewInit(
 		&pVehicle->sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
-		s_pBodyFrames, s_pBodyMask, 0, 0
+		s_pBodyFrames[ubIdx], s_pBodyMask, 0, 0
 	);
 	bobNewInit(
 		&pVehicle->sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
@@ -69,7 +73,7 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 	);
 	bobNewInit(
 		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
-		s_pToolFrames, s_pToolMask, 0, 0
+		s_pToolFrames[ubIdx], s_pToolMask, 0, 0
 	);
 	pVehicle->ubPlayerIdx = ubIdx;
 
