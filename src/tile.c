@@ -38,7 +38,8 @@ typedef enum _tTile {
 	TILE_URANIUM_3,
 	TILE_COAL_1,
 	TILE_COAL_2,
-	TILE_COAL_3
+	TILE_COAL_3,
+	TILE_COUNT
 } tTile;
 // TODO sapphire, emerald, topaz
 
@@ -49,7 +50,7 @@ typedef struct _tTileDef {
 	UBYTE ubColor;
 } tTileDef;
 
-static const tTileDef const s_pTileDefs[] = {
+static const tTileDef const s_pTileDefs[TILE_COUNT] = {
 	{.szMsg = 0, .ubReward = 0, .ubSlots = 0},
 	[TILE_SILVER_1] = {.szMsg = "Silver x1", .ubReward = 5, .ubSlots = 1, .ubColor = 15},
 	[TILE_SILVER_2] = {.szMsg = "Silver x2", .ubReward = 5, .ubSlots = 2, .ubColor = 15},
@@ -59,7 +60,10 @@ static const tTileDef const s_pTileDefs[] = {
 	[TILE_GOLD_3] = {.szMsg = "Gold x3", .ubReward = 10, .ubSlots = 3, .ubColor = 14},
 	[TILE_URANIUM_1] = {.szMsg = "Uranium x1", .ubReward = 20, .ubSlots = 1, .ubColor = 12},
 	[TILE_URANIUM_2] = {.szMsg = "Uranium x2", .ubReward = 20, .ubSlots = 2, .ubColor = 12},
-	[TILE_URANIUM_3] = {.szMsg = "Uranium x3", .ubReward = 20, .ubSlots = 3, .ubColor = 12}
+	[TILE_URANIUM_3] = {.szMsg = "Uranium x3", .ubReward = 20, .ubSlots = 3, .ubColor = 12},
+	[TILE_COAL_1] = {.szMsg = "Coal x1", .ubReward = 5, .ubSlots = 1, .ubColor = 10},
+	[TILE_COAL_2] = {.szMsg = "Coal x2", .ubReward = 5, .ubSlots = 2, .ubColor = 10},
+	[TILE_COAL_3] = {.szMsg = "Coal x3", .ubReward = 5, .ubSlots = 3, .ubColor = 10},
 };
 
 void tileRefreshGrass(UWORD uwX) {
@@ -116,7 +120,7 @@ static UWORD chanceTrapezoid(
 	return uwMin;
 }
 
-void tileInit(void) {
+void tileInit(UBYTE isCoalOnly) {
 	for(UWORD x = 1; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
 		for(UWORD y = 0; y < TILE_ROW_GRASS; ++y) {
 			g_pMainBuffer->pTileData[x][y] = TILE_NONE;
@@ -141,13 +145,25 @@ void tileInit(void) {
 				g_pMainBuffer->pTileData[x][y] = TILE_CAVE_BG+15;
 			}
 			else if(uwWhat < (uwChance += uwChanceSilver)) {
-				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_SILVER_1, TILE_SILVER_3);
+				g_pMainBuffer->pTileData[x][y] = (
+					isCoalOnly
+						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: ubRandMinMax(TILE_SILVER_1, TILE_SILVER_3)
+				);
 			}
 			else if(uwWhat < (uwChance += uwChanceGold)) {
-				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_GOLD_1, TILE_GOLD_3);
+				g_pMainBuffer->pTileData[x][y] = (
+					isCoalOnly
+						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: ubRandMinMax(TILE_GOLD_1, TILE_GOLD_3)
+				);
 			}
 			else if(uwWhat < (uwChance += uwChanceUranium)) {
-				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_URANIUM_1, TILE_URANIUM_3);
+				g_pMainBuffer->pTileData[x][y] = (
+					isCoalOnly
+						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: ubRandMinMax(TILE_URANIUM_1, TILE_URANIUM_3)
+				);
 			}
 			else {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_ROCK_1, TILE_ROCK_2);

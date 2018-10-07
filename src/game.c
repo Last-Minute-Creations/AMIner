@@ -57,7 +57,7 @@ void gameGsCreate(void) {
 
 	randInit(2184);
 
-	tileInit();
+	tileInit(0);
 
 	bobNewManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
