@@ -8,7 +8,7 @@
 #include <ace/types.h>
 #include "vehicle.h"
 
-#define TILE_ROW_GRASS 5
+#define TILE_ROW_GRASS 4
 
 void tileRefreshGrass(UWORD uwX);
 

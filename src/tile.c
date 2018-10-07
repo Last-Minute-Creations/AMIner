@@ -10,11 +10,13 @@
 
 typedef enum _tTile {
 	TILE_NONE = 0,
-	TILE_SHOP_1,
-	TILE_SHOP_2,
-	TILE_SHOP_3,
-	TILE_SHOP_4,
-	TILE_GRASS_1,
+	TILE_SHOP_CHIMNEY,
+	TILE_SHOP_A1, TILE_SHOP_A2, TILE_SHOP_A3,
+	TILE_SHOP_B1, TILE_SHOP_B2, TILE_SHOP_B3,
+	TILE_SHOP_C1, TILE_SHOP_C2, TILE_SHOP_C3,
+	TILE_SHOP_D1, TILE_SHOP_D2, TILE_SHOP_D3,
+	TILE_SHOP_E1, TILE_SHOP_E2, TILE_SHOP_E3,
+	TILE_GRASS_1 = 17,
 	TILE_GRASS_2,
 	TILE_GRASS_NONE,
 	TILE_GRASS_LEFT,
@@ -157,12 +159,19 @@ void tileInit(void) {
 	}
 	g_pMainBuffer->pTileData[0][TILE_ROW_GRASS] = TILE_GRASS_1;
 	// Shop
-	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS-1] = TILE_SHOP_1;
-	g_pMainBuffer->pTileData[8][TILE_ROW_GRASS-1] = TILE_SHOP_2;
-	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS] = TILE_SHOP_3;
-	g_pMainBuffer->pTileData[8][TILE_ROW_GRASS] = TILE_SHOP_4;
-	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS+1] = TILE_STONE_1;
-	g_pMainBuffer->pTileData[8][TILE_ROW_GRASS+1] = TILE_STONE_2;
+	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS-3] = TILE_SHOP_CHIMNEY;
+	for(UWORD y = 0; y < 3; ++y) {
+		g_pMainBuffer->pTileData[3][TILE_ROW_GRASS-2+y] = TILE_SHOP_A1+y;
+		g_pMainBuffer->pTileData[4][TILE_ROW_GRASS-2+y] = TILE_SHOP_B1+y;
+		g_pMainBuffer->pTileData[5][TILE_ROW_GRASS-2+y] = TILE_SHOP_C1+y;
+		g_pMainBuffer->pTileData[6][TILE_ROW_GRASS-2+y] = TILE_SHOP_D1+y;
+		g_pMainBuffer->pTileData[7][TILE_ROW_GRASS-2+y] = TILE_SHOP_E1+y;
+	}
+	for(UWORD x = 3; x <= 7; ++x) {
+		g_pMainBuffer->pTileData[x][TILE_ROW_GRASS+1] = ubRandMinMax(
+			TILE_STONE_1, TILE_STONE_2
+		);
+	}
 }
 
 void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {

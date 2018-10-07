@@ -360,10 +360,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	bobNewPush(&pVehicle->sBobTool);
 
 	if(
-		7*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwX <= 9*32 + VEHICLE_HEIGHT/2 &&
-		1*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwY <= 3*32 &&
+		4*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwX <= 6*32 + VEHICLE_HEIGHT/2 &&
+		(TILE_ROW_GRASS - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_GRASS+1) * 32 &&
 		(pVehicle->ubCargoCurr  || (pVehicle->uwFuelMax - pVehicle->uwFuelCurr > 100))
 	) {
 		pVehicle->ubCargoCurr = 0;
