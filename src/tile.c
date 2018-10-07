@@ -68,7 +68,8 @@ void tileRefreshGrass(UWORD uwX) {
 	else {
 		// left neighbor is _RIGHT or _BOTH - decrease to _NONE or _LEFT
 		tileBufferSetTile(
-			g_pMainBuffer, uwX-1, 2, g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] - 2
+			g_pMainBuffer, uwX-1, TILE_ROW_GRASS,
+			g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] - 2
 		);
 	}
 	if(uwX >= 10 || g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
@@ -77,11 +78,12 @@ void tileRefreshGrass(UWORD uwX) {
 	else if(uwX < 10) {
 		// right neighbor is _LEFT or _BOTH - decrease to _NONE or _RIGHT
 		tileBufferSetTile(
-			g_pMainBuffer, uwX+1, 2, g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] - 1
+			g_pMainBuffer, uwX+1, TILE_ROW_GRASS,
+			g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] - 1
 		);
 	}
 
-	tileBufferSetTile(g_pMainBuffer, uwX, 2, ubCurrTile);
+	tileBufferSetTile(g_pMainBuffer, uwX, TILE_ROW_GRASS, ubCurrTile);
 }
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
@@ -155,12 +157,12 @@ void tileInit(void) {
 	}
 	g_pMainBuffer->pTileData[0][TILE_ROW_GRASS] = TILE_GRASS_1;
 	// Shop
-	g_pMainBuffer->pTileData[7][1] = TILE_SHOP_1;
-	g_pMainBuffer->pTileData[8][1] = TILE_SHOP_2;
-	g_pMainBuffer->pTileData[7][2] = TILE_SHOP_3;
-	g_pMainBuffer->pTileData[8][2] = TILE_SHOP_4;
-	g_pMainBuffer->pTileData[7][3] = TILE_STONE_1;
-	g_pMainBuffer->pTileData[8][3] = TILE_STONE_2;
+	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS-1] = TILE_SHOP_1;
+	g_pMainBuffer->pTileData[8][TILE_ROW_GRASS-1] = TILE_SHOP_2;
+	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS] = TILE_SHOP_3;
+	g_pMainBuffer->pTileData[8][TILE_ROW_GRASS] = TILE_SHOP_4;
+	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS+1] = TILE_STONE_1;
+	g_pMainBuffer->pTileData[8][TILE_ROW_GRASS+1] = TILE_STONE_2;
 }
 
 void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {

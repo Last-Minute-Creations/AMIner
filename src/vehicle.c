@@ -540,6 +540,6 @@ void vehicleProcess(tVehicle *pVehicle) {
 	}
 	hudSetFuel(pVehicle->ubPlayerIdx, pVehicle->uwFuelCurr);
 	textBobAnimate(&pVehicle->sTextBob);
-	hudSetDepth(pVehicle->ubPlayerIdx, MAX(0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - 3*32));
+	hudSetDepth(pVehicle->ubPlayerIdx, MAX(0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_GRASS+1)*32));
 	hudSetScore(pVehicle->ubPlayerIdx, pVehicle->ulCash);
 }
