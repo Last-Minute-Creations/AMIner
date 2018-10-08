@@ -28,16 +28,20 @@ void textBobSet(
 	tTextBob *pTextBob, const char *szText, UBYTE ubColor,
 	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY
 ) {
-	strcpy(pTextBob->szText, szText);
-	pTextBob->ubColor = ubColor;
+	textBobChangeText(pTextBob, szText);
+	textBobChangeColor(pTextBob, ubColor);
 	pTextBob->sBob.sPos.sUwCoord.uwX = uwPosX;
 	pTextBob->sBob.sPos.sUwCoord.uwY = uwPosY;
 	pTextBob->uwDestPosY = uwDestPosY;
-	pTextBob->isUpdateRequired = 1;
 }
 
 void textBobChangeColor(tTextBob *pTextBob, UBYTE ubColor) {
 	pTextBob->ubColor = ubColor;
+	pTextBob->isUpdateRequired = 1;
+}
+
+void textBobChangeText(tTextBob *pTextBob, const char *szText) {
+	strcpy(pTextBob->szText, szText);
 	pTextBob->isUpdateRequired = 1;
 }
 

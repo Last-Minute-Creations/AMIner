@@ -32,6 +32,8 @@ void textBobSet(
 
 void textBobChangeColor(tTextBob *pTextBob, UBYTE ubColor);
 
+void textBobChangeText(tTextBob *pTextBob, const char *szText);
+
 void textBobUpdate(tTextBob *pTextBob);
 
 void textBobAnimate(tTextBob *pTextBob);

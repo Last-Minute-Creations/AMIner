@@ -32,10 +32,6 @@ static tTextBob s_pMenuPositions[4];
 static tBobNew s_sBobLogo;
 static UWORD s_uwOffsY;
 
-static const char * const s_pMenuTexts[4] = {
-	"Start game", "Mode: free play", "Players: 1", "Exit to Workbench"
-};
-
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm");
 	s_pLogoMask = bitmapCreateFromFile("data/logo_mask.bm");
@@ -80,9 +76,12 @@ void menuGsLoop(void) {
 				s_sBobLogo.sPos.sUwCoord.uwX += (320 - s_sBobLogo.uwWidth)/2;
 				s_sBobLogo.sPos.sUwCoord.uwY += 16;
 				s_uwOffsY = s_sBobLogo.sPos.sUwCoord.uwY + s_sBobLogo.uwHeight + 50;
+				const char * const pMenuTexts[4] = {
+					"Start game", "Mode: free play", "Players: 1", "Exit to Workbench"
+				};
 				for(UBYTE i = 0; i < 4; ++i) {
 					textBobSet(
-						&s_pMenuPositions[i], s_pMenuTexts[i],
+						&s_pMenuPositions[i], pMenuTexts[i],
 						i == 0 ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE,
 						160 + 32 - s_pMenuPositions[i].uwWidth / 2,
 						s_uwOffsY + i * 10, 0
@@ -102,18 +101,30 @@ void menuGsLoop(void) {
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 				}
 			}
-			if(keyUse(KEY_DOWN) || keyUse(KEY_S)) {
+			else if(keyUse(KEY_DOWN) || keyUse(KEY_S)) {
 				if(s_eActivePos < 4-1) {
-					s_pMenuPositions[s_eActivePos].ubColor = MENU_COLOR_INACTIVE;
-					s_pMenuPositions[s_eActivePos].isUpdateRequired = 1;
+					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 					++s_eActivePos;
-					s_pMenuPositions[s_eActivePos].ubColor = MENU_COLOR_ACTIVE;
-					s_pMenuPositions[s_eActivePos].isUpdateRequired = 1;
+					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_ACTIVE);
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 				}
 			}
-			if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) {
+			else if(keyUse(KEY_LEFT) || keyUse(KEY_A)) {
+				if(s_eActivePos == MENU_POS_PLAYERS && g_is2pPlaying) {
+					g_is2pPlaying = 0;
+					textBobChangeText(&s_pMenuPositions[MENU_POS_PLAYERS], "Players: 1");
+					textBobUpdate(&s_pMenuPositions[MENU_POS_PLAYERS]);
+				}
+			}
+			else if(keyUse(KEY_RIGHT) || keyUse(KEY_D)) {
+				if(s_eActivePos == MENU_POS_PLAYERS && !g_is2pPlaying) {
+					g_is2pPlaying = 1;
+					textBobChangeText(&s_pMenuPositions[MENU_POS_PLAYERS], "Players: 2");
+					textBobUpdate(&s_pMenuPositions[MENU_POS_PLAYERS]);
+				}
+			}
+			else if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) {
 				if(s_eActivePos == MENU_POS_START) {
 					s_eMenuState = MENU_STATE_ROLL_OUT;
 				}
