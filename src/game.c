@@ -4,6 +4,7 @@
 
 #include "game.h"
 #include <ace/managers/key.h>
+#include <ace/managers/joy.h>
 #include <ace/managers/game.h>
 #include <ace/managers/system.h>
 #include <ace/managers/viewport/simplebuffer.h>
@@ -97,32 +98,32 @@ void gameGsCreate(void) {
 
 static void gameProcessInput(void) {
 	BYTE bDirX = 0, bDirY = 0;
-	if(keyCheck(KEY_D)) {
+	if(keyCheck(KEY_D) || joyCheck(JOY1_RIGHT)) {
 		bDirX += 1;
 	}
-	if(keyCheck(KEY_A)) {
+	if(keyCheck(KEY_A) || joyCheck(JOY1_LEFT)) {
 		bDirX -= 1;
 	}
-	if(keyCheck(KEY_S)) {
+	if(keyCheck(KEY_S) || joyCheck(JOY1_DOWN)) {
 		bDirY += 1;
 	}
-	if(keyCheck(KEY_W)) {
+	if(keyCheck(KEY_W) || joyCheck(JOY1_UP)) {
 		bDirY -= 1;
 	}
 	vehicleMove(&g_pVehicles[0], bDirX, bDirY);
 
 	bDirX = 0;
 	bDirY = 0;
-	if(keyCheck(KEY_RIGHT)) {
+	if(keyCheck(KEY_RIGHT) || joyCheck(JOY2_RIGHT)) {
 		bDirX += 1;
 	}
-	if(keyCheck(KEY_LEFT)) {
+	if(keyCheck(KEY_LEFT) || joyCheck(JOY2_LEFT)) {
 		bDirX -= 1;
 	}
-	if(keyCheck(KEY_DOWN)) {
+	if(keyCheck(KEY_DOWN) || joyCheck(JOY2_DOWN)) {
 		bDirY += 1;
 	}
-	if(keyCheck(KEY_UP)) {
+	if(keyCheck(KEY_UP) || joyCheck(JOY2_UP)) {
 		bDirY -= 1;
 	}
 	vehicleMove(&g_pVehicles[1], bDirX, bDirY);

@@ -4,6 +4,7 @@
 
 #include "menu.h"
 #include <ace/managers/key.h>
+#include <ace/managers/joy.h>
 #include <ace/managers/game.h>
 #include "game.h"
 #include "bob_new.h"
@@ -104,7 +105,10 @@ void menuGsLoop(void) {
 		} break;
 
 		case MENU_STATE_SELECTING: {
-			if(keyUse(KEY_UP) || keyUse(KEY_W)) {
+			if(
+				keyUse(KEY_UP) || keyUse(KEY_W) ||
+				joyUse(JOY1_UP) || joyUse(JOY2_UP)
+			) {
 				if(s_eActivePos) {
 					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
@@ -113,7 +117,10 @@ void menuGsLoop(void) {
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 				}
 			}
-			else if(keyUse(KEY_DOWN) || keyUse(KEY_S)) {
+			else if(
+				keyUse(KEY_DOWN) || keyUse(KEY_S) ||
+				joyUse(JOY1_DOWN) || joyUse(JOY2_DOWN)
+			) {
 				if(s_eActivePos < 4-1) {
 					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
@@ -122,21 +129,30 @@ void menuGsLoop(void) {
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 				}
 			}
-			else if(keyUse(KEY_LEFT) || keyUse(KEY_A)) {
+			else if(
+				keyUse(KEY_LEFT) || keyUse(KEY_A) ||
+				joyUse(JOY1_LEFT) || joyUse(JOY2_LEFT)
+			) {
 				if(s_eActivePos == MENU_POS_PLAYERS && g_is2pPlaying) {
 					g_is2pPlaying = 0;
 					textBobChangeText(&s_pMenuPositions[MENU_POS_PLAYERS], "Players: 1");
 					textBobUpdate(&s_pMenuPositions[MENU_POS_PLAYERS]);
 				}
 			}
-			else if(keyUse(KEY_RIGHT) || keyUse(KEY_D)) {
+			else if(
+				keyUse(KEY_RIGHT) || keyUse(KEY_D) ||
+				joyUse(JOY1_RIGHT) || joyUse(JOY2_RIGHT)
+			) {
 				if(s_eActivePos == MENU_POS_PLAYERS && !g_is2pPlaying) {
 					g_is2pPlaying = 1;
 					textBobChangeText(&s_pMenuPositions[MENU_POS_PLAYERS], "Players: 2");
 					textBobUpdate(&s_pMenuPositions[MENU_POS_PLAYERS]);
 				}
 			}
-			else if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) {
+			else if(
+				keyUse(KEY_RETURN) || keyUse(KEY_SPACE) ||
+				joyUse(JOY1_FIRE) || joyUse(JOY1_FIRE)
+			) {
 				if(s_eActivePos == MENU_POS_START) {
 					gameStart();
 					s_eMenuState = MENU_STATE_ROLL_OUT;
