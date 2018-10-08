@@ -35,7 +35,7 @@ static void goToMenu(void) {
 }
 
 void gameStart(void) {
-	tileInit();
+	tileInit(0);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	hudReset();
