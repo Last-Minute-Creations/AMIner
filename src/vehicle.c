@@ -21,33 +21,37 @@
 #define TRACK_OFFSET_DRILL 21
 #define DRILL_V_ANIM_LEN (VEHICLE_TRACK_HEIGHT + VEHICLE_TRACK_DRILL_HEIGHT - 1)
 
-tBitMap *s_pBodyFrames, *s_pBodyMask;
+tBitMap *s_pBodyFrames[2], *s_pBodyMask;
 tBitMap *s_pTrackFrames, *s_pTrackMask;
 tBitMap *s_pJetFrames, *s_pJetMask;
-tBitMap *s_pToolFrames, *s_pToolMask;
+tBitMap *s_pToolFrames[2], *s_pToolMask;
 
 UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {0,1,2,3,4,5,4,3,2,1,0};
 
 void vehicleBitmapsCreate(void) {
 	// Load gfx
-	s_pBodyFrames = bitmapCreateFromFile("data/drill.bm");
+	s_pBodyFrames[0] = bitmapCreateFromFile("data/drill.bm");
+	s_pBodyFrames[1] = bitmapCreateFromFile("data/drill_2.bm");
 	s_pBodyMask = bitmapCreateFromFile("data/drill_mask.bm");
 	s_pTrackFrames = bitmapCreateFromFile("data/track.bm");
 	s_pTrackMask = bitmapCreateFromFile("data/track_mask.bm");
 	s_pJetFrames = bitmapCreateFromFile("data/jet.bm");
 	s_pJetMask = bitmapCreateFromFile("data/jet_mask.bm");
-	s_pToolFrames = bitmapCreateFromFile("data/tool.bm");
+	s_pToolFrames[0] = bitmapCreateFromFile("data/tool.bm");
+	s_pToolFrames[1] = bitmapCreateFromFile("data/tool_2.bm");
 	s_pToolMask = bitmapCreateFromFile("data/tool_mask.bm");
 }
 
 void vehicleBitmapsDestroy(void) {
-	bitmapDestroy(s_pBodyFrames);
+	bitmapDestroy(s_pBodyFrames[0]);
+	bitmapDestroy(s_pBodyFrames[1]);
 	bitmapDestroy(s_pBodyMask);
 	bitmapDestroy(s_pTrackFrames);
 	bitmapDestroy(s_pTrackMask);
 	bitmapDestroy(s_pJetFrames);
 	bitmapDestroy(s_pJetMask);
-	bitmapDestroy(s_pToolFrames);
+	bitmapDestroy(s_pToolFrames[0]);
+	bitmapDestroy(s_pToolFrames[1]);
 	bitmapDestroy(s_pToolMask);
 }
 
@@ -84,6 +88,29 @@ void vehicleReset(tVehicle *pVehicle) {
 		pVehicle->fX = fix16_from_int(320-32);
 		vehicleMove(pVehicle, -1, 0);
 	}
+}
+
+void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
+	logBlockBegin("vehicleCreate()");
+
+	// Setup bobs
+	bobNewInit(
+		&pVehicle->sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
+		s_pBodyFrames[ubIdx], s_pBodyMask, 0, 0
+	);
+	bobNewInit(
+		&pVehicle->sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
+		s_pTrackFrames, s_pTrackMask, 0, 0
+	);
+	bobNewInit(
+		&pVehicle->sBobJet, VEHICLE_WIDTH, VEHICLE_FLAME_HEIGHT, 1,
+		s_pJetFrames, s_pJetMask, 0, 0
+	);
+	bobNewInit(
+		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
+		s_pToolFrames[ubIdx], s_pToolMask, 0, 0
+	);
+	pVehicle->ubPlayerIdx = ubIdx;
 }
 
 void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
@@ -365,10 +392,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	bobNewPush(&pVehicle->sBobTool);
 
 	if(
-		7*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwX <= 9*32 + VEHICLE_HEIGHT/2 &&
-		1*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwY <= 3*32 &&
+		4*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwX <= 6*32 + VEHICLE_HEIGHT/2 &&
+		(TILE_ROW_GRASS - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_GRASS+1) * 32 &&
 		(pVehicle->ubCargoCurr  || (pVehicle->uwFuelMax - pVehicle->uwFuelCurr > 100))
 	) {
 		pVehicle->ubCargoCurr = 0;
@@ -545,6 +572,6 @@ void vehicleProcess(tVehicle *pVehicle) {
 	}
 	hudSetFuel(pVehicle->ubPlayerIdx, pVehicle->uwFuelCurr);
 	textBobAnimate(&pVehicle->sTextBob);
-	hudSetDepth(pVehicle->ubPlayerIdx, MAX(0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - 3*32));
+	hudSetDepth(pVehicle->ubPlayerIdx, MAX(0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_GRASS+1)*32));
 	hudSetScore(pVehicle->ubPlayerIdx, pVehicle->ulCash);
 }
