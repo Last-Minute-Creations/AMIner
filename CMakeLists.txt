@@ -73,7 +73,12 @@ foreach(bitmap_path ${bitmaps}) # /path/file.png
 endforeach()
 
 # Alpha bitmaps
-file(GLOB bitmaps _res/drill.png _res/tool.png _res/track.png _res/jet.png _res/logo.png)
+file(GLOB bitmaps
+	_res/drill.png _res/tool.png
+	_res/drill_2.png _res/tool_2.png
+	_res/track.png _res/jet.png
+  _res/logo.png
+)
 set(color_transparent "\\#993399")
 foreach(bitmap_path ${bitmaps}) # /path/file.png
 	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png

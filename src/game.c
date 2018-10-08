@@ -70,7 +70,7 @@ void gameGsCreate(void) {
 
 	randInit(2184);
 
-	tileInit();
+	tileInit(0);
 
 	bobNewManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
@@ -87,7 +87,7 @@ void gameGsCreate(void) {
 	g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
 
 	s_isDebug = 0;
-	g_is2pPlaying = 0;
+	g_is2pPlaying = 1;
 	tileBufferInitialDraw(g_pMainBuffer);
 
 	// Load the view
