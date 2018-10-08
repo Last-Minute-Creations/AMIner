@@ -30,6 +30,8 @@ void textBobSet(
 	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY
 );
 
+void textBobChangeColor(tTextBob *pTextBob, UBYTE ubColor);
+
 void textBobUpdate(tTextBob *pTextBob);
 
 void textBobAnimate(tTextBob *pTextBob);

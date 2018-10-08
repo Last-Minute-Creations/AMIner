@@ -36,6 +36,11 @@ void textBobSet(
 	pTextBob->isUpdateRequired = 1;
 }
 
+void textBobChangeColor(tTextBob *pTextBob, UBYTE ubColor) {
+	pTextBob->ubColor = ubColor;
+	pTextBob->isUpdateRequired = 1;
+}
+
 void textBobUpdate(tTextBob *pTextBob) {
 	if(!pTextBob->isUpdateRequired) {
 		return;

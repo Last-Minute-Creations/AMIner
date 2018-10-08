@@ -30,6 +30,11 @@ static tMenuPos s_eActivePos;
 static tBitMap *s_pLogo, *s_pLogoMask;
 static tTextBob s_pMenuPositions[4];
 static tBobNew s_sBobLogo;
+static UWORD s_uwOffsY;
+
+static const char * const s_pMenuTexts[4] = {
+	"Start game", "Mode: free play", "Players: 1", "Exit to Workbench"
+};
 
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm");
@@ -74,43 +79,54 @@ void menuGsLoop(void) {
 				s_sBobLogo.sPos.ulYX = g_pMainBuffer->pCamera->uPos.ulYX;
 				s_sBobLogo.sPos.sUwCoord.uwX += (320 - s_sBobLogo.uwWidth)/2;
 				s_sBobLogo.sPos.sUwCoord.uwY += 16;
-				UWORD uwOffsY = s_sBobLogo.sPos.sUwCoord.uwY + s_sBobLogo.uwHeight + 50;
-				textBobSet(
-					&s_pMenuPositions[MENU_POS_START], "Start game",
-					MENU_COLOR_ACTIVE,
-					160 + 32 - s_pMenuPositions[MENU_POS_START].uwWidth / 2, uwOffsY, 0
-				);
-				textBobSet(
-					&s_pMenuPositions[MENU_POS_MODE], "Mode: free play",
-					MENU_COLOR_INACTIVE,
-					160 + 32 - s_pMenuPositions[MENU_POS_MODE].uwWidth / 2, uwOffsY + 10, 0
-				);
-				textBobSet(
-					&s_pMenuPositions[MENU_POS_PLAYERS], "Players: 1",
-					MENU_COLOR_INACTIVE,
-					160 + 32 - s_pMenuPositions[MENU_POS_PLAYERS].uwWidth / 2, uwOffsY + 20, 0
-				);
-				textBobSet(
-					&s_pMenuPositions[MENU_POS_EXIT], "Exit to Workbench",
-					MENU_COLOR_INACTIVE,
-					160 + 32 - s_pMenuPositions[MENU_POS_EXIT].uwWidth / 2, uwOffsY + 30, 0
-				);
-				textBobUpdate(&s_pMenuPositions[MENU_POS_START]);
-				textBobUpdate(&s_pMenuPositions[MENU_POS_MODE]);
-				textBobUpdate(&s_pMenuPositions[MENU_POS_PLAYERS]);
-				textBobUpdate(&s_pMenuPositions[MENU_POS_EXIT]);
+				s_uwOffsY = s_sBobLogo.sPos.sUwCoord.uwY + s_sBobLogo.uwHeight + 50;
+				for(UBYTE i = 0; i < 4; ++i) {
+					textBobSet(
+						&s_pMenuPositions[i], s_pMenuTexts[i],
+						i == 0 ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE,
+						160 + 32 - s_pMenuPositions[i].uwWidth / 2,
+						s_uwOffsY + i * 10, 0
+					);
+					textBobUpdate(&s_pMenuPositions[i]);
+				}
 			}
 		} break;
 
 		case MENU_STATE_SELECTING: {
+			if(keyUse(KEY_UP) || keyUse(KEY_W)) {
+				if(s_eActivePos) {
+					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
+					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
+					--s_eActivePos;
+					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_ACTIVE);
+					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
+				}
+			}
+			if(keyUse(KEY_DOWN) || keyUse(KEY_S)) {
+				if(s_eActivePos < 4-1) {
+					s_pMenuPositions[s_eActivePos].ubColor = MENU_COLOR_INACTIVE;
+					s_pMenuPositions[s_eActivePos].isUpdateRequired = 1;
+					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
+					++s_eActivePos;
+					s_pMenuPositions[s_eActivePos].ubColor = MENU_COLOR_ACTIVE;
+					s_pMenuPositions[s_eActivePos].isUpdateRequired = 1;
+					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
+				}
+			}
+			if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) {
+				if(s_eActivePos == MENU_POS_START) {
+					s_eMenuState = MENU_STATE_ROLL_OUT;
+				}
+				else if(s_eActivePos == MENU_POS_EXIT) {
+					gameClose();
+					return;
+				}
+			}
 			bobNewPush(&s_sBobLogo);
 			bobNewPush(&s_pMenuPositions[MENU_POS_START].sBob);
 			bobNewPush(&s_pMenuPositions[MENU_POS_MODE].sBob);
 			bobNewPush(&s_pMenuPositions[MENU_POS_PLAYERS].sBob);
 			bobNewPush(&s_pMenuPositions[MENU_POS_EXIT].sBob);
-			if(keyUse(KEY_RETURN)) {
-				s_eMenuState = MENU_STATE_ROLL_OUT;
-			}
 		} break;
 
 		case MENU_STATE_ROLL_OUT: {
