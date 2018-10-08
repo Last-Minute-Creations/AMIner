@@ -17,6 +17,8 @@ void hudCreate(tView *pView, const tFont *pFont);
 
 void hudDestroy(void);
 
+void hudReset(void);
+
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth);
 
 void hudSetScore(UBYTE ubPlayer, ULONG ulCash);

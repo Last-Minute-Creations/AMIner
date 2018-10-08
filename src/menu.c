@@ -57,7 +57,7 @@ void menuGsCreate(void) {
 }
 
 void menuGsLoop(void) {
-  if(keyCheck(KEY_ESCAPE)) {
+  if(keyUse(KEY_ESCAPE)) {
     gameClose();
 		return;
   }
@@ -126,6 +126,7 @@ void menuGsLoop(void) {
 			}
 			else if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) {
 				if(s_eActivePos == MENU_POS_START) {
+					gameStart();
 					s_eMenuState = MENU_STATE_ROLL_OUT;
 				}
 				else if(s_eActivePos == MENU_POS_EXIT) {

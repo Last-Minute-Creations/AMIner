@@ -18,6 +18,8 @@ void gameGsLoop(void);
 
 void gameGsDestroy(void);
 
+void gameStart(void);
+
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
 extern UBYTE g_is2pPlaying;

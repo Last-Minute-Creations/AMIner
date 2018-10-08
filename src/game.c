@@ -29,6 +29,18 @@ static UWORD s_uwColorBg;
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
 
+static void goToMenu(void) {
+	// Switch to menu, after popping it will process gameGsLoop
+	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
+}
+
+void gameStart(void) {
+	tileInit();
+	vehicleReset(&g_pVehicles[0]);
+	vehicleReset(&g_pVehicles[1]);
+	hudReset();
+}
+
 void gameGsCreate(void) {
 	s_pView = viewCreate(0,
 		TAG_VIEW_GLOBAL_CLUT, 1,
@@ -80,7 +92,7 @@ void gameGsCreate(void) {
 
 	// Load the view
 	viewLoad(s_pView);
-	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
+	goToMenu();
 }
 
 static void gameProcessInput(void) {
@@ -123,8 +135,8 @@ static inline void debugColor(UWORD uwColor) {
 }
 
 void gameGsLoop(void) {
-  if(keyCheck(KEY_ESCAPE)) {
-    gameClose();
+  if(keyUse(KEY_ESCAPE)) {
+    goToMenu();
 		return;
   }
 	if(keyUse(KEY_B)) {
@@ -151,15 +163,15 @@ void gameGsLoop(void) {
 	bobNewEnd();
 	hudUpdate();
 
-	UWORD uwCamX, uwCamY;
+	UWORD uwCamX = 32, uwCamY;
 	if(!g_is2pPlaying) {
 		// One player only
-		uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
+		// uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
 		uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
 	}
 	else {
 		// Two players
-		uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
+		// uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
 		uwCamY = (fix16_to_int(g_pVehicles[0].fY) + fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT) / 2;
 	}
 	cameraCenterAt(

@@ -51,6 +51,41 @@ void vehicleBitmapsDestroy(void) {
 	bitmapDestroy(s_pToolMask);
 }
 
+void vehicleReset(tVehicle *pVehicle) {
+	// Initial values
+	pVehicle->ubCargoCurr = 0;
+	pVehicle->ubCargoMax = 50;
+	pVehicle->uwCargoScore = 0;
+	pVehicle->ulCash = 0;
+	pVehicle->uwFuelMax = 1000;
+	pVehicle->uwFuelCurr = 1000;
+
+	pVehicle->ubDrillDir = 0;
+
+	pVehicle->ubTrackAnimCnt = 0;
+	pVehicle->ubTrackFrame = 0;
+	pVehicle->ubBodyShakeCnt = 0;
+	pVehicle->ubJetShowFrame = 0;
+	pVehicle->ubJetAnimFrame = 0;
+	pVehicle->ubJetAnimCnt = 0;
+	pVehicle->ubToolAnimCnt = 0;
+	pVehicle->ubDrillVAnimCnt = 0;
+
+	pVehicle->sBobBody.sPos.ulYX = 0;
+
+	pVehicle->fY = fix16_from_int(32);
+	pVehicle->fDx = 0;
+	pVehicle->fDy = 0;
+	if(pVehicle->ubPlayerIdx == PLAYER_1) {
+		pVehicle->fX = fix16_from_int(64);
+		vehicleMove(pVehicle, 1, 0);
+	}
+	else {
+		pVehicle->fX = fix16_from_int(320-32);
+		vehicleMove(pVehicle, -1, 0);
+	}
+}
+
 void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 	logBlockBegin("vehicleCreate()");
 
@@ -73,36 +108,8 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 	);
 	pVehicle->ubPlayerIdx = ubIdx;
 
-	// Initial values
-	pVehicle->ubCargoCurr = 0;
-	pVehicle->ubCargoMax = 50;
-	pVehicle->uwCargoScore = 0;
-	pVehicle->ulCash = 0;
-	pVehicle->uwFuelMax = 1000;
-	pVehicle->uwFuelCurr = 1000;
+	vehicleReset(pVehicle);
 
-	pVehicle->ubDrillDir = 0;
-
-	pVehicle->ubTrackAnimCnt = 0;
-	pVehicle->ubTrackFrame = 0;
-	pVehicle->ubBodyShakeCnt = 0;
-	pVehicle->ubJetShowFrame = 0;
-	pVehicle->ubJetAnimFrame = 0;
-	pVehicle->ubJetAnimCnt = 0;
-	pVehicle->ubToolAnimCnt = 0;
-	pVehicle->ubDrillVAnimCnt = 0;
-
-	pVehicle->fY = fix16_from_int(32);
-	pVehicle->fDx = 0;
-	pVehicle->fDy = 0;
-	if(ubIdx == PLAYER_1) {
-		pVehicle->fX = fix16_from_int(64);
-		vehicleMove(pVehicle, 1, 0);
-	}
-	else {
-		pVehicle->fX = fix16_from_int(320-32);
-		vehicleMove(pVehicle, -1, 0);
-	}
 	textBobCreate(&pVehicle->sTextBob, g_pFont, "Uranium x200");
 	logBlockEnd("vehicleCreate()");
 }
@@ -319,7 +326,9 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	else {
 		pVehicle->sBobBody.sPos.sUwCoord.uwY += s_pJetAnimOffsets[pVehicle->ubJetShowFrame];
 		if(pVehicle->ubJetShowFrame == 5) {
-			bobNewSetBitMapOffset(&pVehicle->sBobTrack, pVehicle->sSteer.bY ? 2*VEHICLE_TRACK_HEIGHT : 0);
+			bobNewSetBitMapOffset(
+				&pVehicle->sBobTrack, pVehicle->sSteer.bY ? 2*VEHICLE_TRACK_HEIGHT : 0
+			);
 		}
 		else if(pVehicle->ubJetShowFrame == 10) {
 			// Update jet pos
