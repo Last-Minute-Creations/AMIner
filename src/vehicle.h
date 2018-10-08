@@ -74,6 +74,8 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx);
 
 void vehicleDestroy(tVehicle *pVehicle);
 
+void vehicleReset(tVehicle *pVehicle);
+
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);
 
 void vehicleProcessText(void);

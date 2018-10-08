@@ -55,28 +55,7 @@ void vehicleBitmapsDestroy(void) {
 	bitmapDestroy(s_pToolMask);
 }
 
-void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
-	logBlockBegin("vehicleCreate()");
-
-	// Setup bobs
-	bobNewInit(
-		&pVehicle->sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
-		s_pBodyFrames[ubIdx], s_pBodyMask, 0, 0
-	);
-	bobNewInit(
-		&pVehicle->sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
-		s_pTrackFrames, s_pTrackMask, 0, 0
-	);
-	bobNewInit(
-		&pVehicle->sBobJet, VEHICLE_WIDTH, VEHICLE_FLAME_HEIGHT, 1,
-		s_pJetFrames, s_pJetMask, 0, 0
-	);
-	bobNewInit(
-		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
-		s_pToolFrames[ubIdx], s_pToolMask, 0, 0
-	);
-	pVehicle->ubPlayerIdx = ubIdx;
-
+void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
 	pVehicle->ubCargoCurr = 0;
 	pVehicle->ubCargoMax = 50;
@@ -96,10 +75,12 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 	pVehicle->ubToolAnimCnt = 0;
 	pVehicle->ubDrillVAnimCnt = 0;
 
+	pVehicle->sBobBody.sPos.ulYX = 0;
+
 	pVehicle->fY = fix16_from_int(32);
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
-	if(ubIdx == PLAYER_1) {
+	if(pVehicle->ubPlayerIdx == PLAYER_1) {
 		pVehicle->fX = fix16_from_int(64);
 		vehicleMove(pVehicle, 1, 0);
 	}
@@ -107,7 +88,33 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 		pVehicle->fX = fix16_from_int(320-32);
 		vehicleMove(pVehicle, -1, 0);
 	}
-	textBobCreate(&pVehicle->sTextBob, g_pFont);
+}
+
+void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
+	logBlockBegin("vehicleCreate()");
+
+	// Setup bobs
+  bobNewInit(
+		&pVehicle->sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
+		s_pBodyFrames[ubIdx], s_pBodyMask, 0, 0
+	);
+	bobNewInit(
+		&pVehicle->sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
+		s_pTrackFrames, s_pTrackMask, 0, 0
+	);
+	bobNewInit(
+		&pVehicle->sBobJet, VEHICLE_WIDTH, VEHICLE_FLAME_HEIGHT, 1,
+		s_pJetFrames, s_pJetMask, 0, 0
+	);
+	bobNewInit(
+		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
+		s_pToolFrames[ubIdx], s_pToolMask, 0, 0
+	);
+	pVehicle->ubPlayerIdx = ubIdx;
+
+	vehicleReset(pVehicle);
+
+	textBobCreate(&pVehicle->sTextBob, g_pFont, "Uranium x200");
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -323,7 +330,9 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	else {
 		pVehicle->sBobBody.sPos.sUwCoord.uwY += s_pJetAnimOffsets[pVehicle->ubJetShowFrame];
 		if(pVehicle->ubJetShowFrame == 5) {
-			bobNewSetBitMapOffset(&pVehicle->sBobTrack, pVehicle->sSteer.bY ? 2*VEHICLE_TRACK_HEIGHT : 0);
+			bobNewSetBitMapOffset(
+				&pVehicle->sBobTrack, pVehicle->sSteer.bY ? 2*VEHICLE_TRACK_HEIGHT : 0
+			);
 		}
 		else if(pVehicle->ubJetShowFrame == 10) {
 			// Update jet pos

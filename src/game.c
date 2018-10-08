@@ -17,6 +17,7 @@
 #include "tile.h"
 #include "window.h"
 #include "vendor.h"
+#include "menu.h"
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
@@ -28,20 +29,32 @@ static UWORD s_uwColorBg;
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
 
+static void goToMenu(void) {
+	// Switch to menu, after popping it will process gameGsLoop
+	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
+}
+
+void gameStart(void) {
+	tileInit();
+	vehicleReset(&g_pVehicles[0]);
+	vehicleReset(&g_pVehicles[1]);
+	hudReset();
+}
+
 void gameGsCreate(void) {
-  s_pView = viewCreate(0,
-    TAG_VIEW_GLOBAL_CLUT, 1,
-  TAG_END);
+	s_pView = viewCreate(0,
+		TAG_VIEW_GLOBAL_CLUT, 1,
+	TAG_END);
 
 	g_pFont = fontCreate("data/silkscreen5.fnt");
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
 	hudCreate(s_pView, g_pFont);
 
-  s_pVpMain = vPortCreate(0,
-    TAG_VPORT_VIEW, s_pView,
-    TAG_VPORT_BPP, 4,
-  TAG_END);
-  g_pMainBuffer = tileBufferCreate(0,
+	s_pVpMain = vPortCreate(0,
+		TAG_VPORT_VIEW, s_pView,
+		TAG_VPORT_BPP, 4,
+	TAG_END);
+	g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
 		TAG_TILEBUFFER_BOUND_TILE_X, 11,
@@ -50,7 +63,7 @@ void gameGsCreate(void) {
 		TAG_TILEBUFFER_TILE_SHIFT, 5,
 		TAG_TILEBUFFER_REDRAW_QUEUE_LENGTH, 100,
 		TAG_TILEBUFFER_TILESET, s_pTiles,
-  TAG_END);
+	TAG_END);
 
 	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
 	s_uwColorBg = s_pVpMain->pPalette[0];
@@ -67,15 +80,19 @@ void gameGsCreate(void) {
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
+	menuPreload();
 	bobNewAllocateBgBuffers();
 	systemUnuse();
+
+	g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
 
 	s_isDebug = 0;
 	g_is2pPlaying = 1;
 	tileBufferInitialDraw(g_pMainBuffer);
 
-  // Load the view
-  viewLoad(s_pView);
+	// Load the view
+	viewLoad(s_pView);
+	goToMenu();
 }
 
 static void gameProcessInput(void) {
@@ -118,8 +135,8 @@ static inline void debugColor(UWORD uwColor) {
 }
 
 void gameGsLoop(void) {
-  if(keyCheck(KEY_ESCAPE)) {
-    gameClose();
+  if(keyUse(KEY_ESCAPE)) {
+    goToMenu();
 		return;
   }
 	if(keyUse(KEY_B)) {
@@ -146,15 +163,15 @@ void gameGsLoop(void) {
 	bobNewEnd();
 	hudUpdate();
 
-	UWORD uwCamX, uwCamY;
+	UWORD uwCamX = 32, uwCamY;
 	if(!g_is2pPlaying) {
 		// One player only
-		uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
+		// uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
 		uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
 	}
 	else {
 		// Two players
-		uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
+		// uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
 		uwCamY = (fix16_to_int(g_pVehicles[0].fY) + fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT) / 2;
 	}
 	cameraCenterAt(
@@ -173,6 +190,7 @@ void gameGsDestroy(void) {
   // Cleanup when leaving this gamestate
   systemUse();
 
+	menuUnload();
 	bitmapDestroy(s_pTiles);
 	fontDestroy(g_pFont);
 	vehicleDestroy(&g_pVehicles[0]);

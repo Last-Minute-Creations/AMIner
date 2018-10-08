@@ -19,7 +19,9 @@ typedef struct _tTextBob {
 	UBYTE ubColor;
 } tTextBob;
 
-void textBobCreate(tTextBob *pTextBob, const tFont *pFont);
+void textBobCreate(
+	tTextBob *pTextBob, const tFont *pFont, const char *szMaxText
+);
 
 void textBobDestroy(tTextBob *pTextBob);
 
@@ -27,6 +29,10 @@ void textBobSet(
 	tTextBob *pTextBob, const char *szText, UBYTE ubColor,
 	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY
 );
+
+void textBobChangeColor(tTextBob *pTextBob, UBYTE ubColor);
+
+void textBobChangeText(tTextBob *pTextBob, const char *szText);
 
 void textBobUpdate(tTextBob *pTextBob);
 

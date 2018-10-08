@@ -70,6 +70,7 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	s_pFont = pFont;
 	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, 5);
 
+	s_uwHudOffsX = 0;
 	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
 		fontDrawStr(
 			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + FUEL_LABEL_X, ROW_1_Y,
@@ -91,7 +92,16 @@ void hudCreate(tView *pView, const tFont *pFont) {
 			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + CASH_LABEL_X, ROW_2_Y,
 			"Cash:", COLOR_ACTIVE, FONT_LAZY
 		);
+		// Move to 2nd player's HUD
+		s_uwHudOffsX = 160;
+	}
 
+	hudReset();
+}
+
+void hudReset(void) {
+	s_uwHudOffsX = 0;
+	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
 		// Fuel inactive gauge
 		for(UBYTE i = 0; i < 30; ++i) {
 			chunkyToPlanar(
@@ -117,11 +127,10 @@ void hudCreate(tView *pView, const tFont *pFont) {
 			);
 		}
 
+		// Move to 2nd player's HUD
 		s_uwHudOffsX = 160;
-	}
 
-	// Values to display - P1
-	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
+		// Values to display
 		s_pPlayerData[ubPlayer].uwOldDepth = 0xFFFF;
 		s_pPlayerData[ubPlayer].uwDepth = 0;
 		s_pPlayerData[ubPlayer].ulOldCash = 0xFFFFFFFF;
