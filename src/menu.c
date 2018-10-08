@@ -64,10 +64,21 @@ void menuGsLoop(void) {
 
 	bobNewBegin();
 
+	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
+	UWORD uwAvailHeight = g_pMainBuffer->pScroll->uwBmAvailHeight;
 	switch(s_eMenuState) {
 		case MENU_STATE_ROLL_IN: {
-			if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY < g_pMainBuffer->pScroll->uwBmAvailHeight) {
-				g_pMainBuffer->pCamera->uPos.sUwCoord.uwY += 4;
+			if(*pCamY < uwAvailHeight) {
+				*pCamY += 4;
+			}
+			else if(*pCamY > uwAvailHeight) {
+				*pCamY = uwAvailHeight + (*pCamY % uwAvailHeight);
+				if(*pCamY - uwAvailHeight > 4) {
+					*pCamY -= 4;
+				}
+				else {
+					*pCamY = uwAvailHeight;
+				}
 			}
 			else {
 				s_eMenuState = MENU_STATE_SELECTING;
@@ -79,6 +90,7 @@ void menuGsLoop(void) {
 				const char * const pMenuTexts[4] = {
 					"Start game", "Mode: free play", "Players: 1", "Exit to Workbench"
 				};
+				g_is2pPlaying = 0;
 				for(UBYTE i = 0; i < 4; ++i) {
 					textBobSet(
 						&s_pMenuPositions[i], pMenuTexts[i],
