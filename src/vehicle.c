@@ -114,7 +114,7 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 
 	vehicleReset(pVehicle);
 
-	textBobCreate(&pVehicle->sTextBob, g_pFont, "Uranium x200");
+	textBobCreate(&pVehicle->sTextBob, g_pFont, "Emerald x200");
 	logBlockEnd("vehicleCreate()");
 }
 

@@ -33,9 +33,9 @@ typedef enum _tTile {
 	TILE_SILVER_1,
 	TILE_SILVER_2,
 	TILE_SILVER_3,
-	TILE_URANIUM_1,
-	TILE_URANIUM_2,
-	TILE_URANIUM_3,
+	TILE_EMERALD_1,
+	TILE_EMERALD_2,
+	TILE_EMERALD_3,
 	TILE_COAL_1,
 	TILE_COAL_2,
 	TILE_COAL_3,
@@ -58,9 +58,9 @@ static const tTileDef const s_pTileDefs[TILE_COUNT] = {
 	[TILE_GOLD_1] = {.szMsg = "Gold x1", .ubReward = 10, .ubSlots = 1, .ubColor = 14},
 	[TILE_GOLD_2] = {.szMsg = "Gold x2", .ubReward = 10, .ubSlots = 2, .ubColor = 14},
 	[TILE_GOLD_3] = {.szMsg = "Gold x3", .ubReward = 10, .ubSlots = 3, .ubColor = 14},
-	[TILE_URANIUM_1] = {.szMsg = "Uranium x1", .ubReward = 20, .ubSlots = 1, .ubColor = 12},
-	[TILE_URANIUM_2] = {.szMsg = "Uranium x2", .ubReward = 20, .ubSlots = 2, .ubColor = 12},
-	[TILE_URANIUM_3] = {.szMsg = "Uranium x3", .ubReward = 20, .ubSlots = 3, .ubColor = 12},
+	[TILE_EMERALD_1] = {.szMsg = "Emerald x1", .ubReward = 20, .ubSlots = 1, .ubColor = 12},
+	[TILE_EMERALD_2] = {.szMsg = "Emerald x2", .ubReward = 20, .ubSlots = 2, .ubColor = 12},
+	[TILE_EMERALD_3] = {.szMsg = "Emerald x3", .ubReward = 20, .ubSlots = 3, .ubColor = 12},
 	[TILE_COAL_1] = {.szMsg = "Coal x1", .ubReward = 5, .ubSlots = 1, .ubColor = 10},
 	[TILE_COAL_2] = {.szMsg = "Coal x2", .ubReward = 5, .ubSlots = 2, .ubColor = 10},
 	[TILE_COAL_3] = {.szMsg = "Coal x3", .ubReward = 5, .ubSlots = 3, .ubColor = 10},
@@ -133,7 +133,7 @@ void tileInit(UBYTE isCoalOnly) {
 			UWORD uwChanceRock = CLAMP(y * 500 / 2000, 0, 500);
 			UWORD uwChanceSilver = chanceTrapezoid(y, 10, 30, 50, 100, 5, 200);
 			UWORD uwChanceGold = chanceTrapezoid(y, 60, 120, 150, 250, 2, 200);
-			UWORD uwChanceUranium = chanceTrapezoid(y, 175, 400, 450, 600, 1, 200);
+			UWORD uwChanceEmerald = chanceTrapezoid(y, 175, 400, 450, 600, 1, 200);
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_2);
@@ -158,11 +158,11 @@ void tileInit(UBYTE isCoalOnly) {
 						: ubRandMinMax(TILE_GOLD_1, TILE_GOLD_3)
 				);
 			}
-			else if(uwWhat < (uwChance += uwChanceUranium)) {
+			else if(uwWhat < (uwChance += uwChanceEmerald)) {
 				g_pMainBuffer->pTileData[x][y] = (
 					isCoalOnly
 						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_URANIUM_1, TILE_URANIUM_3)
+						: ubRandMinMax(TILE_EMERALD_1, TILE_EMERALD_3)
 				);
 			}
 			else {
