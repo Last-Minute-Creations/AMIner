@@ -27,9 +27,14 @@ tTileBufferManager *g_pMainBuffer;
 static tBitMap *s_pTiles;
 static UBYTE s_isDebug = 0;
 static UWORD s_uwColorBg;
+static UBYTE s_ubChallengeCamCnt;
+static tTextBob s_sChallengeMessage;
+static tTextBob s_sEndMessage;
+
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
+UBYTE g_isChallenge;
 
 static void goToMenu(void) {
 	// Switch to menu, after popping it will process gameGsLoop
@@ -37,7 +42,8 @@ static void goToMenu(void) {
 }
 
 void gameStart(void) {
-	tileInit(0);
+	s_ubChallengeCamCnt = 0;
+	tileInit(0, g_isChallenge);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	hudReset();
@@ -72,7 +78,7 @@ void gameGsCreate(void) {
 
 	randInit(2184);
 
-	tileInit(0);
+	tileInit(0, 0);
 
 	bobNewManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
@@ -82,6 +88,8 @@ void gameGsCreate(void) {
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
+	textBobCreate(&s_sChallengeMessage, g_pFont, "Player 20 wins!");
+	textBobCreate(&s_sEndMessage, g_pFont, "Press fire or enter to continue");
 	menuPreload();
 	bobNewAllocateBgBuffers();
 	systemUnuse();
@@ -94,6 +102,7 @@ void gameGsCreate(void) {
 	g_is2pPlaying = 0;
 	g_is1pKbd = 0;
 	g_is2pKbd = 1;
+	g_isChallenge = 1;
 
 	// Initial background
 	tileBufferInitialDraw(g_pMainBuffer);
@@ -171,21 +180,29 @@ void gameGsLoop(void) {
 	bobNewEnd();
 	hudUpdate();
 
-	UWORD uwCamX = 32, uwCamY;
-	if(!g_is2pPlaying) {
-		// One player only
-		// uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
-		uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
+	if(g_isChallenge) {
+		++s_ubChallengeCamCnt;
+		if(s_ubChallengeCamCnt >= 2) {
+			g_pMainBuffer->pCamera->uPos.sUwCoord.uwY += 1;
+			s_ubChallengeCamCnt = 0;
+		}
 	}
 	else {
-		// Two players
-		// uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
-		uwCamY = (fix16_to_int(g_pVehicles[0].fY) + fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT) / 2;
-	}
-	cameraCenterAt(
-		g_pMainBuffer->pCamera, uwCamX, uwCamY);
-	if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < 32) {
-		g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
+		UWORD uwCamX = 32, uwCamY;
+		if(!g_is2pPlaying) {
+			// One player only
+			// uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
+			uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
+		}
+		else {
+			// Two players
+			// uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
+			uwCamY = (fix16_to_int(g_pVehicles[0].fY) + fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT) / 2;
+		}
+		cameraCenterAt(g_pMainBuffer->pCamera, uwCamX, uwCamY);
+		if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < 32) {
+			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
+		}
 	}
 	debugColor(0x800);
 	viewProcessManagers(s_pView);
@@ -209,4 +226,60 @@ void gameGsDestroy(void) {
 
   hudDestroy();
   viewDestroy(s_pView);
+}
+
+void gsGameLoopChallengeEnd(void) {
+  if(
+		keyUse(KEY_ESCAPE) ||
+		(1 && (keyUse(KEY_RETURN) || joyUse(JOY1_FIRE) || joyUse(JOY2_FIRE)))
+	) {
+    goToMenu();
+		return;
+  }
+	bobNewBegin();
+	tileBufferQueueProcess(g_pMainBuffer);
+
+	vehicleProcess(&g_pVehicles[0]);
+	if(g_is2pPlaying) {
+		vehicleProcess(&g_pVehicles[1]);
+	}
+
+	bobNewPush(&s_sChallengeMessage.sBob);
+	bobNewPush(&s_sEndMessage.sBob);
+
+	bobNewPushingDone();
+	bobNewEnd();
+	hudUpdate();
+
+	viewProcessManagers(s_pView);
+	copProcessBlocks();
+	debugColor(s_uwColorBg);
+	vPortWaitForEnd(s_pVpMain);
+}
+
+void gameChallengeEnd(void) {
+	textBobSet(
+		&s_sChallengeMessage, "", 14,
+		160, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 50, 0
+	);
+	textBobSet(
+		&s_sChallengeMessage, "Press fire or enter to continue", 14,
+		160, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 50, 0
+	);
+	if(g_is2pPlaying) {
+		if(g_pVehicles[0].ulCash > g_pVehicles[1].ulCash) {
+			strcpy(s_sChallengeMessage.szText, "Player 1 wins!");
+		}
+		else if(g_pVehicles[0].ulCash < g_pVehicles[1].ulCash) {
+			strcpy(s_sChallengeMessage.szText, "Player 2 wins!");
+		}
+		else {
+			strcpy(s_sChallengeMessage.szText, "Draw!");
+		}
+	}
+	else {
+		sprintf(s_sChallengeMessage.szText, "Score: %lu", g_pVehicles[0].ulCash);
+	}
+	textBobUpdate(&s_sChallengeMessage);
+	gameChangeLoop(gsGameLoopChallengeEnd);
 }

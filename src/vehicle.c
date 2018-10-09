@@ -114,7 +114,7 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 
 	vehicleReset(pVehicle);
 
-	textBobCreate(&pVehicle->sTextBob, g_pFont, "Emerald x200");
+	textBobCreate(&pVehicle->sTextBob, g_pFont, "Checkpoint! +1000");
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -212,8 +212,30 @@ static inline UBYTE vehicleStartDrilling(
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
 
-	pVehicle->uwFuelCurr -= 30;
+	if(!g_isChallenge) {
+		pVehicle->uwFuelCurr -= 30;
+	}
 	return 1;
+}
+
+WORD vehicleRestock(tVehicle *pVehicle) {
+	pVehicle->ubCargoCurr = 0;
+	pVehicle->ulCash += pVehicle->uwCargoScore;
+	WORD wScoreNow = pVehicle->uwCargoScore;
+	pVehicle->uwCargoScore = 0;
+	hudSetCargo(pVehicle->ubPlayerIdx, 0);
+	const UBYTE ubFuelPrice = 5;
+	const UBYTE ubFuelDiv = 100;
+	UWORD uwRefuelUnits = MIN(
+		(pVehicle->ulCash / ubFuelPrice),
+		(UWORD)(pVehicle->uwFuelMax - pVehicle->uwFuelCurr + ubFuelDiv-1) / ubFuelDiv
+	);
+	pVehicle->uwFuelCurr = MIN(
+		pVehicle->uwFuelCurr + uwRefuelUnits * ubFuelDiv, pVehicle->uwFuelMax
+	);
+	pVehicle->ulCash -= uwRefuelUnits * ubFuelPrice;
+	wScoreNow -= uwRefuelUnits * ubFuelPrice;
+	return wScoreNow;
 }
 
 static void vehicleProcessMovement(tVehicle *pVehicle) {
@@ -375,22 +397,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_GRASS+1) * 32 &&
 		(pVehicle->ubCargoCurr  || (pVehicle->uwFuelMax - pVehicle->uwFuelCurr > 100))
 	) {
-		pVehicle->ubCargoCurr = 0;
-		pVehicle->ulCash += pVehicle->uwCargoScore;
-		WORD wScoreNow = pVehicle->uwCargoScore;
-		pVehicle->uwCargoScore = 0;
-		hudSetCargo(pVehicle->ubPlayerIdx, 0);
-		const UBYTE ubFuelPrice = 5;
-		const UBYTE ubFuelDiv = 100;
-		UWORD uwRefuelUnits = MIN(
-			(pVehicle->ulCash / ubFuelPrice),
-			(UWORD)(pVehicle->uwFuelMax - pVehicle->uwFuelCurr + ubFuelDiv-1) / ubFuelDiv
-		);
-		pVehicle->uwFuelCurr = MIN(
-			pVehicle->uwFuelCurr + uwRefuelUnits * ubFuelDiv, pVehicle->uwFuelMax
-		);
-		pVehicle->ulCash -= uwRefuelUnits * ubFuelPrice;
-		wScoreNow -= uwRefuelUnits * ubFuelPrice;
+		WORD wScoreNow = vehicleRestock(pVehicle);
 		UBYTE ubColor = 12;
 		if(wScoreNow < 0) {
 			ubColor = 6;

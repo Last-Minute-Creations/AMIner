@@ -39,6 +39,8 @@ typedef enum _tTile {
 	TILE_COAL_1,
 	TILE_COAL_2,
 	TILE_COAL_3,
+	TILE_FINISH,
+	TILE_CHECKPOINT,
 	TILE_COUNT
 } tTile;
 // TODO sapphire, emerald, topaz
@@ -120,7 +122,7 @@ static UWORD chanceTrapezoid(
 	return uwMin;
 }
 
-void tileInit(UBYTE isCoalOnly) {
+void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	for(UWORD x = 1; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
 		for(UWORD y = 0; y < TILE_ROW_GRASS; ++y) {
 			g_pMainBuffer->pTileData[x][y] = TILE_NONE;
@@ -188,6 +190,15 @@ void tileInit(UBYTE isCoalOnly) {
 			TILE_STONE_1, TILE_STONE_2
 		);
 	}
+
+	if(isChallenge) {
+		for(UWORD x = 0; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
+			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_1] = TILE_CHECKPOINT;
+			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_2] = TILE_CHECKPOINT;
+			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_3] = TILE_CHECKPOINT;
+			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_FINISH] = TILE_FINISH;
+		}
+	}
 }
 
 void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
@@ -232,9 +243,8 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	// Load mineral to vehicle
 	static const char * const szMessageFull = "Cargo full!";
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
-	UBYTE ubSlots = 0;
 	if(s_pTileDefs[ubTile].szMsg) {
-		ubSlots = s_pTileDefs[ubTile].ubSlots;
+		UBYTE ubSlots = s_pTileDefs[ubTile].ubSlots;
 		ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
 		pVehicle->uwCargoScore += s_pTileDefs[ubTile].ubReward * ubSlots;
 		pVehicle->ubCargoCurr += ubSlots;
@@ -255,6 +265,24 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			pVehicle->sBobBody.sPos.sUwCoord.uwY,
 			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
 		);
+	}
+
+	if(g_isChallenge) {
+		if(ubTile == TILE_CHECKPOINT) {
+			textBobSet(
+				&pVehicle->sTextBob, "", 12,
+				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+				pVehicle->sBobBody.sPos.sUwCoord.uwY,
+				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
+			);
+			sprintf(
+				pVehicle->sTextBob.szText, "Checkpoint! %+hd", vehicleRestock(pVehicle)
+			);
+		}
+		else if(ubTile == TILE_FINISH) {
+			vehicleRestock(pVehicle);
+			gameChallengeEnd();
+		}
 	}
 
 	tileBufferSetTile(g_pMainBuffer, uwX, uwY, ubBg);
