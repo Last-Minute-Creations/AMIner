@@ -29,6 +29,7 @@ static UBYTE s_isDebug = 0;
 static UWORD s_uwColorBg;
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
+UBYTE g_is1pKbd, g_is2pKbd;
 
 static void goToMenu(void) {
 	// Switch to menu, after popping it will process gameGsLoop
@@ -88,7 +89,13 @@ void gameGsCreate(void) {
 	g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
 
 	s_isDebug = 0;
-	g_is2pPlaying = 1;
+
+	// Default config
+	g_is2pPlaying = 0;
+	g_is1pKbd = 0;
+	g_is2pKbd = 1;
+
+	// Initial background
 	tileBufferInitialDraw(g_pMainBuffer);
 
 	// Load the view
@@ -98,33 +105,33 @@ void gameGsCreate(void) {
 
 static void gameProcessInput(void) {
 	BYTE bDirX = 0, bDirY = 0;
-	if(keyCheck(KEY_D) || joyCheck(JOY1_RIGHT)) {
-		bDirX += 1;
+	if(g_is1pKbd) {
+		if(keyCheck(KEY_D)) { bDirX += 1; }
+		if(keyCheck(KEY_A)) { bDirX -= 1; }
+		if(keyCheck(KEY_S)) { bDirY += 1; }
+		if(keyCheck(KEY_W)) { bDirY -= 1; }
 	}
-	if(keyCheck(KEY_A) || joyCheck(JOY1_LEFT)) {
-		bDirX -= 1;
-	}
-	if(keyCheck(KEY_S) || joyCheck(JOY1_DOWN)) {
-		bDirY += 1;
-	}
-	if(keyCheck(KEY_W) || joyCheck(JOY1_UP)) {
-		bDirY -= 1;
+	else {
+		if(joyCheck(JOY1_RIGHT)) { bDirX += 1; }
+		if(joyCheck(JOY1_LEFT)) { bDirX -= 1; }
+		if(joyCheck(JOY1_DOWN)) { bDirY += 1; }
+		if(joyCheck(JOY1_UP)) { bDirY -= 1; }
 	}
 	vehicleMove(&g_pVehicles[0], bDirX, bDirY);
 
 	bDirX = 0;
 	bDirY = 0;
-	if(keyCheck(KEY_RIGHT) || joyCheck(JOY2_RIGHT)) {
-		bDirX += 1;
+	if(g_is2pKbd) {
+		if(keyCheck(KEY_RIGHT)) { bDirX += 1; }
+		if(keyCheck(KEY_LEFT)) { bDirX -= 1; }
+		if(keyCheck(KEY_DOWN)) { bDirY += 1; }
+		if(keyCheck(KEY_UP)) { bDirY -= 1; }
 	}
-	if(keyCheck(KEY_LEFT) || joyCheck(JOY2_LEFT)) {
-		bDirX -= 1;
-	}
-	if(keyCheck(KEY_DOWN) || joyCheck(JOY2_DOWN)) {
-		bDirY += 1;
-	}
-	if(keyCheck(KEY_UP) || joyCheck(JOY2_UP)) {
-		bDirY -= 1;
+	else {
+		if(joyCheck(JOY2_RIGHT)) { bDirX += 1; }
+		if(joyCheck(JOY2_LEFT)) { bDirX -= 1; }
+		if(joyCheck(JOY2_DOWN)) { bDirY += 1; }
+		if(joyCheck(JOY2_UP)) { bDirY -= 1; }
 	}
 	vehicleMove(&g_pVehicles[1], bDirX, bDirY);
 }

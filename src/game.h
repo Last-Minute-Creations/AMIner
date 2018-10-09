@@ -22,6 +22,9 @@ void gameStart(void);
 
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
+
+// Game config
 extern UBYTE g_is2pPlaying;
+extern UBYTE g_is1pKbd, g_is2pKbd;
 
 #endif // _GAME_H_
