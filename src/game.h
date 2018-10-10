@@ -24,6 +24,8 @@ void gameStart(void);
 
 void gameChallengeEnd(void);
 
+void gameGsLoopEnterScore(void);
+
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
 
