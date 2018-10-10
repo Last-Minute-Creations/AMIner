@@ -16,9 +16,15 @@ const tTileDef const g_pTileDefs[TILE_COUNT] = {
 	[TILE_GOLD_1] = {.szMsg = "Gold x1", .ubReward = 10, .ubSlots = 1, .ubColor = 14},
 	[TILE_GOLD_2] = {.szMsg = "Gold x2", .ubReward = 10, .ubSlots = 2, .ubColor = 14},
 	[TILE_GOLD_3] = {.szMsg = "Gold x3", .ubReward = 10, .ubSlots = 3, .ubColor = 14},
-	[TILE_EMERALD_1] = {.szMsg = "Emerald x1", .ubReward = 20, .ubSlots = 1, .ubColor = 12},
-	[TILE_EMERALD_2] = {.szMsg = "Emerald x2", .ubReward = 20, .ubSlots = 2, .ubColor = 12},
-	[TILE_EMERALD_3] = {.szMsg = "Emerald x3", .ubReward = 20, .ubSlots = 3, .ubColor = 12},
+	[TILE_EMERALD_1] = {.szMsg = "Emerald x1", .ubReward = 15, .ubSlots = 1, .ubColor = 12},
+	[TILE_EMERALD_2] = {.szMsg = "Emerald x2", .ubReward = 15, .ubSlots = 2, .ubColor = 12},
+	[TILE_EMERALD_3] = {.szMsg = "Emerald x3", .ubReward = 15, .ubSlots = 3, .ubColor = 12},
+	[TILE_RUBY_1] = {.szMsg = "Ruby x1", .ubReward = 20, .ubSlots = 1, .ubColor = 9},
+	[TILE_RUBY_2] = {.szMsg = "Ruby x2", .ubReward = 20, .ubSlots = 2, .ubColor = 9},
+	[TILE_RUBY_3] = {.szMsg = "Ruby x3", .ubReward = 20, .ubSlots = 3, .ubColor = 9},
+	[TILE_MOONSTONE_1] = {.szMsg = "Moonstone x1", .ubReward = 25, .ubSlots = 1, .ubColor = 10},
+	[TILE_MOONSTONE_2] = {.szMsg = "Moonstone x2", .ubReward = 25, .ubSlots = 2, .ubColor = 10},
+	[TILE_MOONSTONE_3] = {.szMsg = "Moonstone x3", .ubReward = 25, .ubSlots = 3, .ubColor = 10},
 	[TILE_COAL_1] = {.szMsg = "Coal x1", .ubReward = 5, .ubSlots = 1, .ubColor = 10},
 	[TILE_COAL_2] = {.szMsg = "Coal x2", .ubReward = 5, .ubSlots = 2, .ubColor = 10},
 	[TILE_COAL_3] = {.szMsg = "Coal x3", .ubReward = 5, .ubSlots = 3, .ubColor = 10},
@@ -88,10 +94,39 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			// 2000 is max
 			UWORD uwWhat = (uwRand() * 1000) / 65535;
 			UWORD uwChanceAir = 50;
-			UWORD uwChanceRock = CLAMP(y * 500 / 2000, 0, 500);
-			UWORD uwChanceSilver = chanceTrapezoid(y, 10, 30, 50, 100, 5, 200);
-			UWORD uwChanceGold = chanceTrapezoid(y, 60, 120, 150, 250, 2, 200);
-			UWORD uwChanceEmerald = chanceTrapezoid(y, 175, 400, 450, 600, 1, 200);
+			UWORD uwChanceRock, uwChanceSilver, uwChanceGold, uwChanceEmerald, uwChanceRuby, uwChanceMoonstone;
+			if(g_isChallenge) {
+				uwChanceRock = 75;
+				uwChanceSilver = chanceTrapezoid(
+					y, TILE_ROW_GRASS, TILE_ROW_GRASS+5,
+					TILE_ROW_CHALLENGE_CHECKPOINT_1, TILE_ROW_CHALLENGE_CHECKPOINT_1 + 5,
+					5, 200
+				);
+				uwChanceGold = chanceTrapezoid(
+					y, TILE_ROW_CHALLENGE_CHECKPOINT_1 - 5, TILE_ROW_CHALLENGE_CHECKPOINT_1 + 5,
+					TILE_ROW_CHALLENGE_CHECKPOINT_2 - 5, TILE_ROW_CHALLENGE_CHECKPOINT_2 + 5,
+					2, 200
+				);
+				uwChanceEmerald = chanceTrapezoid(
+					y, TILE_ROW_CHALLENGE_CHECKPOINT_2 - 5, TILE_ROW_CHALLENGE_CHECKPOINT_2 + 5,
+					TILE_ROW_CHALLENGE_CHECKPOINT_3 - 5, TILE_ROW_CHALLENGE_CHECKPOINT_3 + 5,
+					1, 200
+				);
+				uwChanceRuby = chanceTrapezoid(
+					y, TILE_ROW_CHALLENGE_CHECKPOINT_3 - 5, TILE_ROW_CHALLENGE_CHECKPOINT_3 + 5,
+					TILE_ROW_CHALLENGE_FINISH - 5, TILE_ROW_CHALLENGE_FINISH + 5,
+					1, 200
+				);
+				uwChanceMoonstone = 10;
+			}
+			else {
+				uwChanceRock = CLAMP(y * 500 / 2000, 0, 500);
+				uwChanceSilver = chanceTrapezoid(y, 10, 30, 50, 100, 5, 200);
+				uwChanceGold = chanceTrapezoid(y, 60, 120, 150, 250, 2, 200);
+				uwChanceEmerald = chanceTrapezoid(y, 175, 400, 450, 600, 1, 200);
+				uwChanceRuby = chanceTrapezoid(y, 500, 650, 700, 850, 1, 200);
+				uwChanceMoonstone = chanceTrapezoid(y, 175, 1000, 1500, 2000, 1, 10);
+			}
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_2);
@@ -121,6 +156,20 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 					isCoalOnly
 						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
 						: ubRandMinMax(TILE_EMERALD_1, TILE_EMERALD_3)
+				);
+			}
+			else if(uwWhat < (uwChance += uwChanceRuby)) {
+				g_pMainBuffer->pTileData[x][y] = (
+					isCoalOnly
+						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: ubRandMinMax(TILE_RUBY_1, TILE_RUBY_3)
+				);
+			}
+			else if(uwWhat < (uwChance += uwChanceMoonstone)) {
+				g_pMainBuffer->pTileData[x][y] = (
+					isCoalOnly
+						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: ubRandMinMax(TILE_MOONSTONE_1, TILE_MOONSTONE_3)
 				);
 			}
 			else {
