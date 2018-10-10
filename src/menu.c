@@ -71,7 +71,7 @@ static void menuChangeText(tMenuPos ePos, const char *szFmt, ...) {
 	va_start(vaArgs, szFmt);
 	vsprintf(s_pMenuTexts[ePos], szFmt, vaArgs);
 	va_end(vaArgs);
-	textBobChangeText(&s_pMenuPositions[ePos], s_pMenuTexts[ePos]);
+	textBobSetText(&s_pMenuPositions[ePos], s_pMenuTexts[ePos]);
 	textBobUpdate(&s_pMenuPositions[ePos]);
 }
 
@@ -113,8 +113,8 @@ void menuGsLoop(void) {
 					textBobSet(
 						&s_pMenuPositions[i], s_pMenuTexts[i],
 						i == 0 ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE,
-						160 + 32 - s_pMenuPositions[i].uwWidth / 2,
-						s_uwOffsY + i * 10, 0
+						g_pMainBuffer->pCamera->uPos.sUwCoord.uwX + 160, s_uwOffsY + i * 10,
+						0, 1
 					);
 					textBobUpdate(&s_pMenuPositions[i]);
 				}
@@ -127,10 +127,10 @@ void menuGsLoop(void) {
 				joyUse(JOY1_UP) || joyUse(JOY2_UP)
 			) {
 				if(s_eActivePos) {
-					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
+					textBobSetColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 					--s_eActivePos;
-					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_ACTIVE);
+					textBobSetColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_ACTIVE);
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 				}
 			}
@@ -139,10 +139,10 @@ void menuGsLoop(void) {
 				joyUse(JOY1_DOWN) || joyUse(JOY2_DOWN)
 			) {
 				if(s_eActivePos < MENU_POS_COUNT-1) {
-					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
+					textBobSetColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 					++s_eActivePos;
-					textBobChangeColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_ACTIVE);
+					textBobSetColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_ACTIVE);
 					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
 				}
 			}

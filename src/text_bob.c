@@ -26,22 +26,37 @@ void textBobCreate(
 
 void textBobSet(
 	tTextBob *pTextBob, const char *szText, UBYTE ubColor,
-	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY
+	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY, UBYTE isCenterH
 ) {
-	textBobChangeText(pTextBob, szText);
-	textBobChangeColor(pTextBob, ubColor);
-	pTextBob->sBob.sPos.sUwCoord.uwX = uwPosX;
-	pTextBob->sBob.sPos.sUwCoord.uwY = uwPosY;
-	pTextBob->uwDestPosY = uwDestPosY;
+	textBobSetText(pTextBob, szText);
+	textBobSetColor(pTextBob, ubColor);
+	textBobSetPosition(pTextBob, uwPosX, uwPosY, uwDestPosY, isCenterH);
 }
 
-void textBobChangeColor(tTextBob *pTextBob, UBYTE ubColor) {
+void textBobSetColor(tTextBob *pTextBob, UBYTE ubColor) {
 	pTextBob->ubColor = ubColor;
 	pTextBob->isUpdateRequired = 1;
 }
 
-void textBobChangeText(tTextBob *pTextBob, const char *szText) {
-	strcpy(pTextBob->szText, szText);
+void textBobSetText(tTextBob *pTextBob, const char *szText, ...) {
+	va_list vaArgs;
+	va_start(vaArgs, szText);
+	vsprintf(pTextBob->szText, szText, vaArgs);
+	va_end(vaArgs);
+	tUwCoordYX sSize = fontMeasureText(pTextBob->pFont, szText);
+	pTextBob->uwWidth = sSize.sUwCoord.uwX;
+	pTextBob->isUpdateRequired = 1;
+}
+
+void textBobSetPosition(
+	tTextBob *pTextBob, UWORD uwX, UWORD uwY, UWORD uwDestY, UBYTE isCenterH
+) {
+	pTextBob->sBob.sPos.sUwCoord.uwX = uwX;
+	pTextBob->sBob.sPos.sUwCoord.uwY = uwY;
+	if(isCenterH) {
+		pTextBob->sBob.sPos.sUwCoord.uwX -= pTextBob->uwWidth / 2;
+	}
+	pTextBob->uwDestPosY = uwDestY;
 	pTextBob->isUpdateRequired = 1;
 }
 
@@ -49,33 +64,29 @@ void textBobUpdate(tTextBob *pTextBob) {
 	if(!pTextBob->isUpdateRequired) {
 		return;
 	}
-	UWORD uwWidth = pTextBob->uwWidth;
 	fontFillTextBitMap(pTextBob->pFont, pTextBob->pTextBitmap, pTextBob->szText);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pBitmap, pTextBob->pTextBitmap, uwWidth/2 + 1, 1,
-		pTextBob->ubColor, FONT_HCENTER
+		pTextBob->sBob.pBitmap, pTextBob->pTextBitmap, 1, 1, pTextBob->ubColor, 0
 	);
 	// Mask outline
-	blitRect(pTextBob->sBob.pMask, 0, 0, uwWidth, pTextBob->sBob.pMask->Rows, 0);
-	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+1, 1, 15,
-		FONT_HCENTER
+	blitRect(
+		pTextBob->sBob.pMask, 0, 0,
+		pTextBob->sBob.uwWidth, pTextBob->sBob.pMask->Rows, 0
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+1, 0, 15,
-		FONT_COOKIE | FONT_HCENTER
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 1, 1, 15, 0
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+1, 2, 15,
-		FONT_COOKIE | FONT_HCENTER
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 1, 0, 15, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+0, 1, 15,
-		FONT_COOKIE | FONT_HCENTER
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 1, 2, 15, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, uwWidth/2+2, 1, 15,
-		FONT_COOKIE | FONT_HCENTER
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 0, 1, 15, FONT_COOKIE
+	);
+	fontDrawTextBitMap(
+		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 2, 1, 15, FONT_COOKIE
 	);
 	pTextBob->isUpdateRequired = 0;
 }

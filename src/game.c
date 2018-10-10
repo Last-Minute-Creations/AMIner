@@ -30,6 +30,25 @@ static UWORD s_uwColorBg;
 static UBYTE s_ubChallengeCamCnt;
 static tTextBob s_sChallengeMessage;
 static tTextBob s_sEndMessage;
+static tTextBob s_pScoreBobs[10];
+
+typedef struct _tHiScore {
+	ULONG ulScore;
+	char szName[20];
+} tHiScore;
+
+static tHiScore s_pScores[10] = {
+	{.ulScore = 10, .szName = "Bestest"},
+	{.ulScore = 9, .szName = "Best"},
+	{.ulScore = 8, .szName = "Better"},
+	{.ulScore = 7, .szName = "Good"},
+	{.ulScore = 6, .szName = "Moderate"},
+	{.ulScore = 5, .szName = "Bad"},
+	{.ulScore = 4, .szName = "Awful"},
+	{.ulScore = 3, .szName = "Too"},
+	{.ulScore = 2, .szName = "Small"},
+	{.ulScore = 1, .szName = "Score"},
+};
 
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
@@ -90,6 +109,9 @@ void gameGsCreate(void) {
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
 	textBobCreate(&s_sChallengeMessage, g_pFont, "Player 20 wins!");
 	textBobCreate(&s_sEndMessage, g_pFont, "Press fire or enter to continue");
+	for(UBYTE i = 0; i < 10; ++i) {
+		textBobCreate(&s_pScoreBobs[i], g_pFont, "10. 12345678901234567890: 655355");
+	}
 	menuPreload();
 	bobNewAllocateBgBuffers();
 	systemUnuse();
@@ -245,6 +267,9 @@ void gsGameLoopChallengeEnd(void) {
 	}
 
 	bobNewPush(&s_sChallengeMessage.sBob);
+	for(UBYTE i = 0; i < 10; ++i) {
+		bobNewPush(&s_pScoreBobs[i].sBob);
+	}
 	bobNewPush(&s_sEndMessage.sBob);
 
 	bobNewPushingDone();
@@ -258,28 +283,45 @@ void gsGameLoopChallengeEnd(void) {
 }
 
 void gameChallengeEnd(void) {
+	UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
 	textBobSet(
-		&s_sChallengeMessage, "", 14,
-		160, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 50, 0
-	);
-	textBobSet(
-		&s_sChallengeMessage, "Press fire or enter to continue", 14,
-		160, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 50, 0
+		&s_sEndMessage, "Press fire or enter to continue", 14,
+		uwCenterX, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 220, 0, 1
 	);
 	if(g_is2pPlaying) {
 		if(g_pVehicles[0].ulCash > g_pVehicles[1].ulCash) {
-			strcpy(s_sChallengeMessage.szText, "Player 1 wins!");
+			textBobSetText(&s_sChallengeMessage, "Player 1 wins!");
 		}
 		else if(g_pVehicles[0].ulCash < g_pVehicles[1].ulCash) {
-			strcpy(s_sChallengeMessage.szText, "Player 2 wins!");
+			textBobSetText(&s_sChallengeMessage, "Player 2 wins!");
 		}
 		else {
-			strcpy(s_sChallengeMessage.szText, "Draw!");
+			textBobSetText(&s_sChallengeMessage, "Draw!");
 		}
 	}
 	else {
-		sprintf(s_sChallengeMessage.szText, "Score: %lu", g_pVehicles[0].ulCash);
+		textBobSetText(&s_sChallengeMessage, "Score: %lu", g_pVehicles[0].ulCash);
+	}
+	textBobSetPosition(
+		&s_sChallengeMessage,
+		uwCenterX, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 50, 0, 1
+	);
+	textBobSetColor(&s_sChallengeMessage, 14);
+
+
+	for(UBYTE i = 0; i < 10; ++i) {
+		textBobSetText(
+			&s_pScoreBobs[i], "%hhu. %s: %5lu",
+			i+1, s_pScores[i].szName, s_pScores[i].ulScore
+		);
+		textBobSetColor(&s_pScoreBobs[i], 14);
+		textBobSetPosition(
+			&s_pScoreBobs[i],
+			100, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 70 + i * 10, 0, 0
+		);
+		textBobUpdate(&s_pScoreBobs[i]);
 	}
 	textBobUpdate(&s_sChallengeMessage);
+	textBobUpdate(&s_sEndMessage);
 	gameChangeLoop(gsGameLoopChallengeEnd);
 }

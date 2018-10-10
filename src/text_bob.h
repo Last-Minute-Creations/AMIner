@@ -27,12 +27,16 @@ void textBobDestroy(tTextBob *pTextBob);
 
 void textBobSet(
 	tTextBob *pTextBob, const char *szText, UBYTE ubColor,
-	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY
+	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY, UBYTE isCenterH
 );
 
-void textBobChangeColor(tTextBob *pTextBob, UBYTE ubColor);
+void textBobSetColor(tTextBob *pTextBob, UBYTE ubColor);
 
-void textBobChangeText(tTextBob *pTextBob, const char *szText);
+void textBobSetText(tTextBob *pTextBob, const char *szText, ...);
+
+void textBobSetPosition(
+	tTextBob *pTextBob, UWORD uwX, UWORD uwY, UWORD uwDestY, UBYTE isCenterH
+);
 
 void textBobUpdate(tTextBob *pTextBob);
 

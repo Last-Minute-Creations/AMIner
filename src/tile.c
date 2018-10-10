@@ -261,22 +261,21 @@ void tileExcavate(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		}
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, ubColor,
-			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 			pVehicle->sBobBody.sPos.sUwCoord.uwY,
-			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
+			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
 		);
 	}
 
 	if(g_isChallenge) {
 		if(ubTile == TILE_CHECKPOINT) {
-			textBobSet(
-				&pVehicle->sTextBob, "", 12,
-				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+			textBobSetText(&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle));
+			textBobSetColor(&pVehicle->sTextBob, 12);
+			textBobSetPosition(
+				&pVehicle->sTextBob,
+				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 				pVehicle->sBobBody.sPos.sUwCoord.uwY,
-				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
-			);
-			sprintf(
-				pVehicle->sTextBob.szText, "Checkpoint! %+hd", vehicleRestock(pVehicle)
+				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
 			);
 		}
 		else if(ubTile == TILE_FINISH) {

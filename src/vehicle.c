@@ -177,9 +177,9 @@ static inline UBYTE vehicleStartDrilling(
 		if(!ubCooldown) {
 			textBobSet(
 				&pVehicle->sTextBob, "No fuel!", 6,
-				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 				pVehicle->sBobBody.sPos.sUwCoord.uwY,
-				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32
+				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
 			);
 			ubCooldown = 25;
 		}
@@ -402,13 +402,14 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		if(wScoreNow < 0) {
 			ubColor = 6;
 		}
-		textBobSet(
-			&pVehicle->sTextBob, "", ubColor,
-			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 - 64/2,
+		textBobSetText(&pVehicle->sTextBob, "%+hd$", wScoreNow);
+		textBobSetColor(&pVehicle->sTextBob, ubColor);
+		textBobSetPosition(
+			&pVehicle->sTextBob,
+			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 			pVehicle->sBobBody.sPos.sUwCoord.uwY,
-			pVehicle->sBobBody.sPos.sUwCoord.uwY - 24
+			pVehicle->sBobBody.sPos.sUwCoord.uwY - 24, 0
 		);
-		sprintf(pVehicle->sTextBob.szText, "%+hd$", wScoreNow);
 	}
 }
 
