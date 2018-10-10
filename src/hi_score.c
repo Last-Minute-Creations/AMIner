@@ -8,13 +8,14 @@
 #include "text_bob.h"
 
 #define SCORE_NAME_LENGTH 20
+#define SCORE_COUNT 10
 
 typedef struct _tHiScore {
 	ULONG ulScore;
 	char szName[SCORE_NAME_LENGTH];
 } tHiScore;
 
-static tHiScore s_pScores[10] = {
+static tHiScore s_pScores[SCORE_COUNT] = {
 	{.ulScore = 10, .szName = "Bestest"},
 	{.ulScore = 9, .szName = "Best"},
 	{.ulScore = 8, .szName = "Better"},
@@ -31,8 +32,8 @@ static tHiScore s_pScores[10] = {
 static UBYTE s_ubNewNameLength;
 static UBYTE s_ubNewScorePos;
 static UBYTE s_isEnteringHiScore;
-static tTextBob s_pScoreNameBobs[10];
-static tTextBob s_pScoreCountBobs[10];
+static tTextBob s_pScoreNameBobs[SCORE_COUNT];
+static tTextBob s_pScoreCountBobs[SCORE_COUNT];
 
 void hiScoreEnteringProcess(void) {
 	if(keyUse(KEY_RETURN) || keyUse(KEY_NUMENTER)) {
@@ -73,7 +74,7 @@ void hiScoreEnteringProcess(void) {
 }
 
 void hiScoreBobsDisplay(void) {
-	for(UBYTE i = 0; i < 10; ++i) {
+	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		bobNewPush(&s_pScoreNameBobs[i].sBob);
 		bobNewPush(&s_pScoreCountBobs[i].sBob);
 	}
@@ -85,17 +86,24 @@ UBYTE hiScoreIsEntering(void) {
 
 void hiScoreSetup(ULONG ulScore) {
 	s_isEnteringHiScore = 0;
-	for(UBYTE i = 0; i < 10; ++i) {
+	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		if(s_pScores[i].ulScore < ulScore) {
 			s_isEnteringHiScore = 1;
 			s_ubNewScorePos = i;
-			s_pScores[i].ulScore = ulScore;
-			memset(s_pScores[i].szName, '\0', SCORE_NAME_LENGTH);
+
+			// Move worse score down
+			for(BYTE j = SCORE_COUNT-2; j >= s_ubNewScorePos; --j) {
+				strcpy(s_pScores[j+1].szName, s_pScores[j].szName);
+				s_pScores[j+1].ulScore = s_pScores[j].ulScore;
+			}
+			// Make room for new score
+			s_pScores[s_ubNewScorePos].ulScore = ulScore;
+			memset(s_pScores[s_ubNewScorePos].szName, '\0', SCORE_NAME_LENGTH);
 			break;
 		}
 	}
 
-	for(UBYTE i = 0; i < 10; ++i) {
+	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		// Score name
 		UWORD uwScorePos = g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 70 + i * 10;
 		textBobSetText(&s_pScoreNameBobs[i], "%hhu. %s", i+1, s_pScores[i].szName);
@@ -115,14 +123,14 @@ void hiScoreSetup(ULONG ulScore) {
 }
 
 void hiScoreBobsCreate(void) {
-	for(UBYTE i = 0; i < 10; ++i) {
+	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		textBobCreate(&s_pScoreNameBobs[i], g_pFont, "10. ZZZZZZZZZZZZZZZZZZZZZ");
 		textBobCreate(&s_pScoreCountBobs[i], g_pFont, "655356");
 	}
 }
 
 void hiScoreBobsDestroy(void) {
-	for(UBYTE i = 0; i < 10; ++i) {
+	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		textBobDestroy(&s_pScoreNameBobs[i]);
 		textBobDestroy(&s_pScoreCountBobs[i]);
 	}
