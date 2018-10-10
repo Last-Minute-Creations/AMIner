@@ -250,11 +250,12 @@ void gameGsDestroy(void) {
   viewDestroy(s_pView);
 }
 
-void gsGameLoopChallengeEnd(void) {
+void gameGsLoopChallengeEnd(void) {
   if(
 		keyUse(KEY_ESCAPE) ||
 		(1 && (keyUse(KEY_RETURN) || joyUse(JOY1_FIRE) || joyUse(JOY2_FIRE)))
 	) {
+		gameChangeLoop(gameGsLoop);
     goToMenu();
 		return;
   }
@@ -283,6 +284,11 @@ void gsGameLoopChallengeEnd(void) {
 }
 
 void gameChallengeEnd(void) {
+	g_pVehicles[0].sSteer.bX = 0;
+	g_pVehicles[0].sSteer.bY = 0;
+	g_pVehicles[1].sSteer.bX = 0;
+	g_pVehicles[1].sSteer.bY = 0;
+
 	UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
 	textBobSet(
 		&s_sEndMessage, "Press fire or enter to continue", 14,
@@ -323,5 +329,5 @@ void gameChallengeEnd(void) {
 	}
 	textBobUpdate(&s_sChallengeMessage);
 	textBobUpdate(&s_sEndMessage);
-	gameChangeLoop(gsGameLoopChallengeEnd);
+	gameChangeLoop(gameGsLoopChallengeEnd);
 }

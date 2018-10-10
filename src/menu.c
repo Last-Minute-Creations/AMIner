@@ -27,7 +27,7 @@ typedef enum _tMenuPos {
 } tMenuPos;
 
 static char * const s_pMenuTexts[MENU_POS_COUNT] = {
-	"Start game", "Mode: free play", "Players: 10",
+	"Start game", "Mode: free playyyy", "Players: 10",
 	"Player 1 controls: arrows", "Player 2 controls: arrows",
 	"Exit to Workbench"
 };
@@ -106,6 +106,7 @@ void menuGsLoop(void) {
 				s_sBobLogo.sPos.sUwCoord.uwX += (320 - s_sBobLogo.uwWidth)/2;
 				s_sBobLogo.sPos.sUwCoord.uwY += 16;
 				s_uwOffsY = s_sBobLogo.sPos.sUwCoord.uwY + s_sBobLogo.uwHeight + 50;
+				sprintf(s_pMenuTexts[MENU_POS_MODE], g_isChallenge ? "Mode: challenge" : "Mode: free play");
 				sprintf(s_pMenuTexts[MENU_POS_PLAYERS], g_is2pPlaying ? "Players: 2" : "Players: 1");
 				sprintf(s_pMenuTexts[MENU_POS_P1_CONTROLS], "Player 1 controls: %s", g_is1pKbd ? "WSAD" : "Joy");
 				sprintf(s_pMenuTexts[MENU_POS_P2_CONTROLS], "Player 2 controls: %s", g_is2pKbd ? "Arrows" : "Joy");
@@ -167,6 +168,15 @@ void menuGsLoop(void) {
 				else if(s_eActivePos == MENU_POS_P2_CONTROLS) {
 					g_is2pKbd = !g_is2pKbd;
 					menuChangeText(MENU_POS_P2_CONTROLS, "Player 2 controls: %s", g_is2pKbd ? "Arrows" : "Joy");
+				}
+				else if(s_eActivePos == MENU_POS_MODE) {
+					g_isChallenge = !g_isChallenge;
+					if(g_isChallenge) {
+						menuChangeText(MENU_POS_MODE, "Mode: challenge");
+					}
+					else {
+						menuChangeText(MENU_POS_MODE, "Mode: free play");
+					}
 				}
 			}
 			else if(

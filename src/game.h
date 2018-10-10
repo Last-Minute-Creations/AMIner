@@ -16,7 +16,7 @@ void gameGsCreate(void);
 
 void gameGsLoop(void);
 
-void gsGameLoopChallengeEnd(void);
+void gameGsLoopChallengeEnd(void);
 
 void gameGsDestroy(void);
 
