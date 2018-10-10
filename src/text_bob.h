@@ -34,7 +34,7 @@ void textBobSetColor(tTextBob *pTextBob, UBYTE ubColor);
 
 void textBobSetText(tTextBob *pTextBob, const char *szText, ...);
 
-void textBobSetPosition(
+void textBobSetPos(
 	tTextBob *pTextBob, UWORD uwX, UWORD uwY, UWORD uwDestY, UBYTE isCenterH
 );
 

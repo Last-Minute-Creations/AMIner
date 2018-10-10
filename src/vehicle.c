@@ -91,7 +91,7 @@ void vehicleReset(tVehicle *pVehicle) {
 }
 
 void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
-	logBlockBegin("vehicleCreate()");
+	logBlockBegin("vehicleCreate(pVehicle: %p, ubIdx: %hhu)", pVehicle, ubIdx);
 
 	// Setup bobs
   bobNewInit(
@@ -270,7 +270,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		if(ubTile == TILE_CHECKPOINT) {
 			textBobSetText(&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle));
 			textBobSetColor(&pVehicle->sTextBob, 12);
-			textBobSetPosition(
+			textBobSetPos(
 				&pVehicle->sTextBob,
 				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 				pVehicle->sBobBody.sPos.sUwCoord.uwY,
@@ -471,7 +471,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		}
 		textBobSetText(&pVehicle->sTextBob, "%+hd$", wScoreNow);
 		textBobSetColor(&pVehicle->sTextBob, ubColor);
-		textBobSetPosition(
+		textBobSetPos(
 			&pVehicle->sTextBob,
 			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 			pVehicle->sBobBody.sPos.sUwCoord.uwY,

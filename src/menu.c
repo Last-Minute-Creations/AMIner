@@ -39,6 +39,7 @@ static tMenuState s_eMenuState;
 static tMenuPos s_eActivePos;
 static tBitMap *s_pLogo, *s_pLogoMask;
 static tTextBob s_pMenuPositions[MENU_POS_COUNT];
+static tTextBob s_sCredits;
 static tBobNew s_sBobLogo;
 static UWORD s_uwOffsY;
 
@@ -52,6 +53,10 @@ void menuPreload(void) {
 	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
 		textBobCreate(&s_pMenuPositions[i], g_pFont, "Some very very long menu text");
 	}
+	const char *szCredits = "Code: KaiN, Gfx: Softiron, Tests: Rav.En";
+	textBobCreate(&s_sCredits, g_pFont, szCredits);
+	textBobSetText(&s_sCredits, szCredits);
+	textBobSetColor(&s_sCredits, 15);
 }
 
 void menuUnload(void) {
@@ -60,6 +65,7 @@ void menuUnload(void) {
 	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
 		textBobDestroy(&s_pMenuPositions[i]);
 	}
+	textBobDestroy(&s_sCredits);
 }
 
 void menuGsCreate(void) {
@@ -105,7 +111,7 @@ void menuGsLoop(void) {
 				s_sBobLogo.sPos.ulYX = g_pMainBuffer->pCamera->uPos.ulYX;
 				s_sBobLogo.sPos.sUwCoord.uwX += (320 - s_sBobLogo.uwWidth)/2;
 				s_sBobLogo.sPos.sUwCoord.uwY += 16;
-				s_uwOffsY = s_sBobLogo.sPos.sUwCoord.uwY + s_sBobLogo.uwHeight + 50;
+				s_uwOffsY = s_sBobLogo.sPos.sUwCoord.uwY + s_sBobLogo.uwHeight + 30;
 				sprintf(s_pMenuTexts[MENU_POS_MODE], g_isChallenge ? "Mode: challenge" : "Mode: free play");
 				sprintf(s_pMenuTexts[MENU_POS_PLAYERS], g_is2pPlaying ? "Players: 2" : "Players: 1");
 				sprintf(s_pMenuTexts[MENU_POS_P1_CONTROLS], "Player 1 controls: %s", g_is1pKbd ? "WSAD" : "Joy");
@@ -119,6 +125,11 @@ void menuGsLoop(void) {
 					);
 					textBobUpdate(&s_pMenuPositions[i]);
 				}
+				textBobSetPos(
+					&s_sCredits, g_pMainBuffer->pCamera->uPos.sUwCoord.uwX + 160,
+					g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight - 15, 0, 1
+				);
+				textBobUpdate(&s_sCredits);
 			}
 		} break;
 
@@ -196,6 +207,7 @@ void menuGsLoop(void) {
 			for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
 				bobNewPush(&s_pMenuPositions[i].sBob);
 			}
+			bobNewPush(&s_sCredits.sBob);
 		} break;
 
 		case MENU_STATE_ROLL_OUT: {

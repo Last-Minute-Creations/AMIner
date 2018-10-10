@@ -6,28 +6,22 @@
 #include <ace/managers/key.h>
 #include <ace/managers/joy.h>
 
-// Without it compiler will yell about undeclared gameGsCreate etc
 #include "game.h"
 
 void genericCreate(void) {
-  // Here goes your startup code
-  logWrite("Hello, Amiga!\n");
-  keyCreate(); // We'll use keyboard
+  keyCreate();
 	joyOpen(0);
-  // Initialize gamestate
   gamePushState(gameGsCreate, gameGsLoop, gameGsDestroy);
 }
 
 void genericProcess(void) {
-  // Here goes code done each game frame
   keyProcess();
 	joyProcess();
-  gameProcess(); // Process current gamestate's loop
+  gameProcess();
 }
 
 void genericDestroy(void) {
-  // Here goes your cleanup code
-  keyDestroy(); // We don't need it anymore
+  keyDestroy();
 	joyClose();
   logWrite("Goodbye, Amiga!\n");
 }

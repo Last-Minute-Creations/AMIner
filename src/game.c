@@ -85,7 +85,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
-	windowInit();
+	// windowInit();
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
@@ -160,10 +160,10 @@ void gameGsLoop(void) {
 	if(keyUse(KEY_B)) {
 		s_isDebug = !s_isDebug;
 	}
-	if(keyUse(KEY_L)) {
-		gamePushState(vendorGsCreate, vendorGsLoop, vendorGsDestroy);
-		return;
-	}
+	// if(keyUse(KEY_L)) {
+	// 	gamePushState(vendorGsCreate, vendorGsLoop, vendorGsDestroy);
+	// 	return;
+	// }
 
 	debugColor(0x008);
 	bobNewBegin();
@@ -216,14 +216,16 @@ void gameGsDestroy(void) {
   // Cleanup when leaving this gamestate
   systemUse();
 
-	hiScoreBobsDestroy();
 	menuUnload();
 	bitmapDestroy(s_pTiles);
 	fontDestroy(g_pFont);
+	hiScoreBobsDestroy();
+	textBobDestroy(&s_sChallengeResult);
+	textBobDestroy(&s_sEndMessage);
 	vehicleDestroy(&g_pVehicles[0]);
 	vehicleDestroy(&g_pVehicles[1]);
 	vehicleBitmapsDestroy();
-	windowDeinit();
+	// windowDeinit();
 	bobNewManagerDestroy();
 
   hudDestroy();
@@ -291,7 +293,7 @@ void gameChallengeEnd(void) {
 	else {
 		textBobSetText(&s_sChallengeResult, "Score: %lu", g_pVehicles[0].ulCash);
 	}
-	textBobSetPosition(
+	textBobSetPos(
 		&s_sChallengeResult,
 		uwCenterX, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 50, 0, 1
 	);

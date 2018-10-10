@@ -30,7 +30,7 @@ void textBobSet(
 ) {
 	textBobSetText(pTextBob, szText);
 	textBobSetColor(pTextBob, ubColor);
-	textBobSetPosition(pTextBob, uwPosX, uwPosY, uwDestPosY, isCenterH);
+	textBobSetPos(pTextBob, uwPosX, uwPosY, uwDestPosY, isCenterH);
 }
 
 void textBobSetColor(tTextBob *pTextBob, UBYTE ubColor) {
@@ -48,7 +48,7 @@ void textBobSetText(tTextBob *pTextBob, const char *szText, ...) {
 	pTextBob->isUpdateRequired = 1;
 }
 
-void textBobSetPosition(
+void textBobSetPos(
 	tTextBob *pTextBob, UWORD uwX, UWORD uwY, UWORD uwDestY, UBYTE isCenterH
 ) {
 	pTextBob->sBob.sPos.sUwCoord.uwX = uwX;
