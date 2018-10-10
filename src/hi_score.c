@@ -43,6 +43,7 @@ void hiScoreEnteringProcess(void) {
 		return;
 	}
 	if(keyUse(g_sKeyManager.ubLastKey)) {
+		UBYTE isUpdateNeeded = 1;
 		char c = g_pToAscii[g_sKeyManager.ubLastKey];
 		if(
 			(c >= 'A' && c <= 'Z') ||
@@ -52,12 +53,21 @@ void hiScoreEnteringProcess(void) {
 			if(s_ubNewNameLength < SCORE_NAME_LENGTH) {
 				s_pScores[s_ubNewScorePos].szName[s_ubNewNameLength] = c;
 				++s_ubNewNameLength;
-				textBobSetText(
-					&s_pScoreNameBobs[s_ubNewScorePos], "%hhu. %s",
-					s_ubNewScorePos+1, s_pScores[s_ubNewScorePos].szName
-				);
-				textBobUpdate(&s_pScoreNameBobs[s_ubNewScorePos]);
 			}
+		}
+		else if(g_sKeyManager.ubLastKey == KEY_BACKSPACE && s_ubNewNameLength){
+			--s_ubNewNameLength;
+			s_pScores[s_ubNewScorePos].szName[s_ubNewNameLength] = '\0';
+		}
+		else {
+			isUpdateNeeded = 0;
+		}
+		if(isUpdateNeeded) {
+			textBobSetText(
+				&s_pScoreNameBobs[s_ubNewScorePos], "%hhu. %s",
+				s_ubNewScorePos+1, s_pScores[s_ubNewScorePos].szName
+			);
+			textBobUpdate(&s_pScoreNameBobs[s_ubNewScorePos]);
 		}
 	}
 }
