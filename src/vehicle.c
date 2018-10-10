@@ -292,6 +292,25 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	const fix16_t fAccX = fix16_one / 8;
 	const fix16_t fFrictX = fix16_one / 12;
 
+	if(
+		g_isChallenge &&
+		fix16_to_int(pVehicle->fY) < g_pMainBuffer->pCamera->uPos.sUwCoord.uwY
+	) {
+		UWORD uwTileY = (
+			g_pMainBuffer->pCamera->uPos.sUwCoord.uwY +
+			g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
+		) / 32;
+		UWORD uwTileX = fix16_to_int(pVehicle->fX)/32;
+		if(tileIsSolid(uwTileX, uwTileY)) {
+			tileExcavate(uwTileX, uwTileY);
+		}
+		pVehicle->fY = fix16_from_int(uwTileY*32);
+		pVehicle->fDy = fix16_from_int(-1); // HACK HACK HACK
+
+		if(uwTileY >= TILE_ROW_CHALLENGE_FINISH) {
+			gameChallengeEnd();
+		}
+	}
 	if(pVehicle->sSteer.bX) {
 		if(pVehicle->sSteer.bX > 0) {
 			pVehicle->fDx = MIN(pVehicle->fDx + fAccX, fMaxDx);

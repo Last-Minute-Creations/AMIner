@@ -150,8 +150,7 @@ static void gameProcessInput(void) {
 	}
 	vehicleMove(&g_pVehicles[0], bDirX, bDirY);
 
-	bDirX = 0;
-	bDirY = 0;
+	bDirX = 0; bDirY = 0;
 	if(g_is2pKbd) {
 		if(keyCheck(KEY_RIGHT)) { bDirX += 1; }
 		if(keyCheck(KEY_LEFT)) { bDirX -= 1; }
