@@ -33,5 +33,6 @@ extern tFont *g_pFont;
 extern UBYTE g_is2pPlaying;
 extern UBYTE g_is1pKbd, g_is2pKbd;
 extern UBYTE g_isChallenge;
+extern UBYTE g_isAtari;
 
 #endif // _GAME_H_

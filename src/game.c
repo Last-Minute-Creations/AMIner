@@ -35,7 +35,7 @@ static tTextBob s_sEndMessage;
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
-UBYTE g_isChallenge;
+UBYTE g_isChallenge, g_isAtari;
 
 static void goToMenu(void) {
 	// Switch to menu, after popping it will process gameGsLoop
@@ -44,7 +44,7 @@ static void goToMenu(void) {
 
 void gameStart(void) {
 	s_ubChallengeCamCnt = 0;
-	tileInit(0, g_isChallenge);
+	tileInit(g_isAtari, g_isChallenge);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	hudReset();
@@ -105,6 +105,7 @@ void gameGsCreate(void) {
 	g_is1pKbd = 0;
 	g_is2pKbd = 1;
 	g_isChallenge = 1;
+	g_isAtari = 0;
 
 	// Initial background
 	tileBufferInitialDraw(g_pMainBuffer);
