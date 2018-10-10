@@ -82,8 +82,6 @@ void vehicleProcessText(void);
 
 void vehicleProcess(tVehicle *pVehicle);
 
-WORD vehicleRestock(tVehicle *pVehicle);
-
 tVehicle g_pVehicles[2];
 
 #endif // _VEHICLE_H_

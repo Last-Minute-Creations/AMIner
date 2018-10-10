@@ -218,7 +218,7 @@ static inline UBYTE vehicleStartDrilling(
 	return 1;
 }
 
-WORD vehicleRestock(tVehicle *pVehicle) {
+static WORD vehicleRestock(tVehicle *pVehicle) {
 	pVehicle->ubCargoCurr = 0;
 	pVehicle->ulCash += pVehicle->uwCargoScore;
 	WORD wScoreNow = pVehicle->uwCargoScore;
@@ -236,6 +236,54 @@ WORD vehicleRestock(tVehicle *pVehicle) {
 	pVehicle->ulCash -= uwRefuelUnits * ubFuelPrice;
 	wScoreNow -= uwRefuelUnits * ubFuelPrice;
 	return wScoreNow;
+}
+
+static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
+	// Load mineral to vehicle
+	static const char * const szMessageFull = "Cargo full!";
+	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
+	if(g_pTileDefs[ubTile].szMsg) {
+		UBYTE ubSlots = g_pTileDefs[ubTile].ubSlots;
+		ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
+		pVehicle->uwCargoScore += g_pTileDefs[ubTile].ubReward * ubSlots;
+		pVehicle->ubCargoCurr += ubSlots;
+		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr);
+		const char *szMessage;
+		UBYTE ubColor;
+		if(pVehicle->ubCargoCurr == pVehicle->ubCargoMax) {
+			szMessage = szMessageFull;
+			ubColor = 6;
+		}
+		else {
+			szMessage = g_pTileDefs[ubTile].szMsg;
+			ubColor = g_pTileDefs[ubTile].ubColor;
+		}
+		textBobSet(
+			&pVehicle->sTextBob, szMessage, ubColor,
+			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
+		);
+	}
+
+	if(g_isChallenge) {
+		if(ubTile == TILE_CHECKPOINT) {
+			textBobSetText(&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle));
+			textBobSetColor(&pVehicle->sTextBob, 12);
+			textBobSetPosition(
+				&pVehicle->sTextBob,
+				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.sUwCoord.uwY,
+				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
+			);
+		}
+		else if(ubTile == TILE_FINISH) {
+			vehicleRestock(pVehicle);
+			gameChallengeEnd();
+		}
+	}
+
+	tileExcavate(uwX, uwY);
 }
 
 static void vehicleProcessMovement(tVehicle *pVehicle) {
@@ -500,7 +548,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			UWORD uwTileX = (fix16_to_int(pVehicle->fX) + VEHICLE_WIDTH / 2) >> 5;
 			UWORD uwTileY = (fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT / 2) >> 5;
 
-			tileExcavate(pVehicle, uwTileX, uwTileY);
+			vehicleExcavateTile(pVehicle, uwTileX, uwTileY);
 			if(uwTileY == TILE_ROW_GRASS + 1) {
 				// Drilling beneath a grass - refresh it
 				tileRefreshGrass(uwTileX);

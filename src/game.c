@@ -311,7 +311,7 @@ void gameChallengeEnd(void) {
 
 	for(UBYTE i = 0; i < 10; ++i) {
 		textBobSetText(
-			&s_pScoreBobs[i], "%hhu. %s: %5lu",
+			&s_pScoreBobs[i], "%hhu. %s   %5lu",
 			i+1, s_pScores[i].szName, s_pScores[i].ulScore
 		);
 		textBobSetColor(&s_pScoreBobs[i], 14);
