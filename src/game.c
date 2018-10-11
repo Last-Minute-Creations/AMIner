@@ -21,6 +21,8 @@
 #include "menu.h"
 #include "hi_score.h"
 
+tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
+
 static tView *s_pView;
 static tVPort *s_pVpMain;
 tTileBufferManager *g_pMainBuffer;
@@ -76,6 +78,11 @@ void gameGsCreate(void) {
 
 	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
 	s_uwColorBg = s_pVpMain->pPalette[0];
+
+	audioCreate();
+	g_pSampleDrill = sampleCreateFromFile("data/sfx/drill1.raw8", 8000);
+	g_pSampleOre = sampleCreateFromFile("data/sfx/ore2.raw8", 8000);
+	g_pSampleTeleport = sampleCreateFromFile("data/sfx/teleport.raw8", 8000);
 
 	randInit(2184);
 
@@ -228,6 +235,11 @@ void gameGsDestroy(void) {
 	vehicleBitmapsDestroy();
 	// windowDeinit();
 	bobNewManagerDestroy();
+
+	audioDestroy();
+	sampleDestroy(g_pSampleDrill);
+	sampleDestroy(g_pSampleOre);
+	sampleDestroy(g_pSampleTeleport);
 
   hudDestroy();
   viewDestroy(s_pView);

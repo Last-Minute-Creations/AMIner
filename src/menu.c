@@ -10,6 +10,8 @@
 #include "bob_new.h"
 #include "text_bob.h"
 
+tSample *s_pSampleEnter, *s_pSampleToggle, *s_pSampleNavigate, *s_pSampleAtari;
+
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
 	MENU_STATE_SELECTING,
@@ -34,7 +36,9 @@ static char * const s_pMenuTexts[MENU_POS_COUNT] = {
 };
 
 static UBYTE s_pKeyHistory[8] = {0};
-static UBYTE s_pKeyKonami[8] = {KEY_RIGHT, KEY_LEFT, KEY_RIGHT, KEY_LEFT, KEY_DOWN, KEY_DOWN, KEY_UP, KEY_UP};
+static UBYTE s_pKeyKonami[8] = {
+	KEY_RIGHT, KEY_LEFT, KEY_RIGHT, KEY_LEFT, KEY_DOWN, KEY_DOWN, KEY_UP, KEY_UP
+};
 
 #define MENU_COLOR_INACTIVE 10
 #define MENU_COLOR_ACTIVE 14
@@ -62,6 +66,11 @@ void menuPreload(void) {
 	textBobCreate(&s_sCredits, g_pFont, szCredits);
 	textBobSetText(&s_sCredits, szCredits);
 	textBobSetColor(&s_sCredits, 15);
+
+	s_pSampleEnter = sampleCreateFromFile("data/sfx/menu_enter.raw8", 22050);
+	s_pSampleToggle = sampleCreateFromFile("data/sfx/menu_toggle.raw8", 22050);
+	s_pSampleNavigate = sampleCreateFromFile("data/sfx/menu_navigate.raw8", 22050);
+	s_pSampleAtari = sampleCreateFromFile("data/sfx/atari.raw8", 22050);
 }
 
 void menuUnload(void) {
@@ -71,6 +80,11 @@ void menuUnload(void) {
 		textBobDestroy(&s_pMenuPositions[i]);
 	}
 	textBobDestroy(&s_sCredits);
+
+	sampleDestroy(s_pSampleEnter);
+	sampleDestroy(s_pSampleToggle);
+	sampleDestroy(s_pSampleNavigate);
+	sampleDestroy(s_pSampleAtari);
 }
 
 void menuGsCreate(void) {
@@ -88,7 +102,10 @@ static void menuChangeText(tMenuPos ePos, const char *szFmt, ...) {
 }
 
 static void menuEnableAtari(void) {
-	s_isAtariDisplayed = 1;
+	if(!s_isAtariDisplayed) {
+		s_isAtariDisplayed = 1;
+		audioPlay(AUDIO_CHANNEL_1, s_pSampleAtari, AUDIO_VOLUME_MAX, 1);
+	}
 }
 
 void menuGsLoop(void) {
@@ -146,6 +163,7 @@ void menuGsLoop(void) {
 
 		case MENU_STATE_SELECTING: {
 			UBYTE ubNewKey = 0;
+			UBYTE isToggle = 0;
 			if(
 				keyUse(KEY_UP) || keyUse(KEY_W) ||
 				joyUse(JOY1_UP) || joyUse(JOY2_UP)
@@ -189,6 +207,7 @@ void menuGsLoop(void) {
 				ubNewKey = KEY_RIGHT;
 			}
 			if(ubNewKey == KEY_LEFT || ubNewKey == KEY_RIGHT) {
+				isToggle = 1;
 				if(s_eActivePos == MENU_POS_PLAYERS) {
 					g_is2pPlaying = !g_is2pPlaying;
 					// ?: aint working here, wtf
@@ -225,12 +244,16 @@ void menuGsLoop(void) {
 						menuChangeText(MENU_POS_ATARI, "ATARI MODE: Off");
 					}
 				}
+				else {
+					isToggle = 0;
+				}
 			}
 			else if(
 				keyUse(KEY_RETURN) || keyUse(KEY_SPACE) ||
 				joyUse(JOY1_FIRE) || joyUse(JOY1_FIRE)
 			) {
 				if(s_eActivePos == MENU_POS_START) {
+					audioPlay(AUDIO_CHANNEL_0, s_pSampleEnter, AUDIO_VOLUME_MAX, 1);
 					gameStart();
 					s_eMenuState = MENU_STATE_ROLL_OUT;
 				}
@@ -241,6 +264,10 @@ void menuGsLoop(void) {
 			}
 
 			if(ubNewKey) {
+				audioPlay(
+					AUDIO_CHANNEL_0,
+					isToggle ? s_pSampleToggle : s_pSampleNavigate, AUDIO_VOLUME_MAX, 1
+				);
 				memmove(s_pKeyHistory+1, s_pKeyHistory, 8-1);
 				s_pKeyHistory[0] = ubNewKey;
 				if(!memcmp(s_pKeyHistory, s_pKeyKonami, 8)) {
@@ -276,5 +303,5 @@ void menuGsLoop(void) {
 }
 
 void menuGsDestroy(void) {
-
+	audioStop(AUDIO_CHANNEL_0);
 }

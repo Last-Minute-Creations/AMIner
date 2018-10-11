@@ -181,6 +181,10 @@ static inline UBYTE vehicleStartDrilling(
 				pVehicle->sBobBody.sPos.sUwCoord.uwY,
 				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
 			);
+			audioPlay(
+				AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
+				g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
+			);
 			ubCooldown = 25;
 		}
 		else {
@@ -211,6 +215,7 @@ static inline UBYTE vehicleStartDrilling(
 	pVehicle->fDestY = fix16_from_int(((uwTileY + 1) << 5) - VEHICLE_HEIGHT - 4);
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
+	audioPlay(AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx, g_pSampleDrill, AUDIO_VOLUME_MAX, -1);
 
 	if(!g_isChallenge) {
 		pVehicle->uwFuelCurr -= 30;
@@ -235,6 +240,12 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 	);
 	pVehicle->ulCash -= uwRefuelUnits * ubFuelPrice;
 	wScoreNow -= uwRefuelUnits * ubFuelPrice;
+
+	audioPlay(
+		AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
+		g_pSampleOre, AUDIO_VOLUME_MAX, 1
+	);
+
 	return wScoreNow;
 }
 
@@ -253,10 +264,18 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		if(pVehicle->ubCargoCurr == pVehicle->ubCargoMax) {
 			szMessage = szMessageFull;
 			ubColor = 6;
+			audioPlay(
+				AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
+				g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
+			);
 		}
 		else {
 			szMessage = g_pTileDefs[ubTile].szMsg;
 			ubColor = g_pTileDefs[ubTile].ubColor;
+			audioPlay(
+				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
+				g_pSampleOre, AUDIO_VOLUME_MAX, 1
+			);
 		}
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, ubColor,
@@ -268,7 +287,9 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 
 	if(g_isChallenge) {
 		if(ubTile == TILE_CHECKPOINT) {
-			textBobSetText(&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle));
+			textBobSetText(
+				&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle)
+			);
 			textBobSetColor(&pVehicle->sTextBob, 12);
 			textBobSetPos(
 				&pVehicle->sTextBob,
@@ -306,6 +327,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		}
 		pVehicle->fY = fix16_from_int(uwTileY*32);
 		pVehicle->fDy = fix16_from_int(-1); // HACK HACK HACK
+		audioPlay(
+			AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
+			g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
+		);
 
 		if(uwTileY >= TILE_ROW_CHALLENGE_FINISH) {
 			gameChallengeEnd();
@@ -402,7 +427,9 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			++pVehicle->ubTrackAnimCnt;
 			if(pVehicle->ubTrackAnimCnt >= (5 - fix16_to_int(fix16_abs(pVehicle->fDx)))) {
 				pVehicle->ubTrackFrame = !pVehicle->ubTrackFrame;
-				bobNewSetBitMapOffset(&pVehicle->sBobTrack, pVehicle->ubTrackFrame * VEHICLE_TRACK_HEIGHT);
+				bobNewSetBitMapOffset(
+					&pVehicle->sBobTrack, pVehicle->ubTrackFrame * VEHICLE_TRACK_HEIGHT
+				);
 				pVehicle->ubTrackAnimCnt = 0;
 			}
 		}
@@ -547,6 +574,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 		if(isDoneX && isDoneY) {
 			if(pVehicle->ubDrillDir == DRILL_DIR_H) {
 				pVehicle->ubDrillDir = DRILL_DIR_NONE;
+				audioStop(AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx);
 			}
 			else {
 				const UBYTE ubAdd = 4; // No grass past this point
@@ -561,6 +589,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				}
 				else {
 					pVehicle->ubDrillState = DRILL_STATE_ANIM_OUT;
+					audioStop(AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx);
 				}
 			}
 			// Center is on tile to excavate
@@ -624,6 +653,8 @@ void vehicleProcess(tVehicle *pVehicle) {
 	}
 	hudSetFuel(pVehicle->ubPlayerIdx, pVehicle->uwFuelCurr);
 	textBobAnimate(&pVehicle->sTextBob);
-	hudSetDepth(pVehicle->ubPlayerIdx, MAX(0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_GRASS+1)*32));
+	hudSetDepth(pVehicle->ubPlayerIdx, MAX(
+		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_GRASS+1)*32
+	));
 	hudSetScore(pVehicle->ubPlayerIdx, pVehicle->ulCash);
 }

@@ -7,6 +7,7 @@
 
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/utils/font.h>
+#include <ace/managers/audio.h>
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
@@ -28,6 +29,8 @@ void gameGsLoopEnterScore(void);
 
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
+
+extern tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 
 // Game config
 extern UBYTE g_is2pPlaying;
