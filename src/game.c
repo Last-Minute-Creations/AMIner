@@ -84,7 +84,11 @@ void gameGsCreate(void) {
 	g_pSampleOre = sampleCreateFromFile("data/sfx/ore2.raw8", 8000);
 	g_pSampleTeleport = sampleCreateFromFile("data/sfx/teleport.raw8", 8000);
 
+#ifdef GAME_DEBUG
 	randInit(2184);
+#else
+	randInit((g_pRayPos->bfPosY << 8) | g_pRayPos->bfPosX);
+#endif
 
 	tileInit(0, 0);
 
