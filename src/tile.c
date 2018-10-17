@@ -85,12 +85,16 @@ static UWORD chanceTrapezoid(
 }
 
 void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
+	UWORD uwEndY = g_pMainBuffer->uTileBounds.sUwCoord.uwY;
+	if(isChallenge) {
+		uwEndY = TILE_ROW_CHALLENGE_FINISH;
+	}
 	for(UWORD x = 1; x < g_pMainBuffer->uTileBounds.sUwCoord.uwX; ++x) {
 		for(UWORD y = 0; y < TILE_ROW_GRASS; ++y) {
 			g_pMainBuffer->pTileData[x][y] = TILE_NONE;
 		}
 		g_pMainBuffer->pTileData[x][TILE_ROW_GRASS] = TILE_GRASS_1 + (x & 1);
-		for(UWORD y = TILE_ROW_GRASS + 1; y < g_pMainBuffer->uTileBounds.sUwCoord.uwY; ++y) {
+		for(UWORD y = TILE_ROW_GRASS + 1; y < uwEndY; ++y) {
 			// 2000 is max
 			UWORD uwWhat = (uwRand() * 1000) / 65535;
 			UWORD uwChanceAir = 50;
@@ -181,6 +185,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
 	}
 	g_pMainBuffer->pTileData[0][TILE_ROW_GRASS] = TILE_GRASS_1;
+
 	// Shop
 	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS-3] = TILE_SHOP_CHIMNEY;
 	for(UWORD y = 0; y < 3; ++y) {

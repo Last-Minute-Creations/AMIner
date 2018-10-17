@@ -303,5 +303,5 @@ void menuGsLoop(void) {
 }
 
 void menuGsDestroy(void) {
-	audioStop(AUDIO_CHANNEL_0);
+
 }
