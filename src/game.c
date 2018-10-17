@@ -58,6 +58,7 @@ void gameGsCreate(void) {
 	TAG_END);
 
 	g_pFont = fontCreate("data/silkscreen5.fnt");
+	textBobManagerCreate(g_pFont);
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
 	hudCreate(s_pView, g_pFont);
 
@@ -87,6 +88,7 @@ void gameGsCreate(void) {
 #ifdef GAME_DEBUG
 	randInit(2184);
 #else
+	// Seed from beam pos Y & X
 	randInit((g_pRayPos->bfPosY << 8) | g_pRayPos->bfPosX);
 #endif
 
@@ -230,6 +232,7 @@ void gameGsDestroy(void) {
 
 	menuUnload();
 	bitmapDestroy(s_pTiles);
+	textBobManagerDestroy();
 	fontDestroy(g_pFont);
 	hiScoreBobsDestroy();
 	textBobDestroy(&s_sChallengeResult);

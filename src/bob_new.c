@@ -61,11 +61,13 @@ void bobNewManagerCreate(
 
 void bobNewAllocateBgBuffers(void) {
 	systemUse();
+	logBlockBegin("bobNewAllocateBgBuffers()");
 	s_pQueues[0].pBobs = memAllocFast(sizeof(tBobNew*) * s_ubMaxBobCount);
 	s_pQueues[1].pBobs = memAllocFast(sizeof(tBobNew*) * s_ubMaxBobCount);
 	s_pQueues[0].pBg = bitmapCreate(16, s_uwBgBufferLength, s_ubBpp, BMF_INTERLEAVED);
 	s_pQueues[1].pBg = bitmapCreate(16, s_uwBgBufferLength, s_ubBpp, BMF_INTERLEAVED);
 	systemUnuse();
+	logBlockEnd("bobNewAllocateBgBuffers()");
 }
 
 void bobNewManagerDestroy(void) {
