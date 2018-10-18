@@ -77,6 +77,8 @@ file(GLOB bitmaps
 	_res/drill.png _res/tool.png
 	_res/drill_2.png _res/tool_2.png
 	_res/track.png _res/jet.png
+)
+file(GLOB bitmaps_planar
   _res/logo.png
 )
 set(color_transparent "\\#993399")
@@ -92,6 +94,25 @@ foreach(bitmap_path ${bitmaps}) # /path/file.png
 			${palette_plt}
 			${bitmap_path}
 			-o ${bitmap_out_name} -i -mc ${color_transparent}
+			-mo ${bitmap_out_mask}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		DEPENDS ${bitmap_path} ${palette_plt}
+	)
+	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name} ${bitmap_out_mask})
+endforeach()
+
+foreach(bitmap_path ${bitmaps_planar}) # /path/file.png
+	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png
+	STRING(REPLACE ".png" ".bm" bitmap_file_bm ${bitmap_file_png}) # file.bm
+	STRING(REPLACE ".png" "_mask.bm" bitmap_file_mask ${bitmap_file_png}) # file.bm
+	SET(bitmap_out_name "${data_path}/${bitmap_file_bm}") # data/file.bm
+	SET(bitmap_out_mask "${data_path}/${bitmap_file_mask}") # data/file.bm
+	add_custom_command(
+		OUTPUT ${bitmap_out_name} ${bitmap_out_mask}
+		COMMAND ${BITMAP_CONV}
+			${palette_plt}
+			${bitmap_path}
+			-o ${bitmap_out_name} -mc ${color_transparent}
 			-mo ${bitmap_out_mask}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS ${bitmap_path} ${palette_plt}
