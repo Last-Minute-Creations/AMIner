@@ -12,12 +12,15 @@ typedef struct _tTextBob {
 	const tFont *pFont;
 	char szText[100];
 	tBobNew sBob;
-	tTextBitMap *pTextBitmap;
 	UWORD uwWidth;
 	UWORD uwDestPosY;
 	UBYTE isUpdateRequired;
 	UBYTE ubColor;
 } tTextBob;
+
+void textBobManagerCreate(const tFont *pBiggestFont);
+
+void textBobManagerDestroy(void);
 
 void textBobCreate(
 	tTextBob *pTextBob, const tFont *pFont, const char *szMaxText

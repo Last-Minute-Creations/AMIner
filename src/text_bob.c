@@ -4,13 +4,22 @@
 
 #include "text_bob.h"
 
+static tTextBitMap *s_pTextBitmap;
+
+void textBobManagerCreate(const tFont *pBiggestFont) {
+	s_pTextBitmap = fontCreateTextBitMap(320, pBiggestFont->uwHeight);
+}
+
+void textBobManagerDestroy(void) {
+	fontDestroyTextBitMap(s_pTextBitmap);
+}
+
 void textBobCreate(
 	tTextBob *pTextBob, const tFont *pFont, const char *szMaxText
 ) {
 	tUwCoordYX sBounds = fontMeasureText(pFont, szMaxText);
 	pTextBob->pFont = pFont;
 	pTextBob->uwWidth = ((sBounds.sUwCoord.uwX + 3 + 15) / 16) * 16;
-	pTextBob->pTextBitmap = fontCreateTextBitMap(pTextBob->uwWidth, pFont->uwHeight);
 	UWORD uwHeight = sBounds.sUwCoord.uwY + 3;
 	tBitMap *pTextBm = bitmapCreate(
 		pTextBob->uwWidth, uwHeight, 4, BMF_INTERLEAVED | BMF_CLEAR
@@ -64,9 +73,9 @@ void textBobUpdate(tTextBob *pTextBob) {
 	if(!pTextBob->isUpdateRequired) {
 		return;
 	}
-	fontFillTextBitMap(pTextBob->pFont, pTextBob->pTextBitmap, pTextBob->szText);
+	fontFillTextBitMap(pTextBob->pFont, s_pTextBitmap, pTextBob->szText);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pBitmap, pTextBob->pTextBitmap, 1, 1, pTextBob->ubColor, 0
+		pTextBob->sBob.pBitmap, s_pTextBitmap, 1, 1, pTextBob->ubColor, 0
 	);
 	// Mask outline
 	blitRect(
@@ -74,19 +83,19 @@ void textBobUpdate(tTextBob *pTextBob) {
 		pTextBob->sBob.uwWidth, pTextBob->sBob.pMask->Rows, 0
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 1, 1, 15, 0
+		pTextBob->sBob.pMask, s_pTextBitmap, 1, 1, 15, 0
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 1, 0, 15, FONT_COOKIE
+		pTextBob->sBob.pMask, s_pTextBitmap, 1, 0, 15, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 1, 2, 15, FONT_COOKIE
+		pTextBob->sBob.pMask, s_pTextBitmap, 1, 2, 15, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 0, 1, 15, FONT_COOKIE
+		pTextBob->sBob.pMask, s_pTextBitmap, 0, 1, 15, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, pTextBob->pTextBitmap, 2, 1, 15, FONT_COOKIE
+		pTextBob->sBob.pMask, s_pTextBitmap, 2, 1, 15, FONT_COOKIE
 	);
 	pTextBob->isUpdateRequired = 0;
 }
@@ -109,5 +118,4 @@ void textBobAnimate(tTextBob *pTextBob) {
 void textBobDestroy(tTextBob *pTextBob) {
 	bitmapDestroy(pTextBob->sBob.pBitmap);
 	bitmapDestroy(pTextBob->sBob.pMask);
-	fontDestroyTextBitMap(pTextBob->pTextBitmap);
 }

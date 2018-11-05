@@ -48,17 +48,12 @@ static tMenuPos s_eActivePos;
 static tBitMap *s_pLogo, *s_pLogoMask;
 static tTextBob s_pMenuPositions[MENU_POS_COUNT];
 static tTextBob s_sCredits;
-static tBobNew s_sBobLogo;
 static UWORD s_uwOffsY;
 static UBYTE s_isAtariDisplayed = 0;
 
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm");
 	s_pLogoMask = bitmapCreateFromFile("data/logo_mask.bm");
-	bobNewInit(
-		&s_sBobLogo, bitmapGetByteWidth(s_pLogo) * 8, s_pLogo->Rows,
-		0, s_pLogo, s_pLogoMask, 0, 0
-	);
 	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
 		textBobCreate(&s_pMenuPositions[i], g_pFont, "Some very very long menu text");
 	}
@@ -135,10 +130,19 @@ void menuGsLoop(void) {
 			else {
 				s_eMenuState = MENU_STATE_SELECTING;
 				s_eActivePos = MENU_POS_START;
-				s_sBobLogo.sPos.ulYX = g_pMainBuffer->pCamera->uPos.ulYX;
-				s_sBobLogo.sPos.sUwCoord.uwX += (320 - s_sBobLogo.uwWidth)/2;
-				s_sBobLogo.sPos.sUwCoord.uwY += 16;
-				s_uwOffsY = s_sBobLogo.sPos.sUwCoord.uwY + s_sBobLogo.uwHeight + 30;
+				UWORD uwLogoWidth = bitmapGetByteWidth(s_pLogo)*8;
+				UWORD uwOffsX = g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
+				blitCopyMask(
+					s_pLogo, 0, 0,
+					g_pMainBuffer->pScroll->pBack, uwOffsX + (320 - uwLogoWidth)/2, 16,
+					uwLogoWidth, s_pLogo->Rows, (UWORD*)s_pLogoMask->Planes[0]
+				);
+				blitCopyMask(
+					s_pLogo, 0, 0,
+					g_pMainBuffer->pScroll->pFront, uwOffsX + (320 - uwLogoWidth)/2, 16,
+					uwLogoWidth, s_pLogo->Rows, (UWORD*)s_pLogoMask->Planes[0]
+				);
+				s_uwOffsY = 16 + s_pLogo->Rows + 30;
 				sprintf(s_pMenuTexts[MENU_POS_MODE], g_isChallenge ? "Mode: Challenge" : "Mode: Free play");
 				sprintf(s_pMenuTexts[MENU_POS_PLAYERS], g_is2pPlaying ? "Players: 2" : "Players: 1");
 				sprintf(s_pMenuTexts[MENU_POS_P1_CONTROLS], "Player 1 controls: %s", g_is1pKbd ? "WSAD" : "Joy");
@@ -148,13 +152,12 @@ void menuGsLoop(void) {
 					textBobSet(
 						&s_pMenuPositions[i], s_pMenuTexts[i],
 						i == 0 ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE,
-						g_pMainBuffer->pCamera->uPos.sUwCoord.uwX + 160, s_uwOffsY + i * 10,
-						0, 1
+						uwOffsX + 160, s_uwOffsY + i * 10, 0, 1
 					);
 					textBobUpdate(&s_pMenuPositions[i]);
 				}
 				textBobSetPos(
-					&s_sCredits, g_pMainBuffer->pCamera->uPos.sUwCoord.uwX + 160,
+					&s_sCredits, uwOffsX + 160,
 					g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight - 15, 0, 1
 				);
 				textBobUpdate(&s_sCredits);
@@ -275,7 +278,6 @@ void menuGsLoop(void) {
 				}
 			}
 
-			bobNewPush(&s_sBobLogo);
 			for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
 				if(i != MENU_POS_ATARI || s_isAtariDisplayed) {
 					bobNewPush(&s_pMenuPositions[i].sBob);
