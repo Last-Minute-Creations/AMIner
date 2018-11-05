@@ -68,7 +68,7 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	paletteLoad("data/aminer.plt", s_pVpHud->pPalette, 16);
 
 	s_pFont = pFont;
-	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, 5);
+	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, pFont->uwHeight);
 
 	s_uwHudOffsX = 0;
 	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
