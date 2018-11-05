@@ -57,7 +57,7 @@ void gameGsCreate(void) {
 		TAG_VIEW_GLOBAL_CLUT, 1,
 	TAG_END);
 
-	g_pFont = fontCreate("data/silkscreen5.fnt");
+	g_pFont = fontCreate("data/uni54.fnt");
 	textBobManagerCreate(g_pFont);
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
 	hudCreate(s_pView, g_pFont);

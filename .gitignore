@@ -5,6 +5,7 @@ _res/placeholders
 build/
 data/*
 !data/silkscreen5.fnt
+!data/uni54.fnt
 
 *.log
 
