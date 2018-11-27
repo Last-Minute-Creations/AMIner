@@ -22,35 +22,43 @@ void windowDeinit(void) {
 }
 
 UBYTE windowShow(void) {
-	if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY & (g_pMainBuffer->uwMarginedHeight-1)) {
+	UWORD uwScrollX = g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
+	UWORD uwScrollY = g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
+	UWORD uwBufferHeight = g_pMainBuffer->uwMarginedHeight;
+	UWORD uwFoldScrollY = uwScrollY & (uwBufferHeight-1);
+	UWORD uwWindowOffsY = (g_pMainBuffer->sCommon.pVPort->uwHeight - WINDOW_HEIGHT) / 2;
+	UWORD uwWindowOffsX = (g_pMainBuffer->sCommon.pVPort->uwWidth - WINDOW_WIDTH) / 2;
+	if(uwBufferHeight - uwFoldScrollY < uwWindowOffsY + WINDOW_HEIGHT) {
 		// Not positioned evenly
 		return 0;
 	}
 	// Store content beneath window
 	blitCopyAligned(
 		g_pMainBuffer->pScroll->pBack,
-		(g_pMainBuffer->sCommon.pVPort->uwWidth - WINDOW_WIDTH) / 2,
-		(g_pMainBuffer->sCommon.pVPort->uwHeight - WINDOW_HEIGHT) / 2,
+		uwScrollX + uwWindowOffsX, uwFoldScrollY + uwWindowOffsY,
 		s_pBgBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT
 	);
 
 	// Draw window
 	blitRect(
 		g_pMainBuffer->pScroll->pBack,
-		(g_pMainBuffer->sCommon.pVPort->uwWidth - WINDOW_WIDTH) / 2,
-		(g_pMainBuffer->sCommon.pVPort->uwHeight - WINDOW_HEIGHT) / 2,
+		uwScrollX + uwWindowOffsX, uwFoldScrollY + uwWindowOffsY,
 		WINDOW_WIDTH, WINDOW_HEIGHT, 0
 	);
 	return 1;
 }
 
 void windowHide(void) {
+	UWORD uwScrollX = g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
+	UWORD uwScrollY = g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
+	UWORD uwBufferHeight = g_pMainBuffer->uwMarginedHeight;
+	UWORD uwFoldScrollY = uwScrollY & (uwBufferHeight-1);
+	UWORD uwWindowOffsY = (g_pMainBuffer->sCommon.pVPort->uwHeight - WINDOW_HEIGHT) / 2;
+	UWORD uwWindowOffsX = (g_pMainBuffer->sCommon.pVPort->uwWidth - WINDOW_WIDTH) / 2;
 	// Restore content beneath window
 	blitCopyAligned(
-		s_pBgBuffer, 0, 0,
-		g_pMainBuffer->pScroll->pBack,
-		(g_pMainBuffer->sCommon.pVPort->uwWidth - WINDOW_WIDTH) / 2,
-		(g_pMainBuffer->sCommon.pVPort->uwHeight - WINDOW_HEIGHT) / 2,
+		s_pBgBuffer, 0, 0, g_pMainBuffer->pScroll->pBack,
+		uwScrollX + uwWindowOffsX, uwFoldScrollY + uwWindowOffsY,
 		WINDOW_WIDTH, WINDOW_HEIGHT
 	);
 }

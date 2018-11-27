@@ -29,7 +29,7 @@ void vendorGsCreate(void) {
 }
 
 void vendorGsLoop(void) {
-	if(keyUse(KEY_L)) {
+	if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) {
 		gamePopState();
 		return;
 	}
