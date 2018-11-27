@@ -64,7 +64,7 @@ void gameGsCreate(void) {
 
 	s_pVpMain = vPortCreate(0,
 		TAG_VPORT_VIEW, s_pView,
-		TAG_VPORT_BPP, 4,
+		TAG_VPORT_BPP, GAME_BPP,
 	TAG_END);
 	g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,

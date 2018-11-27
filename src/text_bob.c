@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "text_bob.h"
+#include "game.h"
 
 static tTextBitMap *s_pTextBitmap;
 
@@ -22,10 +23,10 @@ void textBobCreate(
 	pTextBob->uwWidth = ((sBounds.sUwCoord.uwX + 3 + 15) / 16) * 16;
 	UWORD uwHeight = sBounds.sUwCoord.uwY + 3;
 	tBitMap *pTextBm = bitmapCreate(
-		pTextBob->uwWidth, uwHeight, 4, BMF_INTERLEAVED | BMF_CLEAR
+		pTextBob->uwWidth, uwHeight, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);
 	tBitMap *pTextMask = bitmapCreate(
-		pTextBob->uwWidth, uwHeight, 4, BMF_INTERLEAVED | BMF_CLEAR
+		pTextBob->uwWidth, uwHeight, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);
 	bobNewInit(
 		&pTextBob->sBob, pTextBob->uwWidth, uwHeight, 1, pTextBm, pTextMask, 0, 0

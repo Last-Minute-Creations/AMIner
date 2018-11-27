@@ -9,6 +9,8 @@
 #include <ace/utils/font.h>
 #include <ace/managers/audio.h>
 
+#define GAME_BPP 4
+
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void tileRefreshGrass(UWORD uwX);
