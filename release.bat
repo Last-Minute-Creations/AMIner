@@ -1,0 +1,8 @@
+@echo off
+mkdir game
+copy aminer game
+xcopy data game\data /e /i /h
+mkdir game\s
+echo aminer > game\s\startup-sequence
+exe2adf aminer -l "AMIner" -a "aminer.adf" -d game
+rmdir game /s /q
