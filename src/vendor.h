@@ -13,4 +13,8 @@ void vendorGsLoop(void);
 
 void vendorGsDestroy(void);
 
+void vendorAlloc(void);
+
+void vendorDealloc(void);
+
 #endif // _VENDOR_H_

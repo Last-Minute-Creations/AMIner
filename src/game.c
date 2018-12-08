@@ -99,6 +99,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	windowInit();
+	vendorAlloc();
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
@@ -241,6 +242,7 @@ void gameGsDestroy(void) {
 	vehicleDestroy(&g_pVehicles[1]);
 	vehicleBitmapsDestroy();
 	windowDeinit();
+	vendorDealloc();
 	bobNewManagerDestroy();
 
 	audioDestroy();

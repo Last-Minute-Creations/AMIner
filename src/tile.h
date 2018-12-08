@@ -46,10 +46,9 @@ typedef enum _tTile {
 // TODO sapphire, topaz
 
 typedef struct _tTileDef {
-	const char *szMsg;
-	UBYTE ubReward;
+	UBYTE ubMineral;
 	UBYTE ubSlots;
-	UBYTE ubColor;
+	const char *szMsg;
 } tTileDef;
 
 void tileRefreshGrass(UWORD uwX);

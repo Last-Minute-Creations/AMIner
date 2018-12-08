@@ -7,36 +7,18 @@
 #include <ace/managers/game.h>
 #include "window.h"
 #include "game.h"
-#include "tile.h"
+#include "plan.h"
+#include "mineral.h"
+#include "color.h"
 
 static UBYTE s_isShown;
 static tTextBitMap *s_pTextBitmap;
 tBitMap *s_pBuffer;
 
-typedef struct _tPlanMineral {
-	UBYTE ubMineralType;
-	UBYTE ubCount;
-} tPlanMineral;
-
-typedef struct _tPlan {
-	tPlanMineral pMinerals[4];
-	UBYTE ubMineralCount;
-	ULONG ulAlternativeSum;
-} tPlan;
-
-static const char *s_pMineralNames[] = {0,
-	[TILE_SILVER_1] = "Silver",
-	[TILE_GOLD_1] = "Gold",
-	[TILE_EMERALD_1] = "Emerald",
-	[TILE_RUBY_1] = "Ruby",
-	[TILE_MOONSTONE_1] = "Moonstone",
-	[TILE_COAL_1] = "Coal"
-};
-
 void vendorDrawPlan(void) {
 	tUwCoordYX sOrigin = windowGetOrigin();
 	char *szColNames[3] = {"Mineral", "Required", "Gathered"};
-	uint8_t pColOffs[3] = {16, 120, 200};
+	UBYTE pColOffs[3] = {16, 120, 200};
 	UBYTE ubRowOffsY = sOrigin.sUwCoord.uwY + 16;
 	for(UBYTE i = 0; i < 3; ++i) {
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, szColNames[i]);
@@ -46,15 +28,6 @@ void vendorDrawPlan(void) {
 			14, FONT_COOKIE
 		);
 	}
-
-	tPlan sPlan = {
-		.pMinerals = {
-			{TILE_SILVER_1, 10},
-			{TILE_GOLD_1, 5}
-		},
-		.ubMineralCount = 2,
-		.ulAlternativeSum = 100000
-	};
 
 	ubRowOffsY += g_pFont->uwHeight + 1;
 
@@ -66,27 +39,44 @@ void vendorDrawPlan(void) {
 	ubRowOffsY += 10 - g_pFont->uwHeight;
 
 	char szBfr[10];
-	for(UBYTE i = 0; i < sPlan.ubMineralCount; ++i) {
+	const tPlan *pPlan = planGetCurrent();
+	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
+		if(!pPlan->pMinerals[i].ubTargetCount && !pPlan->pMinerals[i].ubCurrentCount) {
+			continue;
+		}
+		const tMineralDef *pMineralDef = &g_pMinerals[i];
 		fontFillTextBitMap(
-			g_pFont, s_pTextBitmap, s_pMineralNames[sPlan.pMinerals[i].ubMineralType]
+			g_pFont, s_pTextBitmap, pMineralDef->szName
 		);
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap,
-			sOrigin.sUwCoord.uwX + pColOffs[0], ubRowOffsY, 14, FONT_COOKIE
-		);
-
-		sprintf(szBfr, "%hhu", sPlan.pMinerals[i].ubCount);
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap,
-			sOrigin.sUwCoord.uwX + pColOffs[1], ubRowOffsY, 14, FONT_COOKIE
+			s_pBuffer, s_pTextBitmap, sOrigin.sUwCoord.uwX + pColOffs[0], ubRowOffsY,
+			pMineralDef->ubTitleColor, FONT_COOKIE
 		);
 
-		sprintf(szBfr, "%hhu", 0);
+		sprintf(szBfr, "%hhu", pPlan->pMinerals[i].ubTargetCount);
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap,
-			sOrigin.sUwCoord.uwX + pColOffs[2], ubRowOffsY, 14, FONT_COOKIE
+			s_pBuffer, s_pTextBitmap, sOrigin.sUwCoord.uwX + pColOffs[1], ubRowOffsY,
+			COLOR_GOLD, FONT_COOKIE
+		);
+
+		sprintf(szBfr, "%hhu", pPlan->pMinerals[i].ubCurrentCount);
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
+		UBYTE ubColor;
+		if(pPlan->pMinerals[i].ubTargetCount) {
+			if(pPlan->pMinerals[i].ubCurrentCount >= pPlan->pMinerals[i].ubTargetCount) {
+				ubColor = COLOR_GREEN;
+			}
+			else {
+				ubColor = COLOR_RED;
+			}
+		}
+		else {
+			ubColor = COLOR_GOLD;
+		}
+		fontDrawTextBitMap(
+			s_pBuffer, s_pTextBitmap, sOrigin.sUwCoord.uwX + pColOffs[2], ubRowOffsY,
+			ubColor, FONT_COOKIE
 		);
 		ubRowOffsY += 10;
 	}
@@ -94,16 +84,45 @@ void vendorDrawPlan(void) {
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Days remaining:");
 	fontDrawTextBitMap(
 		s_pBuffer, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + 150, sOrigin.sUwCoord.uwY + 160, 14, FONT_COOKIE
+		sOrigin.sUwCoord.uwX + 150, sOrigin.sUwCoord.uwY + 160,
+		COLOR_GOLD, FONT_COOKIE
 	);
 	sprintf(szBfr, "%d", 0);
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 	fontDrawTextBitMap(
 		s_pBuffer, s_pTextBitmap,
 		sOrigin.sUwCoord.uwX + 240, sOrigin.sUwCoord.uwY + 160,
-		14, FONT_COOKIE | FONT_RIGHT
+		COLOR_GOLD, FONT_COOKIE | FONT_RIGHT
 	);
 
+	if(planIsFulfilled()) {
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, "Plan fulfilled!");
+		fontDrawTextBitMap(
+			s_pBuffer, s_pTextBitmap,
+			sOrigin.sUwCoord.uwX + WINDOW_WIDTH/2,
+			sOrigin.sUwCoord.uwY + WINDOW_HEIGHT - 20,
+			COLOR_GREEN, FONT_COOKIE | FONT_CENTER
+		);
+		planGenerateNew();
+	}
+
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Exit: enter/fire");
+	fontDrawTextBitMap(
+		s_pBuffer, s_pTextBitmap,
+		sOrigin.sUwCoord.uwX + WINDOW_WIDTH/2,
+		sOrigin.sUwCoord.uwY + WINDOW_HEIGHT - 10,
+		COLOR_GOLD, FONT_COOKIE | FONT_CENTER
+	);
+}
+
+void vendorAlloc(void) {
+	s_pTextBitmap = fontCreateTextBitMap(
+		WINDOW_WIDTH, g_pFont->uwHeight
+	);
+}
+
+void vendorDealloc(void) {
+	fontDestroyTextBitMap(s_pTextBitmap);
 }
 
 void vendorGsCreate(void) {
@@ -115,10 +134,6 @@ void vendorGsCreate(void) {
 	}
 
 	s_pBuffer = g_pMainBuffer->pScroll->pBack;
-
-	s_pTextBitmap = fontCreateTextBitMap(
-		WINDOW_WIDTH, g_pFont->uwHeight
-	);
 
 	vendorDrawPlan();
 
@@ -144,7 +159,6 @@ void vendorGsDestroy(void) {
 	if(!s_isShown) {
 		return;
 	}
-	fontDestroyTextBitMap(s_pTextBitmap);
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
