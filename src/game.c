@@ -175,7 +175,10 @@ void gameGsLoop(void) {
 	if(keyUse(KEY_B)) {
 		s_isDebug = !s_isDebug;
 	}
-	if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) {
+	if(
+		(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) &&
+		vehicleIsNearShop(&g_pVehicles[0])
+	) {
 		gamePushState(vendorGsCreate, vendorGsLoop, vendorGsDestroy);
 		return;
 	}

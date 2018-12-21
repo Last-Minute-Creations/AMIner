@@ -125,6 +125,15 @@ void vehicleDestroy(tVehicle *pVehicle) {
 	textBobDestroy(&pVehicle->sTextBob);
 }
 
+UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
+	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2;
+	return (
+		4*32 <= uwCenterX && uwCenterX <= 6*32 &&
+		(TILE_ROW_GRASS - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_GRASS+1) * 32
+	);
+}
+
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 	// Always register steer requests so that vehicle can continuously drill down
 	pVehicle->sSteer.bX = bDirX;
@@ -501,10 +510,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	bobNewPush(&pVehicle->sBobTool);
 
 	if(
-		4*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwX <= 6*32 + VEHICLE_HEIGHT/2 &&
-		(TILE_ROW_GRASS - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_GRASS+1) * 32 &&
+		vehicleIsNearShop(pVehicle) &&
 		(pVehicle->ubCargoCurr  || (pVehicle->uwFuelMax - pVehicle->uwFuelCurr > 100))
 	) {
 		WORD wScoreNow = vehicleRestock(pVehicle);
