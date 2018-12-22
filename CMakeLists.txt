@@ -43,12 +43,10 @@ SET(PALETTE_CONV "${TOOLS_PATH}/palette_conv/palette_conv")
 SET(BITMAP_CONV "${TOOLS_PATH}/bitmap_conv/bitmap_conv")
 
 file(GLOB palette_gimp _res/aminer.gpl)
-set(palette_plt data/aminer.plt)
+set(palette_plt "${CMAKE_CURRENT_SOURCE_DIR}/data/aminer.plt")
 add_custom_command(
 	OUTPUT ${palette_plt}
-	COMMAND ${PALETTE_CONV}
-		${palette_gimp}
-		${palette_plt}
+	COMMAND ${PALETTE_CONV} ${palette_gimp} ${palette_plt}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	DEPENDS ${palette_gimp}
 )
@@ -62,9 +60,7 @@ foreach(bitmap_path ${bitmaps}) # /path/file.png
 	SET(bitmap_out_name "${data_path}/${bitmap_file_bm}") # data/file.bm
 	add_custom_command(
 		OUTPUT ${bitmap_out_name}
-		COMMAND ${BITMAP_CONV}
-			${palette_plt}
-			${bitmap_path}
+		COMMAND ${BITMAP_CONV} ${palette_plt} ${bitmap_path}
 			-o ${bitmap_out_name} -i
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS ${bitmap_path} ${palette_plt}
