@@ -179,7 +179,7 @@ static UWORD s_uwOffsY;
 
 static void menuEnableAtari(void) {
 	UBYTE isAtariHidden = s_pOptions[5].isHidden;
-	if(!isAtariHidden) {
+	if(isAtariHidden) {
 		menuSetHidden(5, 0);
 		audioPlay(AUDIO_CHANNEL_1, s_pSampleAtari, AUDIO_VOLUME_MAX, 1);
 	}
@@ -229,6 +229,62 @@ void menuUnload(void) {
 void menuGsCreate(void) {
 	s_eMenuState = MENU_STATE_ROLL_IN;
 	memset(s_pKeyHistory, 0, 8);
+}
+
+static void menuProcessSelecting(void) {
+	UBYTE ubNewKey = 0;
+	if(
+		keyUse(KEY_UP) || keyUse(KEY_W) || joyUse(JOY1_UP) || joyUse(JOY2_UP)
+	) {
+		ubNewKey = KEY_UP;
+		if(menuNavigate(-1)) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
+		}
+	}
+	else if(
+		keyUse(KEY_DOWN) || keyUse(KEY_S) || joyUse(JOY1_DOWN) || joyUse(JOY2_DOWN)
+	) {
+		ubNewKey = KEY_DOWN;
+		if(menuNavigate(+1)) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
+		}
+	}
+	else if(
+		keyUse(KEY_LEFT) || keyUse(KEY_A) || joyUse(JOY1_LEFT) || joyUse(JOY2_LEFT)
+	) {
+		ubNewKey = KEY_LEFT;
+		if(menuToggle(-1)) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
+		}
+	}
+	else if(
+		keyUse(KEY_RIGHT) || keyUse(KEY_D)|| joyUse(JOY1_RIGHT) || joyUse(JOY2_RIGHT)
+	) {
+		ubNewKey = KEY_RIGHT;
+		if(menuToggle(+1)) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
+		}
+	}
+	else if(
+		keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || joyUse(JOY1_FIRE) || joyUse(JOY1_FIRE)
+	) {
+		menuEnter();
+	}
+
+	if(ubNewKey) {
+		memmove(s_pKeyHistory+1, s_pKeyHistory, 8-1);
+		s_pKeyHistory[0] = ubNewKey;
+		if(!memcmp(s_pKeyHistory, s_pKeyKonami, 8)) {
+			menuEnableAtari();
+		}
+	}
+
+	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
+		if(!s_pOptions[i].isHidden) {
+			bobNewPush(&s_pMenuPositions[i].sBob);
+		}
+	}
+	bobNewPush(&s_sCredits.sBob);
 }
 
 void menuGsLoop(void) {
@@ -287,66 +343,9 @@ void menuGsLoop(void) {
 			}
 		} break;
 
-		case MENU_STATE_SELECTING: {
-			UBYTE ubNewKey = 0;
-			if(
-				keyUse(KEY_UP) || keyUse(KEY_W) ||
-				joyUse(JOY1_UP) || joyUse(JOY2_UP)
-			) {
-				ubNewKey = KEY_UP;
-				if(menuNavigate(-1)) {
-					audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
-				}
-			}
-			else if(
-				keyUse(KEY_DOWN) || keyUse(KEY_S) ||
-				joyUse(JOY1_DOWN) || joyUse(JOY2_DOWN)
-			) {
-				ubNewKey = KEY_DOWN;
-				if(menuNavigate(+1)) {
-					audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
-				}
-			}
-			else if(
-				keyUse(KEY_LEFT) || keyUse(KEY_A) ||
-				joyUse(JOY1_LEFT) || joyUse(JOY2_LEFT)
-			) {
-				ubNewKey = KEY_LEFT;
-				if(menuToggle(-1)) {
-					audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
-				}
-			}
-			else if(
-				keyUse(KEY_RIGHT) || keyUse(KEY_D)||
-				joyUse(JOY1_RIGHT) || joyUse(JOY2_RIGHT)
-			) {
-				ubNewKey = KEY_RIGHT;
-				if(menuToggle(+1)) {
-					audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
-				}
-			}
-			else if(
-				keyUse(KEY_RETURN) || keyUse(KEY_SPACE) ||
-				joyUse(JOY1_FIRE) || joyUse(JOY1_FIRE)
-			) {
-				menuEnter();
-			}
-
-			if(ubNewKey) {
-				memmove(s_pKeyHistory+1, s_pKeyHistory, 8-1);
-				s_pKeyHistory[0] = ubNewKey;
-				if(!memcmp(s_pKeyHistory, s_pKeyKonami, 8)) {
-					menuEnableAtari();
-				}
-			}
-
-			for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
-				if(!s_pOptions[i].isHidden) {
-					bobNewPush(&s_pMenuPositions[i].sBob);
-				}
-			}
-			bobNewPush(&s_sCredits.sBob);
-		} break;
+		case MENU_STATE_SELECTING:
+			menuProcessSelecting();
+		break;
 
 		case MENU_STATE_ROLL_OUT: {
 			if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY) {
