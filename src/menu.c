@@ -120,7 +120,7 @@ static UBYTE menuNavigate(BYTE bDir) {
 		wNewPos += bDir;
 	} while(0 < wNewPos && wNewPos < (WORD)MENU_POS_COUNT && s_pOptions[wNewPos].isHidden);
 
-	if(wNewPos < 0 || wNewPos > (WORD)MENU_POS_COUNT) {
+	if(wNewPos < 0 || wNewPos >= (WORD)MENU_POS_COUNT) {
 		// Out of bounds - cancel
 		return 0;
 	}
