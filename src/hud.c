@@ -25,8 +25,8 @@ typedef enum _tHudDraw {
 	HUD_PREPARE_CASH,
 	HUD_DRAW_CASH,
 	HUD_DRAW_FUEL,
-	HUD_DRAW_HEALTH,
 	HUD_DRAW_CARGO,
+	HUD_DRAW_HEALTH,
 	HUD_DRAW_END
 } tHudDraw;
 
@@ -47,6 +47,7 @@ static tHudPlayerData s_pPlayerData[2];
 static tHudDraw s_eDraw;
 static tHudPlayer s_ePlayer;
 static UBYTE s_ubHudOffsY;
+static UBYTE s_isChallenge;
 
 void hudCreate(tView *pView, const tFont *pFont) {
   s_pVpHud = vPortCreate(0,
@@ -74,31 +75,43 @@ void hudCreate(tView *pView, const tFont *pFont) {
 		"Player 2", COLOR_ACTIVE, FONT_LAZY
 	);
 
-	const UBYTE ubLazyRight = FONT_LAZY | FONT_RIGHT;
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, 0,
-		"Drill:", COLOR_ACTIVE, ubLazyRight
+		"Drill:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
 	);
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, 0,
-		"Cargo:", COLOR_ACTIVE, ubLazyRight
+		"Cargo:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
 	);
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, 0,
-		"Hull:", COLOR_ACTIVE, ubLazyRight
+		"Hull:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
 	);
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, 0,
-		"Cash:", COLOR_ACTIVE, ubLazyRight
+		"Cash:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
 	);
-	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, s_pFont->uwHeight + 1,
-		"Depth:", COLOR_ACTIVE, ubLazyRight
-	);
-	hudReset();
+	hudReset(0);
 }
 
-void hudReset(void) {
+void hudReset(UBYTE isChallenge) {
+	s_isChallenge = isChallenge;
+	const UBYTE ubLabelWidth = fontMeasureText(s_pFont, "Depth:").sUwCoord.uwX;
+	if(isChallenge) {
+		// Clear depth label and use it as cash
+		blitRect(
+			s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1 - ubLabelWidth, ROW_2_Y,
+			ubLabelWidth, s_pFont->uwHeight, 0
+		);
+	}
+	else {
+		// Depth instead of 2p cash
+		fontDrawStr(
+			s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, s_pFont->uwHeight + 1,
+			"Depth:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
+		);
+	}
+
 	// Empty bars
 	UWORD pBarOffsX[3] = {GAUGE_DRILL_X, GAUGE_CARGO_X, GAUGE_HULL_X};
 	for(UBYTE i = 0; i < 3; ++i) {
@@ -132,7 +145,7 @@ void hudReset(void) {
 	}
 
 	// Restart state machine
-	s_eDraw = 0;
+	s_eDraw = (isChallenge ? HUD_PREPARE_CASH : HUD_PREPARE_DEPTH);
 	s_ePlayer = PLAYER_1;
 	s_ubHudOffsY = 0;
 }
@@ -203,7 +216,12 @@ void hudUpdate(void) {
 				break;
 			}
 		case HUD_PREPARE_CASH:
-			ulCash = s_pPlayerData[0].ulCash + s_pPlayerData[1].ulCash;
+			if(s_isChallenge) {
+				ulCash = s_pPlayerData[s_ePlayer].ulCash;
+			}
+			else {
+				ulCash = s_pPlayerData[0].ulCash + s_pPlayerData[1].ulCash;
+			}
 			if(ulCash != pData->ulCashDisp) {
 				UWORD m = (ulCash / 1000U) / 1000U;
 				UWORD k = (ulCash / 1000U) % 1000U;
@@ -225,13 +243,14 @@ void hudUpdate(void) {
 			}
 		case HUD_DRAW_CASH:
 			if(isDrawPending) {
+				UBYTE ubY = (s_isChallenge ? s_ubHudOffsY : ROW_1_Y);
 				blitRect(
-					s_pHudBuffer->pBack, GAUGE_CASH_X, ROW_1_Y,
+					s_pHudBuffer->pBack, GAUGE_CASH_X, ubY,
 					320 - GAUGE_CASH_X, s_pFont->uwHeight, 0
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLinebuffer,
-					GAUGE_CASH_X, ROW_1_Y, COLOR_ACTIVE, FONT_LAZY
+					GAUGE_CASH_X, ubY, COLOR_ACTIVE, FONT_LAZY
 				);
 				s_eDraw = HUD_DRAW_FUEL;
 				isDrawPending = 0;
@@ -280,29 +299,28 @@ void hudUpdate(void) {
 				break;
 			}
 		case HUD_DRAW_HEALTH:
-			s_eDraw = HUD_DRAW_END;
+			// s_eDraw = HUD_DRAW_END; // do end immediately after this state
 			ubPercent = 0;
 			if(pData->ubHealthMax) {
 				ubPercent = (100 * pData->ubHealth) / pData->ubHealthMax;
 			}
 			if(pData->ubHealthDisp != ubPercent) {
 
-				break;
+				// break; // do end immediately after this state
 			}
 		case HUD_DRAW_END:
-		default: {
+		default:
 			// Cycle players and start again
 			if(s_ePlayer == PLAYER_1) {
 				s_ePlayer = PLAYER_2;
 				s_ubHudOffsY = s_pFont->uwHeight + 1;
-				s_eDraw = HUD_DRAW_FUEL;
+				s_eDraw = (s_isChallenge ? HUD_PREPARE_CASH : HUD_DRAW_FUEL);
 			}
 			else {
 				s_ePlayer = PLAYER_1;
 				s_ubHudOffsY = 0;
-				s_eDraw = HUD_PREPARE_DEPTH;
+				s_eDraw = (s_isChallenge ? HUD_PREPARE_CASH : HUD_PREPARE_DEPTH);
 			}
-		} break;
 	}
 }
 
