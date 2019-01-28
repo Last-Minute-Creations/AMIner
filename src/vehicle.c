@@ -240,7 +240,7 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 	pVehicle->ulCash += pVehicle->uwCargoScore;
 	WORD wScoreNow = pVehicle->uwCargoScore;
 	pVehicle->uwCargoScore = 0;
-	hudSetCargo(pVehicle->ubPlayerIdx, 0);
+	hudSetCargo(pVehicle->ubPlayerIdx, 0, pVehicle->ubCargoMax);
 	const UBYTE ubFuelPrice = 5;
 	const UBYTE ubFuelDiv = 100;
 	UWORD uwRefuelUnits = MIN(
@@ -276,7 +276,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		pVehicle->ubCargoCurr += ubSlots;
 		planAddMinerals(ubMineralType, ubSlots);
 
-		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr);
+		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr, pVehicle->ubCargoMax);
 		const char *szMessage;
 		UBYTE ubColor;
 		if(pVehicle->ubCargoCurr == pVehicle->ubCargoMax) {
@@ -673,7 +673,7 @@ void vehicleProcess(tVehicle *pVehicle) {
 	else {
 		vehicleProcessMovement(pVehicle);
 	}
-	hudSetFuel(pVehicle->ubPlayerIdx, pVehicle->uwFuelCurr);
+	hudSetFuel(pVehicle->ubPlayerIdx, pVehicle->uwFuelCurr, pVehicle->uwFuelMax);
 	textBobAnimate(&pVehicle->sTextBob);
 	hudSetDepth(pVehicle->ubPlayerIdx, MAX(
 		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_GRASS+1)*32

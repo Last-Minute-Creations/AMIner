@@ -10,17 +10,11 @@
 #define COLOR_ACTIVE 15
 #define COLOR_NACTIVE 4
 
-#define FUEL_LABEL_X 58
-#define HULL_LABEL_X 57
-#define CARGO_LABEL_X 101
-#define DEPTH_LABEL_X 0
-#define CASH_LABEL_X 3
-
-#define FUEL_GAUGE_X 78
-#define HULL_GAUGE_X 78
-#define CARGO_GAUGE_X 129
-#define DEPTH_GAUGE_X 26
-#define CASH_GAUGE_X 26
+#define GAUGE_DRILL_X 85
+#define GAUGE_CARGO_X 148
+#define GAUGE_HULL_X 202
+#define GAUGE_DEPTH_X 272
+#define GAUGE_CASH_X 272
 
 #define ROW_1_Y 0
 #define ROW_2_Y 8
@@ -28,11 +22,11 @@
 typedef enum _tHudDraw {
 	HUD_PREPARE_DEPTH,
 	HUD_DRAW_DEPTH,
+	HUD_PREPARE_CASH,
+	HUD_DRAW_CASH,
 	HUD_DRAW_FUEL,
 	HUD_DRAW_HEALTH,
 	HUD_DRAW_CARGO,
-	HUD_PREPARE_CASH,
-	HUD_DRAW_CASH,
 	HUD_DRAW_END
 } tHudDraw;
 
@@ -42,16 +36,17 @@ static const tFont *s_pFont;
 static tTextBitMap *s_pLinebuffer;
 
 typedef struct _tHudPlayerData {
-	UWORD uwDepth, uwOldDepth;
-	UWORD uwFuel, uwOldFuel;
-	ULONG ulCash, ulOldCash;
-	UBYTE ubCargo, ubOldCargo;
+	UWORD uwDepth, uwDepthDisp;
+	ULONG ulCash, ulCashDisp;
+	UWORD uwFuel, uwFuelDisp, uwFuelMax;
+	UBYTE ubCargo, ubCargoDisp, ubCargoMax;
+	UBYTE ubHealth, ubHealthDisp, ubHealthMax;
 } tHudPlayerData;
 
 static tHudPlayerData s_pPlayerData[2];
 static tHudDraw s_eDraw;
 static tHudPlayer s_ePlayer;
-static UWORD s_uwHudOffsX;
+static UBYTE s_ubHudOffsY;
 
 void hudCreate(tView *pView, const tFont *pFont) {
   s_pVpHud = vPortCreate(0,
@@ -70,81 +65,76 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	s_pFont = pFont;
 	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, pFont->uwHeight);
 
-	s_uwHudOffsX = 0;
-	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
-		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + FUEL_LABEL_X, ROW_1_Y,
-			"Fuel:", COLOR_ACTIVE, FONT_LAZY
-		);
-		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + HULL_LABEL_X, ROW_2_Y,
-			"Hull:", COLOR_ACTIVE, FONT_LAZY
-		);
-		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + CARGO_LABEL_X, ROW_1_Y,
-			"Cargo:", COLOR_ACTIVE, FONT_LAZY
-		);
-		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + DEPTH_LABEL_X, ROW_1_Y,
-			"Depth:", COLOR_ACTIVE, FONT_LAZY
-		);
-		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, s_uwHudOffsX + CASH_LABEL_X, ROW_2_Y,
-			"Cash:", COLOR_ACTIVE, FONT_LAZY
-		);
-		// Move to 2nd player's HUD
-		s_uwHudOffsX = 160;
-	}
+	fontDrawStr(
+		s_pHudBuffer->pBack, s_pFont, 0, 0,
+		"Player 1", COLOR_ACTIVE, FONT_LAZY
+	);
+	fontDrawStr(
+		s_pHudBuffer->pBack, s_pFont, 0, s_pFont->uwHeight + 1,
+		"Player 2", COLOR_ACTIVE, FONT_LAZY
+	);
 
+	const UBYTE ubLazyRight = FONT_LAZY | FONT_RIGHT;
+	fontDrawStr(
+		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, 0,
+		"Drill:", COLOR_ACTIVE, ubLazyRight
+	);
+	fontDrawStr(
+		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, 0,
+		"Cargo:", COLOR_ACTIVE, ubLazyRight
+	);
+	fontDrawStr(
+		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, 0,
+		"Hull:", COLOR_ACTIVE, ubLazyRight
+	);
+	fontDrawStr(
+		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, 0,
+		"Cash:", COLOR_ACTIVE, ubLazyRight
+	);
+	fontDrawStr(
+		s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, s_pFont->uwHeight + 1,
+		"Depth:", COLOR_ACTIVE, ubLazyRight
+	);
 	hudReset();
 }
 
 void hudReset(void) {
-	s_uwHudOffsX = 0;
-	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
-		// Fuel inactive gauge
-		for(UBYTE i = 0; i < 30; ++i) {
-			chunkyToPlanar(
-				COLOR_NACTIVE,
-				s_uwHudOffsX + FUEL_GAUGE_X + 2 * (i % 10), ROW_1_Y + 2 * (i / 10),
-				s_pHudBuffer->pBack
-			);
-		}
-		// Hull
-		for(UBYTE i = 0; i < 30; ++i) {
-			chunkyToPlanar(
-				COLOR_NACTIVE,
-				s_uwHudOffsX + HULL_GAUGE_X + 2 * (i % 10), ROW_2_Y + 2 * (i / 10),
-				s_pHudBuffer->pBack
-			);
-		}
-		// Cargo
-		for(UBYTE i = 0; i < 50; ++i) {
+	// Empty bars
+	UWORD pBarOffsX[3] = {GAUGE_DRILL_X, GAUGE_CARGO_X, GAUGE_HULL_X};
+	for(UBYTE i = 0; i < 3; ++i) {
+		for(UBYTE b = 0; b < 10; ++b) {
 			blitRect(
-				s_pHudBuffer->pBack,
-				s_uwHudOffsX + CARGO_GAUGE_X + 3 * (i % 10), ROW_1_Y + 3 * (i / 10),
-				2, 2, COLOR_NACTIVE
+				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, 0,
+				2, 5, COLOR_NACTIVE
+			);
+			blitRect(
+				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, s_pFont->uwHeight + 1,
+				2, 5, COLOR_NACTIVE
 			);
 		}
+	}
 
-		// Move to 2nd player's HUD
-		s_uwHudOffsX = 160;
-
-		// Values to display
-		s_pPlayerData[ubPlayer].uwOldDepth = 0xFFFF;
+	// Values to display
+	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
+		s_pPlayerData[ubPlayer].uwDepthDisp = 0xFFFF;
 		s_pPlayerData[ubPlayer].uwDepth = 0;
-		s_pPlayerData[ubPlayer].ulOldCash = 0xFFFFFFFF;
+		s_pPlayerData[ubPlayer].ulCashDisp = 0xFFFFFFFF;
 		s_pPlayerData[ubPlayer].ulCash = 0;
-		s_pPlayerData[ubPlayer].ubOldCargo = 0;
+		s_pPlayerData[ubPlayer].ubCargoDisp = 0;
 		s_pPlayerData[ubPlayer].ubCargo = 0;
-		s_pPlayerData[ubPlayer].uwOldFuel = 0;
+		s_pPlayerData[ubPlayer].ubCargoMax = 0;
+		s_pPlayerData[ubPlayer].uwFuelDisp = 0;
 		s_pPlayerData[ubPlayer].uwFuel = 0;
+		s_pPlayerData[ubPlayer].uwFuelMax = 0;
+		s_pPlayerData[ubPlayer].ubHealthDisp = 0;
+		s_pPlayerData[ubPlayer].ubHealth = 0;
+		s_pPlayerData[ubPlayer].ubHealthMax = 0;
 	}
 
 	// Restart state machine
 	s_eDraw = 0;
 	s_ePlayer = PLAYER_1;
-	s_uwHudOffsX = 0;
+	s_ubHudOffsY = 0;
 }
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth) {
@@ -155,111 +145,160 @@ void hudSetScore(UBYTE ubPlayer, ULONG ulCash) {
 	s_pPlayerData[ubPlayer].ulCash = ulCash;
 }
 
-void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo) {
+void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo, UBYTE ubCargoMax) {
 	s_pPlayerData[ubPlayer].ubCargo = ubCargo;
+	s_pPlayerData[ubPlayer].ubCargoMax = ubCargoMax;
 }
 
-void hudSetFuel(UBYTE ubPlayer, UWORD uwFuel) {
-	s_pPlayerData[ubPlayer].uwFuel = (uwFuel+100-30) / 100;
+void hudSetFuel(UBYTE ubPlayer, UWORD uwFuel, UWORD uwFuelMax) {
+	s_pPlayerData[ubPlayer].uwFuel = uwFuel;
+	s_pPlayerData[ubPlayer].uwFuelMax = uwFuelMax;
+}
+
+void hudSetHealth(UBYTE ubPlayer, UBYTE ubHealth, UBYTE ubHealthMax) {
+	s_pPlayerData[ubPlayer].ubHealth = ubHealth;
+	s_pPlayerData[ubPlayer].ubHealthMax = ubHealthMax;
+}
+
+static void hudDrawBarPercent(
+	UWORD uwOffsX, UBYTE ubOffsY, UBYTE ubPercent, UBYTE ubColor
+) {
+	UBYTE ubBarIdx = ubPercent / 10;
+	UBYTE ubBarY = 4 - ((ubPercent % 10) + 1) / 2;
+	UWORD uwX = uwOffsX + ubBarIdx * 3;
+	chunkyToPlanar(ubColor, uwX + 0, ubOffsY + ubBarY, s_pHudBuffer->pBack);
+	chunkyToPlanar(ubColor, uwX + 1, ubOffsY + ubBarY, s_pHudBuffer->pBack);
 }
 
 void hudUpdate(void) {
 	tHudPlayerData * const pData = &s_pPlayerData[s_ePlayer];
 	char szBfr[20];
+	UBYTE ubPercent;
+	static UBYTE isDrawPending = 0;
 	switch(s_eDraw) {
-		case HUD_PREPARE_DEPTH:{
-			if(pData->uwDepth != pData->uwOldDepth) {
-				sprintf(szBfr, "%5u", pData->uwDepth);
+		case HUD_PREPARE_DEPTH:
+			if(pData->uwDepth != pData->uwDepthDisp) {
+				sprintf(szBfr, "%u.%um", pData->uwDepth / 10, pData->uwDepth % 10);
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
-				pData->uwOldDepth = pData->uwDepth;
+				pData->uwDepthDisp = pData->uwDepth;
+				s_eDraw = HUD_DRAW_DEPTH;
+				isDrawPending = 1;
+				break;
 			}
-			else {
-				// Skip drawing
-				++s_eDraw;
-			}
-		} break;
-		case HUD_DRAW_DEPTH: {
-			blitRect(s_pHudBuffer->pBack, s_uwHudOffsX + DEPTH_GAUGE_X, ROW_1_Y, 28, 5, 0);
-			fontDrawTextBitMap(
-				s_pHudBuffer->pBack, s_pLinebuffer,
-				s_uwHudOffsX + DEPTH_GAUGE_X, ROW_1_Y, COLOR_ACTIVE, FONT_LAZY | FONT_COOKIE
-			);
-		} break;
-		case HUD_DRAW_FUEL: {
-			if(pData->uwOldFuel != pData->uwFuel) {
-				UBYTE ubColor, ubDraw;
-				if(pData->uwFuel > pData->uwOldFuel) {
-					ubDraw = pData->uwOldFuel;
-					++pData->uwOldFuel;
-					ubColor = COLOR_ACTIVE;
-				}
-				else {
-					--pData->uwOldFuel;
-					ubDraw = pData->uwOldFuel;
-					ubColor = COLOR_NACTIVE;
-				}
-				chunkyToPlanar(
-					ubColor, s_uwHudOffsX + FUEL_GAUGE_X + 2 * (ubDraw % 10),
-					ROW_1_Y + 2 * (ubDraw / 10), s_pHudBuffer->pBack
-				);
-			}
-		} break;
-		case HUD_DRAW_HEALTH: {
-
-		} break;
-		case HUD_DRAW_CARGO: {
-			if(pData->ubOldCargo != pData->ubCargo) {
-				UBYTE ubColor, ubDraw;
-				if(pData->ubCargo > pData->ubOldCargo) {
-					ubDraw = pData->ubOldCargo;
-					++pData->ubOldCargo;
-					ubColor = COLOR_ACTIVE;
-				}
-				else {
-					--pData->ubOldCargo;
-					ubDraw = pData->ubOldCargo;
-					ubColor = COLOR_NACTIVE;
-				}
+		case HUD_DRAW_DEPTH:
+			if(isDrawPending) {
 				blitRect(
-					s_pHudBuffer->pBack, s_uwHudOffsX + CARGO_GAUGE_X + 3 * ((ubDraw) % 10),
-					ROW_1_Y + 3 * ((ubDraw) / 10), 2, 2, ubColor
+					s_pHudBuffer->pBack, GAUGE_DEPTH_X, ROW_2_Y,
+					320 - GAUGE_DEPTH_X, s_pFont->uwHeight, 0
 				);
+				fontDrawTextBitMap(
+					s_pHudBuffer->pBack, s_pLinebuffer,
+					GAUGE_DEPTH_X, ROW_2_Y, COLOR_ACTIVE, FONT_LAZY
+				);
+				s_eDraw = HUD_PREPARE_CASH;
+				isDrawPending = 0;
+				break;
 			}
-		} break;
-		case HUD_PREPARE_CASH: {
-			if(pData->ulCash != pData->ulOldCash) {
-				sprintf(szBfr, "%5u", pData->ulCash);
+		case HUD_PREPARE_CASH:
+			if(pData->ulCash != pData->ulCashDisp) {
+				UWORD m = (pData->ulCash / 1000U) / 1000U;
+				UWORD k = (pData->ulCash / 1000U) % 1000U;
+				UWORD u = pData->ulCash % 1000U;
+				if(pData->ulCash >= 1000000U) {
+					sprintf(szBfr, "%lu.%03lu.%03lu", m, k, u);
+				}
+				else if(pData->ulCash >= 1000U) {
+					sprintf(szBfr, "%lu.%03lu", k, u);
+				}
+				else {
+					sprintf(szBfr, "%lu", pData->ulCash);
+				}
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
-				pData->ulOldCash = pData->ulCash;
+				pData->ulCashDisp = pData->ulCash;
+				s_eDraw = HUD_DRAW_CASH;
+				isDrawPending = 1;
+				break;
+			}
+		case HUD_DRAW_CASH:
+			if(isDrawPending) {
+				blitRect(
+					s_pHudBuffer->pBack, GAUGE_CASH_X, ROW_1_Y,
+					320 - GAUGE_CASH_X, s_pFont->uwHeight, 0
+				);
+				fontDrawTextBitMap(
+					s_pHudBuffer->pBack, s_pLinebuffer,
+					GAUGE_CASH_X, ROW_1_Y, COLOR_ACTIVE, FONT_LAZY
+				);
+				s_eDraw = HUD_DRAW_FUEL;
+				isDrawPending = 0;
+				break;
+			}
+		case HUD_DRAW_FUEL:
+			ubPercent = 0;
+			if(pData->uwFuelMax) {
+				ubPercent = (100 * pData->uwFuel) / pData->uwFuelMax;
+			}
+			if(pData->uwFuelDisp != ubPercent) {
+				UBYTE ubColor, ubDraw;
+				if(ubPercent > pData->uwFuelDisp) {
+					ubDraw = pData->uwFuelDisp;
+					++pData->uwFuelDisp;
+					ubColor = COLOR_ACTIVE;
+				}
+				else {
+					--pData->uwFuelDisp;
+					ubDraw = pData->uwFuelDisp;
+					ubColor = COLOR_NACTIVE;
+				}
+				hudDrawBarPercent(GAUGE_DRILL_X, s_ubHudOffsY, ubDraw, ubColor);
+				s_eDraw = HUD_DRAW_CARGO;
+				break;
+			}
+		case HUD_DRAW_CARGO:
+			ubPercent = 0;
+			if(pData->ubCargoMax) {
+				ubPercent = (100 * pData->ubCargo) / pData->ubCargoMax;
+			}
+			if(pData->ubCargoDisp != ubPercent) {
+				UBYTE ubColor, ubDraw;
+				if(ubPercent > pData->ubCargoDisp) {
+					ubDraw = pData->ubCargoDisp;
+					++pData->ubCargoDisp;
+					ubColor = COLOR_ACTIVE;
+				}
+				else {
+					--pData->ubCargoDisp;
+					ubDraw = pData->ubCargoDisp;
+					ubColor = COLOR_NACTIVE;
+				}
+				hudDrawBarPercent(GAUGE_CARGO_X, s_ubHudOffsY, ubDraw, ubColor);
+				s_eDraw = HUD_DRAW_HEALTH;
+				break;
+			}
+		case HUD_DRAW_HEALTH:
+			s_eDraw = HUD_DRAW_END;
+			ubPercent = 0;
+			if(pData->ubHealthMax) {
+				ubPercent = (100 * pData->ubHealth) / pData->ubHealthMax;
+			}
+			if(pData->ubHealthDisp != ubPercent) {
+
+				break;
+			}
+		case HUD_DRAW_END:
+		default: {
+			// Cycle players and start again
+			if(s_ePlayer == PLAYER_1) {
+				s_ePlayer = PLAYER_2;
+				s_ubHudOffsY = s_pFont->uwHeight + 1;
+				s_eDraw = HUD_DRAW_FUEL;
 			}
 			else {
-				// Skip drawing
-				++s_eDraw;
+				s_ePlayer = PLAYER_1;
+				s_ubHudOffsY = 0;
+				s_eDraw = HUD_PREPARE_DEPTH;
 			}
 		} break;
-		case HUD_DRAW_CASH: {
-			blitRect(s_pHudBuffer->pBack, s_uwHudOffsX + CASH_GAUGE_X, ROW_2_Y, 28, 5, 0);
-			fontDrawTextBitMap(
-				s_pHudBuffer->pBack, s_pLinebuffer,
-				s_uwHudOffsX + CASH_GAUGE_X, ROW_2_Y, COLOR_ACTIVE, FONT_LAZY | FONT_COOKIE
-			);
-		} break;
-		default: {
-
-		}
-	}
-	++s_eDraw;
-	if(s_eDraw >= HUD_DRAW_END) {
-		// Cycle players and start again
-		if(s_ePlayer == PLAYER_1) {
-			s_ePlayer = PLAYER_2;
-			s_uwHudOffsX = 160;
-		}
-		else {
-			s_ePlayer = PLAYER_1;
-			s_uwHudOffsX = 0;
-		}
-		s_eDraw = 0;
 	}
 }
 
