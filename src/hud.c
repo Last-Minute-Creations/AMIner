@@ -174,13 +174,16 @@ void hudUpdate(void) {
 	tHudPlayerData * const pData = &s_pPlayerData[s_ePlayer];
 	char szBfr[20];
 	UBYTE ubPercent;
+	UWORD uwDepth;
+	ULONG ulCash;
 	static UBYTE isDrawPending = 0;
 	switch(s_eDraw) {
 		case HUD_PREPARE_DEPTH:
-			if(pData->uwDepth != pData->uwDepthDisp) {
-				sprintf(szBfr, "%u.%um", pData->uwDepth / 10, pData->uwDepth % 10);
+			uwDepth = (s_pPlayerData[0].uwDepth + s_pPlayerData[1].uwDepth) / 2;
+			if(uwDepth != pData->uwDepthDisp) {
+				sprintf(szBfr, "%u.%um", uwDepth / 10, uwDepth % 10);
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
-				pData->uwDepthDisp = pData->uwDepth;
+				pData->uwDepthDisp = uwDepth;
 				s_eDraw = HUD_DRAW_DEPTH;
 				isDrawPending = 1;
 				break;
@@ -200,21 +203,22 @@ void hudUpdate(void) {
 				break;
 			}
 		case HUD_PREPARE_CASH:
-			if(pData->ulCash != pData->ulCashDisp) {
-				UWORD m = (pData->ulCash / 1000U) / 1000U;
-				UWORD k = (pData->ulCash / 1000U) % 1000U;
-				UWORD u = pData->ulCash % 1000U;
-				if(pData->ulCash >= 1000000U) {
+			ulCash = s_pPlayerData[0].ulCash + s_pPlayerData[1].ulCash;
+			if(ulCash != pData->ulCashDisp) {
+				UWORD m = (ulCash / 1000U) / 1000U;
+				UWORD k = (ulCash / 1000U) % 1000U;
+				UWORD u = ulCash % 1000U;
+				if(ulCash >= 1000000U) {
 					sprintf(szBfr, "%lu.%03lu.%03lu", m, k, u);
 				}
-				else if(pData->ulCash >= 1000U) {
+				else if(ulCash >= 1000U) {
 					sprintf(szBfr, "%lu.%03lu", k, u);
 				}
 				else {
-					sprintf(szBfr, "%lu", pData->ulCash);
+					sprintf(szBfr, "%lu", ulCash);
 				}
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
-				pData->ulCashDisp = pData->ulCash;
+				pData->ulCashDisp = ulCash;
 				s_eDraw = HUD_DRAW_CASH;
 				isDrawPending = 1;
 				break;
