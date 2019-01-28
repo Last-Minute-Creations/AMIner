@@ -7,6 +7,9 @@
 #include "hud.h"
 #include "game.h"
 #include "tile.h"
+#include "mineral.h"
+#include "plan.h"
+#include "color.h"
 
 #define VEHICLE_BODY_HEIGHT 18
 #define VEHICLE_TRACK_HEIGHT 7
@@ -120,6 +123,15 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 
 void vehicleDestroy(tVehicle *pVehicle) {
 	textBobDestroy(&pVehicle->sTextBob);
+}
+
+UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
+	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2;
+	return (
+		4*32 <= uwCenterX && uwCenterX <= 6*32 &&
+		(TILE_ROW_GRASS - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_GRASS+1) * 32
+	);
 }
 
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
@@ -251,27 +263,40 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 
 static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	// Load mineral to vehicle
+	static UBYTE wasPlanFulfilled = 0; // FIXME this may work incorrectly when game restarts
 	static const char * const szMessageFull = "Cargo full!";
+	static const char * const szMessagePlanDone = "Plan done!";
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	if(g_pTileDefs[ubTile].szMsg) {
+		UBYTE ubMineralType = g_pTileDefs[ubTile].ubMineral;
+		const tMineralDef *pMineral = &g_pMinerals[ubMineralType];
 		UBYTE ubSlots = g_pTileDefs[ubTile].ubSlots;
 		ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
-		pVehicle->uwCargoScore += g_pTileDefs[ubTile].ubReward * ubSlots;
+		pVehicle->uwCargoScore += pMineral->ubReward * ubSlots;
 		pVehicle->ubCargoCurr += ubSlots;
+		planAddMinerals(ubMineralType, ubSlots);
+
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr);
 		const char *szMessage;
 		UBYTE ubColor;
 		if(pVehicle->ubCargoCurr == pVehicle->ubCargoMax) {
 			szMessage = szMessageFull;
-			ubColor = 6;
+			ubColor = COLOR_REDEST;
 			audioPlay(
 				AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
 				g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
 			);
 		}
 		else {
-			szMessage = g_pTileDefs[ubTile].szMsg;
-			ubColor = g_pTileDefs[ubTile].ubColor;
+			UBYTE isPlanFulfilled = planIsFulfilled();
+			if(isPlanFulfilled && !wasPlanFulfilled) {
+				szMessage = szMessagePlanDone;
+			}
+			else {
+				szMessage = g_pTileDefs[ubTile].szMsg;
+			}
+			wasPlanFulfilled = isPlanFulfilled;
+			ubColor = pMineral->ubTitleColor;
 			audioPlay(
 				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
 				g_pSampleOre, AUDIO_VOLUME_MAX, 1
@@ -290,7 +315,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			textBobSetText(
 				&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle)
 			);
-			textBobSetColor(&pVehicle->sTextBob, 12);
+			textBobSetColor(&pVehicle->sTextBob, COLOR_GREEN);
 			textBobSetPos(
 				&pVehicle->sTextBob,
 				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
@@ -485,10 +510,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	bobNewPush(&pVehicle->sBobTool);
 
 	if(
-		4*32 <= pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2 &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwX <= 6*32 + VEHICLE_HEIGHT/2 &&
-		(TILE_ROW_GRASS - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_GRASS+1) * 32 &&
+		vehicleIsNearShop(pVehicle) &&
 		(pVehicle->ubCargoCurr  || (pVehicle->uwFuelMax - pVehicle->uwFuelCurr > 100))
 	) {
 		WORD wScoreNow = vehicleRestock(pVehicle);
@@ -496,7 +518,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		if(wScoreNow < 0) {
 			ubColor = 6;
 		}
-		textBobSetText(&pVehicle->sTextBob, "%+hd$", wScoreNow);
+		textBobSetText(&pVehicle->sTextBob, "%+hd\x1F", wScoreNow);
 		textBobSetColor(&pVehicle->sTextBob, ubColor);
 		textBobSetPos(
 			&pVehicle->sTextBob,

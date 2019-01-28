@@ -10,46 +10,190 @@
 #include "bob_new.h"
 #include "text_bob.h"
 
-tSample *s_pSampleEnter, *s_pSampleToggle, *s_pSampleNavigate, *s_pSampleAtari;
-
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
 	MENU_STATE_SELECTING,
 	MENU_STATE_ROLL_OUT
 } tMenuState;
 
-typedef enum _tMenuPos {
-	MENU_POS_START,
-	MENU_POS_MODE,
-	MENU_POS_PLAYERS,
-	MENU_POS_P1_CONTROLS,
-	MENU_POS_P2_CONTROLS,
-	MENU_POS_ATARI,
-	MENU_POS_EXIT,
-	MENU_POS_COUNT
-} tMenuPos;
+typedef enum _tOptionType {
+	OPTION_TYPE_UINT8,
+	OPTION_TYPE_CALLBACK
+} tOptionType;
 
-static char * const s_pMenuTexts[MENU_POS_COUNT] = {
-	"Start game", "Mode: free playyyy", "Players: 10",
-	"Player 1 controls: arrows", "Player 2 controls: arrows",
-	"ATARI MODE: OFF", "Exit to Workbench"
+typedef void (*tOptionSelectCb)(void);
+
+// All options are uint8_t, enums or numbers
+typedef struct _tOption {
+	char *szName;
+	tOptionType eOptionType;
+	UBYTE isHidden;
+	union {
+		struct {
+			UBYTE *pVar;
+			UBYTE ubMax;
+			UBYTE ubDefault;
+			UBYTE isCyclic;
+			const char **pEnumLabels;
+		} sOptUb;
+		struct {
+			tOptionSelectCb cbSelect;
+		} sOptCb;
+	};
+} tOption;
+
+void onStart(void);
+void onExit(void);
+
+static const char *s_pModeEnum[] = {"Free play", "Challenge"};
+static const char *s_pPlayersEnum[] = {"1", "2"};
+static const char *s_pP1Enum[] = {"Joy", "WSAD"};
+static const char *s_pP2Enum[] = {"Joy", "Arrows"};
+static const char *s_pOnOffEnum[] = {"OFF", "ON"};
+
+static tOption s_pOptions[] = {
+	{"Start game", OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onStart}},
+	{"Mode", OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
+		.pVar = &g_isChallenge, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
+		.pEnumLabels = s_pModeEnum
+	}},
+	{"Players", OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
+		.pVar = &g_is2pPlaying, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
+		.pEnumLabels = s_pPlayersEnum
+	}},
+	{"Player 1 controls", OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
+		.pVar = &g_is1pKbd, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
+		.pEnumLabels = s_pP1Enum
+	}},
+	{"Player 2 controls", OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
+		.pVar = &g_is2pKbd, .ubMax = 1, .isCyclic = 1, .ubDefault = 1,
+		.pEnumLabels = s_pP2Enum
+	}},
+	{"ATARI Mode", OPTION_TYPE_UINT8, .isHidden = 1, .sOptUb = {
+		.pVar = &g_isAtari, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
+		.pEnumLabels = s_pOnOffEnum
+	}},
+	{"Exit to workbench", OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onExit}},
 };
+#define MENU_POS_COUNT (sizeof(s_pOptions) / sizeof(tOption))
+
+//-------------------------------------------------------------- MENU COMP START
+
+#define MENU_COLOR_INACTIVE 10
+#define MENU_COLOR_ACTIVE 14
+
+static UBYTE s_ubActivePos;
+static tTextBob s_pMenuPositions[MENU_POS_COUNT];
+
+static void menuUpdateText(UBYTE ubPos) {
+	char szBfr[50];
+	if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_UINT8) {
+		if(s_pOptions[ubPos].sOptUb.pEnumLabels) {
+			sprintf(
+				szBfr, "%s: %s", s_pOptions[ubPos].szName,
+				s_pOptions[ubPos].sOptUb.pEnumLabels[*s_pOptions[ubPos].sOptUb.pVar]
+			);
+		}
+		else {
+			sprintf(
+				szBfr, "%s: %hhu", s_pOptions[ubPos].szName,
+				*s_pOptions[ubPos].sOptUb.pVar
+			);
+		}
+		textBobSetText(&s_pMenuPositions[ubPos], szBfr);
+	}
+	else if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_CALLBACK) {
+		textBobSetText(&s_pMenuPositions[ubPos], s_pOptions[ubPos].szName);
+	}
+	textBobUpdate(&s_pMenuPositions[ubPos]);
+}
+
+static void menuSetHidden(UBYTE ubPos, UBYTE isHidden) {
+	s_pOptions[ubPos].isHidden = isHidden;
+}
+
+static UBYTE menuNavigate(BYTE bDir) {
+	WORD wNewPos = s_ubActivePos;
+
+	// Find next non-hidden pos
+	do {
+		wNewPos += bDir;
+	} while(0 < wNewPos && wNewPos < (WORD)MENU_POS_COUNT && s_pOptions[wNewPos].isHidden);
+
+	if(wNewPos < 0 || wNewPos >= (WORD)MENU_POS_COUNT) {
+		// Out of bounds - cancel
+		return 0;
+	}
+
+	// Set old pos color to inactive
+	textBobSetColor(&s_pMenuPositions[s_ubActivePos], MENU_COLOR_INACTIVE);
+	textBobUpdate(&s_pMenuPositions[s_ubActivePos]);
+
+	// Update active pos and set color to active
+	s_ubActivePos = wNewPos;
+	textBobSetColor(&s_pMenuPositions[s_ubActivePos], MENU_COLOR_ACTIVE);
+	textBobUpdate(&s_pMenuPositions[s_ubActivePos]);
+
+	return 1;
+}
+
+static UBYTE menuToggle(BYTE bDelta) {
+	if(s_pOptions[s_ubActivePos].eOptionType == OPTION_TYPE_UINT8) {
+		WORD wNewVal = *s_pOptions[s_ubActivePos].sOptUb.pVar + bDelta;
+		if(wNewVal < 0 || wNewVal > s_pOptions[s_ubActivePos].sOptUb.ubMax) {
+			if(s_pOptions[s_ubActivePos].sOptUb.isCyclic) {
+				wNewVal = wNewVal < 0 ? s_pOptions[s_ubActivePos].sOptUb.ubMax : 0;
+			}
+			else {
+				return 0; // Out of bounds on non-cyclic option
+			}
+		}
+		*s_pOptions[s_ubActivePos].sOptUb.pVar = wNewVal;
+		menuUpdateText(s_ubActivePos);
+		return 1;
+	}
+	return 0;
+}
+
+static UBYTE menuEnter(void) {
+	if(s_pOptions[s_ubActivePos].eOptionType == OPTION_TYPE_CALLBACK) {
+		s_pOptions[s_ubActivePos].sOptCb.cbSelect();
+		return 1;
+	}
+	return 0;
+}
+
+//---------------------------------------------------------------- MENU COMP END
+
+tSample *s_pSampleEnter, *s_pSampleToggle, *s_pSampleNavigate, *s_pSampleAtari;
 
 static UBYTE s_pKeyHistory[8] = {0};
 static UBYTE s_pKeyKonami[8] = {
 	KEY_RIGHT, KEY_LEFT, KEY_RIGHT, KEY_LEFT, KEY_DOWN, KEY_DOWN, KEY_UP, KEY_UP
 };
 
-#define MENU_COLOR_INACTIVE 10
-#define MENU_COLOR_ACTIVE 14
-
 static tMenuState s_eMenuState;
-static tMenuPos s_eActivePos;
 static tBitMap *s_pLogo, *s_pLogoMask;
-static tTextBob s_pMenuPositions[MENU_POS_COUNT];
 static tTextBob s_sCredits;
 static UWORD s_uwOffsY;
-static UBYTE s_isAtariDisplayed = 0;
+
+static void menuEnableAtari(void) {
+	UBYTE isAtariHidden = s_pOptions[5].isHidden;
+	if(isAtariHidden) {
+		menuSetHidden(5, 0);
+		audioPlay(AUDIO_CHANNEL_1, s_pSampleAtari, AUDIO_VOLUME_MAX, 1);
+	}
+}
+
+void onStart(void) {
+	audioPlay(AUDIO_CHANNEL_0, s_pSampleEnter, AUDIO_VOLUME_MAX, 1);
+	gameStart();
+	s_eMenuState = MENU_STATE_ROLL_OUT;
+}
+
+void onExit(void) {
+	gameClose();
+}
 
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm");
@@ -87,20 +231,60 @@ void menuGsCreate(void) {
 	memset(s_pKeyHistory, 0, 8);
 }
 
-static void menuChangeText(tMenuPos ePos, const char *szFmt, ...) {
-	va_list vaArgs;
-	va_start(vaArgs, szFmt);
-	vsprintf(s_pMenuTexts[ePos], szFmt, vaArgs);
-	va_end(vaArgs);
-	textBobSetText(&s_pMenuPositions[ePos], s_pMenuTexts[ePos]);
-	textBobUpdate(&s_pMenuPositions[ePos]);
-}
-
-static void menuEnableAtari(void) {
-	if(!s_isAtariDisplayed) {
-		s_isAtariDisplayed = 1;
-		audioPlay(AUDIO_CHANNEL_1, s_pSampleAtari, AUDIO_VOLUME_MAX, 1);
+static void menuProcessSelecting(void) {
+	UBYTE ubNewKey = 0;
+	if(
+		keyUse(KEY_UP) || keyUse(KEY_W) || joyUse(JOY1_UP) || joyUse(JOY2_UP)
+	) {
+		ubNewKey = KEY_UP;
+		if(menuNavigate(-1)) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
+		}
 	}
+	else if(
+		keyUse(KEY_DOWN) || keyUse(KEY_S) || joyUse(JOY1_DOWN) || joyUse(JOY2_DOWN)
+	) {
+		ubNewKey = KEY_DOWN;
+		if(menuNavigate(+1)) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
+		}
+	}
+	else if(
+		keyUse(KEY_LEFT) || keyUse(KEY_A) || joyUse(JOY1_LEFT) || joyUse(JOY2_LEFT)
+	) {
+		ubNewKey = KEY_LEFT;
+		if(menuToggle(-1)) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
+		}
+	}
+	else if(
+		keyUse(KEY_RIGHT) || keyUse(KEY_D)|| joyUse(JOY1_RIGHT) || joyUse(JOY2_RIGHT)
+	) {
+		ubNewKey = KEY_RIGHT;
+		if(menuToggle(+1)) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
+		}
+	}
+	else if(
+		keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || joyUse(JOY1_FIRE) || joyUse(JOY1_FIRE)
+	) {
+		menuEnter();
+	}
+
+	if(ubNewKey) {
+		memmove(s_pKeyHistory+1, s_pKeyHistory, 8-1);
+		s_pKeyHistory[0] = ubNewKey;
+		if(!memcmp(s_pKeyHistory, s_pKeyKonami, 8)) {
+			menuEnableAtari();
+		}
+	}
+
+	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
+		if(!s_pOptions[i].isHidden) {
+			bobNewPush(&s_pMenuPositions[i].sBob);
+		}
+	}
+	bobNewPush(&s_sCredits.sBob);
 }
 
 void menuGsLoop(void) {
@@ -129,7 +313,7 @@ void menuGsLoop(void) {
 			}
 			else {
 				s_eMenuState = MENU_STATE_SELECTING;
-				s_eActivePos = MENU_POS_START;
+				s_ubActivePos = 0;
 				UWORD uwLogoWidth = bitmapGetByteWidth(s_pLogo)*8;
 				UWORD uwOffsX = g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
 				blitCopyMask(
@@ -143,18 +327,13 @@ void menuGsLoop(void) {
 					uwLogoWidth, s_pLogo->Rows, (UWORD*)s_pLogoMask->Planes[0]
 				);
 				s_uwOffsY = 16 + s_pLogo->Rows + 30;
-				sprintf(s_pMenuTexts[MENU_POS_MODE], g_isChallenge ? "Mode: Challenge" : "Mode: Free play");
-				sprintf(s_pMenuTexts[MENU_POS_PLAYERS], g_is2pPlaying ? "Players: 2" : "Players: 1");
-				sprintf(s_pMenuTexts[MENU_POS_P1_CONTROLS], "Player 1 controls: %s", g_is1pKbd ? "WSAD" : "Joy");
-				sprintf(s_pMenuTexts[MENU_POS_P2_CONTROLS], "Player 2 controls: %s", g_is2pKbd ? "Arrows" : "Joy");
-				sprintf(s_pMenuTexts[MENU_POS_ATARI], "ATARI MODE: %s", g_isAtari ? "On" : "Off");
 				for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
-					textBobSet(
-						&s_pMenuPositions[i], s_pMenuTexts[i],
-						i == 0 ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE,
-						uwOffsX + 160, s_uwOffsY + i * 10, 0, 1
+					textBobSetColor(
+						&s_pMenuPositions[i],
+						i == 0 ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE
 					);
-					textBobUpdate(&s_pMenuPositions[i]);
+					menuUpdateText(i);
+					textBobSetPos(&s_pMenuPositions[i], uwOffsX + 160, s_uwOffsY + i * 10, 0, 1);
 				}
 				textBobSetPos(
 					&s_sCredits, uwOffsX + 160,
@@ -164,127 +343,9 @@ void menuGsLoop(void) {
 			}
 		} break;
 
-		case MENU_STATE_SELECTING: {
-			UBYTE ubNewKey = 0;
-			UBYTE isToggle = 0;
-			if(
-				keyUse(KEY_UP) || keyUse(KEY_W) ||
-				joyUse(JOY1_UP) || joyUse(JOY2_UP)
-			) {
-				ubNewKey = KEY_UP;
-				if(s_eActivePos) {
-					textBobSetColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
-					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
-					--s_eActivePos;
-					if(!s_isAtariDisplayed && s_eActivePos == MENU_POS_ATARI) {
-						--s_eActivePos;
-					}
-					textBobSetColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_ACTIVE);
-					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
-				}
-			}
-			else if(
-				keyUse(KEY_DOWN) || keyUse(KEY_S) ||
-				joyUse(JOY1_DOWN) || joyUse(JOY2_DOWN)
-			) {
-				ubNewKey = KEY_DOWN;
-				if(s_eActivePos < MENU_POS_COUNT-1) {
-					textBobSetColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_INACTIVE);
-					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
-					++s_eActivePos;
-					if(!s_isAtariDisplayed && s_eActivePos == MENU_POS_ATARI) {
-						++s_eActivePos;
-					}
-					textBobSetColor(&s_pMenuPositions[s_eActivePos], MENU_COLOR_ACTIVE);
-					textBobUpdate(&s_pMenuPositions[s_eActivePos]);
-				}
-			}
-			else if(
-				keyUse(KEY_LEFT) || keyUse(KEY_A) || joyUse(JOY1_LEFT) || joyUse(JOY2_LEFT)
-			) {
-				ubNewKey = KEY_LEFT;
-			}
-			else if(
-				keyUse(KEY_RIGHT) || keyUse(KEY_D)|| joyUse(JOY1_RIGHT) || joyUse(JOY2_RIGHT)
-			) {
-				ubNewKey = KEY_RIGHT;
-			}
-			if(ubNewKey == KEY_LEFT || ubNewKey == KEY_RIGHT) {
-				isToggle = 1;
-				if(s_eActivePos == MENU_POS_PLAYERS) {
-					g_is2pPlaying = !g_is2pPlaying;
-					// ?: aint working here, wtf
-					if(g_is2pPlaying) {
-						menuChangeText(MENU_POS_PLAYERS, "Players: 2");
-					}
-					else {
-						menuChangeText(MENU_POS_PLAYERS, "Players: 1");
-					}
-				}
-				else if(s_eActivePos == MENU_POS_P1_CONTROLS) {
-					g_is1pKbd = !g_is1pKbd;
-					menuChangeText(MENU_POS_P1_CONTROLS, "Player 1 controls: %s", g_is1pKbd ? "WSAD" : "Joy");
-				}
-				else if(s_eActivePos == MENU_POS_P2_CONTROLS) {
-					g_is2pKbd = !g_is2pKbd;
-					menuChangeText(MENU_POS_P2_CONTROLS, "Player 2 controls: %s", g_is2pKbd ? "Arrows" : "Joy");
-				}
-				else if(s_eActivePos == MENU_POS_MODE) {
-					g_isChallenge = !g_isChallenge;
-					if(g_isChallenge) {
-						menuChangeText(MENU_POS_MODE, "Mode: Challenge");
-					}
-					else {
-						menuChangeText(MENU_POS_MODE, "Mode: Free play");
-					}
-				}
-				else if(s_eActivePos == MENU_POS_ATARI) {
-					g_isAtari = !g_isAtari;
-					if(g_isAtari) {
-						menuChangeText(MENU_POS_ATARI, "ATARI MODE: On");
-					}
-					else {
-						menuChangeText(MENU_POS_ATARI, "ATARI MODE: Off");
-					}
-				}
-				else {
-					isToggle = 0;
-				}
-			}
-			else if(
-				keyUse(KEY_RETURN) || keyUse(KEY_SPACE) ||
-				joyUse(JOY1_FIRE) || joyUse(JOY1_FIRE)
-			) {
-				if(s_eActivePos == MENU_POS_START) {
-					audioPlay(AUDIO_CHANNEL_0, s_pSampleEnter, AUDIO_VOLUME_MAX, 1);
-					gameStart();
-					s_eMenuState = MENU_STATE_ROLL_OUT;
-				}
-				else if(s_eActivePos == MENU_POS_EXIT) {
-					gameClose();
-					return;
-				}
-			}
-
-			if(ubNewKey) {
-				audioPlay(
-					AUDIO_CHANNEL_0,
-					isToggle ? s_pSampleToggle : s_pSampleNavigate, AUDIO_VOLUME_MAX, 1
-				);
-				memmove(s_pKeyHistory+1, s_pKeyHistory, 8-1);
-				s_pKeyHistory[0] = ubNewKey;
-				if(!memcmp(s_pKeyHistory, s_pKeyKonami, 8)) {
-					menuEnableAtari();
-				}
-			}
-
-			for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
-				if(i != MENU_POS_ATARI || s_isAtariDisplayed) {
-					bobNewPush(&s_pMenuPositions[i].sBob);
-				}
-			}
-			bobNewPush(&s_sCredits.sBob);
-		} break;
+		case MENU_STATE_SELECTING:
+			menuProcessSelecting();
+		break;
 
 		case MENU_STATE_ROLL_OUT: {
 			if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY) {

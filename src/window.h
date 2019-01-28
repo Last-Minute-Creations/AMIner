@@ -7,6 +7,9 @@
 
 #include <ace/types.h>
 
+#define WINDOW_WIDTH (320-64)
+#define WINDOW_HEIGHT (192)
+
 void windowInit(void);
 
 void windowDeinit(void);
@@ -14,5 +17,7 @@ void windowDeinit(void);
 UBYTE windowShow(void);
 
 void windowHide(void);
+
+tUwCoordYX windowGetOrigin(void);
 
 #endif // _WINDOW_H_
