@@ -17,15 +17,17 @@ void hudCreate(tView *pView, const tFont *pFont);
 
 void hudDestroy(void);
 
-void hudReset(void);
+void hudReset(UBYTE isChallenge);
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth);
 
 void hudSetScore(UBYTE ubPlayer, ULONG ulCash);
 
-void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo);
+void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo, UBYTE ubCargoMax);
 
-void hudSetFuel(UBYTE ubPlayer, UWORD uwFuel);
+void hudSetFuel(UBYTE ubPlayer, UWORD ubFuel, UWORD ubFuelMax);
+
+void hudSetHealth(UBYTE ubPlayer, UBYTE ubHealth, UBYTE ubHealthMax);
 
 void hudUpdate(void);
 
