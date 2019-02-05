@@ -61,7 +61,7 @@ void hudCreate(tView *pView, const tFont *pFont) {
     TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
   TAG_END);
 
-	paletteLoad("data/aminer.plt", s_pVpHud->pPalette, 16);
+	paletteLoad("data/aminer.plt", s_pVpHud->pPalette, 32);
 
 	s_pFont = pFont;
 	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, pFont->uwHeight);

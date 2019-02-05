@@ -11,17 +11,17 @@
 #include "plan.h"
 #include "color.h"
 
-#define VEHICLE_BODY_HEIGHT 18
+#define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_TRACK_HEIGHT 7
 #define VEHICLE_TRACK_DRILL_HEIGHT 7
 #define VEHICLE_TRACK_JET_HEIGHT 5
-#define VEHICLE_FLAME_HEIGHT 7
+#define VEHICLE_FLAME_HEIGHT 21
 #define VEHICLE_TOOL_WIDTH 16
-#define VEHICLE_TOOL_HEIGHT 17
+#define VEHICLE_TOOL_HEIGHT 16
 
 #define TRACK_OFFSET_TRACK 0
-#define TRACK_OFFSET_JET 14
-#define TRACK_OFFSET_DRILL 21
+#define TRACK_OFFSET_JET 28
+#define TRACK_OFFSET_DRILL 35
 #define DRILL_V_ANIM_LEN (VEHICLE_TRACK_HEIGHT + VEHICLE_TRACK_DRILL_HEIGHT - 1)
 
 tBitMap *s_pBodyFrames[2], *s_pBodyMask;
@@ -154,31 +154,27 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 static inline void vehicleSetTool(
 	tVehicle *pVehicle, tToolState eToolState, UBYTE ubFrame
 ) {
+	pVehicle->sBobTool.sPos.sUwCoord.uwY -= 3;
+	UBYTE ubFrameOffs;
 	if(eToolState == TOOL_STATE_IDLE) {
-		if(!pVehicle->sBobBody.uwOffsetY) {
-			// Facing right
-			pVehicle->sBobTool.sPos.sUwCoord.uwX += 24;
-		}
-		// Vertical drill anim
-		bobNewSetBitMapOffset(&pVehicle->sBobTool, 0);
+		ubFrameOffs = 0;
 	}
 	else { // if(eToolState == TOOL_STATE_DRILL)
-		pVehicle->sBobTool.sPos.sUwCoord.uwY += 3;
-		if(!pVehicle->sBobBody.uwOffsetY) {
-			// Facing right
-			pVehicle->sBobTool.sPos.sUwCoord.uwX += 24+3;
-			bobNewSetBitMapOffset(
-				&pVehicle->sBobTool, (1 + ubFrame) * VEHICLE_TOOL_HEIGHT
-			);
-		}
-		else {
-			// Facing left
-			pVehicle->sBobTool.sPos.sUwCoord.uwX += -13+3;
-			bobNewSetBitMapOffset(
-				&pVehicle->sBobTool, (3 + ubFrame) * VEHICLE_TOOL_HEIGHT
-			);
-		}
+		ubFrameOffs = ubFrame ? VEHICLE_TOOL_HEIGHT : 0;
 	}
+
+	if(!pVehicle->sBobBody.uwOffsetY) {
+		// Facing right
+		pVehicle->sBobTool.sPos.sUwCoord.uwX += 24+3;
+	}
+	else {
+		// Facing left
+		pVehicle->sBobTool.sPos.sUwCoord.uwX += -13+3;
+		ubFrameOffs += 2 * VEHICLE_TOOL_HEIGHT;
+	}
+
+	// Vertical drill anim
+	bobNewSetBitMapOffset(&pVehicle->sBobTool, ubFrameOffs);
 }
 
 static inline UBYTE vehicleStartDrilling(
@@ -449,9 +445,25 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	if(pVehicle->ubJetShowFrame == 0) {
 		// Jet hidden
 		if(pVehicle->fDx) {
-			++pVehicle->ubTrackAnimCnt;
-			if(pVehicle->ubTrackAnimCnt >= (5 - fix16_to_int(fix16_abs(pVehicle->fDx)))) {
-				pVehicle->ubTrackFrame = !pVehicle->ubTrackFrame;
+			// Animate wheel rotation
+			pVehicle->ubTrackAnimCnt += fix16_abs(pVehicle->fDx);
+			if(fix16_to_int(pVehicle->ubTrackAnimCnt) >= 5) {
+				if(pVehicle->fDx > 0) {
+					if(pVehicle->ubTrackFrame >= 3) {
+						pVehicle->ubTrackFrame = 0;
+					}
+					else {
+						++pVehicle->ubTrackFrame;
+					}
+				}
+				else {
+					if(pVehicle->ubTrackFrame <= 0) {
+						pVehicle->ubTrackFrame = 3;
+					}
+					else {
+						--pVehicle->ubTrackFrame;
+					}
+				}
 				bobNewSetBitMapOffset(
 					&pVehicle->sBobTrack, pVehicle->ubTrackFrame * VEHICLE_TRACK_HEIGHT
 				);
@@ -472,14 +484,14 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->sBobBody.sPos.sUwCoord.uwY += s_pJetAnimOffsets[pVehicle->ubJetShowFrame];
 		if(pVehicle->ubJetShowFrame == 5) {
 			bobNewSetBitMapOffset(
-				&pVehicle->sBobTrack, pVehicle->sSteer.bY ? 2*VEHICLE_TRACK_HEIGHT : 0
+				&pVehicle->sBobTrack, pVehicle->sSteer.bY ? TRACK_OFFSET_JET : 0
 			);
 		}
 		else if(pVehicle->ubJetShowFrame == 10) {
 			// Update jet pos
 			pVehicle->ubJetAnimCnt = (pVehicle->ubJetAnimCnt + 1) & 15;
 			bobNewSetBitMapOffset(
-				&pVehicle->sBobJet, VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 4)
+				&pVehicle->sBobJet, 0 //VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 4)
 			);
 			pVehicle->sBobJet.sPos.ulYX = pVehicle->sBobTrack.sPos.ulYX;
 			pVehicle->sBobJet.sPos.sUwCoord.uwY += VEHICLE_TRACK_JET_HEIGHT;
