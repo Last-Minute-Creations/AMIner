@@ -83,20 +83,21 @@ void textBobUpdate(tTextBob *pTextBob) {
 		pTextBob->sBob.pMask, 0, 0,
 		pTextBob->sBob.uwWidth, pTextBob->sBob.pMask->Rows, 0
 	);
+	UBYTE ubMaskColor = (1 << pTextBob->sBob.pMask->Depth) - 1;
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 1, 1, 15, 0
+		pTextBob->sBob.pMask, s_pTextBitmap, 1, 1, ubMaskColor, 0
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 1, 0, 15, FONT_COOKIE
+		pTextBob->sBob.pMask, s_pTextBitmap, 1, 0, ubMaskColor, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 1, 2, 15, FONT_COOKIE
+		pTextBob->sBob.pMask, s_pTextBitmap, 1, 2, ubMaskColor, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 0, 1, 15, FONT_COOKIE
+		pTextBob->sBob.pMask, s_pTextBitmap, 0, 1, ubMaskColor, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 2, 1, 15, FONT_COOKIE
+		pTextBob->sBob.pMask, s_pTextBitmap, 2, 1, ubMaskColor, FONT_COOKIE
 	);
 	pTextBob->isUpdateRequired = 0;
 }

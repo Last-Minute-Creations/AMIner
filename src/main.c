@@ -23,5 +23,4 @@ void genericProcess(void) {
 void genericDestroy(void) {
   keyDestroy();
 	joyClose();
-  logWrite("Goodbye, Amiga!\n");
 }

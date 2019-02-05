@@ -52,7 +52,7 @@ static UBYTE s_isChallenge;
 void hudCreate(tView *pView, const tFont *pFont) {
   s_pVpHud = vPortCreate(0,
     TAG_VPORT_VIEW, pView,
-    TAG_VPORT_BPP, 4,
+    TAG_VPORT_BPP, 5,
     TAG_VPORT_HEIGHT, 16,
   TAG_END);
 

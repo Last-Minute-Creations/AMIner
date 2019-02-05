@@ -77,7 +77,7 @@ void gameGsCreate(void) {
 		TAG_TILEBUFFER_TILESET, s_pTiles,
 	TAG_END);
 
-	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
+	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 1 << GAME_BPP);
 	s_uwColorBg = s_pVpMain->pPalette[0];
 
 	audioCreate();
