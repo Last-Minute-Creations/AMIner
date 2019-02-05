@@ -9,7 +9,7 @@
 #include <ace/utils/font.h>
 #include <ace/managers/audio.h>
 
-#define GAME_BPP 4
+#define GAME_BPP 5
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 

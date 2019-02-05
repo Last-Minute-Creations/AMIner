@@ -12,4 +12,3 @@ const tMineralDef g_pMinerals[MINERAL_TYPE_COUNT] = {
 	[MINERAL_TYPE_MOONSTONE] = {.szName = "Moonstone", .ubReward = 25, .ubTitleColor = 10},
 	[MINERAL_TYPE_COAL] = {.szName = "Coal", .ubReward = 5, .ubTitleColor = 10},
 };
-

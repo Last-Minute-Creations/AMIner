@@ -39,7 +39,7 @@ target_link_libraries(${TARGET_NAME} ace)
 SET(data_path "${CMAKE_CURRENT_SOURCE_DIR}/data")
 file(MAKE_DIRECTORY ${data_path})
 SET(TOOLS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/ace/tools")
-SET(PALETTE_CONV "${TOOLS_PATH}/palette_conv/palette_conv")
+SET(PALETTE_CONV "${TOOLS_PATH}/bin/palette_conv")
 SET(BITMAP_CONV "${TOOLS_PATH}/bitmap_conv/bitmap_conv")
 
 file(GLOB palette_gimp _res/aminer.gpl)
