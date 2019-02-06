@@ -491,7 +491,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			// Update jet pos
 			pVehicle->ubJetAnimCnt = (pVehicle->ubJetAnimCnt + 1) & 15;
 			bobNewSetBitMapOffset(
-				&pVehicle->sBobJet, 0 //VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 4)
+				&pVehicle->sBobJet, VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 8)
 			);
 			pVehicle->sBobJet.sPos.ulYX = pVehicle->sBobTrack.sPos.ulYX;
 			pVehicle->sBobJet.sPos.sUwCoord.uwY += VEHICLE_TRACK_JET_HEIGHT;
