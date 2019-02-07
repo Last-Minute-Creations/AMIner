@@ -11,7 +11,7 @@
 #include "plan.h"
 #include "color.h"
 
-#define VEHICLE_BODY_HEIGHT 20
+#define VEHICLE_BODY_HEIGHT 21
 #define VEHICLE_TRACK_HEIGHT 7
 #define VEHICLE_TRACK_DRILL_HEIGHT 7
 #define VEHICLE_TRACK_JET_HEIGHT 5
@@ -441,7 +441,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	// Update track bob
 	pVehicle->sBobBody.sPos.sUwCoord.uwY = fix16_to_int(pVehicle->fY);
 	pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
-	pVehicle->sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
+	pVehicle->sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT - 1;
 	if(pVehicle->ubJetShowFrame == 0) {
 		// Jet hidden
 		if(pVehicle->fDx) {
@@ -603,7 +603,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 		pVehicle->sBobBody.sPos.sUwCoord.uwY = fix16_to_int(pVehicle->fY);
 		// Pos for tool & track
 		pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
-		pVehicle->sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT;
+		pVehicle->sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT - 1;
 
 		if(isDoneX && isDoneY) {
 			if(pVehicle->ubDrillDir == DRILL_DIR_H) {
