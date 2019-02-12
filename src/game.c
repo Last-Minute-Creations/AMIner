@@ -20,6 +20,7 @@
 #include "vendor.h"
 #include "menu.h"
 #include "hi_score.h"
+#include "ground_layer.h"
 
 tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 
@@ -98,6 +99,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
+	groundLayerCreate(s_pVpMain);
 	windowInit();
 	vendorAlloc();
 	vehicleBitmapsCreate();
@@ -223,6 +225,9 @@ void gameGsLoop(void) {
 			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
 		}
 	}
+
+	groundLayerProcess(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY);
+
 	debugColor(0x800);
 	viewProcessManagers(s_pView);
 	copProcessBlocks();

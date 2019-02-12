@@ -9,6 +9,7 @@
 #include "game.h"
 #include "bob_new.h"
 #include "text_bob.h"
+#include "ground_layer.h"
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -359,7 +360,7 @@ void menuGsLoop(void) {
 
 	bobNewPushingDone();
 	bobNewEnd();
-
+	groundLayerProcess(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY);
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
