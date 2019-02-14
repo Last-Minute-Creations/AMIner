@@ -13,10 +13,11 @@ static UBYTE s_isSet = 0;
 static UWORD s_uwVpHeight, s_uwVpStartY;
 static tCopList *s_pCopList;
 tCopBlock *s_pDisableNext = 0;
+static UBYTE s_ubLowerLayer = 1;
 
 typedef struct _tGroundLayer {
 	UWORD pColors[LAYER_COLOR_COUNT];
-	UWORD uwY;
+	UWORD uwTop;
 	UBYTE ubDifficulty;
 } tGroundLayer;
 
@@ -27,7 +28,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 			RGB(51, 0, 0), RGB(102, 34, 0), RGB(153, 68, 17),
 			RGB(204, 102, 34), RGB(255, 136, 51)
 		},
-		256 + 32, 0
+		0, 0
 	},
 	{
 		// A
@@ -43,7 +44,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 			RGB(51, 34, 17), RGB(102, 68, 34), RGB(153, 102, 51),
 			RGB(204, 136, 68), RGB(255, 170, 85)
 		},
-		768 + 32, 0
+		1024 + 32, 0
 	},
 	{
 		// C
@@ -51,7 +52,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 			RGB(17, 34, 17), RGB(68, 68, 34), RGB(119, 102, 51),
 			RGB(170, 136, 68), RGB(221, 170, 85)
 		},
-		1024 + 32, 0
+		1536 + 32, 0
 	},
 	{
 		// D
@@ -59,7 +60,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 			RGB(17, 34, 34), RGB(68, 68, 51), RGB(119, 102, 68),
 			RGB(170, 136, 85), RGB(221, 170, 102)
 		},
-		1536 + 32, 0
+		2048 + 32, 0
 	}
 };
 
@@ -86,15 +87,22 @@ static void layerCopyColorsToBlock(
 }
 
 void groundLayerProcess(UWORD uwCameraY) {
+	if(uwCameraY < s_pLayers[s_ubLowerLayer-1].uwTop) {
+		--s_ubLowerLayer;
+	}
+	else if(uwCameraY + s_uwVpHeight >= s_pLayers[s_ubLowerLayer+1].uwTop) {
+		++s_ubLowerLayer;
+	}
+
 	// Transition between layers on screen
-	const UWORD uwSeamPos = 320;
+	const UWORD uwSeamPos = s_pLayers[s_ubLowerLayer].uwTop;
 	if(uwCameraY < uwSeamPos && uwSeamPos < uwCameraY + s_uwVpHeight) {
 		if(!s_isSet) {
 			copBlockEnable(s_pCopList, s_pColorsBelow);
-			layerCopyColorsToBlock(&s_pLayers[1], s_pColorsBelow);
+			layerCopyColorsToBlock(&s_pLayers[s_ubLowerLayer], s_pColorsBelow);
 
 			copBlockEnable(s_pCopList, s_pColorsAbove);
-			layerCopyColorsToBlock(&s_pLayers[0], s_pColorsAbove);
+			layerCopyColorsToBlock(&s_pLayers[s_ubLowerLayer - 1], s_pColorsAbove);
 			copBlockWait(
 				s_pCopList, s_pColorsAbove, 0xE2, s_uwVpStartY + s_uwVpHeight - 1
 			);
