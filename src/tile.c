@@ -31,34 +31,11 @@ const tTileDef const g_pTileDefs[TILE_COUNT] = {
 	[TILE_COAL_3] = {.szMsg = "Coal x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_COAL}
 };
 
-void tileRefreshGrass(UWORD uwX) {
-	UBYTE ubCurrTile = TILE_GRASS_NONE;
-	if(g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
-		ubCurrTile += 1; // Promote to TILE_GRASS_LEFT
-	}
-	else {
-		// left neighbor is _RIGHT or _BOTH - decrease to _NONE or _LEFT
-		tileBufferSetTile(
-			g_pMainBuffer, uwX-1, TILE_ROW_GRASS,
-			g_pMainBuffer->pTileData[uwX-1][TILE_ROW_GRASS] - 2
-		);
-	}
-	if(uwX >= 10 || g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] <= TILE_GRASS_2) {
-		ubCurrTile += 2; // Promote to TILE_GRASS_RIGHT or _BOTH
-	}
-	else if(uwX < 10) {
-		// right neighbor is _LEFT or _BOTH - decrease to _NONE or _RIGHT
-		tileBufferSetTile(
-			g_pMainBuffer, uwX+1, TILE_ROW_GRASS,
-			g_pMainBuffer->pTileData[uwX+1][TILE_ROW_GRASS] - 1
-		);
-	}
-
-	tileBufferSetTile(g_pMainBuffer, uwX, TILE_ROW_GRASS, ubCurrTile);
-}
-
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
-	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_STONE_1;
+	return (
+		g_pMainBuffer->pTileData[uwX][uwY] == TILE_BASE_GROUND ||
+		g_pMainBuffer->pTileData[uwX][uwY] >= TILE_STONE_1
+	);
 }
 
 UBYTE tileIsDrillable(UWORD uwX, UWORD uwY) {
@@ -85,18 +62,31 @@ static UWORD chanceTrapezoid(
 	return uwMin;
 }
 
+static const UBYTE s_pBasePattern[] = {
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+	 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,
+	 3,  3,  3,  3,  3,  3,  3,  3,  3,  3,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  5,
+	 6,  6,  7,  6,  6,  8,  9, 10, 11, 12,
+	13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+	23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+	34, 33, 34, 34, 34, 34, 34, 34, 34, 34,
+};
+
 void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	UWORD uwEndX = g_pMainBuffer->uTileBounds.sUwCoord.uwX;
 	UWORD uwEndY = g_pMainBuffer->uTileBounds.sUwCoord.uwY;
 	if(isChallenge) {
 		uwEndY = TILE_ROW_CHALLENGE_FINISH + 1; // without +1 it's broken
 	}
-	for(UWORD x = 1; x < uwEndX; ++x) {
-		for(UWORD y = 0; y < TILE_ROW_GRASS; ++y) {
-			g_pMainBuffer->pTileData[x][y] = TILE_NONE;
+	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT; ++y) {
+		for(UWORD x = 1; x < 1 + 10; ++x) {
+			g_pMainBuffer->pTileData[x][y] = s_pBasePattern[y * 10 + x - 1];
 		}
-		g_pMainBuffer->pTileData[x][TILE_ROW_GRASS] = TILE_GRASS_1 + (x & 1);
-		for(UWORD y = TILE_ROW_GRASS + 1; y < uwEndY; ++y) {
+	}
+	for(UWORD x = 1; x < uwEndX; ++x) {
+		for(UWORD y = TILE_ROW_BASE_DIRT + 1; y < uwEndY; ++y) {
 			// 2000 is max
 			UWORD uwWhat = (uwRand() * 1000) / 65535;
 			UWORD uwChanceAir = 50;
@@ -104,7 +94,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			if(g_isChallenge) {
 				uwChanceRock = 75;
 				uwChanceSilver = chanceTrapezoid(
-					y, TILE_ROW_GRASS, TILE_ROW_GRASS+5,
+					y, TILE_ROW_BASE_DIRT, TILE_ROW_BASE_DIRT+5,
 					TILE_ROW_CHALLENGE_CHECKPOINT_1, TILE_ROW_CHALLENGE_CHECKPOINT_1 + 5,
 					5, 200
 				);
@@ -185,23 +175,10 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	}
 	for(UWORD y = 0; y < uwEndY; ++y) {
 		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
+		g_pMainBuffer->pTileData[11][y] = TILE_ROCK_1;
 	}
-	g_pMainBuffer->pTileData[0][TILE_ROW_GRASS] = TILE_GRASS_1;
-
-	// Shop
-	g_pMainBuffer->pTileData[7][TILE_ROW_GRASS-3] = TILE_SHOP_CHIMNEY;
-	for(UWORD y = 0; y < 3; ++y) {
-		g_pMainBuffer->pTileData[3][TILE_ROW_GRASS-2+y] = TILE_SHOP_A1+y;
-		g_pMainBuffer->pTileData[4][TILE_ROW_GRASS-2+y] = TILE_SHOP_B1+y;
-		g_pMainBuffer->pTileData[5][TILE_ROW_GRASS-2+y] = TILE_SHOP_C1+y;
-		g_pMainBuffer->pTileData[6][TILE_ROW_GRASS-2+y] = TILE_SHOP_D1+y;
-		g_pMainBuffer->pTileData[7][TILE_ROW_GRASS-2+y] = TILE_SHOP_E1+y;
-	}
-	for(UWORD x = 3; x <= 7; ++x) {
-		g_pMainBuffer->pTileData[x][TILE_ROW_GRASS+1] = ubRandMinMax(
-			TILE_STONE_1, TILE_STONE_2
-		);
-	}
+	g_pMainBuffer->pTileData[0][TILE_ROW_BASE_DIRT] = TILE_BASE_GROUND;
+	g_pMainBuffer->pTileData[2][9] = TILE_CAVE_BG + 14; // FIXME this can spawn adjacent to ground hole
 
 	if(isChallenge) {
 		for(UWORD x = 0; x < uwEndX; ++x) {

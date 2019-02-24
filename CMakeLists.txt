@@ -118,45 +118,83 @@ foreach(bitmap_path ${bitmaps_planar}) # /path/file.png
 	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name} ${bitmap_out_mask})
 endforeach()
 
-set(TILE_23 66 0 "dirt.png") # TILE_CAVE_BG
+set(TILE_0 0 0 "base1.png") # TILE_BASE_BG_FIRST
+set(TILE_1 0 32 "base1.png")
+set(TILE_2 0 64 "base1.png")
+set(TILE_3 0 96 "base1.png")
+set(TILE_4 0 128 "base1.png")
+set(TILE_5 288 128 "base1.png")
+set(TILE_6 0 160 "base1.png")
+set(TILE_7 64 160 "base1.png")
+set(TILE_8 160 160 "base1.png")
+set(TILE_9 192 160 "base1.png")
+set(TILE_10 224 160 "base1.png")
+set(TILE_11 256 160 "base1.png")
+set(TILE_12 288 160 "base1.png")
+
+# TILE_BASE_BG_FIRST + 13 .. 22
+set(TILE_IDX 13)
+set(TILE_x 0)
+while(TILE_IDX LESS "23")
+	set(TILE_${TILE_IDX} ${TILE_x} 192 "base1.png")
+	math(EXPR TILE_x "${TILE_x} + 32")
+	math(EXPR TILE_IDX "${TILE_IDX} + 1")
+endwhile()
+
+# TILE_BASE_BG_FIRST + 23 .. 32
+set(TILE_IDX 23)
+set(TILE_x 0)
+while(TILE_IDX LESS "33")
+	set(TILE_${TILE_IDX} ${TILE_x} 224 "base1.png")
+	math(EXPR TILE_IDX "${TILE_IDX} + 1")
+	math(EXPR TILE_x "${TILE_x} + 32")
+endwhile()
+
+# Rest of base tiles
+set(TILE_33 32 256 "base1.png") # TILE_BASE_SHAFT
+set(TILE_34 0 256 "base1.png") # TILE_BASE_GROUND
+
+set(TILE_35 66 0 "dirt.png") # TILE_CAVE_BG
 # TILE_CAVE_BG with edges:
-	set(TILE_24 66 66 "dirt.png")  # N
-	set(TILE_25 0 99 "dirt.png")   # S
-	set(TILE_26 33 66 "dirt.png")  # NS
-	set(TILE_27 99 66 "dirt.png")  # E
-	set(TILE_28 66 99 "dirt.png")  # NE
-	set(TILE_29 99 99 "dirt.png")  # SE
-	set(TILE_30 0 33 "dirt.png")   # NSE
-	set(TILE_31 33 99 "dirt.png")  # W
-	set(TILE_32 33 132 "dirt.png") # NW
-	set(TILE_33 0 132 "dirt.png")  # SW
-	set(TILE_34 99 33 "dirt.png")  # NSW
-	set(TILE_35 0 66 "dirt.png")   # EW
-	set(TILE_36 66 33 "dirt.png")  # NEW
-	set(TILE_37 33 33 "dirt.png")  # SEW
-	set(TILE_38 99 0 "dirt.png")   # NSEW
-set(TILE_39 198 33 "dirt.png") # TILE_STONE_1
-set(TILE_40 198 66 "dirt.png") # TILE_STONE_2
-set(TILE_41 0 0 "dirt.png") # TILE_ROCK_1
-set(TILE_42 33 0 "dirt.png") # TILE_ROCK_2
-set(TILE_43 1 1 "minerals.png") # TILE_GOLD_1
-set(TILE_44 1 34 "minerals.png") # TILE_GOLD_2
-set(TILE_45 1 67 "minerals.png") # TILE_GOLD_3
-set(TILE_46 34 1 "minerals.png") # TILE_SILVER_1
-set(TILE_47 34 34 "minerals.png") # TILE_SILVER_2
-set(TILE_48 34 67 "minerals.png") # TILE_SILVER_3
-set(TILE_49 67 232 "minerals.png") # TILE_EMERALD_1
-set(TILE_50 34 232 "minerals.png") # TILE_EMERALD_2
-set(TILE_51 1 232 "minerals.png") # TILE_EMERALD_3
-set(TILE_52 67 199 "minerals.png") # TILE_RUBY_1
-set(TILE_53 34 199 "minerals.png") # TILE_RUBY_2
-set(TILE_54 1 199 "minerals.png") # TILE_RUBY_3
-set(TILE_55 67 265 "minerals.png") # TILE_MOONSTONE_1
-set(TILE_56 34 265 "minerals.png") # TILE_MOONSTONE_2
-set(TILE_57 1 265 "minerals.png") # TILE_MOONSTONE_3
-set(TILE_58 1 298 "minerals.png") # TILE_COAL_1
-set(TILE_59 34 298 "minerals.png") # TILE_COAL_2
-set(TILE_60 67 298 "minerals.png") # TILE_COAL_3
+	set(TILE_36 66 66 "dirt.png")  # N
+	set(TILE_37 0 99 "dirt.png")   # S
+	set(TILE_38 33 66 "dirt.png")  # NS
+	set(TILE_39 99 66 "dirt.png")  # E
+	set(TILE_40 66 99 "dirt.png")  # NE
+	set(TILE_41 99 99 "dirt.png")  # SE
+	set(TILE_42 0 33 "dirt.png")   # NSE
+	set(TILE_43 33 99 "dirt.png")  # W
+	set(TILE_44 33 132 "dirt.png") # NW
+	set(TILE_45 0 132 "dirt.png")  # SW
+	set(TILE_46 99 33 "dirt.png")  # NSW
+	set(TILE_47 0 66 "dirt.png")   # EW
+	set(TILE_48 66 33 "dirt.png")  # NEW
+	set(TILE_49 33 33 "dirt.png")  # SEW
+	set(TILE_50 99 0 "dirt.png")   # NSEW
+set(TILE_51 198 33 "dirt.png") # TILE_STONE_1
+set(TILE_52 198 66 "dirt.png") # TILE_STONE_2
+set(TILE_53 0 0 "dirt.png") # TILE_ROCK_1
+set(TILE_54 33 0 "dirt.png") # TILE_ROCK_2
+set(TILE_55 1 1 "minerals.png") # TILE_GOLD_1
+set(TILE_56 1 34 "minerals.png") # TILE_GOLD_2
+set(TILE_57 1 67 "minerals.png") # TILE_GOLD_3
+set(TILE_58 34 1 "minerals.png") # TILE_SILVER_1
+set(TILE_59 34 34 "minerals.png") # TILE_SILVER_2
+set(TILE_60 34 67 "minerals.png") # TILE_SILVER_3
+set(TILE_61 67 232 "minerals.png") # TILE_EMERALD_1
+set(TILE_62 34 232 "minerals.png") # TILE_EMERALD_2
+set(TILE_63 1 232 "minerals.png") # TILE_EMERALD_3
+set(TILE_64 67 199 "minerals.png") # TILE_RUBY_1
+set(TILE_65 34 199 "minerals.png") # TILE_RUBY_2
+set(TILE_66 1 199 "minerals.png") # TILE_RUBY_3
+set(TILE_67 67 265 "minerals.png") # TILE_MOONSTONE_1
+set(TILE_68 34 265 "minerals.png") # TILE_MOONSTONE_2
+set(TILE_69 1 265 "minerals.png") # TILE_MOONSTONE_3
+set(TILE_70 1 298 "minerals.png") # TILE_COAL_1
+set(TILE_71 34 298 "minerals.png") # TILE_COAL_2
+set(TILE_72 67 298 "minerals.png") # TILE_COAL_3
+set(TILE_73 67 298 "minerals.png") # TILE_COAL_3, TODO: Proper checkpoint
+set(TILE_74 67 298 "minerals.png") # TILE_COAL_3, TODO: Proper finish
 
 set(TILE_IDX 0)
 set(TILESET_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_res/tiles")

@@ -128,9 +128,9 @@ void vehicleDestroy(tVehicle *pVehicle) {
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2;
 	return (
-		4*32 <= uwCenterX && uwCenterX <= 6*32 &&
-		(TILE_ROW_GRASS - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_GRASS+1) * 32
+		6*32 <= uwCenterX && uwCenterX <= 8*32 &&
+		(TILE_ROW_BASE_DIRT - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
+		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_BASE_DIRT + 1) * 32
 	);
 }
 
@@ -378,7 +378,8 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	const fix16_t fMaxPosX = fix16_one * (11*32 - VEHICLE_WIDTH);
 	pVehicle->fX = CLAMP(pVehicle->fX + pVehicle->fDx, fix16_from_int(32), fMaxPosX);
 	pVehicle->sBobBody.sPos.sUwCoord.uwX = fix16_to_int(pVehicle->fX);
-	UBYTE ubAdd = (pVehicle->sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32) ? 4 : 8;
+	// UBYTE ubAdd = (pVehicle->sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32) ? 4 : 8;
+	UBYTE ubAdd = 4;
 	UBYTE ubHalfWidth = 12;
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
@@ -631,10 +632,6 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			UWORD uwTileY = (fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT / 2) >> 5;
 
 			vehicleExcavateTile(pVehicle, uwTileX, uwTileY);
-			if(uwTileY == TILE_ROW_GRASS + 1) {
-				// Drilling beneath a grass - refresh it
-				tileRefreshGrass(uwTileX);
-			}
 		}
 		else {
 			pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
@@ -688,7 +685,7 @@ void vehicleProcess(tVehicle *pVehicle) {
 	hudSetFuel(pVehicle->ubPlayerIdx, pVehicle->uwFuelCurr, pVehicle->uwFuelMax);
 	textBobAnimate(&pVehicle->sTextBob);
 	hudSetDepth(pVehicle->ubPlayerIdx, MAX(
-		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_GRASS+1)*32
+		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_BASE_DIRT)*32
 	));
 	hudSetScore(pVehicle->ubPlayerIdx, pVehicle->ulCash);
 }

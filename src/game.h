@@ -13,8 +13,6 @@
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
-void tileRefreshGrass(UWORD uwX);
-
 void gameGsCreate(void);
 
 void gameGsLoop(void);
