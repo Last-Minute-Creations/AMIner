@@ -10,3 +10,5 @@ data/*
 *.log
 
 \.vscode/
+
+_res/tiles/

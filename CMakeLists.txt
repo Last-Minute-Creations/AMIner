@@ -41,6 +41,8 @@ file(MAKE_DIRECTORY ${data_path})
 SET(TOOLS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/ace/tools")
 SET(PALETTE_CONV "${TOOLS_PATH}/bin/palette_conv")
 SET(BITMAP_CONV "${TOOLS_PATH}/bitmap_conv/bitmap_conv")
+SET(BITMAP_EXTRACT "${TOOLS_PATH}/bin/bitmap_extract")
+SET(TILESET_CONV "${TOOLS_PATH}/bin/tileset_conv")
 
 file(GLOB palette_gimp _res/aminer.gpl)
 set(palette_plt "${CMAKE_CURRENT_SOURCE_DIR}/data/aminer.plt")
@@ -53,7 +55,7 @@ add_custom_command(
 target_sources(${TARGET_NAME} PUBLIC ${palette_plt})
 
 # Non-alpha bitmaps
-file(GLOB bitmaps _res/tiles.png _res/shop_border.png)
+file(GLOB bitmaps _res/shop_border.png)
 foreach(bitmap_path ${bitmaps}) # /path/file.png
 	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png
 	STRING(REPLACE ".png" ".bm" bitmap_file_bm ${bitmap_file_png}) # file.bm
@@ -115,3 +117,75 @@ foreach(bitmap_path ${bitmaps_planar}) # /path/file.png
 	)
 	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name} ${bitmap_out_mask})
 endforeach()
+
+set(TILE_23 66 0 "dirt.png") # TILE_CAVE_BG
+# TILE_CAVE_BG with edges:
+	set(TILE_24 66 66 "dirt.png")  # N
+	set(TILE_25 0 99 "dirt.png")   # S
+	set(TILE_26 33 66 "dirt.png")  # NS
+	set(TILE_27 99 66 "dirt.png")  # E
+	set(TILE_28 66 99 "dirt.png")  # NE
+	set(TILE_29 99 99 "dirt.png")  # SE
+	set(TILE_30 0 33 "dirt.png")   # NSE
+	set(TILE_31 33 99 "dirt.png")  # W
+	set(TILE_32 33 132 "dirt.png") # NW
+	set(TILE_33 0 132 "dirt.png")  # SW
+	set(TILE_34 99 33 "dirt.png")  # NSW
+	set(TILE_35 0 66 "dirt.png")   # EW
+	set(TILE_36 66 33 "dirt.png")  # NEW
+	set(TILE_37 33 33 "dirt.png")  # SEW
+	set(TILE_38 99 0 "dirt.png")   # NSEW
+set(TILE_39 198 33 "dirt.png") # TILE_STONE_1
+set(TILE_40 198 66 "dirt.png") # TILE_STONE_2
+set(TILE_41 0 0 "dirt.png") # TILE_ROCK_1
+set(TILE_42 33 0 "dirt.png") # TILE_ROCK_2
+set(TILE_43 1 1 "minerals.png") # TILE_GOLD_1
+set(TILE_44 1 34 "minerals.png") # TILE_GOLD_2
+set(TILE_45 1 67 "minerals.png") # TILE_GOLD_3
+set(TILE_46 34 1 "minerals.png") # TILE_SILVER_1
+set(TILE_47 34 34 "minerals.png") # TILE_SILVER_2
+set(TILE_48 34 67 "minerals.png") # TILE_SILVER_3
+set(TILE_49 67 232 "minerals.png") # TILE_EMERALD_1
+set(TILE_50 34 232 "minerals.png") # TILE_EMERALD_2
+set(TILE_51 1 232 "minerals.png") # TILE_EMERALD_3
+set(TILE_52 67 199 "minerals.png") # TILE_RUBY_1
+set(TILE_53 34 199 "minerals.png") # TILE_RUBY_2
+set(TILE_54 1 199 "minerals.png") # TILE_RUBY_3
+set(TILE_55 67 265 "minerals.png") # TILE_MOONSTONE_1
+set(TILE_56 34 265 "minerals.png") # TILE_MOONSTONE_2
+set(TILE_57 1 265 "minerals.png") # TILE_MOONSTONE_3
+set(TILE_58 1 298 "minerals.png") # TILE_COAL_1
+set(TILE_59 34 298 "minerals.png") # TILE_COAL_2
+set(TILE_60 67 298 "minerals.png") # TILE_COAL_3
+
+set(TILE_IDX 0)
+set(TILESET_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_res/tiles")
+set(TILESET_DEPENDS "")
+while(TILE_IDX LESS "256")
+	if(TILE_${TILE_IDX})
+		LIST(GET TILE_${TILE_IDX} 0 TILE_x)
+		LIST(GET TILE_${TILE_IDX} 1 TILE_y)
+		LIST(GET TILE_${TILE_IDX} 2 TILE_src)
+		SET(TILE_PNG_PATH "${TILESET_DIR}/${TILE_IDX}.png")
+		SET(SRC_PNG_PATH "${CMAKE_CURRENT_SOURCE_DIR}/_res/${TILE_src}")
+
+		add_custom_command(
+			OUTPUT ${TILE_PNG_PATH}
+			COMMAND ${BITMAP_EXTRACT}
+				${SRC_PNG_PATH} ${TILE_x} ${TILE_y} 32 32
+				${TILE_PNG_PATH}
+			DEPENDS ${SRC_PNG_PATH}
+		)
+		set(TILESET_DEPENDS "${TILESET_DEPENDS};${TILE_PNG_PATH}")
+	endif()
+	math(EXPR TILE_IDX "${TILE_IDX} + 1")
+endwhile()
+
+set(TILESET_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/data/tiles.bm")
+add_custom_command(
+	OUTPUT ${TILESET_OUTPUT}
+	COMMAND ${TILESET_CONV}
+		${TILESET_DIR} 32 ${TILESET_OUTPUT} -i -plt ${palette_plt}
+	DEPENDS ${palette_plt} ${TILESET_DEPENDS}
+)
+target_sources(${TARGET_NAME} PUBLIC ${TILESET_OUTPUT})
