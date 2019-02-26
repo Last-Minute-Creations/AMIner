@@ -65,6 +65,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 };
 
 void groundLayerCreate(tVPort *pVp) {
+	logBlockBegin("groundLayerCreate(pVp: %p)", pVp);
 	tView *pView = pVp->pView;
 	s_pCopList = pView->pCopList;
 	s_uwVpStartY = pVp->uwOffsY + 0x2C;
@@ -74,6 +75,7 @@ void groundLayerCreate(tVPort *pVp) {
 	s_pColorsBelow->ubDisabled = 1;
 	s_pColorsAbove = copBlockCreate(pView->pCopList, LAYER_COUNT, 0, 0);
 	// s_pColorsAbove->ubDisabled = 1;
+	logBlockEnd("groundLayerCreate()");
 }
 
 static void layerCopyColorsToBlock(
