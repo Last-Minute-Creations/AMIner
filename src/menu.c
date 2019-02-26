@@ -338,7 +338,7 @@ void menuGsLoop(void) {
 				}
 				textBobSetPos(
 					&s_sCredits, uwOffsX + 160,
-					g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight - 15, 0, 1
+					*pCamY + g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight - 15, 0, 1
 				);
 				textBobUpdate(&s_sCredits);
 			}
@@ -349,8 +349,8 @@ void menuGsLoop(void) {
 		break;
 
 		case MENU_STATE_ROLL_OUT: {
-			if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY) {
-				g_pMainBuffer->pCamera->uPos.sUwCoord.uwY -= 4;
+			if(*pCamY) {
+				*pCamY -= 4;
 			}
 			else {
 				gamePopState();
@@ -360,7 +360,7 @@ void menuGsLoop(void) {
 
 	bobNewPushingDone();
 	bobNewEnd();
-	groundLayerProcess(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY);
+	groundLayerProcess(*pCamY);
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
