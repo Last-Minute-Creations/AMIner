@@ -10,6 +10,7 @@
 #include "bob_new.h"
 #include "text_bob.h"
 #include "ground_layer.h"
+#include "build_ver.h"
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -175,7 +176,7 @@ static UBYTE s_pKeyKonami[8] = {
 
 static tMenuState s_eMenuState;
 static tBitMap *s_pLogo, *s_pLogoMask;
-static tTextBob s_sCredits;
+static tTextBob s_sCredits, s_sVersion;
 static UWORD s_uwOffsY;
 
 static void menuEnableAtari(void) {
@@ -207,6 +208,12 @@ void menuPreload(void) {
 	textBobSetText(&s_sCredits, szCredits);
 	textBobSetColor(&s_sCredits, 15);
 
+	char szVersion[15];
+	sprintf(szVersion, "v.%02d.%02d.%02d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
+	textBobCreate(&s_sVersion, g_pFont, szVersion);
+	textBobSetText(&s_sVersion, szVersion);
+	textBobSetColor(&s_sVersion, 15);
+
 	s_pSampleEnter = sampleCreateFromFile("data/sfx/menu_enter.raw8", 22050);
 	s_pSampleToggle = sampleCreateFromFile("data/sfx/menu_toggle.raw8", 22050);
 	s_pSampleNavigate = sampleCreateFromFile("data/sfx/menu_navigate.raw8", 22050);
@@ -220,6 +227,7 @@ void menuUnload(void) {
 		textBobDestroy(&s_pMenuPositions[i]);
 	}
 	textBobDestroy(&s_sCredits);
+	textBobDestroy(&s_sVersion);
 
 	sampleDestroy(s_pSampleEnter);
 	sampleDestroy(s_pSampleToggle);
@@ -286,6 +294,7 @@ static void menuProcessSelecting(void) {
 		}
 	}
 	bobNewPush(&s_sCredits.sBob);
+	bobNewPush(&s_sVersion.sBob);
 }
 
 void menuGsLoop(void) {
@@ -341,6 +350,11 @@ void menuGsLoop(void) {
 					*pCamY + g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight - 15, 0, 1
 				);
 				textBobUpdate(&s_sCredits);
+				textBobSetPos(
+					&s_sVersion, uwOffsX + 320 - s_sVersion.sBob.uwWidth,
+					*pCamY + 4, 0, 0
+				);
+				textBobUpdate(&s_sVersion);
 			}
 		} break;
 
