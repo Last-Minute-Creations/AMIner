@@ -49,7 +49,7 @@ static tHudPlayerData s_pPlayerData[2];
 static tHudDraw s_eDraw;
 static tHudPlayer s_ePlayer;
 static UBYTE s_ubHudOffsY;
-static UBYTE s_isChallenge;
+static UBYTE s_isChallenge, s_is2pPlaying;
 
 void hudCreate(tView *pView, const tFont *pFont) {
   s_pVpHud = vPortCreate(0,
@@ -93,11 +93,12 @@ void hudCreate(tView *pView, const tFont *pFont) {
 		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, 0,
 		"Cash:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
 	);
-	hudReset(0);
+	hudReset(0, 0);
 }
 
-void hudReset(UBYTE isChallenge) {
+void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	s_isChallenge = isChallenge;
+	s_is2pPlaying = is2pPlaying;
 	const UBYTE ubLabelWidth = fontMeasureText(s_pFont, "Depth:").sUwCoord.uwX;
 	if(isChallenge) {
 		// Clear depth label and use it as cash
@@ -194,7 +195,12 @@ void hudUpdate(void) {
 	static UBYTE isDrawPending = 0;
 	switch(s_eDraw) {
 		case HUD_PREPARE_DEPTH:
-			uwDepth = (s_pPlayerData[0].uwDepth + s_pPlayerData[1].uwDepth) / 2;
+			if(s_is2pPlaying) {
+				uwDepth = (s_pPlayerData[0].uwDepth + s_pPlayerData[1].uwDepth) / 2;
+			}
+			else {
+				uwDepth = s_pPlayerData[0].uwDepth;
+			}
 			if(uwDepth != pData->uwDepthDisp) {
 				sprintf(szBfr, "%u.%um", uwDepth / 10, uwDepth % 10);
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);

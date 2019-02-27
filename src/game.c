@@ -50,7 +50,7 @@ void gameStart(void) {
 	tileInit(g_isAtari, g_isChallenge);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
-	hudReset(g_isChallenge);
+	hudReset(g_isChallenge, g_is2pPlaying);
 }
 
 void gameGsCreate(void) {
