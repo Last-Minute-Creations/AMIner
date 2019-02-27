@@ -5,9 +5,9 @@
 #ifndef _COLOR_H_
 #define _COLOR_H_
 
-#define COLOR_RED 9
-#define COLOR_REDEST 6
-#define COLOR_GREEN 12
-#define COLOR_GOLD 14
+#define COLOR_RED 18
+#define COLOR_REDEST 17
+#define COLOR_GREEN 3
+#define COLOR_GOLD 16
 
 #endif // _COLOR_H_
