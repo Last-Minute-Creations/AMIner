@@ -8,7 +8,9 @@
 #include <ace/utils/chunky.h>
 
 #define COLOR_ACTIVE 15
-#define COLOR_NACTIVE 4
+
+#define COLOR_BAR_FULL 24
+#define COLOR_BAR_EMPTY 22
 
 #define GAUGE_DRILL_X 85
 #define GAUGE_CARGO_X 148
@@ -118,11 +120,11 @@ void hudReset(UBYTE isChallenge) {
 		for(UBYTE b = 0; b < 10; ++b) {
 			blitRect(
 				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, 0,
-				2, 5, COLOR_NACTIVE
+				2, 5, COLOR_BAR_EMPTY
 			);
 			blitRect(
 				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, s_pFont->uwHeight + 1,
-				2, 5, COLOR_NACTIVE
+				2, 5, COLOR_BAR_EMPTY
 			);
 		}
 	}
@@ -266,12 +268,12 @@ void hudUpdate(void) {
 				if(ubPercent > pData->uwFuelDisp) {
 					ubDraw = pData->uwFuelDisp;
 					++pData->uwFuelDisp;
-					ubColor = COLOR_ACTIVE;
+					ubColor = COLOR_BAR_FULL;
 				}
 				else {
 					--pData->uwFuelDisp;
 					ubDraw = pData->uwFuelDisp;
-					ubColor = COLOR_NACTIVE;
+					ubColor = COLOR_BAR_EMPTY;
 				}
 				hudDrawBarPercent(GAUGE_DRILL_X, s_ubHudOffsY, ubDraw, ubColor);
 				s_eDraw = HUD_DRAW_CARGO;
@@ -287,12 +289,12 @@ void hudUpdate(void) {
 				if(ubPercent > pData->ubCargoDisp) {
 					ubDraw = pData->ubCargoDisp;
 					++pData->ubCargoDisp;
-					ubColor = COLOR_ACTIVE;
+					ubColor = COLOR_BAR_FULL;
 				}
 				else {
 					--pData->ubCargoDisp;
 					ubDraw = pData->ubCargoDisp;
-					ubColor = COLOR_NACTIVE;
+					ubColor = COLOR_BAR_EMPTY;
 				}
 				hudDrawBarPercent(GAUGE_CARGO_X, s_ubHudOffsY, ubDraw, ubColor);
 				s_eDraw = HUD_DRAW_HEALTH;

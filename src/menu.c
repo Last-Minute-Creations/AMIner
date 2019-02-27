@@ -81,8 +81,8 @@ static tOption s_pOptions[] = {
 
 //-------------------------------------------------------------- MENU COMP START
 
-#define MENU_COLOR_INACTIVE 10
-#define MENU_COLOR_ACTIVE 14
+#define MENU_COLOR_INACTIVE 13
+#define MENU_COLOR_ACTIVE 15
 
 static UBYTE s_ubActivePos;
 static tTextBob s_pMenuPositions[MENU_POS_COUNT];
@@ -206,13 +206,13 @@ void menuPreload(void) {
 	const char *szCredits = "Code: KaiN, Gfx: Softiron, Tests: Rav.En";
 	textBobCreate(&s_sCredits, g_pFont, szCredits);
 	textBobSetText(&s_sCredits, szCredits);
-	textBobSetColor(&s_sCredits, 15);
+	textBobSetColor(&s_sCredits, MENU_COLOR_ACTIVE);
 
 	char szVersion[15];
 	sprintf(szVersion, "v.%02d.%02d.%02d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
 	textBobCreate(&s_sVersion, g_pFont, szVersion);
 	textBobSetText(&s_sVersion, szVersion);
-	textBobSetColor(&s_sVersion, 15);
+	textBobSetColor(&s_sVersion, MENU_COLOR_ACTIVE);
 
 	s_pSampleEnter = sampleCreateFromFile("data/sfx/menu_enter.raw8", 22050);
 	s_pSampleToggle = sampleCreateFromFile("data/sfx/menu_toggle.raw8", 22050);
