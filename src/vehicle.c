@@ -184,7 +184,7 @@ static inline UBYTE vehicleStartDrilling(
 	if(pVehicle->uwFuelCurr < 30) {
 		if(!ubCooldown) {
 			textBobSet(
-				&pVehicle->sTextBob, "No fuel!", 6,
+				&pVehicle->sTextBob, "Drill depleted!", 6,
 				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
 				pVehicle->sBobBody.sPos.sUwCoord.uwY,
 				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
