@@ -80,7 +80,7 @@ void vehicleReset(tVehicle *pVehicle) {
 
 	pVehicle->sBobBody.sPos.ulYX = 0;
 
-	pVehicle->fY = fix16_from_int(32);
+	pVehicle->fY = fix16_from_int((TILE_ROW_BASE_DIRT - 2) * 32);
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
 	if(pVehicle->ubPlayerIdx == PLAYER_1) {

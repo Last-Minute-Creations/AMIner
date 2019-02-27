@@ -209,7 +209,7 @@ void gameGsLoop(void) {
 		}
 	}
 	else {
-		UWORD uwCamX = 32, uwCamY;
+		UWORD uwCamY, uwCamX = 32;
 		if(!g_is2pPlaying) {
 			// One player only
 			// uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
@@ -217,12 +217,23 @@ void gameGsLoop(void) {
 		}
 		else {
 			// Two players
-			// uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
-			uwCamY = (fix16_to_int(g_pVehicles[0].fY) + fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT) / 2;
+			uwCamY = (
+				fix16_to_int(g_pVehicles[0].fY) +
+				fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT
+			) / 2;
 		}
-		cameraCenterAt(g_pMainBuffer->pCamera, uwCamX, uwCamY);
-		if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < 32) {
-			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
+		WORD wDist = (
+			uwCamY - g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
+		) - g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
+		if(ABS(wDist) > 4) {
+			cameraMoveBy(g_pMainBuffer->pCamera, 0, SGN(wDist) * 4);
+		}
+		else {
+			cameraMoveBy(g_pMainBuffer->pCamera, 0, wDist);
+		}
+		// cameraCenterAt(g_pMainBuffer->pCamera, uwCamX, uwCamY);
+		if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < uwCamX) {
+			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = uwCamX;
 		}
 	}
 

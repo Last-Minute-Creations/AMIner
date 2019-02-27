@@ -363,7 +363,7 @@ void menuGsLoop(void) {
 		break;
 
 		case MENU_STATE_ROLL_OUT: {
-			if(*pCamY) {
+			if(*pCamY >= 64) {
 				*pCamY -= 4;
 			}
 			else {
