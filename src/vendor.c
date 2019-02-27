@@ -145,11 +145,7 @@ void vendorGsCreate(void) {
 }
 
 void vendorGsLoop(void) {
-	if(keyUse(KEY_ESCAPE)) {
-		gameClose();
-		return;
-	}
-	if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) {
+	if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || keyUse(KEY_ESCAPE)) {
 		gamePopState();
 		return;
 	}
