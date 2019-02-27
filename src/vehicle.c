@@ -11,7 +11,7 @@
 #include "plan.h"
 #include "color.h"
 
-#define VEHICLE_BODY_HEIGHT 21
+#define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_TRACK_HEIGHT 7
 #define VEHICLE_TRACK_DRILL_HEIGHT 7
 #define VEHICLE_TRACK_JET_HEIGHT 5
