@@ -72,6 +72,7 @@ static const UBYTE s_pBasePattern[] = {
 	13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
 	23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
 	34, 33, 34, 34, 34, 34, 34, 34, 34, 34,
+	53, 49, 53, 53, 53, 53, 53, 53, 53, 53,
 };
 
 void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
@@ -85,7 +86,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	}
 
 	// Draw first base
-	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT; ++y) {
+	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
 		for(UWORD x = 1; x < 1 + 10; ++x) {
 			g_pMainBuffer->pTileData[x][y] = s_pBasePattern[y * 10 + x - 1];
 		}
@@ -93,7 +94,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 
 	// Draw everything beneath it
 	for(UWORD x = 1; x < uwEndX; ++x) {
-		for(UWORD y = TILE_ROW_BASE_DIRT + 1; y < uwEndY; ++y) {
+		for(UWORD y = TILE_ROW_BASE_DIRT + 2; y < uwEndY; ++y) {
 			// 2000 is max
 			UWORD uwWhat = (uwRand() * 1000) / 65535;
 			UWORD uwChanceAir = 50;
@@ -186,7 +187,6 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
 	}
 	g_pMainBuffer->pTileData[0][TILE_ROW_BASE_DIRT] = TILE_BASE_GROUND;
-	g_pMainBuffer->pTileData[2][TILE_ROW_BASE_DIRT + 1] = TILE_CAVE_BG + 14; // FIXME this can spawn adjacent to ground hole
 
 	if(isChallenge) {
 		for(UWORD x = 0; x < uwEndX; ++x) {
