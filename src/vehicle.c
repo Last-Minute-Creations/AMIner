@@ -84,11 +84,11 @@ void vehicleReset(tVehicle *pVehicle) {
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
 	if(pVehicle->ubPlayerIdx == PLAYER_1) {
-		pVehicle->fX = fix16_from_int(64);
+		pVehicle->fX = fix16_from_int(g_isChallenge ? 0 : 96);
 		vehicleMove(pVehicle, 1, 0);
 	}
 	else {
-		pVehicle->fX = fix16_from_int(320-32);
+		pVehicle->fX = fix16_from_int(g_isChallenge ? 96 : 320-64);
 		vehicleMove(pVehicle, -1, 0);
 	}
 }
