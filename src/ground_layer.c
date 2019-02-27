@@ -36,7 +36,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 			RGB(51, 34, 0), RGB(102, 68, 0), RGB(153, 102, 17),
 			RGB(204, 136, 34), RGB(255, 170, 51)
 		},
-		512 + 32, 0
+		1024 + 32, 0
 	},
 	{
 		// B
@@ -44,7 +44,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 			RGB(51, 34, 17), RGB(102, 68, 34), RGB(153, 102, 51),
 			RGB(204, 136, 68), RGB(255, 170, 85)
 		},
-		1024 + 32, 0
+		1536 + 32, 0
 	},
 	{
 		// C
@@ -52,7 +52,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 			RGB(17, 34, 17), RGB(68, 68, 34), RGB(119, 102, 51),
 			RGB(170, 136, 68), RGB(221, 170, 85)
 		},
-		1536 + 32, 0
+		2048 + 32, 0
 	},
 	{
 		// D
@@ -60,7 +60,7 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 			RGB(17, 34, 34), RGB(68, 68, 51), RGB(119, 102, 68),
 			RGB(170, 136, 85), RGB(221, 170, 102)
 		},
-		2048 + 32, 0
+		2560 + 32, 0
 	}
 };
 
