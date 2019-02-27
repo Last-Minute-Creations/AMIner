@@ -32,9 +32,10 @@ const tTileDef const g_pTileDefs[TILE_COUNT] = {
 };
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
+	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	return (
-		g_pMainBuffer->pTileData[uwX][uwY] == TILE_BASE_GROUND ||
-		g_pMainBuffer->pTileData[uwX][uwY] >= TILE_STONE_1
+		(TILE_BASE_GROUND_1 <= ubTile && ubTile <= TILE_BASE_GROUND_9) ||
+		ubTile >= TILE_STONE_1
 	);
 }
 
@@ -71,8 +72,8 @@ static const UBYTE s_pBasePattern[] = {
 	 6,  6,  7,  6,  6,  8,  9, 10, 11, 12,
 	13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
 	23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-	34, 33, 34, 34, 34, 34, 34, 34, 34, 34,
-	53, 49, 53, 53, 53, 53, 53, 53, 53, 53,
+	34, 33, 35, 36, 37, 38, 39, 40, 41, 42,
+	61, 57, 61, 62, 61, 62, 61, 62, 61, 62,
 };
 
 void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
@@ -186,7 +187,6 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	for(UWORD y = 0; y < uwEndY; ++y) {
 		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
 	}
-	g_pMainBuffer->pTileData[0][TILE_ROW_BASE_DIRT] = TILE_BASE_GROUND;
 
 	if(isChallenge) {
 		for(UWORD x = 0; x < uwEndX; ++x) {
