@@ -75,16 +75,23 @@ static const UBYTE s_pBasePattern[] = {
 };
 
 void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
+	logBlockBegin(
+		"tileInit(isCoalOnly: %hhu, isChallenge: %hhu)", isCoalOnly, isChallenge
+	);
 	UWORD uwEndX = g_pMainBuffer->uTileBounds.sUwCoord.uwX;
 	UWORD uwEndY = g_pMainBuffer->uTileBounds.sUwCoord.uwY;
 	if(isChallenge) {
 		uwEndY = TILE_ROW_CHALLENGE_FINISH + 1; // without +1 it's broken
 	}
+
+	// Draw first base
 	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT; ++y) {
 		for(UWORD x = 1; x < 1 + 10; ++x) {
 			g_pMainBuffer->pTileData[x][y] = s_pBasePattern[y * 10 + x - 1];
 		}
 	}
+
+	// Draw everything beneath it
 	for(UWORD x = 1; x < uwEndX; ++x) {
 		for(UWORD y = TILE_ROW_BASE_DIRT + 1; y < uwEndY; ++y) {
 			// 2000 is max
@@ -173,12 +180,13 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			}
 		}
 	}
+
+	// Fill left invisible col with rocks
 	for(UWORD y = 0; y < uwEndY; ++y) {
 		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
-		g_pMainBuffer->pTileData[11][y] = TILE_ROCK_1;
 	}
 	g_pMainBuffer->pTileData[0][TILE_ROW_BASE_DIRT] = TILE_BASE_GROUND;
-	g_pMainBuffer->pTileData[2][9] = TILE_CAVE_BG + 14; // FIXME this can spawn adjacent to ground hole
+	g_pMainBuffer->pTileData[2][TILE_ROW_BASE_DIRT + 1] = TILE_CAVE_BG + 14; // FIXME this can spawn adjacent to ground hole
 
 	if(isChallenge) {
 		for(UWORD x = 0; x < uwEndX; ++x) {
@@ -189,6 +197,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_FINISH+1] = TILE_STONE_1 + (x & 1);
 		}
 	}
+	logBlockEnd("tileInit()");
 }
 
 void tileExcavate(UWORD uwX, UWORD uwY) {
