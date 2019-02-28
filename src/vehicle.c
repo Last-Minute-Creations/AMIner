@@ -263,7 +263,24 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	static const char * const szMessageFull = "Cargo full!";
 	static const char * const szMessagePlanDone = "Plan done!";
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
-	if(g_pTileDefs[ubTile].szMsg) {
+	if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
+		char szMessage[50];
+		if(g_ubDinoBonesFound < 9) {
+			++g_ubDinoBonesFound;
+		}
+		sprintf(szMessage, "Found bone no. %hhu!", g_ubDinoBonesFound);
+		textBobSet(
+			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
+			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY,
+			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
+		);
+		audioPlay(
+			AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
+			g_pSampleOre, AUDIO_VOLUME_MAX, 1
+		);
+	}
+	else if(g_pTileDefs[ubTile].szMsg) {
 		UBYTE ubMineralType = g_pTileDefs[ubTile].ubMineral;
 		const tMineralDef *pMineral = &g_pMinerals[ubMineralType];
 		UBYTE ubSlots = g_pTileDefs[ubTile].ubSlots;

@@ -37,6 +37,10 @@ static UBYTE s_ubChallengeCamCnt;
 static tTextBob s_sChallengeResult;
 static tTextBob s_sEndMessage;
 
+static tBobNew s_pDinoBobs[9];
+static UBYTE s_pDinoWereDrawn[9];
+UBYTE g_ubDinoBonesFound = 0;
+
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
@@ -49,6 +53,10 @@ static void goToMenu(void) {
 
 void gameStart(void) {
 	s_ubChallengeCamCnt = 0;
+	g_ubDinoBonesFound = 0;
+	for(UBYTE i = 0; i < 9; ++i) {
+		s_pDinoWereDrawn[i] = 0;
+	}
 	tileInit(g_isAtari, g_isChallenge);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
@@ -65,6 +73,34 @@ void gameGsCreate(void) {
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
 	s_pBones = bitmapCreateFromFile("data/bones.bm", 0);
 	s_pBonesMask = bitmapCreateFromFile("data/bones_mask.bm", 0);
+
+	bobNewInit(&s_pDinoBobs[0], 80, 22, 0, s_pBones, s_pBonesMask, 32 + 92, 100 * 32 + 170);
+	bobNewSetBitMapOffset(&s_pDinoBobs[0], 0);
+
+	bobNewInit(&s_pDinoBobs[1], 80, 10, 0, s_pBones, s_pBonesMask, 32 + 116, 100 * 32 + 179);
+	bobNewSetBitMapOffset(&s_pDinoBobs[1], 24);
+
+	bobNewInit(&s_pDinoBobs[2], 80, 15, 0, s_pBones, s_pBonesMask, 32 + 147, 100 * 32 + 172);
+	bobNewSetBitMapOffset(&s_pDinoBobs[2], 35);
+
+	bobNewInit(&s_pDinoBobs[3], 80, 24, 0, s_pBones, s_pBonesMask, 32 + 159, 100 * 32 + 189);
+	bobNewSetBitMapOffset(&s_pDinoBobs[3], 51);
+
+	bobNewInit(&s_pDinoBobs[4], 80, 44, 0, s_pBones, s_pBonesMask, 32 + 178, 100 * 32 + 170);
+	bobNewSetBitMapOffset(&s_pDinoBobs[4], 76);
+
+	bobNewInit(&s_pDinoBobs[5], 80, 29, 0, s_pBones, s_pBonesMask, 32 + 215, 100 * 32 + 192);
+	bobNewSetBitMapOffset(&s_pDinoBobs[5], 121);
+
+	bobNewInit(&s_pDinoBobs[6], 80, 45, 0, s_pBones, s_pBonesMask, 32 + 209, 100 * 32 + 201);
+	bobNewSetBitMapOffset(&s_pDinoBobs[6], 151);
+
+	bobNewInit(&s_pDinoBobs[7], 80, 45, 0, s_pBones, s_pBonesMask, 32 + 220, 100 * 32 + 205);
+	bobNewSetBitMapOffset(&s_pDinoBobs[7], 197);
+
+	bobNewInit(&s_pDinoBobs[8], 80, 22, 0, s_pBones, s_pBonesMask, 32 + 250, 100 * 32 + 218);
+	bobNewSetBitMapOffset(&s_pDinoBobs[8], 243);
+
 	hudCreate(s_pView, g_pFont);
 
 	s_pVpMain = vPortCreate(0,
@@ -175,6 +211,7 @@ static inline void debugColor(UWORD uwColor) {
 }
 
 void gameGsLoop(void) {
+	static UBYTE ubLastDino = 0;
   if(keyUse(KEY_ESCAPE)) {
     goToMenu();
 		return;
@@ -196,6 +233,27 @@ void gameGsLoop(void) {
 	gameProcessInput();
 	vehicleProcessText();
 	debugColor(0x080);
+	if(g_ubDinoBonesFound && tileBufferIsTileOnBuffer(
+		g_pMainBuffer,
+		s_pDinoBobs[ubLastDino].sPos.sUwCoord.uwX / 32,
+		s_pDinoBobs[ubLastDino].sPos.sUwCoord.uwY / 32
+	) && s_pDinoWereDrawn[ubLastDino] < 2) {
+		bobNewPush(&s_pDinoBobs[ubLastDino]);
+		++s_pDinoWereDrawn[ubLastDino];
+		if(s_pDinoWereDrawn[ubLastDino] >= 2) {
+			++ubLastDino;
+			if(ubLastDino >= g_ubDinoBonesFound) {
+				ubLastDino = 0;
+			}
+		}
+	}
+	else {
+		s_pDinoWereDrawn[ubLastDino] = 0;
+		++ubLastDino;
+		if(ubLastDino >= g_ubDinoBonesFound) {
+			ubLastDino = 0;
+		}
+	}
 	vehicleProcess(&g_pVehicles[0]);
 	if(g_is2pPlaying) {
 		debugColor(0x880);

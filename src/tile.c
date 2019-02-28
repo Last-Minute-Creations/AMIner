@@ -205,6 +205,17 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 		}
 	}
 
+	// Dino bones
+	g_pMainBuffer->pTileData[5][80] = TILE_BONE_HEAD;
+	g_pMainBuffer->pTileData[3][200] = TILE_BONE_1;
+	g_pMainBuffer->pTileData[7][400] = TILE_BONE_1;
+	g_pMainBuffer->pTileData[1][600] = TILE_BONE_1;
+	g_pMainBuffer->pTileData[5][800] = TILE_BONE_1;
+	g_pMainBuffer->pTileData[6][1000] = TILE_BONE_1;
+	g_pMainBuffer->pTileData[8][1500] = TILE_BONE_1;
+	g_pMainBuffer->pTileData[2][2000] = TILE_BONE_1;
+	g_pMainBuffer->pTileData[9][2500] = TILE_BONE_1;
+
 	// Fill left invisible col with rocks
 	for(UWORD y = 0; y < uwEndY; ++y) {
 		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
