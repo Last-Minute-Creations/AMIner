@@ -236,8 +236,8 @@ void gameGsLoop(void) {
 		if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < uwCamX) {
 			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = uwCamX;
 		}
-		baseTileProcess();
 	}
+	baseTileProcess();
 
 	groundLayerProcess(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY);
 

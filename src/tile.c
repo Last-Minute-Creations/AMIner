@@ -185,7 +185,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 				);
 			}
 			else {
-				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_ROCK_1, TILE_ROCK_2);
+				g_pMainBuffer->pTileData[x][y] = TILE_ROCK_1 + !(x & 1);
 			}
 			g_pMainBuffer->pTileData[2][y] = 55;
 		}
@@ -201,7 +201,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	// Draw second base
 	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
 		for(UWORD x = 1; x < 1 + 10; ++x) {
-			g_pMainBuffer->pTileData[x][50 + y] = s_pBasePatterns[1][y * 10 + x - 1];
+			g_pMainBuffer->pTileData[x][100 + y] = s_pBasePatterns[1][y * 10 + x - 1];
 		}
 	}
 
@@ -211,11 +211,11 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	}
 
 	if(isChallenge) {
-		for(UWORD x = 0; x < uwEndX; ++x) {
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_1] = TILE_CHECKPOINT;
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_2] = TILE_CHECKPOINT;
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_3] = TILE_CHECKPOINT;
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_FINISH] = TILE_FINISH;
+		for(UWORD x = 1; x < uwEndX; ++x) {
+			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_1] = TILE_CHECKPOINT_1 + x - 1;
+			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_2] = TILE_CHECKPOINT_1 + x - 1;
+			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_3] = TILE_CHECKPOINT_1 + x - 1;
+			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_FINISH] = TILE_CHECKPOINT_1 + x - 1;
 			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_FINISH+1] = TILE_STONE_1 + (x & 1);
 		}
 	}

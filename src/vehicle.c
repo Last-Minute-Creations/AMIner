@@ -307,21 +307,23 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	}
 
 	if(g_isChallenge) {
-		if(ubTile == TILE_CHECKPOINT) {
-			textBobSetText(
-				&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle)
-			);
-			textBobSetColor(&pVehicle->sTextBob, COLOR_GREEN);
-			textBobSetPos(
-				&pVehicle->sTextBob,
-				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
-				pVehicle->sBobBody.sPos.sUwCoord.uwY,
-				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
-			);
-		}
-		else if(ubTile == TILE_FINISH) {
-			vehicleRestock(pVehicle);
-			gameChallengeEnd();
+		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_1 + 9) {
+			if(uwY == TILE_ROW_CHALLENGE_FINISH) {
+				vehicleRestock(pVehicle);
+				gameChallengeEnd();
+			}
+			else {
+				textBobSetText(
+					&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle)
+				);
+				textBobSetColor(&pVehicle->sTextBob, COLOR_GREEN);
+				textBobSetPos(
+					&pVehicle->sTextBob,
+					pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
+					pVehicle->sBobBody.sPos.sUwCoord.uwY,
+					pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
+				);
+			}
 		}
 	}
 

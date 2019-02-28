@@ -37,8 +37,18 @@ set(TILE_77 1 265 "minerals.png") # TILE_MOONSTONE_3
 set(TILE_78 1 298 "minerals.png") # TILE_COAL_1
 set(TILE_79 34 298 "minerals.png") # TILE_COAL_2
 set(TILE_80 67 298 "minerals.png") # TILE_COAL_3
-set(TILE_81 67 298 "minerals.png") # TILE_COAL_3, TODO: Proper checkpoint
-set(TILE_82 67 298 "minerals.png") # TILE_COAL_3, TODO: Proper finish
+set(TILE_81 0 0 "checkpoint.png") # TILE_CHECKPOINT_1
+set(TILE_82 32 0 "checkpoint.png") # TILE_CHECKPOINT_2
+set(TILE_83 64 0 "checkpoint.png") # TILE_CHECKPOINT_3
+set(TILE_84 96 0 "checkpoint.png") # TILE_CHECKPOINT_4
+set(TILE_85 128 0 "checkpoint.png") # TILE_CHECKPOINT_5
+set(TILE_86 160 0 "checkpoint.png") # TILE_CHECKPOINT_6
+set(TILE_87 192 0 "checkpoint.png") # TILE_CHECKPOINT_7
+set(TILE_88 224 0 "checkpoint.png") # TILE_CHECKPOINT_8
+set(TILE_89 256 0 "checkpoint.png") # TILE_CHECKPOINT_9
+set(TILE_90 288 0 "checkpoint.png") # TILE_CHECKPOINT_10
+set(TILE_91 33 331 "minerals.png") # TILE_BONE_HEAD
+set(TILE_92 1 331 "minerals.png") # TILE_BONE_1
 
 tileExtractFromPng(
 	${TARGET_NAME} "TILE"

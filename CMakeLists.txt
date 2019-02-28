@@ -118,6 +118,8 @@ foreach(bitmap_path ${bitmaps_planar}) # /path/file.png
 	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name} ${bitmap_out_mask})
 endforeach()
 
+set(PALETTE_TILE_EXPORT "${CMAKE_CURRENT_SOURCE_DIR}/_res/32col/aminer main 32c B.pal")
+
 function(tileExtractFromPng TARGET_NAME TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
 	set(TILE_IDX 0)
 	set(TILESET_DEPENDS "")
@@ -145,12 +147,13 @@ function(tileExtractFromPng TARGET_NAME TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
 	add_custom_command(
 		OUTPUT ${TILESET_OUTPUT}
 		COMMAND ${TILESET_CONV}
-			${TILESET_DIR} 32 ${TILESET_OUTPUT} -i -plt ${palette_plt}
+			${TILESET_DIR} 32 ${TILESET_OUTPUT} -i -plt ${PALETTE_TILE_EXPORT}
 		DEPENDS ${palette_plt} ${TILESET_DEPENDS}
 	)
 	target_sources(${TARGET_NAME} PUBLIC ${TILESET_OUTPUT})
 endfunction()
 
-include("base0.cmake")
+# include("base0.cmake")
 include("base1.cmake")
 include("tiles.cmake")
+include("checkpoint.cmake")
