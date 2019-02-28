@@ -30,6 +30,7 @@ static tVPort *s_pVpMain;
 tTileBufferManager *g_pMainBuffer;
 
 static tBitMap *s_pTiles;
+static tBitMap *s_pBones, *s_pBonesMask;
 static UBYTE s_isDebug = 0;
 static UWORD s_uwColorBg;
 static UBYTE s_ubChallengeCamCnt;
@@ -62,6 +63,8 @@ void gameGsCreate(void) {
 	g_pFont = fontCreate("data/uni54.fnt");
 	textBobManagerCreate(g_pFont);
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
+	s_pBones = bitmapCreateFromFile("data/bones.bm", 0);
+	s_pBonesMask = bitmapCreateFromFile("data/bones_mask.bm", 0);
 	hudCreate(s_pView, g_pFont);
 
 	s_pVpMain = vPortCreate(0,
@@ -254,6 +257,8 @@ void gameGsDestroy(void) {
 
 	menuUnload();
 	bitmapDestroy(s_pTiles);
+	bitmapDestroy(s_pBones);
+	bitmapDestroy(s_pBonesMask);
 	baseTileDestroy();
 	textBobManagerDestroy();
 	fontDestroy(g_pFont);

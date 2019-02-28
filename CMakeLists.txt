@@ -74,7 +74,7 @@ endforeach()
 file(GLOB bitmaps
 	_res/drill.png _res/tool.png
 	_res/drill_2.png _res/tool_2.png
-	_res/track.png _res/jet.png
+	_res/track.png _res/jet.png _res/bones.png
 )
 file(GLOB bitmaps_planar
   _res/logo.png
