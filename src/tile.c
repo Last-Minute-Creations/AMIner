@@ -74,7 +74,7 @@ static const UBYTE s_pBasePatterns[2][10*10] = {
 		13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
 		23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
 		34, 33, 35, 36, 37, 38, 39, 40, 41, 42,
-		61, 57, 61, 62, 61, 62, 61, 62, 61, 62,
+		63, 57, 63, 64, 63, 64, 63, 64, 63, 64,
 	},
 	{
 		43, 43, 43,  0, 43, 43, 43, 43,  1, 43,
@@ -86,7 +86,7 @@ static const UBYTE s_pBasePatterns[2][10*10] = {
 		13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
 		23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
 		34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
-		61, 62, 61, 62, 61, 57, 61, 62, 61, 62
+		63, 64, 63, 64, 63, 57, 63, 64, 63, 64
 	}
 };
 
@@ -141,7 +141,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			}
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
-				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_2);
+				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_4);
 			}
 			else if(
 				uwWhat < (uwChance += uwChanceAir) &&
