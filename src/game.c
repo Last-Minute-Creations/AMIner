@@ -18,6 +18,7 @@
 #include "tile.h"
 #include "window.h"
 #include "vendor.h"
+#include "message.h"
 #include "menu.h"
 #include "hi_score.h"
 #include "ground_layer.h"
@@ -46,6 +47,8 @@ UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isAtari;
 
+UBYTE s_isMsgShown = 0;
+
 static void goToMenu(void) {
 	// Switch to menu, after popping it will process gameGsLoop
 	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
@@ -57,6 +60,7 @@ void gameStart(void) {
 	for(UBYTE i = 0; i < 9; ++i) {
 		s_pDinoWereDrawn[i] = 0;
 	}
+	s_isMsgShown = 0;
 	tileInit(g_isAtari, g_isChallenge);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
@@ -212,6 +216,13 @@ static inline void debugColor(UWORD uwColor) {
 
 void gameGsLoop(void) {
 	static UBYTE ubLastDino = 0;
+
+	if(!g_isChallenge && !s_isMsgShown) {
+		gamePushState(messageGsCreate, messageGsLoop, messageGsDestroy);
+		s_isMsgShown = 1;
+		return;
+	}
+
   if(keyUse(KEY_ESCAPE)) {
     goToMenu();
 		return;

@@ -187,7 +187,6 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			else {
 				g_pMainBuffer->pTileData[x][y] = TILE_ROCK_1 + ((x & 1) ^ (y & 1));
 			}
-			g_pMainBuffer->pTileData[2][y] = 55;
 		}
 	}
 
