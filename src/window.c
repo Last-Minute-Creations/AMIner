@@ -14,7 +14,7 @@ void windowInit(void) {
 		WINDOW_WIDTH, WINDOW_HEIGHT,
 		g_pMainBuffer->sCommon.pVPort->ubBPP, BMF_INTERLEAVED
 	);
-	s_pFrame = bitmapCreateFromFile("data/shop_border.bm");
+	s_pFrame = bitmapCreateFromFile("data/shop_border.bm", 0);
 }
 
 void windowDeinit(void) {

@@ -11,6 +11,7 @@
 #include "text_bob.h"
 #include "ground_layer.h"
 #include "build_ver.h"
+#include "base_tile.h"
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -198,8 +199,8 @@ void onExit(void) {
 }
 
 void menuPreload(void) {
-	s_pLogo = bitmapCreateFromFile("data/logo.bm");
-	s_pLogoMask = bitmapCreateFromFile("data/logo_mask.bm");
+	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
+	s_pLogoMask = bitmapCreateFromFile("data/logo_mask.bm", 0);
 	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
 		textBobCreate(&s_pMenuPositions[i], g_pFont, "Some very very long menu text");
 	}
@@ -304,6 +305,7 @@ void menuGsLoop(void) {
   }
 
 	bobNewBegin();
+	tileBufferQueueProcess(g_pMainBuffer);
 
 	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
 	UWORD uwAvailHeight = g_pMainBuffer->pScroll->uwBmAvailHeight;
@@ -374,6 +376,7 @@ void menuGsLoop(void) {
 
 	bobNewPushingDone();
 	bobNewEnd();
+	baseTileProcess();
 	groundLayerProcess(*pCamY);
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();

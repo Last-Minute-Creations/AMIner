@@ -63,17 +63,31 @@ static UWORD chanceTrapezoid(
 	return uwMin;
 }
 
-static const UBYTE s_pBasePattern[] = {
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,
-	 3,  3,  3,  3,  3,  3,  3,  3,  3,  3,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  5,
-	 6,  6,  7,  6,  6,  8,  9, 10, 11, 12,
-	13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-	23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-	34, 33, 35, 36, 37, 38, 39, 40, 41, 42,
-	61, 57, 61, 62, 61, 62, 61, 62, 61, 62,
+static const UBYTE s_pBasePatterns[2][10*10] = {
+	{
+		 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+		 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,
+		 3,  3,  3,  3,  3,  3,  3,  3,  3,  3,
+		 4,  4,  4,  4,  4,  4,  4,  4,  4,  5,
+		 6,  6,  7,  6,  6,  8,  9, 10, 11, 12,
+		13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+		23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+		34, 33, 35, 36, 37, 38, 39, 40, 41, 42,
+		61, 57, 61, 62, 61, 62, 61, 62, 61, 62,
+	},
+	{
+		43, 43, 43,  0, 43, 43, 43, 43,  1, 43,
+		 0, 43, 43, 43, 43,  1, 43,  0, 43, 43,
+		43,  1, 43, 43, 43, 43, 43, 43, 43,  2,
+		43, 43, 43, 43, 43,  3,  1, 43, 43,  1,
+		43, 43, 43, 43,  4, 43, 43, 43,  0, 43,
+		43,  3,  5,  6,  7,  8,  9, 10, 11, 12,
+		13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+		23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+		34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
+		61, 62, 61, 62, 61, 57, 61, 62, 61, 62
+	}
 };
 
 void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
@@ -86,14 +100,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 		uwEndY = TILE_ROW_CHALLENGE_FINISH + 1; // without +1 it's broken
 	}
 
-	// Draw first base
-	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
-		for(UWORD x = 1; x < 1 + 10; ++x) {
-			g_pMainBuffer->pTileData[x][y] = s_pBasePattern[y * 10 + x - 1];
-		}
-	}
-
-	// Draw everything beneath it
+	// Draw terrain
 	for(UWORD x = 1; x < uwEndX; ++x) {
 		for(UWORD y = TILE_ROW_BASE_DIRT + 2; y < uwEndY; ++y) {
 			// 2000 is max
@@ -180,6 +187,21 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			else {
 				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_ROCK_1, TILE_ROCK_2);
 			}
+			g_pMainBuffer->pTileData[2][y] = 55;
+		}
+	}
+
+	// Draw first base
+	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
+		for(UWORD x = 1; x < 1 + 10; ++x) {
+			g_pMainBuffer->pTileData[x][y] = s_pBasePatterns[0][y * 10 + x - 1];
+		}
+	}
+
+	// Draw second base
+	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
+		for(UWORD x = 1; x < 1 + 10; ++x) {
+			g_pMainBuffer->pTileData[x][50 + y] = s_pBasePatterns[1][y * 10 + x - 1];
 		}
 	}
 

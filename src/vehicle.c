@@ -33,16 +33,16 @@ UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {0,1,2,3,4,5,4,3,2,1,0};
 
 void vehicleBitmapsCreate(void) {
 	// Load gfx
-	s_pBodyFrames[0] = bitmapCreateFromFile("data/drill.bm");
-	s_pBodyFrames[1] = bitmapCreateFromFile("data/drill_2.bm");
-	s_pBodyMask = bitmapCreateFromFile("data/drill_mask.bm");
-	s_pTrackFrames = bitmapCreateFromFile("data/track.bm");
-	s_pTrackMask = bitmapCreateFromFile("data/track_mask.bm");
-	s_pJetFrames = bitmapCreateFromFile("data/jet.bm");
-	s_pJetMask = bitmapCreateFromFile("data/jet_mask.bm");
-	s_pToolFrames[0] = bitmapCreateFromFile("data/tool.bm");
-	s_pToolFrames[1] = bitmapCreateFromFile("data/tool_2.bm");
-	s_pToolMask = bitmapCreateFromFile("data/tool_mask.bm");
+	s_pBodyFrames[0] = bitmapCreateFromFile("data/drill.bm", 0);
+	s_pBodyFrames[1] = bitmapCreateFromFile("data/drill_2.bm", 0);
+	s_pBodyMask = bitmapCreateFromFile("data/drill_mask.bm", 0);
+	s_pTrackFrames = bitmapCreateFromFile("data/track.bm", 0);
+	s_pTrackMask = bitmapCreateFromFile("data/track_mask.bm", 0);
+	s_pJetFrames = bitmapCreateFromFile("data/jet.bm", 0);
+	s_pJetMask = bitmapCreateFromFile("data/jet_mask.bm", 0);
+	s_pToolFrames[0] = bitmapCreateFromFile("data/tool.bm", 0);
+	s_pToolFrames[1] = bitmapCreateFromFile("data/tool_2.bm", 0);
+	s_pToolMask = bitmapCreateFromFile("data/tool_mask.bm", 0);
 }
 
 void vehicleBitmapsDestroy(void) {

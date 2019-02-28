@@ -21,6 +21,7 @@
 #include "menu.h"
 #include "hi_score.h"
 #include "ground_layer.h"
+#include "base_tile.h"
 
 tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 
@@ -60,7 +61,7 @@ void gameGsCreate(void) {
 
 	g_pFont = fontCreate("data/uni54.fnt");
 	textBobManagerCreate(g_pFont);
-	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
+	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
 	hudCreate(s_pView, g_pFont);
 
 	s_pVpMain = vPortCreate(0,
@@ -81,6 +82,7 @@ void gameGsCreate(void) {
 	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 1 << GAME_BPP);
 	s_uwColorBg = s_pVpMain->pPalette[0];
 
+	baseTileCreate(g_pMainBuffer);
 	audioCreate();
 	g_pSampleDrill = sampleCreateFromFile("data/sfx/drill1.raw8", 8000);
 	g_pSampleOre = sampleCreateFromFile("data/sfx/ore2.raw8", 8000);
@@ -231,10 +233,10 @@ void gameGsLoop(void) {
 		else {
 			cameraMoveBy(g_pMainBuffer->pCamera, 0, wDist);
 		}
-		// cameraCenterAt(g_pMainBuffer->pCamera, uwCamX, uwCamY);
 		if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < uwCamX) {
 			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = uwCamX;
 		}
+		baseTileProcess();
 	}
 
 	groundLayerProcess(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY);
@@ -252,6 +254,7 @@ void gameGsDestroy(void) {
 
 	menuUnload();
 	bitmapDestroy(s_pTiles);
+	baseTileDestroy();
 	textBobManagerDestroy();
 	fontDestroy(g_pFont);
 	hiScoreBobsDestroy();
