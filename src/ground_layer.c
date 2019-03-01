@@ -74,7 +74,6 @@ void groundLayerCreate(tVPort *pVp) {
 	s_pColorsBelow = copBlockCreate(pView->pCopList, LAYER_COUNT, 0, 0);
 	s_pColorsBelow->ubDisabled = 1;
 	s_pColorsAbove = copBlockCreate(pView->pCopList, LAYER_COUNT, 0, 0);
-	// s_pColorsAbove->ubDisabled = 1;
 	logBlockEnd("groundLayerCreate()");
 }
 

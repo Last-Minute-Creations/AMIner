@@ -127,11 +127,18 @@ void vehicleDestroy(tVehicle *pVehicle) {
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2;
-	return (
-		6*32 <= uwCenterX && uwCenterX <= 8*32 &&
-		(TILE_ROW_BASE_DIRT - 2) * 32 <= pVehicle->sBobBody.sPos.sUwCoord.uwY &&
-		pVehicle->sBobBody.sPos.sUwCoord.uwY <= (TILE_ROW_BASE_DIRT + 1) * 32
+	UWORD uwY = pVehicle->sBobBody.sPos.sUwCoord.uwY;
+	UBYTE isNearInBase0 = (
+		7*32 <= uwCenterX && uwCenterX <= 9*32 &&
+		(TILE_ROW_BASE_DIRT - 2) * 32 <= uwY && uwY <= (TILE_ROW_BASE_DIRT + 1) * 32
 	);
+
+	UBYTE isNearInBase1 = (
+		1*32 <= uwCenterX && uwCenterX <= 3*32 &&
+		(100 + 6) * 32 <= uwY && uwY <= (100 + 8) * 32
+	);
+
+	return isNearInBase0 || isNearInBase1;
 }
 
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {

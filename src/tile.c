@@ -63,32 +63,45 @@ static UWORD chanceTrapezoid(
 	return uwMin;
 }
 
-static const UBYTE s_pBasePatterns[2][10*10] = {
+typedef struct _tBase {
+	UBYTE pPattern[10 * 10];
+	UWORD uwLevel;
+} tBase;
+
+static const tBase s_pBases[] = {
 	{
-		 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-		 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,
-		 3,  3,  3,  3,  3,  3,  3,  3,  3,  3,
-		 4,  4,  4,  4,  4,  4,  4,  4,  4,  5,
-		 6,  6,  7,  6,  6,  8,  9, 10, 11, 12,
-		13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-		23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-		34, 33, 35, 36, 37, 38, 39, 40, 41, 42,
-		63, 57, 63, 64, 63, 64, 63, 64, 63, 64,
+		.uwLevel = 0,
+		.pPattern = {
+			 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+			 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+			 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,
+			 3,  3,  3,  3,  3,  3,  3,  3,  3,  3,
+			 4,  4,  4,  4,  4,  4,  4,  4,  4,  5,
+			 6,  6,  7,  6,  6,  8,  9, 10, 11, 12,
+			13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+			23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+			34, 33, 35, 36, 37, 38, 39, 40, 41, 42,
+			63, 57, 63, 64, 63, 64, 63, 64, 63, 64,
+		}
 	},
 	{
-		44, 44, 44, 44, 44, 44, 44, 44, 44, 44,
-		 0, 43, 43, 43, 43,  1, 43,  0, 43, 43,
-		43,  1, 43, 43, 43, 43, 43, 43, 43,  2,
-		43, 43, 43, 43, 43,  3,  1, 43, 43,  1,
-		43, 43, 43, 43,  4, 43, 43, 43,  0, 43,
-		43,  3,  5,  6,  7,  8,  9, 10, 11, 12,
-		13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-		23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-		34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
-		63, 64, 63, 64, 63, 57, 63, 64, 63, 64
+		.uwLevel = 100,
+		.pPattern = {
+			44, 44, 44, 44, 44, 44, 44, 44, 44, 44,
+			 0, 43, 43, 43, 43,  1, 43,  0, 43, 43,
+			43,  1, 43, 43, 43, 43, 43, 43, 43,  2,
+			43, 43, 43, 43, 43,  3,  1, 43, 43,  1,
+			43, 43, 43, 43,  4, 43, 43, 43,  0, 43,
+			43,  3,  5,  6,  7,  8,  9, 10, 11, 12,
+			13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+			23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+			34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
+			63, 64, 63, 64, 63, 57, 63, 64, 63, 64
+		}
 	}
 };
+
+const uint8_t s_ubBaseCount = sizeof(s_pBases) / sizeof(s_pBases[0]);
 
 void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	logBlockBegin(
@@ -99,6 +112,8 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	if(isChallenge) {
 		uwEndY = TILE_ROW_CHALLENGE_FINISH + 1; // without +1 it's broken
 	}
+
+	UBYTE **pTiles = g_pMainBuffer->pTileData;
 
 	// Draw terrain
 	for(UWORD x = 1; x < uwEndX; ++x) {
@@ -141,92 +156,88 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			}
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
-				g_pMainBuffer->pTileData[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_4);
+				pTiles[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_4);
 			}
 			else if(
 				uwWhat < (uwChance += uwChanceAir) &&
 				tileIsSolid(x - 1, y) && tileIsSolid(x, y - 1)
 			) {
-				g_pMainBuffer->pTileData[x][y] = TILE_CAVE_BG+15;
+				pTiles[x][y] = TILE_CAVE_BG+15;
 			}
 			else if(uwWhat < (uwChance += uwChanceSilver)) {
-				g_pMainBuffer->pTileData[x][y] = (
+				pTiles[x][y] = (
 					isCoalOnly
 						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
 						: ubRandMinMax(TILE_SILVER_1, TILE_SILVER_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceGold)) {
-				g_pMainBuffer->pTileData[x][y] = (
+				pTiles[x][y] = (
 					isCoalOnly
 						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
 						: ubRandMinMax(TILE_GOLD_1, TILE_GOLD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceEmerald)) {
-				g_pMainBuffer->pTileData[x][y] = (
+				pTiles[x][y] = (
 					isCoalOnly
 						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
 						: ubRandMinMax(TILE_EMERALD_1, TILE_EMERALD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceRuby)) {
-				g_pMainBuffer->pTileData[x][y] = (
+				pTiles[x][y] = (
 					isCoalOnly
 						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
 						: ubRandMinMax(TILE_RUBY_1, TILE_RUBY_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceMoonstone)) {
-				g_pMainBuffer->pTileData[x][y] = (
+				pTiles[x][y] = (
 					isCoalOnly
 						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
 						: ubRandMinMax(TILE_MOONSTONE_1, TILE_MOONSTONE_3)
 				);
 			}
 			else {
-				g_pMainBuffer->pTileData[x][y] = TILE_ROCK_1 + ((x & 1) ^ (y & 1));
+				pTiles[x][y] = TILE_ROCK_1 + ((x & 1) ^ (y & 1));
 			}
 		}
 	}
 
-	// Draw first base
-	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
-		for(UWORD x = 1; x < 1 + 10; ++x) {
-			g_pMainBuffer->pTileData[x][y] = s_pBasePatterns[0][y * 10 + x - 1];
-		}
-	}
-
-	// Draw second base
-	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
-		for(UWORD x = 1; x < 1 + 10; ++x) {
-			g_pMainBuffer->pTileData[x][100 + y] = s_pBasePatterns[1][y * 10 + x - 1];
+	// Draw bases
+	for(UBYTE ubBase = 0; ubBase < s_ubBaseCount; ++ubBase) {
+		const tBase *pBase = &s_pBases[ubBase];
+		for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
+			for(UWORD x = 1; x < 1 + 10; ++x) {
+				pTiles[x][pBase->uwLevel + y] = pBase->pPattern[y * 10 + x - 1];
+			}
 		}
 	}
 
 	// Dino bones
-	g_pMainBuffer->pTileData[5][80] = TILE_BONE_HEAD;
-	g_pMainBuffer->pTileData[3][200] = TILE_BONE_1;
-	g_pMainBuffer->pTileData[7][400] = TILE_BONE_1;
-	g_pMainBuffer->pTileData[1][600] = TILE_BONE_1;
-	g_pMainBuffer->pTileData[5][800] = TILE_BONE_1;
-	g_pMainBuffer->pTileData[6][1000] = TILE_BONE_1;
-	g_pMainBuffer->pTileData[8][1500] = TILE_BONE_1;
-	g_pMainBuffer->pTileData[2][2000] = TILE_BONE_1;
-	g_pMainBuffer->pTileData[9][2500] = TILE_BONE_1;
+	pTiles[5][80] = TILE_BONE_HEAD;
+	pTiles[3][200] = TILE_BONE_1;
+	pTiles[7][400] = TILE_BONE_1;
+	pTiles[1][600] = TILE_BONE_1;
+	pTiles[5][800] = TILE_BONE_1;
+	pTiles[6][1000] = TILE_BONE_1;
+	pTiles[8][1500] = TILE_BONE_1;
+	pTiles[2][2000] = TILE_BONE_1;
+	pTiles[9][2500] = TILE_BONE_1;
 
 	// Fill left invisible col with rocks
 	for(UWORD y = 0; y < uwEndY; ++y) {
-		g_pMainBuffer->pTileData[0][y] = TILE_ROCK_1;
+		pTiles[0][y] = TILE_ROCK_1;
 	}
 
 	if(isChallenge) {
 		for(UWORD x = 1; x < uwEndX; ++x) {
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_1] = TILE_CHECKPOINT_1 + x - 1;
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_2] = TILE_CHECKPOINT_1 + x - 1;
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_CHECKPOINT_3] = TILE_CHECKPOINT_1 + x - 1;
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_FINISH] = TILE_CHECKPOINT_1 + x - 1;
-			g_pMainBuffer->pTileData[x][TILE_ROW_CHALLENGE_FINISH+1] = TILE_STONE_1 + (x & 1);
+			pTiles[x][TILE_ROW_CHALLENGE_CHECKPOINT_1] = TILE_CHECKPOINT_1 + x - 1;
+			pTiles[x][TILE_ROW_CHALLENGE_CHECKPOINT_2] = TILE_CHECKPOINT_1 + x - 1;
+			pTiles[x][TILE_ROW_CHALLENGE_CHECKPOINT_3] = TILE_CHECKPOINT_1 + x - 1;
+			pTiles[x][TILE_ROW_CHALLENGE_FINISH] = TILE_CHECKPOINT_1 + x - 1;
+			pTiles[x][TILE_ROW_CHALLENGE_FINISH+1] = TILE_STONE_1 + (x & 1);
 		}
 	}
 	logBlockEnd("tileInit()");
