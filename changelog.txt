@@ -1,0 +1,9 @@
+19.3.?
+- fixed broken colors at depth 950+
+
+19.3.3
+- removed leading zeros from version string
+- fixed ground layer colors not being reset after game end
+
+19.03.01
+- added restock in dino base to the left

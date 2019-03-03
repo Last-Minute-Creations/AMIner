@@ -5,7 +5,6 @@
 
 #define LAYER_COLOR_START 27
 #define LAYER_COLOR_COUNT (32 - LAYER_COLOR_START)
-#define LAYER_COUNT 5
 
 static tCopBlock *s_pColorsAbove;
 static tCopBlock *s_pColorsBelow;
@@ -21,7 +20,7 @@ typedef struct _tGroundLayer {
 	UBYTE ubDifficulty;
 } tGroundLayer;
 
-static const tGroundLayer s_pLayers[LAYER_COUNT] = {
+static const tGroundLayer s_pLayers[] = {
 	{
 		// Stock
 		{
@@ -64,6 +63,8 @@ static const tGroundLayer s_pLayers[LAYER_COUNT] = {
 	}
 };
 
+static const UBYTE s_ubLayerCount = sizeof(s_pLayers) / sizeof(s_pLayers[0]);
+
 void groundLayerCreate(tVPort *pVp) {
 	logBlockBegin("groundLayerCreate(pVp: %p)", pVp);
 	tView *pView = pVp->pView;
@@ -71,10 +72,20 @@ void groundLayerCreate(tVPort *pVp) {
 	s_uwVpStartY = pVp->uwOffsY + 0x2C;
 	s_uwVpHeight = pVp->uwHeight;
 	s_isSet = 0;
-	s_pColorsBelow = copBlockCreate(pView->pCopList, LAYER_COUNT, 0, 0);
-	s_pColorsBelow->ubDisabled = 1;
-	s_pColorsAbove = copBlockCreate(pView->pCopList, LAYER_COUNT, 0, 0);
+	s_pColorsBelow = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);
+	s_pColorsAbove = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);
+	groundLayerReset(1);
 	logBlockEnd("groundLayerCreate()");
+}
+
+void groundLayerReset(UBYTE ubLowerLayer) {
+	s_pColorsBelow->ubDisabled = 1;
+	s_ubLowerLayer = ubLowerLayer;
+	const tGroundLayer *pLayer = &s_pLayers[ubLowerLayer - 1];
+	volatile UWORD *pColorRegs = &g_pCustom->color[LAYER_COLOR_START];
+	for(UBYTE i = 0; i < LAYER_COLOR_COUNT; ++i) {
+		pColorRegs[i] = pLayer->pColors[i];
+	}
 }
 
 static void layerCopyColorsToBlock(
@@ -91,7 +102,10 @@ void groundLayerProcess(UWORD uwCameraY) {
 	if(uwCameraY < s_pLayers[s_ubLowerLayer-1].uwTop) {
 		--s_ubLowerLayer;
 	}
-	else if(uwCameraY + s_uwVpHeight >= s_pLayers[s_ubLowerLayer+1].uwTop) {
+	else if(
+		uwCameraY + s_uwVpHeight >= s_pLayers[s_ubLowerLayer+1].uwTop &&
+		s_ubLowerLayer < s_ubLayerCount - 1
+	) {
 		++s_ubLowerLayer;
 	}
 

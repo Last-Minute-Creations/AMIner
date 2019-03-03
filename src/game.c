@@ -65,6 +65,7 @@ void gameStart(void) {
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	hudReset(g_isChallenge, g_is2pPlaying);
+	groundLayerReset(1);
 }
 
 void gameGsCreate(void) {

@@ -7,4 +7,6 @@ void groundLayerCreate(tVPort *pVp);
 
 void groundLayerProcess(UWORD uwCameraY);
 
+void groundLayerReset(UBYTE ubLowerLayer);
+
 #endif // _AMINER_GROUND_LAYER_H_

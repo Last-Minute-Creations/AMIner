@@ -210,7 +210,7 @@ void menuPreload(void) {
 	textBobSetColor(&s_sCredits, MENU_COLOR_ACTIVE);
 
 	char szVersion[15];
-	sprintf(szVersion, "v.%02d.%02d.%02d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
+	sprintf(szVersion, "v.%d.%d.%d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
 	textBobCreate(&s_sVersion, g_pFont, szVersion);
 	textBobSetText(&s_sVersion, szVersion);
 	textBobSetColor(&s_sVersion, MENU_COLOR_ACTIVE);
