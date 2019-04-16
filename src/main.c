@@ -5,13 +5,12 @@
 #include <ace/generic/main.h>
 #include <ace/managers/key.h>
 #include <ace/managers/joy.h>
-
-#include "game.h"
+#include "logo.h"
 
 void genericCreate(void) {
   keyCreate();
 	joyOpen(0);
-  gamePushState(gameGsCreate, gameGsLoop, gameGsDestroy);
+  gamePushState(logoGsCreate, logoGsLoop, logoGsDestroy);
 }
 
 void genericProcess(void) {

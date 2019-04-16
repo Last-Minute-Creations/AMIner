@@ -1,5 +1,10 @@
-19.3.?
+19.4.16
+- new Aminer logo
+- new group logo
+
+19.3.4
 - fixed broken colors at depth 950+
+- fixed dino bones being displayed when it shouldn't be on dirt tiles
 
 19.3.3
 - removed leading zeros from version string

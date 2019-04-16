@@ -55,7 +55,7 @@ add_custom_command(
 target_sources(${TARGET_NAME} PUBLIC ${palette_plt})
 
 # Non-alpha bitmaps
-file(GLOB bitmaps _res/shop_border.png)
+file(GLOB bitmaps _res/shop_border.png _res/lmc.png)
 foreach(bitmap_path ${bitmaps}) # /path/file.png
 	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png
 	STRING(REPLACE ".png" ".bm" bitmap_file_bm ${bitmap_file_png}) # file.bm
