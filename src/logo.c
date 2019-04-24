@@ -31,7 +31,7 @@ void logoGsCreate(void) {
 	TAG_END);
 
 	s_pVp = vPortCreate(0,
-		TAG_VPORT_BPP, 5,
+		TAG_VPORT_BPP, 3,
 		TAG_VPORT_VIEW, s_pView,
 	TAG_END);
 
@@ -41,7 +41,7 @@ void logoGsCreate(void) {
 		TAG_SIMPLEBUFFER_IS_DBLBUF, 0,
 	TAG_END);
 
-	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << s_pVp->ubBPP);
+	paletteLoad("data/lmc.plt", s_pPaletteRef, 1 << s_pVp->ubBPP);
 
 	bitmapLoadFromFile(
 		s_pBfr->pBack, "data/lmc.bm",

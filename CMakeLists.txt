@@ -36,87 +36,48 @@ add_executable(${TARGET_NAME} ${SOURCES} ${HEADERS})
 target_link_libraries(${TARGET_NAME} ace)
 
 # Palette
-SET(data_path "${CMAKE_CURRENT_SOURCE_DIR}/data")
-file(MAKE_DIRECTORY ${data_path})
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data")
 SET(TOOLS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/ace/tools")
-SET(PALETTE_CONV "${TOOLS_PATH}/bin/palette_conv")
-SET(BITMAP_CONV "${TOOLS_PATH}/bitmap_conv/bitmap_conv")
 SET(BITMAP_EXTRACT "${TOOLS_PATH}/bin/bitmap_extract")
 SET(TILESET_CONV "${TOOLS_PATH}/bin/tileset_conv")
 
-file(GLOB palette_gimp _res/aminer.gpl)
-set(palette_plt "${CMAKE_CURRENT_SOURCE_DIR}/data/aminer.plt")
-add_custom_command(
-	OUTPUT ${palette_plt}
-	COMMAND ${PALETTE_CONV} ${palette_gimp} ${palette_plt}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	DEPENDS ${palette_gimp}
-)
-target_sources(${TARGET_NAME} PUBLIC ${palette_plt})
+file(GLOB palette_aminer_gpl _res/palettes/aminer.gpl)
+file(GLOB palette_lmc_gpl _res/palettes/lmc.gpl)
+set(palette_aminer "${CMAKE_CURRENT_SOURCE_DIR}/data/aminer.plt")
+set(palette_lmc "${CMAKE_CURRENT_SOURCE_DIR}/data/lmc.plt")
+convertPalette(${TARGET_NAME} ${palette_aminer_gpl} ${palette_aminer})
+convertPalette(${TARGET_NAME} ${palette_lmc_gpl} ${palette_lmc})
+set(transparency_hex "#993399")
 
-# Non-alpha bitmaps
-file(GLOB bitmaps _res/shop_border.png _res/lmc.png)
-foreach(bitmap_path ${bitmaps}) # /path/file.png
-	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png
-	STRING(REPLACE ".png" ".bm" bitmap_file_bm ${bitmap_file_png}) # file.bm
-	SET(bitmap_out_name "${data_path}/${bitmap_file_bm}") # data/file.bm
-	add_custom_command(
-		OUTPUT ${bitmap_out_name}
-		COMMAND ${BITMAP_CONV} ${palette_plt} ${bitmap_path}
-			-o ${bitmap_out_name} -i
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		DEPENDS ${bitmap_path} ${palette_plt}
-	)
-	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name})
-endforeach()
-
-# Alpha bitmaps
-file(GLOB bitmaps
-	_res/drill.png _res/tool.png
-	_res/drill_2.png _res/tool_2.png
-	_res/track.png _res/jet.png _res/bones.png
+convertBitmaps(
+	TARGET ${TARGET_NAME} PALETTE ${palette_aminer}
+	INTERLEAVED SOURCES _res/shop_border.png DESTINATIONS data/shop_border.bm
 )
-file(GLOB bitmaps_planar
-  _res/logo.png
-)
-set(color_transparent "\\#993399")
-foreach(bitmap_path ${bitmaps}) # /path/file.png
-	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png
-	STRING(REPLACE ".png" ".bm" bitmap_file_bm ${bitmap_file_png}) # file.bm
-	STRING(REPLACE ".png" "_mask.bm" bitmap_file_mask ${bitmap_file_png}) # file.bm
-	SET(bitmap_out_name "${data_path}/${bitmap_file_bm}") # data/file.bm
-	SET(bitmap_out_mask "${data_path}/${bitmap_file_mask}") # data/file.bm
-	add_custom_command(
-		OUTPUT ${bitmap_out_name} ${bitmap_out_mask}
-		COMMAND ${BITMAP_CONV}
-			${palette_plt}
-			${bitmap_path}
-			-o ${bitmap_out_name} -i -mc ${color_transparent}
-			-mo ${bitmap_out_mask}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		DEPENDS ${bitmap_path} ${palette_plt}
-	)
-	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name} ${bitmap_out_mask})
-endforeach()
 
-foreach(bitmap_path ${bitmaps_planar}) # /path/file.png
-	get_filename_component(bitmap_file_png ${bitmap_path} NAME) # file.png
-	STRING(REPLACE ".png" ".bm" bitmap_file_bm ${bitmap_file_png}) # file.bm
-	STRING(REPLACE ".png" "_mask.bm" bitmap_file_mask ${bitmap_file_png}) # file.bm
-	SET(bitmap_out_name "${data_path}/${bitmap_file_bm}") # data/file.bm
-	SET(bitmap_out_mask "${data_path}/${bitmap_file_mask}") # data/file.bm
-	add_custom_command(
-		OUTPUT ${bitmap_out_name} ${bitmap_out_mask}
-		COMMAND ${BITMAP_CONV}
-			${palette_plt}
-			${bitmap_path}
-			-o ${bitmap_out_name} -mc ${color_transparent}
-			-mo ${bitmap_out_mask}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		DEPENDS ${bitmap_path} ${palette_plt}
-	)
-	target_sources(${TARGET_NAME} PUBLIC ${bitmap_out_name} ${bitmap_out_mask})
-endforeach()
+convertBitmaps(
+	TARGET ${TARGET_NAME} PALETTE ${palette_lmc}
+	INTERLEAVED SOURCES _res/lmc.png DESTINATIONS data/lmc.bm
+)
+
+convertBitmaps(
+	TARGET ${TARGET_NAME} PALETTE ${palette_aminer} MASK_COLOR ${transparency_hex}
+	SOURCES _res/logo.png DESTINATIONS data/logo.bm MASKS data/logo_mask.bm
+)
+
+convertBitmaps(
+	TARGET ${TARGET_NAME} PALETTE ${palette_aminer} MASK_COLOR ${transparency_hex}
+	INTERLEAVED SOURCES
+		_res/drill.png _res/tool.png _res/drill_2.png _res/tool_2.png
+		_res/track.png _res/jet.png _res/bones.png
+	DESTINATIONS
+		data/drill.bm data/tool.bm data/drill_2.bm data/tool_2.bm
+		data/track.bm data/jet.bm data/bones.bm
+	MASKS
+		data/drill_mask.bm data/tool_mask.bm data/drill_2_mask.bm data/tool_2_mask.bm
+		data/track_mask.bm data/jet_mask.bm data/bones_mask.bm
+)
+
+# TODO Font convert
 
 set(PALETTE_TILE_EXPORT "${CMAKE_CURRENT_SOURCE_DIR}/_res/32col/aminer main 32c B.pal")
 
@@ -148,12 +109,12 @@ function(tileExtractFromPng TARGET_NAME TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
 		OUTPUT ${TILESET_OUTPUT}
 		COMMAND ${TILESET_CONV}
 			${TILESET_DIR} 32 ${TILESET_OUTPUT} -i -plt ${PALETTE_TILE_EXPORT}
-		DEPENDS ${palette_plt} ${TILESET_DEPENDS}
+		DEPENDS ${palette_aminer} ${TILESET_DEPENDS}
 	)
 	target_sources(${TARGET_NAME} PUBLIC ${TILESET_OUTPUT})
 endfunction()
 
-# include("base0.cmake")
+include("base0.cmake")
 include("base1.cmake")
 include("tiles.cmake")
 include("checkpoint.cmake")
