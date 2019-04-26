@@ -3,7 +3,8 @@ aminer
 _res/placeholders
 
 build/
-data/*
+data/*.bm
+data/*.plt
 !data/silkscreen5.fnt
 !data/uni54.fnt
 

@@ -4,81 +4,129 @@
 
 #include "message.h"
 #include <ace/managers/key.h>
+#include <ace/managers/joy.h>
 #include <ace/managers/game.h>
+#include <ace/managers/system.h>
 #include <ace/utils/font.h>
 #include "game.h"
 #include "color.h"
 #include "window.h"
 
+#define LINES_MAX 100
+
+const UWORD s_uwOffsX = 20;
+const UWORD s_uwOffsY = 26;
+const UWORD s_uwTextWidth = 172;
+const UWORD s_uwTextHeight = 129;
+const UBYTE s_ubColorBg = 11;
+const UBYTE s_ubColorText = 14;
+
 UBYTE s_isShown;
 tBitMap *s_pBuffer;
 static tTextBitMap *s_pTextBitmap;
 
-static const char *s_pMessages[] = {
-	"Comrade!",
-	"",
-	"You have been sent to this facility by the decision",
-	"of Ministry of Mining and Fossile Fuels. The outpost",
-	"is small but we believe not yet fully explored",
-	"and examined. As you know, development of our",
-	"great Democratic Peoples Republic requires significant",
-	"expenditures in the sector of heavy industry.",
-	"Industry that will astound and amaze with its",
-	"creations not only imperialist in the West but the",
-	"whole world. Industry that is so important for our ",
-	"great Army that protects our Motherland and helps",
-	"to liberate more and more nations from the imperial",
-	"and capitalist occupant.",
-	"",
-	"Comrade, your task here is very simple, yet",
-	"so much important. All you need to do is to fulfill",
-	"the mining plans that will be sent to you in the form",
-	"of a telegram from the Ministry of Mining and Fossile",
-	"Fuels. To help you achieve that goals we are giving",
-	"under your command hard working employees.",
-	"They are true communists and the sons of this land.",
-	// PAGE 2
-	"We are also giving you our latest",
-	"and newest technology and machinery together with",
-	"some great amount of spare parts in case you need",
-	"them. ",
-	""
-	"Our Great Leader trusts its Comrades but likes",
-	"to keep an eye on different aspects of life of his",
-	"fellow countrymen. After all he is also just a simple",
-	"farmer from the province. Therefore an observant",
-	"from Ministry of National Security will be sent out",
-	"to your facility. You can trust him like own brother",
-	"and we expect you will inform him of any special",
-	"findings and discoveries, should you encounter any",
-	"in your underground work.",
-	"",
-	"Good luck Comrade!"
-};
-const UBYTE s_ubMessageCount = sizeof(s_pMessages) / sizeof(s_pMessages[0]);
+static char *s_pLines[LINES_MAX];
+UWORD s_uwLineCount;
+UBYTE s_ubCurrPage;
+UBYTE s_ubPageCount;
 
 static tUwCoordYX s_sOrigin;
 
-static void messageDrawPage(UBYTE ubNo) {
-	blitRect(s_pBuffer, s_sOrigin.sUwCoord.uwX + 4, s_sOrigin.sUwCoord.uwY + 8, WINDOW_WIDTH - 8, WINDOW_HEIGHT - 16, 0);
-	UWORD uwOffsY = 16;
-	for(UBYTE i = ubNo*22; i < (ubNo+1)*22 && i < s_ubMessageCount; ++i) {
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pMessages[i]);
-		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap, s_sOrigin.sUwCoord.uwX + 8,
-			s_sOrigin.sUwCoord.uwY + uwOffsY, COLOR_GOLD, FONT_COOKIE | FONT_SHADOW
-		);
-		uwOffsY += g_pFont->uwHeight;
+static void freeLines(void) {
+	while(s_uwLineCount--) {
+		memFree(s_pLines[s_uwLineCount], strlen(s_pLines[s_uwLineCount]) + 1);
 	}
-	uwOffsY += g_pFont->uwHeight;
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Press FIRE, SPACE or ENTER to continue");
-	fontDrawTextBitMap(
-		s_pBuffer, s_pTextBitmap, s_sOrigin.sUwCoord.uwX + 8,
-		s_sOrigin.sUwCoord.uwY + uwOffsY, COLOR_GREEN, FONT_COOKIE | FONT_SHADOW
-	);
+	s_uwLineCount = 0;
+	s_ubCurrPage = 0;
+	s_ubPageCount = 0;
 }
 
-static UBYTE s_ubPage = 0;
+static void readLines(const char *szFilePath, UWORD uwMaxLength) {
+	systemUse();
+	freeLines();
+	tFile *pFileLines = fileOpen(szFilePath, "r");
+	if(!pFileLines) {
+		logWrite("ERR: Couldn't read lines from '%s'\n", szFilePath);
+		return;
+	}
+	char szWordBfr[50];
+	UBYTE ubWordBytes = 0;
+	char szLineBfr[200];
+	UWORD uwLinePxLength = 0;
+	UBYTE ubSpacePxLength = fontGlyphWidth(g_pFont, ' ') + 1;
+
+	while(!fileIsEof(pFileLines)) {
+		// Read one word and measure it when complete
+		char c;
+		fileRead(pFileLines, &c, 1);
+		if(c > ' ') {
+			szWordBfr[ubWordBytes] = c;
+			++ubWordBytes;
+			continue;
+		}
+
+		// It it's end of line start new line
+		szWordBfr[ubWordBytes] = '\0';
+		UWORD uwWordPxLength = fontMeasureText(g_pFont, szWordBfr).sUwCoord.uwX;
+		if(uwLinePxLength + ubSpacePxLength + uwWordPxLength > uwMaxLength) {
+			// If it's too long, save current line and write that word at the beginning of new line
+			s_pLines[s_uwLineCount] = memAllocFast(strlen(szLineBfr) + 1);
+			strcpy(s_pLines[s_uwLineCount], szLineBfr);
+			++s_uwLineCount;
+			strcpy(szLineBfr, szWordBfr);
+			uwLinePxLength = uwWordPxLength;
+		}
+		else {
+			// If it's not, append to current line
+			strcat(szLineBfr, " ");
+			strcat(szLineBfr, szWordBfr);
+			uwLinePxLength += ubSpacePxLength + uwWordPxLength;
+		}
+		ubWordBytes = 0;
+		if(c == '\n') {
+			// If it's end of line, save current line and start new one
+			s_pLines[s_uwLineCount] = memAllocFast(strlen(szLineBfr) + 1);
+			strcpy(s_pLines[s_uwLineCount], szLineBfr);
+			++s_uwLineCount;
+			szLineBfr[0] = '\0';
+			uwLinePxLength = 0;
+		}
+	}
+	fileClose(pFileLines);
+
+	if(s_uwLineCount >= LINES_MAX) {
+		logWrite("ERR: line count %hu >= LINES MAX %d", s_uwLineCount, LINES_MAX);
+	}
+
+	systemUnuse();
+
+	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
+	UBYTE ubLinesPerPage = s_uwTextHeight / ubLineHeight;
+	s_ubPageCount = (s_uwLineCount + (ubLinesPerPage - 1)) / ubLinesPerPage;
+}
+
+static void messageDrawPage(
+	UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight, UBYTE ubPage
+) {
+	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
+	UBYTE ubLinesPerPage = uwHeight / ubLineHeight;
+	UWORD uwLineStart = ubPage * ubLinesPerPage;
+	blitRect(
+		s_pBuffer, s_sOrigin.sUwCoord.uwX + uwX, s_sOrigin.sUwCoord.uwY + uwY,
+		uwWidth, uwHeight, s_ubColorBg
+	);
+	for(
+		UWORD i = uwLineStart;
+		i < uwLineStart + ubLinesPerPage && i < s_uwLineCount; ++i
+	) {
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pLines[i]);
+		fontDrawTextBitMap(
+			s_pBuffer, s_pTextBitmap, s_sOrigin.sUwCoord.uwX + uwX,
+			s_sOrigin.sUwCoord.uwY + uwY, s_ubColorText, FONT_COOKIE | FONT_SHADOW
+		);
+		uwY += ubLineHeight;
+	}
+}
 
 void messageGsCreate(void) {
 	s_isShown = windowShow();
@@ -88,32 +136,50 @@ void messageGsCreate(void) {
 		return;
 	}
 
+	s_uwLineCount = 0;
+	readLines("data/intro.txt", s_uwTextWidth);
+
 	s_pBuffer = g_pMainBuffer->pScroll->pBack;
 	s_pTextBitmap = fontCreateTextBitMap(
 		WINDOW_WIDTH, g_pFont->uwHeight
 	);
 	s_sOrigin = windowGetOrigin();
 
-	s_ubPage = 0;
-	messageDrawPage(0);
+	messageDrawPage(s_uwOffsX, s_uwOffsY, s_uwTextWidth, s_uwTextHeight, 0);
 
 	// Process managers once so that backbuffer becomes front buffer
-	// Single buffering from now!
+	// Single buffering from now on!
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 }
 
 void messageGsLoop(void) {
-	if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || keyUse(KEY_ESCAPE)) {
-		if(s_ubPage >= 1) {
-			gamePopState();
-			return;
-		}
-		else {
-			++s_ubPage;
-			messageDrawPage(s_ubPage);
-		}
+	if(
+		keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || keyUse(KEY_ESCAPE) ||
+		joyUse(JOY1 + JOY_FIRE) || joyUse(JOY2 + JOY_FIRE)
+	) {
+		gamePopState();
+		return;
+	}
+
+	if(s_ubCurrPage > 0 && (
+		keyUse(KEY_W) || keyUse(KEY_UP) ||
+		joyUse(JOY1 + JOY_UP) || joyUse(JOY2 + JOY_UP)
+	)) {
+		--s_ubCurrPage;
+		messageDrawPage(
+			s_uwOffsX, s_uwOffsY, s_uwTextWidth, s_uwTextHeight, s_ubCurrPage
+		);
+	}
+	else if(s_ubCurrPage < s_ubPageCount - 1 && (
+		keyUse(KEY_S) || keyUse(KEY_DOWN) ||
+		joyUse(JOY1 + JOY_DOWN) || joyUse(JOY2 + JOY_DOWN)
+	)) {
+		++s_ubCurrPage;
+		messageDrawPage(
+			s_uwOffsX, s_uwOffsY, s_uwTextWidth, s_uwTextHeight, s_ubCurrPage
+		);
 	}
 }
 
@@ -121,6 +187,9 @@ void messageGsDestroy(void) {
 	if(!s_isShown) {
 		return;
 	}
+
+	freeLines();
+
 	fontDestroyTextBitMap(s_pTextBitmap);
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
