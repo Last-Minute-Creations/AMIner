@@ -3,10 +3,9 @@ aminer
 _res/placeholders
 
 build/
-data/*.bm
-data/*.plt
-!data/silkscreen5.fnt
-!data/uni54.fnt
+data/*
+!data/*.mod
+!data/*.raw8
 
 *.log
 

@@ -78,7 +78,7 @@ convertBitmaps(
 		data/track_mask.bm data/jet_mask.bm data/bones_mask.bm
 )
 
-# TODO Font convert
+convertFont(${TARGET_NAME} _res/uni54 data/uni54.fnt)
 
 set(PALETTE_TILE_EXPORT "${CMAKE_CURRENT_SOURCE_DIR}/_res/32col/aminer main 32c B.pal")
 
