@@ -14,13 +14,6 @@
 
 #define LINES_MAX 100
 
-const UWORD s_uwOffsX = 20;
-const UWORD s_uwOffsY = 26;
-const UWORD s_uwTextWidth = 172;
-const UWORD s_uwTextHeight = 129;
-const UBYTE s_ubColorBg = 11;
-const UBYTE s_ubColorText = 14;
-
 UBYTE s_isShown;
 tBitMap *s_pBuffer;
 static tTextBitMap *s_pTextBitmap;
@@ -101,7 +94,7 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 	systemUnuse();
 
 	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
-	UBYTE ubLinesPerPage = s_uwTextHeight / ubLineHeight;
+	UBYTE ubLinesPerPage = WINDOW_DISPLAY_HEIGHT / ubLineHeight;
 	s_ubPageCount = (s_uwLineCount + (ubLinesPerPage - 1)) / ubLinesPerPage;
 }
 
@@ -113,7 +106,7 @@ static void messageDrawPage(
 	UWORD uwLineStart = ubPage * ubLinesPerPage;
 	blitRect(
 		s_pBuffer, s_sOrigin.sUwCoord.uwX + uwX, s_sOrigin.sUwCoord.uwY + uwY,
-		uwWidth, uwHeight, s_ubColorBg
+		uwWidth, uwHeight, WINDOW_DISPLAY_COLOR_BG
 	);
 	for(
 		UWORD i = uwLineStart;
@@ -122,7 +115,7 @@ static void messageDrawPage(
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pLines[i]);
 		fontDrawTextBitMap(
 			s_pBuffer, s_pTextBitmap, s_sOrigin.sUwCoord.uwX + uwX,
-			s_sOrigin.sUwCoord.uwY + uwY, s_ubColorText, FONT_COOKIE | FONT_SHADOW
+			s_sOrigin.sUwCoord.uwY + uwY, WINDOW_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_SHADOW
 		);
 		uwY += ubLineHeight;
 	}
@@ -137,7 +130,7 @@ void messageGsCreate(void) {
 	}
 
 	s_uwLineCount = 0;
-	readLines("data/intro.txt", s_uwTextWidth);
+	readLines("data/intro.txt", WINDOW_DISPLAY_WIDTH);
 
 	s_pBuffer = g_pMainBuffer->pScroll->pBack;
 	s_pTextBitmap = fontCreateTextBitMap(
@@ -145,7 +138,7 @@ void messageGsCreate(void) {
 	);
 	s_sOrigin = windowGetOrigin();
 
-	messageDrawPage(s_uwOffsX, s_uwOffsY, s_uwTextWidth, s_uwTextHeight, 0);
+	messageDrawPage(WINDOW_DISPLAY_X, WINDOW_DISPLAY_Y, WINDOW_DISPLAY_WIDTH, WINDOW_DISPLAY_HEIGHT, 0);
 
 	// Process managers once so that backbuffer becomes front buffer
 	// Single buffering from now on!
@@ -169,7 +162,7 @@ void messageGsLoop(void) {
 	)) {
 		--s_ubCurrPage;
 		messageDrawPage(
-			s_uwOffsX, s_uwOffsY, s_uwTextWidth, s_uwTextHeight, s_ubCurrPage
+			WINDOW_DISPLAY_X, WINDOW_DISPLAY_Y, WINDOW_DISPLAY_WIDTH, WINDOW_DISPLAY_HEIGHT, s_ubCurrPage
 		);
 	}
 	else if(s_ubCurrPage < s_ubPageCount - 1 && (
@@ -178,7 +171,7 @@ void messageGsLoop(void) {
 	)) {
 		++s_ubCurrPage;
 		messageDrawPage(
-			s_uwOffsX, s_uwOffsY, s_uwTextWidth, s_uwTextHeight, s_ubCurrPage
+			WINDOW_DISPLAY_X, WINDOW_DISPLAY_Y, WINDOW_DISPLAY_WIDTH, WINDOW_DISPLAY_HEIGHT, s_ubCurrPage
 		);
 	}
 }
@@ -188,9 +181,10 @@ void messageGsDestroy(void) {
 		return;
 	}
 
+	systemUse();
 	freeLines();
-
 	fontDestroyTextBitMap(s_pTextBitmap);
+	systemUnuse();
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);

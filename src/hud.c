@@ -7,19 +7,21 @@
 #include <ace/utils/palette.h>
 #include <ace/utils/chunky.h>
 
-#define COLOR_ACTIVE 15
+#define COLOR_BG 11
+#define COLOR_BAR_FULL 14
+#define COLOR_BAR_EMPTY 12
 
-#define COLOR_BAR_FULL 24
-#define COLOR_BAR_EMPTY 22
+#define HUD_ORIGIN_X 11
+#define HUD_ORIGIN_Y 10
 
-#define GAUGE_DRILL_X 85
-#define GAUGE_CARGO_X 148
-#define GAUGE_HULL_X 202
-#define GAUGE_DEPTH_X 272
-#define GAUGE_CASH_X 272
+#define GAUGE_DRILL_X (HUD_ORIGIN_X + 70)
+#define GAUGE_CARGO_X (HUD_ORIGIN_X + 138)
+#define GAUGE_HULL_X (HUD_ORIGIN_X + 192)
+#define GAUGE_DEPTH_X (HUD_ORIGIN_X + 262)
+#define GAUGE_CASH_X (HUD_ORIGIN_X + 262)
 
-#define ROW_1_Y 0
-#define ROW_2_Y 8
+#define ROW_1_Y (HUD_ORIGIN_Y + 0)
+#define ROW_2_Y (HUD_ORIGIN_Y + 8)
 
 typedef enum _tHudDraw {
 	HUD_PREPARE_DEPTH,
@@ -36,6 +38,7 @@ static tVPort *s_pVpHud;
 static tSimpleBufferManager *s_pHudBuffer;
 static const tFont *s_pFont;
 static tTextBitMap *s_pLinebuffer;
+static tBitMap *s_pBg;
 
 typedef struct _tHudPlayerData {
 	UWORD uwDepth, uwDepthDisp;
@@ -55,43 +58,48 @@ void hudCreate(tView *pView, const tFont *pFont) {
   s_pVpHud = vPortCreate(0,
     TAG_VPORT_VIEW, pView,
     TAG_VPORT_BPP, 5,
-    TAG_VPORT_HEIGHT, 16,
+    TAG_VPORT_HEIGHT, 31,
   TAG_END);
 
   s_pHudBuffer = simpleBufferCreate(0,
     TAG_SIMPLEBUFFER_VPORT, s_pVpHud,
-    TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
+    TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_INTERLEAVED,
   TAG_END);
 
 	paletteLoad("data/aminer.plt", s_pVpHud->pPalette, 32);
+	s_pBg = bitmapCreateFromFile("data/hud.bm", 0);
+	blitCopyAligned(
+		s_pBg, 0, 0, s_pHudBuffer->pBack, 0, 0,
+		s_pVpHud->uwWidth, s_pVpHud->uwHeight
+	);
 
 	s_pFont = pFont;
 	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, pFont->uwHeight);
 
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, 0, 0,
-		"Player 1", COLOR_ACTIVE, FONT_LAZY
+		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_1_Y,
+		"Player 1", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, 0, s_pFont->uwHeight + 1,
-		"Player 2", COLOR_ACTIVE, FONT_LAZY
+		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_2_Y,
+		"Player 2", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 	);
 
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, 0,
-		"Drill:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
+		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, ROW_1_Y,
+		"Drill:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, 0,
-		"Cargo:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
+		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, ROW_1_Y,
+		"Cargo:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, 0,
-		"Hull:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
+		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, ROW_1_Y,
+		"Hull:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, 0,
-		"Cash:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
+		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, ROW_1_Y,
+		"Cash:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	hudReset(0, 0);
 }
@@ -104,14 +112,14 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 		// Clear depth label and use it as cash
 		blitRect(
 			s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1 - ubLabelWidth, ROW_2_Y,
-			ubLabelWidth, s_pFont->uwHeight, 0
+			ubLabelWidth, s_pFont->uwHeight, COLOR_BG
 		);
 	}
 	else {
 		// Depth instead of 2p cash
 		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, s_pFont->uwHeight + 1,
-			"Depth:", COLOR_ACTIVE, FONT_LAZY | FONT_RIGHT
+			s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, ROW_2_Y,
+			"Depth:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 		);
 	}
 
@@ -120,11 +128,11 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	for(UBYTE i = 0; i < 3; ++i) {
 		for(UBYTE b = 0; b < 10; ++b) {
 			blitRect(
-				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, 0,
+				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, ROW_1_Y,
 				2, 5, COLOR_BAR_EMPTY
 			);
 			blitRect(
-				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, s_pFont->uwHeight + 1,
+				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, ROW_2_Y,
 				2, 5, COLOR_BAR_EMPTY
 			);
 		}
@@ -150,7 +158,7 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	// Restart state machine
 	s_eDraw = (isChallenge ? HUD_PREPARE_CASH : HUD_PREPARE_DEPTH);
 	s_ePlayer = PLAYER_1;
-	s_ubHudOffsY = 0;
+	s_ubHudOffsY = ROW_1_Y;
 }
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth) {
@@ -211,13 +219,14 @@ void hudUpdate(void) {
 			}
 		case HUD_DRAW_DEPTH:
 			if(isDrawPending) {
+				// decreased clear height 'cuz digits are smaller than whole font
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_DEPTH_X, ROW_2_Y,
-					320 - GAUGE_DEPTH_X, s_pFont->uwHeight, 0
+					320 - (GAUGE_DEPTH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 2, COLOR_BG
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLinebuffer,
-					GAUGE_DEPTH_X, ROW_2_Y, COLOR_ACTIVE, FONT_LAZY
+					GAUGE_DEPTH_X, ROW_2_Y, COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 				);
 				s_eDraw = HUD_PREPARE_CASH;
 				isDrawPending = 0;
@@ -251,14 +260,15 @@ void hudUpdate(void) {
 			}
 		case HUD_DRAW_CASH:
 			if(isDrawPending) {
+				// decreased clear height 'cuz digits are smaller than whole font
 				UBYTE ubY = (s_isChallenge ? s_ubHudOffsY : ROW_1_Y);
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_CASH_X, ubY,
-					320 - GAUGE_CASH_X, s_pFont->uwHeight, 0
+					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 2, COLOR_BG
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLinebuffer,
-					GAUGE_CASH_X, ubY, COLOR_ACTIVE, FONT_LAZY
+					GAUGE_CASH_X, ubY, COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 				);
 				s_eDraw = HUD_DRAW_FUEL;
 				isDrawPending = 0;
@@ -321,17 +331,18 @@ void hudUpdate(void) {
 			// Cycle players and start again
 			if(s_ePlayer == PLAYER_1) {
 				s_ePlayer = PLAYER_2;
-				s_ubHudOffsY = s_pFont->uwHeight + 1;
+				s_ubHudOffsY = ROW_2_Y;
 				s_eDraw = (s_isChallenge ? HUD_PREPARE_CASH : HUD_DRAW_FUEL);
 			}
 			else {
 				s_ePlayer = PLAYER_1;
-				s_ubHudOffsY = 0;
+				s_ubHudOffsY = ROW_1_Y;
 				s_eDraw = (s_isChallenge ? HUD_PREPARE_CASH : HUD_PREPARE_DEPTH);
 			}
 	}
 }
 
 void hudDestroy(void) {
+	bitmapDestroy(s_pBg);
 	fontDestroyTextBitMap(s_pLinebuffer);
 }

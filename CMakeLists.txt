@@ -51,7 +51,8 @@ set(transparency_hex "#993399")
 
 convertBitmaps(
 	TARGET ${TARGET_NAME} PALETTE ${palette_aminer}
-	INTERLEAVED SOURCES _res/commrade/bg.png DESTINATIONS data/commrade_bg.bm
+	INTERLEAVED SOURCES _res/commrade/bg.png _res/hud.png
+	DESTINATIONS data/commrade_bg.bm data/hud.bm
 )
 
 convertBitmaps(

@@ -10,6 +10,13 @@
 #define WINDOW_WIDTH (320-64)
 #define WINDOW_HEIGHT (192)
 
+#define WINDOW_DISPLAY_X 23
+#define WINDOW_DISPLAY_Y 32
+#define WINDOW_DISPLAY_WIDTH 168
+#define WINDOW_DISPLAY_HEIGHT 120
+#define WINDOW_DISPLAY_COLOR_BG 11
+#define WINDOW_DISPLAY_COLOR_TEXT 14
+
 void windowInit(void);
 
 void windowDeinit(void);
