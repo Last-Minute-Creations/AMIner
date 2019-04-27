@@ -404,8 +404,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	const fix16_t fMaxPosX = fix16_one * (11*32 - VEHICLE_WIDTH);
 	pVehicle->fX = CLAMP(pVehicle->fX + pVehicle->fDx, fix16_from_int(32), fMaxPosX);
 	pVehicle->sBobBody.sPos.sUwCoord.uwX = fix16_to_int(pVehicle->fX);
-	// UBYTE ubAdd = (pVehicle->sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_GRASS) * 32) ? 4 : 8;
-	UBYTE ubAdd = 4;
+	UBYTE ubAdd = (pVehicle->sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_BASE_DIRT) * 32) ? 4 : 2;
 	UBYTE ubHalfWidth = 12;
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
