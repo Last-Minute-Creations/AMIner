@@ -239,29 +239,39 @@ static inline UBYTE vehicleStartDrilling(
 }
 
 static WORD vehicleRestock(tVehicle *pVehicle) {
+	UBYTE isRestocked = 0;
+	if(pVehicle->ubCargoCurr) {
+		isRestocked = 1;
+	}
 	pVehicle->ubCargoCurr = 0;
 	pVehicle->ulCash += pVehicle->uwCargoScore;
-	WORD wScoreNow = pVehicle->uwCargoScore;
 	pVehicle->uwCargoScore = 0;
 	hudSetCargo(pVehicle->ubPlayerIdx, 0, pVehicle->ubCargoMax);
-	const UBYTE ubFuelPrice = 5;
-	const UBYTE ubFuelDiv = 100;
-	UWORD uwRefuelUnits = MIN(
-		(pVehicle->ulCash / ubFuelPrice),
-		(UWORD)(pVehicle->uwFuelMax - pVehicle->uwFuelCurr + ubFuelDiv-1) / ubFuelDiv
+
+	// Fuel price per liter, units in liter
+	const UBYTE ubLiterPrice = 5;
+	const UBYTE ubFuelInLiter = 100;
+
+	// Buy as much fuel as you can afford or as much as needed
+	// Start refueling if half a liter is spent
+	UWORD uwRefuelLiters = MIN(
+		(pVehicle->ulCash / ubLiterPrice),
+		(UWORD)(pVehicle->uwFuelMax - pVehicle->uwFuelCurr + ubFuelInLiter / 2) / ubFuelInLiter
 	);
+
+	// It's possible to buy more fuel than needed (last liter) - fill up to max
 	pVehicle->uwFuelCurr = MIN(
-		pVehicle->uwFuelCurr + uwRefuelUnits * ubFuelDiv, pVehicle->uwFuelMax
-	);
-	pVehicle->ulCash -= uwRefuelUnits * ubFuelPrice;
-	wScoreNow -= uwRefuelUnits * ubFuelPrice;
-
-	audioPlay(
-		AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
-		g_pSampleOre, AUDIO_VOLUME_MAX, 1
+		pVehicle->uwFuelCurr + uwRefuelLiters * ubFuelInLiter, pVehicle->uwFuelMax
 	);
 
-	return wScoreNow;
+	// Pay for your fuel!
+	pVehicle->ulCash -= uwRefuelLiters * ubLiterPrice;
+
+	if(uwRefuelLiters) {
+		isRestocked = 1;
+	}
+
+	return isRestocked;
 }
 
 static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
@@ -348,6 +358,10 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 					pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
 				);
 			}
+			audioPlay(
+				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
+				g_pSampleOre, AUDIO_VOLUME_MAX, 1
+			);
 		}
 	}
 
@@ -547,23 +561,26 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 	bobNewPush(&pVehicle->sBobTool);
 
-	if(
-		vehicleIsNearShop(pVehicle) &&
-		(pVehicle->ubCargoCurr  || (pVehicle->uwFuelMax - pVehicle->uwFuelCurr > 100))
-	) {
-		WORD wScoreNow = vehicleRestock(pVehicle);
-		UBYTE ubColor = 12;
-		if(wScoreNow < 0) {
-			ubColor = 6;
+	if(vehicleIsNearShop(pVehicle)) {
+		// Save current score & try to restock
+		ULONG ulOldScore = pVehicle->ulCash;
+		// If restocked then play audio & display score
+		if(vehicleRestock(pVehicle)) {
+			WORD wDeltaScore = pVehicle->ulCash - ulOldScore;
+			UBYTE ubColor = (wDeltaScore < 0) ? COLOR_REDEST : COLOR_GOLD;
+			audioPlay(
+				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
+				g_pSampleOre, AUDIO_VOLUME_MAX, 1
+			);
+			textBobSetText(&pVehicle->sTextBob, "%+hd\x1F", wDeltaScore);
+			textBobSetColor(&pVehicle->sTextBob, ubColor);
+			textBobSetPos(
+				&pVehicle->sTextBob,
+				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.sUwCoord.uwY,
+				pVehicle->sBobBody.sPos.sUwCoord.uwY - 24, 0
+			);
 		}
-		textBobSetText(&pVehicle->sTextBob, "%+hd\x1F", wScoreNow);
-		textBobSetColor(&pVehicle->sTextBob, ubColor);
-		textBobSetPos(
-			&pVehicle->sTextBob,
-			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
-			pVehicle->sBobBody.sPos.sUwCoord.uwY,
-			pVehicle->sBobBody.sPos.sUwCoord.uwY - 24, 0
-		);
 	}
 }
 
