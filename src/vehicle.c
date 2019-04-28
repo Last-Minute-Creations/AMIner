@@ -370,7 +370,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 
 static void vehicleProcessMovement(tVehicle *pVehicle) {
 	UBYTE isOnGround = 0;
-	const fix16_t fMaxDx = 4 * fix16_one;
+	const fix16_t fMaxDx = 5 * fix16_one / 2;
 	const fix16_t fAccX = fix16_one / 8;
 	const fix16_t fFrictX = fix16_one / 12;
 

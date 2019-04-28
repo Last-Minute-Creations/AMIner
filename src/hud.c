@@ -14,11 +14,11 @@
 #define HUD_ORIGIN_X 11
 #define HUD_ORIGIN_Y 10
 
-#define GAUGE_DRILL_X (HUD_ORIGIN_X + 70)
-#define GAUGE_CARGO_X (HUD_ORIGIN_X + 138)
-#define GAUGE_HULL_X (HUD_ORIGIN_X + 192)
-#define GAUGE_DEPTH_X (HUD_ORIGIN_X + 262)
-#define GAUGE_CASH_X (HUD_ORIGIN_X + 262)
+#define GAUGE_DRILL_X (HUD_ORIGIN_X + 65)
+#define GAUGE_CARGO_X (HUD_ORIGIN_X + 128)
+#define GAUGE_HULL_X (HUD_ORIGIN_X + 182)
+#define GAUGE_DEPTH_X (HUD_ORIGIN_X + 248)
+#define GAUGE_CASH_X (HUD_ORIGIN_X + 248)
 
 #define ROW_1_Y (HUD_ORIGIN_Y + 0)
 #define ROW_2_Y (HUD_ORIGIN_Y + 8)
@@ -244,13 +244,13 @@ void hudUpdate(void) {
 				UWORD k = (ulCash / 1000U) % 1000U;
 				UWORD u = ulCash % 1000U;
 				if(ulCash >= 1000000U) {
-					sprintf(szBfr, "%lu.%03lu.%03lu", m, k, u);
+					sprintf(szBfr, "%lu.%03lu.%03lu\x1F", m, k, u);
 				}
 				else if(ulCash >= 1000U) {
-					sprintf(szBfr, "%lu.%03lu", k, u);
+					sprintf(szBfr, "%lu.%03lu\x1F", k, u);
 				}
 				else {
-					sprintf(szBfr, "%lu", ulCash);
+					sprintf(szBfr, "%lu\x1F", ulCash);
 				}
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
 				pData->ulCashDisp = ulCash;
@@ -264,7 +264,7 @@ void hudUpdate(void) {
 				UBYTE ubY = (s_isChallenge ? s_ubHudOffsY : ROW_1_Y);
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_CASH_X, ubY,
-					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 2, COLOR_BG
+					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 1, COLOR_BG
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLinebuffer,
