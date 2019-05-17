@@ -80,7 +80,7 @@ convertBitmaps(
 
 convertFont(${TARGET_NAME} _res/uni54 data/uni54.fnt)
 
-set(PALETTE_TILE_EXPORT "${CMAKE_CURRENT_SOURCE_DIR}/_res/32col/aminer main 32c B.pal")
+set(PALETTE_TILE_EXPORT "${CMAKE_CURRENT_SOURCE_DIR}/_res/palettes/aminer_editing.gpl")
 
 function(tileExtractFromPng TARGET_NAME TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
 	set(TILE_IDX 0)
