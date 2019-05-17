@@ -4,9 +4,19 @@ _res/placeholders
 
 build/
 data/*
-!data/silkscreen5.fnt
-!data/uni54.fnt
+!data/*.mod
+!data/*.raw8
 
 *.log
 
 \.vscode/
+
+_res/tiles/
+
+aminer\.adf
+
+_res/base0/
+
+_res/base1/
+
+_res/checkpoint/

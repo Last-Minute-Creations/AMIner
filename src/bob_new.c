@@ -37,6 +37,10 @@ tBobQueue s_pQueues[2];
 void bobNewManagerCreate(
 	tBitMap *pFront, tBitMap *pBack, UWORD uwAvailHeight
 ) {
+	logBlockBegin(
+		"bobNewManagerCreate(pFront: %p, pBack: %p, uwAvailHeight: %hu)",
+		pFront, pBack, uwAvailHeight
+	);
 	s_ubBpp = pFront->Depth;
 	s_ubMaxBobCount = 0;
 
@@ -57,6 +61,7 @@ void bobNewManagerCreate(
 	s_pQueues[1].pBg = 0;
 	s_pQueues[0].pBobs = 0;
 	s_pQueues[1].pBobs = 0;
+	logBlockEnd("bobNewManagerCreate()");
 }
 
 void bobNewAllocateBgBuffers(void) {

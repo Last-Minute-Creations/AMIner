@@ -9,11 +9,9 @@
 #include <ace/utils/font.h>
 #include <ace/managers/audio.h>
 
-#define GAME_BPP 4
+#define GAME_BPP 5
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
-
-void tileRefreshGrass(UWORD uwX);
 
 void gameGsCreate(void);
 
@@ -39,5 +37,6 @@ extern UBYTE g_is2pPlaying;
 extern UBYTE g_is1pKbd, g_is2pKbd;
 extern UBYTE g_isChallenge;
 extern UBYTE g_isAtari;
+extern UBYTE g_ubDinoBonesFound;
 
 #endif // _GAME_H_

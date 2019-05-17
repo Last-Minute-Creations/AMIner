@@ -5,11 +5,10 @@
 #include <mineral.h>
 
 const tMineralDef g_pMinerals[MINERAL_TYPE_COUNT] = {
-	[MINERAL_TYPE_SILVER] = {.szName = "Silver", .ubReward = 5, .ubTitleColor = 15},
-	[MINERAL_TYPE_GOLD] = {.szName = "Gold", .ubReward = 10, .ubTitleColor = 14},
-	[MINERAL_TYPE_EMERALD] = {.szName = "Emerald", .ubReward = 15, .ubTitleColor = 12},
-	[MINERAL_TYPE_RUBY] = {.szName = "Ruby", .ubReward = 20, .ubTitleColor = 9},
-	[MINERAL_TYPE_MOONSTONE] = {.szName = "Moonstone", .ubReward = 25, .ubTitleColor = 10},
-	[MINERAL_TYPE_COAL] = {.szName = "Coal", .ubReward = 5, .ubTitleColor = 10},
+	[MINERAL_TYPE_SILVER] = {.szName = "Silver", .ubReward = 5, .ubTitleColor = 9},
+	[MINERAL_TYPE_GOLD] = {.szName = "Gold", .ubReward = 10, .ubTitleColor = 16},
+	[MINERAL_TYPE_EMERALD] = {.szName = "Emerald", .ubReward = 15, .ubTitleColor = 3},
+	[MINERAL_TYPE_RUBY] = {.szName = "Ruby", .ubReward = 20, .ubTitleColor = 17},
+	[MINERAL_TYPE_MOONSTONE] = {.szName = "Moonstone", .ubReward = 25, .ubTitleColor = 25},
+	[MINERAL_TYPE_COAL] = {.szName = "Coal", .ubReward = 5, .ubTitleColor = 6},
 };
-

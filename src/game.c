@@ -18,8 +18,11 @@
 #include "tile.h"
 #include "window.h"
 #include "vendor.h"
+#include "message.h"
 #include "menu.h"
 #include "hi_score.h"
+#include "ground_layer.h"
+#include "base_tile.h"
 
 tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 
@@ -28,16 +31,23 @@ static tVPort *s_pVpMain;
 tTileBufferManager *g_pMainBuffer;
 
 static tBitMap *s_pTiles;
+static tBitMap *s_pBones, *s_pBonesMask;
 static UBYTE s_isDebug = 0;
 static UWORD s_uwColorBg;
 static UBYTE s_ubChallengeCamCnt;
 static tTextBob s_sChallengeResult;
 static tTextBob s_sEndMessage;
 
+static tBobNew s_pDinoBobs[9];
+static UBYTE s_pDinoWereDrawn[9];
+UBYTE g_ubDinoBonesFound = 0;
+
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isAtari;
+
+UBYTE s_isMsgShown = 0;
 
 static void goToMenu(void) {
 	// Switch to menu, after popping it will process gameGsLoop
@@ -46,10 +56,16 @@ static void goToMenu(void) {
 
 void gameStart(void) {
 	s_ubChallengeCamCnt = 0;
+	g_ubDinoBonesFound = 0;
+	for(UBYTE i = 0; i < 9; ++i) {
+		s_pDinoWereDrawn[i] = 0;
+	}
+	s_isMsgShown = 0;
 	tileInit(g_isAtari, g_isChallenge);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
-	hudReset(g_isChallenge);
+	hudReset(g_isChallenge, g_is2pPlaying);
+	groundLayerReset(1);
 }
 
 void gameGsCreate(void) {
@@ -59,7 +75,37 @@ void gameGsCreate(void) {
 
 	g_pFont = fontCreate("data/uni54.fnt");
 	textBobManagerCreate(g_pFont);
-	s_pTiles = bitmapCreateFromFile("data/tiles.bm");
+	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
+	s_pBones = bitmapCreateFromFile("data/bones.bm", 0);
+	s_pBonesMask = bitmapCreateFromFile("data/bones_mask.bm", 0);
+
+	bobNewInit(&s_pDinoBobs[0], 80, 22, 0, s_pBones, s_pBonesMask, 32 + 92, 100 * 32 + 170);
+	bobNewSetBitMapOffset(&s_pDinoBobs[0], 0);
+
+	bobNewInit(&s_pDinoBobs[1], 80, 10, 0, s_pBones, s_pBonesMask, 32 + 116, 100 * 32 + 179);
+	bobNewSetBitMapOffset(&s_pDinoBobs[1], 24);
+
+	bobNewInit(&s_pDinoBobs[2], 80, 15, 0, s_pBones, s_pBonesMask, 32 + 147, 100 * 32 + 172);
+	bobNewSetBitMapOffset(&s_pDinoBobs[2], 35);
+
+	bobNewInit(&s_pDinoBobs[3], 80, 24, 0, s_pBones, s_pBonesMask, 32 + 159, 100 * 32 + 189);
+	bobNewSetBitMapOffset(&s_pDinoBobs[3], 51);
+
+	bobNewInit(&s_pDinoBobs[4], 80, 44, 0, s_pBones, s_pBonesMask, 32 + 178, 100 * 32 + 170);
+	bobNewSetBitMapOffset(&s_pDinoBobs[4], 76);
+
+	bobNewInit(&s_pDinoBobs[5], 80, 29, 0, s_pBones, s_pBonesMask, 32 + 215, 100 * 32 + 192);
+	bobNewSetBitMapOffset(&s_pDinoBobs[5], 121);
+
+	bobNewInit(&s_pDinoBobs[6], 80, 45, 0, s_pBones, s_pBonesMask, 32 + 209, 100 * 32 + 201);
+	bobNewSetBitMapOffset(&s_pDinoBobs[6], 151);
+
+	bobNewInit(&s_pDinoBobs[7], 80, 45, 0, s_pBones, s_pBonesMask, 32 + 220, 100 * 32 + 205);
+	bobNewSetBitMapOffset(&s_pDinoBobs[7], 197);
+
+	bobNewInit(&s_pDinoBobs[8], 80, 22, 0, s_pBones, s_pBonesMask, 32 + 250, 100 * 32 + 218);
+	bobNewSetBitMapOffset(&s_pDinoBobs[8], 243);
+
 	hudCreate(s_pView, g_pFont);
 
 	s_pVpMain = vPortCreate(0,
@@ -77,9 +123,10 @@ void gameGsCreate(void) {
 		TAG_TILEBUFFER_TILESET, s_pTiles,
 	TAG_END);
 
-	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 16);
+	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 1 << GAME_BPP);
 	s_uwColorBg = s_pVpMain->pPalette[0];
 
+	baseTileCreate(g_pMainBuffer);
 	audioCreate();
 	g_pSampleDrill = sampleCreateFromFile("data/sfx/drill1.raw8", 8000);
 	g_pSampleOre = sampleCreateFromFile("data/sfx/ore2.raw8", 8000);
@@ -98,6 +145,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
+	groundLayerCreate(s_pVpMain);
 	windowInit();
 	vendorAlloc();
 	vehicleBitmapsCreate();
@@ -168,6 +216,14 @@ static inline void debugColor(UWORD uwColor) {
 }
 
 void gameGsLoop(void) {
+	static UBYTE ubLastDino = 0;
+
+	if(!g_isChallenge && !s_isMsgShown) {
+		gamePushState(messageGsCreate, messageGsLoop, messageGsDestroy);
+		s_isMsgShown = 1;
+		return;
+	}
+
   if(keyUse(KEY_ESCAPE)) {
     goToMenu();
 		return;
@@ -189,6 +245,27 @@ void gameGsLoop(void) {
 	gameProcessInput();
 	vehicleProcessText();
 	debugColor(0x080);
+	if(g_ubDinoBonesFound && tileBufferIsTileOnBuffer(
+		g_pMainBuffer,
+		s_pDinoBobs[ubLastDino].sPos.sUwCoord.uwX / 32,
+		s_pDinoBobs[ubLastDino].sPos.sUwCoord.uwY / 32
+	) && s_pDinoWereDrawn[ubLastDino] < 2) {
+		bobNewPush(&s_pDinoBobs[ubLastDino]);
+		++s_pDinoWereDrawn[ubLastDino];
+		if(s_pDinoWereDrawn[ubLastDino] >= 2) {
+			++ubLastDino;
+			if(ubLastDino >= g_ubDinoBonesFound) {
+				ubLastDino = 0;
+			}
+		}
+	}
+	else {
+		s_pDinoWereDrawn[ubLastDino] = 0;
+		++ubLastDino;
+		if(ubLastDino >= g_ubDinoBonesFound) {
+			ubLastDino = 0;
+		}
+	}
 	vehicleProcess(&g_pVehicles[0]);
 	if(g_is2pPlaying) {
 		debugColor(0x880);
@@ -207,7 +284,7 @@ void gameGsLoop(void) {
 		}
 	}
 	else {
-		UWORD uwCamX = 32, uwCamY;
+		UWORD uwCamY, uwCamX = 32;
 		if(!g_is2pPlaying) {
 			// One player only
 			// uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
@@ -215,14 +292,28 @@ void gameGsLoop(void) {
 		}
 		else {
 			// Two players
-			// uwCamX = (fix16_to_int(g_pVehicles[0].fX) + fix16_to_int(g_pVehicles[1].fX) + VEHICLE_WIDTH) / 2;
-			uwCamY = (fix16_to_int(g_pVehicles[0].fY) + fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT) / 2;
+			uwCamY = (
+				fix16_to_int(g_pVehicles[0].fY) +
+				fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT
+			) / 2;
 		}
-		cameraCenterAt(g_pMainBuffer->pCamera, uwCamX, uwCamY);
-		if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < 32) {
-			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
+		WORD wDist = (
+			uwCamY - g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
+		) - g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
+		if(ABS(wDist) > 4) {
+			cameraMoveBy(g_pMainBuffer->pCamera, 0, SGN(wDist) * 4);
+		}
+		else {
+			cameraMoveBy(g_pMainBuffer->pCamera, 0, wDist);
+		}
+		if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < uwCamX) {
+			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = uwCamX;
 		}
 	}
+	baseTileProcess();
+
+	groundLayerProcess(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY);
+
 	debugColor(0x800);
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
@@ -236,6 +327,9 @@ void gameGsDestroy(void) {
 
 	menuUnload();
 	bitmapDestroy(s_pTiles);
+	bitmapDestroy(s_pBones);
+	bitmapDestroy(s_pBonesMask);
+	baseTileDestroy();
 	textBobManagerDestroy();
 	fontDestroy(g_pFont);
 	hiScoreBobsDestroy();

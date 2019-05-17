@@ -4,22 +4,21 @@
 
 #include "window.h"
 #include "game.h"
-#include <ace/utils/bmframe.h>
 
 tBitMap *s_pBgBuffer;
-tBitMap *s_pFrame;
+tBitMap *s_pCommradeBg;
 
 void windowInit(void) {
 	s_pBgBuffer = bitmapCreate(
 		WINDOW_WIDTH, WINDOW_HEIGHT,
 		g_pMainBuffer->sCommon.pVPort->ubBPP, BMF_INTERLEAVED
 	);
-	s_pFrame = bitmapCreateFromFile("data/shop_border.bm");
+	s_pCommradeBg = bitmapCreateFromFile("data/commrade_bg.bm", 0);
 }
 
 void windowDeinit(void) {
-	bitmapDestroy(s_pFrame);
 	bitmapDestroy(s_pBgBuffer);
+	bitmapDestroy(s_pCommradeBg);
 }
 
 UBYTE windowShow(void) {
@@ -36,10 +35,10 @@ UBYTE windowShow(void) {
 	);
 
 	// Draw window background
-	bmFrameDraw(
-		s_pFrame, g_pMainBuffer->pScroll->pBack,
-		sOrigin.sUwCoord.uwX, sOrigin.sUwCoord.uwY,
-		WINDOW_WIDTH / 16, WINDOW_HEIGHT / 16, 16
+	blitCopyAligned(
+		s_pCommradeBg, 0, 0,
+		g_pMainBuffer->pScroll->pBack, sOrigin.sUwCoord.uwX, sOrigin.sUwCoord.uwY,
+		WINDOW_WIDTH, WINDOW_HEIGHT
 	);
 	return 1;
 }
@@ -48,8 +47,8 @@ void windowHide(void) {
 	tUwCoordYX sOrigin = windowGetOrigin();
 	// Restore content beneath window
 	blitCopyAligned(
-		s_pBgBuffer, 0, 0, g_pMainBuffer->pScroll->pBack,
-		sOrigin.sUwCoord.uwX, sOrigin.sUwCoord.uwY,
+		s_pBgBuffer, 0, 0,
+		g_pMainBuffer->pScroll->pBack, sOrigin.sUwCoord.uwX, sOrigin.sUwCoord.uwY,
 		WINDOW_WIDTH, WINDOW_HEIGHT
 	);
 }

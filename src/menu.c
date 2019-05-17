@@ -9,6 +9,9 @@
 #include "game.h"
 #include "bob_new.h"
 #include "text_bob.h"
+#include "ground_layer.h"
+#include "build_ver.h"
+#include "base_tile.h"
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -79,8 +82,8 @@ static tOption s_pOptions[] = {
 
 //-------------------------------------------------------------- MENU COMP START
 
-#define MENU_COLOR_INACTIVE 10
-#define MENU_COLOR_ACTIVE 14
+#define MENU_COLOR_INACTIVE 13
+#define MENU_COLOR_ACTIVE 15
 
 static UBYTE s_ubActivePos;
 static tTextBob s_pMenuPositions[MENU_POS_COUNT];
@@ -174,7 +177,7 @@ static UBYTE s_pKeyKonami[8] = {
 
 static tMenuState s_eMenuState;
 static tBitMap *s_pLogo, *s_pLogoMask;
-static tTextBob s_sCredits;
+static tTextBob s_sCredits, s_sVersion;
 static UWORD s_uwOffsY;
 
 static void menuEnableAtari(void) {
@@ -196,15 +199,21 @@ void onExit(void) {
 }
 
 void menuPreload(void) {
-	s_pLogo = bitmapCreateFromFile("data/logo.bm");
-	s_pLogoMask = bitmapCreateFromFile("data/logo_mask.bm");
+	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
+	s_pLogoMask = bitmapCreateFromFile("data/logo_mask.bm", 0);
 	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
 		textBobCreate(&s_pMenuPositions[i], g_pFont, "Some very very long menu text");
 	}
 	const char *szCredits = "Code: KaiN, Gfx: Softiron, Tests: Rav.En";
 	textBobCreate(&s_sCredits, g_pFont, szCredits);
 	textBobSetText(&s_sCredits, szCredits);
-	textBobSetColor(&s_sCredits, 15);
+	textBobSetColor(&s_sCredits, MENU_COLOR_ACTIVE);
+
+	char szVersion[15];
+	sprintf(szVersion, "v.%d.%d.%d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
+	textBobCreate(&s_sVersion, g_pFont, szVersion);
+	textBobSetText(&s_sVersion, szVersion);
+	textBobSetColor(&s_sVersion, MENU_COLOR_ACTIVE);
 
 	s_pSampleEnter = sampleCreateFromFile("data/sfx/menu_enter.raw8", 22050);
 	s_pSampleToggle = sampleCreateFromFile("data/sfx/menu_toggle.raw8", 22050);
@@ -219,6 +228,7 @@ void menuUnload(void) {
 		textBobDestroy(&s_pMenuPositions[i]);
 	}
 	textBobDestroy(&s_sCredits);
+	textBobDestroy(&s_sVersion);
 
 	sampleDestroy(s_pSampleEnter);
 	sampleDestroy(s_pSampleToggle);
@@ -285,6 +295,7 @@ static void menuProcessSelecting(void) {
 		}
 	}
 	bobNewPush(&s_sCredits.sBob);
+	bobNewPush(&s_sVersion.sBob);
 }
 
 void menuGsLoop(void) {
@@ -294,6 +305,7 @@ void menuGsLoop(void) {
   }
 
 	bobNewBegin();
+	tileBufferQueueProcess(g_pMainBuffer);
 
 	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
 	UWORD uwAvailHeight = g_pMainBuffer->pScroll->uwBmAvailHeight;
@@ -337,9 +349,14 @@ void menuGsLoop(void) {
 				}
 				textBobSetPos(
 					&s_sCredits, uwOffsX + 160,
-					g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight - 15, 0, 1
+					*pCamY + g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight - 15, 0, 1
 				);
 				textBobUpdate(&s_sCredits);
+				textBobSetPos(
+					&s_sVersion, uwOffsX + 320 - s_sVersion.sBob.uwWidth,
+					*pCamY + 4, 0, 0
+				);
+				textBobUpdate(&s_sVersion);
 			}
 		} break;
 
@@ -348,8 +365,8 @@ void menuGsLoop(void) {
 		break;
 
 		case MENU_STATE_ROLL_OUT: {
-			if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY) {
-				g_pMainBuffer->pCamera->uPos.sUwCoord.uwY -= 4;
+			if(*pCamY >= 64) {
+				*pCamY -= 4;
 			}
 			else {
 				gamePopState();
@@ -359,7 +376,8 @@ void menuGsLoop(void) {
 
 	bobNewPushingDone();
 	bobNewEnd();
-
+	baseTileProcess();
+	groundLayerProcess(*pCamY);
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);

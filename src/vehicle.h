@@ -11,7 +11,7 @@
 #include "text_bob.h"
 
 #define VEHICLE_WIDTH 32
-#define VEHICLE_HEIGHT 23
+#define VEHICLE_HEIGHT 24
 
 typedef enum _tDrillDir {
 	DRILL_DIR_NONE = 0,
@@ -44,7 +44,7 @@ typedef struct _tVehicle {
 	fix16_t fDestX;
 	fix16_t fDestY;
 	UBYTE ubTrackFrame;
-	UBYTE ubTrackAnimCnt;
+	fix16_t ubTrackAnimCnt;
 	UBYTE ubBodyShakeCnt;
 	UBYTE ubJetShowFrame;
 	UBYTE ubJetAnimFrame;
