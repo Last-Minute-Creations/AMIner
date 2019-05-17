@@ -48,7 +48,7 @@ typedef struct _tOption {
 void onStart(void);
 void onExit(void);
 
-static const char *s_pModeEnum[] = {"Free play", "Challenge"};
+static const char *s_pModeEnum[] = {"Campaign", "Challenge"};
 static const char *s_pPlayersEnum[] = {"1", "2"};
 static const char *s_pP1Enum[] = {"Joy", "WSAD"};
 static const char *s_pP2Enum[] = {"Joy", "Arrows"};

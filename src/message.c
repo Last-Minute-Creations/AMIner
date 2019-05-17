@@ -44,7 +44,7 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 	}
 	char szWordBfr[50];
 	UBYTE ubWordBytes = 0;
-	char szLineBfr[200];
+	char szLineBfr[200] = "";
 	UWORD uwLinePxLength = 0;
 	UBYTE ubSpacePxLength = fontGlyphWidth(g_pFont, ' ') + 1;
 
@@ -71,7 +71,10 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 		}
 		else {
 			// If it's not, append to current line
-			strcat(szLineBfr, " ");
+			if(uwLinePxLength) {
+				// Add space before word if there's already something in line
+				strcat(szLineBfr, " ");
+			}
 			strcat(szLineBfr, szWordBfr);
 			uwLinePxLength += ubSpacePxLength + uwWordPxLength;
 		}
