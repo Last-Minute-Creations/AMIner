@@ -1,22 +1,18 @@
-
-aminer
-_res/placeholders
-
 build/
+
 data/*
 !data/*.mod
 !data/*.raw8
 
-*.log
-
 \.vscode/
 
 _res/tiles/
-
-aminer\.adf
-
+_res/32col/
 _res/base0/
-
 _res/base1/
-
 _res/checkpoint/
+_res/placeholders
+
+aminer
+aminer\.adf
+*.log
