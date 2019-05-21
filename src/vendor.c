@@ -146,7 +146,9 @@ void vendorGsCreate(void) {
 }
 
 void vendorGsLoop(void) {
-	if(keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || keyUse(KEY_ESCAPE)) {
+	windowProcess();
+
+	if(windowNavUse(WINDOW_NAV_BTN)) {
 		gamePopState();
 		return;
 	}

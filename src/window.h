@@ -17,13 +17,28 @@
 #define WINDOW_DISPLAY_COLOR_BG 11
 #define WINDOW_DISPLAY_COLOR_TEXT 14
 
+typedef enum _tWindowNav {
+	WINDOW_NAV_UP,
+	WINDOW_NAV_DOWN,
+	WINDOW_NAV_LEFT,
+	WINDOW_NAV_RIGHT,
+	WINDOW_NAV_BTN,
+	WINDOW_NAV_COUNT
+} tWindowNav;
+
 void windowInit(void);
 
 void windowDeinit(void);
 
+void windowProcess(void);
+
 UBYTE windowShow(void);
 
 void windowHide(void);
+
+UBYTE windowNavCheck(tWindowNav eNav);
+
+UBYTE windowNavUse(tWindowNav eNav);
 
 tUwCoordYX windowGetOrigin(void);
 

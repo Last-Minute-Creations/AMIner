@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "message.h"
-#include <ace/managers/key.h>
-#include <ace/managers/joy.h>
 #include <ace/managers/game.h>
 #include <ace/managers/system.h>
 #include <ace/utils/font.h>
@@ -151,27 +149,22 @@ void messageGsCreate(void) {
 }
 
 void messageGsLoop(void) {
-	if(
-		keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || keyUse(KEY_ESCAPE) ||
-		joyUse(JOY1 + JOY_FIRE) || joyUse(JOY2 + JOY_FIRE)
-	) {
+
+	windowProcess();
+
+	if(windowNavUse(WINDOW_NAV_BTN)) {
+		blitWait();
 		gamePopState();
 		return;
 	}
 
-	if(s_ubCurrPage > 0 && (
-		keyUse(KEY_W) || keyUse(KEY_UP) ||
-		joyUse(JOY1 + JOY_UP) || joyUse(JOY2 + JOY_UP)
-	)) {
+	if(s_ubCurrPage > 0 && windowNavUse(WINDOW_NAV_UP)) {
 		--s_ubCurrPage;
 		messageDrawPage(
 			WINDOW_DISPLAY_X, WINDOW_DISPLAY_Y, WINDOW_DISPLAY_WIDTH, WINDOW_DISPLAY_HEIGHT, s_ubCurrPage
 		);
 	}
-	else if(s_ubCurrPage < s_ubPageCount - 1 && (
-		keyUse(KEY_S) || keyUse(KEY_DOWN) ||
-		joyUse(JOY1 + JOY_DOWN) || joyUse(JOY2 + JOY_DOWN)
-	)) {
+	else if(s_ubCurrPage < s_ubPageCount - 1 && windowNavUse(WINDOW_NAV_DOWN)) {
 		++s_ubCurrPage;
 		messageDrawPage(
 			WINDOW_DISPLAY_X, WINDOW_DISPLAY_Y, WINDOW_DISPLAY_WIDTH, WINDOW_DISPLAY_HEIGHT, s_ubCurrPage
