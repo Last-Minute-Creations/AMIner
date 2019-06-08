@@ -84,24 +84,24 @@ void commProcess(void) {
 
 	UBYTE pTests[COMM_NAV_COUNT] = {
 		(
-			keyCheck(KEY_W) || keyCheck(KEY_UP) ||
-			joyCheck(JOY1 + JOY_UP) || joyCheck(JOY2 + JOY_UP)
+			keyCheck(KEY_W) || joyCheck(JOY1 + JOY_UP) ||
+			(g_is2pPlaying && (keyCheck(KEY_UP) || joyCheck(JOY2 + JOY_UP)))
 		),
 		(
-			keyCheck(KEY_S) || keyCheck(KEY_DOWN) ||
-			joyCheck(JOY1 + JOY_DOWN) || joyCheck(JOY2 + JOY_DOWN)
+			keyCheck(KEY_S) || joyCheck(JOY1 + JOY_DOWN) ||
+			(g_is2pPlaying && (keyCheck(KEY_DOWN) || joyCheck(JOY2 + JOY_DOWN)))
 		),
 		(
-			keyCheck(KEY_A) || keyCheck(KEY_LEFT) ||
-			joyCheck(JOY1 + JOY_LEFT) || joyCheck(JOY2 + JOY_LEFT)
+			keyCheck(KEY_A) || joyCheck(JOY1 + JOY_LEFT) ||
+			(g_is2pPlaying && (keyCheck(KEY_LEFT) || joyCheck(JOY2 + JOY_LEFT)))
 		),
 		(
-			keyCheck(KEY_D) || keyCheck(KEY_RIGHT) ||
-			joyCheck(JOY1 + JOY_RIGHT) || joyCheck(JOY2 + JOY_RIGHT)
+			keyCheck(KEY_D) || joyCheck(JOY1 + JOY_RIGHT) ||
+			(g_is2pPlaying && (keyCheck(KEY_RIGHT) || joyCheck(JOY2 + JOY_RIGHT)))
 		),
 		(
-		keyCheck(KEY_RETURN) || keyCheck(KEY_SPACE) || keyCheck(KEY_ESCAPE) ||
-		joyCheck(JOY1 + JOY_FIRE) || joyCheck(JOY2 + JOY_FIRE)
+			keyCheck(KEY_RETURN) || keyCheck(KEY_SPACE) || keyCheck(KEY_ESCAPE) ||
+			joyCheck(JOY1 + JOY_FIRE) || (g_is2pPlaying && (joyCheck(JOY2 + JOY_FIRE)))
 		)
 	};
 
