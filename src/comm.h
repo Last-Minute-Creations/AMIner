@@ -26,9 +26,16 @@ typedef enum _tCommNav {
 	COMM_NAV_COUNT
 } tCommNav;
 
-void commInit(void);
+typedef enum _tCommLed {
+	COMM_LED_OFFICE,
+	COMM_LED_WORKSHOP,
+	COMM_LED_WAREHOUSE,
+	COMM_LED_COUNT
+} tCommLed;
 
-void commDeinit(void);
+void commCreate(void);
+
+void commDestroy(void);
 
 void commProcess(void);
 
@@ -41,5 +48,7 @@ UBYTE commNavCheck(tCommNav eNav);
 UBYTE commNavUse(tCommNav eNav);
 
 tUwCoordYX commGetOrigin(void);
+
+void commSetActiveLed(tCommLed eLed);
 
 #endif // _COMM_H_

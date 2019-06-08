@@ -146,7 +146,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	groundLayerCreate(s_pVpMain);
-	commInit();
+	commCreate();
 	commShopAlloc();
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
@@ -338,7 +338,7 @@ void gameGsDestroy(void) {
 	vehicleDestroy(&g_pVehicles[0]);
 	vehicleDestroy(&g_pVehicles[1]);
 	vehicleBitmapsDestroy();
-	commDeinit();
+	commDestroy();
 	commShopDealloc();
 	bobNewManagerDestroy();
 

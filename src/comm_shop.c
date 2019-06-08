@@ -12,9 +12,10 @@
 
 static UBYTE s_isShown;
 static tTextBitMap *s_pTextBitmap;
-tBitMap *s_pBuffer;
+tBitMap *s_pBmDraw;
+tCommLed s_eTab;
 
-void commShopDrawPlan(void) {
+static void commShopDrawOffice(void) {
 	tUwCoordYX sOrigin = commGetOrigin();
 	char *szColNames[3] = {"Mineral", "Required", "Gathered"};
 	UBYTE pColOffs[3] = {0, 70, 120};
@@ -22,7 +23,7 @@ void commShopDrawPlan(void) {
 	for(UBYTE i = 0; i < 3; ++i) {
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, szColNames[i]);
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap,
+			s_pBmDraw, s_pTextBitmap,
 			sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[i],
 			ubRowOffsY, 14, FONT_COOKIE
 		);
@@ -31,7 +32,7 @@ void commShopDrawPlan(void) {
 	ubRowOffsY += g_pFont->uwHeight + 1;
 
 	blitRect(
-		s_pBuffer, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0],
+		s_pBmDraw, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0],
 		ubRowOffsY, COMM_DISPLAY_WIDTH, 1, 14
 	);
 
@@ -48,14 +49,14 @@ void commShopDrawPlan(void) {
 			g_pFont, s_pTextBitmap, pMineralDef->szName
 		);
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0], ubRowOffsY,
+			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0], ubRowOffsY,
 			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
 		);
 
 		sprintf(szBfr, "%hhu", pPlan->pMinerals[i].ubTargetCount);
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[1], ubRowOffsY,
+			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[1], ubRowOffsY,
 			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
 		);
 
@@ -74,7 +75,7 @@ void commShopDrawPlan(void) {
 		// 	ubColor = COMM_DISPLAY_COLOR_TEXT;
 		// }
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[2], ubRowOffsY,
+			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[2], ubRowOffsY,
 			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
 		);
 		ubRowOffsY += 10;
@@ -82,7 +83,7 @@ void commShopDrawPlan(void) {
 
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Days remaining:");
 	fontDrawTextBitMap(
-		s_pBuffer, s_pTextBitmap,
+		s_pBmDraw, s_pTextBitmap,
 		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH - 20,
 		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 3*(g_pFont->uwHeight + 1),
 		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_RIGHT
@@ -90,7 +91,7 @@ void commShopDrawPlan(void) {
 	sprintf(szBfr, "%d", 0);
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 	fontDrawTextBitMap(
-		s_pBuffer, s_pTextBitmap,
+		s_pBmDraw, s_pTextBitmap,
 		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH,
 		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 3*(g_pFont->uwHeight + 1),
 		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_RIGHT
@@ -99,7 +100,7 @@ void commShopDrawPlan(void) {
 	if(planIsFulfilled()) {
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, "Plan fulfilled!");
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap,
+			s_pBmDraw, s_pTextBitmap,
 		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH / 2,
 		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 2*(g_pFont->uwHeight + 1),
 			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_HCENTER
@@ -109,11 +110,19 @@ void commShopDrawPlan(void) {
 
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Exit: enter/fire");
 	fontDrawTextBitMap(
-		s_pBuffer, s_pTextBitmap,
+		s_pBmDraw, s_pTextBitmap,
 		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH / 2,
 		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - (g_pFont->uwHeight + 1),
 		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_HCENTER
 	);
+}
+
+static void commShopDrawWorkshop(void) {
+
+}
+
+static void commShopDrawWarehouse(void) {
+
 }
 
 void commShopAlloc(void) {
@@ -126,6 +135,30 @@ void commShopDealloc(void) {
 	fontDestroyTextBitMap(s_pTextBitmap);
 }
 
+static void commShopShowTab(tCommLed eTab) {
+	s_eTab = eTab;
+	commSetActiveLed(eTab);
+	tUwCoordYX sOrigin = commGetOrigin();
+	blitRect(
+		s_pBmDraw, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X,
+		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y,
+		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, COMM_DISPLAY_COLOR_BG
+	);
+	switch(eTab) {
+		case COMM_LED_OFFICE:
+			commShopDrawOffice();
+			break;
+		case COMM_LED_WORKSHOP:
+			commShopDrawWorkshop();
+			break;
+		case COMM_LED_WAREHOUSE:
+			commShopDrawWarehouse();
+			break;
+		default:
+		break;
+	}
+}
+
 void commShopGsCreate(void) {
 	s_isShown = commShow();
 	if(!s_isShown) {
@@ -134,9 +167,10 @@ void commShopGsCreate(void) {
 		return;
 	}
 
-	s_pBuffer = g_pMainBuffer->pScroll->pBack;
+	s_pBmDraw = g_pMainBuffer->pScroll->pBack;
 
-	commShopDrawPlan();
+	s_eTab = COMM_LED_OFFICE;
+	commShopShowTab(s_eTab);
 
 	// Process managers once so that backbuffer becomes front buffer
 	// Single buffering from now!
@@ -146,11 +180,50 @@ void commShopGsCreate(void) {
 }
 
 void commShopGsLoop(void) {
+	static UBYTE isShift = 0;
+	static UBYTE wasShiftAction = 0;
 	commProcess();
 
-	if(commNavUse(COMM_NAV_BTN)) {
-		gamePopState();
-		return;
+	tCommLed eOldTab = s_eTab;
+	if(commNavCheck(COMM_NAV_BTN)) {
+		isShift = 1;
+	}
+	else if(isShift) {
+		isShift = 0;
+		if(!wasShiftAction) {
+			// Btn released and no other pressed in the meantime - quit commrade
+			gamePopState();
+			return;
+		}
+		else {
+			wasShiftAction = 0;
+		}
+	}
+
+	// Tab nav using shift+left / shift+right
+	if(isShift && commNavUse(COMM_NAV_LEFT) && s_eTab) {
+		--s_eTab;
+		wasShiftAction = 1;
+	}
+	else if(isShift && commNavUse(COMM_NAV_RIGHT) && s_eTab < COMM_LED_COUNT - 1) {
+		++s_eTab;
+		wasShiftAction = 1;
+	}
+
+	if(s_eTab != eOldTab) {
+		commShopShowTab(s_eTab);
+	}
+	else {
+		switch(s_eTab) {
+			case COMM_LED_OFFICE:
+				break;
+			case COMM_LED_WORKSHOP:
+				break;
+			case COMM_LED_WAREHOUSE:
+				break;
+			default:
+				break;
+		}
 	}
 }
 

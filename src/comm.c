@@ -17,7 +17,7 @@ static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
 
-void commInit(void) {
+void commCreate(void) {
 	s_pBmRestore = bitmapCreate(
 		COMM_WIDTH, COMM_HEIGHT,
 		g_pMainBuffer->sCommon.pVPort->ubBPP, BMF_INTERLEAVED
@@ -26,10 +26,27 @@ void commInit(void) {
 	s_pButtons = bitmapCreateFromFile("data/comm_buttons.bm", 0);
 }
 
-void commDeinit(void) {
+void commDestroy(void) {
 	bitmapDestroy(s_pBmRestore);
 	bitmapDestroy(s_pBg);
 	bitmapDestroy(s_pButtons);
+}
+
+void commSetActiveLed(tCommLed eLed) {
+	const UBYTE ubLedWidth = 16;
+	const UBYTE ubLedHeight = 13;
+	const UBYTE ubGrnLedY = ubLedHeight;
+	static const UBYTE pLedX[] = {19, 95, 181};
+	const UBYTE ubLedY = 169;
+
+	tUwCoordYX sOrigin = commGetOrigin();
+	for(UBYTE i = 0; i < COMM_LED_COUNT; ++i) {
+		blitCopy(
+			s_pButtons, 0, (i == eLed ? ubGrnLedY : 0),
+			s_pBmDraw, sOrigin.sUwCoord.uwX + pLedX[i], sOrigin.sUwCoord.uwY + ubLedY,
+			ubLedWidth, ubLedHeight, MINTERM_COOKIE, 0xFF
+		);
+	}
 }
 
 UBYTE commShow(void) {
