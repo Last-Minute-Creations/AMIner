@@ -62,18 +62,6 @@ static void commShopDrawOffice(void) {
 
 		sprintf(szBfr, "%hhu", pPlan->pMinerals[i].ubCurrentCount);
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-		// UBYTE ubColor;
-		// if(pPlan->pMinerals[i].ubTargetCount) {
-		// 	if(pPlan->pMinerals[i].ubCurrentCount >= pPlan->pMinerals[i].ubTargetCount) {
-		// 		ubColor = COLOR_GREEN;
-		// 	}
-		// 	else {
-		// 		ubColor = COLOR_RED;
-		// 	}
-		// }
-		// else {
-		// 	ubColor = COMM_DISPLAY_COLOR_TEXT;
-		// }
 		fontDrawTextBitMap(
 			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[2], ubRowOffsY,
 			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
@@ -122,7 +110,115 @@ static void commShopDrawWorkshop(void) {
 }
 
 static void commShopDrawWarehouse(void) {
+	const UBYTE ubLineHeight = g_pFont->uwHeight + 1;
+	tUwCoordYX sOrigin = commGetOrigin();
+	char *szColNames[4] = {"Mineral", "Plan", "Stock", "Black market"};
+	UBYTE pColOffs[4] = {0, 50, 80, 110};
+	UBYTE ubRowOffsY = sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y;
+	for(UBYTE ubCol = 0; ubCol < 4; ++ubCol) {
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, szColNames[ubCol]);
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pTextBitmap,
+			sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[ubCol],
+			ubRowOffsY, 14, FONT_COOKIE
+		);
+	}
 
+	ubRowOffsY += ubLineHeight;
+
+	blitRect(
+		s_pBmDraw, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0],
+		ubRowOffsY, COMM_DISPLAY_WIDTH, 1, 14
+	);
+
+	ubRowOffsY += 10 - g_pFont->uwHeight;
+
+	char szBfr[30];
+	const tPlan *pPlan = planGetCurrent();
+	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
+		// Omit minerals not in plan
+		if(!pPlan->pMinerals[i].ubTargetCount && !pPlan->pMinerals[i].ubCurrentCount) {
+			continue;
+		}
+
+		// Name
+		const tMineralDef *pMineralDef = &g_pMinerals[i];
+		fontFillTextBitMap(
+			g_pFont, s_pTextBitmap, pMineralDef->szName
+		);
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0], ubRowOffsY,
+			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+		);
+
+		// Plan
+		sprintf(
+			szBfr, "%hhu/%hhu",
+			pPlan->pMinerals[i].ubCurrentCount, pPlan->pMinerals[i].ubTargetCount
+		);
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[1], ubRowOffsY,
+			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+		);
+
+		// Stock
+		sprintf(szBfr, "%hhu", 0);
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[2], ubRowOffsY,
+			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+		);
+
+		// Black market
+		sprintf(szBfr, "%hhu/%hhu\x1F", 0, 0);
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[3], ubRowOffsY,
+			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+		);
+
+		ubRowOffsY += 10;
+	}
+	ubRowOffsY += 10;
+
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Or any worth:");
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X, ubRowOffsY,
+		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+	);
+	sprintf(szBfr, "%d/%d\x1F", pPlan->ulCurrentSum, pPlan->ulTargetSum);
+	UWORD uwAdd = s_pTextBitmap->uwActualWidth;
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pTextBitmap,
+		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + uwAdd + 1, ubRowOffsY,
+		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+	);
+
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Days remaining:");
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pTextBitmap,
+		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH - 20,
+		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 3 * ubLineHeight,
+		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_RIGHT
+	);
+	sprintf(szBfr, "%d", 0);
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pTextBitmap,
+		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH - 20 + 5,
+		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 3 * ubLineHeight,
+		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+	);
+
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, "L/R: move stock to plan/market");
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pTextBitmap,
+		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH / 2,
+		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - (g_pFont->uwHeight + 1),
+		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_HCENTER
+	);
 }
 
 void commShopAlloc(void) {
@@ -169,7 +265,7 @@ void commShopGsCreate(void) {
 
 	s_pBmDraw = g_pMainBuffer->pScroll->pBack;
 
-	s_eTab = COMM_LED_OFFICE;
+	s_eTab = COMM_LED_WAREHOUSE;
 	commShopShowTab(s_eTab);
 
 	// Process managers once so that backbuffer becomes front buffer
@@ -201,12 +297,22 @@ void commShopGsLoop(void) {
 	}
 
 	// Tab nav using shift+left / shift+right
-	if(isShift && commNavUse(COMM_NAV_LEFT) && s_eTab) {
-		--s_eTab;
+	if(isShift && commNavUse(COMM_NAV_LEFT)) {
+		if(s_eTab) {
+			--s_eTab;
+		}
+		else {
+			s_eTab = COMM_LED_COUNT-1;
+		}
 		wasShiftAction = 1;
 	}
-	else if(isShift && commNavUse(COMM_NAV_RIGHT) && s_eTab < COMM_LED_COUNT - 1) {
-		++s_eTab;
+	else if(isShift && commNavUse(COMM_NAV_RIGHT)) {
+		if(s_eTab < COMM_LED_COUNT - 1) {
+			++s_eTab;
+		}
+		else {
+			s_eTab = 0;
+		}
 		wasShiftAction = 1;
 	}
 
