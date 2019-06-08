@@ -54,7 +54,7 @@ convertBitmaps(
 	INTERLEAVED SOURCES
 		_res/commrade/bg.png _res/commrade/buttons.png _res/hud.png
 	DESTINATIONS
-		data/commrade_bg.bm data/commrade_buttons.bm data/hud.bm
+		data/comm_bg.bm data/comm_buttons.bm data/hud.bm
 )
 
 convertBitmaps(

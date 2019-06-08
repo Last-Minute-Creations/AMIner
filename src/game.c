@@ -16,9 +16,9 @@
 #include "vehicle.h"
 #include "hud.h"
 #include "tile.h"
-#include "window.h"
-#include "vendor.h"
-#include "message.h"
+#include "comm.h"
+#include "comm_shop.h"
+#include "comm_msg.h"
 #include "menu.h"
 #include "hi_score.h"
 #include "ground_layer.h"
@@ -146,8 +146,8 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	groundLayerCreate(s_pVpMain);
-	windowInit();
-	vendorAlloc();
+	commInit();
+	commShopAlloc();
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
@@ -219,7 +219,7 @@ void gameGsLoop(void) {
 	static UBYTE ubLastDino = 0;
 
 	if(!g_isChallenge && !s_isMsgShown) {
-		gamePushState(messageGsCreate, messageGsLoop, messageGsDestroy);
+		gamePushState(commMsgGsCreate, commMsgGsLoop, commMsgGsDestroy);
 		s_isMsgShown = 1;
 		return;
 	}
@@ -235,7 +235,7 @@ void gameGsLoop(void) {
 		(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) &&
 		vehicleIsNearShop(&g_pVehicles[0])
 	) {
-		gamePushState(vendorGsCreate, vendorGsLoop, vendorGsDestroy);
+		gamePushState(commShopGsCreate, commShopGsLoop, commShopGsDestroy);
 		return;
 	}
 
@@ -338,8 +338,8 @@ void gameGsDestroy(void) {
 	vehicleDestroy(&g_pVehicles[0]);
 	vehicleDestroy(&g_pVehicles[1]);
 	vehicleBitmapsDestroy();
-	windowDeinit();
-	vendorDealloc();
+	commDeinit();
+	commShopDealloc();
 	bobNewManagerDestroy();
 
 	audioDestroy();

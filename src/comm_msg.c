@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "message.h"
+#include "comm_msg.h"
 #include <ace/managers/game.h>
 #include <ace/managers/system.h>
 #include <ace/utils/font.h>
 #include "game.h"
 #include "color.h"
-#include "window.h"
+#include "comm.h"
 
 #define LINES_MAX 100
 
@@ -95,11 +95,11 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 	systemUnuse();
 
 	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
-	UBYTE ubLinesPerPage = WINDOW_DISPLAY_HEIGHT / ubLineHeight;
+	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight;
 	s_ubPageCount = (s_uwLineCount + (ubLinesPerPage - 1)) / ubLinesPerPage;
 }
 
-static void messageDrawPage(
+static void commMsgDrawPage(
 	UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight, UBYTE ubPage
 ) {
 	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
@@ -107,7 +107,7 @@ static void messageDrawPage(
 	UWORD uwLineStart = ubPage * ubLinesPerPage;
 	blitRect(
 		s_pBuffer, s_sOrigin.sUwCoord.uwX + uwX, s_sOrigin.sUwCoord.uwY + uwY,
-		uwWidth, uwHeight, WINDOW_DISPLAY_COLOR_BG
+		uwWidth, uwHeight, COMM_DISPLAY_COLOR_BG
 	);
 	for(
 		UWORD i = uwLineStart;
@@ -116,14 +116,14 @@ static void messageDrawPage(
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pLines[i]);
 		fontDrawTextBitMap(
 			s_pBuffer, s_pTextBitmap, s_sOrigin.sUwCoord.uwX + uwX,
-			s_sOrigin.sUwCoord.uwY + uwY, WINDOW_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_SHADOW
+			s_sOrigin.sUwCoord.uwY + uwY, COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_SHADOW
 		);
 		uwY += ubLineHeight;
 	}
 }
 
-void messageGsCreate(void) {
-	s_isShown = windowShow();
+void commMsgGsCreate(void) {
+	s_isShown = commShow();
 	if(!s_isShown) {
 		// Camera not placed properly
 		gamePopState();
@@ -131,15 +131,15 @@ void messageGsCreate(void) {
 	}
 
 	s_uwLineCount = 0;
-	readLines("data/intro.txt", WINDOW_DISPLAY_WIDTH);
+	readLines("data/intro.txt", COMM_DISPLAY_WIDTH);
 
 	s_pBuffer = g_pMainBuffer->pScroll->pBack;
 	s_pTextBitmap = fontCreateTextBitMap(
-		WINDOW_WIDTH, g_pFont->uwHeight
+		COMM_WIDTH, g_pFont->uwHeight
 	);
-	s_sOrigin = windowGetOrigin();
+	s_sOrigin = commGetOrigin();
 
-	messageDrawPage(WINDOW_DISPLAY_X, WINDOW_DISPLAY_Y, WINDOW_DISPLAY_WIDTH, WINDOW_DISPLAY_HEIGHT, 0);
+	commMsgDrawPage(COMM_DISPLAY_X, COMM_DISPLAY_Y, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, 0);
 
 	// Process managers once so that backbuffer becomes front buffer
 	// Single buffering from now on!
@@ -148,31 +148,31 @@ void messageGsCreate(void) {
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 }
 
-void messageGsLoop(void) {
+void commMsgGsLoop(void) {
 
-	windowProcess();
+	commProcess();
 
-	if(windowNavUse(WINDOW_NAV_BTN)) {
+	if(commNavUse(COMM_NAV_BTN)) {
 		blitWait();
 		gamePopState();
 		return;
 	}
 
-	if(s_ubCurrPage > 0 && windowNavUse(WINDOW_NAV_UP)) {
+	if(s_ubCurrPage > 0 && commNavUse(COMM_NAV_UP)) {
 		--s_ubCurrPage;
-		messageDrawPage(
-			WINDOW_DISPLAY_X, WINDOW_DISPLAY_Y, WINDOW_DISPLAY_WIDTH, WINDOW_DISPLAY_HEIGHT, s_ubCurrPage
+		commMsgDrawPage(
+			COMM_DISPLAY_X, COMM_DISPLAY_Y, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, s_ubCurrPage
 		);
 	}
-	else if(s_ubCurrPage < s_ubPageCount - 1 && windowNavUse(WINDOW_NAV_DOWN)) {
+	else if(s_ubCurrPage < s_ubPageCount - 1 && commNavUse(COMM_NAV_DOWN)) {
 		++s_ubCurrPage;
-		messageDrawPage(
-			WINDOW_DISPLAY_X, WINDOW_DISPLAY_Y, WINDOW_DISPLAY_WIDTH, WINDOW_DISPLAY_HEIGHT, s_ubCurrPage
+		commMsgDrawPage(
+			COMM_DISPLAY_X, COMM_DISPLAY_Y, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, s_ubCurrPage
 		);
 	}
 }
 
-void messageGsDestroy(void) {
+void commMsgGsDestroy(void) {
 	if(!s_isShown) {
 		return;
 	}
@@ -184,5 +184,5 @@ void messageGsDestroy(void) {
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
-	windowHide();
+	commHide();
 }
