@@ -1,6 +1,7 @@
 @echo off
 mkdir game
 copy aminer game
+copy aminer.info game
 xcopy data game\data /e /i /h
 mkdir game\s
 echo aminer > game\s\startup-sequence
