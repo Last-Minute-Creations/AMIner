@@ -452,7 +452,7 @@ void gameChallengeEnd(void) {
 	// End text
 	textBobSet(
 		&s_sEndMessage, "Press fire or enter to continue", 14,
-		uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 220, 0, 1
+		uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 200, 0, 1
 	);
 	textBobUpdate(&s_sEndMessage);
 
