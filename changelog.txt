@@ -1,3 +1,20 @@
+19.6.9
+- Added navigation buttons and tabs to commrade in shop
+- Fixed garbled screen on start
+- Added game icon
+- 2nd player's controls in Commrade are now disabled in single player mode
+- Initial work on warehouse tab in shop
+
+19.5.18
+- added Commrade display for shop / messages
+- HUD rework
+- fixed vehicle moving a bit above ground level in surface base
+- fixed restock sfx trigerring continuously
+- decreased speed of vehicle a bit
+- greatly improved game stability
+- ADF generation works again, dunno why it was broken and why it's not atm
+- removed spaces at the beginning of paragraphs in message display
+
 19.4.16
 - new Aminer logo
 - new group logo
