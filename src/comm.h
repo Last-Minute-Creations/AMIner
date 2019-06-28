@@ -16,6 +16,7 @@
 #define COMM_DISPLAY_HEIGHT 120
 #define COMM_DISPLAY_COLOR_BG 11
 #define COMM_DISPLAY_COLOR_TEXT 14
+#define COMM_DISPLAY_COLOR_TEXT_DARK 13
 
 typedef enum _tCommNav {
 	COMM_NAV_UP,
@@ -48,6 +49,8 @@ UBYTE commNavCheck(tCommNav eNav);
 UBYTE commNavUse(tCommNav eNav);
 
 tUwCoordYX commGetOrigin(void);
+
+tUwCoordYX commGetOriginDisplay(void);
 
 void commSetActiveLed(tCommLed eLed);
 

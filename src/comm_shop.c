@@ -7,218 +7,273 @@
 #include <ace/managers/game.h>
 #include "comm.h"
 #include "game.h"
-#include "plan.h"
+#include "warehouse.h"
 #include "mineral.h"
+#include "button.h"
+#include "vehicle.h"
+#include "hud.h"
 
 static UBYTE s_isShown;
+static UBYTE s_isBtnPress;
 static tTextBitMap *s_pTextBitmap;
 tBitMap *s_pBmDraw;
 tCommLed s_eTab;
 
+//----------------------------------------------------------------------- OFFICE
+
 static void commShopDrawOffice(void) {
-	tUwCoordYX sOrigin = commGetOrigin();
-	char *szColNames[3] = {"Mineral", "Required", "Gathered"};
-	UBYTE pColOffs[3] = {0, 70, 120};
-	UBYTE ubRowOffsY = sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y;
-	for(UBYTE i = 0; i < 3; ++i) {
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, szColNames[i]);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap,
-			sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[i],
-			ubRowOffsY, 14, FONT_COOKIE
-		);
-	}
 
-	ubRowOffsY += g_pFont->uwHeight + 1;
-
-	blitRect(
-		s_pBmDraw, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0],
-		ubRowOffsY, COMM_DISPLAY_WIDTH, 1, 14
-	);
-
-	ubRowOffsY += 10 - g_pFont->uwHeight;
-
-	char szBfr[10];
-	const tPlan *pPlan = planGetCurrent();
-	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
-		if(!pPlan->pMinerals[i].ubTargetCount && !pPlan->pMinerals[i].ubCurrentCount) {
-			continue;
-		}
-		const tMineralDef *pMineralDef = &g_pMinerals[i];
-		fontFillTextBitMap(
-			g_pFont, s_pTextBitmap, pMineralDef->szName
-		);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0], ubRowOffsY,
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
-		);
-
-		sprintf(szBfr, "%hhu", pPlan->pMinerals[i].ubTargetCount);
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[1], ubRowOffsY,
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
-		);
-
-		sprintf(szBfr, "%hhu", pPlan->pMinerals[i].ubCurrentCount);
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[2], ubRowOffsY,
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
-		);
-		ubRowOffsY += 10;
-	}
-
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Days remaining:");
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH - 20,
-		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 3*(g_pFont->uwHeight + 1),
-		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_RIGHT
-	);
-	sprintf(szBfr, "%d", 0);
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH,
-		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 3*(g_pFont->uwHeight + 1),
-		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_RIGHT
-	);
-
-	if(planIsFulfilled()) {
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, "Plan fulfilled!");
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH / 2,
-		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 2*(g_pFont->uwHeight + 1),
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_HCENTER
-		);
-		planGenerateNew();
-	}
-
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Exit: enter/fire");
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH / 2,
-		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - (g_pFont->uwHeight + 1),
-		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_HCENTER
-	);
 }
+
+//--------------------------------------------------------------------- WORKSHOP
 
 static void commShopDrawWorkshop(void) {
 
 }
 
-static void commShopDrawWarehouse(void) {
-	const UBYTE ubLineHeight = g_pFont->uwHeight + 1;
-	tUwCoordYX sOrigin = commGetOrigin();
-	char *szColNames[4] = {"Mineral", "Plan", "Stock", "Black market"};
-	UBYTE pColOffs[4] = {0, 50, 80, 110};
-	UBYTE ubRowOffsY = sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y;
-	for(UBYTE ubCol = 0; ubCol < 4; ++ubCol) {
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, szColNames[ubCol]);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap,
-			sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[ubCol],
-			ubRowOffsY, 14, FONT_COOKIE
-		);
-	}
+//-------------------------------------------------------------------- WAREHOUSE
 
-	ubRowOffsY += ubLineHeight;
+static UBYTE s_ubPosCurr = 0, s_ubPosCount = 0;
+static const char *s_pColNames[4] = {"Mineral", "Sell", "Stock", "Plan"};
+static const UBYTE s_pColOffs[4] = {0,  50, 85, 130};
+static UBYTE s_pMineralsOnList[MINERAL_TYPE_COUNT];
 
-	blitRect(
-		s_pBmDraw, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0],
-		ubRowOffsY, COMM_DISPLAY_WIDTH, 1, 14
-	);
+static UBYTE s_pTmpSell[MINERAL_TYPE_COUNT];
+static UBYTE s_pTmpPlan[MINERAL_TYPE_COUNT];
+static UBYTE s_pTmpStock[MINERAL_TYPE_COUNT];
 
-	ubRowOffsY += 10 - g_pFont->uwHeight;
-
-	char szBfr[30];
-	const tPlan *pPlan = planGetCurrent();
+static UBYTE getMineralsOnList(const tPlan *pPlan, UBYTE *pMineralsOnList) {
+	UBYTE ubCount = 0;
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		// Omit minerals not in plan
-		if(!pPlan->pMinerals[i].ubTargetCount && !pPlan->pMinerals[i].ubCurrentCount) {
-			continue;
+		if(pPlan->pMinerals[i].ubTargetCount || warehouseGetStock(i)) {
+			pMineralsOnList[ubCount] = i;
+			s_pTmpStock[i] = warehouseGetStock(i);
+			s_pTmpPlan[i] = pPlan->pMinerals[i].ubCurrentCount;
+			s_pTmpSell[i] = 0;
+			++ubCount;
 		}
-
-		// Name
-		const tMineralDef *pMineralDef = &g_pMinerals[i];
-		fontFillTextBitMap(
-			g_pFont, s_pTextBitmap, pMineralDef->szName
-		);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[0], ubRowOffsY,
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
-		);
-
-		// Plan
-		sprintf(
-			szBfr, "%hhu/%hhu",
-			pPlan->pMinerals[i].ubCurrentCount, pPlan->pMinerals[i].ubTargetCount
-		);
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[1], ubRowOffsY,
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
-		);
-
-		// Stock
-		sprintf(szBfr, "%hhu", 0);
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[2], ubRowOffsY,
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
-		);
-
-		// Black market
-		sprintf(szBfr, "%hhu/%hhu\x1F", 0, 0);
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + pColOffs[3], ubRowOffsY,
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
-		);
-
-		ubRowOffsY += 10;
 	}
-	ubRowOffsY += 10;
+	return ubCount;
+}
 
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Or any worth:");
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X, ubRowOffsY,
-		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
+	UBYTE ubMineral = s_pMineralsOnList[ubPos];
+	UBYTE ubColor = (
+		ubPos == s_ubPosCurr ?
+		COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
-	sprintf(szBfr, "%d/%d\x1F", pPlan->ulCurrentSum, pPlan->ulTargetSum);
-	UWORD uwAdd = s_pTextBitmap->uwActualWidth;
+
+	tUwCoordYX sPosRow = commGetOriginDisplay();
+	sPosRow.uwY += 11 + ubPos * 10;
+
+	// Erase
+	blitRect(
+		s_pBmDraw, sPosRow.uwX, sPosRow.uwY, COMM_DISPLAY_WIDTH, 10,
+		COMM_DISPLAY_COLOR_BG
+	);
+
+	// Name
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, g_pMinerals[ubMineral].szName);
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pTextBitmap, sPosRow.uwX + s_pColOffs[0], sPosRow.uwY,
+		ubColor, FONT_COOKIE
+	);
+
+	// Sell
+	char szBfr[10];
+	UWORD uwMineralReward = s_pTmpSell[ubMineral] * g_pMinerals[ubMineral].ubReward;
+	sprintf(szBfr, "%hu\x1F", uwMineralReward);
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + uwAdd + 1, ubRowOffsY,
-		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+		s_pBmDraw, s_pTextBitmap, sPosRow.uwX + s_pColOffs[1], sPosRow.uwY,
+		ubColor, FONT_COOKIE
 	);
 
+	// Stock
+	UBYTE ubStockCenter = fontMeasureText(g_pFont, s_pColNames[2]).uwX / 2;
+	sprintf(szBfr, "%hhu", s_pTmpStock[ubMineral]);
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
+	UBYTE ubValWidthHalf = fontMeasureText(g_pFont, szBfr).uwX / 2;
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pTextBitmap,
+		sPosRow.uwX + s_pColOffs[2] + ubStockCenter - ubValWidthHalf, sPosRow.uwY,
+		ubColor, FONT_COOKIE
+	);
+	if(ubPos == s_ubPosCurr) {
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, ">");
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pTextBitmap,
+			sPosRow.uwX + s_pColOffs[2] + ubStockCenter + ubValWidthHalf + 3,
+			sPosRow.uwY, ubColor, FONT_COOKIE
+		);
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, "<");
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pTextBitmap,
+			sPosRow.uwX + s_pColOffs[2] + ubStockCenter - ubValWidthHalf - 3,
+			sPosRow.uwY, ubColor, FONT_COOKIE | FONT_RIGHT
+		);
+	}
+	else {
+		blitRect(
+			s_pBmDraw,
+			sPosRow.uwX + s_pColOffs[2] + ubStockCenter + ubValWidthHalf + 3,
+			sPosRow.uwY, 5, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
+		);
+		blitRect(
+			s_pBmDraw,
+			sPosRow.uwX + s_pColOffs[2] + ubStockCenter - ubValWidthHalf - 3 - 5,
+			sPosRow.uwY, 5, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
+		);
+	}
+
+	// Plan
+	sprintf(
+		szBfr, "%hhu/%hhu",
+		s_pTmpPlan[ubMineral], pPlan->pMinerals[ubMineral].ubTargetCount
+	);
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pTextBitmap, sPosRow.uwX + s_pColOffs[3], sPosRow.uwY,
+		ubColor, FONT_COOKIE
+	);
+}
+
+static void commShopDrawWarehouse(void) {
+	const UBYTE ubLineHeight = g_pFont->uwHeight + 1;
+	tUwCoordYX sPosDisplay = commGetOriginDisplay();
+	for(UBYTE ubCol = 0; ubCol < 4; ++ubCol) {
+		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pColNames[ubCol]);
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pTextBitmap, sPosDisplay.uwX + s_pColOffs[ubCol], sPosDisplay.uwY,
+			14, FONT_COOKIE
+		);
+	}
+
+	tUwCoordYX sPosRow = sPosDisplay;
+	sPosRow.uwY += ubLineHeight;
+	blitRect(
+		s_pBmDraw, sPosRow.uwX + s_pColOffs[0], sPosRow.uwY, COMM_DISPLAY_WIDTH, 1, 14
+	);
+
+	const tPlan *pPlan = warehouseGetPlan();
+	s_ubPosCount = getMineralsOnList(pPlan, s_pMineralsOnList);
+	s_ubPosCurr = 0;
+	for(UBYTE i = 0; i < s_ubPosCount; ++i) {
+		commShopDrawWarehouseRow(i, pPlan);
+	}
+
+	// Confirm button
+	tUwCoordYX sPosBtn = sPosDisplay;
+	sPosBtn.uwY += COMM_DISPLAY_HEIGHT - 5 * ubLineHeight;
+	sPosBtn.uwX += COMM_DISPLAY_WIDTH / 3;
+	buttonRmAll();
+	buttonAdd("Confirm", sPosBtn.uwX, sPosBtn.uwY);
+	buttonAdd("Exit", sPosBtn.uwX + COMM_DISPLAY_WIDTH / 3, sPosBtn.uwY);
+	buttonDrawAll(s_pBmDraw, s_pTextBitmap);
+
+	char szBfr[5];
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Days remaining:");
 	fontDrawTextBitMap(
 		s_pBmDraw, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH - 20,
-		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 3 * ubLineHeight,
+		sPosDisplay.uwX + COMM_DISPLAY_WIDTH - 20,
+		sPosDisplay.uwY + COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
 		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_RIGHT
 	);
 	sprintf(szBfr, "%d", 0);
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 	fontDrawTextBitMap(
 		s_pBmDraw, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH - 20 + 5,
-		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - 3 * ubLineHeight,
+		sPosDisplay.uwX + COMM_DISPLAY_WIDTH - 20 + 5,
+		sPosDisplay.uwY + COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
 		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
 	);
+}
 
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, "L/R: move stock to plan/market");
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap,
-		sOrigin.sUwCoord.uwX + COMM_DISPLAY_X + COMM_DISPLAY_WIDTH / 2,
-		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y + COMM_DISPLAY_HEIGHT - (g_pFont->uwHeight + 1),
-		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_HCENTER
-	);
+static void commShopProcessWarehouse() {
+	UBYTE isButtonRefresh = 0;
+	UBYTE ubPosPrev = s_ubPosCurr;
+	if(commNavUse(COMM_NAV_UP) && s_ubPosCurr) {
+		 s_ubPosCurr = MAX(0, s_ubPosCurr - 1);
+	}
+	else if(commNavUse(COMM_NAV_DOWN) && s_ubPosCurr < s_ubPosCount) {
+		s_ubPosCurr = MIN(s_ubPosCount, s_ubPosCurr + 1);
+	}
+
+	if(s_ubPosCurr != ubPosPrev) {
+		// Deselect previous pos
+		if(ubPosPrev < s_ubPosCount) {
+			commShopDrawWarehouseRow(ubPosPrev, warehouseGetPlan());
+		}
+		// Select new pos
+		if(s_ubPosCurr < s_ubPosCount) {
+			commShopDrawWarehouseRow(s_ubPosCurr, warehouseGetPlan());
+			if(ubPosPrev >= s_ubPosCount) {
+				buttonSelect(BUTTON_INVALID);
+				isButtonRefresh = 1;
+			}
+		}
+		else {
+			buttonSelect(0);
+			isButtonRefresh = 1;
+		}
+	}
+	else if(s_ubPosCurr < s_ubPosCount) {
+		UBYTE ubMineral = s_pMineralsOnList[s_ubPosCurr];
+		// Process moving stock
+		if(commNavUse(COMM_NAV_LEFT) && s_pTmpStock[ubMineral]) {
+			++s_pTmpSell[ubMineral];
+			--s_pTmpStock[ubMineral];
+			commShopDrawWarehouseRow(ubPosPrev, warehouseGetPlan());
+		}
+		else if(commNavUse(COMM_NAV_RIGHT) && s_pTmpStock[ubMineral]) {
+			++s_pTmpPlan[ubMineral];
+			--s_pTmpStock[ubMineral];
+			commShopDrawWarehouseRow(ubPosPrev, warehouseGetPlan());
+		}
+	}
+	else {
+		// Navigation between buttons
+		if(commNavUse(COMM_NAV_RIGHT)) {
+			buttonSelect(1);
+			isButtonRefresh = 1;
+		}
+		else if(commNavUse(COMM_NAV_LEFT)) {
+			buttonSelect(0);
+			isButtonRefresh = 1;
+		}
+		else if(ubPosPrev < s_ubPosCount) {
+			buttonSelect(0);
+			isButtonRefresh = 1;
+		}
+	}
+	if(isButtonRefresh) {
+		buttonDrawAll(s_pBmDraw, s_pTextBitmap);
+	}
+
+	// Process button press
+	if(s_isBtnPress) {
+		switch(buttonGetSelected()) {
+			case 0:
+				// Confirm
+				for(UBYTE i = 0; i < s_ubPosCount; ++i) {
+					UBYTE ubMineral = s_pMineralsOnList[i];
+					warehouseSetStock(ubMineral, s_pTmpStock[ubMineral]);
+					warehouseReserveMineralsForPlan(ubMineral, s_pTmpPlan[ubMineral]);
+					g_pVehicles[0].lCash += g_pMinerals[ubMineral].ubReward * s_pTmpSell[ubMineral];
+					s_pTmpSell[ubMineral] = 0;
+					commShopDrawWarehouseRow(i, warehouseGetPlan());
+					hudSetCash(0, g_pVehicles[0].lCash);
+				}
+				break;
+			case 1:
+				// Exit
+				gamePopState();
+				return;
+			default:
+				break;
+		};
+	}
 }
 
 void commShopAlloc(void) {
@@ -234,10 +289,9 @@ void commShopDealloc(void) {
 static void commShopShowTab(tCommLed eTab) {
 	s_eTab = eTab;
 	commSetActiveLed(eTab);
-	tUwCoordYX sOrigin = commGetOrigin();
+	tUwCoordYX sPosDisplay = commGetOriginDisplay();
 	blitRect(
-		s_pBmDraw, sOrigin.sUwCoord.uwX + COMM_DISPLAY_X,
-		sOrigin.sUwCoord.uwY + COMM_DISPLAY_Y,
+		s_pBmDraw, sPosDisplay.uwX, sPosDisplay.uwY,
 		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, COMM_DISPLAY_COLOR_BG
 	);
 	switch(eTab) {
@@ -281,40 +335,43 @@ void commShopGsLoop(void) {
 	commProcess();
 
 	tCommLed eOldTab = s_eTab;
+	s_isBtnPress = 0;
 	if(commNavCheck(COMM_NAV_BTN)) {
 		isShift = 1;
 	}
 	else if(isShift) {
-		isShift = 0;
 		if(!wasShiftAction) {
-			// Btn released and no other pressed in the meantime - quit commrade
-			gamePopState();
-			return;
+			// Btn released and no other pressed in the meantime
+			s_isBtnPress = 1;
 		}
-		else {
-			wasShiftAction = 0;
-		}
+		isShift = 0;
+		wasShiftAction = 0;
 	}
 
 	// Tab nav using shift+left / shift+right
-	if(isShift && commNavUse(COMM_NAV_LEFT)) {
-		if(s_eTab) {
-			--s_eTab;
+	if(isShift) {
+		if(commNavUse(COMM_NAV_LEFT)) {
+			if(s_eTab) {
+				--s_eTab;
+			}
+			else {
+				s_eTab = COMM_LED_COUNT - 1;
+			}
+			wasShiftAction = 1;
 		}
-		else {
-			s_eTab = COMM_LED_COUNT-1;
+		else if(commNavUse(COMM_NAV_RIGHT)) {
+			if(s_eTab < COMM_LED_COUNT - 1) {
+				++s_eTab;
+			}
+			else {
+				s_eTab = 0;
+			}
+			wasShiftAction = 1;
 		}
-		wasShiftAction = 1;
 	}
-	else if(isShift && commNavUse(COMM_NAV_RIGHT)) {
-		if(s_eTab < COMM_LED_COUNT - 1) {
-			++s_eTab;
-		}
-		else {
-			s_eTab = 0;
-		}
-		wasShiftAction = 1;
-	}
+
+	hudUpdate();
+	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 
 	if(s_eTab != eOldTab) {
 		commShopShowTab(s_eTab);
@@ -326,6 +383,7 @@ void commShopGsLoop(void) {
 			case COMM_LED_WORKSHOP:
 				break;
 			case COMM_LED_WAREHOUSE:
+				commShopProcessWarehouse();
 				break;
 			default:
 				break;

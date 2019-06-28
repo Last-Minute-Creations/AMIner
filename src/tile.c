@@ -107,8 +107,8 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	logBlockBegin(
 		"tileInit(isCoalOnly: %hhu, isChallenge: %hhu)", isCoalOnly, isChallenge
 	);
-	UWORD uwEndX = g_pMainBuffer->uTileBounds.sUwCoord.uwX;
-	UWORD uwEndY = g_pMainBuffer->uTileBounds.sUwCoord.uwY;
+	UWORD uwEndX = g_pMainBuffer->uTileBounds.uwX;
+	UWORD uwEndY = g_pMainBuffer->uTileBounds.uwY;
 	if(isChallenge) {
 		uwEndY = TILE_ROW_CHALLENGE_FINISH + 1; // without +1 it's broken
 	}

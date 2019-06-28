@@ -21,11 +21,11 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying);
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth);
 
-void hudSetScore(UBYTE ubPlayer, ULONG ulCash);
+void hudSetCash(UBYTE ubPlayer, LONG lCash);
 
 void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo, UBYTE ubCargoMax);
 
-void hudSetFuel(UBYTE ubPlayer, UWORD ubFuel, UWORD ubFuelMax);
+void hudSetDrill(UBYTE ubPlayer, UWORD uwDrill, UWORD uwDrillMax);
 
 void hudSetHealth(UBYTE ubPlayer, UBYTE ubHealth, UBYTE ubHealthMax);
 

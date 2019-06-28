@@ -9,6 +9,7 @@
 #include <fixmath/fix16.h>
 #include "bob_new.h"
 #include "text_bob.h"
+#include "mineral.h"
 
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 24
@@ -57,10 +58,11 @@ typedef struct _tVehicle {
 	UBYTE ubCargoMax;
 	UBYTE ubCargoCurr;
 	UWORD uwCargoScore;
+	UBYTE pStock[MINERAL_TYPE_COUNT];
 	// Score, fuel, hull
-	ULONG ulCash;
-	UWORD uwFuelCurr;
-	UWORD uwFuelMax;
+	LONG lCash;
+	UWORD uwDrillCurr;
+	UWORD uwDrillMax;
 	UWORD uwDrillTileX;
 	UWORD uwDrillTileY;
 	UBYTE ubPlayerIdx;

@@ -42,8 +42,8 @@ static tBitMap *s_pBg;
 
 typedef struct _tHudPlayerData {
 	UWORD uwDepth, uwDepthDisp;
-	ULONG ulCash, ulCashDisp;
-	UWORD uwFuel, uwFuelDisp, uwFuelMax;
+	LONG lCash, lCashDisp;
+	UWORD uwDrill, uwDrillDisp, uwDrillMax;
 	UBYTE ubCargo, ubCargoDisp, ubCargoMax;
 	UBYTE ubHealth, ubHealthDisp, ubHealthMax;
 } tHudPlayerData;
@@ -74,7 +74,7 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	);
 
 	s_pFont = pFont;
-	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.sUwCoord.uwX, pFont->uwHeight);
+	s_pLinebuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, pFont->uwHeight);
 
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_1_Y,
@@ -107,7 +107,7 @@ void hudCreate(tView *pView, const tFont *pFont) {
 void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	s_isChallenge = isChallenge;
 	s_is2pPlaying = is2pPlaying;
-	const UBYTE ubLabelWidth = fontMeasureText(s_pFont, "Depth:").sUwCoord.uwX;
+	const UBYTE ubLabelWidth = fontMeasureText(s_pFont, "Depth:").uwX;
 	if(isChallenge) {
 		// Clear depth label and use it as cash
 		blitRect(
@@ -142,14 +142,14 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
 		s_pPlayerData[ubPlayer].uwDepthDisp = 0xFFFF;
 		s_pPlayerData[ubPlayer].uwDepth = 0;
-		s_pPlayerData[ubPlayer].ulCashDisp = 0xFFFFFFFF;
-		s_pPlayerData[ubPlayer].ulCash = 0;
+		s_pPlayerData[ubPlayer].lCashDisp = 0xFFFFFFFF;
+		s_pPlayerData[ubPlayer].lCash = 0;
 		s_pPlayerData[ubPlayer].ubCargoDisp = 0;
 		s_pPlayerData[ubPlayer].ubCargo = 0;
 		s_pPlayerData[ubPlayer].ubCargoMax = 0;
-		s_pPlayerData[ubPlayer].uwFuelDisp = 0;
-		s_pPlayerData[ubPlayer].uwFuel = 0;
-		s_pPlayerData[ubPlayer].uwFuelMax = 0;
+		s_pPlayerData[ubPlayer].uwDrillDisp = 0;
+		s_pPlayerData[ubPlayer].uwDrill = 0;
+		s_pPlayerData[ubPlayer].uwDrillMax = 0;
 		s_pPlayerData[ubPlayer].ubHealthDisp = 0;
 		s_pPlayerData[ubPlayer].ubHealth = 0;
 		s_pPlayerData[ubPlayer].ubHealthMax = 0;
@@ -165,8 +165,8 @@ void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth) {
 	s_pPlayerData[ubPlayer].uwDepth = uwDepth;
 }
 
-void hudSetScore(UBYTE ubPlayer, ULONG ulCash) {
-	s_pPlayerData[ubPlayer].ulCash = ulCash;
+void hudSetCash(UBYTE ubPlayer, LONG lCash) {
+	s_pPlayerData[ubPlayer].lCash = lCash;
 }
 
 void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo, UBYTE ubCargoMax) {
@@ -174,9 +174,9 @@ void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo, UBYTE ubCargoMax) {
 	s_pPlayerData[ubPlayer].ubCargoMax = ubCargoMax;
 }
 
-void hudSetFuel(UBYTE ubPlayer, UWORD uwFuel, UWORD uwFuelMax) {
-	s_pPlayerData[ubPlayer].uwFuel = uwFuel;
-	s_pPlayerData[ubPlayer].uwFuelMax = uwFuelMax;
+void hudSetDrill(UBYTE ubPlayer, UWORD uwDrill, UWORD uwDrillMax) {
+	s_pPlayerData[ubPlayer].uwDrill = uwDrill;
+	s_pPlayerData[ubPlayer].uwDrillMax = uwDrillMax;
 }
 
 void hudSetHealth(UBYTE ubPlayer, UBYTE ubHealth, UBYTE ubHealthMax) {
@@ -199,7 +199,7 @@ void hudUpdate(void) {
 	char szBfr[20];
 	UBYTE ubPercent;
 	UWORD uwDepth;
-	ULONG ulCash;
+	LONG lCash;
 	static UBYTE isDrawPending = 0;
 	switch(s_eDraw) {
 		case HUD_PREPARE_DEPTH:
@@ -234,26 +234,36 @@ void hudUpdate(void) {
 			}
 		case HUD_PREPARE_CASH:
 			if(s_isChallenge) {
-				ulCash = s_pPlayerData[s_ePlayer].ulCash;
+				lCash = s_pPlayerData[s_ePlayer].lCash;
 			}
 			else {
-				ulCash = s_pPlayerData[0].ulCash + s_pPlayerData[1].ulCash;
+				lCash = s_pPlayerData[0].lCash + s_pPlayerData[1].lCash;
 			}
-			if(ulCash != pData->ulCashDisp) {
-				UWORD m = (ulCash / 1000U) / 1000U;
-				UWORD k = (ulCash / 1000U) % 1000U;
-				UWORD u = ulCash % 1000U;
-				if(ulCash >= 1000000U) {
-					sprintf(szBfr, "%lu.%03lu.%03lu\x1F", m, k, u);
-				}
-				else if(ulCash >= 1000U) {
-					sprintf(szBfr, "%lu.%03lu\x1F", k, u);
+			if(lCash != pData->lCashDisp) {
+				ULONG ulDisp;
+				UBYTE ubOffs = 0;
+				if(lCash < 0) {
+					ulDisp = -lCash;
+					szBfr[0] = '-';
+					ubOffs = 1;
 				}
 				else {
-					sprintf(szBfr, "%lu\x1F", ulCash);
+					ulDisp = lCash;
+				}
+				UWORD m = (ulDisp / 1000U) / 1000U;
+				UWORD k = (ulDisp / 1000U) % 1000U;
+				UWORD u = ulDisp % 1000U;
+				if(ulDisp >= 1000000U) {
+					sprintf(&szBfr[ubOffs], "%lu.%03lu.%03lu\x1F", m, k, u);
+				}
+				else if(ulDisp >= 1000U) {
+					sprintf(&szBfr[ubOffs], "%lu.%03lu\x1F", k, u);
+				}
+				else {
+					sprintf(&szBfr[ubOffs], "%lu\x1F", u);
 				}
 				fontFillTextBitMap(s_pFont, s_pLinebuffer, szBfr);
-				pData->ulCashDisp = ulCash;
+				pData->lCashDisp = lCash;
 				s_eDraw = HUD_DRAW_CASH;
 				isDrawPending = 1;
 				break;
@@ -276,19 +286,19 @@ void hudUpdate(void) {
 			}
 		case HUD_DRAW_FUEL:
 			ubPercent = 0;
-			if(pData->uwFuelMax) {
-				ubPercent = (100 * pData->uwFuel) / pData->uwFuelMax;
+			if(pData->uwDrillMax) {
+				ubPercent = (100 * pData->uwDrill) / pData->uwDrillMax;
 			}
-			if(pData->uwFuelDisp != ubPercent) {
+			if(pData->uwDrillDisp != ubPercent) {
 				UBYTE ubColor, ubDraw;
-				if(ubPercent > pData->uwFuelDisp) {
-					ubDraw = pData->uwFuelDisp;
-					++pData->uwFuelDisp;
+				if(ubPercent > pData->uwDrillDisp) {
+					ubDraw = pData->uwDrillDisp;
+					++pData->uwDrillDisp;
 					ubColor = COLOR_BAR_FULL;
 				}
 				else {
-					--pData->uwFuelDisp;
-					ubDraw = pData->uwFuelDisp;
+					--pData->uwDrillDisp;
+					ubDraw = pData->uwDrillDisp;
 					ubColor = COLOR_BAR_EMPTY;
 				}
 				hudDrawBarPercent(GAUGE_DRILL_X, s_ubHudOffsY, ubDraw, ubColor);

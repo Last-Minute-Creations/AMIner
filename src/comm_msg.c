@@ -58,7 +58,7 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 
 		// It it's end of line start new line
 		szWordBfr[ubWordBytes] = '\0';
-		UWORD uwWordPxLength = fontMeasureText(g_pFont, szWordBfr).sUwCoord.uwX;
+		UWORD uwWordPxLength = fontMeasureText(g_pFont, szWordBfr).uwX;
 		if(uwLinePxLength + ubSpacePxLength + uwWordPxLength > uwMaxLength) {
 			// If it's too long, save current line and write that word at the beginning of new line
 			s_pLines[s_uwLineCount] = memAllocFast(strlen(szLineBfr) + 1);
@@ -106,7 +106,7 @@ static void commMsgDrawPage(
 	UBYTE ubLinesPerPage = uwHeight / ubLineHeight;
 	UWORD uwLineStart = ubPage * ubLinesPerPage;
 	blitRect(
-		s_pBuffer, s_sOrigin.sUwCoord.uwX + uwX, s_sOrigin.sUwCoord.uwY + uwY,
+		s_pBuffer, s_sOrigin.uwX + uwX, s_sOrigin.uwY + uwY,
 		uwWidth, uwHeight, COMM_DISPLAY_COLOR_BG
 	);
 	for(
@@ -115,8 +115,8 @@ static void commMsgDrawPage(
 	) {
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pLines[i]);
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap, s_sOrigin.sUwCoord.uwX + uwX,
-			s_sOrigin.sUwCoord.uwY + uwY, COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_SHADOW
+			s_pBuffer, s_pTextBitmap, s_sOrigin.uwX + uwX,
+			s_sOrigin.uwY + uwY, COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_SHADOW
 		);
 		uwY += ubLineHeight;
 	}

@@ -20,8 +20,8 @@ void textBobCreate(
 ) {
 	tUwCoordYX sBounds = fontMeasureText(pFont, szMaxText);
 	pTextBob->pFont = pFont;
-	pTextBob->uwWidth = ((sBounds.sUwCoord.uwX + 3 + 15) / 16) * 16;
-	UWORD uwHeight = sBounds.sUwCoord.uwY + 3;
+	pTextBob->uwWidth = ((sBounds.uwX + 3 + 15) / 16) * 16;
+	UWORD uwHeight = sBounds.uwY + 3;
 	tBitMap *pTextBm = bitmapCreate(
 		pTextBob->uwWidth, uwHeight, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);
@@ -54,17 +54,17 @@ void textBobSetText(tTextBob *pTextBob, const char *szText, ...) {
 	vsprintf(pTextBob->szText, szText, vaArgs);
 	va_end(vaArgs);
 	tUwCoordYX sSize = fontMeasureText(pTextBob->pFont, szText);
-	pTextBob->uwWidth = sSize.sUwCoord.uwX;
+	pTextBob->uwWidth = sSize.uwX;
 	pTextBob->isUpdateRequired = 1;
 }
 
 void textBobSetPos(
 	tTextBob *pTextBob, UWORD uwX, UWORD uwY, UWORD uwDestY, UBYTE isCenterH
 ) {
-	pTextBob->sBob.sPos.sUwCoord.uwX = uwX;
-	pTextBob->sBob.sPos.sUwCoord.uwY = uwY;
+	pTextBob->sBob.sPos.uwX = uwX;
+	pTextBob->sBob.sPos.uwY = uwY;
 	if(isCenterH) {
-		pTextBob->sBob.sPos.sUwCoord.uwX -= pTextBob->uwWidth / 2;
+		pTextBob->sBob.sPos.uwX -= pTextBob->uwWidth / 2;
 	}
 	pTextBob->uwDestPosY = uwDestY;
 	pTextBob->isUpdateRequired = 1;
@@ -105,13 +105,13 @@ void textBobUpdate(tTextBob *pTextBob) {
 void textBobAnimate(tTextBob *pTextBob) {
 	if(
 		!pTextBob->isUpdateRequired &&
-		pTextBob->sBob.sPos.sUwCoord.uwY != pTextBob->uwDestPosY
+		pTextBob->sBob.sPos.uwY != pTextBob->uwDestPosY
 	) {
-		if(pTextBob->sBob.sPos.sUwCoord.uwY < pTextBob->uwDestPosY) {
-			++pTextBob->sBob.sPos.sUwCoord.uwY;
+		if(pTextBob->sBob.sPos.uwY < pTextBob->uwDestPosY) {
+			++pTextBob->sBob.sPos.uwY;
 		}
 		else {
-			--pTextBob->sBob.sPos.sUwCoord.uwY;
+			--pTextBob->sBob.sPos.uwY;
 		}
 		bobNewPush(&pTextBob->sBob);
 	}

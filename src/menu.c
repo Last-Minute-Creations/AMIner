@@ -307,7 +307,7 @@ void menuGsLoop(void) {
 	bobNewBegin();
 	tileBufferQueueProcess(g_pMainBuffer);
 
-	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
+	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.uwY;
 	UWORD uwAvailHeight = g_pMainBuffer->pScroll->uwBmAvailHeight;
 	switch(s_eMenuState) {
 		case MENU_STATE_ROLL_IN: {
@@ -327,7 +327,7 @@ void menuGsLoop(void) {
 				s_eMenuState = MENU_STATE_SELECTING;
 				s_ubActivePos = 0;
 				UWORD uwLogoWidth = bitmapGetByteWidth(s_pLogo)*8;
-				UWORD uwOffsX = g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
+				UWORD uwOffsX = g_pMainBuffer->pCamera->uPos.uwX;
 				blitCopyMask(
 					s_pLogo, 0, 0,
 					g_pMainBuffer->pScroll->pBack, uwOffsX + (320 - uwLogoWidth)/2, 16,

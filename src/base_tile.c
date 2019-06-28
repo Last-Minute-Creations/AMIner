@@ -40,7 +40,7 @@ void baseTileDestroy(void) {
 #define TILE_BYTE_COUNT (32 * 4 * 5)
 
 void baseTileProcess(void) {
-	UWORD uwCamY = s_pManager->pCamera->uPos.sUwCoord.uwY;
+	UWORD uwCamY = s_pManager->pCamera->uPos.uwY;
 	if(g_isChallenge) {
 		tBitMap *pTiles = s_pManager->pTileSet;
 		if(uwCamY >= TILE_ROW_CHALLENGE_CHECKPOINT_3 * 32) {

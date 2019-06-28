@@ -158,7 +158,7 @@ void gameGsCreate(void) {
 	bobNewAllocateBgBuffers();
 	systemUnuse();
 
-	g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = 32;
+	g_pMainBuffer->pCamera->uPos.uwX = 32;
 
 	s_isDebug = 0;
 
@@ -247,8 +247,8 @@ void gameGsLoop(void) {
 	debugColor(0x080);
 	if(g_ubDinoBonesFound && tileBufferIsTileOnBuffer(
 		g_pMainBuffer,
-		s_pDinoBobs[ubLastDino].sPos.sUwCoord.uwX / 32,
-		s_pDinoBobs[ubLastDino].sPos.sUwCoord.uwY / 32
+		s_pDinoBobs[ubLastDino].sPos.uwX / 32,
+		s_pDinoBobs[ubLastDino].sPos.uwY / 32
 	) && s_pDinoWereDrawn[ubLastDino] < 2) {
 		bobNewPush(&s_pDinoBobs[ubLastDino]);
 		++s_pDinoWereDrawn[ubLastDino];
@@ -279,7 +279,7 @@ void gameGsLoop(void) {
 	if(g_isChallenge) {
 		++s_ubChallengeCamCnt;
 		if(s_ubChallengeCamCnt >= 2) {
-			g_pMainBuffer->pCamera->uPos.sUwCoord.uwY += 1;
+			g_pMainBuffer->pCamera->uPos.uwY += 1;
 			s_ubChallengeCamCnt = 0;
 		}
 	}
@@ -299,20 +299,20 @@ void gameGsLoop(void) {
 		}
 		WORD wDist = (
 			uwCamY - g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
-		) - g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
+		) - g_pMainBuffer->pCamera->uPos.uwY;
 		if(ABS(wDist) > 4) {
 			cameraMoveBy(g_pMainBuffer->pCamera, 0, SGN(wDist) * 4);
 		}
 		else {
 			cameraMoveBy(g_pMainBuffer->pCamera, 0, wDist);
 		}
-		if(g_pMainBuffer->pCamera->uPos.sUwCoord.uwX < uwCamX) {
-			g_pMainBuffer->pCamera->uPos.sUwCoord.uwX = uwCamX;
+		if(g_pMainBuffer->pCamera->uPos.uwX < uwCamX) {
+			g_pMainBuffer->pCamera->uPos.uwX = uwCamX;
 		}
 	}
 	baseTileProcess();
 
-	groundLayerProcess(g_pMainBuffer->pCamera->uPos.sUwCoord.uwY);
+	groundLayerProcess(g_pMainBuffer->pCamera->uPos.uwY);
 
 	debugColor(0x800);
 	viewProcessManagers(s_pView);
@@ -395,14 +395,14 @@ void gameChallengeEnd(void) {
 	g_pVehicles[1].sSteer.bX = 0;
 	g_pVehicles[1].sSteer.bY = 0;
 
-	UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
+	UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.uwX;
 
 	// Result text
 	if(g_is2pPlaying) {
-		if(g_pVehicles[0].ulCash > g_pVehicles[1].ulCash) {
+		if(g_pVehicles[0].lCash > g_pVehicles[1].lCash) {
 			textBobSetText(&s_sChallengeResult, "Player 1 wins!");
 		}
-		else if(g_pVehicles[0].ulCash < g_pVehicles[1].ulCash) {
+		else if(g_pVehicles[0].lCash < g_pVehicles[1].lCash) {
 			textBobSetText(&s_sChallengeResult, "Player 2 wins!");
 		}
 		else {
@@ -410,17 +410,17 @@ void gameChallengeEnd(void) {
 		}
 	}
 	else {
-		textBobSetText(&s_sChallengeResult, "Score: %lu", g_pVehicles[0].ulCash);
+		textBobSetText(&s_sChallengeResult, "Score: %ld", g_pVehicles[0].lCash);
 	}
 	textBobSetPos(
 		&s_sChallengeResult,
-		uwCenterX, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 50, 0, 1
+		uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 50, 0, 1
 	);
 	textBobSetColor(&s_sChallengeResult, 14);
 	textBobUpdate(&s_sChallengeResult);
 
 	if(!g_is2pPlaying) {
-		hiScoreSetup(g_pVehicles[0].ulCash);
+		hiScoreSetup(g_pVehicles[0].lCash);
 	}
 	else {
 		// No hi score for 2 players
@@ -430,7 +430,7 @@ void gameChallengeEnd(void) {
 	// End text
 	textBobSet(
 		&s_sEndMessage, "Press fire or enter to continue", 14,
-		uwCenterX, g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 220, 0, 1
+		uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 220, 0, 1
 	);
 	textBobUpdate(&s_sEndMessage);
 

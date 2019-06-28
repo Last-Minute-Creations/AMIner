@@ -43,7 +43,7 @@ void commSetActiveLed(tCommLed eLed) {
 	for(UBYTE i = 0; i < COMM_LED_COUNT; ++i) {
 		blitCopy(
 			s_pButtons, 0, (i == eLed ? ubGrnLedY : 0),
-			s_pBmDraw, sOrigin.sUwCoord.uwX + pLedX[i], sOrigin.sUwCoord.uwY + ubLedY,
+			s_pBmDraw, sOrigin.uwX + pLedX[i], sOrigin.uwY + ubLedY,
 			ubLedWidth, ubLedHeight, MINTERM_COOKIE, 0xFF
 		);
 	}
@@ -51,7 +51,7 @@ void commSetActiveLed(tCommLed eLed) {
 
 UBYTE commShow(void) {
 	tUwCoordYX sOrigin = commGetOrigin();
-	if(g_pMainBuffer->uwMarginedHeight - sOrigin.sUwCoord.uwX < COMM_HEIGHT) {
+	if(g_pMainBuffer->uwMarginedHeight - sOrigin.uwX < COMM_HEIGHT) {
 		// Not positioned evenly
 		return 0;
 	}
@@ -60,20 +60,20 @@ UBYTE commShow(void) {
 
 	// Store content beneath commrade
 	blitCopyAligned(
-		s_pBmDraw, sOrigin.sUwCoord.uwX, sOrigin.sUwCoord.uwY,
+		s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
 		s_pBmRestore, 0, 0, COMM_WIDTH, COMM_HEIGHT
 	);
 
 	// Draw commrade background
 	blitCopyAligned(
-		s_pBg, 0, 0, s_pBmDraw, sOrigin.sUwCoord.uwX, sOrigin.sUwCoord.uwY,
+		s_pBg, 0, 0, s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
 		COMM_WIDTH, COMM_HEIGHT
 	);
 	return 1;
 }
 
 void commProcess(void) {
-	static const UWORD pCoords[COMM_NAV_COUNT][4] = {
+	static const UWORD pBtnPos[COMM_NAV_COUNT][4] = {
 		// dX, dY, sY, h
 		{218, 114, 26, 14},
 		{218, 143, 54, 14},
@@ -112,20 +112,20 @@ void commProcess(void) {
 			if(s_pNav[i] == BTN_STATE_NACTIVE) {
 				s_pNav[i] = BTN_STATE_ACTIVE;
 				blitCopy(
-					s_pButtons, 0, pCoords[i][2], s_pBmDraw,
-					sOrigin.sUwCoord.uwX + pCoords[i][0],
-					sOrigin.sUwCoord.uwY + pCoords[i][1],
-					16, pCoords[i][3], MINTERM_COOKIE, 0xFF
+					s_pButtons, 0, pBtnPos[i][2], s_pBmDraw,
+					sOrigin.uwX + pBtnPos[i][0],
+					sOrigin.uwY + pBtnPos[i][1],
+					16, pBtnPos[i][3], MINTERM_COOKIE, 0xFF
 				);
 			}
 		}
 		else if(s_pNav[i] != BTN_STATE_NACTIVE) {
 			s_pNav[i] = BTN_STATE_NACTIVE;
 			blitCopy(
-				s_pButtons, 0, pCoords[i][2] + pCoords[i][3], s_pBmDraw,
-				sOrigin.sUwCoord.uwX + pCoords[i][0],
-				sOrigin.sUwCoord.uwY + pCoords[i][1],
-				16, pCoords[i][3], MINTERM_COOKIE, 0xFF
+				s_pButtons, 0, pBtnPos[i][2] + pBtnPos[i][3], s_pBmDraw,
+				sOrigin.uwX + pBtnPos[i][0],
+				sOrigin.uwY + pBtnPos[i][1],
+				16, pBtnPos[i][3], MINTERM_COOKIE, 0xFF
 			);
 		}
 	}
@@ -171,22 +171,29 @@ void commHide(void) {
 	tUwCoordYX sOrigin = commGetOrigin();
 	// Restore content beneath commrade
 	blitCopyAligned(
-		s_pBmRestore, 0, 0, s_pBmDraw, sOrigin.sUwCoord.uwX, sOrigin.sUwCoord.uwY,
+		s_pBmRestore, 0, 0, s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
 		COMM_WIDTH, COMM_HEIGHT
 	);
 }
 
 tUwCoordYX commGetOrigin(void) {
-	UWORD uwScrollX = g_pMainBuffer->pCamera->uPos.sUwCoord.uwX;
-	UWORD uwScrollY = g_pMainBuffer->pCamera->uPos.sUwCoord.uwY;
+	UWORD uwScrollX = g_pMainBuffer->pCamera->uPos.uwX;
+	UWORD uwScrollY = g_pMainBuffer->pCamera->uPos.uwY;
 	UWORD uwBufferHeight = g_pMainBuffer->uwMarginedHeight;
 	UWORD uwFoldScrollY = uwScrollY & (uwBufferHeight-1);
 	UWORD uwCommOffsY = (g_pMainBuffer->sCommon.pVPort->uwHeight - COMM_HEIGHT) / 2;
 	UWORD uwCommOffsX = (g_pMainBuffer->sCommon.pVPort->uwWidth - COMM_WIDTH) / 2;
 
-	tUwCoordYX sCoord;
-	sCoord.sUwCoord.uwX = uwScrollX + uwCommOffsX;
-	sCoord.sUwCoord.uwY = uwFoldScrollY + uwCommOffsY;
+	tUwCoordYX sOrigin;
+	sOrigin.uwX = uwScrollX + uwCommOffsX;
+	sOrigin.uwY = uwFoldScrollY + uwCommOffsY;
 
-	return sCoord;
+	return sOrigin;
+}
+
+tUwCoordYX commGetOriginDisplay(void) {
+	tUwCoordYX sOrigin = commGetOrigin();
+	sOrigin.uwX += COMM_DISPLAY_X;
+	sOrigin.uwY += COMM_DISPLAY_Y;
+	return sOrigin;
 }

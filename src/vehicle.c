@@ -7,8 +7,7 @@
 #include "hud.h"
 #include "game.h"
 #include "tile.h"
-#include "mineral.h"
-#include "plan.h"
+#include "warehouse.h"
 #include "color.h"
 
 #define VEHICLE_BODY_HEIGHT 20
@@ -63,9 +62,9 @@ void vehicleReset(tVehicle *pVehicle) {
 	pVehicle->ubCargoCurr = 0;
 	pVehicle->ubCargoMax = 50;
 	pVehicle->uwCargoScore = 0;
-	pVehicle->ulCash = 0;
-	pVehicle->uwFuelMax = 1000;
-	pVehicle->uwFuelCurr = 1000;
+	pVehicle->lCash = 0;
+	pVehicle->uwDrillMax = 1000;
+	pVehicle->uwDrillCurr = 1000;
 
 	pVehicle->ubDrillDir = 0;
 
@@ -126,8 +125,8 @@ void vehicleDestroy(tVehicle *pVehicle) {
 }
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
-	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2;
-	UWORD uwY = pVehicle->sBobBody.sPos.sUwCoord.uwY;
+	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2;
+	UWORD uwY = pVehicle->sBobBody.sPos.uwY;
 	UBYTE isNearInBase0 = (
 		7*32 <= uwCenterX && uwCenterX <= 9*32 &&
 		(TILE_ROW_BASE_DIRT - 2) * 32 <= uwY && uwY <= (TILE_ROW_BASE_DIRT + 1) * 32
@@ -161,7 +160,7 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 static inline void vehicleSetTool(
 	tVehicle *pVehicle, tToolState eToolState, UBYTE ubFrame
 ) {
-	pVehicle->sBobTool.sPos.sUwCoord.uwY -= 3;
+	pVehicle->sBobTool.sPos.uwY -= 3;
 	UBYTE ubFrameOffs;
 	if(eToolState == TOOL_STATE_IDLE) {
 		ubFrameOffs = 0;
@@ -172,11 +171,11 @@ static inline void vehicleSetTool(
 
 	if(!pVehicle->sBobBody.uwOffsetY) {
 		// Facing right
-		pVehicle->sBobTool.sPos.sUwCoord.uwX += 24+3;
+		pVehicle->sBobTool.sPos.uwX += 24+3;
 	}
 	else {
 		// Facing left
-		pVehicle->sBobTool.sPos.sUwCoord.uwX += -13+3;
+		pVehicle->sBobTool.sPos.uwX += -13+3;
 		ubFrameOffs += 2 * VEHICLE_TOOL_HEIGHT;
 	}
 
@@ -188,13 +187,13 @@ static inline UBYTE vehicleStartDrilling(
 	tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY, UBYTE ubDrillDir
 ) {
 	static UBYTE ubCooldown = 0;
-	if(pVehicle->uwFuelCurr < 30) {
+	if(pVehicle->uwDrillCurr < 30) {
 		if(!ubCooldown) {
 			textBobSet(
 				&pVehicle->sTextBob, "Drill depleted!", 6,
-				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
-				pVehicle->sBobBody.sPos.sUwCoord.uwY,
-				pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
+				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.uwY,
+				pVehicle->sBobBody.sPos.uwY - 32, 1
 			);
 			audioPlay(
 				AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
@@ -233,20 +232,21 @@ static inline UBYTE vehicleStartDrilling(
 	audioPlay(AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx, g_pSampleDrill, AUDIO_VOLUME_MAX, -1);
 
 	if(!g_isChallenge) {
-		pVehicle->uwFuelCurr -= 30;
+		pVehicle->uwDrillCurr -= 30;
 	}
 	return 1;
 }
 
-static WORD vehicleRestock(tVehicle *pVehicle) {
-	UBYTE isRestocked = 0;
-	if(pVehicle->ubCargoCurr) {
-		isRestocked = 1;
-	}
+static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
+	LONG *pCash = ubUseCashP1 ? &g_pVehicles[0].lCash : &pVehicle->lCash;
+
 	pVehicle->ubCargoCurr = 0;
-	pVehicle->ulCash += pVehicle->uwCargoScore;
 	pVehicle->uwCargoScore = 0;
 	hudSetCargo(pVehicle->ubPlayerIdx, 0, pVehicle->ubCargoMax);
+	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
+		warehouseSetStock(i, warehouseGetStock(i) + pVehicle->pStock[i]);
+		pVehicle->pStock[i] = 0;
+	}
 
 	// Fuel price per liter, units in liter
 	const UBYTE ubLiterPrice = 5;
@@ -254,24 +254,19 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 
 	// Buy as much fuel as you can afford or as much as needed
 	// Start refueling if half a liter is spent
-	UWORD uwRefuelLiters = MIN(
-		(pVehicle->ulCash / ubLiterPrice),
-		(UWORD)(pVehicle->uwFuelMax - pVehicle->uwFuelCurr + ubFuelInLiter / 2) / ubFuelInLiter
-	);
+	UWORD uwRefuelLiters = (
+		pVehicle->uwDrillMax - pVehicle->uwDrillCurr + ubFuelInLiter / 2
+	) / ubFuelInLiter;
 
 	// It's possible to buy more fuel than needed (last liter) - fill up to max
-	pVehicle->uwFuelCurr = MIN(
-		pVehicle->uwFuelCurr + uwRefuelLiters * ubFuelInLiter, pVehicle->uwFuelMax
+	pVehicle->uwDrillCurr = MIN(
+		pVehicle->uwDrillCurr + uwRefuelLiters * ubFuelInLiter, pVehicle->uwDrillMax
 	);
 
 	// Pay for your fuel!
-	pVehicle->ulCash -= uwRefuelLiters * ubLiterPrice;
-
-	if(uwRefuelLiters) {
-		isRestocked = 1;
-	}
-
-	return isRestocked;
+	*pCash -= uwRefuelLiters * ubLiterPrice;
+	WORD wRestockValue = -uwRefuelLiters * ubLiterPrice;
+	return wRestockValue;
 }
 
 static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
@@ -288,9 +283,9 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		sprintf(szMessage, "Found bone no. %hhu!", g_ubDinoBonesFound);
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
-			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
-			pVehicle->sBobBody.sPos.sUwCoord.uwY,
-			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
+			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+			pVehicle->sBobBody.sPos.uwY,
+			pVehicle->sBobBody.sPos.uwY - 32, 1
 		);
 		audioPlay(
 			AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
@@ -304,7 +299,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		ubSlots = MIN(ubSlots, pVehicle->ubCargoMax - pVehicle->ubCargoCurr);
 		pVehicle->uwCargoScore += pMineral->ubReward * ubSlots;
 		pVehicle->ubCargoCurr += ubSlots;
-		planAddMinerals(ubMineralType, ubSlots);
+		pVehicle->pStock[ubMineralType] += ubSlots;
 
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr, pVehicle->ubCargoMax);
 		const char *szMessage;
@@ -318,7 +313,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			);
 		}
 		else {
-			UBYTE isPlanFulfilled = planIsFulfilled();
+			UBYTE isPlanFulfilled = warehouseIsPlanFulfilled();
 			if(isPlanFulfilled && !wasPlanFulfilled) {
 				szMessage = szMessagePlanDone;
 			}
@@ -334,29 +329,31 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		}
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, ubColor,
-			pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
-			pVehicle->sBobBody.sPos.sUwCoord.uwY,
-			pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
+			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+			pVehicle->sBobBody.sPos.uwY,
+			pVehicle->sBobBody.sPos.uwY - 32, 1
 		);
 	}
 
 	if(g_isChallenge) {
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_1 + 9) {
 			if(uwY == TILE_ROW_CHALLENGE_FINISH) {
-				vehicleRestock(pVehicle);
+				vehicleRestock(pVehicle, 0);
 				gameChallengeEnd();
 			}
 			else {
 				textBobSetText(
-					&pVehicle->sTextBob, "Checkpoint! %+hd", vehicleRestock(pVehicle)
+					&pVehicle->sTextBob, "Checkpoint! %+hd", pVehicle->uwCargoScore
 				);
 				textBobSetColor(&pVehicle->sTextBob, COLOR_GREEN);
 				textBobSetPos(
 					&pVehicle->sTextBob,
-					pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
-					pVehicle->sBobBody.sPos.sUwCoord.uwY,
-					pVehicle->sBobBody.sPos.sUwCoord.uwY - 32, 1
+					pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+					pVehicle->sBobBody.sPos.uwY,
+					pVehicle->sBobBody.sPos.uwY - 32, 1
 				);
+				pVehicle->lCash += pVehicle->uwCargoScore;
+				vehicleRestock(pVehicle, 0);
 			}
 			audioPlay(
 				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
@@ -376,10 +373,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 
 	if(
 		g_isChallenge &&
-		fix16_to_int(pVehicle->fY) < g_pMainBuffer->pCamera->uPos.sUwCoord.uwY
+		fix16_to_int(pVehicle->fY) < g_pMainBuffer->pCamera->uPos.uwY
 	) {
 		UWORD uwTileY = (
-			g_pMainBuffer->pCamera->uPos.sUwCoord.uwY +
+			g_pMainBuffer->pCamera->uPos.uwY +
 			g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
 		) / 32;
 		UWORD uwTileX = fix16_to_int(pVehicle->fX)/32;
@@ -417,13 +414,13 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	// Limit X movement
 	const fix16_t fMaxPosX = fix16_one * (11*32 - VEHICLE_WIDTH);
 	pVehicle->fX = CLAMP(pVehicle->fX + pVehicle->fDx, fix16_from_int(32), fMaxPosX);
-	pVehicle->sBobBody.sPos.sUwCoord.uwX = fix16_to_int(pVehicle->fX);
-	UBYTE ubAdd = (pVehicle->sBobBody.sPos.sUwCoord.uwY > (1 + TILE_ROW_BASE_DIRT) * 32) ? 4 : 2;
+	pVehicle->sBobBody.sPos.uwX = fix16_to_int(pVehicle->fX);
+	UBYTE ubAdd = (pVehicle->sBobBody.sPos.uwY > (1 + TILE_ROW_BASE_DIRT) * 32) ? 4 : 2;
 	UBYTE ubHalfWidth = 12;
 
-	UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
-	UWORD uwTileBottom = (pVehicle->sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
-	UWORD uwTileMid = (pVehicle->sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT / 2) >> 5;
+	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
+	UWORD uwTileBottom = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
+	UWORD uwTileMid = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT / 2) >> 5;
 	UWORD uwTileCenter = uwCenterX >> 5;
 	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> 5;
 	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> 5;
@@ -477,11 +474,19 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			pVehicle->fDy = 0;
 		}
 	}
+	pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
+
+	// Vehicle has its destination position calculated - check if it's visible
+	// TODO: Could check only row for a bit faster calculations
+	UWORD uwTileTop = (pVehicle->sBobBody.sPos.uwY + ubAdd) / 32;
+	UBYTE isVehicleVisible = (
+		tileBufferIsTileOnBuffer(g_pMainBuffer, uwTileLeft, uwTileTop) &&
+		tileBufferIsTileOnBuffer(g_pMainBuffer, uwTileLeft, uwTileBottom)
+	);
 
 	// Update track bob
-	pVehicle->sBobBody.sPos.sUwCoord.uwY = fix16_to_int(pVehicle->fY);
 	pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
-	pVehicle->sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT - 1;
+	pVehicle->sBobTrack.sPos.uwY += VEHICLE_BODY_HEIGHT - 1;
 	if(pVehicle->ubJetShowFrame == 0) {
 		// Jet hidden
 		if(pVehicle->fDx) {
@@ -517,11 +522,11 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			pVehicle->ubBodyShakeCnt = 0;
 		}
 		if(pVehicle->ubBodyShakeCnt >= ubShakeSpeed) {
-			pVehicle->sBobBody.sPos.sUwCoord.uwY += 1;
+			pVehicle->sBobBody.sPos.uwY += 1;
 		}
 	}
 	else {
-		pVehicle->sBobBody.sPos.sUwCoord.uwY += s_pJetAnimOffsets[pVehicle->ubJetShowFrame];
+		pVehicle->sBobBody.sPos.uwY += s_pJetAnimOffsets[pVehicle->ubJetShowFrame];
 		if(pVehicle->ubJetShowFrame == 5) {
 			bobNewSetBitMapOffset(
 				&pVehicle->sBobTrack, pVehicle->sSteer.bY ? TRACK_OFFSET_JET : 0
@@ -534,11 +539,15 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 				&pVehicle->sBobJet, VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 8)
 			);
 			pVehicle->sBobJet.sPos.ulYX = pVehicle->sBobTrack.sPos.ulYX;
-			pVehicle->sBobJet.sPos.sUwCoord.uwY += VEHICLE_TRACK_JET_HEIGHT;
-			bobNewPush(&pVehicle->sBobJet);
+			pVehicle->sBobJet.sPos.uwY += VEHICLE_TRACK_JET_HEIGHT;
+			if(isVehicleVisible) {
+				bobNewPush(&pVehicle->sBobJet);
+			}
 		}
 	}
-	bobNewPush(&pVehicle->sBobTrack);
+	if(isVehicleVisible) {
+		bobNewPush(&pVehicle->sBobTrack);
+	}
 
 	// Drilling
 	if(isOnGround) {
@@ -554,31 +563,32 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			vehicleStartDrilling(pVehicle, uwTileCenter, uwTileBottom, DRILL_DIR_V);
 		}
 	}
-	bobNewPush(&pVehicle->sBobBody);
+	if(isVehicleVisible) {
+		bobNewPush(&pVehicle->sBobBody);
+	}
 
 	// Tool
 	pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
-	bobNewPush(&pVehicle->sBobTool);
+	if(isVehicleVisible) {
+		bobNewPush(&pVehicle->sBobTool);
+	}
 
 	if(vehicleIsNearShop(pVehicle)) {
-		// Save current score & try to restock
-		ULONG ulOldScore = pVehicle->ulCash;
 		// If restocked then play audio & display score
-		if(vehicleRestock(pVehicle)) {
-			WORD wDeltaScore = pVehicle->ulCash - ulOldScore;
-			UBYTE ubColor = (wDeltaScore < 0) ? COLOR_REDEST : COLOR_GOLD;
+		WORD wDeltaScore = vehicleRestock(pVehicle, 1);
+		if(wDeltaScore) {
 			audioPlay(
 				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
 				g_pSampleOre, AUDIO_VOLUME_MAX, 1
 			);
-			textBobSetText(&pVehicle->sTextBob, "%+hd\x1F", wDeltaScore);
-			textBobSetColor(&pVehicle->sTextBob, ubColor);
+			textBobSetText(&pVehicle->sTextBob, "Restock! %hd\x1F", wDeltaScore);
+			textBobSetColor(&pVehicle->sTextBob, COLOR_GOLD);
 			textBobSetPos(
 				&pVehicle->sTextBob,
-				pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH/2,
-				pVehicle->sBobBody.sPos.sUwCoord.uwY,
-				pVehicle->sBobBody.sPos.sUwCoord.uwY - 24, 0
+				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.uwY,
+				pVehicle->sBobBody.sPos.uwY - 48, 0
 			);
 		}
 	}
@@ -611,9 +621,9 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			}
 		}
 
-		pVehicle->sBobBody.sPos.sUwCoord.uwX = fix16_to_int(pVehicle->fX);
-		pVehicle->sBobBody.sPos.sUwCoord.uwY = fix16_to_int(pVehicle->fY);
-		pVehicle->sBobBody.sPos.sUwCoord.uwY += pTrackAnimOffs[pVehicle->ubDrillVAnimCnt];
+		pVehicle->sBobBody.sPos.uwX = fix16_to_int(pVehicle->fX);
+		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
+		pVehicle->sBobBody.sPos.uwY += pTrackAnimOffs[pVehicle->ubDrillVAnimCnt];
 		pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 		vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 	}
@@ -642,11 +652,11 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 		else {
 			pVehicle->fY -= fDelta;
 		}
-		pVehicle->sBobBody.sPos.sUwCoord.uwX = fix16_to_int(pVehicle->fX);
-		pVehicle->sBobBody.sPos.sUwCoord.uwY = fix16_to_int(pVehicle->fY);
+		pVehicle->sBobBody.sPos.uwX = fix16_to_int(pVehicle->fX);
+		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 		// Pos for tool & track
 		pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
-		pVehicle->sBobTrack.sPos.sUwCoord.uwY += VEHICLE_BODY_HEIGHT - 1;
+		pVehicle->sBobTrack.sPos.uwY += VEHICLE_BODY_HEIGHT - 1;
 
 		if(isDoneX && isDoneY) {
 			if(pVehicle->ubDrillDir == DRILL_DIR_H) {
@@ -655,8 +665,8 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			}
 			else {
 				const UBYTE ubAdd = 4; // No grass past this point
-				UWORD uwTileBottom = (pVehicle->sBobBody.sPos.sUwCoord.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
-				UWORD uwCenterX = pVehicle->sBobBody.sPos.sUwCoord.uwX + VEHICLE_WIDTH / 2;
+				UWORD uwTileBottom = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
+				UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
 				UWORD uwTileCenter = uwCenterX >> 5;
 				if(
 					pVehicle->sSteer.bY > 0 && tileIsDrillable(uwTileCenter, uwTileBottom) &&
@@ -678,8 +688,8 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 		else {
 			pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 			// Body shake
-			pVehicle->sBobBody.sPos.sUwCoord.uwX += ubRand() & 1;
-			pVehicle->sBobBody.sPos.sUwCoord.uwY += ubRand() & 1;
+			pVehicle->sBobBody.sPos.uwX += ubRand() & 1;
+			pVehicle->sBobBody.sPos.uwY += ubRand() & 1;
 
 			// Anim counter for Tool / track drill
 			UBYTE ubAnim = 0;
@@ -724,10 +734,10 @@ void vehicleProcess(tVehicle *pVehicle) {
 	else {
 		vehicleProcessMovement(pVehicle);
 	}
-	hudSetFuel(pVehicle->ubPlayerIdx, pVehicle->uwFuelCurr, pVehicle->uwFuelMax);
+	hudSetDrill(pVehicle->ubPlayerIdx, pVehicle->uwDrillCurr, pVehicle->uwDrillMax);
 	textBobAnimate(&pVehicle->sTextBob);
 	hudSetDepth(pVehicle->ubPlayerIdx, MAX(
 		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_BASE_DIRT)*32
 	));
-	hudSetScore(pVehicle->ubPlayerIdx, pVehicle->ulCash);
+	hudSetCash(pVehicle->ubPlayerIdx, pVehicle->lCash);
 }

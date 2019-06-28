@@ -2,10 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "plan.h"
+#include "warehouse.h"
 #include "mineral.h"
 #include <ace/macros.h>
 #include <ace/managers/log.h>
+
+// Not spent on plan, not sold
+static UBYTE s_pStock[MINERAL_TYPE_COUNT];
 
 tPlan s_sCurrentPlan = {
 	.pMinerals = { {0},
@@ -15,32 +18,29 @@ tPlan s_sCurrentPlan = {
 	.ulTargetSum = 100000
 };
 
-const tPlan *planGetCurrent(void) {
+const tPlan *warehouseGetPlan(void) {
 	return &s_sCurrentPlan;
 }
 
-void planAddMinerals(UBYTE ubMineralType, UBYTE ubCount) {
-	s_sCurrentPlan.pMinerals[ubMineralType].ubCurrentCount += ubCount;
-	s_sCurrentPlan.ulCurrentSum += g_pMinerals[ubMineralType].ubReward * ubCount;
+void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount) {
+	s_sCurrentPlan.pMinerals[ubMineralType].ubCurrentCount = ubCount;
 }
 
-UBYTE planIsFulfilled(void) {
+UBYTE warehouseIsPlanFulfilled(void) {
 	UBYTE hasAllMinerals = 1;
+	ULONG ulSum = 0;
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
+		ulSum += g_pMinerals[i].ubReward * s_sCurrentPlan.pMinerals[i].ubCurrentCount;
 		if(s_sCurrentPlan.pMinerals[i].ubCurrentCount < s_sCurrentPlan.pMinerals[i].ubTargetCount) {
 			hasAllMinerals = 0;
-			break;
 		}
 	}
 
-	UBYTE hasSum = (
-		s_sCurrentPlan.ulCurrentSum == s_sCurrentPlan.ulTargetSum
-	);
-
+	UBYTE hasSum = 0; //(ulSum == s_sCurrentPlan.ulTargetSum);
 	return hasAllMinerals || hasSum;
 }
 
-void planGenerateNew(void) {
+void warehouseNewPlan(void) {
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		tPlanMineral *pMineral = &s_sCurrentPlan.pMinerals[i];
 		if(pMineral->ubCurrentCount) {
@@ -49,5 +49,12 @@ void planGenerateNew(void) {
 		}
 	}
 	s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum / 2;
-	s_sCurrentPlan.ulCurrentSum = 0;
+}
+
+UBYTE warehouseGetStock(UBYTE ubMineralType) {
+	return s_pStock[ubMineralType];
+}
+
+void warehouseSetStock(UBYTE ubMineralType, UBYTE ubCount) {
+	s_pStock[ubMineralType] = ubCount;
 }

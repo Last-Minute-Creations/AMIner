@@ -105,7 +105,7 @@ void hiScoreSetup(ULONG ulScore) {
 
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		// Score name
-		UWORD uwScorePos = g_pMainBuffer->pCamera->uPos.sUwCoord.uwY + 70 + i * 10;
+		UWORD uwScorePos = g_pMainBuffer->pCamera->uPos.uwY + 70 + i * 10;
 		textBobSetText(&s_pScoreNameBobs[i], "%hhu. %s", i+1, s_pScores[i].szName);
 		textBobSetColor(&s_pScoreNameBobs[i], 14);
 		textBobSetPos(&s_pScoreNameBobs[i], 32+64, uwScorePos, 0, 0);
