@@ -57,15 +57,7 @@ void vehicleBitmapsDestroy(void) {
 	bitmapDestroy(s_pToolMask);
 }
 
-void vehicleReset(tVehicle *pVehicle) {
-	// Initial values
-	pVehicle->ubCargoCurr = 0;
-	pVehicle->ubCargoMax = 50;
-	pVehicle->uwCargoScore = 0;
-	pVehicle->lCash = 0;
-	pVehicle->uwDrillMax = 1000;
-	pVehicle->uwDrillCurr = 1000;
-
+void vehicleResetPos(tVehicle *pVehicle) {
 	pVehicle->ubDrillDir = 0;
 
 	pVehicle->ubTrackAnimCnt = 0;
@@ -90,6 +82,18 @@ void vehicleReset(tVehicle *pVehicle) {
 		pVehicle->fX = fix16_from_int(g_isChallenge ? 96 : 320-64);
 		vehicleMove(pVehicle, -1, 0);
 	}
+}
+
+void vehicleReset(tVehicle *pVehicle) {
+	// Initial values
+	pVehicle->ubCargoCurr = 0;
+	pVehicle->ubCargoMax = 50;
+	pVehicle->uwCargoScore = 0;
+	pVehicle->lCash = 0;
+	pVehicle->uwDrillMax = 1000;
+	pVehicle->uwDrillCurr = 1000;
+
+	vehicleResetPos(pVehicle);
 }
 
 void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {

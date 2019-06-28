@@ -104,6 +104,10 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	hudReset(0, 0);
 }
 
+void hudSet2pPlaying(UBYTE isPlaying) {
+	s_is2pPlaying = isPlaying;
+}
+
 void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	s_isChallenge = isChallenge;
 	s_is2pPlaying = is2pPlaying;

@@ -78,6 +78,8 @@ void vehicleDestroy(tVehicle *pVehicle);
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle);
 
+void vehicleResetPos(tVehicle *pVehicle);
+
 void vehicleReset(tVehicle *pVehicle);
 
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);

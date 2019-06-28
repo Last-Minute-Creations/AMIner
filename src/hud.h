@@ -17,6 +17,8 @@ void hudCreate(tView *pView, const tFont *pFont);
 
 void hudDestroy(void);
 
+void hudSet2pPlaying(UBYTE isPlaying);
+
 void hudReset(UBYTE isChallenge, UBYTE is2pPlaying);
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth);

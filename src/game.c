@@ -178,6 +178,26 @@ void gameGsCreate(void) {
 }
 
 static void gameProcessInput(void) {
+	if(keyUse(KEY_F1) && !g_isChallenge) {
+		if(!g_is2pPlaying) {
+			g_is2pPlaying = 1;
+			hudSet2pPlaying(1);
+			vehicleResetPos(&g_pVehicles[1]);
+			g_pVehicles[1].fX = g_pVehicles[0].fX;
+			g_pVehicles[1].fY = g_pVehicles[0].fY;
+		}
+		else {
+			g_is2pPlaying = 0;
+			hudSet2pPlaying(0);
+		}
+	}
+	else if(keyUse(KEY_F2)) {
+		g_is1pKbd = !g_is1pKbd;
+	}
+	else if(keyUse(KEY_F3)) {
+		g_is2pKbd = !g_is2pKbd;
+	}
+
 	BYTE bDirX = 0, bDirY = 0;
 	if(g_is1pKbd) {
 		if(keyCheck(KEY_D)) { bDirX += 1; }
@@ -193,20 +213,22 @@ static void gameProcessInput(void) {
 	}
 	vehicleMove(&g_pVehicles[0], bDirX, bDirY);
 
-	bDirX = 0; bDirY = 0;
-	if(g_is2pKbd) {
-		if(keyCheck(KEY_RIGHT)) { bDirX += 1; }
-		if(keyCheck(KEY_LEFT)) { bDirX -= 1; }
-		if(keyCheck(KEY_DOWN)) { bDirY += 1; }
-		if(keyCheck(KEY_UP)) { bDirY -= 1; }
+	if(g_is2pPlaying) {
+		bDirX = 0; bDirY = 0;
+		if(g_is2pKbd) {
+			if(keyCheck(KEY_RIGHT)) { bDirX += 1; }
+			if(keyCheck(KEY_LEFT)) { bDirX -= 1; }
+			if(keyCheck(KEY_DOWN)) { bDirY += 1; }
+			if(keyCheck(KEY_UP)) { bDirY -= 1; }
+		}
+		else {
+			if(joyCheck(JOY2_RIGHT)) { bDirX += 1; }
+			if(joyCheck(JOY2_LEFT)) { bDirX -= 1; }
+			if(joyCheck(JOY2_DOWN)) { bDirY += 1; }
+			if(joyCheck(JOY2_UP)) { bDirY -= 1; }
+		}
+		vehicleMove(&g_pVehicles[1], bDirX, bDirY);
 	}
-	else {
-		if(joyCheck(JOY2_RIGHT)) { bDirX += 1; }
-		if(joyCheck(JOY2_LEFT)) { bDirX -= 1; }
-		if(joyCheck(JOY2_DOWN)) { bDirY += 1; }
-		if(joyCheck(JOY2_UP)) { bDirY -= 1; }
-	}
-	vehicleMove(&g_pVehicles[1], bDirX, bDirY);
 }
 
 static inline void debugColor(UWORD uwColor) {
