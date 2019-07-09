@@ -1,3 +1,10 @@
+19.7.9
+- You can have now negative cash because of refueling
+- Warehouse tab allows selling stuff
+- F1 joins/kicks 2nd player, F2/F3 changes P1/P2 controls
+- F4 changes camera tracking behavior
+- fixed HUD changing colors on when in different-colored soil
+
 19.6.9
 - Added navigation buttons and tabs to commrade in shop
 - Fixed garbled screen on start
