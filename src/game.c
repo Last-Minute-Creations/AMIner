@@ -24,8 +24,16 @@
 #include "ground_layer.h"
 #include "base_tile.h"
 
+typedef enum _tCameraType {
+	CAMERA_TYPE_BETWEEN,
+	CAMERA_TYPE_P1,
+	CAMERA_TYPE_P2,
+	CAMERA_TYPE_COUNT
+} tCameraType;
+
 tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 
+static tCameraType s_eCameraType = CAMERA_TYPE_BETWEEN;
 static tView *s_pView;
 static tVPort *s_pVpMain;
 tTileBufferManager *g_pMainBuffer;
@@ -197,6 +205,11 @@ static void gameProcessInput(void) {
 	else if(keyUse(KEY_F3)) {
 		g_is2pKbd = !g_is2pKbd;
 	}
+	else if(keyUse(KEY_F4)) {
+		if(++s_eCameraType == CAMERA_TYPE_COUNT) {
+			s_eCameraType = CAMERA_TYPE_BETWEEN;
+		}
+	}
 
 	BYTE bDirX = 0, bDirY = 0;
 	if(g_is1pKbd) {
@@ -314,10 +327,18 @@ void gameGsLoop(void) {
 		}
 		else {
 			// Two players
-			uwCamY = (
-				fix16_to_int(g_pVehicles[0].fY) +
-				fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT
-			) / 2;
+			if(s_eCameraType == CAMERA_TYPE_P1) {
+				uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
+			}
+			else if(s_eCameraType == CAMERA_TYPE_P2) {
+				uwCamY = fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT / 2;
+			}
+			else {
+				uwCamY = (
+					fix16_to_int(g_pVehicles[0].fY) +
+					fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT
+				) / 2;
+			}
 		}
 		WORD wDist = (
 			uwCamY - g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
@@ -417,7 +438,6 @@ void gameChallengeEnd(void) {
 	g_pVehicles[1].sSteer.bX = 0;
 	g_pVehicles[1].sSteer.bY = 0;
 
-	UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.uwX;
 
 	// Result text
 	if(g_is2pPlaying) {
@@ -434,9 +454,9 @@ void gameChallengeEnd(void) {
 	else {
 		textBobSetText(&s_sChallengeResult, "Score: %ld", g_pVehicles[0].lCash);
 	}
+	UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.uwX;
 	textBobSetPos(
-		&s_sChallengeResult,
-		uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 50, 0, 1
+		&s_sChallengeResult, uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 50, 0, 1
 	);
 	textBobSetColor(&s_sChallengeResult, 14);
 	textBobUpdate(&s_sChallengeResult);
