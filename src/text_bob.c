@@ -18,6 +18,10 @@ void textBobManagerDestroy(void) {
 void textBobCreate(
 	tTextBob *pTextBob, const tFont *pFont, const char *szMaxText
 ) {
+	logBlockBegin(
+		"textBobCreate(pTextBob: %p, pFont: %p, szMaxText: '%s')",
+		pTextBob, pFont, szMaxText
+	);
 	tUwCoordYX sBounds = fontMeasureText(pFont, szMaxText);
 	pTextBob->pFont = pFont;
 	pTextBob->uwWidth = ((sBounds.uwX + 3 + 15) / 16) * 16;
@@ -32,6 +36,7 @@ void textBobCreate(
 		&pTextBob->sBob, pTextBob->uwWidth, uwHeight, 1, pTextBm, pTextMask, 0, 0
 	);
 	pTextBob->isUpdateRequired = 0;
+	logBlockEnd("textBobCreate()");
 }
 
 void textBobSet(

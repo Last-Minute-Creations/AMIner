@@ -202,6 +202,8 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			else {
 				pTiles[x][y] = TILE_ROCK_1 + ((x & 1) ^ (y & 1));
 			}
+			// For quick tests
+			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG + 12;
 		}
 	}
 
