@@ -41,6 +41,7 @@ SET(TOOLS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/ace/tools")
 SET(BITMAP_EXTRACT "${TOOLS_PATH}/bin/bitmap_extract")
 SET(TILESET_CONV "${TOOLS_PATH}/bin/tileset_conv")
 
+set(palette_aminer_unique "${CMAKE_CURRENT_SOURCE_DIR}/_res/palettes/aminer_editing.gpl")
 file(GLOB palette_aminer_gpl _res/palettes/aminer.gpl)
 file(GLOB palette_lmc_gpl _res/palettes/lmc.gpl)
 set(palette_aminer "${CMAKE_CURRENT_SOURCE_DIR}/data/aminer.plt")
@@ -50,7 +51,7 @@ convertPalette(${TARGET_NAME} ${palette_lmc_gpl} ${palette_lmc})
 set(transparency_hex "#993399")
 
 convertBitmaps(
-	TARGET ${TARGET_NAME} PALETTE ${palette_aminer}
+	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCES
 		_res/commrade/bg.png _res/commrade/buttons.png _res/hud.png
 	DESTINATIONS
@@ -63,12 +64,12 @@ convertBitmaps(
 )
 
 convertBitmaps(
-	TARGET ${TARGET_NAME} PALETTE ${palette_aminer} MASK_COLOR ${transparency_hex}
+	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
 	SOURCES _res/logo.png DESTINATIONS data/logo.bm MASKS data/logo_mask.bm
 )
 
 convertBitmaps(
-	TARGET ${TARGET_NAME} PALETTE ${palette_aminer} MASK_COLOR ${transparency_hex}
+	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
 	INTERLEAVED SOURCES
 		_res/drill.png _res/tool.png _res/drill_2.png _res/tool_2.png
 		_res/track.png _res/jet.png _res/bones.png
@@ -81,8 +82,6 @@ convertBitmaps(
 )
 
 convertFont(${TARGET_NAME} _res/uni54 data/uni54.fnt)
-
-set(PALETTE_TILE_EXPORT "${CMAKE_CURRENT_SOURCE_DIR}/_res/palettes/aminer_editing.gpl")
 
 function(tileExtractFromPng TARGET_NAME TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
 	set(TILE_IDX 0)
@@ -111,8 +110,8 @@ function(tileExtractFromPng TARGET_NAME TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
 	add_custom_command(
 		OUTPUT ${TILESET_OUTPUT}
 		COMMAND ${TILESET_CONV}
-			${TILESET_DIR} 32 ${TILESET_OUTPUT} -i -plt ${PALETTE_TILE_EXPORT}
-		DEPENDS ${palette_aminer} ${TILESET_DEPENDS}
+			${TILESET_DIR} 32 ${TILESET_OUTPUT} -i -plt ${palette_aminer_unique}
+		DEPENDS ${palette_aminer_unique} ${TILESET_DEPENDS}
 	)
 	target_sources(${TARGET_NAME} PUBLIC ${TILESET_OUTPUT})
 endfunction()
