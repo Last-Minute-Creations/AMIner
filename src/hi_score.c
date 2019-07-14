@@ -35,6 +35,7 @@ static tHiScore s_pPrevScores[SCORE_COUNT] = {
 static UBYTE s_ubNewNameLength;
 static UBYTE s_ubNewScorePos;
 static UBYTE s_isEnteringHiScore;
+static UBYTE s_isShift = 0;
 static tTextBob s_pScoreNameBobs[SCORE_COUNT];
 static tTextBob s_pScoreCountBobs[SCORE_COUNT];
 // static tTextBob s_sEndMessage;
@@ -46,7 +47,6 @@ void hiScoreLoad(void) {
 		logWrite("opened scores file");
 		for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 			fileRead(pFile, &s_pScores[i], sizeof(s_pScores[i]));
-			logWrite("score: '%s': %lu\n", s_pScores[i].szName, s_pScores[i].ulScore);
 		}
 		fileClose(pFile);
 		CopyMem(s_pScores, s_pPrevScores, sizeof(s_pPrevScores));
@@ -84,16 +84,30 @@ void hiScoreEnteringProcess(void) {
 		s_isEnteringHiScore = 0;
 		return;
 	}
-	if(keyUse(g_sKeyManager.ubLastKey)) {
-		UBYTE isUpdateNeeded = 1;
-		char c = g_pToAscii[g_sKeyManager.ubLastKey];
+	UBYTE isUpdateNeeded = 0;
+	if(keyUse(KEY_LSHIFT) || keyUse(KEY_RSHIFT)) {
+		s_isShift = 1;
+	}
+	else if(
+		s_isShift &&
+		keyCheck(KEY_LSHIFT) == KEY_NACTIVE &&
+		keyCheck(KEY_RSHIFT) == KEY_NACTIVE
+	) {
+		s_isShift = 0;
+	}
+	else if(keyUse(g_sKeyManager.ubLastKey)) {
+		isUpdateNeeded = 1;
+		WORD wInput = g_pToAscii[g_sKeyManager.ubLastKey];
+		if(s_isShift) {
+			wInput -= 'a' - 'A';
+		}
 		if(
-			(c >= 'A' && c <= 'Z') ||
-			(c >= 'a' && c <= 'z') ||
-			(c >= '0' && c <= '9')
+			(wInput >= 'A' && wInput <= 'Z') ||
+			(wInput >= 'a' && wInput <= 'z') ||
+			(wInput >= '0' && wInput <= '9')
 		) {
 			if(s_ubNewNameLength < SCORE_NAME_LENGTH) {
-				s_pScores[s_ubNewScorePos].szName[s_ubNewNameLength] = c;
+				s_pScores[s_ubNewScorePos].szName[s_ubNewNameLength] = wInput;
 				++s_ubNewNameLength;
 			}
 		}
@@ -134,6 +148,7 @@ void hiScoreSetup(ULONG ulScore) {
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		if(s_pScores[i].ulScore < ulScore) {
 			s_isEnteringHiScore = 1;
+			s_isShift = 0;
 			s_ubNewScorePos = i;
 
 			// Move worse score down

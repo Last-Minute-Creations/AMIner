@@ -342,6 +342,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	if(g_isChallenge) {
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_1 + 9) {
 			if(uwY == TILE_ROW_CHALLENGE_FINISH) {
+				pVehicle->lCash += pVehicle->uwCargoScore;
 				vehicleRestock(pVehicle, 0);
 				gameChallengeEnd();
 			}

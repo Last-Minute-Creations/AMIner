@@ -437,7 +437,6 @@ void gameGsLoopScorePreview(void) {
 	}
 
 	bobNewBegin();
-	bobNewPush(&s_sChallengeResult.sBob);
 	hiScoreBobsDisplay();
 	bobNewPushingDone();
 	bobNewEnd();
