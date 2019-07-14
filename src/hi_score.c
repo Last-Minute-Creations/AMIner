@@ -6,6 +6,7 @@
 #include <ace/managers/key.h>
 #include "game.h"
 #include "text_bob.h"
+#include <ace/managers/system.h>
 
 #define SCORE_NAME_LENGTH 20
 #define SCORE_COUNT 10
@@ -15,7 +16,9 @@ typedef struct _tHiScore {
 	char szName[SCORE_NAME_LENGTH];
 } tHiScore;
 
-static tHiScore s_pScores[SCORE_COUNT] = {
+static tHiScore s_pScores[SCORE_COUNT];
+
+static tHiScore s_pPrevScores[SCORE_COUNT] = {
 	{.ulScore = 10, .szName = "Bestest"},
 	{.ulScore = 9, .szName = "Best"},
 	{.ulScore = 8, .szName = "Better"},
@@ -34,12 +37,50 @@ static UBYTE s_ubNewScorePos;
 static UBYTE s_isEnteringHiScore;
 static tTextBob s_pScoreNameBobs[SCORE_COUNT];
 static tTextBob s_pScoreCountBobs[SCORE_COUNT];
+// static tTextBob s_sEndMessage;
+
+void hiScoreLoad(void) {
+	systemUse();
+	tFile *pFile = fileOpen("scores.dat", "r");
+	if(pFile) {
+		logWrite("opened scores file");
+		for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
+			fileRead(pFile, &s_pScores[i], sizeof(s_pScores[i]));
+			logWrite("score: '%s': %lu\n", s_pScores[i].szName, s_pScores[i].ulScore);
+		}
+		fileClose(pFile);
+		CopyMem(s_pScores, s_pPrevScores, sizeof(s_pPrevScores));
+	}
+	else {
+		CopyMem(s_pPrevScores, s_pScores, sizeof(s_pScores));
+	}
+	systemUnuse();
+}
+
+static void hiScoreSave(void) {
+	systemUse();
+	tFile *pFile = fileOpen("scores.dat", "w");
+	if(pFile) {
+		for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
+			fileWrite(pFile, &s_pScores[i], sizeof(s_pScores[i]));
+		}
+		fileClose(pFile);
+		CopyMem(s_pScores, s_pPrevScores, sizeof(s_pPrevScores));
+	}
+	systemUnuse();
+}
 
 void hiScoreEnteringProcess(void) {
 	if(keyUse(KEY_RETURN) || keyUse(KEY_NUMENTER)) {
-		// if(s_ubNewNameLength) {
-		// 	scoreSave();
-		// }
+		if(s_ubNewNameLength) {
+			hiScoreSave();
+		}
+		else {
+			// No entry provided - revert to old scores
+			// not as hiScoreLoadFromFile() because it won't work if file was
+			// not yet created
+			CopyMem(s_pPrevScores, s_pScores, sizeof(s_pScores));
+		}
 		s_isEnteringHiScore = 0;
 		return;
 	}
@@ -78,6 +119,9 @@ void hiScoreBobsDisplay(void) {
 		bobNewPush(&s_pScoreNameBobs[i].sBob);
 		bobNewPush(&s_pScoreCountBobs[i].sBob);
 	}
+	// if(!s_isEnteringHiScore) {
+	// 	bobNewPush(&s_sEndMessage.sBob);
+	// }
 }
 
 UBYTE hiScoreIsEntering(void) {
@@ -86,6 +130,7 @@ UBYTE hiScoreIsEntering(void) {
 
 void hiScoreSetup(ULONG ulScore) {
 	s_isEnteringHiScore = 0;
+	s_ubNewNameLength = 0;
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		if(s_pScores[i].ulScore < ulScore) {
 			s_isEnteringHiScore = 1;
@@ -102,31 +147,37 @@ void hiScoreSetup(ULONG ulScore) {
 			break;
 		}
 	}
-
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		// Score name
 		UWORD uwScorePos = g_pMainBuffer->pCamera->uPos.uwY + 70 + i * 10;
 		textBobSetText(&s_pScoreNameBobs[i], "%hhu. %s", i+1, s_pScores[i].szName);
-		textBobSetColor(&s_pScoreNameBobs[i], 14);
 		textBobSetPos(&s_pScoreNameBobs[i], 32+64, uwScorePos, 0, 0);
 		textBobUpdate(&s_pScoreNameBobs[i]);
 		// Score count
 		textBobSetText(&s_pScoreCountBobs[i], "%lu", s_pScores[i].ulScore);
-		textBobSetColor(&s_pScoreCountBobs[i], 14);
 		textBobSetPos(
 			&s_pScoreCountBobs[i],
 			(32+320-64) - s_pScoreCountBobs[i].uwWidth, uwScorePos, 0, 0
 		);
 		textBobUpdate(&s_pScoreCountBobs[i]);
 	}
-	s_ubNewNameLength = 0;
+	// End text
+	// UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.uwX;
+	// textBobSetPos(
+	// 	&s_sEndMessage, uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 200, 0, 1
+	// );
+	// textBobUpdate(&s_sEndMessage);
 }
 
 void hiScoreBobsCreate(void) {
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		textBobCreate(&s_pScoreNameBobs[i], g_pFont, "10. ZZZZZZZZZZZZZZZZZZZZZ");
+		textBobSetColor(&s_pScoreNameBobs[i], 14);
 		textBobCreate(&s_pScoreCountBobs[i], g_pFont, "655356");
+		textBobSetColor(&s_pScoreCountBobs[i], 14);
 	}
+	// textBobCreate(&s_sEndMessage, g_pFont, "Press button to continue");
+	// textBobSetColor(&s_sEndMessage, 14);
 }
 
 void hiScoreBobsDestroy(void) {
@@ -134,4 +185,5 @@ void hiScoreBobsDestroy(void) {
 		textBobDestroy(&s_pScoreNameBobs[i]);
 		textBobDestroy(&s_pScoreCountBobs[i]);
 	}
+	// textBobDestroy(&s_sEndMessage);
 }

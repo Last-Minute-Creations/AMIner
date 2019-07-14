@@ -19,4 +19,6 @@ void hiScoreBobsDestroy(void);
 
 void hiScoreSetup(ULONG ulScore);
 
+void hiScoreLoad(void);
+
 #endif // _HI_SCORE_H_

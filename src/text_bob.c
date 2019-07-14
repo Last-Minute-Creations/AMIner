@@ -24,8 +24,8 @@ void textBobCreate(
 	);
 	tUwCoordYX sBounds = fontMeasureText(pFont, szMaxText);
 	pTextBob->pFont = pFont;
-	pTextBob->uwWidth = ((sBounds.uwX + 3 + 15) / 16) * 16;
-	UWORD uwHeight = sBounds.uwY + 3;
+	pTextBob->uwWidth = ((sBounds.uwX + 2 + 15) / 16) * 16;
+	UWORD uwHeight = sBounds.uwY + 2;
 	tBitMap *pTextBm = bitmapCreate(
 		pTextBob->uwWidth, uwHeight, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);

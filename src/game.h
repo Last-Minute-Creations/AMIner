@@ -19,6 +19,8 @@ void gameGsLoop(void);
 
 void gameGsLoopChallengeEnd(void);
 
+void gameGsLoopScorePreview();
+
 void gameGsDestroy(void);
 
 void gameStart(void);

@@ -12,6 +12,7 @@
 #include "ground_layer.h"
 #include "build_ver.h"
 #include "base_tile.h"
+#include "hi_score.h"
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -47,6 +48,7 @@ typedef struct _tOption {
 
 void onStart(void);
 void onExit(void);
+void onShowScores(void);
 
 static const char *s_pModeEnum[] = {"Campaign", "Challenge"};
 static const char *s_pPlayersEnum[] = {"1", "2"};
@@ -76,6 +78,7 @@ static tOption s_pOptions[] = {
 		.pVar = &g_isAtari, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
 		.pEnumLabels = s_pOnOffEnum
 	}},
+	{"Hi-Scores", OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onShowScores}},
 	{"Exit to workbench", OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onExit}},
 };
 #define MENU_POS_COUNT (sizeof(s_pOptions) / sizeof(tOption))
@@ -192,6 +195,11 @@ void onStart(void) {
 	audioPlay(AUDIO_CHANNEL_0, s_pSampleEnter, AUDIO_VOLUME_MAX, 1);
 	gameStart();
 	s_eMenuState = MENU_STATE_ROLL_OUT;
+}
+
+void onShowScores(void) {
+	hiScoreSetup(0);
+	gameChangeLoop(gameGsLoopScorePreview);
 }
 
 void onExit(void) {

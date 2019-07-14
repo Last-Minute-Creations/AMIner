@@ -44,7 +44,6 @@ static UBYTE s_isDebug = 0;
 static UWORD s_uwColorBg;
 static UBYTE s_ubChallengeCamCnt;
 static tTextBob s_sChallengeResult;
-static tTextBob s_sEndMessage;
 
 static tBobNew s_pDinoBobs[9];
 static UBYTE s_pDinoWereDrawn[9];
@@ -77,6 +76,7 @@ void gameStart(void) {
 }
 
 void gameGsCreate(void) {
+	hiScoreLoad();
 	s_pView = viewCreate(0,
 		TAG_VIEW_GLOBAL_CLUT, 1,
 	TAG_END);
@@ -160,7 +160,7 @@ void gameGsCreate(void) {
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
 	textBobCreate(&s_sChallengeResult, g_pFont, "Player 20 wins!");
-	textBobCreate(&s_sEndMessage, g_pFont, "Press fire or enter to continue");
+
 	hiScoreBobsCreate();
 	menuPreload();
 	bobNewAllocateBgBuffers();
@@ -377,7 +377,6 @@ void gameGsDestroy(void) {
 	fontDestroy(g_pFont);
 	hiScoreBobsDestroy();
 	textBobDestroy(&s_sChallengeResult);
-	textBobDestroy(&s_sEndMessage);
 	vehicleDestroy(&g_pVehicles[0]);
 	vehicleDestroy(&g_pVehicles[1]);
 	vehicleBitmapsDestroy();
@@ -411,20 +410,37 @@ void gameGsLoopChallengeEnd(void) {
 	}
 
 	vehicleProcess(&g_pVehicles[0]);
-	bobNewPush(&s_sChallengeResult.sBob);
 	if(g_is2pPlaying) {
 		vehicleProcess(&g_pVehicles[1]);
 	}
-	else {
-		hiScoreBobsDisplay();
-	}
-	if(!hiScoreIsEntering()) {
-		bobNewPush(&s_sEndMessage.sBob);
-	}
+	bobNewPush(&s_sChallengeResult.sBob);
+	hiScoreBobsDisplay();
 
 	bobNewPushingDone();
 	bobNewEnd();
 	hudUpdate();
+
+	viewProcessManagers(s_pView);
+	copProcessBlocks();
+	debugColor(s_uwColorBg);
+	vPortWaitForEnd(s_pVpMain);
+}
+
+void gameGsLoopScorePreview(void) {
+	if(
+		keyUse(KEY_ESCAPE) || keyUse(KEY_RETURN) ||
+		joyUse(JOY1_FIRE) || joyUse(JOY2_FIRE)
+	) {
+		gameChangeLoop(gameGsLoop);
+		goToMenu();
+		return;
+	}
+
+	bobNewBegin();
+	bobNewPush(&s_sChallengeResult.sBob);
+	hiScoreBobsDisplay();
+	bobNewPushingDone();
+	bobNewEnd();
 
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
@@ -468,13 +484,6 @@ void gameChallengeEnd(void) {
 		// No hi score for 2 players
 		hiScoreSetup(0);
 	}
-
-	// End text
-	textBobSet(
-		&s_sEndMessage, "Press fire or enter to continue", 14,
-		uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 200, 0, 1
-	);
-	textBobUpdate(&s_sEndMessage);
 
 	gameChangeLoop(gameGsLoopChallengeEnd);
 }
