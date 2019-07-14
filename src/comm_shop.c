@@ -158,7 +158,7 @@ static void commShopDrawWarehouse(void) {
 
 	const tPlan *pPlan = warehouseGetPlan();
 	s_ubPosCount = getMineralsOnList(pPlan, s_pMineralsOnList);
-	s_ubPosCurr = 0;
+	s_ubPosCurr = s_ubPosCount; // move to buttons on start
 	for(UBYTE i = 0; i < s_ubPosCount; ++i) {
 		commShopDrawWarehouseRow(i, pPlan);
 	}
@@ -170,6 +170,7 @@ static void commShopDrawWarehouse(void) {
 	buttonRmAll();
 	buttonAdd("Confirm", sPosBtn.uwX, sPosBtn.uwY);
 	buttonAdd("Exit", sPosBtn.uwX + COMM_DISPLAY_WIDTH / 3, sPosBtn.uwY);
+	buttonSelect(0);
 	buttonDrawAll(s_pBmDraw, s_pTextBitmap);
 
 	char szBfr[5];
