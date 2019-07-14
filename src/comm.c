@@ -9,7 +9,8 @@
 
 typedef enum _tBtnState {
 	BTN_STATE_NACTIVE = 0,
-	BTN_STATE_ACTIVE = 1
+	BTN_STATE_ACTIVE = 1,
+	BTN_STATE_USED
 } tBtnState;
 
 static tBitMap *s_pBmRestore;
@@ -136,35 +137,13 @@ UBYTE commNavCheck(tCommNav eNav) {
 }
 
 UBYTE commNavUse(tCommNav eNav) {
-	switch(eNav) {
-		case COMM_NAV_UP:
-			return (
-				keyUse(KEY_W) || keyUse(KEY_UP) ||
-				joyUse(JOY1 + JOY_UP) || joyUse(JOY2 + JOY_UP)
-			);
-		case COMM_NAV_DOWN:
-			return (
-				keyUse(KEY_S) || keyUse(KEY_DOWN) ||
-				joyUse(JOY1 + JOY_DOWN) || joyUse(JOY2 + JOY_DOWN)
-			);
-		case COMM_NAV_LEFT:
-			return (
-				keyUse(KEY_A) || keyUse(KEY_LEFT) ||
-				joyUse(JOY1 + JOY_LEFT) || joyUse(JOY2 + JOY_LEFT)
-			);
-		case COMM_NAV_RIGHT:
-			return (
-				keyUse(KEY_D) || keyUse(KEY_RIGHT) ||
-				joyUse(JOY1 + JOY_RIGHT) || joyUse(JOY2 + JOY_RIGHT)
-			);
-		case COMM_NAV_BTN:
-			return (
-				keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || keyUse(KEY_ESCAPE) ||
-				joyUse(JOY1 + JOY_FIRE) || joyUse(JOY2 + JOY_FIRE)
-			);
-		default:
-			return 0;
+	// Relying on btn states from commProcess() makes it independent from state
+	// changes during interrupts and allows hierarchical usage of buttons
+	if(s_pNav[eNav] == BTN_STATE_ACTIVE) {
+		s_pNav[eNav] = BTN_STATE_USED;
+		return 1;
 	}
+	return 0;
 }
 
 void commHide(void) {

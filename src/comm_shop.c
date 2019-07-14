@@ -14,7 +14,7 @@
 #include "hud.h"
 
 static UBYTE s_isShown;
-static UBYTE s_isBtnPress;
+static UBYTE s_isBtnPress = 0;
 static tTextBitMap *s_pTextBitmap;
 tBitMap *s_pBmDraw;
 tCommLed s_eTab;
@@ -311,6 +311,7 @@ static void commShopShowTab(tCommLed eTab) {
 }
 
 void commShopGsCreate(void) {
+	s_isBtnPress = 0;
 	s_isShown = commShow();
 	if(!s_isShown) {
 		// Camera not placed properly
