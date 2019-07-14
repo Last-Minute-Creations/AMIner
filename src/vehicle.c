@@ -120,7 +120,7 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 
 	vehicleReset(pVehicle);
 
-	textBobCreate(&pVehicle->sTextBob, g_pFont, "Checkpoint! +1000");
+	textBobCreate(&pVehicle->sTextBob, g_pFont, "Checkpoint! +1000\x1F");
 	logBlockEnd("vehicleCreate()");
 }
 
@@ -347,7 +347,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			}
 			else {
 				textBobSetText(
-					&pVehicle->sTextBob, "Checkpoint! %+hd", pVehicle->uwCargoScore
+					&pVehicle->sTextBob, "Checkpoint! %+hu\x1F", pVehicle->uwCargoScore
 				);
 				textBobSetColor(&pVehicle->sTextBob, COLOR_GREEN);
 				textBobSetPos(
@@ -389,10 +389,21 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		}
 		pVehicle->fY = fix16_from_int(uwTileY*32);
 		pVehicle->fDy = fix16_from_int(-1); // HACK HACK HACK
+		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 		audioPlay(
 			AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
 			g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
 		);
+		UWORD uwTeleportPenalty = 200;
+		textBobSetText(&pVehicle->sTextBob, "Teleport: -%hu\x1F", uwTeleportPenalty);
+		textBobSetColor(&pVehicle->sTextBob, COLOR_REDEST);
+		textBobSetPos(
+			&pVehicle->sTextBob,
+			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+			pVehicle->sBobBody.sPos.uwY,
+			pVehicle->sBobBody.sPos.uwY - 48, 1
+		);
+		pVehicle->lCash -= uwTeleportPenalty;
 
 		if(uwTileY >= TILE_ROW_CHALLENGE_FINISH) {
 			gameChallengeEnd();
@@ -592,7 +603,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 				&pVehicle->sTextBob,
 				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
 				pVehicle->sBobBody.sPos.uwY,
-				pVehicle->sBobBody.sPos.uwY - 48, 0
+				pVehicle->sBobBody.sPos.uwY - 48, 1
 			);
 		}
 	}
