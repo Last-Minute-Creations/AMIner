@@ -1,3 +1,12 @@
+19.7.14
+- Added saving scores to file and score preview in menu
+- Added score penalty for teleport in challenge
+- Added upper/lowercase input using shift btn in hiscore
+- Warehouse now properly resets on starting new game
+- Added cursor on entry input in hiscore
+- Warehouse tab has now focus on buttons by default
+- Fixed Commrade tab changes not being processed properly
+
 19.7.9
 - You can have now negative cash because of refueling
 - Warehouse tab allows selling stuff
