@@ -7,9 +7,11 @@
 #include "game.h"
 #include "text_bob.h"
 #include <ace/managers/system.h>
+#include <ace/managers/timer.h>
 
 #define SCORE_NAME_LENGTH 20
 #define SCORE_COUNT 10
+#define SCORE_CURSOR_BLINK_TICKS 25 // 25 ticks = 500ms
 
 typedef struct _tHiScore {
 	ULONG ulScore;
@@ -36,6 +38,8 @@ static UBYTE s_ubNewNameLength;
 static UBYTE s_ubNewScorePos;
 static UBYTE s_isEnteringHiScore;
 static UBYTE s_isShift = 0;
+static UBYTE s_isCursor = 0;
+static ULONG s_ulCursorStart = 0;
 static tTextBob s_pScoreNameBobs[SCORE_COUNT];
 static tTextBob s_pScoreCountBobs[SCORE_COUNT];
 // static tTextBob s_sEndMessage;
@@ -70,6 +74,23 @@ static void hiScoreSave(void) {
 	systemUnuse();
 }
 
+static void hiScoreUpdateScoreBobs(void) {
+	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
+		// Score name
+		UWORD uwScorePos = g_pMainBuffer->pCamera->uPos.uwY + 70 + i * 10;
+		textBobSetText(&s_pScoreNameBobs[i], "%hhu. %s", i+1, s_pScores[i].szName);
+		textBobSetPos(&s_pScoreNameBobs[i], 32+64, uwScorePos, 0, 0);
+		textBobUpdate(&s_pScoreNameBobs[i]);
+		// Score count
+		textBobSetText(&s_pScoreCountBobs[i], "%lu", s_pScores[i].ulScore);
+		textBobSetPos(
+			&s_pScoreCountBobs[i],
+			(32+320-64) - s_pScoreCountBobs[i].uwWidth, uwScorePos, 0, 0
+		);
+		textBobUpdate(&s_pScoreCountBobs[i]);
+	}
+}
+
 void hiScoreEnteringProcess(void) {
 	if(keyUse(KEY_RETURN) || keyUse(KEY_NUMENTER)) {
 		if(s_ubNewNameLength) {
@@ -82,6 +103,7 @@ void hiScoreEnteringProcess(void) {
 			CopyMem(s_pPrevScores, s_pScores, sizeof(s_pScores));
 		}
 		s_isEnteringHiScore = 0;
+		hiScoreUpdateScoreBobs();
 		return;
 	}
 	UBYTE isUpdateNeeded = 0;
@@ -118,13 +140,20 @@ void hiScoreEnteringProcess(void) {
 		else {
 			isUpdateNeeded = 0;
 		}
-		if(isUpdateNeeded) {
-			textBobSetText(
-				&s_pScoreNameBobs[s_ubNewScorePos], "%hhu. %s",
-				s_ubNewScorePos+1, s_pScores[s_ubNewScorePos].szName
-			);
-			textBobUpdate(&s_pScoreNameBobs[s_ubNewScorePos]);
-		}
+	}
+	ULONG ulDelta = timerGetDelta(s_ulCursorStart, timerGet());
+	if(ulDelta >= SCORE_CURSOR_BLINK_TICKS) {
+		s_ulCursorStart += SCORE_CURSOR_BLINK_TICKS;
+		s_isCursor = !s_isCursor;
+		isUpdateNeeded = 1;
+	}
+
+	if(isUpdateNeeded) {
+		textBobSetText(
+			&s_pScoreNameBobs[s_ubNewScorePos], "%hhu. %s%c",
+			s_ubNewScorePos+1, s_pScores[s_ubNewScorePos].szName, s_isCursor ? '_' : ' '
+		);
+		textBobUpdate(&s_pScoreNameBobs[s_ubNewScorePos]);
 	}
 }
 
@@ -149,6 +178,8 @@ void hiScoreSetup(ULONG ulScore) {
 		if(s_pScores[i].ulScore < ulScore) {
 			s_isEnteringHiScore = 1;
 			s_isShift = 0;
+			s_isCursor = 0;
+			s_ulCursorStart = timerGet();
 			s_ubNewScorePos = i;
 
 			// Move worse score down
@@ -162,20 +193,7 @@ void hiScoreSetup(ULONG ulScore) {
 			break;
 		}
 	}
-	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-		// Score name
-		UWORD uwScorePos = g_pMainBuffer->pCamera->uPos.uwY + 70 + i * 10;
-		textBobSetText(&s_pScoreNameBobs[i], "%hhu. %s", i+1, s_pScores[i].szName);
-		textBobSetPos(&s_pScoreNameBobs[i], 32+64, uwScorePos, 0, 0);
-		textBobUpdate(&s_pScoreNameBobs[i]);
-		// Score count
-		textBobSetText(&s_pScoreCountBobs[i], "%lu", s_pScores[i].ulScore);
-		textBobSetPos(
-			&s_pScoreCountBobs[i],
-			(32+320-64) - s_pScoreCountBobs[i].uwWidth, uwScorePos, 0, 0
-		);
-		textBobUpdate(&s_pScoreCountBobs[i]);
-	}
+	hiScoreUpdateScoreBobs();
 	// End text
 	// UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.uwX;
 	// textBobSetPos(

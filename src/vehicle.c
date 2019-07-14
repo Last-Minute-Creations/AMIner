@@ -93,6 +93,9 @@ void vehicleReset(tVehicle *pVehicle) {
 	pVehicle->uwDrillMax = 1000;
 	pVehicle->uwDrillCurr = 1000;
 
+	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
+		pVehicle->pStock[i] = 0;
+	}
 	vehicleResetPos(pVehicle);
 }
 

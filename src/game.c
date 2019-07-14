@@ -23,6 +23,7 @@
 #include "hi_score.h"
 #include "ground_layer.h"
 #include "base_tile.h"
+#include "warehouse.h"
 
 typedef enum _tCameraType {
 	CAMERA_TYPE_BETWEEN,
@@ -69,6 +70,7 @@ void gameStart(void) {
 	}
 	s_isMsgShown = 0;
 	tileInit(g_isAtari, g_isChallenge);
+	warehouseReset();
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	hudReset(g_isChallenge, g_is2pPlaying);

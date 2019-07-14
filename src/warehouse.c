@@ -8,15 +8,21 @@
 #include <ace/managers/log.h>
 
 // Not spent on plan, not sold
-static UBYTE s_pStock[MINERAL_TYPE_COUNT];
+static UBYTE s_pStock[MINERAL_TYPE_COUNT] = {0};
 
-tPlan s_sCurrentPlan = {
+static tPlan s_sCurrentPlan;
+static const tPlan s_sFirstPlan = {
 	.pMinerals = { {0},
 		[MINERAL_TYPE_SILVER] = {.ubTargetCount = 3, .ubCurrentCount = 0},
 		[MINERAL_TYPE_GOLD] = {.ubTargetCount = 1, .ubCurrentCount = 0}
 	},
 	.ulTargetSum = 100000
 };
+
+void warehouseReset(void) {
+	memset(s_pStock, 0, sizeof(s_pStock));
+	s_sCurrentPlan = s_sFirstPlan;
+}
 
 const tPlan *warehouseGetPlan(void) {
 	return &s_sCurrentPlan;

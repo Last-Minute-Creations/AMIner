@@ -30,4 +30,6 @@ UBYTE warehouseGetStock(UBYTE ubMineralType);
 
 void warehouseSetStock(UBYTE ubMineralType, UBYTE ubCount);
 
+void warehouseReset(void);
+
 #endif // _WAREHOUSE_H_
