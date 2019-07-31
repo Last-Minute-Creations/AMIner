@@ -212,6 +212,9 @@ static void gameProcessInput(void) {
 			s_eCameraType = CAMERA_TYPE_BETWEEN;
 		}
 	}
+	else if(keyUse(KEY_U)) {
+		hudShowMessage(0, "Hello, comrade!\nMultiline text test");
+	}
 
 	BYTE bDirX = 0, bDirY = 0;
 	if(g_is1pKbd) {

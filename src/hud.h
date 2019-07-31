@@ -33,4 +33,6 @@ void hudSetHealth(UBYTE ubPlayer, UBYTE ubHealth, UBYTE ubHealthMax);
 
 void hudUpdate(void);
 
+void hudShowMessage(UBYTE ubFace, const char *szMsg);
+
 #endif // _HUD_H_
