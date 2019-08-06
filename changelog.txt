@@ -1,3 +1,7 @@
+19.8.6
+ - Added HUD messages
+ - Added plan generation on timeout
+
 19.7.14
 - Added saving scores to file and score preview in menu
 - Added score penalty for teleport in challenge

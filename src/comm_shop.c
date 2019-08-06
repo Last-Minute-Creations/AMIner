@@ -174,18 +174,18 @@ static void commShopDrawWarehouse(void) {
 	buttonDrawAll(s_pBmDraw, s_pTextBitmap);
 
 	char szBfr[5];
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Days remaining:");
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Time remaining:");
 	fontDrawTextBitMap(
 		s_pBmDraw, s_pTextBitmap,
-		sPosDisplay.uwX + COMM_DISPLAY_WIDTH - 20,
+		sPosDisplay.uwX + COMM_DISPLAY_WIDTH - 25,
 		sPosDisplay.uwY + COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
 		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_RIGHT
 	);
-	sprintf(szBfr, "%d", 0);
+	sprintf(szBfr, "%d", (pPlan->wTimeRemaining + 9) / 10);
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 	fontDrawTextBitMap(
 		s_pBmDraw, s_pTextBitmap,
-		sPosDisplay.uwX + COMM_DISPLAY_WIDTH - 20 + 5,
+		sPosDisplay.uwX + COMM_DISPLAY_WIDTH - 25 + 5,
 		sPosDisplay.uwY + COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
 		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
 	);

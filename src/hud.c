@@ -125,7 +125,7 @@ static void hudShowPage(UBYTE ubPage) {
 }
 
 void hudShowMessage(UBYTE ubFace, const char *szMsg) {
-	memcpy(s_szMsg, szMsg, MIN(strlen(szMsg), HUD_MSG_LEN_MAX));
+	memcpy(s_szMsg, szMsg, MIN(strlen(szMsg) + 1, HUD_MSG_LEN_MAX));
 	s_eState = STATE_MSG_NOISE_IN;
 	s_uwFrameDelay = 25;
 	s_uwStateCounter = 0;

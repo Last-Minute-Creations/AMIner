@@ -6,22 +6,22 @@
 #include "mineral.h"
 #include <ace/macros.h>
 #include <ace/managers/log.h>
+#include <ace/managers/rand.h>
 
 // Not spent on plan, not sold
 static UBYTE s_pStock[MINERAL_TYPE_COUNT] = {0};
 
 static tPlan s_sCurrentPlan;
 static const tPlan s_sFirstPlan = {
-	.pMinerals = { {0},
-		[MINERAL_TYPE_SILVER] = {.ubTargetCount = 3, .ubCurrentCount = 0},
-		[MINERAL_TYPE_GOLD] = {.ubTargetCount = 1, .ubCurrentCount = 0}
-	},
-	.ulTargetSum = 100000
+	.pMinerals = {{0}},
+	.ulMineralsUnlocked = 1 << MINERAL_TYPE_SILVER,
+	.ulTargetSum = 100
 };
 
-void warehouseReset(void) {
+void warehouseReset(UBYTE is2pPlaying) {
 	memset(s_pStock, 0, sizeof(s_pStock));
 	s_sCurrentPlan = s_sFirstPlan;
+	warehouseNewPlan(0, is2pPlaying);
 }
 
 const tPlan *warehouseGetPlan(void) {
@@ -46,15 +46,37 @@ UBYTE warehouseIsPlanFulfilled(void) {
 	return hasAllMinerals || hasSum;
 }
 
-void warehouseNewPlan(void) {
-	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
-		tPlanMineral *pMineral = &s_sCurrentPlan.pMinerals[i];
-		if(pMineral->ubCurrentCount) {
-			pMineral->ubTargetCount = pMineral->ubCurrentCount + pMineral->ubCurrentCount / 2;
-			pMineral->ubCurrentCount = 0;
+void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
+	if(isBigger) {
+		if(is2pPlaying) {
+			s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum * 3 / 4;
+		}
+		else {
+			s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum * 1 / 2;
 		}
 	}
-	s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum / 2;
+	memset(
+		s_sCurrentPlan.pMinerals, 0, sizeof(s_sCurrentPlan.pMinerals)
+	);
+	UBYTE isDone = 0;
+	LONG lCostRemaining = s_sCurrentPlan.ulTargetSum;
+	do {
+		UBYTE ubMineral = ubRandMax(MINERAL_TYPE_COUNT - 1);
+		if(s_sCurrentPlan.ulMineralsUnlocked & (1 << ubMineral)) {
+			UWORD uwCount = uwRandMax(lCostRemaining / g_pMinerals[ubMineral].ubReward);
+			s_sCurrentPlan.pMinerals[ubMineral].ubTargetCount += uwCount;
+			lCostRemaining -= uwCount * g_pMinerals[ubMineral].ubReward;
+			if(lCostRemaining <= 0) {
+				isDone = 1;
+			}
+		}
+	} while(!isDone);
+	s_sCurrentPlan.wTimeMax = 4 * 1000; // Two times fuel capacity for 2p
+	s_sCurrentPlan.wTimeRemaining = s_sCurrentPlan.wTimeMax;
+}
+
+void warehousePlanUnlockMineral(tMineralType eMineral) {
+	s_sCurrentPlan.ulMineralsUnlocked |= 1 << eMineral;
 }
 
 UBYTE warehouseGetStock(UBYTE ubMineralType) {
@@ -63,4 +85,8 @@ UBYTE warehouseGetStock(UBYTE ubMineralType) {
 
 void warehouseSetStock(UBYTE ubMineralType, UBYTE ubCount) {
 	s_pStock[ubMineralType] = ubCount;
+}
+
+void warehouseElapseTime(UBYTE ubTime) {
+	s_sCurrentPlan.wTimeRemaining = MAX(0, s_sCurrentPlan.wTimeRemaining - ubTime);
 }

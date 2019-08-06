@@ -70,7 +70,7 @@ void gameStart(void) {
 	}
 	s_isMsgShown = 0;
 	tileInit(g_isAtari, g_isChallenge);
-	warehouseReset();
+	warehouseReset(g_is2pPlaying);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	hudReset(g_isChallenge, g_is2pPlaying);
@@ -212,9 +212,6 @@ static void gameProcessInput(void) {
 			s_eCameraType = CAMERA_TYPE_BETWEEN;
 		}
 	}
-	else if(keyUse(KEY_U)) {
-		hudShowMessage(0, "Hello, comrade!\nMultiline text test");
-	}
 
 	BYTE bDirX = 0, bDirY = 0;
 	if(g_is1pKbd) {
@@ -285,6 +282,19 @@ void gameGsLoop(void) {
 	gameProcessInput();
 	vehicleProcessText();
 	debugColor(0x080);
+
+	// Process plan being complete
+	if(warehouseGetPlan()->wTimeRemaining <= 0 || keyUse(KEY_U)) {
+		if(warehouseIsPlanFulfilled()) {
+			hudShowMessage(0, "Comrade, plan done, new has arrived");
+			warehouseNewPlan(1, g_is2pPlaying);
+		}
+		else {
+			hudShowMessage(0, "Comrade, plan not done, warning and new plan");
+			warehouseNewPlan(0, g_is2pPlaying);
+		}
+	}
+
 	if(g_ubDinoBonesFound && tileBufferIsTileOnBuffer(
 		g_pMainBuffer,
 		s_pDinoBobs[ubLastDino].sPos.uwX / 32,

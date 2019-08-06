@@ -239,7 +239,9 @@ static inline UBYTE vehicleStartDrilling(
 	audioPlay(AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx, g_pSampleDrill, AUDIO_VOLUME_MAX, -1);
 
 	if(!g_isChallenge) {
-		pVehicle->uwDrillCurr -= 30;
+		UBYTE ubDrillCost = 30;
+		pVehicle->uwDrillCurr -= ubDrillCost;
+		warehouseElapseTime(ubDrillCost);
 	}
 	return 1;
 }
@@ -278,9 +280,7 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 
 static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	// Load mineral to vehicle
-	static UBYTE wasPlanFulfilled = 0; // FIXME this may work incorrectly when game restarts
 	static const char * const szMessageFull = "Cargo full!";
-	static const char * const szMessagePlanDone = "Plan done!";
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
 		char szMessage[50];
@@ -307,6 +307,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		pVehicle->uwCargoScore += pMineral->ubReward * ubSlots;
 		pVehicle->ubCargoCurr += ubSlots;
 		pVehicle->pStock[ubMineralType] += ubSlots;
+		warehousePlanUnlockMineral(ubMineralType);
 
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr, pVehicle->ubCargoMax);
 		const char *szMessage;
@@ -320,14 +321,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 			);
 		}
 		else {
-			UBYTE isPlanFulfilled = warehouseIsPlanFulfilled();
-			if(isPlanFulfilled && !wasPlanFulfilled) {
-				szMessage = szMessagePlanDone;
-			}
-			else {
-				szMessage = g_pTileDefs[ubTile].szMsg;
-			}
-			wasPlanFulfilled = isPlanFulfilled;
+			szMessage = g_pTileDefs[ubTile].szMsg;
 			ubColor = pMineral->ubTitleColor;
 			audioPlay(
 				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
