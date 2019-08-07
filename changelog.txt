@@ -1,3 +1,6 @@
+19.8.7
+- Fixed gane not starting on configs without FAST mem
+
 19.8.6
  - Added HUD messages
  - Added plan generation on timeout
