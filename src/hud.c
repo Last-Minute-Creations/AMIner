@@ -125,6 +125,7 @@ static void hudShowPage(UBYTE ubPage) {
 }
 
 void hudShowMessage(UBYTE ubFace, const char *szMsg) {
+	logWrite("Showing HUD message: '%s'\n", szMsg);
 	memcpy(s_szMsg, szMsg, MIN(strlen(szMsg) + 1, HUD_MSG_LEN_MAX));
 	s_eState = STATE_MSG_NOISE_IN;
 	s_uwFrameDelay = 25;
@@ -405,7 +406,9 @@ void hudUpdate(void) {
 			break;
 		case STATE_MSG_PREPARE_LETTER:
 			s_szLetter[0] = s_szMsg[s_ubMsgCharIdx];
-			fontFillTextBitMap(s_pFont, s_pLineBufferPage2, s_szLetter);
+			if(s_szMsg[s_ubMsgCharIdx] != '\n') {
+				fontFillTextBitMap(s_pFont, s_pLineBufferPage2, s_szLetter);
+			}
 			s_eState = STATE_MSG_DRAW_LETTER;
 			break;
 		case STATE_MSG_DRAW_LETTER:

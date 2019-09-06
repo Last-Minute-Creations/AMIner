@@ -9,13 +9,13 @@
 #include <ace/managers/rand.h>
 
 // Not spent on plan, not sold
-static UBYTE s_pStock[MINERAL_TYPE_COUNT] = {0};
+static UWORD s_pStock[MINERAL_TYPE_COUNT] = {0};
 
 static tPlan s_sCurrentPlan;
 static const tPlan s_sFirstPlan = {
 	.pMinerals = {{0}},
 	.ulMineralsUnlocked = 1 << MINERAL_TYPE_SILVER,
-	.ulTargetSum = 100
+	.ulTargetSum = 15
 };
 
 void warehouseReset(UBYTE is2pPlaying) {
@@ -29,24 +29,42 @@ const tPlan *warehouseGetPlan(void) {
 }
 
 void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount) {
-	s_sCurrentPlan.pMinerals[ubMineralType].ubCurrentCount = ubCount;
+	s_sCurrentPlan.pMinerals[ubMineralType].uwCurrentCount = ubCount;
 }
 
 UBYTE warehouseIsPlanFulfilled(void) {
-	UBYTE hasAllMinerals = 1;
-	ULONG ulSum = 0;
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
-		ulSum += g_pMinerals[i].ubReward * s_sCurrentPlan.pMinerals[i].ubCurrentCount;
-		if(s_sCurrentPlan.pMinerals[i].ubCurrentCount < s_sCurrentPlan.pMinerals[i].ubTargetCount) {
-			hasAllMinerals = 0;
+		const tPlanMineral *pMineral = &s_sCurrentPlan.pMinerals[i];
+		if(pMineral->uwCurrentCount < pMineral->uwTargetCount) {
+			logWrite("Plan not fulfilled\n");
+			return 0;
 		}
 	}
+	logWrite("Plan fulfilled\n");
+	return 1;
+}
 
-	UBYTE hasSum = 0; //(ulSum == s_sCurrentPlan.ulTargetSum);
-	return hasAllMinerals || hasSum;
+UBYTE warehouseTryFulfillPlan(void) {
+	UWORD pNewStock[MINERAL_TYPE_COUNT];
+	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
+		const tPlanMineral *pMineral = &s_sCurrentPlan.pMinerals[i];
+		UWORD uwTotal = pMineral->uwCurrentCount + s_pStock[i];
+		if(uwTotal < pMineral->uwTargetCount) {
+			return 0;
+		}
+		else {
+			pNewStock[i] = uwTotal - pMineral->uwTargetCount;
+		}
+	}
+	// We can fulfill plan from current stock, so replace it with reduced one
+	CopyMem(pNewStock, s_pStock, MINERAL_TYPE_COUNT * sizeof(pNewStock[0]));
+	return 1;
 }
 
 void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
+	logBlockBegin(
+		"warehouseNewPlan(isBigger: %hhu, is2pPlaying: %hhu)", isBigger, is2pPlaying
+	);
 	if(isBigger) {
 		if(is2pPlaying) {
 			s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum * 3 / 4;
@@ -63,9 +81,10 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 	do {
 		UBYTE ubMineral = ubRandMax(MINERAL_TYPE_COUNT - 1);
 		if(s_sCurrentPlan.ulMineralsUnlocked & (1 << ubMineral)) {
-			UWORD uwCount = uwRandMax(lCostRemaining / g_pMinerals[ubMineral].ubReward);
-			s_sCurrentPlan.pMinerals[ubMineral].ubTargetCount += uwCount;
-			lCostRemaining -= uwCount * g_pMinerals[ubMineral].ubReward;
+			UBYTE ubReward = g_pMinerals[ubMineral].ubReward;
+			UWORD uwCount = uwRandMax((lCostRemaining + ubReward - 1) / ubReward);
+			s_sCurrentPlan.pMinerals[ubMineral].uwTargetCount += uwCount;
+			lCostRemaining -= uwCount * ubReward;
 			if(lCostRemaining <= 0) {
 				isDone = 1;
 			}
@@ -73,18 +92,19 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 	} while(!isDone);
 	s_sCurrentPlan.wTimeMax = 4 * 1000; // Two times fuel capacity for 2p
 	s_sCurrentPlan.wTimeRemaining = s_sCurrentPlan.wTimeMax;
+	logBlockEnd("warehouseNewPlan()");
 }
 
 void warehousePlanUnlockMineral(tMineralType eMineral) {
 	s_sCurrentPlan.ulMineralsUnlocked |= 1 << eMineral;
 }
 
-UBYTE warehouseGetStock(UBYTE ubMineralType) {
+UWORD warehouseGetStock(UBYTE ubMineralType) {
 	return s_pStock[ubMineralType];
 }
 
-void warehouseSetStock(UBYTE ubMineralType, UBYTE ubCount) {
-	s_pStock[ubMineralType] = ubCount;
+void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount) {
+	s_pStock[ubMineralType] = uwCount;
 }
 
 void warehouseElapseTime(UBYTE ubTime) {

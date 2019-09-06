@@ -12,6 +12,7 @@
 #include "button.h"
 #include "vehicle.h"
 #include "hud.h"
+#include "tutorial.h"
 
 static UBYTE s_isShown;
 static UBYTE s_isBtnPress = 0;
@@ -38,18 +39,18 @@ static const char *s_pColNames[4] = {"Mineral", "Sell", "Stock", "Plan"};
 static const UBYTE s_pColOffs[4] = {0,  50, 85, 130};
 static UBYTE s_pMineralsOnList[MINERAL_TYPE_COUNT];
 
-static UBYTE s_pTmpSell[MINERAL_TYPE_COUNT];
-static UBYTE s_pTmpPlan[MINERAL_TYPE_COUNT];
-static UBYTE s_pTmpStock[MINERAL_TYPE_COUNT];
+static UWORD s_pTmpSell[MINERAL_TYPE_COUNT];
+static UWORD s_pTmpPlan[MINERAL_TYPE_COUNT];
+static UWORD s_pTmpStock[MINERAL_TYPE_COUNT];
 
 static UBYTE getMineralsOnList(const tPlan *pPlan, UBYTE *pMineralsOnList) {
 	UBYTE ubCount = 0;
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		// Omit minerals not in plan
-		if(pPlan->pMinerals[i].ubTargetCount || warehouseGetStock(i)) {
+		if(pPlan->pMinerals[i].uwTargetCount || warehouseGetStock(i)) {
 			pMineralsOnList[ubCount] = i;
 			s_pTmpStock[i] = warehouseGetStock(i);
-			s_pTmpPlan[i] = pPlan->pMinerals[i].ubCurrentCount;
+			s_pTmpPlan[i] = pPlan->pMinerals[i].uwCurrentCount;
 			s_pTmpSell[i] = 0;
 			++ubCount;
 		}
@@ -92,7 +93,7 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 
 	// Stock
 	UBYTE ubStockCenter = fontMeasureText(g_pFont, s_pColNames[2]).uwX / 2;
-	sprintf(szBfr, "%hhu", s_pTmpStock[ubMineral]);
+	sprintf(szBfr, "%hu", s_pTmpStock[ubMineral]);
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 	UBYTE ubValWidthHalf = fontMeasureText(g_pFont, szBfr).uwX / 2;
 	fontDrawTextBitMap(
@@ -129,8 +130,8 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 
 	// Plan
 	sprintf(
-		szBfr, "%hhu/%hhu",
-		s_pTmpPlan[ubMineral], pPlan->pMinerals[ubMineral].ubTargetCount
+		szBfr, "%hu/%hu",
+		s_pTmpPlan[ubMineral], pPlan->pMinerals[ubMineral].uwTargetCount
 	);
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 	fontDrawTextBitMap(
@@ -263,8 +264,15 @@ static void commShopProcessWarehouse() {
 					warehouseReserveMineralsForPlan(ubMineral, s_pTmpPlan[ubMineral]);
 					g_pVehicles[0].lCash += g_pMinerals[ubMineral].ubReward * s_pTmpSell[ubMineral];
 					s_pTmpSell[ubMineral] = 0;
-					commShopDrawWarehouseRow(i, warehouseGetPlan());
+					s_pTmpPlan[ubMineral] = 0;
+					s_pTmpStock[ubMineral] = 0;
 					hudSetCash(0, g_pVehicles[0].lCash);
+				}
+				if(warehouseIsPlanFulfilled()) {
+					warehouseNewPlan(1, g_is2pPlaying);
+				}
+				for(UBYTE i = 0; i < s_ubPosCount; ++i) {
+					commShopDrawWarehouseRow(i, warehouseGetPlan());
 				}
 				break;
 			case 1:
@@ -336,6 +344,8 @@ void commShopGsLoop(void) {
 	static UBYTE wasShiftAction = 0;
 	commProcess();
 
+	tutorialProcess();
+
 	tCommLed eOldTab = s_eTab;
 	s_isBtnPress = 0;
 	if(commNavCheck(COMM_NAV_BTN)) {
@@ -373,6 +383,9 @@ void commShopGsLoop(void) {
 	}
 
 	hudUpdate();
+	// Process only managers of HUD because we want single buffering on main one
+	vPortProcessManagers(g_pMainBuffer->sCommon.pVPort->pView->pFirstVPort);
+	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 
 	if(s_eTab != eOldTab) {
@@ -401,4 +414,8 @@ void commShopGsDestroy(void) {
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 	commHide();
+}
+
+UBYTE commShopIsActive(void) {
+	return s_isShown;
 }

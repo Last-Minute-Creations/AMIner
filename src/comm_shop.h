@@ -17,4 +17,6 @@ void commShopAlloc(void);
 
 void commShopDealloc(void);
 
+UBYTE commShopIsActive(void);
+
 #endif // _COMM_SHOP_H_

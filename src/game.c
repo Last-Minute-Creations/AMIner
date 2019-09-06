@@ -24,6 +24,7 @@
 #include "ground_layer.h"
 #include "base_tile.h"
 #include "warehouse.h"
+#include "tutorial.h"
 
 typedef enum _tCameraType {
 	CAMERA_TYPE_BETWEEN,
@@ -55,8 +56,6 @@ UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isAtari;
 
-UBYTE s_isMsgShown = 0;
-
 static void goToMenu(void) {
 	// Switch to menu, after popping it will process gameGsLoop
 	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
@@ -68,7 +67,7 @@ void gameStart(void) {
 	for(UBYTE i = 0; i < 9; ++i) {
 		s_pDinoWereDrawn[i] = 0;
 	}
-	s_isMsgShown = 0;
+	tutorialReset();
 	tileInit(g_isAtari, g_isChallenge);
 	warehouseReset(g_is2pPlaying);
 	vehicleReset(&g_pVehicles[0]);
@@ -255,10 +254,10 @@ static inline void debugColor(UWORD uwColor) {
 void gameGsLoop(void) {
 	static UBYTE ubLastDino = 0;
 
-	if(!g_isChallenge && !s_isMsgShown) {
-		gamePushState(commMsgGsCreate, commMsgGsLoop, commMsgGsDestroy);
-		s_isMsgShown = 1;
-		return;
+	if(!g_isChallenge) {
+		if(tutorialProcess()) {
+			return;
+		}
 	}
 
   if(keyUse(KEY_ESCAPE)) {
@@ -285,8 +284,8 @@ void gameGsLoop(void) {
 
 	// Process plan being complete
 	if(warehouseGetPlan()->wTimeRemaining <= 0 || keyUse(KEY_U)) {
-		if(warehouseIsPlanFulfilled()) {
-			hudShowMessage(0, "Comrade, plan done, new has arrived");
+		if(warehouseTryFulfillPlan()) {
+			hudShowMessage(0, "We've fulfilled plan with your reserves.\nNew has arrived");
 			warehouseNewPlan(1, g_is2pPlaying);
 		}
 		else {

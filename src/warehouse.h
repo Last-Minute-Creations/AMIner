@@ -9,8 +9,8 @@
 #include "mineral.h"
 
 typedef struct _tPlanMineral {
-	UBYTE ubTargetCount;
-	UBYTE ubCurrentCount;
+	UWORD uwTargetCount;
+	UWORD uwCurrentCount;
 } tPlanMineral;
 
 typedef struct _tPlan {
@@ -27,11 +27,19 @@ void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount);
 
 UBYTE warehouseIsPlanFulfilled(void);
 
+/**
+ * @brief Tries to fulfill plan using minerals from non-spent stock.
+ * If successful, it will remove used minerals from stock.
+ *
+ * @return 1 On success, otherwise 0.
+ */
+UBYTE warehouseTryFulfillPlan(void);
+
 void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying);
 
-UBYTE warehouseGetStock(UBYTE ubMineralType);
+UWORD warehouseGetStock(UBYTE ubMineralType);
 
-void warehouseSetStock(UBYTE ubMineralType, UBYTE ubCount);
+void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount);
 
 void warehouseReset(UBYTE is2pPlaying);
 

@@ -58,7 +58,7 @@ typedef struct _tVehicle {
 	UBYTE ubCargoMax;
 	UBYTE ubCargoCurr;
 	UWORD uwCargoScore;
-	UBYTE pStock[MINERAL_TYPE_COUNT];
+	UWORD pStock[MINERAL_TYPE_COUNT];
 	// Score, fuel, hull
 	LONG lCash;
 	UWORD uwDrillCurr;
