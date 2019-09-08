@@ -29,7 +29,7 @@ void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo, UBYTE ubCargoMax);
 
 void hudSetDrill(UBYTE ubPlayer, UWORD uwDrill, UWORD uwDrillMax);
 
-void hudSetHealth(UBYTE ubPlayer, UBYTE ubHealth, UBYTE ubHealthMax);
+void hudSetHull(UBYTE ubPlayer, UWORD uwHull, UWORD uwHullMax);
 
 void hudUpdate(void);
 

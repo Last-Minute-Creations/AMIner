@@ -63,6 +63,8 @@ typedef struct _tVehicle {
 	LONG lCash;
 	UWORD uwDrillCurr;
 	UWORD uwDrillMax;
+	UWORD wHullCurr;
+	UWORD wHullMax;
 	UWORD uwDrillTileX;
 	UWORD uwDrillTileY;
 	UBYTE ubPlayerIdx;

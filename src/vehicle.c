@@ -86,13 +86,14 @@ void vehicleResetPos(tVehicle *pVehicle) {
 
 void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
-	pVehicle->ubCargoCurr = 0;
 	pVehicle->ubCargoMax = 50;
+	pVehicle->ubCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
 	pVehicle->lCash = 0;
 	pVehicle->uwDrillMax = 1000;
-	pVehicle->uwDrillCurr = 1000;
-
+	pVehicle->uwDrillCurr = pVehicle->uwDrillMax;
+	pVehicle->wHullMax = 100;
+	pVehicle->wHullCurr = pVehicle->wHullMax;
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		pVehicle->pStock[i] = 0;
 	}
@@ -260,8 +261,9 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 	// Fuel price per liter, units in liter
 	const UBYTE ubLiterPrice = 5;
 	const UBYTE ubFuelInLiter = 100;
+	const UBYTE ubHullPrice = 2;
 
-	// Buy as much fuel as you can afford or as much as needed
+	// Buy as much fuel as needed
 	// Start refueling if half a liter is spent
 	UWORD uwRefuelLiters = (
 		pVehicle->uwDrillMax - pVehicle->uwDrillCurr + ubFuelInLiter / 2
@@ -272,10 +274,15 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 		pVehicle->uwDrillCurr + uwRefuelLiters * ubFuelInLiter, pVehicle->uwDrillMax
 	);
 
-	// Pay for your fuel!
-	*pCash -= uwRefuelLiters * ubLiterPrice;
-	WORD wRestockValue = -uwRefuelLiters * ubLiterPrice;
-	return wRestockValue;
+	// Buy as much hull as needed
+	UWORD uwRehullCost = ubHullPrice * (pVehicle->wHullMax - pVehicle->wHullCurr);
+	pVehicle->wHullCurr = pVehicle->wHullMax;
+	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
+
+	// Pay for your fuel & hull!
+	WORD wRestockValue = uwRefuelLiters * ubLiterPrice + uwRehullCost;
+	*pCash -= wRestockValue;
+	return -wRestockValue;
 }
 
 static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
@@ -365,6 +372,11 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	}
 
 	tileExcavate(uwX, uwY);
+}
+
+static void vehicleTakeDamage(tVehicle *pVehicle, UWORD uwDmg) {
+	pVehicle->wHullCurr = MAX(0, pVehicle->wHullCurr - uwDmg);
+	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
 }
 
 static void vehicleProcessMovement(tVehicle *pVehicle) {
@@ -484,6 +496,11 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			// Collision with ground
 			isOnGround = 1;
 			pVehicle->fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
+			if(pVehicle->fDy > 2 * fix16_one) {
+				vehicleTakeDamage(pVehicle, fix16_to_int(fix16_div(
+					pVehicle->fDy - 2 * fix16_one, (fix16_one / 2)
+				) * 2));
+			}
 			pVehicle->fDy = 0;
 		}
 	}
@@ -747,10 +764,11 @@ void vehicleProcess(tVehicle *pVehicle) {
 	else {
 		vehicleProcessMovement(pVehicle);
 	}
-	hudSetDrill(pVehicle->ubPlayerIdx, pVehicle->uwDrillCurr, pVehicle->uwDrillMax);
+	UBYTE ubPlayerIdx = pVehicle->ubPlayerIdx;
+	hudSetDrill(ubPlayerIdx, pVehicle->uwDrillCurr, pVehicle->uwDrillMax);
 	textBobAnimate(&pVehicle->sTextBob);
-	hudSetDepth(pVehicle->ubPlayerIdx, MAX(
+	hudSetDepth(ubPlayerIdx, MAX(
 		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_BASE_DIRT)*32
 	));
-	hudSetCash(pVehicle->ubPlayerIdx, pVehicle->lCash);
+	hudSetCash(ubPlayerIdx, pVehicle->lCash);
 }
