@@ -13,7 +13,8 @@
 
 #define HUD_HEIGHT 31
 #define HUD_ORIGIN_X 11
-#define HUD_ORIGIN_Y 10
+#define HUD_ORIGIN_Y 9
+#define HUD_FACE_SIZE 16
 
 #define GAUGE_DRILL_X (HUD_ORIGIN_X + 65)
 #define GAUGE_CARGO_X (HUD_ORIGIN_X + 128)
@@ -22,7 +23,7 @@
 #define GAUGE_CASH_X (HUD_ORIGIN_X + 248)
 
 #define ROW_1_Y (HUD_ORIGIN_Y + 0)
-#define ROW_2_Y (HUD_ORIGIN_Y + 8)
+#define ROW_2_Y (HUD_ORIGIN_Y + 9)
 #define HUD_MSG_LEN_MAX 250
 #define HUD_MSG_WAIT_CNT 150
 
@@ -47,11 +48,6 @@ typedef enum _tHudState {
 	// State machine for drawing aux HUD
 } tHudState;
 
-static tVPort *s_pVpHud;
-static tSimpleBufferManager *s_pHudBuffer;
-static const tFont *s_pFont;
-static tTextBitMap *s_pLineBuffer;
-
 typedef struct _tHudPlayerData {
 	UWORD uwDepth, uwDepthDisp;
 	LONG lCash, lCashDisp;
@@ -60,6 +56,10 @@ typedef struct _tHudPlayerData {
 	UBYTE ubHealth, ubHealthDisp, ubHealthMax;
 } tHudPlayerData;
 
+static tVPort *s_pVpHud;
+static tSimpleBufferManager *s_pHudBuffer;
+static const tFont *s_pFont;
+static tTextBitMap *s_pLineBuffer;
 static tHudPlayerData s_pPlayerData[2];
 static tHudState s_eState;
 static tHudPlayer s_ePlayer;
@@ -71,6 +71,8 @@ static tUwCoordYX s_sMsgCharPos;
 static UBYTE s_ubMsgCharIdx;
 static char s_szMsg[HUD_MSG_LEN_MAX];
 static char s_szLetter[2] = {'\0'};
+static tBitMap *s_pFaces;
+static UBYTE s_ubFaceToDraw;
 
 void hudCreate(tView *pView, const tFont *pFont) {
   s_pVpHud = vPortCreate(0,
@@ -87,6 +89,7 @@ void hudCreate(tView *pView, const tFont *pFont) {
 
 	paletteLoad("data/aminer.plt", s_pVpHud->pPalette, 32);
 	bitmapLoadFromFile(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
+	s_pFaces = bitmapCreateFromFile("data/comm_faces.bm", 0);
 
 	s_pFont = pFont;
 	s_pLineBuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, pFont->uwHeight);
@@ -129,10 +132,19 @@ void hudShowMessage(UBYTE ubFace, const char *szMsg) {
 	s_eState = STATE_MSG_NOISE_IN;
 	s_uwFrameDelay = 25;
 	s_uwStateCounter = 0;
+	s_ubFaceToDraw = ubFace;
 }
 
 void hudSet2pPlaying(UBYTE isPlaying) {
 	s_is2pPlaying = isPlaying;
+}
+
+static void hudResetStateMachine(void) {
+	s_eState = (
+		s_isChallenge ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH
+	);
+	s_ePlayer = PLAYER_1;
+	s_ubHudOffsY = ROW_1_Y;
 }
 
 void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
@@ -186,10 +198,7 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 		s_pPlayerData[ubPlayer].ubHealthMax = 0;
 	}
 
-	// Restart state machine
-	s_eState = (isChallenge ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH);
-	s_ePlayer = PLAYER_1;
-	s_ubHudOffsY = ROW_1_Y;
+	hudResetStateMachine();
 }
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth) {
@@ -392,13 +401,19 @@ void hudUpdate(void) {
 			break;
 		case STATE_MSG_DRAW_FACE:
 			isLineOverflow = 0;
-			s_sMsgCharPos.uwX = HUD_ORIGIN_X + 16;
+			s_sMsgCharPos.uwX = HUD_ORIGIN_X;
 			s_sMsgCharPos.uwY = 4 * HUD_HEIGHT + HUD_ORIGIN_Y;
+			// TODO: implement drawing face
+			blitCopy(
+				s_pFaces, 0, s_ubFaceToDraw * HUD_FACE_SIZE,
+				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
+				HUD_FACE_SIZE, HUD_FACE_SIZE, MINTERM_COOKIE, 0xFF
+			);
+			s_sMsgCharPos.uwX += HUD_FACE_SIZE + 1;
 			blitRect(
 				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
-				284, 2 * s_pFont->uwHeight, COLOR_BG
+				283, 2 * s_pFont->uwHeight + 1, COLOR_BG
 			);
-			// TODO: implement drawing face
 
 			hudShowPage(4);
 			s_ubMsgCharIdx = 0;
@@ -414,15 +429,15 @@ void hudUpdate(void) {
 			break;
 		case STATE_MSG_DRAW_LETTER:
 			if(s_szMsg[s_ubMsgCharIdx] == '\n') {
-				s_sMsgCharPos.uwX = HUD_ORIGIN_X + 16;
-				s_sMsgCharPos.uwY += s_pFont->uwHeight;
+				s_sMsgCharPos.uwX = HUD_ORIGIN_X + HUD_FACE_SIZE + 1;
+				s_sMsgCharPos.uwY += s_pFont->uwHeight + 1;
 				isLineOverflow = 0;
 			}
 			else {
 				UBYTE ubGlyphWidth = fontGlyphWidth(s_pFont, s_szMsg[s_ubMsgCharIdx]);
 				if(
 					!isLineOverflow &&
-					s_sMsgCharPos.uwX + ubGlyphWidth <= HUD_ORIGIN_X + 16 + 284
+					s_sMsgCharPos.uwX + ubGlyphWidth <= HUD_ORIGIN_X + HUD_FACE_SIZE + 1 + 283
 				) {
 					fontDrawTextBitMap(
 						s_pHudBuffer->pBack, s_pLineBuffer,
@@ -459,11 +474,12 @@ void hudUpdate(void) {
 			break;
 		case STATE_MSG_END:
 			hudShowPage(0);
-			s_eState = 0;
+			hudResetStateMachine();
 			break;
 	}
 }
 
 void hudDestroy(void) {
 	fontDestroyTextBitMap(s_pLineBuffer);
+	bitmapDestroy(s_pFaces);
 }
