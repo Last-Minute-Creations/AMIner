@@ -21,8 +21,6 @@ UWORD s_uwLineCount;
 UBYTE s_ubCurrPage;
 UBYTE s_ubPageCount;
 
-static tUwCoordYX s_sOrigin;
-
 static void freeLines(void) {
 	while(s_uwLineCount--) {
 		memFree(s_pLines[s_uwLineCount], strlen(s_pLines[s_uwLineCount]) + 1);
@@ -99,26 +97,24 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 	s_ubPageCount = (s_uwLineCount + (ubLinesPerPage - 1)) / ubLinesPerPage;
 }
 
-static void commMsgDrawPage(
-	UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight, UBYTE ubPage
-) {
+static void commMsgDrawPage(UBYTE ubPage) {
 	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
-	UBYTE ubLinesPerPage = uwHeight / ubLineHeight;
+	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight;
 	UWORD uwLineStart = ubPage * ubLinesPerPage;
-	blitRect(
-		s_pBuffer, s_sOrigin.uwX + uwX, s_sOrigin.uwY + uwY,
-		uwWidth, uwHeight, COMM_DISPLAY_COLOR_BG
-	);
+	commClearDisplay();
+	tUwCoordYX sOrigin = commGetOrigin();
+	sOrigin.uwX += COMM_DISPLAY_X;
+	sOrigin.uwY += COMM_DISPLAY_Y;
 	for(
 		UWORD i = uwLineStart;
 		i < uwLineStart + ubLinesPerPage && i < s_uwLineCount; ++i
 	) {
 		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pLines[i]);
 		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap, s_sOrigin.uwX + uwX,
-			s_sOrigin.uwY + uwY, COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_SHADOW
+			s_pBuffer, s_pTextBitmap, sOrigin.uwX,
+			sOrigin.uwY, COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_SHADOW
 		);
-		uwY += ubLineHeight;
+		sOrigin.uwY += ubLineHeight;
 	}
 }
 
@@ -137,9 +133,8 @@ void commMsgGsCreate(void) {
 	s_pTextBitmap = fontCreateTextBitMap(
 		COMM_WIDTH, g_pFont->uwHeight
 	);
-	s_sOrigin = commGetOrigin();
 
-	commMsgDrawPage(COMM_DISPLAY_X, COMM_DISPLAY_Y, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, 0);
+	commMsgDrawPage(0);
 
 	// Process managers once so that backbuffer becomes front buffer
 	// Single buffering from now on!
@@ -160,15 +155,11 @@ void commMsgGsLoop(void) {
 
 	if(s_ubCurrPage > 0 && commNavUse(COMM_NAV_UP)) {
 		--s_ubCurrPage;
-		commMsgDrawPage(
-			COMM_DISPLAY_X, COMM_DISPLAY_Y, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, s_ubCurrPage
-		);
+		commMsgDrawPage(s_ubCurrPage);
 	}
 	else if(s_ubCurrPage < s_ubPageCount - 1 && commNavUse(COMM_NAV_DOWN)) {
 		++s_ubCurrPage;
-		commMsgDrawPage(
-			COMM_DISPLAY_X, COMM_DISPLAY_Y, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, s_ubCurrPage
-		);
+		commMsgDrawPage(s_ubCurrPage);
 	}
 }
 

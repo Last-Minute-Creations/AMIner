@@ -271,9 +271,8 @@ static void commShopProcessWarehouse() {
 				if(warehouseIsPlanFulfilled()) {
 					warehouseNewPlan(1, g_is2pPlaying);
 				}
-				for(UBYTE i = 0; i < s_ubPosCount; ++i) {
-					commShopDrawWarehouseRow(i, warehouseGetPlan());
-				}
+				commClearDisplay();
+				commShopDrawWarehouse();
 				break;
 			case 1:
 				// Exit
@@ -298,11 +297,7 @@ void commShopDealloc(void) {
 static void commShopShowTab(tCommLed eTab) {
 	s_eTab = eTab;
 	commSetActiveLed(eTab);
-	tUwCoordYX sPosDisplay = commGetOriginDisplay();
-	blitRect(
-		s_pBmDraw, sPosDisplay.uwX, sPosDisplay.uwY,
-		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, COMM_DISPLAY_COLOR_BG
-	);
+	commClearDisplay();
 	switch(eTab) {
 		case COMM_LED_OFFICE:
 			commShopDrawOffice();

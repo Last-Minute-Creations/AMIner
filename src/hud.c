@@ -50,7 +50,7 @@ typedef enum _tHudState {
 static tVPort *s_pVpHud;
 static tSimpleBufferManager *s_pHudBuffer;
 static const tFont *s_pFont;
-static tTextBitMap *s_pLineBufferPage1, *s_pLineBufferPage2;
+static tTextBitMap *s_pLineBuffer;
 
 typedef struct _tHudPlayerData {
 	UWORD uwDepth, uwDepthDisp;
@@ -89,8 +89,7 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	bitmapLoadFromFile(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
 
 	s_pFont = pFont;
-	s_pLineBufferPage1 = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, pFont->uwHeight);
-	s_pLineBufferPage2 = fontCreateTextBitMap(280, pFont->uwHeight);
+	s_pLineBuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, pFont->uwHeight);
 
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_1_Y,
@@ -233,6 +232,7 @@ void hudUpdate(void) {
 	UWORD uwDepth;
 	LONG lCash;
 	static UBYTE isDrawPending = 0;
+	static UBYTE isLineOverflow = 0;
 	switch(s_eState) {
 		case STATE_MAIN_PREPARE_DEPTH:
 			if(s_is2pPlaying) {
@@ -243,7 +243,7 @@ void hudUpdate(void) {
 			}
 			if(uwDepth != pData->uwDepthDisp) {
 				sprintf(szBfr, "%u.%um", uwDepth / 10, uwDepth % 10);
-				fontFillTextBitMap(s_pFont, s_pLineBufferPage1, szBfr);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, szBfr);
 				pData->uwDepthDisp = uwDepth;
 				s_eState = STATE_MAIN_DRAW_DEPTH;
 				isDrawPending = 1;
@@ -257,7 +257,7 @@ void hudUpdate(void) {
 					320 - (GAUGE_DEPTH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 2, COLOR_BG
 				);
 				fontDrawTextBitMap(
-					s_pHudBuffer->pBack, s_pLineBufferPage1,
+					s_pHudBuffer->pBack, s_pLineBuffer,
 					GAUGE_DEPTH_X, ROW_2_Y, COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 				);
 				s_eState = STATE_MAIN_PREPARE_CASH;
@@ -294,7 +294,7 @@ void hudUpdate(void) {
 				else {
 					sprintf(&szBfr[ubOffs], "%lu\x1F", u);
 				}
-				fontFillTextBitMap(s_pFont, s_pLineBufferPage1, szBfr);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, szBfr);
 				pData->lCashDisp = lCash;
 				s_eState = STATE_MAIN_DRAW_CASH;
 				isDrawPending = 1;
@@ -309,7 +309,7 @@ void hudUpdate(void) {
 					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 1, COLOR_BG
 				);
 				fontDrawTextBitMap(
-					s_pHudBuffer->pBack, s_pLineBufferPage1,
+					s_pHudBuffer->pBack, s_pLineBuffer,
 					GAUGE_CASH_X, ubY, COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 				);
 				s_eState = STATE_MAIN_DRAW_FUEL;
@@ -391,11 +391,12 @@ void hudUpdate(void) {
 			}
 			break;
 		case STATE_MSG_DRAW_FACE:
+			isLineOverflow = 0;
 			s_sMsgCharPos.uwX = HUD_ORIGIN_X + 16;
 			s_sMsgCharPos.uwY = 4 * HUD_HEIGHT + HUD_ORIGIN_Y;
 			blitRect(
 				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
-				284, 14, COLOR_BG
+				284, 2 * s_pFont->uwHeight, COLOR_BG
 			);
 			// TODO: implement drawing face
 
@@ -407,21 +408,31 @@ void hudUpdate(void) {
 		case STATE_MSG_PREPARE_LETTER:
 			s_szLetter[0] = s_szMsg[s_ubMsgCharIdx];
 			if(s_szMsg[s_ubMsgCharIdx] != '\n') {
-				fontFillTextBitMap(s_pFont, s_pLineBufferPage2, s_szLetter);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, s_szLetter);
 			}
 			s_eState = STATE_MSG_DRAW_LETTER;
 			break;
 		case STATE_MSG_DRAW_LETTER:
 			if(s_szMsg[s_ubMsgCharIdx] == '\n') {
 				s_sMsgCharPos.uwX = HUD_ORIGIN_X + 16;
-				s_sMsgCharPos.uwY += s_pFont->uwHeight + 1;
+				s_sMsgCharPos.uwY += s_pFont->uwHeight;
+				isLineOverflow = 0;
 			}
 			else {
-				fontDrawTextBitMap(
-					s_pHudBuffer->pBack, s_pLineBufferPage2,
-					s_sMsgCharPos.uwX, s_sMsgCharPos.uwY, COLOR_BAR_FULL, FONT_COOKIE
-				);
-				s_sMsgCharPos.uwX += fontGlyphWidth(s_pFont, s_szMsg[s_ubMsgCharIdx]) + 1;
+				UBYTE ubGlyphWidth = fontGlyphWidth(s_pFont, s_szMsg[s_ubMsgCharIdx]);
+				if(
+					!isLineOverflow &&
+					s_sMsgCharPos.uwX + ubGlyphWidth <= HUD_ORIGIN_X + 16 + 284
+				) {
+					fontDrawTextBitMap(
+						s_pHudBuffer->pBack, s_pLineBuffer,
+						s_sMsgCharPos.uwX, s_sMsgCharPos.uwY, COLOR_BAR_FULL, FONT_COOKIE
+					);
+					s_sMsgCharPos.uwX += ubGlyphWidth + 1;
+				}
+				else {
+					isLineOverflow = 1;
+				}
 			}
 			if(++s_ubMsgCharIdx >= s_uwMsgLen) {
 				s_eState = STATE_MSG_WAIT_OUT;
@@ -454,6 +465,5 @@ void hudUpdate(void) {
 }
 
 void hudDestroy(void) {
-	fontDestroyTextBitMap(s_pLineBufferPage1);
-	fontDestroyTextBitMap(s_pLineBufferPage2);
+	fontDestroyTextBitMap(s_pLineBuffer);
 }

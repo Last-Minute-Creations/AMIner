@@ -176,3 +176,11 @@ tUwCoordYX commGetOriginDisplay(void) {
 	sOrigin.uwY += COMM_DISPLAY_Y;
 	return sOrigin;
 }
+
+void commClearDisplay(void) {
+	tUwCoordYX sPosDisplay = commGetOriginDisplay();
+	blitRect(
+		s_pBmDraw, sPosDisplay.uwX, sPosDisplay.uwY,
+		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, COMM_DISPLAY_COLOR_BG
+	);
+}

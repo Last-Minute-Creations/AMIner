@@ -42,8 +42,8 @@ UBYTE tutorialProcess(void) {
 		case TUTORIAL_WAITING_FOR_DIG:
 			if(g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] + g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] >= 3) {
 				hudShowMessage(0,
-					"Your drill gets depleted and cargo bay filled as you are drilling.\n"
-					"Get to the warehouse to leave minerals and restock your drill."
+					"Your drill gets damaged and cargo bay filled as you dig.\n"
+					"Get to the warehouse to leave minerals and replace drill."
 				);
 				++s_eTutorialState;
 			}

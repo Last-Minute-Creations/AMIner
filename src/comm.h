@@ -54,4 +54,6 @@ tUwCoordYX commGetOriginDisplay(void);
 
 void commSetActiveLed(tCommLed eLed);
 
+void commClearDisplay(void);
+
 #endif // _COMM_H_
