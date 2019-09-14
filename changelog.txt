@@ -1,9 +1,18 @@
+19.9.14
+- Added fall damage system
+- Vehicle now visually changes as it takes damage
+
+19.9.8
+- HUD Messages now display faces
+- Implemented tutorial
+- Initial implementation of fall damage
+
 19.8.7
 - Fixed game not starting on configs without FAST mem
 
 19.8.6
- - Added HUD messages
- - Added plan generation on timeout
+- Added HUD messages
+- Added plan generation on timeout
 
 19.7.14
 - Added saving scores to file and score preview in menu

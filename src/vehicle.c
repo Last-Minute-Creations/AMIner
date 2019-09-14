@@ -11,6 +11,8 @@
 #include "color.h"
 
 #define VEHICLE_BODY_HEIGHT 20
+#define VEHICLE_DESTRUCTION_FRAMES 4
+#define VEHICLE_TOOL_ANIM_FRAMES 2
 #define VEHICLE_TRACK_HEIGHT 7
 #define VEHICLE_TRACK_DRILL_HEIGHT 7
 #define VEHICLE_TRACK_JET_HEIGHT 5
@@ -84,6 +86,35 @@ void vehicleResetPos(tVehicle *pVehicle) {
 	}
 }
 
+void vehicleUpdateBodyBob(tVehicle *pVehicle) {
+	UBYTE ubFrameOffs = VEHICLE_BODY_HEIGHT * pVehicle->ubDestructionState;
+	if(!pVehicle->isFacingRight) {
+		ubFrameOffs += VEHICLE_BODY_HEIGHT * VEHICLE_DESTRUCTION_FRAMES;
+	}
+	bobNewSetBitMapOffset(&pVehicle->sBobBody, ubFrameOffs);
+}
+
+static void vehicleHullDamage(tVehicle *pVehicle, UWORD uwDmg) {
+	pVehicle->wHullCurr = MAX(0, pVehicle->wHullCurr - uwDmg);
+	if(pVehicle->wHullCurr == 0) {
+		// TODO: destroy machine
+	}
+	else {
+		pVehicle->ubDestructionState = (
+			(((UWORD)pVehicle->wHullCurr - 1) * VEHICLE_DESTRUCTION_FRAMES) /
+			(UWORD)pVehicle->wHullMax
+		);
+		vehicleUpdateBodyBob(pVehicle);
+	}
+	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
+}
+
+static void vehicleHullRepair(tVehicle *pVehicle) {
+	pVehicle->wHullCurr = pVehicle->wHullMax;
+	pVehicle->ubDestructionState = VEHICLE_DESTRUCTION_FRAMES - 1;
+	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
+}
+
 void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
 	pVehicle->ubCargoMax = 50;
@@ -93,7 +124,7 @@ void vehicleReset(tVehicle *pVehicle) {
 	pVehicle->uwDrillMax = 1000;
 	pVehicle->uwDrillCurr = pVehicle->uwDrillMax;
 	pVehicle->wHullMax = 100;
-	pVehicle->wHullCurr = pVehicle->wHullMax;
+	vehicleHullRepair(pVehicle);
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		pVehicle->pStock[i] = 0;
 	}
@@ -157,12 +188,14 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 	if(pVehicle->ubDrillDir != DRILL_DIR_NONE) {
 		return;
 	}
+
 	if(bDirX > 0) {
-		bobNewSetBitMapOffset(&pVehicle->sBobBody, 0);
+		pVehicle->isFacingRight = 1;
 	}
 	else if(bDirX < 0) {
-		bobNewSetBitMapOffset(&pVehicle->sBobBody, VEHICLE_BODY_HEIGHT);
+		pVehicle->isFacingRight = 0;
 	}
+	vehicleUpdateBodyBob(pVehicle);
 }
 
 static inline void vehicleSetTool(
@@ -177,15 +210,22 @@ static inline void vehicleSetTool(
 		ubFrameOffs = ubFrame ? VEHICLE_TOOL_HEIGHT : 0;
 	}
 
-	if(!pVehicle->sBobBody.uwOffsetY) {
-		// Facing right
+	if(pVehicle->isFacingRight) {
 		pVehicle->sBobTool.sPos.uwX += 24+3;
 	}
 	else {
-		// Facing left
 		pVehicle->sBobTool.sPos.uwX += -13+3;
-		ubFrameOffs += 2 * VEHICLE_TOOL_HEIGHT;
+		ubFrameOffs += (
+			VEHICLE_TOOL_ANIM_FRAMES * VEHICLE_DESTRUCTION_FRAMES *
+			VEHICLE_TOOL_HEIGHT
+		);
 	}
+
+	// Apply destruction
+	ubFrameOffs += (
+		VEHICLE_TOOL_HEIGHT * VEHICLE_TOOL_ANIM_FRAMES *
+		pVehicle->ubDestructionState
+	);
 
 	// Vertical drill anim
 	bobNewSetBitMapOffset(&pVehicle->sBobTool, ubFrameOffs);
@@ -276,8 +316,7 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 
 	// Buy as much hull as needed
 	UWORD uwRehullCost = ubHullPrice * (pVehicle->wHullMax - pVehicle->wHullCurr);
-	pVehicle->wHullCurr = pVehicle->wHullMax;
-	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
+	vehicleHullRepair(pVehicle);
 
 	// Pay for your fuel & hull!
 	WORD wRestockValue = uwRefuelLiters * ubLiterPrice + uwRehullCost;
@@ -372,11 +411,6 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	}
 
 	tileExcavate(uwX, uwY);
-}
-
-static void vehicleTakeDamage(tVehicle *pVehicle, UWORD uwDmg) {
-	pVehicle->wHullCurr = MAX(0, pVehicle->wHullCurr - uwDmg);
-	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
 }
 
 static void vehicleProcessMovement(tVehicle *pVehicle) {
@@ -497,7 +531,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			isOnGround = 1;
 			pVehicle->fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
 			if(pVehicle->fDy > 2 * fix16_one) {
-				vehicleTakeDamage(pVehicle, fix16_to_int(fix16_div(
+				vehicleHullDamage(pVehicle, fix16_to_int(fix16_div(
 					pVehicle->fDy - 2 * fix16_one, (fix16_one / 2)
 				) * 2));
 			}

@@ -44,6 +44,7 @@ typedef struct _tVehicle {
 	fix16_t fDy;
 	fix16_t fDestX;
 	fix16_t fDestY;
+	UBYTE isFacingRight;
 	UBYTE ubTrackFrame;
 	fix16_t ubTrackAnimCnt;
 	UBYTE ubBodyShakeCnt;
@@ -68,6 +69,7 @@ typedef struct _tVehicle {
 	UWORD uwDrillTileX;
 	UWORD uwDrillTileY;
 	UBYTE ubPlayerIdx;
+	UBYTE ubDestructionState;
 } tVehicle;
 
 void vehicleBitmapsCreate(void);
