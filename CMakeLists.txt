@@ -73,14 +73,17 @@ convertBitmaps(
 convertBitmaps(
 	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
 	INTERLEAVED SOURCES
-		_res/drill.png _res/tool.png _res/drill_2.png _res/tool_2.png
-		_res/track.png _res/jet.png _res/bones.png
+		_res/drill.png _res/tool.png _res/wreck.png
+		_res/drill_2.png _res/tool_2.png _res/wreck_2.png
+		_res/track.png _res/jet.png _res/bones.png _res/explosion.png _res/smoke.png
 	DESTINATIONS
-		data/drill.bm data/tool.bm data/drill_2.bm data/tool_2.bm
-		data/track.bm data/jet.bm data/bones.bm
+		data/drill.bm data/tool.bm data/wreck.bm
+		data/drill_2.bm data/tool_2.bm data/wreck_2.bm
+		data/track.bm data/jet.bm data/bones.bm data/explosion.bm data/smoke.bm
 	MASKS
-		data/drill_mask.bm data/tool_mask.bm data/drill_2_mask.bm data/tool_2_mask.bm
-		data/track_mask.bm data/jet_mask.bm data/bones_mask.bm
+		data/drill_mask.bm data/tool_mask.bm data/wreck_mask.bm
+		data/drill_2_mask.bm data/tool_2_mask.bm data/wreck_2_mask.bm
+		data/track_mask.bm data/jet_mask.bm data/bones_mask.bm data/explosion_mask.bm data/smoke_mask.bm
 )
 
 convertFont(${TARGET_NAME} _res/uni54 data/uni54.fnt)

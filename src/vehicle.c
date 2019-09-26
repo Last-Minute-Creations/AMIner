@@ -19,6 +19,12 @@
 #define VEHICLE_FLAME_HEIGHT 21
 #define VEHICLE_TOOL_WIDTH 16
 #define VEHICLE_TOOL_HEIGHT 16
+#define VEHICLE_WRECK_WIDTH 48
+#define VEHICLE_WRECK_HEIGHT 21
+#define VEHICLE_SMOKE_WIDTH 48
+#define VEHICLE_SMOKE_FRAME_HEIGHT 29
+#define VEHICLE_SMOKE_ANIM_HEIGHT 42
+#define VEHICLE_SMOKE_FRAMES 12
 
 #define TRACK_OFFSET_TRACK 0
 #define TRACK_OFFSET_JET 28
@@ -29,6 +35,8 @@ tBitMap *s_pBodyFrames[2], *s_pBodyMask;
 tBitMap *s_pTrackFrames, *s_pTrackMask;
 tBitMap *s_pJetFrames, *s_pJetMask;
 tBitMap *s_pToolFrames[2], *s_pToolMask;
+tBitMap *s_pWreckFrames[2], *s_pWreckMask;
+tBitMap *s_pSmokeFrames, *s_pSmokeMask;
 
 UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {0,1,2,3,4,5,4,3,2,1,0};
 
@@ -37,26 +45,46 @@ void vehicleBitmapsCreate(void) {
 	s_pBodyFrames[0] = bitmapCreateFromFile("data/drill.bm", 0);
 	s_pBodyFrames[1] = bitmapCreateFromFile("data/drill_2.bm", 0);
 	s_pBodyMask = bitmapCreateFromFile("data/drill_mask.bm", 0);
+
 	s_pTrackFrames = bitmapCreateFromFile("data/track.bm", 0);
 	s_pTrackMask = bitmapCreateFromFile("data/track_mask.bm", 0);
+
 	s_pJetFrames = bitmapCreateFromFile("data/jet.bm", 0);
 	s_pJetMask = bitmapCreateFromFile("data/jet_mask.bm", 0);
+
 	s_pToolFrames[0] = bitmapCreateFromFile("data/tool.bm", 0);
 	s_pToolFrames[1] = bitmapCreateFromFile("data/tool_2.bm", 0);
 	s_pToolMask = bitmapCreateFromFile("data/tool_mask.bm", 0);
+
+	s_pWreckFrames[0] = bitmapCreateFromFile("data/wreck.bm", 0);
+	s_pWreckFrames[1] = bitmapCreateFromFile("data/wreck_2.bm", 0);
+	s_pWreckMask = bitmapCreateFromFile("data/wreck_mask.bm", 0);
+
+	s_pSmokeFrames = bitmapCreateFromFile("data/smoke.bm", 0);
+	s_pSmokeMask = bitmapCreateFromFile("data/smoke_mask.bm", 0);
 }
 
 void vehicleBitmapsDestroy(void) {
 	bitmapDestroy(s_pBodyFrames[0]);
 	bitmapDestroy(s_pBodyFrames[1]);
 	bitmapDestroy(s_pBodyMask);
+
 	bitmapDestroy(s_pTrackFrames);
 	bitmapDestroy(s_pTrackMask);
+
 	bitmapDestroy(s_pJetFrames);
 	bitmapDestroy(s_pJetMask);
+
 	bitmapDestroy(s_pToolFrames[0]);
 	bitmapDestroy(s_pToolFrames[1]);
 	bitmapDestroy(s_pToolMask);
+
+	bitmapDestroy(s_pWreckFrames[0]);
+	bitmapDestroy(s_pWreckFrames[1]);
+	bitmapDestroy(s_pWreckMask);
+
+	bitmapDestroy(s_pSmokeFrames);
+	bitmapDestroy(s_pSmokeMask);
 }
 
 void vehicleResetPos(tVehicle *pVehicle) {
@@ -70,6 +98,8 @@ void vehicleResetPos(tVehicle *pVehicle) {
 	pVehicle->ubJetAnimCnt = 0;
 	pVehicle->ubToolAnimCnt = 0;
 	pVehicle->ubDrillVAnimCnt = 0;
+	pVehicle->ubSmokeAnimFrame = 0;
+	pVehicle->ubSmokeAnimCnt = 0;
 
 	pVehicle->sBobBody.sPos.ulYX = 0;
 
@@ -94,10 +124,28 @@ void vehicleUpdateBodyBob(tVehicle *pVehicle) {
 	bobNewSetBitMapOffset(&pVehicle->sBobBody, ubFrameOffs);
 }
 
+static UBYTE s_ubBebCountdown = 0;
+
+static void vehicleCrash(tVehicle *pVehicle) {
+	// Calculate pos for bobs
+	pVehicle->sBobWreck.sPos.uwX = fix16_to_int(pVehicle->fX);
+	pVehicle->sBobWreck.sPos.uwY = (
+		fix16_to_int(pVehicle->fY) + VEHICLE_BODY_HEIGHT +
+		VEHICLE_TRACK_HEIGHT - VEHICLE_WRECK_HEIGHT
+	);
+	pVehicle->sBobSmoke.sPos.uwX = fix16_to_int(pVehicle->fX);
+	pVehicle->sBobSmoke.sPos.uwY = (
+		fix16_to_int(pVehicle->fY) + VEHICLE_BODY_HEIGHT +
+		VEHICLE_TRACK_HEIGHT - VEHICLE_SMOKE_ANIM_HEIGHT
+	);
+
+	s_ubBebCountdown = 200;
+}
+
 static void vehicleHullDamage(tVehicle *pVehicle, UWORD uwDmg) {
 	pVehicle->wHullCurr = MAX(0, pVehicle->wHullCurr - uwDmg);
 	if(pVehicle->wHullCurr == 0) {
-		// TODO: destroy machine
+		vehicleCrash(pVehicle);
 	}
 	else {
 		pVehicle->ubDestructionState = (
@@ -115,20 +163,24 @@ static void vehicleHullRepair(tVehicle *pVehicle) {
 	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
 }
 
-void vehicleReset(tVehicle *pVehicle) {
-	// Initial values
-	pVehicle->ubCargoMax = 50;
+void vehicleRespawn(tVehicle *pVehicle) {
 	pVehicle->ubCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
-	pVehicle->lCash = 0;
-	pVehicle->uwDrillMax = 1000;
 	pVehicle->uwDrillCurr = pVehicle->uwDrillMax;
-	pVehicle->wHullMax = 100;
 	vehicleHullRepair(pVehicle);
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		pVehicle->pStock[i] = 0;
 	}
 	vehicleResetPos(pVehicle);
+}
+
+void vehicleReset(tVehicle *pVehicle) {
+	// Initial values
+	pVehicle->ubCargoMax = 50;
+	pVehicle->lCash = 0;
+	pVehicle->uwDrillMax = 1000;
+	pVehicle->wHullMax = 100;
+	vehicleRespawn(pVehicle);
 }
 
 void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
@@ -150,6 +202,14 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 	bobNewInit(
 		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
 		s_pToolFrames[ubIdx], s_pToolMask, 0, 0
+	);
+	bobNewInit(
+		&pVehicle->sBobWreck, VEHICLE_WRECK_WIDTH, VEHICLE_WRECK_HEIGHT, 1,
+		s_pWreckFrames[ubIdx], s_pWreckMask, 0, 0
+	);
+	bobNewInit(
+		&pVehicle->sBobSmoke, VEHICLE_SMOKE_WIDTH, VEHICLE_SMOKE_FRAME_HEIGHT, 1,
+		s_pSmokeFrames, s_pSmokeMask, 0, 0
 	);
 	pVehicle->ubPlayerIdx = ubIdx;
 
@@ -658,6 +718,32 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 }
 
+static void vehicleProcessDestroyed(tVehicle *pVehicle) {
+	bobNewPush(&pVehicle->sBobWreck);
+
+	if(pVehicle->ubSmokeAnimCnt == 5) {
+		pVehicle->ubSmokeAnimCnt = 0;
+		++pVehicle->ubSmokeAnimFrame;
+		if(pVehicle->ubSmokeAnimFrame == VEHICLE_SMOKE_FRAMES) {
+			pVehicle->ubSmokeAnimFrame = 0;
+		}
+		bobNewSetBitMapOffset(
+			&pVehicle->sBobSmoke, VEHICLE_SMOKE_FRAME_HEIGHT * pVehicle->ubSmokeAnimFrame
+		);
+	}
+	else {
+		++pVehicle->ubSmokeAnimCnt;
+	}
+	bobNewPush(&pVehicle->sBobSmoke);
+
+	if(s_ubBebCountdown == 0) {
+		vehicleRespawn(pVehicle);
+	}
+	else {
+		--s_ubBebCountdown;
+	}
+}
+
 static void vehicleProcessDrilling(tVehicle *pVehicle) {
 	const UBYTE pTrackAnimOffs[DRILL_V_ANIM_LEN] = {
 		0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0
@@ -795,8 +881,11 @@ void vehicleProcess(tVehicle *pVehicle) {
 	if(pVehicle->ubDrillDir) {
 		vehicleProcessDrilling(pVehicle);
 	}
-	else {
+	else if(pVehicle->wHullCurr) {
 		vehicleProcessMovement(pVehicle);
+	}
+	else {
+		vehicleProcessDestroyed(pVehicle);
 	}
 	UBYTE ubPlayerIdx = pVehicle->ubPlayerIdx;
 	hudSetDrill(ubPlayerIdx, pVehicle->uwDrillCurr, pVehicle->uwDrillMax);

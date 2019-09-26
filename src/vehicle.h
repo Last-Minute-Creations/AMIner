@@ -38,6 +38,8 @@ typedef struct _tVehicle {
 	tBobNew sBobTrack;
 	tBobNew sBobJet;
 	tBobNew sBobTool;
+	tBobNew sBobWreck;
+	tBobNew sBobSmoke;
 	fix16_t fX;
 	fix16_t fY;
 	fix16_t fDx;
@@ -54,6 +56,8 @@ typedef struct _tVehicle {
 	UBYTE ubToolAnimCnt;
 	UBYTE ubDrillDir;
 	UBYTE ubDrillVAnimCnt;
+	UBYTE ubSmokeAnimFrame;
+	UBYTE ubSmokeAnimCnt;
 	UBYTE ubDrillState;
 	// Cargo
 	UBYTE ubCargoMax;
