@@ -658,9 +658,9 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		}
 		else if(pVehicle->ubJetShowFrame == 10) {
 			// Update jet pos
-			pVehicle->ubJetAnimCnt = (pVehicle->ubJetAnimCnt + 1) & 15;
+			pVehicle->ubJetAnimCnt = (pVehicle->ubJetAnimCnt + 1) & 63;
 			bobNewSetBitMapOffset(
-				&pVehicle->sBobJet, VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 8)
+				&pVehicle->sBobJet, VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 4)
 			);
 			pVehicle->sBobJet.sPos.ulYX = pVehicle->sBobTrack.sPos.ulYX;
 			pVehicle->sBobJet.sPos.uwY += VEHICLE_TRACK_JET_HEIGHT;
@@ -721,7 +721,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 static void vehicleProcessDestroyed(tVehicle *pVehicle) {
 	bobNewPush(&pVehicle->sBobWreck);
 
-	if(pVehicle->ubSmokeAnimCnt == 5) {
+	if(pVehicle->ubSmokeAnimCnt == 10) {
 		pVehicle->ubSmokeAnimCnt = 0;
 		++pVehicle->ubSmokeAnimFrame;
 		if(pVehicle->ubSmokeAnimFrame == VEHICLE_SMOKE_FRAMES) {
