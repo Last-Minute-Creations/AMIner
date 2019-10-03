@@ -25,6 +25,7 @@
 #include "base_tile.h"
 #include "warehouse.h"
 #include "tutorial.h"
+#include "explosion.h"
 
 typedef enum _tCameraType {
 	CAMERA_TYPE_BETWEEN,
@@ -154,6 +155,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
+	explosionManagerCreate();
 	groundLayerCreate(s_pVpMain);
 	commCreate();
 	commShopAlloc();
@@ -274,6 +276,9 @@ void gameGsLoop(void) {
 		gamePushState(commShopGsCreate, commShopGsLoop, commShopGsDestroy);
 		return;
 	}
+	if(keyUse(KEY_K)) {
+		explosionAdd(g_pVehicles[0].sBobBody.sPos.uwX, g_pVehicles[0].sBobBody.sPos.uwY, 0);
+	}
 
 	debugColor(0x008);
 	bobNewBegin();
@@ -320,6 +325,8 @@ void gameGsLoop(void) {
 		debugColor(0x880);
 		vehicleProcess(&g_pVehicles[1]);
 	}
+	debugColor(0x808);
+	explosionManagerProcess();
 	debugColor(0x088);
 	bobNewPushingDone();
 	bobNewEnd();
@@ -402,6 +409,8 @@ void gameGsDestroy(void) {
 	sampleDestroy(g_pSampleDrill);
 	sampleDestroy(g_pSampleOre);
 	sampleDestroy(g_pSampleTeleport);
+
+	explosionManagerDestroy();
 
   hudDestroy();
   viewDestroy(s_pView);
