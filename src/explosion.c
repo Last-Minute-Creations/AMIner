@@ -9,11 +9,14 @@
 #define EXPLOSION_FRAME_MAX 10
 #define EXPLOSION_COUNTER_MAX 4
 #define EXPLOSION_FRAME_HEIGHT 32
+#define EXPLOSION_FRAME_PEAK 4
 
 typedef struct tExplosion {
 	UBYTE ubFrame;
 	UBYTE ubCnt;
 	tBobNew sBob;
+	tCbOnPeak cbOnPeak;
+	ULONG ulCbData;
 } tExplosion;
 
 static tExplosion s_pExplosions[EXPLOSION_MAX];
@@ -44,13 +47,14 @@ void explosionManagerDestroy(void) {
 	bitmapDestroy(s_pFramesMask);
 }
 
-void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak) {
+void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData) {
 	tExplosion *pStart = s_pExplosionNext;
 	do {
 		if(s_pExplosionNext->ubFrame >= EXPLOSION_FRAME_MAX) {
 			s_pExplosionNext->sBob.sPos.uwX = uwX;
 			s_pExplosionNext->sBob.sPos.uwY = uwY;
 			s_pExplosionNext->ubFrame = 0;
+			s_pExplosionNext->cbOnPeak = cbOnPeak;
 			bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
 			break;
 		}
@@ -67,6 +71,9 @@ void explosionManagerProcess(void) {
 			if(pExplosion->ubCnt >= EXPLOSION_COUNTER_MAX) {
 				pExplosion->ubCnt = 0;
 				++pExplosion->ubFrame;
+				if(pExplosion->ubFrame == EXPLOSION_FRAME_PEAK && pExplosion->cbOnPeak) {
+					pExplosion->cbOnPeak(pExplosion->ulCbData);
+				}
 				bobNewSetBitMapOffset(
 					&pExplosion->sBob, pExplosion->ubFrame * EXPLOSION_FRAME_HEIGHT
 				);

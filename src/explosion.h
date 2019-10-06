@@ -7,13 +7,13 @@
 
 #include <ace/types.h>
 
-typedef void (*tCbOnPeak)(void);
+typedef void (*tCbOnPeak)(ULONG ulData);
 
 void explosionManagerCreate(void);
 
 void explosionManagerDestroy(void);
 
-void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak);
+void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData);
 
 void explosionManagerProcess(void);
 

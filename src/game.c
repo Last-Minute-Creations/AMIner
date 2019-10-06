@@ -277,7 +277,7 @@ void gameGsLoop(void) {
 		return;
 	}
 	if(keyUse(KEY_K)) {
-		explosionAdd(g_pVehicles[0].sBobBody.sPos.uwX, g_pVehicles[0].sBobBody.sPos.uwY, 0);
+		explosionAdd(g_pVehicles[0].sBobBody.sPos.uwX, g_pVehicles[0].sBobBody.sPos.uwY, 0, 0);
 	}
 
 	debugColor(0x008);

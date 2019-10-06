@@ -21,15 +21,23 @@ typedef enum _tDrillDir {
 } tDrillDir;
 
 typedef enum _tDrillState {
-	DRILL_STATE_ANIM_IN = 0,
+	DRILL_STATE_VERT_ANIM_IN = 0,
 	DRILL_STATE_DRILLING,
-	DRILL_STATE_ANIM_OUT
+	DRILL_STATE_VERT_ANIM_OUT
 } tDrillState;
 
 typedef enum _tToolState {
 	TOOL_STATE_IDLE,
 	TOOL_STATE_DRILL
 } tToolState;
+
+typedef enum _tVehicleState {
+	VEHICLE_STATE_MOVING,
+	VEHICLE_STATE_DRILLING,
+	VEHICLE_STATE_EXPLODING,
+	VEHICLE_STATE_SMOKING,
+	VEHICLE_STATE_TELEPORTING
+} tVehicleState;
 
 typedef struct _tVehicle {
 	tBCoordYX sSteer;
@@ -46,6 +54,7 @@ typedef struct _tVehicle {
 	fix16_t fDy;
 	fix16_t fDestX;
 	fix16_t fDestY;
+	UBYTE ubVehicleState;
 	UBYTE isFacingRight;
 	UBYTE ubTrackFrame;
 	fix16_t ubTrackAnimCnt;
