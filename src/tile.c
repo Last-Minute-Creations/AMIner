@@ -43,6 +43,11 @@ UBYTE tileIsDrillable(UWORD uwX, UWORD uwY) {
 	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_ROCK_1;
 }
 
+UBYTE tileIsExplodable(UWORD uwX, UWORD uwY) {
+	const UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
+	return ubTile >= TILE_STONE_1 && ubTile != TILE_BONE_HEAD;
+}
+
 static UWORD chanceTrapezoid(
 	UWORD uwCurr, UWORD uwStart, UWORD uwPeakStart, UWORD uwPeakEnd, UWORD uwEnd,
 	UWORD uwMin, UWORD uwMax

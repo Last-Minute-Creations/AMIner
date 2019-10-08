@@ -10,6 +10,7 @@
 #include "bob_new.h"
 #include "text_bob.h"
 #include "mineral.h"
+#include "dynamite.h"
 
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 24
@@ -83,6 +84,7 @@ typedef struct _tVehicle {
 	UWORD uwDrillTileY;
 	UBYTE ubPlayerIdx;
 	UBYTE ubDestructionState;
+	tDynamite sDynamite;
 } tVehicle;
 
 void vehicleBitmapsCreate(void);

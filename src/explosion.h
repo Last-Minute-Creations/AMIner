@@ -13,7 +13,7 @@ void explosionManagerCreate(void);
 
 void explosionManagerDestroy(void);
 
-void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData);
+void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData, UBYTE isFast);
 
 void explosionManagerProcess(void);
 

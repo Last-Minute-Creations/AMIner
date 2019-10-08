@@ -150,7 +150,7 @@ static void vehicleCrash(tVehicle *pVehicle) {
 
 	explosionAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnExplodePeak, pVehicle->ubPlayerIdx
+		vehicleOnExplodePeak, pVehicle->ubPlayerIdx, 0
 	);
 	pVehicle->ubVehicleState = VEHICLE_STATE_EXPLODING;
 

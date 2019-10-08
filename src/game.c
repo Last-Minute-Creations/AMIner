@@ -277,7 +277,28 @@ void gameGsLoop(void) {
 		return;
 	}
 	if(keyUse(KEY_K)) {
-		explosionAdd(g_pVehicles[0].sBobBody.sPos.uwX, g_pVehicles[0].sBobBody.sPos.uwY, 0, 0);
+		dynamiteTrigger(
+			&g_pVehicles[0].sDynamite,
+			(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+			(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
+			DYNAMITE_TYPE_HORZ
+		);
+	}
+	else if(keyUse(KEY_L)) {
+		dynamiteTrigger(
+			&g_pVehicles[0].sDynamite,
+			(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+			(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
+			DYNAMITE_TYPE_3X3
+		);
+	}
+	else if(keyUse(KEY_O)) {
+		dynamiteTrigger(
+			&g_pVehicles[0].sDynamite,
+			(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+			(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
+			DYNAMITE_TYPE_VERT
+		);
 	}
 
 	debugColor(0x008);

@@ -5,18 +5,19 @@
 #include "explosion.h"
 #include "bob_new.h"
 
-#define EXPLOSION_MAX 4
-#define EXPLOSION_FRAME_MAX 10
+#define EXPLOSION_MAX 6
 #define EXPLOSION_COUNTER_MAX 4
 #define EXPLOSION_FRAME_HEIGHT 32
-#define EXPLOSION_FRAME_PEAK 4
+#define EXPLOSION_FRAME_PEAK 5
+#define EXPLOSION_FRAME_COUNT 10
 
 typedef struct tExplosion {
-	UBYTE ubFrame;
-	UBYTE ubCnt;
 	tBobNew sBob;
 	tCbOnPeak cbOnPeak;
 	ULONG ulCbData;
+	UBYTE ubFrame;
+	UBYTE ubCnt;
+	UBYTE isFast;
 } tExplosion;
 
 static tExplosion s_pExplosions[EXPLOSION_MAX];
@@ -31,7 +32,7 @@ void explosionManagerCreate(void) {
 
 	s_pExplosionNext = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i) {
-		s_pExplosions[i].ubFrame = EXPLOSION_FRAME_MAX;
+		s_pExplosions[i].ubFrame = EXPLOSION_FRAME_COUNT;
 		s_pExplosions[i].ubCnt = 0;
 
 		bobNewInit(
@@ -47,14 +48,16 @@ void explosionManagerDestroy(void) {
 	bitmapDestroy(s_pFramesMask);
 }
 
-void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData) {
+void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData, UBYTE isFast) {
 	tExplosion *pStart = s_pExplosionNext;
 	do {
-		if(s_pExplosionNext->ubFrame >= EXPLOSION_FRAME_MAX) {
+		if(s_pExplosionNext->ubFrame >= EXPLOSION_FRAME_COUNT) {
 			s_pExplosionNext->sBob.sPos.uwX = uwX;
 			s_pExplosionNext->sBob.sPos.uwY = uwY;
 			s_pExplosionNext->ubFrame = 0;
 			s_pExplosionNext->cbOnPeak = cbOnPeak;
+			s_pExplosionNext->ulCbData = ulCbData;
+			s_pExplosionNext->isFast = isFast;
 			bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
 			break;
 		}
@@ -67,8 +70,8 @@ void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData) {
 void explosionManagerProcess(void) {
 	tExplosion *pExplosion = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i, ++pExplosion) {
-		if(pExplosion->ubFrame < EXPLOSION_FRAME_MAX) {
-			if(pExplosion->ubCnt >= EXPLOSION_COUNTER_MAX) {
+		if(pExplosion->ubFrame < EXPLOSION_FRAME_COUNT) {
+			if(pExplosion->ubCnt >= EXPLOSION_COUNTER_MAX >> pExplosion->isFast) {
 				pExplosion->ubCnt = 0;
 				++pExplosion->ubFrame;
 				if(pExplosion->ubFrame == EXPLOSION_FRAME_PEAK && pExplosion->cbOnPeak) {
@@ -81,7 +84,7 @@ void explosionManagerProcess(void) {
 			else {
 				++pExplosion->ubCnt;
 			}
-			if(pExplosion->ubFrame < EXPLOSION_FRAME_MAX) {
+			if(pExplosion->ubFrame < EXPLOSION_FRAME_COUNT) {
 				bobNewPush(&pExplosion->sBob);
 			}
 		}
