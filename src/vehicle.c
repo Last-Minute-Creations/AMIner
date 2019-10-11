@@ -32,6 +32,9 @@
 #define TRACK_OFFSET_DRILL 35
 #define DRILL_V_ANIM_LEN (VEHICLE_TRACK_HEIGHT + VEHICLE_TRACK_DRILL_HEIGHT - 1)
 
+static const fix16_t s_fAccGrav = F16(1) / 8;
+static const fix16_t s_fMaxGravDy = 4 * F16(1);
+
 tBitMap *s_pBodyFrames[2], *s_pBodyMask;
 tBitMap *s_pTrackFrames, *s_pTrackMask;
 tBitMap *s_pJetFrames, *s_pJetMask;
@@ -143,10 +146,6 @@ static void vehicleCrash(tVehicle *pVehicle) {
 		VEHICLE_TRACK_HEIGHT - VEHICLE_WRECK_HEIGHT
 	);
 	pVehicle->sBobSmoke.sPos.uwX = fix16_to_int(pVehicle->fX);
-	pVehicle->sBobSmoke.sPos.uwY = (
-		fix16_to_int(pVehicle->fY) + VEHICLE_BODY_HEIGHT +
-		VEHICLE_TRACK_HEIGHT - VEHICLE_SMOKE_ANIM_HEIGHT
-	);
 
 	explosionAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
@@ -276,6 +275,7 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 static inline void vehicleSetTool(
 	tVehicle *pVehicle, tToolState eToolState, UBYTE ubFrame
 ) {
+	pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 	pVehicle->sBobTool.sPos.uwY -= 3;
 	UBYTE ubFrameOffs;
 	if(eToolState == TOOL_STATE_IDLE) {
@@ -571,8 +571,6 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 
 	const fix16_t fMaxFlightDy = 3 * fix16_one;
 	const fix16_t fAccFlight = fix16_one / 12;
-	const fix16_t fMaxGravDy = 4 * fix16_one;
-	const fix16_t fAccGrav = fix16_one / 8;
 	if(pVehicle->sSteer.bY < 0) {
 		if(pVehicle->ubJetShowFrame == 10) {
 			pVehicle->fDy = MAX(-fMaxFlightDy, pVehicle->fDy - fAccFlight);
@@ -585,7 +583,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		if(pVehicle->ubJetShowFrame) {
 			--pVehicle->ubJetShowFrame;
 		}
-		pVehicle->fDy = MIN(fMaxGravDy, pVehicle->fDy + fAccGrav);
+		pVehicle->fDy = MIN(s_fMaxGravDy, pVehicle->fDy + s_fAccGrav);
 	}
 
 	if(pVehicle->fDy < 0) {
@@ -708,7 +706,6 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 
 	// Tool
-	pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 	if(isVehicleVisible) {
 		bobNewPush(&pVehicle->sBobTool);
@@ -734,9 +731,37 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 }
 
-static void vehicleProcessDestroyed(tVehicle *pVehicle) {
+static void vehicleProcessDeadGravity(tVehicle *pVehicle) {
+	UWORD uwY = fix16_to_int(pVehicle->fY);
+	UBYTE ubAdd = (uwY > (1 + TILE_ROW_BASE_DIRT) * 32) ? 4 : 2;
+	UWORD uwTileBottom = (uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
+	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
+	UWORD uwTileCenter = uwCenterX >> 5;
+	if(!tileIsSolid(uwTileCenter, uwTileBottom)) {
+		// Gravity
+		pVehicle->fDy = MIN(s_fMaxGravDy, pVehicle->fDy + s_fAccGrav);
+		pVehicle->fY += pVehicle->fDy;
+	}
+	else {
+		// Collision with ground
+		pVehicle->fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
+		pVehicle->fDy = 0;
+	}
+}
+
+static void vehicleProcessSmoking(tVehicle *pVehicle) {
+	// TODO: push if vehicle is visible
+	vehicleProcessDeadGravity(pVehicle);
+	pVehicle->sBobWreck.sPos.uwY = (
+		fix16_to_int(pVehicle->fY) + VEHICLE_BODY_HEIGHT +
+		VEHICLE_TRACK_HEIGHT - VEHICLE_WRECK_HEIGHT
+	);
 	bobNewPush(&pVehicle->sBobWreck);
 
+	pVehicle->sBobSmoke.sPos.uwY = (
+		fix16_to_int(pVehicle->fY) + VEHICLE_BODY_HEIGHT +
+		VEHICLE_TRACK_HEIGHT - VEHICLE_SMOKE_ANIM_HEIGHT
+	);
 	if(pVehicle->ubSmokeAnimCnt == 10) {
 		pVehicle->ubSmokeAnimCnt = 0;
 		++pVehicle->ubSmokeAnimFrame;
@@ -791,7 +816,6 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 		pVehicle->sBobBody.sPos.uwX = fix16_to_int(pVehicle->fX);
 		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 		pVehicle->sBobBody.sPos.uwY += pTrackAnimOffs[pVehicle->ubDrillVAnimCnt];
-		pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 		vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 	}
 	else if(pVehicle->ubDrillState == DRILL_STATE_DRILLING) {
@@ -854,7 +878,6 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			vehicleExcavateTile(pVehicle, uwTileX, uwTileY);
 		}
 		else {
-			pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 			// Body shake
 			pVehicle->sBobBody.sPos.uwX += ubRand() & 1;
 			pVehicle->sBobBody.sPos.uwY += ubRand() & 1;
@@ -896,8 +919,13 @@ void vehicleProcessText(void) {
 }
 
 void vehicleProcessExploding(tVehicle *pVehicle) {
+	// TODO: push if vehicle is visible
+	vehicleProcessDeadGravity(pVehicle);
+	pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
+	pVehicle->sBobTrack.sPos.uwY += VEHICLE_BODY_HEIGHT - 1;
 	bobNewPush(&pVehicle->sBobTrack);
 	bobNewPush(&pVehicle->sBobBody);
+	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 	bobNewPush(&pVehicle->sBobTool);
 }
 
@@ -913,7 +941,7 @@ void vehicleProcess(tVehicle *pVehicle) {
 			vehicleProcessExploding(pVehicle);
 			break;
 		case VEHICLE_STATE_SMOKING:
-			vehicleProcessDestroyed(pVehicle);
+			vehicleProcessSmoking(pVehicle);
 			break;
 		case VEHICLE_STATE_TELEPORTING:
 			break;
