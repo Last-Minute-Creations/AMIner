@@ -688,7 +688,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 
 	// Drilling
-	if(isOnGround) {
+	if(isOnGround && !pVehicle->sDynamite.ubCount) {
 		if(pVehicle->sSteer.bX > 0 && tileIsDrillable(uwTileRight, uwTileMid)) {
 			vehicleStartDrilling(pVehicle, uwTileRight, uwTileMid, DRILL_DIR_H);
 		}
