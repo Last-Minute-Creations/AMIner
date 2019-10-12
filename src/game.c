@@ -12,7 +12,6 @@
 #include <ace/utils/custom.h>
 #include <ace/managers/blit.h>
 #include <ace/managers/rand.h>
-#include "bob_new.h"
 #include "vehicle.h"
 #include "hud.h"
 #include "tile.h"
@@ -56,6 +55,15 @@ tFont *g_pFont;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isAtari;
+
+void gameTryPushBob(tBobNew *pBob) {
+	if(
+		pBob->sPos.uwY + pBob->uwHeight >= g_pMainBuffer->pCamera->uPos.uwY &&
+		pBob->sPos.uwY < g_pMainBuffer->pCamera->uPos.uwY +  s_pVpMain->uwHeight
+	) {
+		bobNewPush(pBob);
+	}
+}
 
 static void goToMenu(void) {
 	// Switch to menu, after popping it will process gameGsLoop

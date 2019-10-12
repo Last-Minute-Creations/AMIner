@@ -679,12 +679,12 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			pVehicle->sBobJet.sPos.ulYX = pVehicle->sBobTrack.sPos.ulYX;
 			pVehicle->sBobJet.sPos.uwY += VEHICLE_TRACK_JET_HEIGHT;
 			if(isVehicleVisible) {
-				bobNewPush(&pVehicle->sBobJet);
+				gameTryPushBob(&pVehicle->sBobJet);
 			}
 		}
 	}
 	if(isVehicleVisible) {
-		bobNewPush(&pVehicle->sBobTrack);
+		gameTryPushBob(&pVehicle->sBobTrack);
 	}
 
 	// Drilling
@@ -702,13 +702,13 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		}
 	}
 	if(isVehicleVisible) {
-		bobNewPush(&pVehicle->sBobBody);
+		gameTryPushBob(&pVehicle->sBobBody);
 	}
 
 	// Tool
 	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 	if(isVehicleVisible) {
-		bobNewPush(&pVehicle->sBobTool);
+		gameTryPushBob(&pVehicle->sBobTool);
 	}
 
 	if(vehicleIsNearShop(pVehicle)) {
@@ -756,7 +756,7 @@ static void vehicleProcessSmoking(tVehicle *pVehicle) {
 		fix16_to_int(pVehicle->fY) + VEHICLE_BODY_HEIGHT +
 		VEHICLE_TRACK_HEIGHT - VEHICLE_WRECK_HEIGHT
 	);
-	bobNewPush(&pVehicle->sBobWreck);
+	gameTryPushBob(&pVehicle->sBobWreck);
 
 	pVehicle->sBobSmoke.sPos.uwY = (
 		fix16_to_int(pVehicle->fY) + VEHICLE_BODY_HEIGHT +
@@ -775,7 +775,7 @@ static void vehicleProcessSmoking(tVehicle *pVehicle) {
 	else {
 		++pVehicle->ubSmokeAnimCnt;
 	}
-	bobNewPush(&pVehicle->sBobSmoke);
+	gameTryPushBob(&pVehicle->sBobSmoke);
 
 	if(s_ubBebCountdown == 0) {
 		vehicleRespawn(pVehicle);
@@ -874,7 +874,6 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			// Center is on tile to excavate
 			UWORD uwTileX = (fix16_to_int(pVehicle->fX) + VEHICLE_WIDTH / 2) >> 5;
 			UWORD uwTileY = (fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT / 2) >> 5;
-
 			vehicleExcavateTile(pVehicle, uwTileX, uwTileY);
 		}
 		else {
@@ -906,9 +905,9 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 		}
 	}
 
-	bobNewPush(&pVehicle->sBobTrack);
-	bobNewPush(&pVehicle->sBobBody);
-	bobNewPush(&pVehicle->sBobTool);
+	gameTryPushBob(&pVehicle->sBobTrack);
+	gameTryPushBob(&pVehicle->sBobBody);
+	gameTryPushBob(&pVehicle->sBobTool);
 }
 
 void vehicleProcessText(void) {
@@ -923,10 +922,10 @@ void vehicleProcessExploding(tVehicle *pVehicle) {
 	vehicleProcessDeadGravity(pVehicle);
 	pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 	pVehicle->sBobTrack.sPos.uwY += VEHICLE_BODY_HEIGHT - 1;
-	bobNewPush(&pVehicle->sBobTrack);
-	bobNewPush(&pVehicle->sBobBody);
+	gameTryPushBob(&pVehicle->sBobTrack);
+	gameTryPushBob(&pVehicle->sBobBody);
 	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
-	bobNewPush(&pVehicle->sBobTool);
+	gameTryPushBob(&pVehicle->sBobTool);
 }
 
 void vehicleProcess(tVehicle *pVehicle) {
