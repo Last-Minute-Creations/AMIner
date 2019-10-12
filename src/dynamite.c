@@ -20,7 +20,7 @@ void onExplosionPeak(ULONG ulData) {
 			explosionAdd(
 				pDynamite->pCoords[pDynamite->ubCount - 1].uwX << 5,
 				pDynamite->pCoords[pDynamite->ubCount - 1].uwY << 5,
-				onExplosionPeak, ulData, 1
+				onExplosionPeak, ulData, 1, 0
 			);
 		}
 	}
@@ -77,6 +77,6 @@ void dynamiteTrigger(
 	}
 	const tUwCoordYX *pFirst = &pDynamite->pCoords[pDynamite->ubCount - 1];
 	explosionAdd(
-		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pDynamite, 1
+		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pDynamite, 1, 0
 	);
 }

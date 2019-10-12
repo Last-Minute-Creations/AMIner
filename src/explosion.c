@@ -17,18 +17,20 @@ typedef struct tExplosion {
 	ULONG ulCbData;
 	UBYTE ubFrame;
 	UBYTE ubCnt;
-	UBYTE isFast;
+	UBYTE isQuick;
 } tExplosion;
 
 static tExplosion s_pExplosions[EXPLOSION_MAX];
 static tExplosion *s_pExplosionNext = 0;
 
-static tBitMap *s_pFrames;
-static tBitMap *s_pFramesMask;
+static tBitMap *s_pBoomFrames, *s_pBoomFramesMask;
+static tBitMap *s_pTpFrames, *s_pTpFramesMask;
 
 void explosionManagerCreate(void) {
-	s_pFrames = bitmapCreateFromFile("data/explosion.bm", 0);
-	s_pFramesMask = bitmapCreateFromFile("data/explosion_mask.bm", 0);
+	s_pBoomFrames = bitmapCreateFromFile("data/explosion.bm", 0);
+	s_pBoomFramesMask = bitmapCreateFromFile("data/explosion_mask.bm", 0);
+	s_pTpFrames = bitmapCreateFromFile("data/teleport.bm", 0);
+	s_pTpFramesMask = bitmapCreateFromFile("data/teleport_mask.bm", 0);
 
 	s_pExplosionNext = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i) {
@@ -37,18 +39,23 @@ void explosionManagerCreate(void) {
 
 		bobNewInit(
 			&s_pExplosions[i].sBob, EXPLOSION_FRAME_HEIGHT, EXPLOSION_FRAME_HEIGHT, 1,
-			s_pFrames, s_pFramesMask, 0, 0
+			s_pBoomFrames, s_pBoomFramesMask, 0, 0
 		);
 	}
 
 }
 
 void explosionManagerDestroy(void) {
-	bitmapDestroy(s_pFrames);
-	bitmapDestroy(s_pFramesMask);
+	bitmapDestroy(s_pBoomFrames);
+	bitmapDestroy(s_pBoomFramesMask);
+	bitmapDestroy(s_pTpFrames);
+	bitmapDestroy(s_pTpFramesMask);
 }
 
-void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData, UBYTE isFast) {
+void explosionAdd(
+	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData,
+	UBYTE isQuick, UBYTE isTeleport
+) {
 	tExplosion *pStart = s_pExplosionNext;
 	do {
 		if(s_pExplosionNext->ubFrame >= EXPLOSION_FRAME_COUNT) {
@@ -57,7 +64,15 @@ void explosionAdd(UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData, UBYT
 			s_pExplosionNext->ubFrame = 0;
 			s_pExplosionNext->cbOnPeak = cbOnPeak;
 			s_pExplosionNext->ulCbData = ulCbData;
-			s_pExplosionNext->isFast = isFast;
+			s_pExplosionNext->isQuick = isQuick;
+			if(isTeleport) {
+				s_pExplosionNext->sBob.pBitmap = s_pTpFrames;
+				s_pExplosionNext->sBob.pMask = s_pTpFramesMask;
+			}
+			else {
+				s_pExplosionNext->sBob.pBitmap = s_pBoomFrames;
+				s_pExplosionNext->sBob.pMask = s_pBoomFramesMask;
+			}
 			bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
 			break;
 		}
@@ -71,7 +86,7 @@ void explosionManagerProcess(void) {
 	tExplosion *pExplosion = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i, ++pExplosion) {
 		if(pExplosion->ubFrame < EXPLOSION_FRAME_COUNT) {
-			if(pExplosion->ubCnt >= EXPLOSION_COUNTER_MAX >> pExplosion->isFast) {
+			if(pExplosion->ubCnt >= EXPLOSION_COUNTER_MAX >> pExplosion->isQuick) {
 				pExplosion->ubCnt = 0;
 				++pExplosion->ubFrame;
 				if(pExplosion->ubFrame == EXPLOSION_FRAME_PEAK && pExplosion->cbOnPeak) {
