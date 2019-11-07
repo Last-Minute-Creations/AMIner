@@ -97,6 +97,8 @@ void vehicleDestroy(tVehicle *pVehicle);
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle);
 
+void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
+
 void vehicleResetPos(tVehicle *pVehicle);
 
 void vehicleReset(tVehicle *pVehicle);
@@ -106,6 +108,8 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);
 void vehicleProcessText(void);
 
 void vehicleProcess(tVehicle *pVehicle);
+
+uint8_t vehiclesAreClose(void);
 
 tVehicle g_pVehicles[2];
 

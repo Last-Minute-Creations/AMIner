@@ -385,7 +385,7 @@ void menuGsLoop(void) {
 	bobNewPushingDone();
 	bobNewEnd();
 	baseTileProcess();
-	groundLayerProcess(*pCamY);
+	groundLayerProcess(*pCamY, 0xF);
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);

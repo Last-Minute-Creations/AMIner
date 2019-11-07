@@ -3,9 +3,9 @@
 
 #include <ace/utils/extview.h>
 
-void groundLayerCreate(tVPort *pVp);
+void groundLayerCreate(const tVPort *pVp);
 
-void groundLayerProcess(UWORD uwCameraY);
+void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel);
 
 void groundLayerReset(UBYTE ubLowerLayer);
 

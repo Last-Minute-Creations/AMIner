@@ -95,7 +95,7 @@ void vehicleBitmapsDestroy(void) {
 	bitmapDestroy(s_pSmokeMask);
 }
 
-void vehicleResetPos(tVehicle *pVehicle) {
+void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubDrillDir = DRILL_DIR_NONE;
 	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 
@@ -112,17 +112,28 @@ void vehicleResetPos(tVehicle *pVehicle) {
 
 	pVehicle->sBobBody.sPos.ulYX = 0;
 
-	pVehicle->fY = fix16_from_int((TILE_ROW_BASE_DIRT - 2) * 32);
+	pVehicle->fX = fix16_from_int(uwX);
+	pVehicle->fY = fix16_from_int(uwY);
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
 	if(pVehicle->ubPlayerIdx == PLAYER_1) {
-		pVehicle->fX = fix16_from_int(g_isChallenge ? 0 : 96);
 		vehicleMove(pVehicle, 1, 0);
 	}
 	else {
-		pVehicle->fX = fix16_from_int(g_isChallenge ? 96 : 320-64);
 		vehicleMove(pVehicle, -1, 0);
 	}
+}
+
+void vehicleResetPos(tVehicle *pVehicle) {
+	UWORD uwX;
+	if(pVehicle->ubPlayerIdx == PLAYER_1) {
+		uwX = g_isChallenge ? 0 : 96;
+	}
+	else {
+		uwX = g_isChallenge ? 96 : 320-64;
+	}
+	UWORD uwY = (TILE_ROW_BASE_DIRT - 2) * 32;
+	vehicleSetPos(pVehicle, uwX, uwY);
 }
 
 void vehicleUpdateBodyBob(tVehicle *pVehicle) {
@@ -952,4 +963,15 @@ void vehicleProcess(tVehicle *pVehicle) {
 		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_BASE_DIRT)*32
 	));
 	hudSetCash(ubPlayerIdx, pVehicle->lCash);
+}
+
+uint8_t vehiclesAreClose(void) {
+	const UWORD uwVpHeight = 256 - 31;
+	WORD wDelta = ABS(
+		g_pVehicles[0].sBobBody.sPos.uwY - g_pVehicles[1].sBobBody.sPos.uwY
+	);
+	if(wDelta <= uwVpHeight) {
+		return 1;
+	}
+	return 0;
 }

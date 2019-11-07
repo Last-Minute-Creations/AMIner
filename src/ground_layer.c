@@ -1,5 +1,6 @@
 #include "ground_layer.h"
 #include <ace/utils/extview.h>
+#include <ace/utils/palette.h>
 
 #define RGB(r,g,b) ((((r) >> 4) << 8) | (((g) >> 4) << 4) | (((b) >> 4) << 0))
 
@@ -8,7 +9,7 @@
 
 static tCopBlock *s_pColorsAbove;
 static tCopBlock *s_pColorsBelow;
-static UBYTE s_isSet = 0;
+static UBYTE s_isCopperActive = 0, s_ubPrevLevel = 0;
 static UWORD s_uwVpHeight, s_uwVpStartY;
 static tCopList *s_pCopList;
 tCopBlock *s_pDisableNext = 0;
@@ -65,13 +66,22 @@ static const tGroundLayer s_pLayers[] = {
 
 static const UBYTE s_ubLayerCount = sizeof(s_pLayers) / sizeof(s_pLayers[0]);
 
-void groundLayerCreate(tVPort *pVp) {
+static void groundLayerSetColorRegs(
+	const tGroundLayer *pLayer, UBYTE ubColorLevel
+) {
+	volatile UWORD *pColorRegs = &g_pCustom->color[LAYER_COLOR_START];
+	for(UBYTE i = 0; i < LAYER_COLOR_COUNT; ++i) {
+		pColorRegs[i] = paletteColorDim(pLayer->pColors[i], ubColorLevel);
+	}
+}
+
+void groundLayerCreate(const tVPort *pVp) {
 	logBlockBegin("groundLayerCreate(pVp: %p)", pVp);
 	tView *pView = pVp->pView;
 	s_pCopList = pView->pCopList;
 	s_uwVpStartY = pVp->uwOffsY + 0x2C;
 	s_uwVpHeight = pVp->uwHeight;
-	s_isSet = 0;
+	s_isCopperActive = 0;
 	s_pColorsBelow = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);
 	s_pColorsAbove = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);
 	groundLayerReset(1);
@@ -81,24 +91,26 @@ void groundLayerCreate(tVPort *pVp) {
 void groundLayerReset(UBYTE ubLowerLayer) {
 	s_pColorsBelow->ubDisabled = 1;
 	s_ubLowerLayer = ubLowerLayer;
-	const tGroundLayer *pLayer = &s_pLayers[ubLowerLayer - 1];
+	const tGroundLayer *pLayerCurrent = &s_pLayers[ubLowerLayer - 1];
 	volatile UWORD *pColorRegs = &g_pCustom->color[LAYER_COLOR_START];
-	for(UBYTE i = 0; i < LAYER_COLOR_COUNT; ++i) {
-		pColorRegs[i] = pLayer->pColors[i];
-	}
+	s_ubPrevLevel = 0xF;
+	groundLayerSetColorRegs(pLayerCurrent, s_ubPrevLevel);
 }
 
 static void layerCopyColorsToBlock(
-	const tGroundLayer *pLayer, tCopBlock *pBlock
+	const tGroundLayer *pLayer, tCopBlock *pBlock, UBYTE ubColorLevel
 ) {
 	volatile UWORD *pColorRegs = &g_pCustom->color[LAYER_COLOR_START];
 	pBlock->uwCurrCount = 0;
 	for(UBYTE i = 0; i < LAYER_COLOR_COUNT; ++i) {
-		copMove(s_pCopList, pBlock, &pColorRegs[i], pLayer->pColors[i]);
+		copMove(
+			s_pCopList, pBlock, &pColorRegs[i],
+			paletteColorDim(pLayer->pColors[i], ubColorLevel)
+		);
 	}
 }
 
-void groundLayerProcess(UWORD uwCameraY) {
+void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel) {
 	if(uwCameraY < s_pLayers[s_ubLowerLayer-1].uwTop) {
 		--s_ubLowerLayer;
 	}
@@ -110,41 +122,53 @@ void groundLayerProcess(UWORD uwCameraY) {
 	}
 
 	// Transition between layers on screen
-	const UWORD uwSeamPos = s_pLayers[s_ubLowerLayer].uwTop;
+	const tGroundLayer *pLayerLower = &s_pLayers[s_ubLowerLayer];
+	const tGroundLayer *pLayerUpper = &s_pLayers[s_ubLowerLayer - 1];
+	const UWORD uwSeamPos = pLayerLower->uwTop;
 	if(uwCameraY < uwSeamPos && uwSeamPos < uwCameraY + s_uwVpHeight) {
-		if(!s_isSet) {
+		if(!s_isCopperActive) {
 			copBlockEnable(s_pCopList, s_pColorsBelow);
-			layerCopyColorsToBlock(&s_pLayers[s_ubLowerLayer], s_pColorsBelow);
+			layerCopyColorsToBlock(pLayerLower, s_pColorsBelow, ubColorLevel);
 
 			copBlockEnable(s_pCopList, s_pColorsAbove);
-			layerCopyColorsToBlock(&s_pLayers[s_ubLowerLayer - 1], s_pColorsAbove);
+			layerCopyColorsToBlock(pLayerUpper, s_pColorsAbove, ubColorLevel);
 			copBlockWait(
 				s_pCopList, s_pColorsAbove, 0xE2, s_uwVpStartY + s_uwVpHeight - 1
 			);
-			s_isSet = 1;
+			s_isCopperActive = 1;
+		}
+		else if(s_ubPrevLevel != ubColorLevel) {
+			layerCopyColorsToBlock(pLayerLower, s_pColorsBelow, ubColorLevel);
+			layerCopyColorsToBlock(pLayerUpper, s_pColorsAbove, ubColorLevel);
 		}
 		copBlockWait(
 			s_pCopList, s_pColorsBelow, 0, s_uwVpStartY + uwSeamPos - uwCameraY
 		);
 	}
 	else {
-		if(s_isSet) {
-
+		if(s_isCopperActive) {
 			if(s_pDisableNext) {
+				// Disable in next frame so that color regs will have colors of this layer
 				copBlockDisable(s_pCopList, s_pDisableNext);
 				s_pDisableNext = 0;
-				s_isSet = 0;
+				s_isCopperActive = 0;
 			}
 			else {
 				if(uwCameraY >= uwSeamPos) {
+					// Going down - disable copBlock of upper layer
 					copBlockDisable(s_pCopList, s_pColorsAbove);
 					s_pDisableNext = s_pColorsBelow;
 				}
 				else {
+					// Going uo - disable copBlock of lower layer
 					copBlockDisable(s_pCopList, s_pColorsBelow);
 					s_pDisableNext = s_pColorsAbove;
 				}
 			}
 		}
+		else if(s_ubPrevLevel != ubColorLevel) {
+			groundLayerSetColorRegs(pLayerUpper, ubColorLevel);
+		}
 	}
+	s_ubPrevLevel = ubColorLevel;
 }
