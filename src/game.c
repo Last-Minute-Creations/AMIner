@@ -407,10 +407,10 @@ void gameGsLoop(void) {
 			);
 		}
 		else if(keyUse(KEY_1)) {
-			vehicleSetPos(&g_pVehicles[0], 160, 220);
+			vehicleTeleport(&g_pVehicles[0], 160, 220);
 		}
 		else if(keyUse(KEY_2)) {
-			vehicleSetPos(&g_pVehicles[0], 160, 3428);
+			vehicleTeleport(&g_pVehicles[0], 160, 3428);
 		}
 	}
 

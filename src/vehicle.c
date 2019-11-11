@@ -948,12 +948,13 @@ void vehicleProcess(tVehicle *pVehicle) {
 			vehicleProcessMovement(pVehicle);
 			break;
 		case VEHICLE_STATE_EXPLODING:
+		case VEHICLE_STATE_TELEPORTING_OUT:
 			vehicleProcessExploding(pVehicle);
 			break;
 		case VEHICLE_STATE_SMOKING:
 			vehicleProcessSmoking(pVehicle);
 			break;
-		case VEHICLE_STATE_TELEPORTING:
+		case VEHICLE_STATE_TELEPORTING_IN:
 			break;
 	}
 	UBYTE ubPlayerIdx = pVehicle->ubPlayerIdx;
@@ -974,4 +975,31 @@ uint8_t vehiclesAreClose(void) {
 		return 1;
 	}
 	return 0;
+}
+
+static void vehicleOnTeleportInPeak(ULONG ulData) {
+	tVehicle *pVehicle = (tVehicle*)ulData;
+	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
+}
+
+static void vehicleOnTeleportOutPeak(ULONG ulData) {
+	tVehicle *pVehicle = (tVehicle*)ulData;
+	pVehicle->ubTeleportAnimFrame = 0;
+	pVehicle->ubTeleportAnimCnt = 0;
+	vehicleSetPos(pVehicle, pVehicle->uwTeleportX, pVehicle->uwTeleportY);
+	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_IN;
+	explosionAdd(
+		pVehicle->uwTeleportX, pVehicle->uwTeleportY,
+		vehicleOnTeleportInPeak, (ULONG)pVehicle, 0, 1
+	);
+}
+
+void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
+	pVehicle->uwTeleportX = uwX;
+	pVehicle->uwTeleportY = uwY;
+	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_OUT;
+	explosionAdd(
+		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
+		vehicleOnTeleportOutPeak, (ULONG)pVehicle, 0, 1
+	);
 }

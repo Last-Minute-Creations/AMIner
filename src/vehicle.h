@@ -37,7 +37,9 @@ typedef enum _tVehicleState {
 	VEHICLE_STATE_DRILLING,
 	VEHICLE_STATE_EXPLODING,
 	VEHICLE_STATE_SMOKING,
-	VEHICLE_STATE_TELEPORTING
+	VEHICLE_STATE_TELEPORTING_OUT,
+	VEHICLE_STATE_TELEPORTING_WAIT_FOR_CAMERA,
+	VEHICLE_STATE_TELEPORTING_IN
 } tVehicleState;
 
 typedef struct _tVehicle {
@@ -68,6 +70,10 @@ typedef struct _tVehicle {
 	UBYTE ubDrillVAnimCnt;
 	UBYTE ubSmokeAnimFrame;
 	UBYTE ubSmokeAnimCnt;
+	UBYTE ubTeleportAnimFrame;
+	UBYTE ubTeleportAnimCnt;
+	UWORD uwTeleportX;
+	UWORD uwTeleportY;
 	UBYTE ubDrillState;
 	// Cargo
 	UBYTE ubCargoMax;
@@ -108,6 +114,8 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);
 void vehicleProcessText(void);
 
 void vehicleProcess(tVehicle *pVehicle);
+
+void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
 
 uint8_t vehiclesAreClose(void);
 
