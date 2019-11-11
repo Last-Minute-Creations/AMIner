@@ -4,6 +4,7 @@
 
 #include "explosion.h"
 #include "bob_new.h"
+#include "game.h"
 
 #define EXPLOSION_MAX 6
 #define EXPLOSION_COUNTER_MAX 4
@@ -59,27 +60,40 @@ void explosionAdd(
 	tExplosion *pStart = s_pExplosionNext;
 	do {
 		if(s_pExplosionNext->ubFrame >= EXPLOSION_FRAME_COUNT) {
-			s_pExplosionNext->sBob.sPos.uwX = uwX;
-			s_pExplosionNext->sBob.sPos.uwY = uwY;
-			s_pExplosionNext->ubFrame = 0;
-			s_pExplosionNext->cbOnPeak = cbOnPeak;
-			s_pExplosionNext->ulCbData = ulCbData;
-			s_pExplosionNext->isQuick = isQuick;
-			if(isTeleport) {
-				s_pExplosionNext->sBob.pBitmap = s_pTpFrames;
-				s_pExplosionNext->sBob.pMask = s_pTpFramesMask;
-			}
-			else {
-				s_pExplosionNext->sBob.pBitmap = s_pBoomFrames;
-				s_pExplosionNext->sBob.pMask = s_pBoomFramesMask;
-			}
-			bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
 			break;
 		}
 		if(++s_pExplosionNext >= &s_pExplosions[EXPLOSION_MAX]) {
 			s_pExplosionNext = &s_pExplosions[0];
 		}
 	} while(s_pExplosionNext != pStart);
+
+	// If there's free slot, s_pExplosionNext will point to it
+	// Otherwise, it will use oldest - the one from pStart
+
+	if(
+		s_pExplosionNext == pStart &&
+		s_pExplosionNext->ubFrame <= EXPLOSION_FRAME_PEAK &&
+		s_pExplosionNext->cbOnPeak
+	) {
+		// Call pStart's callback if it's before peak
+		s_pExplosionNext->cbOnPeak(s_pExplosionNext->ulCbData);
+	}
+
+	s_pExplosionNext->sBob.sPos.uwX = uwX;
+	s_pExplosionNext->sBob.sPos.uwY = uwY;
+	s_pExplosionNext->ubFrame = 0;
+	s_pExplosionNext->cbOnPeak = cbOnPeak;
+	s_pExplosionNext->ulCbData = ulCbData;
+	s_pExplosionNext->isQuick = isQuick;
+	if(isTeleport) {
+		s_pExplosionNext->sBob.pBitmap = s_pTpFrames;
+		s_pExplosionNext->sBob.pMask = s_pTpFramesMask;
+	}
+	else {
+		s_pExplosionNext->sBob.pBitmap = s_pBoomFrames;
+		s_pExplosionNext->sBob.pMask = s_pBoomFramesMask;
+	}
+	bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
 }
 
 void explosionManagerProcess(void) {
@@ -100,7 +114,7 @@ void explosionManagerProcess(void) {
 				++pExplosion->ubCnt;
 			}
 			if(pExplosion->ubFrame < EXPLOSION_FRAME_COUNT) {
-				bobNewPush(&pExplosion->sBob);
+				gameTryPushBob(&pExplosion->sBob);
 			}
 		}
 	}
