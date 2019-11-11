@@ -329,6 +329,7 @@ static void gameCameraProcess(void) {
 				g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
 				baseTileProcess();
 				tileBufferRedrawAll(g_pMainBuffer);
+				bobNewDiscardUndraw();
 				g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
 				s_eCameraFade = CAMERA_FADE_IN;
 			}
@@ -367,6 +368,11 @@ void gameGsLoop(void) {
   }
 	if(keyUse(KEY_B)) {
 		s_isDebug = !s_isDebug;
+	}
+	if(keyCheck(KEY_M)) {
+		vPortWaitForEnd(s_pVpMain);
+		vPortWaitForEnd(s_pVpMain);
+		vPortWaitForEnd(s_pVpMain);
 	}
 	if(
 		(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) &&
@@ -411,6 +417,7 @@ void gameGsLoop(void) {
 	debugColor(0x008);
 	bobNewBegin();
 	tileBufferQueueProcess(g_pMainBuffer);
+	gameCameraProcess();
 	gameProcessInput();
 	vehicleProcessText();
 	debugColor(0x080);
@@ -460,7 +467,6 @@ void gameGsLoop(void) {
 	bobNewEnd();
 	hudUpdate();
 
-	gameCameraProcess();
 	baseTileProcess();
 
 	groundLayerProcess(g_pMainBuffer->pCamera->uPos.uwY, s_ubCameraFadeLevel);
