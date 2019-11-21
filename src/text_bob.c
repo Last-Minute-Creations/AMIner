@@ -118,7 +118,7 @@ void textBobAnimate(tTextBob *pTextBob) {
 		else {
 			--pTextBob->sBob.sPos.uwY;
 		}
-		bobNewPush(&pTextBob->sBob);
+		gameTryPushBob(&pTextBob->sBob);
 	}
 }
 

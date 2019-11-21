@@ -17,7 +17,7 @@ void hiScoreBobsCreate(void);
 
 void hiScoreBobsDestroy(void);
 
-void hiScoreSetup(ULONG ulScore);
+void hiScoreSetup(LONG lScore);
 
 void hiScoreLoad(void);
 

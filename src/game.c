@@ -12,7 +12,6 @@
 #include <ace/utils/custom.h>
 #include <ace/managers/blit.h>
 #include <ace/managers/rand.h>
-#include "bob_new.h"
 #include "vehicle.h"
 #include "hud.h"
 #include "tile.h"
@@ -25,17 +24,27 @@
 #include "base_tile.h"
 #include "warehouse.h"
 #include "tutorial.h"
+#include "explosion.h"
 
 typedef enum _tCameraType {
-	CAMERA_TYPE_BETWEEN,
 	CAMERA_TYPE_P1,
 	CAMERA_TYPE_P2,
-	CAMERA_TYPE_COUNT
 } tCameraType;
+
+#define CAMERA_SPEED 4
+
+typedef enum _tCameraFade {
+	CAMERA_FADE_NONE,
+	CAMERA_FADE_OUT,
+	CAMERA_FADE_IN
+} tCameraFade;
+
+static tCameraFade s_eCameraFade = CAMERA_FADE_NONE;
+static UBYTE s_ubCameraFadeLevel, s_ubCameraFadeLevelPrev;
 
 tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 
-static tCameraType s_eCameraType = CAMERA_TYPE_BETWEEN;
+static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 static tView *s_pView;
 static tVPort *s_pVpMain;
 tTileBufferManager *g_pMainBuffer;
@@ -43,7 +52,8 @@ tTileBufferManager *g_pMainBuffer;
 static tBitMap *s_pTiles;
 static tBitMap *s_pBones, *s_pBonesMask;
 static UBYTE s_isDebug = 0;
-static UWORD s_uwColorBg;
+static UWORD s_pPaletteRef[1 << GAME_BPP];
+static UWORD *s_pColorBg;
 static UBYTE s_ubChallengeCamCnt;
 static tTextBob s_sChallengeResult;
 
@@ -55,6 +65,15 @@ tFont *g_pFont;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isAtari;
+
+void gameTryPushBob(tBobNew *pBob) {
+	if(
+		pBob->sPos.uwY + pBob->uwHeight >= g_pMainBuffer->pCamera->uPos.uwY &&
+		pBob->sPos.uwY < g_pMainBuffer->pCamera->uPos.uwY +  s_pVpMain->uwHeight
+	) {
+		bobNewPush(pBob);
+	}
+}
 
 static void goToMenu(void) {
 	// Switch to menu, after popping it will process gameGsLoop
@@ -132,8 +151,9 @@ void gameGsCreate(void) {
 		TAG_TILEBUFFER_TILESET, s_pTiles,
 	TAG_END);
 
-	paletteLoad("data/aminer.plt", s_pVpMain->pPalette, 1 << GAME_BPP);
-	s_uwColorBg = s_pVpMain->pPalette[0];
+	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
+	CopyMem(s_pPaletteRef, s_pVpMain->pPalette, 1 << GAME_BPP);
+	s_pColorBg = &s_pVpMain->pPalette[0];
 
 	baseTileCreate(g_pMainBuffer);
 	audioCreate();
@@ -154,6 +174,7 @@ void gameGsCreate(void) {
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
+	explosionManagerCreate();
 	groundLayerCreate(s_pVpMain);
 	commCreate();
 	commShopAlloc();
@@ -165,6 +186,8 @@ void gameGsCreate(void) {
 	hiScoreBobsCreate();
 	menuPreload();
 	bobNewAllocateBgBuffers();
+	s_ubCameraFadeLevelPrev = 0xF;
+	s_ubCameraFadeLevel = 0xF;
 	systemUnuse();
 
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
@@ -179,7 +202,7 @@ void gameGsCreate(void) {
 	g_isAtari = 0;
 
 	// Initial background
-	tileBufferInitialDraw(g_pMainBuffer);
+	tileBufferRedrawAll(g_pMainBuffer);
 
 	// Load the view
 	viewLoad(s_pView);
@@ -207,8 +230,11 @@ static void gameProcessInput(void) {
 		g_is2pKbd = !g_is2pKbd;
 	}
 	else if(keyUse(KEY_F4)) {
-		if(++s_eCameraType == CAMERA_TYPE_COUNT) {
-			s_eCameraType = CAMERA_TYPE_BETWEEN;
+		if(s_eCameraType == CAMERA_TYPE_P1) {
+			s_eCameraType = CAMERA_TYPE_P2;
+		}
+		else {
+			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
 
@@ -251,6 +277,91 @@ static inline void debugColor(UWORD uwColor) {
 	}
 }
 
+static void gameCameraProcess(void) {
+	if(g_isChallenge) {
+		const UWORD uwBottomPos = g_pMainBuffer->pCamera->uPos.uwY + g_pMainBuffer->sCommon.pVPort->uwHeight - 2 * 32;
+		if(
+			g_pVehicles[0].sBobBody.sPos.uwY >  uwBottomPos ||
+			(g_is2pPlaying && g_pVehicles[1].sBobBody.sPos.uwY > uwBottomPos)
+		) {
+			g_pMainBuffer->pCamera->uPos.uwY += 1;
+		}
+		else {
+			++s_ubChallengeCamCnt;
+			if(s_ubChallengeCamCnt >= 2) {
+				g_pMainBuffer->pCamera->uPos.uwY += 1;
+				s_ubChallengeCamCnt = 0;
+			}
+		}
+	}
+	else {
+		UWORD uwCamDestY, uwCamDestX = 32;
+		if(g_is2pPlaying && vehiclesAreClose()) {
+			uwCamDestY = (
+				fix16_to_int(g_pVehicles[0].fY) +
+				fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT
+			) / 2;
+		}
+		else if(g_is2pPlaying && s_eCameraType == CAMERA_TYPE_P2) {
+			uwCamDestY = fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT / 2;
+		}
+		else {
+			uwCamDestY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
+		}
+		WORD wCameraDistance = (
+			uwCamDestY - g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
+		) - g_pMainBuffer->pCamera->uPos.uwY;
+		UWORD uwAbsDistance = ABS(wCameraDistance);
+		if(uwAbsDistance > CAMERA_SPEED * 50 && s_eCameraFade == CAMERA_FADE_NONE) {
+			s_eCameraFade = CAMERA_FADE_OUT;
+			s_ubCameraFadeLevel = 0xF;
+		}
+		if(
+			s_eCameraFade == CAMERA_FADE_NONE || s_eCameraFade == CAMERA_FADE_OUT
+		) {
+			if(uwAbsDistance > CAMERA_SPEED) {
+				cameraMoveBy(g_pMainBuffer->pCamera, 0, SGN(wCameraDistance) * CAMERA_SPEED);
+			}
+			else {
+				cameraMoveBy(g_pMainBuffer->pCamera, 0, wCameraDistance);
+			}
+			if(g_pMainBuffer->pCamera->uPos.uwX < uwCamDestX) {
+				g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
+			}
+		}
+		if(s_eCameraFade == CAMERA_FADE_OUT) {
+			if(s_ubCameraFadeLevel > 0) {
+				--s_ubCameraFadeLevel;
+			}
+			else {
+				cameraCenterAt(g_pMainBuffer->pCamera, uwCamDestX, uwCamDestY);
+				g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
+				baseTileProcess();
+				tileBufferRedrawAll(g_pMainBuffer);
+				bobNewDiscardUndraw();
+				g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
+				s_eCameraFade = CAMERA_FADE_IN;
+			}
+		}
+		else if(s_eCameraFade == CAMERA_FADE_IN) {
+			if(s_ubCameraFadeLevel < 0xF) {
+				++s_ubCameraFadeLevel;
+			}
+			else {
+				s_eCameraFade = CAMERA_FADE_NONE;
+			}
+		}
+	}
+}
+
+static void mainPaletteProcess(UBYTE ubFadeLevel) {
+	if(s_ubCameraFadeLevelPrev != ubFadeLevel) {
+		*s_pColorBg = paletteColorDim(s_pPaletteRef[0], ubFadeLevel);
+		paletteDim(s_pPaletteRef, g_pCustom->color, 27, ubFadeLevel);
+		s_ubCameraFadeLevelPrev = ubFadeLevel;
+	}
+}
+
 void gameGsLoop(void) {
 	static UBYTE ubLastDino = 0;
 
@@ -267,6 +378,11 @@ void gameGsLoop(void) {
 	if(keyUse(KEY_B)) {
 		s_isDebug = !s_isDebug;
 	}
+	if(keyCheck(KEY_M)) {
+		vPortWaitForEnd(s_pVpMain);
+		vPortWaitForEnd(s_pVpMain);
+		vPortWaitForEnd(s_pVpMain);
+	}
 	if(
 		(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) &&
 		vehicleIsNearShop(&g_pVehicles[0])
@@ -274,10 +390,43 @@ void gameGsLoop(void) {
 		gamePushState(commShopGsCreate, commShopGsLoop, commShopGsDestroy);
 		return;
 	}
+	if(g_pVehicles[0].ubDrillDir == DRILL_DIR_NONE) {
+		if(keyUse(KEY_K)) {
+			dynamiteTrigger(
+				&g_pVehicles[0].sDynamite,
+				(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+				(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
+				DYNAMITE_TYPE_HORZ
+			);
+		}
+		else if(keyUse(KEY_L)) {
+			dynamiteTrigger(
+				&g_pVehicles[0].sDynamite,
+				(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+				(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
+				DYNAMITE_TYPE_3X3
+			);
+		}
+		else if(keyUse(KEY_O)) {
+			dynamiteTrigger(
+				&g_pVehicles[0].sDynamite,
+				(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+				(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
+				DYNAMITE_TYPE_VERT
+			);
+		}
+		else if(keyUse(KEY_1)) {
+			vehicleTeleport(&g_pVehicles[0], 160, 220);
+		}
+		else if(keyUse(KEY_2)) {
+			vehicleTeleport(&g_pVehicles[0], 160, 3428);
+		}
+	}
 
 	debugColor(0x008);
 	bobNewBegin();
 	tileBufferQueueProcess(g_pMainBuffer);
+	gameCameraProcess();
 	gameProcessInput();
 	vehicleProcessText();
 	debugColor(0x080);
@@ -320,61 +469,22 @@ void gameGsLoop(void) {
 		debugColor(0x880);
 		vehicleProcess(&g_pVehicles[1]);
 	}
+	debugColor(0x808);
+	explosionManagerProcess();
 	debugColor(0x088);
 	bobNewPushingDone();
 	bobNewEnd();
 	hudUpdate();
 
-	if(g_isChallenge) {
-		++s_ubChallengeCamCnt;
-		if(s_ubChallengeCamCnt >= 2) {
-			g_pMainBuffer->pCamera->uPos.uwY += 1;
-			s_ubChallengeCamCnt = 0;
-		}
-	}
-	else {
-		UWORD uwCamY, uwCamX = 32;
-		if(!g_is2pPlaying) {
-			// One player only
-			// uwCamX = fix16_to_int(g_pVehicles[0].fX) + VEHICLE_WIDTH / 2;
-			uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
-		}
-		else {
-			// Two players
-			if(s_eCameraType == CAMERA_TYPE_P1) {
-				uwCamY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
-			}
-			else if(s_eCameraType == CAMERA_TYPE_P2) {
-				uwCamY = fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT / 2;
-			}
-			else {
-				uwCamY = (
-					fix16_to_int(g_pVehicles[0].fY) +
-					fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT
-				) / 2;
-			}
-		}
-		WORD wDist = (
-			uwCamY - g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
-		) - g_pMainBuffer->pCamera->uPos.uwY;
-		if(ABS(wDist) > 4) {
-			cameraMoveBy(g_pMainBuffer->pCamera, 0, SGN(wDist) * 4);
-		}
-		else {
-			cameraMoveBy(g_pMainBuffer->pCamera, 0, wDist);
-		}
-		if(g_pMainBuffer->pCamera->uPos.uwX < uwCamX) {
-			g_pMainBuffer->pCamera->uPos.uwX = uwCamX;
-		}
-	}
 	baseTileProcess();
 
-	groundLayerProcess(g_pMainBuffer->pCamera->uPos.uwY);
+	groundLayerProcess(g_pMainBuffer->pCamera->uPos.uwY, s_ubCameraFadeLevel);
+	mainPaletteProcess(s_ubCameraFadeLevel);
 
 	debugColor(0x800);
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
-	debugColor(s_uwColorBg);
+	debugColor(*s_pColorBg);
 	vPortWaitForEnd(s_pVpMain);
 }
 
@@ -402,6 +512,8 @@ void gameGsDestroy(void) {
 	sampleDestroy(g_pSampleDrill);
 	sampleDestroy(g_pSampleOre);
 	sampleDestroy(g_pSampleTeleport);
+
+	explosionManagerDestroy();
 
   hudDestroy();
   viewDestroy(s_pView);
@@ -436,7 +548,7 @@ void gameGsLoopChallengeEnd(void) {
 
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
-	debugColor(s_uwColorBg);
+	debugColor(*s_pColorBg);
 	vPortWaitForEnd(s_pVpMain);
 }
 
@@ -457,7 +569,7 @@ void gameGsLoopScorePreview(void) {
 
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
-	debugColor(s_uwColorBg);
+	debugColor(*s_pColorBg);
 	vPortWaitForEnd(s_pVpMain);
 }
 

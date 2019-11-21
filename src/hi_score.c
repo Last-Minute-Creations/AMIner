@@ -14,23 +14,23 @@
 #define SCORE_CURSOR_BLINK_TICKS 25 // 25 ticks = 500ms
 
 typedef struct _tHiScore {
-	ULONG ulScore;
+	LONG lScore;
 	char szName[SCORE_NAME_LENGTH];
 } tHiScore;
 
 static tHiScore s_pScores[SCORE_COUNT];
 
 static tHiScore s_pPrevScores[SCORE_COUNT] = {
-	{.ulScore = 10, .szName = "Bestest"},
-	{.ulScore = 9, .szName = "Best"},
-	{.ulScore = 8, .szName = "Better"},
-	{.ulScore = 7, .szName = "Good"},
-	{.ulScore = 6, .szName = "Moderate"},
-	{.ulScore = 5, .szName = "Bad"},
-	{.ulScore = 4, .szName = "Awful"},
-	{.ulScore = 3, .szName = "Too"},
-	{.ulScore = 2, .szName = "Small"},
-	{.ulScore = 1, .szName = "Score"},
+	{.lScore = 10, .szName = "Bestest"},
+	{.lScore = 9, .szName = "Best"},
+	{.lScore = 8, .szName = "Better"},
+	{.lScore = 7, .szName = "Good"},
+	{.lScore = 6, .szName = "Moderate"},
+	{.lScore = 5, .szName = "Bad"},
+	{.lScore = 4, .szName = "Awful"},
+	{.lScore = 3, .szName = "Too"},
+	{.lScore = 2, .szName = "Small"},
+	{.lScore = 1, .szName = "Score"},
 };
 
 
@@ -82,7 +82,7 @@ static void hiScoreUpdateScoreBobs(void) {
 		textBobSetPos(&s_pScoreNameBobs[i], 32+64, uwScorePos, 0, 0);
 		textBobUpdate(&s_pScoreNameBobs[i]);
 		// Score count
-		textBobSetText(&s_pScoreCountBobs[i], "%lu", s_pScores[i].ulScore);
+		textBobSetText(&s_pScoreCountBobs[i], "%lu", s_pScores[i].lScore);
 		textBobSetPos(
 			&s_pScoreCountBobs[i],
 			(32+320-64) - s_pScoreCountBobs[i].uwWidth, uwScorePos, 0, 0
@@ -171,11 +171,11 @@ UBYTE hiScoreIsEntering(void) {
 	return s_isEnteringHiScore;
 }
 
-void hiScoreSetup(ULONG ulScore) {
+void hiScoreSetup(LONG lScore) {
 	s_isEnteringHiScore = 0;
 	s_ubNewNameLength = 0;
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-		if(s_pScores[i].ulScore < ulScore) {
+		if(s_pScores[i].lScore < lScore) {
 			s_isEnteringHiScore = 1;
 			s_isShift = 0;
 			s_isCursor = 0;
@@ -185,10 +185,10 @@ void hiScoreSetup(ULONG ulScore) {
 			// Move worse score down
 			for(BYTE j = SCORE_COUNT-2; j >= s_ubNewScorePos; --j) {
 				strcpy(s_pScores[j+1].szName, s_pScores[j].szName);
-				s_pScores[j+1].ulScore = s_pScores[j].ulScore;
+				s_pScores[j+1].lScore = s_pScores[j].lScore;
 			}
 			// Make room for new score
-			s_pScores[s_ubNewScorePos].ulScore = ulScore;
+			s_pScores[s_ubNewScorePos].lScore = lScore;
 			memset(s_pScores[s_ubNewScorePos].szName, '\0', SCORE_NAME_LENGTH);
 			break;
 		}

@@ -181,4 +181,6 @@ void bobNewPushingDone(void);
  */
 void bobNewEnd(void);
 
+void bobNewDiscardUndraw(void);
+
 #endif // _BOB_NEW_H_

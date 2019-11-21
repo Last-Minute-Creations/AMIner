@@ -8,6 +8,7 @@
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/utils/font.h>
 #include <ace/managers/audio.h>
+#include "bob_new.h"
 
 #define GAME_BPP 5
 
@@ -28,6 +29,8 @@ void gameStart(void);
 void gameChallengeEnd(void);
 
 void gameGsLoopEnterScore(void);
+
+void gameTryPushBob(tBobNew *pBob);
 
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;

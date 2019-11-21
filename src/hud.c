@@ -35,7 +35,7 @@ typedef enum _tHudState {
 	STATE_MAIN_DRAW_CASH,
 	STATE_MAIN_DRAW_FUEL,
 	STATE_MAIN_DRAW_CARGO,
-	STATE_MAIN_DRAW_HEALTH,
+	STATE_MAIN_DRAW_HULL,
 	STATE_MAIN_DRAW_END,
 	// State machine for drawing message
 	STATE_MSG_NOISE_IN,
@@ -51,9 +51,10 @@ typedef enum _tHudState {
 typedef struct _tHudPlayerData {
 	UWORD uwDepth, uwDepthDisp;
 	LONG lCash, lCashDisp;
-	UWORD uwDrill, uwDrillDisp, uwDrillMax;
-	UBYTE ubCargo, ubCargoDisp, ubCargoMax;
-	UBYTE ubHealth, ubHealthDisp, ubHealthMax;
+	UWORD uwDrill, uwDrillMax;
+	UBYTE ubCargo, ubCargoMax;
+	UWORD uwHull, uwHullMax;
+	UBYTE ubHullDisp, ubCargoDisp, ubDrillDisp;
 } tHudPlayerData;
 
 static tVPort *s_pVpHud;
@@ -190,12 +191,12 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 		s_pPlayerData[ubPlayer].ubCargoDisp = 0;
 		s_pPlayerData[ubPlayer].ubCargo = 0;
 		s_pPlayerData[ubPlayer].ubCargoMax = 0;
-		s_pPlayerData[ubPlayer].uwDrillDisp = 0;
+		s_pPlayerData[ubPlayer].ubDrillDisp = 0;
 		s_pPlayerData[ubPlayer].uwDrill = 0;
 		s_pPlayerData[ubPlayer].uwDrillMax = 0;
-		s_pPlayerData[ubPlayer].ubHealthDisp = 0;
-		s_pPlayerData[ubPlayer].ubHealth = 0;
-		s_pPlayerData[ubPlayer].ubHealthMax = 0;
+		s_pPlayerData[ubPlayer].ubHullDisp = 0;
+		s_pPlayerData[ubPlayer].uwHull = 0;
+		s_pPlayerData[ubPlayer].uwHullMax = 0;
 	}
 
 	hudResetStateMachine();
@@ -219,9 +220,9 @@ void hudSetDrill(UBYTE ubPlayer, UWORD uwDrill, UWORD uwDrillMax) {
 	s_pPlayerData[ubPlayer].uwDrillMax = uwDrillMax;
 }
 
-void hudSetHealth(UBYTE ubPlayer, UBYTE ubHealth, UBYTE ubHealthMax) {
-	s_pPlayerData[ubPlayer].ubHealth = ubHealth;
-	s_pPlayerData[ubPlayer].ubHealthMax = ubHealthMax;
+void hudSetHull(UBYTE ubPlayer, UWORD uwHull, UWORD uwHullMax) {
+	s_pPlayerData[ubPlayer].uwHull = uwHull;
+	s_pPlayerData[ubPlayer].uwHullMax = uwHullMax;
 }
 
 static void hudDrawStateBarPercent(
@@ -330,16 +331,16 @@ void hudUpdate(void) {
 			if(pData->uwDrillMax) {
 				ubPercent = (100 * pData->uwDrill) / pData->uwDrillMax;
 			}
-			if(pData->uwDrillDisp != ubPercent) {
+			if(pData->ubDrillDisp != ubPercent) {
 				UBYTE ubColor, ubDraw;
-				if(ubPercent > pData->uwDrillDisp) {
-					ubDraw = pData->uwDrillDisp;
-					++pData->uwDrillDisp;
+				if(ubPercent > pData->ubDrillDisp) {
+					ubDraw = pData->ubDrillDisp;
+					++pData->ubDrillDisp;
 					ubColor = COLOR_BAR_FULL;
 				}
 				else {
-					--pData->uwDrillDisp;
-					ubDraw = pData->uwDrillDisp;
+					--pData->ubDrillDisp;
+					ubDraw = pData->ubDrillDisp;
 					ubColor = COLOR_BAR_EMPTY;
 				}
 				hudDrawStateBarPercent(GAUGE_DRILL_X, s_ubHudOffsY, ubDraw, ubColor);
@@ -364,18 +365,29 @@ void hudUpdate(void) {
 					ubColor = COLOR_BAR_EMPTY;
 				}
 				hudDrawStateBarPercent(GAUGE_CARGO_X, s_ubHudOffsY, ubDraw, ubColor);
-				s_eState = STATE_MAIN_DRAW_HEALTH;
+				s_eState = STATE_MAIN_DRAW_HULL;
 				break;
 			}
-		case STATE_MAIN_DRAW_HEALTH:
-			// s_eState = STATE_MAIN_DRAW_END; // do end immediately after this state
+		case STATE_MAIN_DRAW_HULL:
 			ubPercent = 0;
-			if(pData->ubHealthMax) {
-				ubPercent = (100 * pData->ubHealth) / pData->ubHealthMax;
+			if(pData->uwHullMax) {
+				ubPercent = (100 * pData->uwHull) / pData->uwHullMax;
 			}
-			if(pData->ubHealthDisp != ubPercent) {
-
-				// break; // do end immediately after this state
+			if(pData->ubHullDisp != ubPercent) {
+				UBYTE ubColor, ubDraw;
+				if(ubPercent > pData->ubHullDisp) {
+					ubDraw = pData->ubHullDisp;
+					++pData->ubHullDisp;
+					ubColor = COLOR_BAR_FULL;
+				}
+				else {
+					--pData->ubHullDisp;
+					ubDraw = pData->ubHullDisp;
+					ubColor = COLOR_BAR_EMPTY;
+				}
+				hudDrawStateBarPercent(GAUGE_HULL_X, s_ubHudOffsY, ubDraw, ubColor);
+				s_eState = STATE_MAIN_DRAW_END;
+				break;
 			}
 		case STATE_MAIN_DRAW_END:
 			// Cycle players and start again
