@@ -279,10 +279,19 @@ static inline void debugColor(UWORD uwColor) {
 
 static void gameCameraProcess(void) {
 	if(g_isChallenge) {
-		++s_ubChallengeCamCnt;
-		if(s_ubChallengeCamCnt >= 2) {
+		const UWORD uwBottomPos = g_pMainBuffer->pCamera->uPos.uwY + g_pMainBuffer->sCommon.pVPort->uwHeight - 2 * 32;
+		if(
+			g_pVehicles[0].sBobBody.sPos.uwY >  uwBottomPos ||
+			(g_is2pPlaying && g_pVehicles[1].sBobBody.sPos.uwY > uwBottomPos)
+		) {
 			g_pMainBuffer->pCamera->uPos.uwY += 1;
-			s_ubChallengeCamCnt = 0;
+		}
+		else {
+			++s_ubChallengeCamCnt;
+			if(s_ubChallengeCamCnt >= 2) {
+				g_pMainBuffer->pCamera->uPos.uwY += 1;
+				s_ubChallengeCamCnt = 0;
+			}
 		}
 	}
 	else {

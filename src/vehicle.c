@@ -525,7 +525,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
 			g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
 		);
-		UWORD uwTeleportPenalty = 200;
+		UWORD uwTeleportPenalty = 50;
 		textBobSetText(&pVehicle->sTextBob, "Teleport: -%hu\x1F", uwTeleportPenalty);
 		textBobSetColor(&pVehicle->sTextBob, COLOR_REDEST);
 		textBobSetPos(
