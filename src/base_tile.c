@@ -45,17 +45,19 @@ void baseTileProcess(void) {
 		tBitMap *pTiles = s_pManager->pTileSet;
 		if(uwCamY >= TILE_ROW_CHALLENGE_CHECKPOINT_3 * 32) {
 			if(!s_isFinishLoaded) {
-				memcpy(
+				CopyMem(
+					&s_pCheckpointTiles->Planes[0][10 * TILE_BYTE_COUNT],
 					&pTiles->Planes[0][TILE_CHECKPOINT_1 * TILE_BYTE_COUNT],
-					&s_pCheckpointTiles->Planes[0][10 * TILE_BYTE_COUNT], 10 * TILE_BYTE_COUNT
+					10 * TILE_BYTE_COUNT
 				);
 				s_isFinishLoaded = 1;
 			}
 		}
 		else if(s_isFinishLoaded) {
-			memcpy(
+			CopyMem(
+				s_pCheckpointTiles->Planes[0],
 				&pTiles->Planes[0][TILE_CHECKPOINT_1 * TILE_BYTE_COUNT],
-				s_pCheckpointTiles->Planes[0], 10 * TILE_BYTE_COUNT
+				10 * TILE_BYTE_COUNT
 			);
 			s_isFinishLoaded = 0;
 		}
