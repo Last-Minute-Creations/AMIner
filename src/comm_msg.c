@@ -14,7 +14,6 @@
 
 UBYTE s_isShown;
 tBitMap *s_pBuffer;
-static tTextBitMap *s_pTextBitmap;
 
 static char *s_pLines[LINES_MAX];
 UWORD s_uwLineCount;
@@ -102,19 +101,16 @@ static void commMsgDrawPage(UBYTE ubPage) {
 	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight;
 	UWORD uwLineStart = ubPage * ubLinesPerPage;
 	commClearDisplay();
-	tUwCoordYX sOrigin = commGetOrigin();
-	sOrigin.uwX += COMM_DISPLAY_X;
-	sOrigin.uwY += COMM_DISPLAY_Y;
+	UWORD uwLineY = 0;
 	for(
 		UWORD i = uwLineStart;
 		i < uwLineStart + ubLinesPerPage && i < s_uwLineCount; ++i
 	) {
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pLines[i]);
-		fontDrawTextBitMap(
-			s_pBuffer, s_pTextBitmap, sOrigin.uwX,
-			sOrigin.uwY, COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_SHADOW
+		commDrawText(
+			0, uwLineY, s_pLines[i], FONT_COOKIE | FONT_SHADOW,
+			COMM_DISPLAY_COLOR_TEXT
 		);
-		sOrigin.uwY += ubLineHeight;
+		uwLineY += ubLineHeight;
 	}
 }
 
@@ -130,9 +126,6 @@ void commMsgGsCreate(void) {
 	readLines("data/intro.txt", COMM_DISPLAY_WIDTH);
 
 	s_pBuffer = g_pMainBuffer->pScroll->pBack;
-	s_pTextBitmap = fontCreateTextBitMap(
-		COMM_WIDTH, g_pFont->uwHeight
-	);
 
 	commMsgDrawPage(0);
 
@@ -170,7 +163,6 @@ void commMsgGsDestroy(void) {
 
 	systemUse();
 	freeLines();
-	fontDestroyTextBitMap(s_pTextBitmap);
 	systemUnuse();
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();

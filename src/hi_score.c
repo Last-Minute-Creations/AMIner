@@ -72,32 +72,28 @@ static void hiScoreSave(void) {
 }
 
 static void hiScoreDrawPosition(tBitMap *pDisplayBuffer, UBYTE ubPos) {
-	char szBfr[SCORE_NAME_LENGTH];
-	tUwCoordYX sOrigin = commGetOriginDisplay();
-	UWORD uwY = sOrigin.uwY + 5 + (ubPos * 10);
+	UWORD uwY = 5 + (ubPos * 10);
 
 	// Clear BG
+	tUwCoordYX sOrigin = commGetOriginDisplay();
 	blitRect(
-		pDisplayBuffer, sOrigin.uwX, uwY,
+		pDisplayBuffer, sOrigin.uwX, sOrigin.uwY + uwY,
 		COMM_DISPLAY_WIDTH, g_pFont->uwHeight + 1, COMM_DISPLAY_COLOR_BG
 	);
 
 	// Score name
+	char szBfr[SCORE_NAME_LENGTH];
 	sprintf(szBfr, "%hhu. %s", ubPos + 1, s_pScores[ubPos].szName);
-	fontFillTextBitMap(g_pFont, g_pCommLineBuffer, szBfr);
-	fontDrawTextBitMap(
-		pDisplayBuffer, g_pCommLineBuffer,
-		sOrigin.uwX + 16, uwY, COMM_DISPLAY_COLOR_TEXT,
-		FONT_LAZY | FONT_COOKIE | FONT_SHADOW
+	commDrawText(
+		16, uwY, szBfr, FONT_LAZY | FONT_COOKIE | FONT_SHADOW,
+		COMM_DISPLAY_COLOR_TEXT
 	);
 
 	// Score count
 	sprintf(szBfr, "%lu", s_pScores[ubPos].lScore);
-	fontFillTextBitMap(g_pFont, g_pCommLineBuffer, szBfr);
-	fontDrawTextBitMap(
-		pDisplayBuffer, g_pCommLineBuffer,
-		sOrigin.uwX + COMM_DISPLAY_WIDTH - 16, uwY,
-		COMM_DISPLAY_COLOR_TEXT, FONT_LAZY | FONT_COOKIE | FONT_RIGHT | FONT_SHADOW
+	commDrawText(
+		COMM_DISPLAY_WIDTH - 16, uwY, szBfr,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 	);
 }
 
@@ -113,17 +109,17 @@ void hiScoreDrawAll(tBitMap *pDisplayBuffer) {
 		sOrigin.uwX, sOrigin.uwY + COMM_DISPLAY_HEIGHT - g_pFont->uwHeight,
 		COMM_DISPLAY_WIDTH, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
 	);
+	const char *szMsg;
 	if(hiScoreIsEntering()) {
-		fontFillTextBitMap(g_pFont, g_pCommLineBuffer, "New hi-score! Enter your name!");
+		szMsg = "New hi-score! Enter your name!";
 	}
 	else {
-		fontFillTextBitMap(g_pFont, g_pCommLineBuffer, "Press FIRE or ENTER to continue");
+		szMsg = "Press FIRE or ENTER to continue";
 	}
-	fontDrawTextBitMap(
-		pDisplayBuffer, g_pCommLineBuffer,
-		sOrigin.uwX + COMM_DISPLAY_WIDTH / 2, sOrigin.uwY + COMM_DISPLAY_HEIGHT,
-		COMM_DISPLAY_COLOR_TEXT,
-		FONT_LAZY | FONT_COOKIE | FONT_HCENTER | FONT_BOTTOM
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szMsg,
+		FONT_LAZY | FONT_COOKIE | FONT_HCENTER | FONT_BOTTOM,
+		COMM_DISPLAY_COLOR_TEXT
 	);
 }
 

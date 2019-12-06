@@ -57,6 +57,8 @@ void commSetActiveLed(tCommLed eLed);
 
 void commClearDisplay(void);
 
-extern tTextBitMap *g_pCommLineBuffer;
+void commDrawText(
+	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
+);
 
 #endif // _COMM_H_

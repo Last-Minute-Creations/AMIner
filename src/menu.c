@@ -93,8 +93,16 @@ static tOption s_pOptions[] = {
 static UBYTE s_ubActivePos;
 static UBYTE s_isScoreShowAfterRollIn = 0;
 
-static void menuSetText(UBYTE ubPos, tTextBitMap *pTextBitmap) {
+static void menuDrawPos(UBYTE ubPos, UWORD uwOffsTop) {
+	tUwCoordYX sOrigin = commGetOriginDisplay();
+	UWORD uwOffsY = uwOffsTop + ubPos * (g_pFont->uwHeight + 2);
+	blitRect(
+		g_pMainBuffer->pScroll->pFront, sOrigin.uwX, sOrigin.uwY + uwOffsY,
+		COMM_DISPLAY_WIDTH, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
+	);
+
 	char szBfr[50];
+	const char *szText = 0;
 	if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_UINT8) {
 		if(s_pOptions[ubPos].sOptUb.pEnumLabels) {
 			sprintf(
@@ -108,10 +116,16 @@ static void menuSetText(UBYTE ubPos, tTextBitMap *pTextBitmap) {
 				*s_pOptions[ubPos].sOptUb.pVar
 			);
 		}
-		fontFillTextBitMap(g_pFont, pTextBitmap, szBfr);
+		szText = szBfr;
 	}
 	else if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_CALLBACK) {
-		fontFillTextBitMap(g_pFont, pTextBitmap, s_pOptions[ubPos].szName);
+		szText = s_pOptions[ubPos].szName;
+	}
+	if(szText != 0) {
+		commDrawText(COMM_DISPLAY_WIDTH / 2, uwOffsY, szText,
+			FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW,
+			(ubPos == s_ubActivePos) ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE
+		);
 	}
 }
 
@@ -177,7 +191,6 @@ static UBYTE s_pKeyKonami[8] = {
 static tMenuState s_eMenuState;
 static tBitMap *s_pLogo;
 static UWORD s_uwOffsY;
-static tTextBitMap *s_pTextBitmap;
 
 static void menuEnableAtari(void) {
 	UBYTE isAtariHidden = s_pOptions[5].isHidden;
@@ -222,13 +235,10 @@ void menuInitialDraw(tBitMap *pDisplayBuffer) {
 
 	char szVersion[15];
 	sprintf(szVersion, "v.%d.%d.%d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, szVersion);
-	fontDrawTextBitMap(
-		pDisplayBuffer, s_pTextBitmap,
-		sOrigin.uwX + COMM_DISPLAY_WIDTH / 2,
-		sOrigin.uwY + COMM_DISPLAY_HEIGHT,
-		MENU_COLOR_ACTIVE,
-		FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW | FONT_BOTTOM
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szVersion,
+		FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW | FONT_BOTTOM,
+		COMM_DISPLAY_COLOR_TEXT
 	);
 	memset(s_pKeyHistory, 0, 8);
 	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
@@ -238,7 +248,6 @@ void menuInitialDraw(tBitMap *pDisplayBuffer) {
 
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
-	s_pTextBitmap = fontCreateTextBitMap(320, g_pFont->uwHeight);
 
 	s_pSampleEnter = sampleCreateFromFile("data/sfx/menu_enter.raw8", 22050);
 	s_pSampleToggle = sampleCreateFromFile("data/sfx/menu_toggle.raw8", 22050);
@@ -248,7 +257,6 @@ void menuPreload(void) {
 
 void menuUnload(void) {
 	bitmapDestroy(s_pLogo);
-	fontDestroyTextBitMap(s_pTextBitmap);
 
 	sampleDestroy(s_pSampleEnter);
 	sampleDestroy(s_pSampleToggle);
@@ -262,24 +270,11 @@ void menuGsCreate(void) {
 
 static void menuProcessSelecting(void) {
 	commProcess();
-	tUwCoordYX sOrigin = commGetOriginDisplay();
-	UWORD uwOffsY = sOrigin.uwY + s_pLogo->Rows + 10;
 	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
 		if(!s_pOptions[ubMenuPos].isHidden && s_pOptions[ubMenuPos].isDirty) {
-			blitRect(
-				g_pMainBuffer->pScroll->pFront, sOrigin.uwX, uwOffsY,
-				COMM_DISPLAY_WIDTH, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
-			);
-			menuSetText(ubMenuPos, s_pTextBitmap);
-			fontDrawTextBitMap(
-				g_pMainBuffer->pScroll->pFront, s_pTextBitmap,
-				sOrigin.uwX + COMM_DISPLAY_WIDTH / 2, uwOffsY,
-				(ubMenuPos == s_ubActivePos) ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE,
-				FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW
-			);
+			menuDrawPos(ubMenuPos, s_pLogo->Rows + 10);
 			s_pOptions[ubMenuPos].isDirty = 0;
 		}
-		uwOffsY += g_pFont->uwHeight + 2;
 	}
 
 	UBYTE ubNewKey = 0;

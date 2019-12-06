@@ -17,7 +17,7 @@ static tBitMap *s_pBmRestore;
 static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
-tTextBitMap *g_pCommLineBuffer;
+static tTextBitMap *s_pLineBuffer;
 
 void commCreate(void) {
 	s_pBmRestore = bitmapCreate(
@@ -26,14 +26,14 @@ void commCreate(void) {
 	);
 	s_pBg = bitmapCreateFromFile("data/comm_bg.bm", 0);
 	s_pButtons = bitmapCreateFromFile("data/comm_buttons.bm", 0);
-	g_pCommLineBuffer = fontCreateTextBitMap(COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
+	s_pLineBuffer = fontCreateTextBitMap(COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
 }
 
 void commDestroy(void) {
 	bitmapDestroy(s_pBmRestore);
 	bitmapDestroy(s_pBg);
 	bitmapDestroy(s_pButtons);
-	fontDestroyTextBitMap(g_pCommLineBuffer);
+	fontDestroyTextBitMap(s_pLineBuffer);
 }
 
 void commSetActiveLed(tCommLed eLed) {
@@ -190,5 +190,16 @@ void commClearDisplay(void) {
 	blitRect(
 		s_pBmDraw, sPosDisplay.uwX, sPosDisplay.uwY,
 		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, COMM_DISPLAY_COLOR_BG
+	);
+}
+
+void commDrawText(
+	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
+) {
+	fontFillTextBitMap(g_pFont, s_pLineBuffer, szText);
+	const tUwCoordYX sOrigin = commGetOriginDisplay();
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pLineBuffer,
+		sOrigin.uwX + uwX, sOrigin.uwY + uwY, ubColor, ubFontFlags
 	);
 }
