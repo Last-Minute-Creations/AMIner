@@ -352,7 +352,7 @@ void gameGsCreate(void) {
 	randInit((g_pRayPos->bfPosY << 8) | g_pRayPos->bfPosX);
 #endif
 
-	tileInit(0, 0);
+	tileInit(0, 1);
 
 	bobNewManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
