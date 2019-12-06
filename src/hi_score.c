@@ -4,10 +4,10 @@
 
 #include "hi_score.h"
 #include <ace/managers/key.h>
-#include "game.h"
-#include "text_bob.h"
 #include <ace/managers/system.h>
 #include <ace/managers/timer.h>
+#include "game.h"
+#include "comm.h"
 
 #define SCORE_NAME_LENGTH 20
 #define SCORE_COUNT 10
@@ -40,9 +40,6 @@ static UBYTE s_isEnteringHiScore;
 static UBYTE s_isShift = 0;
 static UBYTE s_isCursor = 0;
 static ULONG s_ulCursorStart = 0;
-static tTextBob s_pScoreNameBobs[SCORE_COUNT];
-static tTextBob s_pScoreCountBobs[SCORE_COUNT];
-// static tTextBob s_sEndMessage;
 
 void hiScoreLoad(void) {
 	systemUse();
@@ -74,24 +71,63 @@ static void hiScoreSave(void) {
 	systemUnuse();
 }
 
-static void hiScoreUpdateScoreBobs(void) {
-	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-		// Score name
-		UWORD uwScorePos = g_pMainBuffer->pCamera->uPos.uwY + 70 + i * 10;
-		textBobSetText(&s_pScoreNameBobs[i], "%hhu. %s", i+1, s_pScores[i].szName);
-		textBobSetPos(&s_pScoreNameBobs[i], 32+64, uwScorePos, 0, 0);
-		textBobUpdate(&s_pScoreNameBobs[i]);
-		// Score count
-		textBobSetText(&s_pScoreCountBobs[i], "%lu", s_pScores[i].lScore);
-		textBobSetPos(
-			&s_pScoreCountBobs[i],
-			(32+320-64) - s_pScoreCountBobs[i].uwWidth, uwScorePos, 0, 0
-		);
-		textBobUpdate(&s_pScoreCountBobs[i]);
-	}
+static void hiScoreDrawPosition(tBitMap *pDisplayBuffer, UBYTE ubPos) {
+	char szBfr[SCORE_NAME_LENGTH];
+	tUwCoordYX sOrigin = commGetOriginDisplay();
+	UWORD uwY = sOrigin.uwY + 5 + (ubPos * 10);
+
+	// Clear BG
+	blitRect(
+		pDisplayBuffer, sOrigin.uwX, uwY,
+		COMM_DISPLAY_WIDTH, g_pFont->uwHeight + 1, COMM_DISPLAY_COLOR_BG
+	);
+
+	// Score name
+	sprintf(szBfr, "%hhu. %s", ubPos + 1, s_pScores[ubPos].szName);
+	fontFillTextBitMap(g_pFont, g_pCommLineBuffer, szBfr);
+	fontDrawTextBitMap(
+		pDisplayBuffer, g_pCommLineBuffer,
+		sOrigin.uwX + 16, uwY, COMM_DISPLAY_COLOR_TEXT,
+		FONT_LAZY | FONT_COOKIE | FONT_SHADOW
+	);
+
+	// Score count
+	sprintf(szBfr, "%lu", s_pScores[ubPos].lScore);
+	fontFillTextBitMap(g_pFont, g_pCommLineBuffer, szBfr);
+	fontDrawTextBitMap(
+		pDisplayBuffer, g_pCommLineBuffer,
+		sOrigin.uwX + COMM_DISPLAY_WIDTH - 16, uwY,
+		COMM_DISPLAY_COLOR_TEXT, FONT_LAZY | FONT_COOKIE | FONT_RIGHT | FONT_SHADOW
+	);
 }
 
-void hiScoreEnteringProcess(void) {
+void hiScoreDrawAll(tBitMap *pDisplayBuffer) {
+	for(UBYTE ubPos = 0; ubPos < SCORE_COUNT; ++ubPos) {
+		hiScoreDrawPosition(pDisplayBuffer, ubPos);
+	}
+
+	// End text
+	tUwCoordYX sOrigin = commGetOriginDisplay();
+	blitRect(
+		pDisplayBuffer,
+		sOrigin.uwX, sOrigin.uwY + COMM_DISPLAY_HEIGHT - g_pFont->uwHeight,
+		COMM_DISPLAY_WIDTH, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
+	);
+	if(hiScoreIsEntering()) {
+		fontFillTextBitMap(g_pFont, g_pCommLineBuffer, "New hi-score! Enter your name!");
+	}
+	else {
+		fontFillTextBitMap(g_pFont, g_pCommLineBuffer, "Press FIRE or ENTER to continue");
+	}
+	fontDrawTextBitMap(
+		pDisplayBuffer, g_pCommLineBuffer,
+		sOrigin.uwX + COMM_DISPLAY_WIDTH / 2, sOrigin.uwY + COMM_DISPLAY_HEIGHT,
+		COMM_DISPLAY_COLOR_TEXT,
+		FONT_LAZY | FONT_COOKIE | FONT_HCENTER | FONT_BOTTOM
+	);
+}
+
+void hiScoreEnteringProcess(tBitMap *pDisplayBuffer) {
 	if(keyUse(KEY_RETURN) || keyUse(KEY_NUMENTER)) {
 		if(s_ubNewNameLength) {
 			hiScoreSave();
@@ -103,7 +139,7 @@ void hiScoreEnteringProcess(void) {
 			CopyMem(s_pPrevScores, s_pScores, sizeof(s_pScores));
 		}
 		s_isEnteringHiScore = 0;
-		hiScoreUpdateScoreBobs();
+		hiScoreDrawAll(pDisplayBuffer);
 		return;
 	}
 	UBYTE isUpdateNeeded = 0;
@@ -149,29 +185,15 @@ void hiScoreEnteringProcess(void) {
 	}
 
 	if(isUpdateNeeded) {
-		textBobSetText(
-			&s_pScoreNameBobs[s_ubNewScorePos], "%hhu. %s%c",
-			s_ubNewScorePos+1, s_pScores[s_ubNewScorePos].szName, s_isCursor ? '_' : ' '
-		);
-		textBobUpdate(&s_pScoreNameBobs[s_ubNewScorePos]);
+		hiScoreDrawPosition(pDisplayBuffer, s_ubNewScorePos);
 	}
-}
-
-void hiScoreBobsDisplay(void) {
-	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-		bobNewPush(&s_pScoreNameBobs[i].sBob);
-		bobNewPush(&s_pScoreCountBobs[i].sBob);
-	}
-	// if(!s_isEnteringHiScore) {
-	// 	bobNewPush(&s_sEndMessage.sBob);
-	// }
 }
 
 UBYTE hiScoreIsEntering(void) {
 	return s_isEnteringHiScore;
 }
 
-void hiScoreSetup(LONG lScore) {
+void hiScoreSetup(LONG lScore, const char *szResult) {
 	s_isEnteringHiScore = 0;
 	s_ubNewNameLength = 0;
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
@@ -193,30 +215,4 @@ void hiScoreSetup(LONG lScore) {
 			break;
 		}
 	}
-	hiScoreUpdateScoreBobs();
-	// End text
-	// UWORD uwCenterX = 160 + g_pMainBuffer->pCamera->uPos.uwX;
-	// textBobSetPos(
-	// 	&s_sEndMessage, uwCenterX, g_pMainBuffer->pCamera->uPos.uwY + 200, 0, 1
-	// );
-	// textBobUpdate(&s_sEndMessage);
-}
-
-void hiScoreBobsCreate(void) {
-	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-		textBobCreate(&s_pScoreNameBobs[i], g_pFont, "10. ZZZZZZZZZZZZZZZZZZZZZ");
-		textBobSetColor(&s_pScoreNameBobs[i], 14);
-		textBobCreate(&s_pScoreCountBobs[i], g_pFont, "655356");
-		textBobSetColor(&s_pScoreCountBobs[i], 14);
-	}
-	// textBobCreate(&s_sEndMessage, g_pFont, "Press button to continue");
-	// textBobSetColor(&s_sEndMessage, 14);
-}
-
-void hiScoreBobsDestroy(void) {
-	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-		textBobDestroy(&s_pScoreNameBobs[i]);
-		textBobDestroy(&s_pScoreCountBobs[i]);
-	}
-	// textBobDestroy(&s_sEndMessage);
 }

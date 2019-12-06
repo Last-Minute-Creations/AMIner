@@ -6,19 +6,16 @@
 #define _HI_SCORE_H_
 
 #include <ace/types.h>
+#include <ace/utils/bitmap.h>
 
-void hiScoreEnteringProcess(void);
+void hiScoreEnteringProcess(tBitMap *pDisplayBuffer);
 
 UBYTE hiScoreIsEntering(void);
 
-void hiScoreBobsDisplay(void);
-
-void hiScoreBobsCreate(void);
-
-void hiScoreBobsDestroy(void);
-
-void hiScoreSetup(LONG lScore);
+void hiScoreSetup(LONG lScore, const char *szResult);
 
 void hiScoreLoad(void);
+
+void hiScoreDrawAll(tBitMap *pDisplayBuffer);
 
 #endif // _HI_SCORE_H_

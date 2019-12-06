@@ -13,6 +13,7 @@
 #include "build_ver.h"
 #include "base_tile.h"
 #include "hi_score.h"
+#include "comm.h"
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -32,6 +33,7 @@ typedef struct _tOption {
 	char *szName;
 	tOptionType eOptionType;
 	UBYTE isHidden;
+	UBYTE isDirty;
 	union {
 		struct {
 			UBYTE *pVar;
@@ -89,9 +91,9 @@ static tOption s_pOptions[] = {
 #define MENU_COLOR_ACTIVE 15
 
 static UBYTE s_ubActivePos;
-static tTextBob s_pMenuPositions[MENU_POS_COUNT];
+static UBYTE s_isScoreShowAfterRollIn = 0;
 
-static void menuUpdateText(UBYTE ubPos) {
+static void menuSetText(UBYTE ubPos, tTextBitMap *pTextBitmap) {
 	char szBfr[50];
 	if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_UINT8) {
 		if(s_pOptions[ubPos].sOptUb.pEnumLabels) {
@@ -106,12 +108,11 @@ static void menuUpdateText(UBYTE ubPos) {
 				*s_pOptions[ubPos].sOptUb.pVar
 			);
 		}
-		textBobSetText(&s_pMenuPositions[ubPos], szBfr);
+		fontFillTextBitMap(g_pFont, pTextBitmap, szBfr);
 	}
 	else if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_CALLBACK) {
-		textBobSetText(&s_pMenuPositions[ubPos], s_pOptions[ubPos].szName);
+		fontFillTextBitMap(g_pFont, pTextBitmap, s_pOptions[ubPos].szName);
 	}
-	textBobUpdate(&s_pMenuPositions[ubPos]);
 }
 
 static void menuSetHidden(UBYTE ubPos, UBYTE isHidden) {
@@ -131,15 +132,10 @@ static UBYTE menuNavigate(BYTE bDir) {
 		return 0;
 	}
 
-	// Set old pos color to inactive
-	textBobSetColor(&s_pMenuPositions[s_ubActivePos], MENU_COLOR_INACTIVE);
-	textBobUpdate(&s_pMenuPositions[s_ubActivePos]);
-
-	// Update active pos and set color to active
+	// Update active pos and mark as dirty
+	s_pOptions[s_ubActivePos].isDirty = 1;
+	s_pOptions[wNewPos].isDirty = 1;
 	s_ubActivePos = wNewPos;
-	textBobSetColor(&s_pMenuPositions[s_ubActivePos], MENU_COLOR_ACTIVE);
-	textBobUpdate(&s_pMenuPositions[s_ubActivePos]);
-
 	return 1;
 }
 
@@ -155,7 +151,7 @@ static UBYTE menuToggle(BYTE bDelta) {
 			}
 		}
 		*s_pOptions[s_ubActivePos].sOptUb.pVar = wNewVal;
-		menuUpdateText(s_ubActivePos);
+		s_pOptions[s_ubActivePos].isDirty = 1;
 		return 1;
 	}
 	return 0;
@@ -179,49 +175,70 @@ static UBYTE s_pKeyKonami[8] = {
 };
 
 static tMenuState s_eMenuState;
-static tBitMap *s_pLogo, *s_pLogoMask;
-static tTextBob s_sCredits, s_sVersion;
+static tBitMap *s_pLogo;
 static UWORD s_uwOffsY;
+static tTextBitMap *s_pTextBitmap;
 
 static void menuEnableAtari(void) {
 	UBYTE isAtariHidden = s_pOptions[5].isHidden;
 	if(isAtariHidden) {
 		menuSetHidden(5, 0);
 		audioPlay(AUDIO_CHANNEL_1, s_pSampleAtari, AUDIO_VOLUME_MAX, 1);
+		s_pOptions[5].isDirty = 1;
 	}
 }
 
 void onStart(void) {
 	audioPlay(AUDIO_CHANNEL_0, s_pSampleEnter, AUDIO_VOLUME_MAX, 1);
 	gameStart();
+	commHide();
+	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
+	copProcessBlocks();
 	s_eMenuState = MENU_STATE_ROLL_OUT;
 }
 
+void menuGsLoopScore(void);
+
 void onShowScores(void) {
-	hiScoreSetup(0);
-	gameChangeLoop(gameGsLoopScorePreview);
+	commClearDisplay();
+	hiScoreSetup(0, 0);
+	hiScoreDrawAll(g_pMainBuffer->pScroll->pFront);
+	gameChangeLoop(menuGsLoopScore);
 }
 
 void onExit(void) {
 	gameClose();
 }
 
-void menuPreload(void) {
-	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
-	s_pLogoMask = bitmapCreateFromFile("data/logo_mask.bm", 0);
-	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
-		textBobCreate(&s_pMenuPositions[i], g_pFont, "Some very very long menu text");
-	}
-	const char *szCredits = "Code: KaiN, Gfx: Softiron, Tests: Rav.En";
-	textBobCreate(&s_sCredits, g_pFont, szCredits);
-	textBobSetText(&s_sCredits, szCredits);
-	textBobSetColor(&s_sCredits, MENU_COLOR_ACTIVE);
+void menuInitialDraw(tBitMap *pDisplayBuffer) {
+	commClearDisplay();
+	UWORD uwLogoWidth = bitmapGetByteWidth(s_pLogo)*8;
+	const tUwCoordYX sOrigin = commGetOriginDisplay();
+	blitCopy(
+		s_pLogo, 0, 0, pDisplayBuffer,
+		sOrigin.uwX + (COMM_DISPLAY_WIDTH - uwLogoWidth) / 2, sOrigin.uwY,
+		uwLogoWidth, s_pLogo->Rows, MINTERM_COOKIE, 0xFF
+	);
 
 	char szVersion[15];
 	sprintf(szVersion, "v.%d.%d.%d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
-	textBobCreate(&s_sVersion, g_pFont, szVersion);
-	textBobSetText(&s_sVersion, szVersion);
-	textBobSetColor(&s_sVersion, MENU_COLOR_ACTIVE);
+	fontFillTextBitMap(g_pFont, s_pTextBitmap, szVersion);
+	fontDrawTextBitMap(
+		pDisplayBuffer, s_pTextBitmap,
+		sOrigin.uwX + COMM_DISPLAY_WIDTH / 2,
+		sOrigin.uwY + COMM_DISPLAY_HEIGHT,
+		MENU_COLOR_ACTIVE,
+		FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW | FONT_BOTTOM
+	);
+	memset(s_pKeyHistory, 0, 8);
+	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
+		s_pOptions[ubMenuPos].isDirty = 1;
+	}
+}
+
+void menuPreload(void) {
+	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
+	s_pTextBitmap = fontCreateTextBitMap(320, g_pFont->uwHeight);
 
 	s_pSampleEnter = sampleCreateFromFile("data/sfx/menu_enter.raw8", 22050);
 	s_pSampleToggle = sampleCreateFromFile("data/sfx/menu_toggle.raw8", 22050);
@@ -231,12 +248,7 @@ void menuPreload(void) {
 
 void menuUnload(void) {
 	bitmapDestroy(s_pLogo);
-	bitmapDestroy(s_pLogoMask);
-	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
-		textBobDestroy(&s_pMenuPositions[i]);
-	}
-	textBobDestroy(&s_sCredits);
-	textBobDestroy(&s_sVersion);
+	fontDestroyTextBitMap(s_pTextBitmap);
 
 	sampleDestroy(s_pSampleEnter);
 	sampleDestroy(s_pSampleToggle);
@@ -246,46 +258,56 @@ void menuUnload(void) {
 
 void menuGsCreate(void) {
 	s_eMenuState = MENU_STATE_ROLL_IN;
-	memset(s_pKeyHistory, 0, 8);
 }
 
 static void menuProcessSelecting(void) {
+	commProcess();
+	tUwCoordYX sOrigin = commGetOriginDisplay();
+	UWORD uwOffsY = sOrigin.uwY + s_pLogo->Rows + 10;
+	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
+		if(!s_pOptions[ubMenuPos].isHidden && s_pOptions[ubMenuPos].isDirty) {
+			blitRect(
+				g_pMainBuffer->pScroll->pFront, sOrigin.uwX, uwOffsY,
+				COMM_DISPLAY_WIDTH, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
+			);
+			menuSetText(ubMenuPos, s_pTextBitmap);
+			fontDrawTextBitMap(
+				g_pMainBuffer->pScroll->pFront, s_pTextBitmap,
+				sOrigin.uwX + COMM_DISPLAY_WIDTH / 2, uwOffsY,
+				(ubMenuPos == s_ubActivePos) ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE,
+				FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW
+			);
+			s_pOptions[ubMenuPos].isDirty = 0;
+		}
+		uwOffsY += g_pFont->uwHeight + 2;
+	}
+
 	UBYTE ubNewKey = 0;
-	if(
-		keyUse(KEY_UP) || keyUse(KEY_W) || joyUse(JOY1_UP) || joyUse(JOY2_UP)
-	) {
+	if(commNavUse(COMM_NAV_UP)) {
 		ubNewKey = KEY_UP;
 		if(menuNavigate(-1)) {
 			audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
 		}
 	}
-	else if(
-		keyUse(KEY_DOWN) || keyUse(KEY_S) || joyUse(JOY1_DOWN) || joyUse(JOY2_DOWN)
-	) {
+	else if(commNavUse(COMM_NAV_DOWN)) {
 		ubNewKey = KEY_DOWN;
 		if(menuNavigate(+1)) {
 			audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
 		}
 	}
-	else if(
-		keyUse(KEY_LEFT) || keyUse(KEY_A) || joyUse(JOY1_LEFT) || joyUse(JOY2_LEFT)
-	) {
+	else if(commNavUse(COMM_NAV_LEFT)) {
 		ubNewKey = KEY_LEFT;
 		if(menuToggle(-1)) {
 			audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
 		}
 	}
-	else if(
-		keyUse(KEY_RIGHT) || keyUse(KEY_D)|| joyUse(JOY1_RIGHT) || joyUse(JOY2_RIGHT)
-	) {
+	else if(commNavUse(COMM_NAV_RIGHT)) {
 		ubNewKey = KEY_RIGHT;
 		if(menuToggle(+1)) {
 			audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
 		}
 	}
-	else if(
-		keyUse(KEY_RETURN) || keyUse(KEY_SPACE) || joyUse(JOY1_FIRE) || joyUse(JOY1_FIRE)
-	) {
+	else if(commNavUse(COMM_NAV_BTN)) {
 		menuEnter();
 	}
 
@@ -296,14 +318,64 @@ static void menuProcessSelecting(void) {
 			menuEnableAtari();
 		}
 	}
+}
 
-	for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
-		if(!s_pOptions[i].isHidden) {
-			bobNewPush(&s_pMenuPositions[i].sBob);
+static void menuProcessRollIn(void) {
+	tileBufferQueueProcess(g_pMainBuffer);
+	bobNewDiscardUndraw();
+
+	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.uwY;
+	UWORD uwAvailHeight = g_pMainBuffer->pScroll->uwBmAvailHeight;
+	if(*pCamY < uwAvailHeight) {
+		*pCamY += 4;
+	}
+	else if(*pCamY > uwAvailHeight) {
+		*pCamY = uwAvailHeight + (*pCamY % uwAvailHeight);
+		if(*pCamY - uwAvailHeight > 4) {
+			*pCamY -= 4;
+		}
+		else {
+			*pCamY = uwAvailHeight;
 		}
 	}
-	bobNewPush(&s_sCredits.sBob);
-	bobNewPush(&s_sVersion.sBob);
+	else {
+		s_eMenuState = MENU_STATE_SELECTING;
+		s_ubActivePos = 0;
+		s_uwOffsY = 16 + s_pLogo->Rows + 30;
+
+		if(!commShow()) {
+			// TODO do something
+		}
+		if(s_isScoreShowAfterRollIn) {
+			hiScoreDrawAll(g_pMainBuffer->pScroll->pBack);
+			gameChangeLoop(menuGsLoopScore);
+		}
+		else {
+			menuInitialDraw(g_pMainBuffer->pScroll->pBack);
+		}
+	}
+
+	baseTileProcess();
+	groundLayerProcess(*pCamY, 0xF);
+	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
+	copProcessBlocks();
+}
+
+static void menuProcessRollOut(void) {
+	tileBufferQueueProcess(g_pMainBuffer);
+
+	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.uwY;
+	if(*pCamY >= 64) {
+		*pCamY -= 4;
+	}
+	else {
+		gamePopState();
+	}
+
+	baseTileProcess();
+	groundLayerProcess(*pCamY, 0xF);
+	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
+	copProcessBlocks();
 }
 
 void menuGsLoop(void) {
@@ -312,85 +384,42 @@ void menuGsLoop(void) {
 		return;
   }
 
-	bobNewBegin();
-	tileBufferQueueProcess(g_pMainBuffer);
-
-	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.uwY;
-	UWORD uwAvailHeight = g_pMainBuffer->pScroll->uwBmAvailHeight;
 	switch(s_eMenuState) {
-		case MENU_STATE_ROLL_IN: {
-			if(*pCamY < uwAvailHeight) {
-				*pCamY += 4;
-			}
-			else if(*pCamY > uwAvailHeight) {
-				*pCamY = uwAvailHeight + (*pCamY % uwAvailHeight);
-				if(*pCamY - uwAvailHeight > 4) {
-					*pCamY -= 4;
-				}
-				else {
-					*pCamY = uwAvailHeight;
-				}
-			}
-			else {
-				s_eMenuState = MENU_STATE_SELECTING;
-				s_ubActivePos = 0;
-				UWORD uwLogoWidth = bitmapGetByteWidth(s_pLogo)*8;
-				UWORD uwOffsX = g_pMainBuffer->pCamera->uPos.uwX;
-				blitCopyMask(
-					s_pLogo, 0, 0,
-					g_pMainBuffer->pScroll->pBack, uwOffsX + (320 - uwLogoWidth)/2, 16,
-					uwLogoWidth, s_pLogo->Rows, (UWORD*)s_pLogoMask->Planes[0]
-				);
-				blitCopyMask(
-					s_pLogo, 0, 0,
-					g_pMainBuffer->pScroll->pFront, uwOffsX + (320 - uwLogoWidth)/2, 16,
-					uwLogoWidth, s_pLogo->Rows, (UWORD*)s_pLogoMask->Planes[0]
-				);
-				s_uwOffsY = 16 + s_pLogo->Rows + 30;
-				for(UBYTE i = 0; i < MENU_POS_COUNT; ++i) {
-					textBobSetColor(
-						&s_pMenuPositions[i],
-						i == 0 ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE
-					);
-					menuUpdateText(i);
-					textBobSetPos(&s_pMenuPositions[i], uwOffsX + 160, s_uwOffsY + i * 10, 0, 1);
-				}
-				textBobSetPos(
-					&s_sCredits, uwOffsX + 160,
-					*pCamY + g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight - 15, 0, 1
-				);
-				textBobUpdate(&s_sCredits);
-				textBobSetPos(
-					&s_sVersion, uwOffsX + 320 - s_sVersion.sBob.uwWidth,
-					*pCamY + 4, 0, 0
-				);
-				textBobUpdate(&s_sVersion);
-			}
-		} break;
-
+		case MENU_STATE_ROLL_IN:
+			menuProcessRollIn();
+			break;
 		case MENU_STATE_SELECTING:
 			menuProcessSelecting();
-		break;
+			break;
+		case MENU_STATE_ROLL_OUT:
+			menuProcessRollOut();
+	}
+	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
+}
 
-		case MENU_STATE_ROLL_OUT: {
-			if(*pCamY >= 64) {
-				*pCamY -= 4;
-			}
-			else {
-				gamePopState();
-			}
+void menuGsLoopScore(void) {
+	if(hiScoreIsEntering()) {
+		hiScoreEnteringProcess(g_pMainBuffer->pScroll->pFront);
+	}
+	else {
+		if(
+			keyUse(KEY_ESCAPE) || keyUse(KEY_RETURN) ||
+			joyUse(JOY1_FIRE) || joyUse(JOY2_FIRE)
+		) {
+			menuInitialDraw(g_pMainBuffer->pScroll->pFront);
+			gameChangeLoop(menuGsLoop);
+			return;
 		}
 	}
-
-	bobNewPushingDone();
-	bobNewEnd();
-	baseTileProcess();
-	groundLayerProcess(*pCamY, 0xF);
-	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
-	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 }
 
 void menuGsDestroy(void) {
 
+}
+
+void menuGsEnter(UBYTE isScoreShow) {
+	// Switch to menu, after popping it will process gameGsLoop
+	s_isScoreShowAfterRollIn = isScoreShow;
+	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
 }

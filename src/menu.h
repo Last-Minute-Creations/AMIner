@@ -5,6 +5,8 @@
 #ifndef _MENU_H_
 #define _MENU_H_
 
+#include <ace/types.h>
+
 void menuGsCreate(void);
 
 void menuGsLoop(void);
@@ -13,5 +15,7 @@ void menuGsDestroy(void);
 
 void menuPreload(void);
 void menuUnload(void);
+
+void menuGsEnter(UBYTE isScoreShow);
 
 #endif // _MENU_H_
