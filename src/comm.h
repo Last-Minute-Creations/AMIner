@@ -6,6 +6,7 @@
 #define _COMM_H_
 
 #include <ace/types.h>
+#include <ace/utils/font.h>
 
 #define COMM_WIDTH (320-64)
 #define COMM_HEIGHT (192)
@@ -54,6 +55,12 @@ tUwCoordYX commGetOriginDisplay(void);
 
 void commSetActiveLed(tCommLed eLed);
 
-void commClearDisplay(void);
+void commDrawText(
+	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
+);
+
+void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight);
+
+void commEraseAll(void);
 
 #endif // _COMM_H_

@@ -11,14 +11,10 @@ void hiScoreEnteringProcess(void);
 
 UBYTE hiScoreIsEntering(void);
 
-void hiScoreBobsDisplay(void);
-
-void hiScoreBobsCreate(void);
-
-void hiScoreBobsDestroy(void);
-
-void hiScoreSetup(LONG lScore);
+void hiScoreSetup(LONG lScore, const char *szResult);
 
 void hiScoreLoad(void);
+
+void hiScoreDrawAll(void);
 
 #endif // _HI_SCORE_H_

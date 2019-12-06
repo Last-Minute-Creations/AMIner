@@ -17,6 +17,7 @@ static tBitMap *s_pBmRestore;
 static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
+static tTextBitMap *s_pLineBuffer;
 
 void commCreate(void) {
 	s_pBmRestore = bitmapCreate(
@@ -25,12 +26,14 @@ void commCreate(void) {
 	);
 	s_pBg = bitmapCreateFromFile("data/comm_bg.bm", 0);
 	s_pButtons = bitmapCreateFromFile("data/comm_buttons.bm", 0);
+	s_pLineBuffer = fontCreateTextBitMap(COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
 }
 
 void commDestroy(void) {
 	bitmapDestroy(s_pBmRestore);
 	bitmapDestroy(s_pBg);
 	bitmapDestroy(s_pButtons);
+	fontDestroyTextBitMap(s_pLineBuffer);
 }
 
 void commSetActiveLed(tCommLed eLed) {
@@ -85,24 +88,29 @@ void commProcess(void) {
 
 	UBYTE pTests[COMM_NAV_COUNT] = {
 		(
-			keyCheck(KEY_W) || joyCheck(JOY1 + JOY_UP) ||
-			(g_is2pPlaying && (keyCheck(KEY_UP) || joyCheck(JOY2 + JOY_UP)))
+			(keyCheck(KEY_W) || joyCheck(JOY1 + JOY_UP)) || (g_is2pPlaying && (
+				(g_is2pKbd && keyCheck(KEY_UP)) || (!g_is2pKbd && joyCheck(JOY2 + JOY_UP))
+			))
 		),
 		(
-			keyCheck(KEY_S) || joyCheck(JOY1 + JOY_DOWN) ||
-			(g_is2pPlaying && (keyCheck(KEY_DOWN) || joyCheck(JOY2 + JOY_DOWN)))
+			(keyCheck(KEY_S) || joyCheck(JOY1 + JOY_DOWN)) || (g_is2pPlaying && (
+				(g_is2pKbd && keyCheck(KEY_DOWN)) || (!g_is2pKbd && joyCheck(JOY2 + JOY_DOWN))
+			))
 		),
 		(
-			keyCheck(KEY_A) || joyCheck(JOY1 + JOY_LEFT) ||
-			(g_is2pPlaying && (keyCheck(KEY_LEFT) || joyCheck(JOY2 + JOY_LEFT)))
+			(keyCheck(KEY_A) || joyCheck(JOY1 + JOY_LEFT)) || (g_is2pPlaying && (
+				(g_is2pKbd && keyCheck(KEY_LEFT)) || (!g_is2pKbd && joyCheck(JOY2 + JOY_LEFT))
+			))
 		),
 		(
-			keyCheck(KEY_D) || joyCheck(JOY1 + JOY_RIGHT) ||
-			(g_is2pPlaying && (keyCheck(KEY_RIGHT) || joyCheck(JOY2 + JOY_RIGHT)))
+			(keyCheck(KEY_D) || joyCheck(JOY1 + JOY_RIGHT)) || (g_is2pPlaying && (
+				(g_is2pKbd && keyCheck(KEY_RIGHT)) || (!g_is2pKbd && joyCheck(JOY2 + JOY_RIGHT))
+			))
 		),
 		(
-			keyCheck(KEY_RETURN) || keyCheck(KEY_SPACE) || keyCheck(KEY_ESCAPE) ||
-			joyCheck(JOY1 + JOY_FIRE) || (g_is2pPlaying && (joyCheck(JOY2 + JOY_FIRE)))
+			keyCheck(KEY_RETURN) || keyCheck(KEY_SPACE) ||
+			joyCheck(JOY1 + JOY_FIRE) ||
+			(g_is2pPlaying && !g_is2pKbd && joyCheck(JOY2 + JOY_FIRE))
 		)
 	};
 
@@ -177,10 +185,26 @@ tUwCoordYX commGetOriginDisplay(void) {
 	return sOrigin;
 }
 
-void commClearDisplay(void) {
-	tUwCoordYX sPosDisplay = commGetOriginDisplay();
-	blitRect(
-		s_pBmDraw, sPosDisplay.uwX, sPosDisplay.uwY,
-		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, COMM_DISPLAY_COLOR_BG
+
+void commDrawText(
+	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
+) {
+	fontFillTextBitMap(g_pFont, s_pLineBuffer, szText);
+	const tUwCoordYX sOrigin = commGetOriginDisplay();
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pLineBuffer,
+		sOrigin.uwX + uwX, sOrigin.uwY + uwY, ubColor, ubFontFlags
 	);
+}
+
+void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight) {
+	const tUwCoordYX sPosDisplay = commGetOriginDisplay();
+	blitRect(
+		s_pBmDraw, sPosDisplay.uwX + uwX, sPosDisplay.uwY + uwY,
+		uwWidth, uwHeight, COMM_DISPLAY_COLOR_BG
+	);
+}
+
+void commEraseAll(void) {
+	commErase(0, 0, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT);
 }

@@ -20,8 +20,6 @@ void gameGsLoop(void);
 
 void gameGsLoopChallengeEnd(void);
 
-void gameGsLoopScorePreview();
-
 void gameGsDestroy(void);
 
 void gameStart(void);
@@ -40,7 +38,7 @@ extern tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 // Game config
 extern UBYTE g_is2pPlaying;
 extern UBYTE g_is1pKbd, g_is2pKbd;
-extern UBYTE g_isChallenge;
+extern UBYTE g_isChallenge, g_isChallengeEnd;
 extern UBYTE g_isAtari;
 extern UBYTE g_ubDinoBonesFound;
 

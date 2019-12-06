@@ -54,20 +54,15 @@ convertBitmaps(
 	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCES
 		_res/commrade/bg.png _res/commrade/buttons.png _res/commrade/faces.png
-		_res/hud.png
+		_res/hud.png _res/logo.png
 	DESTINATIONS
 		data/comm_bg.bm data/comm_buttons.bm data/comm_faces.bm
-		data/hud.bm
+		data/hud.bm data/logo.bm
 )
 
 convertBitmaps(
 	TARGET ${TARGET_NAME} PALETTE ${palette_lmc}
 	INTERLEAVED SOURCES _res/lmc.png DESTINATIONS data/lmc.bm
-)
-
-convertBitmaps(
-	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
-	SOURCES _res/logo.png DESTINATIONS data/logo.bm MASKS data/logo_mask.bm
 )
 
 convertBitmaps(

@@ -30,32 +30,41 @@ UBYTE buttonAdd(const char *szName, UWORD uwX, UWORD uwY) {
 	return BUTTON_INVALID;
 }
 
-void buttonDraw(UBYTE ubIdx, tBitMap *pBfr, tTextBitMap *pTextBitmap) {
+void buttonDraw(UBYTE ubIdx, tBitMap *pBfr) {
 	UBYTE ubColor = (
 		ubIdx == s_ubSelected ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	tUwCoordYX sSize = fontMeasureText(g_pFont, s_pButtons[ubIdx].szName);
 	sSize.uwX += 5;
 	sSize.uwY += 4;
+	const tUwCoordYX sOrigin = commGetOriginDisplay();
 	UWORD uwBtnX = s_pButtons[ubIdx].sPos.uwX - sSize.uwX / 2;
 	UWORD uwBtnY = s_pButtons[ubIdx].sPos.uwY;
-	blitRect(pBfr, uwBtnX, uwBtnY, sSize.uwX, 1, ubColor);
-	blitRect(pBfr, uwBtnX, uwBtnY, 1, sSize.uwY, ubColor);
-	blitRect(pBfr, uwBtnX, uwBtnY + sSize.uwY - 1, sSize.uwX, 1, ubColor);
-	blitRect(pBfr, uwBtnX + sSize.uwX - 1, uwBtnY, 1, sSize.uwY, ubColor);
-	fontFillTextBitMap(g_pFont, pTextBitmap, s_pButtons[ubIdx].szName);
-	fontDrawTextBitMap(
-		pBfr, pTextBitmap, uwBtnX + 3, uwBtnY  + 3,
-		ubColor, FONT_COOKIE
+	blitRect(
+		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY, sSize.uwX, 1, ubColor
+	);
+	blitRect(
+		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY, 1, sSize.uwY, ubColor
+	);
+	blitRect(
+		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY + sSize.uwY - 1,
+		sSize.uwX, 1, ubColor
+	);
+	blitRect(
+		pBfr, sOrigin.uwX + uwBtnX + sSize.uwX - 1, sOrigin.uwY + uwBtnY,
+		1, sSize.uwY, ubColor
+	);
+	commDrawText(
+		uwBtnX + 3, uwBtnY  + 3, s_pButtons[ubIdx].szName, FONT_COOKIE, ubColor
 	);
 }
 
-void buttonDrawAll(tBitMap *pBfr, tTextBitMap *pTextBitmap) {
+void buttonDrawAll(tBitMap *pBfr) {
 	for(UBYTE i = 0; i < BUTTON_COUNT_MAX; ++i) {
 		if(!s_pButtons[i].szName[0]) {
 			break;
 		}
-		buttonDraw(i, pBfr, pTextBitmap);
+		buttonDraw(i, pBfr);
 	}
 }
 
