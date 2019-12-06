@@ -100,7 +100,7 @@ static void commMsgDrawPage(UBYTE ubPage) {
 	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
 	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight;
 	UWORD uwLineStart = ubPage * ubLinesPerPage;
-	commClearDisplay();
+	commEraseAll();
 	UWORD uwLineY = 0;
 	for(
 		UWORD i = uwLineStart;

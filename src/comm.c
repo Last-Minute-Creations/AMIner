@@ -185,13 +185,6 @@ tUwCoordYX commGetOriginDisplay(void) {
 	return sOrigin;
 }
 
-void commClearDisplay(void) {
-	tUwCoordYX sPosDisplay = commGetOriginDisplay();
-	blitRect(
-		s_pBmDraw, sPosDisplay.uwX, sPosDisplay.uwY,
-		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT, COMM_DISPLAY_COLOR_BG
-	);
-}
 
 void commDrawText(
 	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
@@ -202,4 +195,16 @@ void commDrawText(
 		s_pBmDraw, s_pLineBuffer,
 		sOrigin.uwX + uwX, sOrigin.uwY + uwY, ubColor, ubFontFlags
 	);
+}
+
+void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight) {
+	const tUwCoordYX sPosDisplay = commGetOriginDisplay();
+	blitRect(
+		s_pBmDraw, sPosDisplay.uwX + uwX, sPosDisplay.uwY + uwY,
+		uwWidth, uwHeight, COMM_DISPLAY_COLOR_BG
+	);
+}
+
+void commEraseAll(void) {
+	commErase(0, 0, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT);
 }

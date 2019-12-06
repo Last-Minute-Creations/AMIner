@@ -6,6 +6,7 @@
 #include <ace/managers/key.h>
 #include <ace/managers/system.h>
 #include <ace/managers/timer.h>
+#include <ace/utils/bitmap.h>
 #include "game.h"
 #include "comm.h"
 
@@ -71,15 +72,11 @@ static void hiScoreSave(void) {
 	systemUnuse();
 }
 
-static void hiScoreDrawPosition(tBitMap *pDisplayBuffer, UBYTE ubPos) {
+static void hiScoreDrawPosition(UBYTE ubPos) {
 	UWORD uwY = 5 + (ubPos * 10);
 
 	// Clear BG
-	tUwCoordYX sOrigin = commGetOriginDisplay();
-	blitRect(
-		pDisplayBuffer, sOrigin.uwX, sOrigin.uwY + uwY,
-		COMM_DISPLAY_WIDTH, g_pFont->uwHeight + 1, COMM_DISPLAY_COLOR_BG
-	);
+	commErase(0, uwY, COMM_DISPLAY_WIDTH, g_pFont->uwHeight + 1);
 
 	// Score name
 	char szBfr[SCORE_NAME_LENGTH];
@@ -97,17 +94,15 @@ static void hiScoreDrawPosition(tBitMap *pDisplayBuffer, UBYTE ubPos) {
 	);
 }
 
-void hiScoreDrawAll(tBitMap *pDisplayBuffer) {
+void hiScoreDrawAll(void) {
 	for(UBYTE ubPos = 0; ubPos < SCORE_COUNT; ++ubPos) {
-		hiScoreDrawPosition(pDisplayBuffer, ubPos);
+		hiScoreDrawPosition(ubPos);
 	}
 
 	// End text
-	tUwCoordYX sOrigin = commGetOriginDisplay();
-	blitRect(
-		pDisplayBuffer,
-		sOrigin.uwX, sOrigin.uwY + COMM_DISPLAY_HEIGHT - g_pFont->uwHeight,
-		COMM_DISPLAY_WIDTH, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
+	commErase(
+		0, COMM_DISPLAY_HEIGHT - g_pFont->uwHeight,
+		COMM_DISPLAY_WIDTH, g_pFont->uwHeight
 	);
 	const char *szMsg;
 	if(hiScoreIsEntering()) {
@@ -123,7 +118,7 @@ void hiScoreDrawAll(tBitMap *pDisplayBuffer) {
 	);
 }
 
-void hiScoreEnteringProcess(tBitMap *pDisplayBuffer) {
+void hiScoreEnteringProcess(void) {
 	if(keyUse(KEY_RETURN) || keyUse(KEY_NUMENTER)) {
 		if(s_ubNewNameLength) {
 			hiScoreSave();
@@ -135,7 +130,7 @@ void hiScoreEnteringProcess(tBitMap *pDisplayBuffer) {
 			CopyMem(s_pPrevScores, s_pScores, sizeof(s_pScores));
 		}
 		s_isEnteringHiScore = 0;
-		hiScoreDrawAll(pDisplayBuffer);
+		hiScoreDrawAll();
 		return;
 	}
 	UBYTE isUpdateNeeded = 0;
@@ -181,7 +176,7 @@ void hiScoreEnteringProcess(tBitMap *pDisplayBuffer) {
 	}
 
 	if(isUpdateNeeded) {
-		hiScoreDrawPosition(pDisplayBuffer, s_ubNewScorePos);
+		hiScoreDrawPosition(s_ubNewScorePos);
 	}
 }
 

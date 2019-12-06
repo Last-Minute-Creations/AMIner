@@ -94,12 +94,8 @@ static UBYTE s_ubActivePos;
 static UBYTE s_isScoreShowAfterRollIn = 0;
 
 static void menuDrawPos(UBYTE ubPos, UWORD uwOffsTop) {
-	tUwCoordYX sOrigin = commGetOriginDisplay();
 	UWORD uwOffsY = uwOffsTop + ubPos * (g_pFont->uwHeight + 2);
-	blitRect(
-		g_pMainBuffer->pScroll->pFront, sOrigin.uwX, sOrigin.uwY + uwOffsY,
-		COMM_DISPLAY_WIDTH, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
-	);
+	commErase(0, uwOffsY, COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
 
 	char szBfr[50];
 	const char *szText = 0;
@@ -213,9 +209,9 @@ void onStart(void) {
 void menuGsLoopScore(void);
 
 void onShowScores(void) {
-	commClearDisplay();
+	commEraseAll();
 	hiScoreSetup(0, 0);
-	hiScoreDrawAll(g_pMainBuffer->pScroll->pFront);
+	hiScoreDrawAll();
 	gameChangeLoop(menuGsLoopScore);
 }
 
@@ -224,7 +220,7 @@ void onExit(void) {
 }
 
 void menuInitialDraw(tBitMap *pDisplayBuffer) {
-	commClearDisplay();
+	commEraseAll();
 	UWORD uwLogoWidth = bitmapGetByteWidth(s_pLogo)*8;
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
 	blitCopy(
@@ -342,7 +338,7 @@ static void menuProcessRollIn(void) {
 			// TODO do something
 		}
 		if(s_isScoreShowAfterRollIn) {
-			hiScoreDrawAll(g_pMainBuffer->pScroll->pBack);
+			hiScoreDrawAll();
 			gameChangeLoop(menuGsLoopScore);
 		}
 		else {
@@ -394,7 +390,7 @@ void menuGsLoop(void) {
 
 void menuGsLoopScore(void) {
 	if(hiScoreIsEntering()) {
-		hiScoreEnteringProcess(g_pMainBuffer->pScroll->pFront);
+		hiScoreEnteringProcess();
 	}
 	else {
 		if(

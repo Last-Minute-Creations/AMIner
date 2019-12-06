@@ -69,10 +69,7 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 	sPosRow.uwY += 11 + ubPos * 10;
 
 	// Erase
-	blitRect(
-		s_pBmDraw, sPosRow.uwX, sPosRow.uwY, COMM_DISPLAY_WIDTH, 10,
-		COMM_DISPLAY_COLOR_BG
-	);
+	commErase(0, 11 + ubPos * 10, COMM_DISPLAY_WIDTH, 10);
 
 	// Name
 	fontFillTextBitMap(g_pFont, s_pTextBitmap, g_pMinerals[ubMineral].szName);
@@ -271,7 +268,7 @@ static void commShopProcessWarehouse() {
 				if(warehouseIsPlanFulfilled()) {
 					warehouseNewPlan(1, g_is2pPlaying);
 				}
-				commClearDisplay();
+				commEraseAll();
 				commShopDrawWarehouse();
 				break;
 			case 1:
@@ -297,7 +294,7 @@ void commShopDealloc(void) {
 static void commShopShowTab(tCommLed eTab) {
 	s_eTab = eTab;
 	commSetActiveLed(eTab);
-	commClearDisplay();
+	commEraseAll();
 	switch(eTab) {
 		case COMM_LED_OFFICE:
 			commShopDrawOffice();
