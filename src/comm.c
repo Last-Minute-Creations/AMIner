@@ -108,7 +108,7 @@ void commProcess(void) {
 			))
 		),
 		(
-			(keyCheck(KEY_RETURN) || keyCheck(KEY_SPACE) || keyCheck(KEY_ESCAPE)) ||
+			keyCheck(KEY_RETURN) || keyCheck(KEY_SPACE) ||
 			joyCheck(JOY1 + JOY_FIRE) ||
 			(g_is2pPlaying && !g_is2pKbd && joyCheck(JOY2 + JOY_FIRE))
 		)

@@ -16,7 +16,6 @@
 
 static UBYTE s_isShown;
 static UBYTE s_isBtnPress = 0;
-static tTextBitMap *s_pTextBitmap;
 tBitMap *s_pBmDraw;
 tCommLed s_eTab;
 
@@ -65,93 +64,74 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 		COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
-	tUwCoordYX sPosRow = commGetOriginDisplay();
-	sPosRow.uwY += 11 + ubPos * 10;
+	UWORD uwRowOffsY = 11 + ubPos * 10;
 
 	// Erase
-	commErase(0, 11 + ubPos * 10, COMM_DISPLAY_WIDTH, 10);
+	commErase(0, uwRowOffsY, COMM_DISPLAY_WIDTH, 10);
 
 	// Name
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, g_pMinerals[ubMineral].szName);
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap, sPosRow.uwX + s_pColOffs[0], sPosRow.uwY,
-		ubColor, FONT_COOKIE
+	commDrawText(
+		s_pColOffs[0], uwRowOffsY, g_pMinerals[ubMineral].szName,
+		FONT_COOKIE, ubColor
 	);
 
 	// Sell
 	char szBfr[10];
 	UWORD uwMineralReward = s_pTmpSell[ubMineral] * g_pMinerals[ubMineral].ubReward;
 	sprintf(szBfr, "%hu\x1F", uwMineralReward);
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap, sPosRow.uwX + s_pColOffs[1], sPosRow.uwY,
-		ubColor, FONT_COOKIE
-	);
+	commDrawText(s_pColOffs[1], uwRowOffsY, szBfr, FONT_COOKIE, ubColor);
 
 	// Stock
 	UBYTE ubStockCenter = fontMeasureText(g_pFont, s_pColNames[2]).uwX / 2;
 	sprintf(szBfr, "%hu", s_pTmpStock[ubMineral]);
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
 	UBYTE ubValWidthHalf = fontMeasureText(g_pFont, szBfr).uwX / 2;
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap,
-		sPosRow.uwX + s_pColOffs[2] + ubStockCenter - ubValWidthHalf, sPosRow.uwY,
-		ubColor, FONT_COOKIE
-	);
+
 	if(ubPos == s_ubPosCurr) {
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, ">");
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap,
-			sPosRow.uwX + s_pColOffs[2] + ubStockCenter + ubValWidthHalf + 3,
-			sPosRow.uwY, ubColor, FONT_COOKIE
+		commDrawText(
+			s_pColOffs[2] + ubStockCenter + ubValWidthHalf + 3, uwRowOffsY, ">",
+			FONT_COOKIE | FONT_LEFT, ubColor
 		);
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, "<");
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap,
-			sPosRow.uwX + s_pColOffs[2] + ubStockCenter - ubValWidthHalf - 3,
-			sPosRow.uwY, ubColor, FONT_COOKIE | FONT_RIGHT
+		commDrawText(
+			s_pColOffs[2] + ubStockCenter - ubValWidthHalf - 3, uwRowOffsY, "<",
+			FONT_COOKIE | FONT_RIGHT, ubColor
 		);
 	}
 	else {
-		blitRect(
-			s_pBmDraw,
-			sPosRow.uwX + s_pColOffs[2] + ubStockCenter + ubValWidthHalf + 3,
-			sPosRow.uwY, 5, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
+		commErase(
+			s_pColOffs[2] + ubStockCenter + ubValWidthHalf + 3, uwRowOffsY,
+			5, g_pFont->uwHeight
 		);
-		blitRect(
-			s_pBmDraw,
-			sPosRow.uwX + s_pColOffs[2] + ubStockCenter - ubValWidthHalf - 3 - 5,
-			sPosRow.uwY, 5, g_pFont->uwHeight, COMM_DISPLAY_COLOR_BG
+		commErase(
+			s_pColOffs[2] + ubStockCenter + ubValWidthHalf - 3 - 5, uwRowOffsY,
+			5, g_pFont->uwHeight
 		);
 	}
+	commDrawText(
+		s_pColOffs[2] + ubStockCenter - ubValWidthHalf, uwRowOffsY, szBfr,
+		FONT_COOKIE, ubColor
+	);
 
 	// Plan
 	sprintf(
 		szBfr, "%hu/%hu",
 		s_pTmpPlan[ubMineral], pPlan->pMinerals[ubMineral].uwTargetCount
 	);
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap, sPosRow.uwX + s_pColOffs[3], sPosRow.uwY,
-		ubColor, FONT_COOKIE
-	);
+	commDrawText(s_pColOffs[3], uwRowOffsY, szBfr, FONT_COOKIE, ubColor);
 }
 
 static void commShopDrawWarehouse(void) {
-	const UBYTE ubLineHeight = g_pFont->uwHeight + 1;
-	tUwCoordYX sPosDisplay = commGetOriginDisplay();
 	for(UBYTE ubCol = 0; ubCol < 4; ++ubCol) {
-		fontFillTextBitMap(g_pFont, s_pTextBitmap, s_pColNames[ubCol]);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pTextBitmap, sPosDisplay.uwX + s_pColOffs[ubCol], sPosDisplay.uwY,
-			14, FONT_COOKIE
+		commDrawText(
+			s_pColOffs[ubCol], 0, s_pColNames[ubCol],
+			FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT
 		);
 	}
 
-	tUwCoordYX sPosRow = sPosDisplay;
-	sPosRow.uwY += ubLineHeight;
+	const tUwCoordYX sPosDisplay = commGetOriginDisplay();
+	const UBYTE ubLineHeight = g_pFont->uwHeight + 1;
 	blitRect(
-		s_pBmDraw, sPosRow.uwX + s_pColOffs[0], sPosRow.uwY, COMM_DISPLAY_WIDTH, 1, 14
+		s_pBmDraw, sPosDisplay.uwX + s_pColOffs[0], sPosDisplay.uwY + ubLineHeight,
+		COMM_DISPLAY_WIDTH, 1, COMM_DISPLAY_COLOR_TEXT
 	);
 
 	const tPlan *pPlan = warehouseGetPlan();
@@ -162,30 +142,23 @@ static void commShopDrawWarehouse(void) {
 	}
 
 	// Confirm button
-	tUwCoordYX sPosBtn = sPosDisplay;
-	sPosBtn.uwY += COMM_DISPLAY_HEIGHT - 5 * ubLineHeight;
-	sPosBtn.uwX += COMM_DISPLAY_WIDTH / 3;
+	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 3;
+	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 5 * ubLineHeight;
 	buttonRmAll();
-	buttonAdd("Confirm", sPosBtn.uwX, sPosBtn.uwY);
-	buttonAdd("Exit", sPosBtn.uwX + COMM_DISPLAY_WIDTH / 3, sPosBtn.uwY);
+	buttonAdd("Confirm", uwBtnX, uwBtnY);
+	buttonAdd("Exit", uwBtnX * 2, uwBtnY);
 	buttonSelect(0);
-	buttonDrawAll(s_pBmDraw, s_pTextBitmap);
+	buttonDrawAll(s_pBmDraw);
 
-	char szBfr[5];
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, "Time remaining:");
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap,
-		sPosDisplay.uwX + COMM_DISPLAY_WIDTH - 25,
-		sPosDisplay.uwY + COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
-		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE | FONT_RIGHT
+	commDrawText(
+		COMM_DISPLAY_WIDTH - 25, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
+		"Time remaining:", FONT_COOKIE | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT
 	);
+	char szBfr[5];
 	sprintf(szBfr, "%d", (pPlan->wTimeRemaining + 9) / 10);
-	fontFillTextBitMap(g_pFont, s_pTextBitmap, szBfr);
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pTextBitmap,
-		sPosDisplay.uwX + COMM_DISPLAY_WIDTH - 25 + 5,
-		sPosDisplay.uwY + COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
-		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+	commDrawText(
+		COMM_DISPLAY_WIDTH - 25 + 5, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight, szBfr,
+		FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT
 	);
 }
 
@@ -247,7 +220,7 @@ static void commShopProcessWarehouse() {
 		}
 	}
 	if(isButtonRefresh) {
-		buttonDrawAll(s_pBmDraw, s_pTextBitmap);
+		buttonDrawAll(s_pBmDraw);
 	}
 
 	// Process button press
@@ -279,16 +252,6 @@ static void commShopProcessWarehouse() {
 				break;
 		};
 	}
-}
-
-void commShopAlloc(void) {
-	s_pTextBitmap = fontCreateTextBitMap(
-		COMM_WIDTH, g_pFont->uwHeight
-	);
-}
-
-void commShopDealloc(void) {
-	fontDestroyTextBitMap(s_pTextBitmap);
 }
 
 static void commShopShowTab(tCommLed eTab) {

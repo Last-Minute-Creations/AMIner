@@ -16,9 +16,9 @@ void buttonRmAll(void);
 
 UBYTE buttonAdd(const char *szName, UWORD uwX, UWORD uwY);
 
-void buttonDraw(UBYTE ubIdx, tBitMap *pBfr, tTextBitMap *pTextBitmap);
+void buttonDraw(UBYTE ubIdx, tBitMap *pBfr);
 
-void buttonDrawAll(tBitMap *pBfr, tTextBitMap *pTextBitmap);
+void buttonDrawAll(tBitMap *pBfr);
 
 void buttonSelect(UBYTE ubIdx);
 
