@@ -63,4 +63,6 @@ void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight);
 
 void commEraseAll(void);
 
+void commProgress(UBYTE ubPercent, const char *szDescription);
+
 #endif // _COMM_H_

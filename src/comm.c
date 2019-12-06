@@ -18,6 +18,7 @@ static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
 static tTextBitMap *s_pLineBuffer;
+static UBYTE s_isShown = 0;
 
 void commCreate(void) {
 	s_pBmRestore = bitmapCreate(
@@ -27,6 +28,7 @@ void commCreate(void) {
 	s_pBg = bitmapCreateFromFile("data/comm_bg.bm", 0);
 	s_pButtons = bitmapCreateFromFile("data/comm_buttons.bm", 0);
 	s_pLineBuffer = fontCreateTextBitMap(COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
+	s_isShown = 0;
 }
 
 void commDestroy(void) {
@@ -59,6 +61,7 @@ UBYTE commShow(void) {
 		// Not positioned evenly
 		return 0;
 	}
+	s_isShown = 1;
 
 	s_pBmDraw = g_pMainBuffer->pScroll->pBack;
 
@@ -155,6 +158,10 @@ UBYTE commNavUse(tCommNav eNav) {
 }
 
 void commHide(void) {
+	if(!s_isShown) {
+		return;
+	}
+	s_isShown = 0;
 	tUwCoordYX sOrigin = commGetOrigin();
 	// Restore content beneath commrade
 	blitCopyAligned(
@@ -207,4 +214,55 @@ void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight) {
 
 void commEraseAll(void) {
 	commErase(0, 0, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT);
+}
+
+void commProgress(UBYTE ubPercent, const char *szDescription) {
+	logWrite("Comm Progress: %hhu\n", ubPercent);
+	if(!s_isShown) {
+		return;
+	}
+
+	commErase(
+		0, COMM_DISPLAY_HEIGHT / 2 - g_pFont->uwHeight,
+		COMM_DISPLAY_WIDTH, g_pFont->uwHeight * 3
+	);
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT / 2, szDescription,
+		FONT_HCENTER | FONT_BOTTOM | FONT_COOKIE | FONT_LAZY,
+		COMM_DISPLAY_COLOR_TEXT
+	);
+
+	tUwCoordYX sBarPos = commGetOriginDisplay();
+	const UBYTE ubDist = 2;
+	const UBYTE ubBarWidth = 100;
+	const UBYTE ubBarHeight = g_pFont->uwHeight;
+	sBarPos.uwX += (COMM_DISPLAY_WIDTH - 100) / 2;
+	sBarPos.uwY += COMM_DISPLAY_HEIGHT / 2 + 1 + ubDist;
+
+	// X lines
+	blitRect(
+		s_pBmDraw, sBarPos.uwX - ubDist, sBarPos.uwY - ubDist,
+		ubDist + ubBarWidth + ubDist, 1, COMM_DISPLAY_COLOR_TEXT
+	);
+	blitRect(
+		s_pBmDraw, sBarPos.uwX - ubDist, sBarPos.uwY + ubBarHeight + ubDist - 1,
+		ubDist + ubBarWidth + ubDist, 1, COMM_DISPLAY_COLOR_TEXT
+	);
+
+	// Y lines
+	blitRect(
+		s_pBmDraw, sBarPos.uwX - ubDist, sBarPos.uwY - ubDist,
+		1, ubDist + ubBarHeight + ubDist, COMM_DISPLAY_COLOR_TEXT
+	);
+	blitRect(
+		s_pBmDraw, sBarPos.uwX + ubBarWidth + ubDist - 1, sBarPos.uwY - ubDist,
+		1, ubDist + ubBarHeight + ubDist, COMM_DISPLAY_COLOR_TEXT
+	);
+
+	// Fill
+	blitRect(
+		s_pBmDraw, sBarPos.uwX, sBarPos.uwY,
+		ubBarWidth * ubPercent / 100, ubBarHeight, COMM_DISPLAY_COLOR_TEXT_DARK
+	);
+
 }

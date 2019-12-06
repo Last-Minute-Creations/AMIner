@@ -199,6 +199,7 @@ static void menuEnableAtari(void) {
 
 void onStart(void) {
 	audioPlay(AUDIO_CHANNEL_0, s_pSampleEnter, AUDIO_VOLUME_MAX, 1);
+	commEraseAll();
 	gameStart();
 	commHide();
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
