@@ -14,6 +14,7 @@
 #include "base_tile.h"
 #include "hi_score.h"
 #include "comm.h"
+#include "hud.h"
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -263,6 +264,7 @@ void menuUnload(void) {
 
 void menuGsCreate(void) {
 	s_eMenuState = MENU_STATE_ROLL_IN;
+	hudShowMain();
 }
 
 static void menuProcessSelecting(void) {

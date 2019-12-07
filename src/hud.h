@@ -35,4 +35,6 @@ void hudUpdate(void);
 
 void hudShowMessage(UBYTE ubFace, const char *szMsg);
 
+void hudShowMain(void);
+
 #endif // _HUD_H_

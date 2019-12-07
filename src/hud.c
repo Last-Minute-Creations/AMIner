@@ -415,7 +415,7 @@ void hudUpdate(void) {
 			isLineOverflow = 0;
 			s_sMsgCharPos.uwX = HUD_ORIGIN_X;
 			s_sMsgCharPos.uwY = 4 * HUD_HEIGHT + HUD_ORIGIN_Y;
-			// TODO: implement drawing face
+
 			blitCopy(
 				s_pFaces, 0, s_ubFaceToDraw * HUD_FACE_SIZE,
 				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
@@ -494,4 +494,8 @@ void hudUpdate(void) {
 void hudDestroy(void) {
 	fontDestroyTextBitMap(s_pLineBuffer);
 	bitmapDestroy(s_pFaces);
+}
+
+void hudShowMain(void) {
+	hudShowPage(0);
 }
