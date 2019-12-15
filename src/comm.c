@@ -5,6 +5,7 @@
 #include "comm.h"
 #include <ace/managers/key.h>
 #include <ace/managers/joy.h>
+#include "core.h"
 #include "game.h"
 
 typedef enum _tBtnState {

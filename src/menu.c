@@ -15,6 +15,7 @@
 #include "hi_score.h"
 #include "comm.h"
 #include "hud.h"
+#include "core.h"
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -203,8 +204,8 @@ void onStart(void) {
 	commEraseAll();
 	gameStart();
 	commHide();
-	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
-	copProcessBlocks();
+	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
+	// copProcessBlocks();
 	s_eMenuState = MENU_STATE_ROLL_OUT;
 }
 
@@ -269,6 +270,7 @@ void menuGsCreate(void) {
 
 static void menuProcessSelecting(void) {
 	commProcess();
+	hudUpdate();
 	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
 		if(!s_pOptions[ubMenuPos].isHidden && s_pOptions[ubMenuPos].isDirty) {
 			menuDrawPos(ubMenuPos, s_pLogo->Rows + 10);
@@ -312,11 +314,12 @@ static void menuProcessSelecting(void) {
 			menuEnableAtari();
 		}
 	}
+	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 }
 
 static void menuProcessRollIn(void) {
-	tileBufferQueueProcess(g_pMainBuffer);
 	bobNewDiscardUndraw();
+	coreProcessBeforeBobs();
 
 	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.uwY;
 	UWORD uwAvailHeight = g_pMainBuffer->pScroll->uwBmAvailHeight;
@@ -349,27 +352,20 @@ static void menuProcessRollIn(void) {
 		}
 	}
 
-	baseTileProcess();
-	groundLayerProcess(*pCamY, 0xF);
-	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
-	copProcessBlocks();
+	coreProcessAfterBobs();
 }
 
 static void menuProcessRollOut(void) {
-	tileBufferQueueProcess(g_pMainBuffer);
+	coreProcessBeforeBobs();
 
 	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.uwY;
 	if(*pCamY >= 64) {
 		*pCamY -= 4;
 	}
 	else {
-		gamePopState();
+		gameChangeState(gameGsCreate, gameGsLoop, gameGsDestroy);
 	}
-
-	baseTileProcess();
-	groundLayerProcess(*pCamY, 0xF);
-	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
-	copProcessBlocks();
+	coreProcessAfterBobs();
 }
 
 void menuGsLoop(void) {
@@ -388,7 +384,6 @@ void menuGsLoop(void) {
 		case MENU_STATE_ROLL_OUT:
 			menuProcessRollOut();
 	}
-	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 }
 
 void menuGsLoopScore(void) {
@@ -415,5 +410,5 @@ void menuGsDestroy(void) {
 void menuGsEnter(UBYTE isScoreShow) {
 	// Switch to menu, after popping it will process gameGsLoop
 	s_isScoreShowAfterRollIn = isScoreShow;
-	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
+	gameChangeState(menuGsCreate, menuGsLoop, menuGsDestroy);
 }

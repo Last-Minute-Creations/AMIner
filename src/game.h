@@ -5,8 +5,6 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include <ace/managers/viewport/tilebuffer.h>
-#include <ace/utils/font.h>
 #include <ace/managers/audio.h>
 #include "bob_new.h"
 
@@ -30,9 +28,6 @@ void gameGsLoopEnterScore(void);
 
 void gameTryPushBob(tBobNew *pBob);
 
-extern tTileBufferManager *g_pMainBuffer;
-extern tFont *g_pFont;
-
 extern tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 
 // Game config
@@ -40,6 +35,5 @@ extern UBYTE g_is2pPlaying;
 extern UBYTE g_is1pKbd, g_is2pKbd;
 extern UBYTE g_isChallenge, g_isChallengeEnd;
 extern UBYTE g_isAtari;
-extern UBYTE g_ubDinoBonesFound;
 
 #endif // _GAME_H_

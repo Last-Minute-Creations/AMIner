@@ -5,11 +5,13 @@
 #include "vehicle.h"
 #include <ace/managers/rand.h>
 #include "hud.h"
+#include "core.h"
 #include "game.h"
 #include "tile.h"
 #include "warehouse.h"
 #include "color.h"
 #include "explosion.h"
+#include "dino.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -417,10 +419,10 @@ static void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
 		char szMessage[50];
-		if(g_ubDinoBonesFound < 9) {
-			++g_ubDinoBonesFound;
+		if(dinoGetBoneCount() < 9) {
+			dinoFoundBone();
 		}
-		sprintf(szMessage, "Found bone no. %hhu!", g_ubDinoBonesFound);
+		sprintf(szMessage, "Found bone no. %hhu!", dinoGetBoneCount());
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
 			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,

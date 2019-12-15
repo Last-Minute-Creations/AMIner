@@ -8,7 +8,7 @@
 #include <ace/managers/system.h>
 #include <ace/managers/joy.h>
 #include <ace/utils/palette.h>
-#include "game.h"
+#include "core.h"
 
 #define STATE_FADE_IN 0
 #define STATE_FADE_OUT 1
@@ -82,7 +82,7 @@ void logoGsLoop(void) {
 	}
 	else if(s_ubState == STATE_FADE_OUT) {
 		if(s_ubFadeoutCnt == 0) {
-			gameChangeState(gameGsCreate, gameGsLoop, gameGsDestroy);
+			gameChangeState(coreGsCreate, coreGsLoop, coreGsDestroy);
 			return;
 		}
 		else {

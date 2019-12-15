@@ -6,7 +6,7 @@
 #include <ace/managers/game.h>
 #include <ace/managers/system.h>
 #include <ace/utils/font.h>
-#include "game.h"
+#include "core.h"
 #include "color.h"
 #include "comm.h"
 

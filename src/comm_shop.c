@@ -6,6 +6,7 @@
 #include <ace/managers/key.h>
 #include <ace/managers/game.h>
 #include "comm.h"
+#include "core.h"
 #include "game.h"
 #include "warehouse.h"
 #include "mineral.h"

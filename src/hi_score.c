@@ -7,7 +7,7 @@
 #include <ace/managers/system.h>
 #include <ace/managers/timer.h>
 #include <ace/utils/bitmap.h>
-#include "game.h"
+#include "core.h"
 #include "comm.h"
 
 #define SCORE_NAME_LENGTH 20

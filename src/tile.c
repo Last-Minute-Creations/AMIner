@@ -6,6 +6,7 @@
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/managers/rand.h>
 #include "game.h"
+#include "core.h"
 #include "hud.h"
 #include "mineral.h"
 #include "comm.h"

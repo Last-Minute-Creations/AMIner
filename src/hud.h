@@ -37,4 +37,10 @@ void hudShowMessage(UBYTE ubFace, const char *szMsg);
 
 void hudShowMain(void);
 
+void hudPause(UBYTE isPaused);
+
+UBYTE hudGetSelection(void);
+
+void hudSelect(UBYTE ubSelection);
+
 #endif // _HUD_H_

@@ -44,7 +44,10 @@ typedef enum _tHudState {
 	STATE_MSG_DRAW_LETTER,
 	STATE_MSG_WAIT_OUT,
 	STATE_MSG_NOISE_OUT,
-	STATE_MSG_END
+	STATE_MSG_END,
+	// State machine for pause screen
+	STATE_PAUSE_INITIAL_DRAW,
+	STATE_PAUSE_LOOP,
 	// State machine for drawing aux HUD
 } tHudState;
 
@@ -74,6 +77,7 @@ static char s_szMsg[HUD_MSG_LEN_MAX];
 static char s_szLetter[2] = {'\0'};
 static tBitMap *s_pFaces;
 static UBYTE s_ubFaceToDraw;
+static UBYTE s_ubSelection, s_ubSelectionPrev;
 
 void hudCreate(tView *pView, const tFont *pFont) {
   s_pVpHud = vPortCreate(0,
@@ -88,7 +92,6 @@ void hudCreate(tView *pView, const tFont *pFont) {
 		TAG_SIMPLEBUFFER_BOUND_HEIGHT, 31 * 5,
   TAG_END);
 
-	paletteLoad("data/aminer.plt", s_pVpHud->pPalette, 32);
 	bitmapLoadFromFile(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
 	s_pFaces = bitmapCreateFromFile("data/comm_faces.bm", 0);
 
@@ -228,8 +231,9 @@ void hudSetHull(UBYTE ubPlayer, UWORD uwHull, UWORD uwHullMax) {
 static void hudDrawStateBarPercent(
 	UWORD uwOffsX, UBYTE ubOffsY, UBYTE ubPercent, UBYTE ubColor
 ) {
+	// This draws only 0..99! 0: only 1px of first bar, 99: full
 	UBYTE ubBarIdx = ubPercent / 10;
-	UBYTE ubBarY = 4 - ((ubPercent % 10) + 1) / 2;
+	UBYTE ubBarY = 4 - (UBYTE)((ubPercent % 10) * 4) / 9;
 	UWORD uwX = uwOffsX + ubBarIdx * 3;
 	chunkyToPlanar(ubColor, uwX + 0, ubOffsY + ubBarY, s_pHudBuffer->pBack);
 	chunkyToPlanar(ubColor, uwX + 1, ubOffsY + ubBarY, s_pHudBuffer->pBack);
@@ -488,6 +492,45 @@ void hudUpdate(void) {
 			hudShowPage(0);
 			hudResetStateMachine();
 			break;
+		case STATE_PAUSE_INITIAL_DRAW:
+				blitRect(
+					s_pHudBuffer->pBack, HUD_ORIGIN_X, 4 * HUD_HEIGHT + HUD_ORIGIN_Y,
+					320 - 2 * HUD_ORIGIN_X, 2 * s_pFont->uwHeight + 1, COLOR_BG
+				);
+
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Game paused");
+				fontDrawTextBitMap(
+					s_pHudBuffer->pBack, s_pLineBuffer,
+					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 2,
+					4 * HUD_HEIGHT + HUD_ORIGIN_Y, COLOR_BAR_FULL, FONT_COOKIE | FONT_HCENTER
+				);
+				hudShowPage(4);
+				s_eState = STATE_PAUSE_LOOP;
+				s_ubSelection = 0;
+				s_ubSelectionPrev = 1;
+			break;
+		case STATE_PAUSE_LOOP:
+			if(s_ubSelection != s_ubSelectionPrev) {
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Resume");
+				fontDrawTextBitMap(
+					s_pHudBuffer->pBack, s_pLineBuffer,
+					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 3,
+					4 * HUD_HEIGHT + HUD_ORIGIN_Y + s_pFont->uwHeight,
+					(s_ubSelection == 0) ? COLOR_BAR_FULL : COLOR_BAR_EMPTY,
+					FONT_COOKIE | FONT_HCENTER
+				);
+
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Quit");
+				fontDrawTextBitMap(
+					s_pHudBuffer->pBack, s_pLineBuffer,
+					HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,
+					4 * HUD_HEIGHT + HUD_ORIGIN_Y + s_pFont->uwHeight,
+					(s_ubSelection == 1) ? COLOR_BAR_FULL : COLOR_BAR_EMPTY,
+					FONT_COOKIE | FONT_HCENTER
+				);
+				s_ubSelectionPrev = s_ubSelection;
+			}
+			break;
 	}
 }
 
@@ -498,4 +541,30 @@ void hudDestroy(void) {
 
 void hudShowMain(void) {
 	hudShowPage(0);
+}
+
+void hudPause(UBYTE isPaused) {
+	if(isPaused) {
+		s_eState = STATE_PAUSE_INITIAL_DRAW;
+	}
+	else {
+		hudShowPage(0);
+		hudResetStateMachine();
+		// TODO: perhaps reset to last "safe" state? E.g. begin of msg display
+	}
+}
+
+UBYTE hudIsPaused(void) {
+	return (
+		s_eState == STATE_PAUSE_INITIAL_DRAW ||
+		s_eState == STATE_PAUSE_LOOP
+	);
+}
+
+void hudSelect(UBYTE ubSelection) {
+	s_ubSelection = ubSelection;
+}
+
+UBYTE hudGetSelection(void) {
+	return s_ubSelection;
 }
