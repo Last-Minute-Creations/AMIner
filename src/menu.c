@@ -410,5 +410,8 @@ void menuGsDestroy(void) {
 void menuGsEnter(UBYTE isScoreShow) {
 	// Switch to menu, after popping it will process gameGsLoop
 	s_isScoreShowAfterRollIn = isScoreShow;
+	if(!isScoreShow) {
+		hudReset(0, 0);
+	}
 	gameChangeState(menuGsCreate, menuGsLoop, menuGsDestroy);
 }

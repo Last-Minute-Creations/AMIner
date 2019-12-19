@@ -150,6 +150,7 @@ void coreGsCreate(void) {
 	g_isChallenge = 1;
 	g_isAtari = 0;
 
+	hudReset(0, 0);
 	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
 }
 
