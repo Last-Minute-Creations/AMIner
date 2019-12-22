@@ -84,6 +84,7 @@ void groundLayerCreate(const tVPort *pVp) {
 	s_isCopperActive = 0;
 	s_pColorsBelow = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);
 	s_pColorsAbove = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);
+	s_ubPrevLevel = 0xF;
 	groundLayerReset(1);
 	logBlockEnd("groundLayerCreate()");
 }
@@ -92,7 +93,6 @@ void groundLayerReset(UBYTE ubLowerLayer) {
 	s_pColorsBelow->ubDisabled = 1;
 	s_ubLowerLayer = ubLowerLayer;
 	const tGroundLayer *pLayerCurrent = &s_pLayers[ubLowerLayer - 1];
-	s_ubPrevLevel = 0xF;
 	groundLayerSetColorRegs(pLayerCurrent, s_ubPrevLevel);
 }
 
@@ -179,4 +179,12 @@ UBYTE groundLayerGetDifficultyAtDepth(UWORD uwDepth) {
 		}
 	}
 	return s_pLayers[0].ubDifficulty;
+}
+
+UWORD groundLayerGetLowerAtDepth(UWORD uwY) {
+	UBYTE ubLayer = 0;
+	while(s_pLayers[ubLayer].uwTop <= uwY) {
+		++ubLayer;
+	}
+	return ubLayer;
 }

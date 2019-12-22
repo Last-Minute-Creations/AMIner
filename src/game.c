@@ -187,6 +187,7 @@ static void gameCameraProcess(void) {
 			cameraCenterAt(g_pMainBuffer->pCamera, uwCamDestX, uwCamDestY);
 			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
 			baseTileProcess();
+			groundLayerReset(groundLayerGetLowerAtDepth(g_pMainBuffer->pCamera->uPos.uwY));
 			tileBufferRedrawAll(g_pMainBuffer);
 			bobNewDiscardUndraw();
 			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
