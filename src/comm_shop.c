@@ -28,8 +28,128 @@ static void commShopDrawOffice(void) {
 
 //--------------------------------------------------------------------- WORKSHOP
 
-static void commShopDrawWorkshop(void) {
+#define WORKSHOP_POS_COUNT 4
+#define WORKSHOP_LEVEL_MAX 4
 
+static const char *s_pShopNames[WORKSHOP_POS_COUNT] = {
+	[VEHICLE_PART_DRILL] = "Drill",
+	[VEHICLE_PART_CARGO] = "Cargo bay",
+	[VEHICLE_PART_HULL] = "Hull",
+	[VEHICLE_PART_COUNT + 0] = "Dynamite",
+};
+static const ULONG s_pLevelCosts[WORKSHOP_LEVEL_MAX] = {
+	1000, 5000, 25000, 150000
+};
+static UBYTE s_ubWorkshopPos = 0;
+static UBYTE s_isOnExitBtn = 0;
+
+static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
+	s_ubWorkshopPos = ubPart;
+	static const char szUpgrade[] = "KRTEK 2600 Part";
+	static const char szUtility[] = "KRTEK 2600 Utility";
+
+	const UBYTE ubRowSize = g_pFont->uwHeight + 2;
+	const UBYTE ubFontFlags = FONT_COOKIE | FONT_SHADOW;
+	const UBYTE ubColor = (
+		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
+	);
+
+	commErase(0, 0, COMM_DISPLAY_WIDTH, 5 * ubRowSize);
+	const char *szType = ubPart < VEHICLE_PART_COUNT ? szUtility : szUpgrade;
+	UWORD uwOffs = 0;
+	commDrawText(0, uwOffs, szType, ubFontFlags, ubColor);
+	uwOffs += ubRowSize;
+	commDrawText(0, uwOffs, s_pShopNames[ubPart], ubFontFlags, ubColor);
+	uwOffs += 2 * ubRowSize;
+	char szBfr[50];
+	if(ubPart < VEHICLE_PART_COUNT) {
+		UBYTE ubLevel = g_pVehicles[0].pPartLevels[s_ubWorkshopPos];
+		sprintf(szBfr, "%s Mk%hhu", "GLGR", ubLevel + 1);
+		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+		if(ubLevel < WORKSHOP_LEVEL_MAX) {
+			uwOffs += ubRowSize;
+			sprintf(szBfr, "upgrade to Mk%hhu: %lu\x1F", ubLevel + 2, s_pLevelCosts[ubLevel]);
+			commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+		}
+	}
+	else {
+		sprintf(szBfr, "Stock: %hu/%hu", 0, 10);
+		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+		uwOffs += ubRowSize;
+		sprintf(szBfr, "Cost: %lu\x1F", 100);
+		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+	}
+}
+
+static void commShopDrawWorkshop(void) {
+	commShopSelectWorkshopPart(0, 1);
+
+	// Buttons
+	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 2;
+	UWORD uwBtnY1 = COMM_DISPLAY_HEIGHT - 3 * g_pFont->uwHeight;
+	UWORD uwBtnY2 = COMM_DISPLAY_HEIGHT - 1 * g_pFont->uwHeight;
+	buttonRmAll();
+	buttonAdd("Buy", uwBtnX, uwBtnY1);
+	buttonAdd("Exit", uwBtnX, uwBtnY2);
+	buttonSelect(0);
+	buttonDrawAll(s_pBmDraw);
+	s_isOnExitBtn = 0;
+}
+
+static void commShopProcessWorkshop(void) {
+	if(s_isOnExitBtn) {
+		if(s_isBtnPress) {
+			// Exit
+			gamePopState();
+		}
+		else if(commNavUse(COMM_NAV_UP)) {
+			buttonSelect(0);
+			buttonDrawAll(s_pBmDraw);
+			s_isOnExitBtn = 0;
+			commShopSelectWorkshopPart(s_ubWorkshopPos, 1);
+		}
+	}
+	else {
+		if(s_isBtnPress) {
+			if(s_ubWorkshopPos < VEHICLE_PART_COUNT) {
+				UBYTE ubPartLevel = g_pVehicles[0].pPartLevels[s_ubWorkshopPos];
+				if(ubPartLevel < WORKSHOP_LEVEL_MAX) {
+					LONG lNextCost = s_pLevelCosts[ubPartLevel];
+					if(g_pVehicles[0].lCash >= lNextCost) {
+						// Buy part
+						g_pVehicles[0].lCash -= lNextCost;
+						hudSetCash(0, g_pVehicles[0].lCash);
+						vehicleSetPartLevel(&g_pVehicles[0], s_ubWorkshopPos, ubPartLevel + 1);
+						vehicleSetPartLevel(&g_pVehicles[1], s_ubWorkshopPos, ubPartLevel + 1);
+						commShopSelectWorkshopPart(s_ubWorkshopPos, 1);
+					}
+					else {
+						// Not enough cash
+					}
+				}
+			}
+		}
+		else if(commNavUse(COMM_NAV_DOWN)) {
+			buttonSelect(1);
+			buttonDrawAll(s_pBmDraw);
+			s_isOnExitBtn = 1;
+			commShopSelectWorkshopPart(s_ubWorkshopPos, 0);
+		}
+		else if(commNavUse(COMM_NAV_RIGHT)) {
+			BYTE bNewPos = s_ubWorkshopPos + 1;
+			if(bNewPos >= WORKSHOP_POS_COUNT) {
+				bNewPos = 0;
+			}
+			commShopSelectWorkshopPart(bNewPos, 1);
+		}
+		else if(commNavUse(COMM_NAV_LEFT)) {
+			BYTE bNewPos = s_ubWorkshopPos - 1;
+			if(bNewPos < 0) {
+				bNewPos = WORKSHOP_POS_COUNT - 1;
+			}
+			commShopSelectWorkshopPart(bNewPos, 1);
+		}
+	}
 }
 
 //-------------------------------------------------------------------- WAREHOUSE
@@ -73,14 +193,14 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 	// Name
 	commDrawText(
 		s_pColOffs[0], uwRowOffsY, g_pMinerals[ubMineral].szName,
-		FONT_COOKIE, ubColor
+		FONT_COOKIE | FONT_SHADOW, ubColor
 	);
 
 	// Sell
 	char szBfr[10];
 	UWORD uwMineralReward = s_pTmpSell[ubMineral] * g_pMinerals[ubMineral].ubReward;
 	sprintf(szBfr, "%hu\x1F", uwMineralReward);
-	commDrawText(s_pColOffs[1], uwRowOffsY, szBfr, FONT_COOKIE, ubColor);
+	commDrawText(s_pColOffs[1], uwRowOffsY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 
 	// Stock
 	UBYTE ubStockCenter = fontMeasureText(g_pFont, s_pColNames[2]).uwX / 2;
@@ -90,26 +210,26 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 	if(ubPos == s_ubPosCurr) {
 		commDrawText(
 			s_pColOffs[2] + ubStockCenter + ubValWidthHalf + 3, uwRowOffsY, ">",
-			FONT_COOKIE | FONT_LEFT, ubColor
+			FONT_COOKIE | FONT_SHADOW | FONT_LEFT, ubColor
 		);
 		commDrawText(
 			s_pColOffs[2] + ubStockCenter - ubValWidthHalf - 3, uwRowOffsY, "<",
-			FONT_COOKIE | FONT_RIGHT, ubColor
+			FONT_COOKIE | FONT_SHADOW | FONT_RIGHT, ubColor
 		);
 	}
 	else {
 		commErase(
 			s_pColOffs[2] + ubStockCenter + ubValWidthHalf + 3, uwRowOffsY,
-			5, g_pFont->uwHeight
+			5, g_pFont->uwHeight + 1
 		);
 		commErase(
 			s_pColOffs[2] + ubStockCenter + ubValWidthHalf - 3 - 5, uwRowOffsY,
-			5, g_pFont->uwHeight
+			5, g_pFont->uwHeight + 1
 		);
 	}
 	commDrawText(
 		s_pColOffs[2] + ubStockCenter - ubValWidthHalf, uwRowOffsY, szBfr,
-		FONT_COOKIE, ubColor
+		FONT_COOKIE | FONT_SHADOW, ubColor
 	);
 
 	// Plan
@@ -117,21 +237,21 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 		szBfr, "%hu/%hu",
 		s_pTmpPlan[ubMineral], pPlan->pMinerals[ubMineral].uwTargetCount
 	);
-	commDrawText(s_pColOffs[3], uwRowOffsY, szBfr, FONT_COOKIE, ubColor);
+	commDrawText(s_pColOffs[3], uwRowOffsY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 }
 
 static void commShopDrawWarehouse(void) {
 	for(UBYTE ubCol = 0; ubCol < 4; ++ubCol) {
 		commDrawText(
 			s_pColOffs[ubCol], 0, s_pColNames[ubCol],
-			FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT
+			FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 		);
 	}
 
 	const tUwCoordYX sPosDisplay = commGetOriginDisplay();
 	const UBYTE ubLineHeight = g_pFont->uwHeight + 1;
 	blitRect(
-		s_pBmDraw, sPosDisplay.uwX + s_pColOffs[0], sPosDisplay.uwY + ubLineHeight,
+		s_pBmDraw, sPosDisplay.uwX, sPosDisplay.uwY + ubLineHeight,
 		COMM_DISPLAY_WIDTH, 1, COMM_DISPLAY_COLOR_TEXT
 	);
 
@@ -142,7 +262,7 @@ static void commShopDrawWarehouse(void) {
 		commShopDrawWarehouseRow(i, pPlan);
 	}
 
-	// Confirm button
+	// Buttons
 	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 3;
 	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 5 * ubLineHeight;
 	buttonRmAll();
@@ -153,13 +273,13 @@ static void commShopDrawWarehouse(void) {
 
 	commDrawText(
 		COMM_DISPLAY_WIDTH - 25, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
-		"Time remaining:", FONT_COOKIE | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT
+		"Time remaining:", FONT_COOKIE | FONT_SHADOW | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT
 	);
 	char szBfr[5];
 	sprintf(szBfr, "%d", (pPlan->wTimeRemaining + 9) / 10);
 	commDrawText(
 		COMM_DISPLAY_WIDTH - 25 + 5, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight, szBfr,
-		FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT
+		FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 	);
 }
 
@@ -274,6 +394,8 @@ static void commShopShowTab(tCommLed eTab) {
 	}
 }
 
+//-------------------------------------------------------------------- GAMESTATE
+
 void commShopGsCreate(void) {
 	s_isBtnPress = 0;
 	s_isShown = commShow();
@@ -352,6 +474,7 @@ void commShopGsLoop(void) {
 			case COMM_LED_OFFICE:
 				break;
 			case COMM_LED_WORKSHOP:
+				commShopProcessWorkshop();
 				break;
 			case COMM_LED_WAREHOUSE:
 				commShopProcessWarehouse();

@@ -42,6 +42,13 @@ typedef enum _tVehicleState {
 	VEHICLE_STATE_TELEPORTING_IN
 } tVehicleState;
 
+typedef enum _tPart {
+	VEHICLE_PART_DRILL,
+	VEHICLE_PART_CARGO,
+	VEHICLE_PART_HULL,
+	VEHICLE_PART_COUNT
+} tPart;
+
 typedef struct _tVehicle {
 	tBCoordYX sSteer;
 	tTextBob sTextBob;
@@ -55,8 +62,6 @@ typedef struct _tVehicle {
 	fix16_t fY;
 	fix16_t fDx;
 	fix16_t fDy;
-	fix16_t fDestX;
-	fix16_t fDestY;
 	UBYTE ubVehicleState;
 	UBYTE isFacingRight;
 	UBYTE ubTrackFrame;
@@ -66,8 +71,13 @@ typedef struct _tVehicle {
 	UBYTE ubJetAnimFrame;
 	UBYTE ubJetAnimCnt;
 	UBYTE ubToolAnimCnt;
+	// Drilling
 	UBYTE ubDrillDir;
 	UBYTE ubDrillVAnimCnt;
+	fix16_t fDrillDestX, fDrillDestY;
+	fix16_t fDrillDelta;
+	tUwCoordYX sDrillTile;
+	// Anims
 	UBYTE ubSmokeAnimFrame;
 	UBYTE ubSmokeAnimCnt;
 	UBYTE ubTeleportAnimFrame;
@@ -76,8 +86,8 @@ typedef struct _tVehicle {
 	UWORD uwTeleportY;
 	UBYTE ubDrillState;
 	// Cargo
-	UBYTE ubCargoMax;
-	UBYTE ubCargoCurr;
+	UBYTE uwCargoMax;
+	UBYTE uwCargoCurr;
 	UWORD uwCargoScore;
 	UWORD pStock[MINERAL_TYPE_COUNT];
 	// Score, fuel, hull
@@ -86,12 +96,14 @@ typedef struct _tVehicle {
 	UWORD uwDrillMax;
 	UWORD wHullCurr;
 	UWORD wHullMax;
-	UWORD uwDrillTileX;
-	UWORD uwDrillTileY;
 	UBYTE ubPlayerIdx;
 	UBYTE ubDestructionState;
 	tDynamite sDynamite;
+	// Upgrade levels
+	UBYTE pPartLevels[VEHICLE_PART_COUNT];
 } tVehicle;
+
+void vehicleSetPartLevel(tVehicle *pVehicle, tPart ePart, UBYTE ubLevel);
 
 void vehicleBitmapsCreate(void);
 

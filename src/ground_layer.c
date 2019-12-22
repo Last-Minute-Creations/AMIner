@@ -28,7 +28,7 @@ static const tGroundLayer s_pLayers[] = {
 			RGB(51, 0, 0), RGB(102, 34, 0), RGB(153, 68, 17),
 			RGB(204, 102, 34), RGB(255, 136, 51)
 		},
-		0, 0
+		0, 2
 	},
 	{
 		// A
@@ -36,7 +36,7 @@ static const tGroundLayer s_pLayers[] = {
 			RGB(51, 34, 0), RGB(102, 68, 0), RGB(153, 102, 17),
 			RGB(204, 136, 34), RGB(255, 170, 51)
 		},
-		2048 + 32, 0
+		2048 + 32, 3
 	},
 	{
 		// B
@@ -44,7 +44,7 @@ static const tGroundLayer s_pLayers[] = {
 			RGB(51, 34, 17), RGB(102, 68, 34), RGB(153, 102, 51),
 			RGB(204, 136, 68), RGB(255, 170, 85)
 		},
-		4096 + 32, 0
+		4096 + 32, 4
 	},
 	{
 		// C
@@ -52,7 +52,7 @@ static const tGroundLayer s_pLayers[] = {
 			RGB(17, 34, 17), RGB(68, 68, 34), RGB(119, 102, 51),
 			RGB(170, 136, 68), RGB(221, 170, 85)
 		},
-		6144 + 32, 0
+		6144 + 32, 5
 	},
 	{
 		// D
@@ -60,7 +60,7 @@ static const tGroundLayer s_pLayers[] = {
 			RGB(17, 34, 34), RGB(68, 68, 51), RGB(119, 102, 68),
 			RGB(170, 136, 85), RGB(221, 170, 102)
 		},
-		8192 + 32, 0
+		8192 + 32, 6
 	}
 };
 
@@ -92,7 +92,6 @@ void groundLayerReset(UBYTE ubLowerLayer) {
 	s_pColorsBelow->ubDisabled = 1;
 	s_ubLowerLayer = ubLowerLayer;
 	const tGroundLayer *pLayerCurrent = &s_pLayers[ubLowerLayer - 1];
-	volatile UWORD *pColorRegs = &g_pCustom->color[LAYER_COLOR_START];
 	s_ubPrevLevel = 0xF;
 	groundLayerSetColorRegs(pLayerCurrent, s_ubPrevLevel);
 }
@@ -171,4 +170,13 @@ void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel) {
 		}
 	}
 	s_ubPrevLevel = ubColorLevel;
+}
+
+UBYTE groundLayerGetDifficultyAtDepth(UWORD uwDepth) {
+	for(UBYTE ubNextLayer = 1; ubNextLayer < s_ubLayerCount; ++ubNextLayer) {
+		if(uwDepth < s_pLayers[ubNextLayer].uwTop) {
+			return s_pLayers[ubNextLayer - 1].ubDifficulty;
+		}
+	}
+	return s_pLayers[0].ubDifficulty;
 }
