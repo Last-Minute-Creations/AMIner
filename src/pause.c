@@ -5,6 +5,7 @@
 #include "hud.h"
 #include "game.h"
 #include "core.h"
+#include "menu.h"
 
 void pauseGsCreate(void) {
 	hudPause(1);
@@ -56,7 +57,7 @@ void pauseGsLoop(void) {
 	tVPort *pVpHud = pView->pFirstVPort;
 	vPortProcessManagers(pVpHud);
 	copProcessBlocks();
-	vPortWaitForEnd(pView);
+	vPortWaitForEnd(pVpHud->pNext);
 }
 
 void pauseGsDestroy(void) {

@@ -13,6 +13,7 @@
 #include "explosion.h"
 #include "dino.h"
 #include "ground_layer.h"
+#include "defs.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -204,7 +205,7 @@ void vehicleRespawn(tVehicle *pVehicle) {
 
 void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
-	pVehicle->lCash = 10000;
+	pVehicle->lCash = g_lInitialCash;
 	vehicleSetPartLevel(pVehicle, VEHICLE_PART_DRILL, 0);
 	vehicleSetPartLevel(pVehicle, VEHICLE_PART_HULL, 0);
 	vehicleSetPartLevel(pVehicle, VEHICLE_PART_CARGO, 0);
@@ -215,13 +216,13 @@ void vehicleSetPartLevel(tVehicle *pVehicle, tPart ePart, UBYTE ubLevel) {
 	pVehicle->pPartLevels[ePart] = ubLevel;
 	switch(ePart) {
 		case VEHICLE_PART_DRILL:
-			pVehicle->uwDrillMax = 1000 + 250 * (ubLevel);
+			pVehicle->uwDrillMax = g_uwPartDrillBase + g_uwPartDrillPerLevel * (ubLevel);
 			break;
 		case VEHICLE_PART_CARGO:
-			pVehicle->uwCargoMax = 50 + 20 *(ubLevel);
+			pVehicle->uwCargoMax = g_uwPartCargoBase + g_uwPartCargoPerLevel *(ubLevel);
 			break;
 		case VEHICLE_PART_HULL:
-			pVehicle->wHullMax = 100 + 20 * (ubLevel);
+			pVehicle->wHullMax = g_uwPartHullBase + g_uwPartHullPerLevel * (ubLevel);
 			break;
 		default:
 			break;
@@ -355,7 +356,7 @@ static inline UBYTE vehicleStartDrilling(
 	BYTE bLayerDifficulty = groundLayerGetDifficultyAtDepth(uwTileY << 5);
 	BYTE bDrillLevel = pVehicle->pPartLevels[VEHICLE_PART_DRILL];
 	BYTE bDrillDuration = MAX(1, bLayerDifficulty - bDrillLevel);
-	UBYTE ubDrillCost = 15 * bDrillDuration;
+	UBYTE ubDrillCost = g_ubDrillingCost * bDrillDuration;
 
 	// Check vehicle's drill depletion
 	if(!g_isChallenge) {
@@ -412,28 +413,23 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 		pVehicle->pStock[i] = 0;
 	}
 
-	// Fuel price per liter, units in liter
-	const UBYTE ubLiterPrice = 5;
-	const UBYTE ubFuelInLiter = 100;
-	const UBYTE ubHullPrice = 2;
-
 	// Buy as much fuel as needed
 	// Start refueling if half a liter is spent
 	UWORD uwRefuelLiters = (
-		pVehicle->uwDrillMax - pVehicle->uwDrillCurr + ubFuelInLiter / 2
-	) / ubFuelInLiter;
+		pVehicle->uwDrillMax - pVehicle->uwDrillCurr + g_ubFuelInLiter / 2
+	) / g_ubFuelInLiter;
 
 	// It's possible to buy more fuel than needed (last liter) - fill up to max
 	pVehicle->uwDrillCurr = MIN(
-		pVehicle->uwDrillCurr + uwRefuelLiters * ubFuelInLiter, pVehicle->uwDrillMax
+		pVehicle->uwDrillCurr + uwRefuelLiters * g_ubFuelInLiter, pVehicle->uwDrillMax
 	);
 
 	// Buy as much hull as needed
-	UWORD uwRehullCost = ubHullPrice * (pVehicle->wHullMax - pVehicle->wHullCurr);
+	UWORD uwRehullCost = g_ubHullPrice * (pVehicle->wHullMax - pVehicle->wHullCurr);
 	vehicleHullRepair(pVehicle);
 
 	// Pay for your fuel & hull!
-	WORD wRestockValue = uwRefuelLiters * ubLiterPrice + uwRehullCost;
+	WORD wRestockValue = uwRefuelLiters * g_ubLiterPrice + uwRehullCost;
 	*pCash -= wRestockValue;
 	return -wRestockValue;
 }

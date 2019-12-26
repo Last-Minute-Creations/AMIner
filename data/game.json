@@ -1,0 +1,28 @@
+{
+	"initialCash": 10000,
+	"upgradeCosts": [1000, 5000, 25000, 150000],
+	"hull": {
+		"base": 100,
+		"addPerLevel": 20
+	},
+	"drill": {
+		"base": 1000,
+		"addPerLevel": 250
+	},
+	"cargo": {
+		"base": 50,
+		"addPerLevel": 20
+	},
+	"drillingCost": 15,
+	"restock": {
+		"literPrice": 5,
+		"fuelInLiter": 100,
+		"hullPrice": 2
+	},
+	"dinoDepths": [80, 200, 400, 600, 800, 1000, 1500, 2000, 2500],
+	"utilCost": {
+		"tnt": 100,
+		"nuke": 1000,
+		"teleport": 750
+	}
+}

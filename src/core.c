@@ -20,6 +20,7 @@
 #include "tile.h"
 #include "explosion.h"
 #include "comm.h"
+#include "defs.h"
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
@@ -75,6 +76,7 @@ void coreProcessAfterBobs(void) {
 }
 
 void coreGsCreate(void) {
+	defsInit();
 	hiScoreLoad();
 	s_pView = viewCreate(0,
 		TAG_VIEW_GLOBAL_CLUT, 1,

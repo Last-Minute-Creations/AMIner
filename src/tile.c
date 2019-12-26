@@ -10,6 +10,7 @@
 #include "hud.h"
 #include "mineral.h"
 #include "comm.h"
+#include "defs.h"
 
 const tTileDef const g_pTileDefs[TILE_COUNT] = {
 	{.szMsg = 0, .ubSlots = 0, .ubMineral = MINERAL_TYPE_COUNT},
@@ -230,15 +231,15 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	}
 
 	// Dino bones
-	pTiles[5][80] = TILE_BONE_HEAD;
-	pTiles[3][200] = TILE_BONE_1;
-	pTiles[7][400] = TILE_BONE_1;
-	pTiles[1][600] = TILE_BONE_1;
-	pTiles[5][800] = TILE_BONE_1;
-	pTiles[6][1000] = TILE_BONE_1;
-	pTiles[8][1500] = TILE_BONE_1;
-	pTiles[2][2000] = TILE_BONE_1;
-	pTiles[9][2500] = TILE_BONE_1;
+	pTiles[5][g_pDinoDepths[0]] = TILE_BONE_HEAD;
+	pTiles[3][g_pDinoDepths[1]] = TILE_BONE_1;
+	pTiles[7][g_pDinoDepths[2]] = TILE_BONE_1;
+	pTiles[1][g_pDinoDepths[3]] = TILE_BONE_1;
+	pTiles[4][g_pDinoDepths[4]] = TILE_BONE_1;
+	pTiles[6][g_pDinoDepths[5]] = TILE_BONE_1;
+	pTiles[8][g_pDinoDepths[6]] = TILE_BONE_1;
+	pTiles[2][g_pDinoDepths[7]] = TILE_BONE_1;
+	pTiles[9][g_pDinoDepths[8]] = TILE_BONE_1;
 
 	// Fill left invisible col with rocks
 	commProgress(100, "Finishing touches");

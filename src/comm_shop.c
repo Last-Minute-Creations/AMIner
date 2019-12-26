@@ -14,6 +14,7 @@
 #include "vehicle.h"
 #include "hud.h"
 #include "tutorial.h"
+#include "defs.h"
 
 static UBYTE s_isShown;
 static UBYTE s_isBtnPress = 0;
@@ -29,7 +30,6 @@ static void commShopDrawOffice(void) {
 //--------------------------------------------------------------------- WORKSHOP
 
 #define WORKSHOP_POS_COUNT 4
-#define WORKSHOP_LEVEL_MAX 4
 
 static const char *s_pShopNames[WORKSHOP_POS_COUNT] = {
 	[VEHICLE_PART_DRILL] = "Drill",
@@ -37,16 +37,12 @@ static const char *s_pShopNames[WORKSHOP_POS_COUNT] = {
 	[VEHICLE_PART_HULL] = "Hull",
 	[VEHICLE_PART_COUNT + 0] = "Dynamite",
 };
-static const ULONG s_pLevelCosts[WORKSHOP_LEVEL_MAX] = {
-	1000, 5000, 25000, 150000
-};
 static UBYTE s_ubWorkshopPos = 0;
 static UBYTE s_isOnExitBtn = 0;
 
 static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
 	s_ubWorkshopPos = ubPart;
-	static const char szUpgrade[] = "KRTEK 2600 Part";
-	static const char szUtility[] = "KRTEK 2600 Utility";
+	static const char szCaption[] = "KRTEK 2600";
 
 	const UBYTE ubRowSize = g_pFont->uwHeight + 2;
 	const UBYTE ubFontFlags = FONT_COOKIE | FONT_SHADOW;
@@ -55,9 +51,8 @@ static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
 	);
 
 	commErase(0, 0, COMM_DISPLAY_WIDTH, 5 * ubRowSize);
-	const char *szType = ubPart < VEHICLE_PART_COUNT ? szUtility : szUpgrade;
 	UWORD uwOffs = 0;
-	commDrawText(0, uwOffs, szType, ubFontFlags, ubColor);
+	commDrawText(0, uwOffs, szCaption, ubFontFlags, ubColor);
 	uwOffs += ubRowSize;
 	commDrawText(0, uwOffs, s_pShopNames[ubPart], ubFontFlags, ubColor);
 	uwOffs += 2 * ubRowSize;
@@ -66,9 +61,9 @@ static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
 		UBYTE ubLevel = g_pVehicles[0].pPartLevels[s_ubWorkshopPos];
 		sprintf(szBfr, "%s Mk%hhu", "GLGR", ubLevel + 1);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
-		if(ubLevel < WORKSHOP_LEVEL_MAX) {
+		if(ubLevel < g_ubUpgradeLevels) {
 			uwOffs += ubRowSize;
-			sprintf(szBfr, "upgrade to Mk%hhu: %lu\x1F", ubLevel + 2, s_pLevelCosts[ubLevel]);
+			sprintf(szBfr, "Upgrade to Mk%hhu: %lu\x1F", ubLevel + 2, g_pUpgradeCosts[ubLevel]);
 			commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 		}
 	}
@@ -76,7 +71,7 @@ static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
 		sprintf(szBfr, "Stock: %hu/%hu", 0, 10);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 		uwOffs += ubRowSize;
-		sprintf(szBfr, "Cost: %lu\x1F", 100);
+		sprintf(szBfr, "Buy: %lu\x1F", 100);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 	}
 }
@@ -86,8 +81,8 @@ static void commShopDrawWorkshop(void) {
 
 	// Buttons
 	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 2;
-	UWORD uwBtnY1 = COMM_DISPLAY_HEIGHT - 3 * g_pFont->uwHeight;
-	UWORD uwBtnY2 = COMM_DISPLAY_HEIGHT - 1 * g_pFont->uwHeight;
+	UWORD uwBtnY1 = COMM_DISPLAY_HEIGHT - 4 * g_pFont->uwHeight;
+	UWORD uwBtnY2 = COMM_DISPLAY_HEIGHT - 2 * g_pFont->uwHeight;
 	buttonRmAll();
 	buttonAdd("Buy", uwBtnX, uwBtnY1);
 	buttonAdd("Exit", uwBtnX, uwBtnY2);
@@ -113,8 +108,8 @@ static void commShopProcessWorkshop(void) {
 		if(s_isBtnPress) {
 			if(s_ubWorkshopPos < VEHICLE_PART_COUNT) {
 				UBYTE ubPartLevel = g_pVehicles[0].pPartLevels[s_ubWorkshopPos];
-				if(ubPartLevel < WORKSHOP_LEVEL_MAX) {
-					LONG lNextCost = s_pLevelCosts[ubPartLevel];
+				if(ubPartLevel < g_ubUpgradeLevels) {
+					LONG lNextCost = g_pUpgradeCosts[ubPartLevel];
 					if(g_pVehicles[0].lCash >= lNextCost) {
 						// Buy part
 						g_pVehicles[0].lCash -= lNextCost;
