@@ -45,6 +45,7 @@ tFont *g_pFont;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
+tStringArray g_sPlanMessages;
 
 void gameTryPushBob(tBobNew *pBob) {
 	if(
@@ -302,11 +303,11 @@ void gameGsLoop(void) {
 	// Process plan being complete
 	if(warehouseGetPlan()->wTimeRemaining <= 0 || keyUse(KEY_U)) {
 		if(warehouseTryFulfillPlan()) {
-			hudShowMessage(0, "We've fulfilled plan with your reserves.\nNew has arrived");
+			hudShowMessage(0, g_sPlanMessages.pStrings[0]);
 			warehouseNewPlan(1, g_is2pPlaying);
 		}
 		else {
-			hudShowMessage(0, "Comrade, plan not done, warning and new plan");
+			hudShowMessage(0, g_sPlanMessages.pStrings[1]);
 			warehouseNewPlan(0, g_is2pPlaying);
 		}
 	}

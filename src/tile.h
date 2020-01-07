@@ -55,5 +55,6 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge);
 void tileExcavate(UWORD uwX, UWORD uwY);
 
 extern const tTileDef const g_pTileDefs[TILE_COUNT];
+extern tStringArray g_sLoadMsgs;
 
 #endif // _TILE_H_

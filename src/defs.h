@@ -20,4 +20,8 @@ extern UWORD g_pDinoDepths[9];
 
 void defsInit(void);
 
+void langCreate(const char *szLangPrefix);
+
+void langDestroy(void);
+
 #endif // _DEFS_H_

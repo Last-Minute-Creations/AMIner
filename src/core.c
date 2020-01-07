@@ -77,6 +77,7 @@ void coreProcessAfterBobs(void) {
 
 void coreGsCreate(void) {
 	defsInit();
+	langCreate("en");
 	hiScoreLoad();
 	s_pView = viewCreate(0,
 		TAG_VIEW_GLOBAL_CLUT, 1,
@@ -162,7 +163,7 @@ void coreGsLoop(void) {
 }
 
 void coreGsDestroy(void) {
-systemUse();
+	systemUse();
 
 	menuUnload();
 	bitmapDestroy(s_pTiles);
@@ -182,6 +183,7 @@ systemUse();
 	sampleDestroy(g_pSampleTeleport);
 
 	explosionManagerDestroy();
+	langDestroy();
 
   hudDestroy();
   viewDestroy(s_pView);

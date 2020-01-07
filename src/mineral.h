@@ -6,6 +6,7 @@
 #define _MINERAL_H_
 
 #include <ace/types.h>
+#include "string_array.h"
 
 typedef enum _tMineralType {
 	MINERAL_TYPE_SILVER,
@@ -19,11 +20,11 @@ typedef enum _tMineralType {
 } tMineralType;
 
 typedef struct _tMineralDef {
-	const char szName[11];
 	UBYTE ubReward;
 	UBYTE ubTitleColor;
 } tMineralDef;
 
 extern const tMineralDef g_pMinerals[MINERAL_TYPE_COUNT];
+extern tStringArray g_sMineralNames;
 
 #endif // _MINERAL_H_

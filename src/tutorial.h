@@ -6,6 +6,7 @@
 #define _TUTORIAL_H_
 
 #include <ace/types.h>
+#include "string_array.h"
 
 /**
  * @brief Resets tutorial state.
@@ -18,5 +19,7 @@ void tutorialReset(void);
  * @return 1 if game loop should return early, otherwise 0.
  */
 UBYTE tutorialProcess(void);
+
+extern tStringArray g_sTutorialMsgs;
 
 #endif // _TUTORIAL_H_

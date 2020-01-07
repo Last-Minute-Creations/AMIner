@@ -39,6 +39,8 @@
 static const fix16_t s_fAccGrav = F16(1) / 8;
 static const fix16_t s_fMaxGravDy = 4 * F16(1);
 
+tStringArray g_sMessages;
+
 tBitMap *s_pBodyFrames[2], *s_pBodyMask;
 tBitMap *s_pTrackFrames, *s_pTrackMask;
 tBitMap *s_pJetFrames, *s_pJetMask;
@@ -363,7 +365,7 @@ static inline UBYTE vehicleStartDrilling(
 		if(pVehicle->uwDrillCurr < ubDrillCost) {
 			if(!ubCooldown) {
 				textBobSet(
-					&pVehicle->sTextBob, "Drill depleted!", 6,
+					&pVehicle->sTextBob, g_sMessages.pStrings[MSG_DRILL_DEPLETED], 6,
 					pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
 					pVehicle->sBobBody.sPos.uwY,
 					pVehicle->sBobBody.sPos.uwY - 32, 1
@@ -436,14 +438,13 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 
 static void vehicleExcavateTile(tVehicle *pVehicle) {
 	// Load mineral to vehicle
-	static const char * const szMessageFull = "Cargo full!";
 	UBYTE ubTile = g_pMainBuffer->pTileData[pVehicle->sDrillTile.uwX][pVehicle->sDrillTile.uwY];
 	if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
 		char szMessage[50];
 		if(dinoGetBoneCount() < 9) {
 			dinoFoundBone();
 		}
-		sprintf(szMessage, "Found bone no. %hhu!", dinoGetBoneCount());
+		sprintf(szMessage, g_sMessages.pStrings[MSG_FOUND_BONE], dinoGetBoneCount());
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
 			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
@@ -455,7 +456,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle) {
 			g_pSampleOre, AUDIO_VOLUME_MAX, 1
 		);
 	}
-	else if(g_pTileDefs[ubTile].szMsg) {
+	else if(g_pTileDefs[ubTile].ubSlots) {
 		UBYTE ubMineralType = g_pTileDefs[ubTile].ubMineral;
 		const tMineralDef *pMineral = &g_pMinerals[ubMineralType];
 		UBYTE ubSlots = g_pTileDefs[ubTile].ubSlots;
@@ -466,10 +467,11 @@ static void vehicleExcavateTile(tVehicle *pVehicle) {
 		warehousePlanUnlockMineral(ubMineralType);
 
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->uwCargoCurr, pVehicle->uwCargoMax);
+		char szMsgBuffer[40];
 		const char *szMessage;
 		UBYTE ubColor;
 		if(pVehicle->uwCargoCurr == pVehicle->uwCargoMax) {
-			szMessage = szMessageFull;
+			szMessage = g_sMessages.pStrings[MSG_CARGO_FULL];
 			ubColor = COLOR_REDEST;
 			audioPlay(
 				AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
@@ -477,7 +479,12 @@ static void vehicleExcavateTile(tVehicle *pVehicle) {
 			);
 		}
 		else {
-			szMessage = g_pTileDefs[ubTile].szMsg;
+			sprintf(
+				szMsgBuffer, "%s x%hhu",
+				g_sMineralNames.pStrings[g_pTileDefs[ubTile].ubMineral],
+				g_pTileDefs[ubTile].ubSlots
+			);
+			szMessage = szMsgBuffer;
 			ubColor = pMineral->ubTitleColor;
 			audioPlay(
 				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
@@ -501,7 +508,8 @@ static void vehicleExcavateTile(tVehicle *pVehicle) {
 			}
 			else {
 				textBobSetText(
-					&pVehicle->sTextBob, "Checkpoint! %+hu\x1F", pVehicle->uwCargoScore
+					&pVehicle->sTextBob, "%s %+hu\x1F",
+					g_sMessages.pStrings[MSG_CHALLENGE_CHECKPOINT], pVehicle->uwCargoScore
 				);
 				textBobSetColor(&pVehicle->sTextBob, COLOR_GREEN);
 				textBobSetPos(
@@ -549,7 +557,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
 		);
 		UWORD uwTeleportPenalty = 50;
-		textBobSetText(&pVehicle->sTextBob, "Teleport: -%hu\x1F", uwTeleportPenalty);
+		textBobSetText(
+			&pVehicle->sTextBob, "%s -%hu\x1F",
+			g_sMessages.pStrings[MSG_CHALLENGE_TELEPORT], uwTeleportPenalty
+		);
 		textBobSetColor(&pVehicle->sTextBob, COLOR_REDEST);
 		textBobSetPos(
 			&pVehicle->sTextBob,
@@ -753,7 +764,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 				AUDIO_CHANNEL_2 + pVehicle->ubPlayerIdx,
 				g_pSampleOre, AUDIO_VOLUME_MAX, 1
 			);
-			textBobSetText(&pVehicle->sTextBob, "Restock! %hd\x1F", wDeltaScore);
+			textBobSetText(
+				&pVehicle->sTextBob, "%s %hd\x1F",
+				g_sMessages.pStrings[MSG_RESTOCK], wDeltaScore
+			);
 			textBobSetColor(&pVehicle->sTextBob, COLOR_GOLD);
 			textBobSetPos(
 				&pVehicle->sTextBob,
@@ -1022,3 +1036,5 @@ void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 		vehicleOnTeleportOutPeak, (ULONG)pVehicle, 0, 1
 	);
 }
+
+tVehicle g_pVehicles[2];

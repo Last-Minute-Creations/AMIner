@@ -1,0 +1,63 @@
+{
+	"shopNames": ["Drill", "Cargo bay", "Hull", "Dynamite"],
+	"warehouseColNames": ["Mineral", "Sell", "Stock", "Plan"],
+	"planMessages": {
+		"doneAfk": [
+			"We've fulfilled plan with your reserves.",
+			"New has arrived"
+		],
+		"notDone": "Comrade, plan not done, warning and new plan"
+	},
+	"hiScoreMessages": {
+		"new": "New hi-score! Enter your name!",
+		"press": "Press FIRE or ENTER to continue"
+	},
+	"menu": {
+		"enumMode": ["Campaign", "Challenge"],
+		"enumP1": ["Joy", "WSAD"],
+		"enumP2": ["Joy", "Arrows"],
+		"enumOnOff": ["OFF", "ON"],
+		"enumPlayerCount": ["One", "Two"],
+		"captions": [
+			"Start game",
+			"Mode",
+			"Players",
+			"Player 1 controls",
+			"Player 2 controls",
+			"ATARI Mode",
+			"Hi-Scores",
+			"Exit to workbench"
+		]
+	},
+	"minerals": [
+		"Silver", "Gold", "Emerald", "Ruby", "Moonstone", "Coal"
+	],
+	"loadMsgs": [
+		"Generating terrain", "Generating bases", "Finishing touches"
+	],
+	"tutorial": {
+		"start": "Comrade, go dig 3 ores of silver!",
+		"onDugOut": [
+			"Your drill gets damaged and cargo bay filled as you dig.",
+			"Get to the warehouse to leave minerals and replace drill."
+		],
+		"nearShop": [
+			"Comrade, press ENTER or FIRE or SPACE to enter shop.",
+			"You can sell ore or use it for fulfilling plans."
+		],
+		"inShop": [
+			"You need to spend 3 silver to fulfill the plan. Navigate to it",
+			"and move minerals to plan column, then press Confirm."
+		],
+		"onMoveToPlan": [
+			"Congratulations comrade, you've fulfilled your first plan.",
+			"Keep doing it and surely you will be promoted!"
+		]
+	},
+	"challengeCheckpoint": "Checkpoint!",
+	"challengeTeleport": "Teleport:",
+	"drillDepleted": "Drill depleted!",
+	"cargoFull": "Cargo full!",
+	"restock": "Restock!",
+	"foundBone": "Found bone no. %hhu!"
+}

@@ -29,14 +29,8 @@ static void commShopDrawOffice(void) {
 
 //--------------------------------------------------------------------- WORKSHOP
 
-#define WORKSHOP_POS_COUNT 4
+tStringArray g_sShopNames;
 
-static const char *s_pShopNames[WORKSHOP_POS_COUNT] = {
-	[VEHICLE_PART_DRILL] = "Drill",
-	[VEHICLE_PART_CARGO] = "Cargo bay",
-	[VEHICLE_PART_HULL] = "Hull",
-	[VEHICLE_PART_COUNT + 0] = "Dynamite",
-};
 static UBYTE s_ubWorkshopPos = 0;
 static UBYTE s_isOnExitBtn = 0;
 
@@ -54,12 +48,12 @@ static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
 	UWORD uwOffs = 0;
 	commDrawText(0, uwOffs, szCaption, ubFontFlags, ubColor);
 	uwOffs += ubRowSize;
-	commDrawText(0, uwOffs, s_pShopNames[ubPart], ubFontFlags, ubColor);
+	commDrawText(0, uwOffs, g_sShopNames.pStrings[ubPart], ubFontFlags, ubColor);
 	uwOffs += 2 * ubRowSize;
 	char szBfr[50];
 	if(ubPart < VEHICLE_PART_COUNT) {
 		UBYTE ubLevel = g_pVehicles[0].pPartLevels[s_ubWorkshopPos];
-		sprintf(szBfr, "%s Mk%hhu", "GLGR", ubLevel + 1);
+		sprintf(szBfr, "Mk%hhu", ubLevel + 1);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 		if(ubLevel < g_ubUpgradeLevels) {
 			uwOffs += ubRowSize;
@@ -132,7 +126,7 @@ static void commShopProcessWorkshop(void) {
 		}
 		else if(commNavUse(COMM_NAV_RIGHT)) {
 			BYTE bNewPos = s_ubWorkshopPos + 1;
-			if(bNewPos >= WORKSHOP_POS_COUNT) {
+			if(bNewPos >= WORKSHOP_ITEM_COUNT) {
 				bNewPos = 0;
 			}
 			commShopSelectWorkshopPart(bNewPos, 1);
@@ -140,7 +134,7 @@ static void commShopProcessWorkshop(void) {
 		else if(commNavUse(COMM_NAV_LEFT)) {
 			BYTE bNewPos = s_ubWorkshopPos - 1;
 			if(bNewPos < 0) {
-				bNewPos = WORKSHOP_POS_COUNT - 1;
+				bNewPos = WORKSHOP_ITEM_COUNT - 1;
 			}
 			commShopSelectWorkshopPart(bNewPos, 1);
 		}
@@ -149,9 +143,10 @@ static void commShopProcessWorkshop(void) {
 
 //-------------------------------------------------------------------- WAREHOUSE
 
+tStringArray g_sWarehouseColNames;
+
 static UBYTE s_ubPosCurr = 0, s_ubPosCount = 0;
-static const char *s_pColNames[4] = {"Mineral", "Sell", "Stock", "Plan"};
-static const UBYTE s_pColOffs[4] = {0,  50, 85, 130};
+static const UBYTE s_pColOffs[WAREHOUSE_COL_COUNT] = {0,  50, 85, 130};
 static UBYTE s_pMineralsOnList[MINERAL_TYPE_COUNT];
 
 static UWORD s_pTmpSell[MINERAL_TYPE_COUNT];
@@ -187,7 +182,7 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 
 	// Name
 	commDrawText(
-		s_pColOffs[0], uwRowOffsY, g_pMinerals[ubMineral].szName,
+		s_pColOffs[0], uwRowOffsY, g_sMineralNames.pStrings[ubMineral],
 		FONT_COOKIE | FONT_SHADOW, ubColor
 	);
 
@@ -198,7 +193,7 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 	commDrawText(s_pColOffs[1], uwRowOffsY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 
 	// Stock
-	UBYTE ubStockCenter = fontMeasureText(g_pFont, s_pColNames[2]).uwX / 2;
+	UBYTE ubStockCenter = fontMeasureText(g_pFont, g_sWarehouseColNames.pStrings[2]).uwX / 2;
 	sprintf(szBfr, "%hu", s_pTmpStock[ubMineral]);
 	UBYTE ubValWidthHalf = fontMeasureText(g_pFont, szBfr).uwX / 2;
 
@@ -238,7 +233,7 @@ static void commShopDrawWarehouseRow(UBYTE ubPos, const tPlan *pPlan) {
 static void commShopDrawWarehouse(void) {
 	for(UBYTE ubCol = 0; ubCol < 4; ++ubCol) {
 		commDrawText(
-			s_pColOffs[ubCol], 0, s_pColNames[ubCol],
+			s_pColOffs[ubCol], 0, g_sWarehouseColNames.pStrings[ubCol],
 			FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 		);
 	}

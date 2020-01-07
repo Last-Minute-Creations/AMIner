@@ -19,6 +19,8 @@ typedef struct _tHiScore {
 	char szName[SCORE_NAME_LENGTH];
 } tHiScore;
 
+tStringArray g_sHiScoreMessages;
+
 static tHiScore s_pScores[SCORE_COUNT];
 
 static tHiScore s_pPrevScores[SCORE_COUNT] = {
@@ -106,10 +108,10 @@ void hiScoreDrawAll(void) {
 	);
 	const char *szMsg;
 	if(hiScoreIsEntering()) {
-		szMsg = "New hi-score! Enter your name!";
+		szMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_NEW];
 	}
 	else {
-		szMsg = "Press FIRE or ENTER to continue";
+		szMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_PRESS];
 	}
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szMsg,

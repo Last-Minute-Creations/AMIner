@@ -6,6 +6,7 @@
 #define _MENU_H_
 
 #include <ace/types.h>
+#include <string_array.h>
 
 void menuGsCreate(void);
 
@@ -17,5 +18,8 @@ void menuPreload(void);
 void menuUnload(void);
 
 void menuGsEnter(UBYTE isScoreShow);
+
+extern tStringArray g_sMenuCaptions, g_sMenuEnumMode,
+	g_sMenuEnumP1, g_sMenuEnumP2, g_sMenuEnumOnOff, g_sMenuEnumPlayerCount;
 
 #endif // _MENU_H_

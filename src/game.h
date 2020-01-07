@@ -7,6 +7,7 @@
 
 #include <ace/managers/audio.h>
 #include "bob_new.h"
+#include "string_array.h"
 
 #define GAME_BPP 5
 
@@ -29,6 +30,7 @@ void gameGsLoopEnterScore(void);
 void gameTryPushBob(tBobNew *pBob);
 
 extern tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
+extern tStringArray g_sPlanMessages;
 
 // Game config
 extern UBYTE g_is2pPlaying;

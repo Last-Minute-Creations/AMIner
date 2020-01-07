@@ -32,7 +32,6 @@ typedef void (*tOptionSelectCb)(void);
 
 // All options are uint8_t, enums or numbers
 typedef struct _tOption {
-	char *szName;
 	tOptionType eOptionType;
 	UBYTE isHidden;
 	UBYTE isDirty;
@@ -42,7 +41,7 @@ typedef struct _tOption {
 			UBYTE ubMax;
 			UBYTE ubDefault;
 			UBYTE isCyclic;
-			const char **pEnumLabels;
+			const tStringArray *pEnumLabels;
 		} sOptUb;
 		struct {
 			tOptionSelectCb cbSelect;
@@ -54,36 +53,33 @@ void onStart(void);
 void onExit(void);
 void onShowScores(void);
 
-static const char *s_pModeEnum[] = {"Campaign", "Challenge"};
-static const char *s_pPlayersEnum[] = {"1", "2"};
-static const char *s_pP1Enum[] = {"Joy", "WSAD"};
-static const char *s_pP2Enum[] = {"Joy", "Arrows"};
-static const char *s_pOnOffEnum[] = {"OFF", "ON"};
+tStringArray g_sMenuCaptions, g_sMenuEnumMode,
+	g_sMenuEnumP1, g_sMenuEnumP2, g_sMenuEnumOnOff, g_sMenuEnumPlayerCount;
 
 static tOption s_pOptions[] = {
-	{"Start game", OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onStart}},
-	{"Mode", OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
+	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onStart}},
+	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_isChallenge, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
-		.pEnumLabels = s_pModeEnum
+		.pEnumLabels = &g_sMenuEnumMode
 	}},
-	{"Players", OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
+	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_is2pPlaying, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
-		.pEnumLabels = s_pPlayersEnum
+		.pEnumLabels = &g_sMenuEnumPlayerCount
 	}},
-	{"Player 1 controls", OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
+	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_is1pKbd, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
-		.pEnumLabels = s_pP1Enum
+		.pEnumLabels = &g_sMenuEnumP1
 	}},
-	{"Player 2 controls", OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
+	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_is2pKbd, .ubMax = 1, .isCyclic = 1, .ubDefault = 1,
-		.pEnumLabels = s_pP2Enum
+		.pEnumLabels = &g_sMenuEnumP2
 	}},
-	{"ATARI Mode", OPTION_TYPE_UINT8, .isHidden = 1, .sOptUb = {
+	{OPTION_TYPE_UINT8, .isHidden = 1, .sOptUb = {
 		.pVar = &g_isAtari, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
-		.pEnumLabels = s_pOnOffEnum
+		.pEnumLabels = &g_sMenuEnumOnOff
 	}},
-	{"Hi-Scores", OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onShowScores}},
-	{"Exit to workbench", OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onExit}},
+	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onShowScores}},
+	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onExit}},
 };
 #define MENU_POS_COUNT (sizeof(s_pOptions) / sizeof(tOption))
 
@@ -104,20 +100,20 @@ static void menuDrawPos(UBYTE ubPos, UWORD uwOffsTop) {
 	if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_UINT8) {
 		if(s_pOptions[ubPos].sOptUb.pEnumLabels) {
 			sprintf(
-				szBfr, "%s: %s", s_pOptions[ubPos].szName,
-				s_pOptions[ubPos].sOptUb.pEnumLabels[*s_pOptions[ubPos].sOptUb.pVar]
+				szBfr, "%s: %s", g_sMenuCaptions.pStrings[ubPos],
+				s_pOptions[ubPos].sOptUb.pEnumLabels->pStrings[*s_pOptions[ubPos].sOptUb.pVar]
 			);
 		}
 		else {
 			sprintf(
-				szBfr, "%s: %hhu", s_pOptions[ubPos].szName,
+				szBfr, "%s: %hhu", g_sMenuCaptions.pStrings[ubPos],
 				*s_pOptions[ubPos].sOptUb.pVar
 			);
 		}
 		szText = szBfr;
 	}
 	else if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_CALLBACK) {
-		szText = s_pOptions[ubPos].szName;
+		szText = g_sMenuCaptions.pStrings[ubPos];
 	}
 	if(szText != 0) {
 		commDrawText(COMM_DISPLAY_WIDTH / 2, uwOffsY, szText,

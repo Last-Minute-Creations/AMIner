@@ -6,6 +6,15 @@
 #include "json/json.h"
 #include <ace/managers/log.h>
 
+#include "comm_shop.h"
+#include "hi_score.h"
+#include "menu.h"
+#include "game.h"
+#include "mineral.h"
+#include "tutorial.h"
+#include "vehicle.h"
+#include "tile.h"
+
 LONG g_lInitialCash;
 UBYTE g_ubUpgradeLevels;
 UWORD g_uwPartDrillBase, g_uwPartDrillPerLevel;
@@ -62,4 +71,73 @@ void defsInit(void) {
 	}
 
 	jsonDestroy(pJson);
+}
+
+void langCreate(const char *szLangPrefix) {
+	logBlockBegin("langCreate()");
+	char szPath[100];
+	sprintf(szPath, "data/strings_%s.json", szLangPrefix);
+	tJson *pJson = jsonCreate(szPath);
+	if(!pJson) {
+		logWrite("ERR: %s not found\n", szPath);
+		return;
+	}
+
+	// Shop names
+	g_sShopNames = stringArrayCreateFromDom(pJson, "shopNames");
+	g_sWarehouseColNames = stringArrayCreateFromDom(pJson, "warehouseColNames");
+
+	// Plan messages
+	g_sPlanMessages = stringArrayCreateFromDomElements(
+		pJson, 2, "planMessages.doneAfk", "planMessages.notDone"
+	);
+
+	// Hi score messages
+	g_sHiScoreMessages = stringArrayCreateFromDomElements(
+		pJson, 2, "hiScoreMessages.new", "hiScoreMessages.press"
+	);
+
+	g_sMenuEnumMode = stringArrayCreateFromDom(pJson, "menu.enumMode");
+	g_sMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, "menu.enumPlayerCount");
+	g_sMenuEnumP1 = stringArrayCreateFromDom(pJson, "menu.enumP1");
+	g_sMenuEnumP2 = stringArrayCreateFromDom(pJson, "menu.enumP2");
+	g_sMenuEnumOnOff = stringArrayCreateFromDom(pJson, "menu.enumOnOff");
+	g_sMenuCaptions = stringArrayCreateFromDom(pJson, "menu.captions");
+	g_sMineralNames = stringArrayCreateFromDom(pJson, "minerals");
+	g_sLoadMsgs = stringArrayCreateFromDom(pJson, "loadMsgs");
+
+	g_sTutorialMsgs = stringArrayCreateFromDomElements(
+		pJson, 5, "tutorial.start", "tutorial.onDugOut", "tutorial.nearShop",
+		"tutorial.inShop", "tutorial.onMoveToPlan"
+	);
+
+	g_sMessages = stringArrayCreateFromDomElements(
+		pJson, MSG_COUNT, "challengeCheckpoint", "challengeTeleport",
+		"drillDepleted", "cargoFull", "restock", "foundBone"
+	);
+
+	jsonDestroy(pJson);
+	logBlockEnd("langCreate()");
+}
+
+void langDestroy(void) {
+	logBlockBegin("langDestroy()");
+	stringArrayDestroy(&g_sShopNames);
+	stringArrayDestroy(&g_sWarehouseColNames);
+
+	stringArrayDestroy(&g_sPlanMessages);
+	stringArrayDestroy(&g_sHiScoreMessages);
+
+	stringArrayDestroy(&g_sMenuEnumMode);
+	stringArrayDestroy(&g_sMenuEnumPlayerCount);
+	stringArrayDestroy(&g_sMenuEnumP1);
+	stringArrayDestroy(&g_sMenuEnumP2);
+	stringArrayDestroy(&g_sMenuEnumOnOff);
+	stringArrayDestroy(&g_sMenuCaptions);
+	stringArrayDestroy(&g_sMineralNames);
+	stringArrayDestroy(&g_sLoadMsgs);
+
+	stringArrayDestroy(&g_sTutorialMsgs);
+	stringArrayDestroy(&g_sMessages);
+	logBlockEnd("langDestroy()");
 }

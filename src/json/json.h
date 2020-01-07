@@ -27,8 +27,10 @@ UWORD jsonGetDom(const tJson *pJson,const char *szPattern);
 
 ULONG jsonTokToUlong(const tJson *pJson,UWORD uwTok,LONG lBase);
 
+UWORD jsonStrLen(const tJson *pJson, UWORD uwTok);
+
 UWORD jsonTokStrCpy(
-	const tJson *pJson,UWORD uwTok,char *pDst,UWORD uwMaxLength
+	const tJson *pJson, UWORD uwTok, char *pDst, UWORD uwMaxLength
 );
 
 #endif // GUARD_OF_JSON_H

@@ -7,7 +7,7 @@
 
 tJson *jsonCreate(const char *szFilePath) {
 	systemUse();
-	logBlockBegin("jsonCreate(szFilePath: %s)", szFilePath);
+	logBlockBegin("jsonCreate(szFilePath: '%s')", szFilePath);
 	tJson *pJson = memAllocFast(sizeof(tJson));
 
 	// Read whole file to string
@@ -15,7 +15,9 @@ tJson *jsonCreate(const char *szFilePath) {
 	pJson->szData = memAllocFast(lFileSize+1);
 	tFile *pFile = fileOpen(szFilePath, "rb");
 	if(!pFile) {
-		logWrite("ERR: File doesn't exist: '%s'\n", szFilePath);
+		logWrite("ERR: File doesn't exist\n");
+		logBlockEnd("jsonCreate()");
+		return 0;
 	}
 	fileRead(pFile, pJson->szData, lFileSize);
 	pJson->szData[lFileSize] = '\0';
@@ -121,14 +123,15 @@ UWORD jsonGetDom(const tJson *pJson, const char *szPattern) {
 		if(*c == '[') {
 			// Array element - read number
 			UWORD uwIdx = 0;
-			while(*c != ']') {
+			while(*(++c) != ']') {
 				if(*c < '0' || *c > '9') {
+					logWrite("ERR: Unexpected idx char: '%c'\n", *c);
 					return 0;
 				}
 				uwIdx = uwIdx*10 + (*c - '0');
-				++c;
 			}
 			uwParentTok = jsonGetElementInArray(pJson, uwParentTok, uwIdx);
+			++c;
 		}
 		else {
 			// Struct element - read name
@@ -144,6 +147,9 @@ UWORD jsonGetDom(const tJson *pJson, const char *szPattern) {
 			if(*c == '.') {
 				++c;
 			}
+			if(!uwParentTok) {
+				logWrite("Can't find: '%s'\n", szElementName);
+			}
 		}
 		if(!uwParentTok) {
 			return 0;
@@ -157,15 +163,20 @@ ULONG jsonTokToUlong(const tJson *pJson, UWORD uwTok, LONG lBase) {
 	return strtoul(pJson->szData + pJson->pTokens[uwTok].start, 0, lBase);
 }
 
+UWORD jsonStrLen(const tJson *pJson, UWORD uwTok) {
+	UWORD uwLength = pJson->pTokens[uwTok].end - pJson->pTokens[uwTok].start;
+	return uwLength;
+}
+
 UWORD jsonTokStrCpy(
 	const tJson *pJson, UWORD uwTok, char *pDst, UWORD uwMaxLength
 ) {
-	UWORD uwTrueLength = pJson->pTokens[uwTok].end - pJson->pTokens[uwTok].start;
+	UWORD uwCpyLength = jsonStrLen(pJson, uwTok);
 	if(uwMaxLength) {
-		UWORD uwCpyLength = MIN(uwTrueLength, uwMaxLength-1);
-		memcpy(pDst, pJson->szData + pJson->pTokens[uwTok].start, uwCpyLength);
-		pDst[uwCpyLength] = '\0';
+		uwCpyLength = MIN(uwCpyLength, uwMaxLength-1);
 	}
-	return uwTrueLength;
+	memcpy(pDst, pJson->szData + pJson->pTokens[uwTok].start, uwCpyLength);
+	pDst[uwCpyLength] = '\0';
+	return uwCpyLength;
 }
 

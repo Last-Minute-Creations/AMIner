@@ -6,6 +6,13 @@
 #define _COMM_SHOP_H_
 
 #include <ace/types.h>
+#include "string_array.h"
+
+#define WORKSHOP_ITEM_COUNT 4
+#define WAREHOUSE_COL_COUNT 4
+
+extern tStringArray g_sShopNames;
+tStringArray g_sWarehouseColNames;
 
 void commShopGsCreate(void);
 

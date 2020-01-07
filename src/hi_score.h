@@ -6,6 +6,13 @@
 #define _HI_SCORE_H_
 
 #include <ace/types.h>
+#include "string_array.h"
+
+typedef enum _tMsgHiScore {
+	MSG_HI_SCORE_NEW,
+	MSG_HI_SCORE_PRESS,
+	MSG_HI_SCORE_COUNT,
+} tMsgHiScore;
 
 void hiScoreEnteringProcess(void);
 
@@ -16,5 +23,7 @@ void hiScoreSetup(LONG lScore, const char *szResult);
 void hiScoreLoad(void);
 
 void hiScoreDrawAll(void);
+
+extern tStringArray g_sHiScoreMessages;
 
 #endif // _HI_SCORE_H_
