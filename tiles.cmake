@@ -53,7 +53,7 @@ set(TILE_93 33 331 "minerals.png") # TILE_BONE_HEAD
 set(TILE_94 1 331 "minerals.png") # TILE_BONE_1
 
 tileExtractFromPng(
-	${TARGET_NAME} "TILE"
+	aminer "TILE"
 	"${CMAKE_CURRENT_SOURCE_DIR}/_res/tiles"
 	"${CMAKE_CURRENT_SOURCE_DIR}/data/tiles.bm"
 )

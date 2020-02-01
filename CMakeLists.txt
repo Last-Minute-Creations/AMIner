@@ -2,38 +2,22 @@ cmake_minimum_required(VERSION 2.8.5)
 project(aminer)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Lowercase project name for binaries and packaging
-string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
-
 if(NOT AMIGA)
 	message(SEND_ERROR "This project only compiles for Amiga")
 endif()
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAMIGA -Wall -Wextra -fomit-frame-pointer")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DACE_DEBUG")
-file(GLOB_RECURSE SOURCES src/*.c)
-file(GLOB_RECURSE HEADERS src/*.h)
-
-include_directories(
-	${PROJECT_SOURCE_DIR}/src
-)
-
-if(GAME_DEBUG)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGAME_DEBUG")
-endif()
-if(ACE_DEBUG)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DACE_DEBUG") # For ACE headers with ifdefs
-endif()
-
 # ACE
 add_subdirectory(deps/ace ace)
-include_directories(deps/ace/include)
 
-# Linux/other UNIX get a lower-case binary name
-set(TARGET_NAME ${PROJECT_NAME_LOWER})
-add_executable(${TARGET_NAME} ${SOURCES} ${HEADERS})
-target_link_libraries(${TARGET_NAME} ace)
+set(CMAKE_C_STANDARD 11)
+file(GLOB_RECURSE SOURCES src/*.c src/*.h)
+add_executable(aminer ${SOURCES})
+target_include_directories(aminer PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_compile_options(aminer PUBLIC -Wall -Wextra)
+target_link_libraries(aminer ace)
+if(GAME_DEBUG)
+  target_compile_definitions(aminer PRIVATE GAME_DEBUG)
+endif()
 
 # Palette
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data")
@@ -46,12 +30,12 @@ file(GLOB palette_aminer_gpl _res/palettes/aminer.gpl)
 file(GLOB palette_lmc_gpl _res/palettes/lmc.gpl)
 set(palette_aminer "${CMAKE_CURRENT_SOURCE_DIR}/data/aminer.plt")
 set(palette_lmc "${CMAKE_CURRENT_SOURCE_DIR}/data/lmc.plt")
-convertPalette(${TARGET_NAME} ${palette_aminer_gpl} ${palette_aminer})
-convertPalette(${TARGET_NAME} ${palette_lmc_gpl} ${palette_lmc})
+convertPalette(aminer ${palette_aminer_gpl} ${palette_aminer})
+convertPalette(aminer ${palette_lmc_gpl} ${palette_lmc})
 set(transparency_hex "#993399")
 
 convertBitmaps(
-	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique}
+	TARGET aminer PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCES
 		_res/commrade/bg.png _res/commrade/buttons.png _res/commrade/faces.png
 		_res/hud/hud.png _res/hud/mode_icons.png _res/logo.png
@@ -61,12 +45,12 @@ convertBitmaps(
 )
 
 convertBitmaps(
-	TARGET ${TARGET_NAME} PALETTE ${palette_lmc}
+	TARGET aminer PALETTE ${palette_lmc}
 	INTERLEAVED SOURCES _res/lmc.png DESTINATIONS data/lmc.bm
 )
 
 convertBitmaps(
-	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
+	TARGET aminer PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
 	INTERLEAVED SOURCES
 		_res/drill.png _res/tool.png _res/wreck.png
 		_res/drill_2.png _res/tool_2.png _res/wreck_2.png
@@ -84,9 +68,9 @@ convertBitmaps(
 		data/explosion_mask.bm data/teleport_mask.bm data/mode_cursor_mask.bm
 )
 
-convertFont(${TARGET_NAME} _res/uni54 data/uni54.fnt)
+convertFont(aminer _res/uni54 data/uni54.fnt)
 
-function(tileExtractFromPng TARGET_NAME TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
+function(tileExtractFromPng aminer TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
 	set(TILE_IDX 0)
 	set(TILESET_DEPENDS "")
 	while(TILE_IDX LESS "256")
@@ -116,7 +100,7 @@ function(tileExtractFromPng TARGET_NAME TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
 			${TILESET_DIR} 32 ${TILESET_OUTPUT} -i -plt ${palette_aminer_unique}
 		DEPENDS ${palette_aminer_unique} ${TILESET_DEPENDS}
 	)
-	target_sources(${TARGET_NAME} PUBLIC ${TILESET_OUTPUT})
+	target_sources(aminer PUBLIC ${TILESET_OUTPUT})
 endfunction()
 
 include("base0.cmake")

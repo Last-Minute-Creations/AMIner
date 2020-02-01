@@ -23,7 +23,7 @@ set(CHECKPOINT_18 256 64 "checkpoint.png") # TILE_CHECKPOINT_9
 set(CHECKPOINT_19 288 64 "checkpoint.png") # TILE_CHECKPOINT_10
 
 tileExtractFromPng(
-	${TARGET_NAME} "CHECKPOINT"
+	aminer "CHECKPOINT"
 	"${CMAKE_CURRENT_SOURCE_DIR}/_res/checkpoint"
 	"${CMAKE_CURRENT_SOURCE_DIR}/data/checkpoint.bm"
 )

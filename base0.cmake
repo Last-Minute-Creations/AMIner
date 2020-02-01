@@ -43,7 +43,7 @@ set(BASE0_41 256 256 "base0.png") # TILE_BASE_GROUND_8
 set(BASE0_42 288 256 "base0.png") # TILE_BASE_GROUND_9
 
 tileExtractFromPng(
-	${TARGET_NAME} "BASE0"
+	aminer "BASE0"
 	"${CMAKE_CURRENT_SOURCE_DIR}/_res/base0"
 	"${CMAKE_CURRENT_SOURCE_DIR}/data/base0.bm"
 )
