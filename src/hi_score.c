@@ -9,6 +9,7 @@
 #include <ace/utils/bitmap.h>
 #include "core.h"
 #include "comm.h"
+#include "game.h"
 
 #define SCORE_NAME_LENGTH 20
 #define SCORE_COUNT 10
@@ -121,7 +122,8 @@ void hiScoreDrawAll(void) {
 }
 
 void hiScoreEnteringProcess(void) {
-	if(keyUse(KEY_RETURN) || keyUse(KEY_NUMENTER)) {
+	commProcess();
+	if(commNavUse(COMM_NAV_BTN)) {
 		if(s_ubNewNameLength) {
 			hiScoreSave();
 		}

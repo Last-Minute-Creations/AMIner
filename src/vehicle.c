@@ -14,6 +14,7 @@
 #include "dino.h"
 #include "ground_layer.h"
 #include "defs.h"
+#include "inventory.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -174,6 +175,7 @@ static void vehicleCrash(tVehicle *pVehicle) {
 }
 
 static void vehicleHullDamage(tVehicle *pVehicle, UWORD uwDmg) {
+	UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
 	pVehicle->wHullCurr = MAX(0, pVehicle->wHullCurr - uwDmg);
 	if(pVehicle->wHullCurr == 0) {
 		vehicleCrash(pVehicle);
@@ -181,23 +183,24 @@ static void vehicleHullDamage(tVehicle *pVehicle, UWORD uwDmg) {
 	else {
 		pVehicle->ubDestructionState = (
 			(((UWORD)pVehicle->wHullCurr - 1) * VEHICLE_DESTRUCTION_FRAMES) /
-			(UWORD)pVehicle->wHullMax
+			uwHullMax
 		);
 		vehicleUpdateBodyBob(pVehicle);
 	}
-	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
+	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, uwHullMax);
 }
 
 static void vehicleHullRepair(tVehicle *pVehicle) {
-	pVehicle->wHullCurr = pVehicle->wHullMax;
+	UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
+	pVehicle->wHullCurr = uwHullMax;
 	pVehicle->ubDestructionState = VEHICLE_DESTRUCTION_FRAMES - 1;
-	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, pVehicle->wHullMax);
+	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, uwHullMax);
 }
 
 void vehicleRespawn(tVehicle *pVehicle) {
 	pVehicle->uwCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
-	pVehicle->uwDrillCurr = pVehicle->uwDrillMax;
+	pVehicle->uwDrillCurr = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
 	vehicleHullRepair(pVehicle);
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		pVehicle->pStock[i] = 0;
@@ -208,27 +211,7 @@ void vehicleRespawn(tVehicle *pVehicle) {
 void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
 	pVehicle->lCash = g_lInitialCash;
-	vehicleSetPartLevel(pVehicle, VEHICLE_PART_DRILL, 0);
-	vehicleSetPartLevel(pVehicle, VEHICLE_PART_HULL, 0);
-	vehicleSetPartLevel(pVehicle, VEHICLE_PART_CARGO, 0);
 	vehicleRespawn(pVehicle);
-}
-
-void vehicleSetPartLevel(tVehicle *pVehicle, tPart ePart, UBYTE ubLevel) {
-	pVehicle->pPartLevels[ePart] = ubLevel;
-	switch(ePart) {
-		case VEHICLE_PART_DRILL:
-			pVehicle->uwDrillMax = g_uwPartDrillBase + g_uwPartDrillPerLevel * (ubLevel);
-			break;
-		case VEHICLE_PART_CARGO:
-			pVehicle->uwCargoMax = g_uwPartCargoBase + g_uwPartCargoPerLevel *(ubLevel);
-			break;
-		case VEHICLE_PART_HULL:
-			pVehicle->wHullMax = g_uwPartHullBase + g_uwPartHullPerLevel * (ubLevel);
-			break;
-		default:
-			break;
-	}
 }
 
 void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
@@ -356,7 +339,7 @@ static inline UBYTE vehicleStartDrilling(
 
 	// Calculate layer difficulty
 	BYTE bLayerDifficulty = groundLayerGetDifficultyAtDepth(uwTileY << 5);
-	BYTE bDrillLevel = pVehicle->pPartLevels[VEHICLE_PART_DRILL];
+	BYTE bDrillLevel = inventoryGetPartDef(INVENTORY_PART_DRILL)->ubLevel;
 	BYTE bDrillDuration = MAX(1, bLayerDifficulty - bDrillLevel);
 	UBYTE ubDrillCost = g_ubDrillingCost * bDrillDuration;
 
@@ -409,7 +392,8 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 
 	pVehicle->uwCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
-	hudSetCargo(pVehicle->ubPlayerIdx, 0, pVehicle->uwCargoMax);
+	UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
+	hudSetCargo(pVehicle->ubPlayerIdx, 0, uwCargoMax);
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		warehouseSetStock(i, warehouseGetStock(i) + pVehicle->pStock[i]);
 		pVehicle->pStock[i] = 0;
@@ -417,17 +401,19 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 
 	// Buy as much fuel as needed
 	// Start refueling if half a liter is spent
+	UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
 	UWORD uwRefuelLiters = (
-		pVehicle->uwDrillMax - pVehicle->uwDrillCurr + g_ubFuelInLiter / 2
+		uwDrillMax - pVehicle->uwDrillCurr + g_ubFuelInLiter / 2
 	) / g_ubFuelInLiter;
 
 	// It's possible to buy more fuel than needed (last liter) - fill up to max
 	pVehicle->uwDrillCurr = MIN(
-		pVehicle->uwDrillCurr + uwRefuelLiters * g_ubFuelInLiter, pVehicle->uwDrillMax
+		pVehicle->uwDrillCurr + uwRefuelLiters * g_ubFuelInLiter, uwDrillMax
 	);
 
 	// Buy as much hull as needed
-	UWORD uwRehullCost = g_ubHullPrice * (pVehicle->wHullMax - pVehicle->wHullCurr);
+	UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
+	UWORD uwRehullCost = g_ubHullPrice * (uwHullMax - pVehicle->wHullCurr);
 	vehicleHullRepair(pVehicle);
 
 	// Pay for your fuel & hull!
@@ -457,20 +443,21 @@ static void vehicleExcavateTile(tVehicle *pVehicle) {
 		);
 	}
 	else if(g_pTileDefs[ubTile].ubSlots) {
+		UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
 		UBYTE ubMineralType = g_pTileDefs[ubTile].ubMineral;
 		const tMineralDef *pMineral = &g_pMinerals[ubMineralType];
 		UBYTE ubSlots = g_pTileDefs[ubTile].ubSlots;
-		ubSlots = MIN(ubSlots, pVehicle->uwCargoMax - pVehicle->uwCargoCurr);
+		ubSlots = MIN(ubSlots, uwCargoMax - pVehicle->uwCargoCurr);
 		pVehicle->uwCargoScore += pMineral->ubReward * ubSlots;
 		pVehicle->uwCargoCurr += ubSlots;
 		pVehicle->pStock[ubMineralType] += ubSlots;
 		warehousePlanUnlockMineral(ubMineralType);
 
-		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->uwCargoCurr, pVehicle->uwCargoMax);
+		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->uwCargoCurr, uwCargoMax);
 		char szMsgBuffer[40];
 		const char *szMessage;
 		UBYTE ubColor;
-		if(pVehicle->uwCargoCurr == pVehicle->uwCargoMax) {
+		if(pVehicle->uwCargoCurr == uwCargoMax) {
 			szMessage = g_sMessages.pStrings[MSG_CARGO_FULL];
 			ubColor = COLOR_REDEST;
 			audioPlay(
@@ -991,7 +978,8 @@ void vehicleProcess(tVehicle *pVehicle) {
 			break;
 	}
 	UBYTE ubPlayerIdx = pVehicle->ubPlayerIdx;
-	hudSetDrill(ubPlayerIdx, pVehicle->uwDrillCurr, pVehicle->uwDrillMax);
+	UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
+	hudSetDrill(ubPlayerIdx, pVehicle->uwDrillCurr, uwDrillMax);
 	textBobAnimate(&pVehicle->sTextBob);
 	hudSetDepth(ubPlayerIdx, MAX(
 		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_BASE_DIRT)*32

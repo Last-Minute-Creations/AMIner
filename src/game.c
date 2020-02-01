@@ -4,7 +4,6 @@
 
 #include "game.h"
 #include <ace/managers/key.h>
-#include <ace/managers/joy.h>
 #include <ace/managers/game.h>
 #include <ace/utils/custom.h>
 #include <ace/managers/blit.h>
@@ -26,13 +25,37 @@
 #include "core.h"
 #include "dino.h"
 #include "debug.h"
+#include "steer.h"
+#include "inventory.h"
+
+#define CAMERA_SPEED 4
 
 typedef enum _tCameraType {
 	CAMERA_TYPE_P1,
 	CAMERA_TYPE_P2,
 } tCameraType;
 
-#define CAMERA_SPEED 4
+typedef struct _tModeSelection {
+	tMode eMode;
+	UBYTE isSelecting;
+	UBYTE isPress;
+	UBYTE ubPushTime;
+	tSteer eSteerFire;
+	tSteer eSteerLeft, eSteerRight, eSteerUp, eSteerDown;
+} tModeSelection;
+
+static tModeSelection s_pModeSelection[2] = {
+	{
+		.eSteerFire = STEER_P1_FIRE,
+		.eSteerLeft = STEER_P1_LEFT, .eSteerRight = STEER_P1_RIGHT,
+		.eSteerUp = STEER_P1_UP, .eSteerDown = STEER_P1_DOWN
+	},
+	{
+		.eSteerFire = STEER_P2_FIRE,
+		.eSteerLeft = STEER_P2_LEFT, .eSteerRight = STEER_P2_RIGHT,
+		.eSteerUp = STEER_P2_UP, .eSteerDown = STEER_P2_DOWN
+	},
+};
 
 tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
 
@@ -56,6 +79,13 @@ void gameTryPushBob(tBobNew *pBob) {
 	}
 }
 
+void modeReset(UBYTE ubPlayer) {
+	s_pModeSelection[ubPlayer].isSelecting = 0;
+	s_pModeSelection[ubPlayer].ubPushTime = 0;
+	s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
+	hudSetMode(ubPlayer, MODE_DRILL);
+}
+
 void gameStart(void) {
 	s_ubChallengeCamCnt = 0;
 	g_isChallengeEnd = 0;
@@ -63,6 +93,9 @@ void gameStart(void) {
 	tutorialReset();
 	tileInit(g_isAtari, g_isChallenge);
 	warehouseReset(g_is2pPlaying);
+	inventoryReset();
+	modeReset(0);
+	modeReset(1);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	hudReset(g_isChallenge, g_is2pPlaying);
@@ -70,14 +103,25 @@ void gameStart(void) {
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
 }
 
-static void gameProcessInput(void) {
-	if(g_isChallengeEnd) {
+static void gameProcessHotkeys(void) {
+  if(keyUse(KEY_ESCAPE) || keyUse(KEY_P)) {
+		gameChangeState(pauseGsCreate, pauseGsLoop, pauseGsDestroy);
 		return;
+  }
+	if(keyUse(KEY_B)) {
+		debugToggle();
 	}
+	if(keyCheck(KEY_M)) {
+		vPortWaitForEnd(s_pVpMain);
+		vPortWaitForEnd(s_pVpMain);
+		vPortWaitForEnd(s_pVpMain);
+	}
+
 	if(keyUse(KEY_F1) && !g_isChallenge) {
 		if(!g_is2pPlaying) {
 			g_is2pPlaying = 1;
 			hudSet2pPlaying(1);
+			modeReset(1);
 			vehicleResetPos(&g_pVehicles[1]);
 			g_pVehicles[1].fX = g_pVehicles[0].fX;
 			g_pVehicles[1].fY = g_pVehicles[0].fY;
@@ -101,39 +145,117 @@ static void gameProcessInput(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+}
 
-	BYTE bDirX = 0, bDirY = 0;
-	if(g_is1pKbd) {
-		if(keyCheck(KEY_D)) { bDirX += 1; }
-		if(keyCheck(KEY_A)) { bDirX -= 1; }
-		if(keyCheck(KEY_S)) { bDirY += 1; }
-		if(keyCheck(KEY_W)) { bDirY -= 1; }
-	}
-	else {
-		if(joyCheck(JOY1_RIGHT)) { bDirX += 1; }
-		if(joyCheck(JOY1_LEFT)) { bDirX -= 1; }
-		if(joyCheck(JOY1_DOWN)) { bDirY += 1; }
-		if(joyCheck(JOY1_UP)) { bDirY -= 1; }
-	}
-	vehicleMove(&g_pVehicles[0], bDirX, bDirY);
+static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 
-	if(g_is2pPlaying) {
-		bDirX = 0; bDirY = 0;
-		if(g_is2pKbd) {
-			if(keyCheck(KEY_RIGHT)) { bDirX += 1; }
-			if(keyCheck(KEY_LEFT)) { bDirX -= 1; }
-			if(keyCheck(KEY_DOWN)) { bDirY += 1; }
-			if(keyCheck(KEY_UP)) { bDirY -= 1; }
-		}
-		else {
-			if(joyCheck(JOY2_RIGHT)) { bDirX += 1; }
-			if(joyCheck(JOY2_LEFT)) { bDirX -= 1; }
-			if(joyCheck(JOY2_DOWN)) { bDirY += 1; }
-			if(joyCheck(JOY2_UP)) { bDirY -= 1; }
-		}
-		vehicleMove(&g_pVehicles[1], bDirX, bDirY);
+static void gameProcessModeTnt(UBYTE ubPlayer) {
+	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
+	if(pSelection->isPress) {
+		dynamiteTrigger(
+			&g_pVehicles[ubPlayer].sDynamite,
+			(g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+			(g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
+			DYNAMITE_TYPE_3X3
+		);
 	}
 }
+
+static void gameProcessModeTeleport(UBYTE ubPlayer) {
+	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
+	if(!pSelection->isSelecting && pSelection->eMode == MODE_TELEPORT) {
+		if(pSelection->isPress) {
+			vehicleTeleport(&g_pVehicles[ubPlayer], 160, s_pBaseTeleportY[0]);
+			pSelection->eMode = MODE_DRILL;
+			hudSetMode(0, pSelection->eMode);
+		}
+	}
+}
+
+static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
+	if(g_isChallengeEnd) {
+		return 0;
+	}
+	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
+
+	// Normal press
+	if(pSelection->isPress && vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+		gamePushState(commShopGsCreate, commShopGsLoop, commShopGsDestroy);
+		return  1;
+	}
+
+	BYTE bDirX = 0, bDirY = 0;
+	if(steerGet(pSelection->eSteerRight)) { bDirX += 1; }
+	if(steerGet(pSelection->eSteerLeft)) { bDirX -= 1; }
+	if(steerGet(pSelection->eSteerDown)) { bDirY += 1; }
+	if(steerGet(pSelection->eSteerUp)) { bDirY -= 1; }
+	vehicleMove(&g_pVehicles[ubPlayer], bDirX, bDirY);
+	return 0;
+}
+
+static void gameProcessModeSelection(UBYTE ubPlayerIdx) {
+	tModeSelection *pSelection = &s_pModeSelection[ubPlayerIdx];
+	pSelection->isPress = 0;
+	if(steerUse(pSelection->eSteerFire)) {
+		pSelection->ubPushTime = 1;
+	}
+	else if(steerGet(pSelection->eSteerFire)) {
+		if(pSelection->ubPushTime < 10) {
+			++pSelection->ubPushTime;
+		}
+		else if(!pSelection->isSelecting) {
+			// Long press - process hud selection
+			pSelection->isSelecting = 1;
+			hudShowMode();
+		}
+		if(pSelection->isSelecting) {
+			if(steerUse(pSelection->eSteerLeft) && pSelection->eMode > 0) {
+				--pSelection->eMode;
+			}
+			else if(steerUse(pSelection->eSteerRight) && pSelection->eMode < MODE_COUNT - 1) {
+				++pSelection->eMode;
+			}
+			hudSetMode(ubPlayerIdx, pSelection->eMode);
+		}
+	}
+	else if(pSelection->ubPushTime) {
+		pSelection->ubPushTime = 0;
+		if(pSelection->isSelecting) {
+			pSelection->isSelecting = 0;
+			hudHideMode();
+		}
+		else {
+			pSelection->isPress = 1;
+		}
+	}
+	return;
+}
+
+static UBYTE gameProcessSteer(UBYTE ubPlayer) {
+	UBYTE isReturnImmediately = 0;
+	if((ubPlayer == 0 || g_is2pPlaying)) {
+		gameProcessModeSelection(ubPlayer);
+		if(!s_pModeSelection[ubPlayer].isSelecting) {
+			switch(s_pModeSelection[ubPlayer].eMode) {
+				case MODE_DRILL:
+					isReturnImmediately = gameProcessModeDrill(ubPlayer);
+					break;
+				case MODE_TNT:
+					gameProcessModeTnt(ubPlayer);
+					break;
+				case MODE_NUKE:
+					break;
+				case MODE_TELEPORT:
+					gameProcessModeTeleport(ubPlayer);
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	return isReturnImmediately;
+}
+
 
 static void gameCameraProcess(void) {
 	if(g_isChallenge) {
@@ -235,69 +357,20 @@ void gameGsCreate(void) {
 }
 
 void gameGsLoop(void) {
-
-  if(keyUse(KEY_ESCAPE) || keyUse(KEY_P)) {
-		gameChangeState(pauseGsCreate, pauseGsLoop, pauseGsDestroy);
-		return;
-  }
-
 	if(!g_isChallenge) {
 		if(tutorialProcess()) {
 			return;
 		}
 	}
 
-	if(keyUse(KEY_B)) {
-		debugToggle();
-	}
-	if(keyCheck(KEY_M)) {
-		vPortWaitForEnd(s_pVpMain);
-		vPortWaitForEnd(s_pVpMain);
-		vPortWaitForEnd(s_pVpMain);
-	}
-	if(
-		(keyUse(KEY_RETURN) || keyUse(KEY_SPACE)) &&
-		vehicleIsNearShop(&g_pVehicles[0])
-	) {
-		gamePushState(commShopGsCreate, commShopGsLoop, commShopGsDestroy);
-		return;
-	}
-	if(g_pVehicles[0].ubDrillDir == DRILL_DIR_NONE) {
-		if(keyUse(KEY_K)) {
-			dynamiteTrigger(
-				&g_pVehicles[0].sDynamite,
-				(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
-				(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
-				DYNAMITE_TYPE_HORZ
-			);
-		}
-		else if(keyUse(KEY_L)) {
-			dynamiteTrigger(
-				&g_pVehicles[0].sDynamite,
-				(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
-				(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
-				DYNAMITE_TYPE_3X3
-			);
-		}
-		else if(keyUse(KEY_O)) {
-			dynamiteTrigger(
-				&g_pVehicles[0].sDynamite,
-				(g_pVehicles[0].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
-				(g_pVehicles[0].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
-				DYNAMITE_TYPE_VERT
-			);
-		}
-		else if(keyUse(KEY_1)) {
-			vehicleTeleport(&g_pVehicles[0], 160, 220);
-		}
-		else if(keyUse(KEY_2)) {
-			vehicleTeleport(&g_pVehicles[0], 160, 3428);
-		}
-	}
-
 	debugColor(0x080);
 	gameCameraProcess();
-	gameProcessInput();
+	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
+	gameProcessHotkeys();
+	UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
+	if(isGameStateChange) {
+		return;
+	}
 	vehicleProcessText();
 
 	// Process plan being complete

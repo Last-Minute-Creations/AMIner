@@ -159,8 +159,8 @@ UWORD jsonGetDom(const tJson *pJson, const char *szPattern) {
 	return uwParentTok;
 }
 
-ULONG jsonTokToUlong(const tJson *pJson, UWORD uwTok, LONG lBase) {
-	return strtoul(pJson->szData + pJson->pTokens[uwTok].start, 0, lBase);
+ULONG jsonTokToUlong(const tJson *pJson, UWORD uwTok) {
+	return strtoul(pJson->szData + pJson->pTokens[uwTok].start, 0, 10);
 }
 
 UWORD jsonStrLen(const tJson *pJson, UWORD uwTok) {

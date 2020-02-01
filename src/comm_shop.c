@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "comm_shop.h"
-#include <ace/managers/key.h>
 #include <ace/managers/game.h>
 #include "comm.h"
 #include "core.h"
@@ -15,6 +14,7 @@
 #include "hud.h"
 #include "tutorial.h"
 #include "defs.h"
+#include "inventory.h"
 
 static UBYTE s_isShown;
 static UBYTE s_isBtnPress = 0;
@@ -34,7 +34,7 @@ tStringArray g_sShopNames;
 static UBYTE s_ubWorkshopPos = 0;
 static UBYTE s_isOnExitBtn = 0;
 
-static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
+static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 	s_ubWorkshopPos = ubPart;
 	static const char szCaption[] = "KRTEK 2600";
 
@@ -51,8 +51,8 @@ static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
 	commDrawText(0, uwOffs, g_sShopNames.pStrings[ubPart], ubFontFlags, ubColor);
 	uwOffs += 2 * ubRowSize;
 	char szBfr[50];
-	if(ubPart < VEHICLE_PART_COUNT) {
-		UBYTE ubLevel = g_pVehicles[0].pPartLevels[s_ubWorkshopPos];
+	if(ubPart < INVENTORY_PART_COUNT) {
+		UBYTE ubLevel = inventoryGetPartDef(s_ubWorkshopPos)->ubLevel;
 		sprintf(szBfr, "Mk%hhu", ubLevel + 1);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 		if(ubLevel < g_ubUpgradeLevels) {
@@ -62,16 +62,17 @@ static void commShopSelectWorkshopPart(UBYTE ubPart, UBYTE isActive) {
 		}
 	}
 	else {
-		sprintf(szBfr, "Stock: %hu/%hu", 0, 10);
+		const tItem *pItem = inventoryGetItemDef(s_ubWorkshopPos - INVENTORY_PART_COUNT);
+		sprintf(szBfr, "Stock: %hu/%hu", pItem->ubCount, pItem->ubMax);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 		uwOffs += ubRowSize;
-		sprintf(szBfr, "Buy: %lu\x1F", 100);
+		sprintf(szBfr, "Buy: %hu\x1F", pItem->uwPrice);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 	}
 }
 
 static void commShopDrawWorkshop(void) {
-	commShopSelectWorkshopPart(0, 1);
+	commShopSelectWorkshopPos(0, 1);
 
 	// Buttons
 	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 2;
@@ -85,6 +86,26 @@ static void commShopDrawWorkshop(void) {
 	s_isOnExitBtn = 0;
 }
 
+static UBYTE commShopWorkshopBuyFor(LONG lCost) {
+	if(g_pVehicles[0].lCash >= lCost) {
+		g_pVehicles[0].lCash -= lCost;
+		hudSetCash(0, g_pVehicles[0].lCash);
+		return 1;
+	}
+	logWrite("commShopWorkshopBuyFor: not enough cash\n");
+	// TODO: msg "you don't have enough cash"
+	return 0;
+}
+
+static UBYTE commShopWorkshopBuyIsFull(UBYTE ubGot, UBYTE ubMax, const char *szMsg) {
+	if(ubGot < ubMax) {
+		return 0;
+	}
+	// TODO: msg szMsg
+	logWrite("commShopWorkshopBuyIsFull: '%s'\n", szMsg);
+	return 1;
+}
+
 static void commShopProcessWorkshop(void) {
 	if(s_isOnExitBtn) {
 		if(s_isBtnPress) {
@@ -95,26 +116,31 @@ static void commShopProcessWorkshop(void) {
 			buttonSelect(0);
 			buttonDrawAll(s_pBmDraw);
 			s_isOnExitBtn = 0;
-			commShopSelectWorkshopPart(s_ubWorkshopPos, 1);
+			commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
 		}
 	}
 	else {
 		if(s_isBtnPress) {
-			if(s_ubWorkshopPos < VEHICLE_PART_COUNT) {
-				UBYTE ubPartLevel = g_pVehicles[0].pPartLevels[s_ubWorkshopPos];
-				if(ubPartLevel < g_ubUpgradeLevels) {
-					LONG lNextCost = g_pUpgradeCosts[ubPartLevel];
-					if(g_pVehicles[0].lCash >= lNextCost) {
-						// Buy part
-						g_pVehicles[0].lCash -= lNextCost;
-						hudSetCash(0, g_pVehicles[0].lCash);
-						vehicleSetPartLevel(&g_pVehicles[0], s_ubWorkshopPos, ubPartLevel + 1);
-						vehicleSetPartLevel(&g_pVehicles[1], s_ubWorkshopPos, ubPartLevel + 1);
-						commShopSelectWorkshopPart(s_ubWorkshopPos, 1);
-					}
-					else {
-						// Not enough cash
-					}
+			if(s_ubWorkshopPos < INVENTORY_PART_COUNT) {
+				const tPart *pPart = inventoryGetPartDef(s_ubWorkshopPos);
+				UBYTE ubLevel = pPart->ubLevel;
+				if(!commShopWorkshopBuyIsFull(
+					ubLevel, g_ubUpgradeLevels, "you already have max level!"
+				) && commShopWorkshopBuyFor(g_pUpgradeCosts[ubLevel])) {
+					inventorySetPartLevel(s_ubWorkshopPos, ubLevel+1);
+					commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
+				}
+			}
+			else {
+				tItemName eItemName = s_ubWorkshopPos - INVENTORY_PART_COUNT;
+				const tItem *pItem = inventoryGetItemDef(eItemName);
+				logWrite("try to buy item %p, %hhu/%hhu\n", pItem, pItem->ubCount, pItem->ubMax);
+				// item - TNT, nuke, teleport
+				if(!commShopWorkshopBuyIsFull(
+					pItem->ubCount, pItem->ubMax, "you're already full!"
+				) && commShopWorkshopBuyFor(pItem->uwPrice)) {
+					inventorySetItemCount(eItemName, pItem->ubCount + 1);
+					commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
 				}
 			}
 		}
@@ -122,21 +148,21 @@ static void commShopProcessWorkshop(void) {
 			buttonSelect(1);
 			buttonDrawAll(s_pBmDraw);
 			s_isOnExitBtn = 1;
-			commShopSelectWorkshopPart(s_ubWorkshopPos, 0);
+			commShopSelectWorkshopPos(s_ubWorkshopPos, 0);
 		}
 		else if(commNavUse(COMM_NAV_RIGHT)) {
 			BYTE bNewPos = s_ubWorkshopPos + 1;
 			if(bNewPos >= WORKSHOP_ITEM_COUNT) {
 				bNewPos = 0;
 			}
-			commShopSelectWorkshopPart(bNewPos, 1);
+			commShopSelectWorkshopPos(bNewPos, 1);
 		}
 		else if(commNavUse(COMM_NAV_LEFT)) {
 			BYTE bNewPos = s_ubWorkshopPos - 1;
 			if(bNewPos < 0) {
 				bNewPos = WORKSHOP_ITEM_COUNT - 1;
 			}
-			commShopSelectWorkshopPart(bNewPos, 1);
+			commShopSelectWorkshopPos(bNewPos, 1);
 		}
 	}
 }

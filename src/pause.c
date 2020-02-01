@@ -1,49 +1,25 @@
 #include "pause.h"
-#include <ace/managers/key.h>
-#include <ace/managers/joy.h>
 #include <ace/managers/game.h>
 #include "hud.h"
 #include "game.h"
 #include "core.h"
 #include "menu.h"
+#include "steer.h"
 
 void pauseGsCreate(void) {
 	hudPause(1);
 }
 
 void pauseGsLoop(void) {
-	UBYTE ubKey = 0;
-	if(g_is1pKbd) {
-		if(keyUse(KEY_D)) { ubKey = KEY_RIGHT; }
-		if(keyUse(KEY_A)) { ubKey = KEY_LEFT; }
-	}
-	else {
-		if(joyUse(JOY1_RIGHT)) { ubKey = KEY_RIGHT; }
-		if(joyUse(JOY1_LEFT)) { ubKey = KEY_LEFT; }
-		if(joyUse(JOY1_FIRE)) { ubKey = KEY_RETURN; }
-	}
-	if(keyUse(KEY_RETURN)) { ubKey = KEY_RETURN; }
+	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
 
-	if(g_is2pPlaying) {
-		if(g_is2pKbd) {
-			if(keyUse(KEY_RIGHT)) { ubKey = KEY_RIGHT; }
-			if(keyUse(KEY_LEFT)) { ubKey = KEY_LEFT; }
-		}
-		else {
-			if(joyUse(JOY2_RIGHT)) { ubKey = KEY_RIGHT; }
-			if(joyUse(JOY2_LEFT)) { ubKey = KEY_LEFT; }
-			if(joyUse(JOY2_FIRE)) { ubKey = KEY_RETURN; }
-		}
-	}
-
-	if(ubKey == KEY_LEFT) {
+	if(steerGet(STEER_P1_LEFT) || steerGet(STEER_P2_LEFT)) {
 		hudSelect(0);
 	}
-	else if(ubKey == KEY_RIGHT) {
+	else if(steerGet(STEER_P1_RIGHT) || steerGet(STEER_P2_RIGHT)) {
 		hudSelect(1);
 	}
-	else if(ubKey == KEY_RETURN) {
-
+	else if(steerGet(STEER_P1_FIRE) || steerGet(STEER_P2_FIRE)) {
 		if(hudGetSelection() == 0) {
 			gameChangeState(gameGsCreate, gameGsLoop, gameGsDestroy);
 		}

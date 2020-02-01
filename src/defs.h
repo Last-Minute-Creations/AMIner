@@ -9,9 +9,6 @@
 
 extern LONG g_lInitialCash;
 extern UBYTE g_ubUpgradeLevels;
-extern UWORD g_uwPartDrillBase, g_uwPartDrillPerLevel;
-extern UWORD g_uwPartCargoBase, g_uwPartCargoPerLevel;
-extern UWORD g_uwPartHullBase, g_uwPartHullPerLevel;
 extern UBYTE g_ubDrillingCost;
 extern UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 

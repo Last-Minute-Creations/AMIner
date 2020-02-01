@@ -54,10 +54,10 @@ convertBitmaps(
 	TARGET ${TARGET_NAME} PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCES
 		_res/commrade/bg.png _res/commrade/buttons.png _res/commrade/faces.png
-		_res/hud.png _res/logo.png
+		_res/hud/hud.png _res/hud/mode_icons.png _res/logo.png
 	DESTINATIONS
 		data/comm_bg.bm data/comm_buttons.bm data/comm_faces.bm
-		data/hud.bm data/logo.bm
+		data/hud.bm data/mode_icons.bm data/logo.bm
 )
 
 convertBitmaps(
@@ -71,17 +71,17 @@ convertBitmaps(
 		_res/drill.png _res/tool.png _res/wreck.png
 		_res/drill_2.png _res/tool_2.png _res/wreck_2.png
 		_res/track.png _res/jet.png _res/bones.png _res/smoke.png
-		_res/explosion.png _res/teleport.png
+		_res/explosion.png _res/teleport.png _res/hud/mode_cursor.png
 	DESTINATIONS
 		data/drill.bm data/tool.bm data/wreck.bm
 		data/drill_2.bm data/tool_2.bm data/wreck_2.bm
 		data/track.bm data/jet.bm data/bones.bm data/smoke.bm
-		data/explosion.bm data/teleport.bm
+		data/explosion.bm data/teleport.bm data/mode_cursor.bm
 	MASKS
 		data/drill_mask.bm data/tool_mask.bm data/wreck_mask.bm
 		NONE NONE NONE
 		data/track_mask.bm data/jet_mask.bm data/bones_mask.bm data/smoke_mask.bm
-		data/explosion_mask.bm data/teleport_mask.bm
+		data/explosion_mask.bm data/teleport_mask.bm data/mode_cursor_mask.bm
 )
 
 convertFont(${TARGET_NAME} _res/uni54 data/uni54.fnt)

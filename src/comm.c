@@ -3,9 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "comm.h"
-#include <ace/managers/key.h>
-#include <ace/managers/joy.h>
 #include "core.h"
+#include "steer.h"
 #include "game.h"
 
 typedef enum _tBtnState {
@@ -90,32 +89,13 @@ void commProcess(void) {
 		{218, 129, 142, 13}
 	};
 
+	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
 	UBYTE pTests[COMM_NAV_COUNT] = {
-		(
-			(keyCheck(KEY_W) || joyCheck(JOY1 + JOY_UP)) || (g_is2pPlaying && (
-				(g_is2pKbd && keyCheck(KEY_UP)) || (!g_is2pKbd && joyCheck(JOY2 + JOY_UP))
-			))
-		),
-		(
-			(keyCheck(KEY_S) || joyCheck(JOY1 + JOY_DOWN)) || (g_is2pPlaying && (
-				(g_is2pKbd && keyCheck(KEY_DOWN)) || (!g_is2pKbd && joyCheck(JOY2 + JOY_DOWN))
-			))
-		),
-		(
-			(keyCheck(KEY_A) || joyCheck(JOY1 + JOY_LEFT)) || (g_is2pPlaying && (
-				(g_is2pKbd && keyCheck(KEY_LEFT)) || (!g_is2pKbd && joyCheck(JOY2 + JOY_LEFT))
-			))
-		),
-		(
-			(keyCheck(KEY_D) || joyCheck(JOY1 + JOY_RIGHT)) || (g_is2pPlaying && (
-				(g_is2pKbd && keyCheck(KEY_RIGHT)) || (!g_is2pKbd && joyCheck(JOY2 + JOY_RIGHT))
-			))
-		),
-		(
-			keyCheck(KEY_RETURN) || keyCheck(KEY_SPACE) ||
-			joyCheck(JOY1 + JOY_FIRE) ||
-			(g_is2pPlaying && !g_is2pKbd && joyCheck(JOY2 + JOY_FIRE))
-		)
+		steerGet(STEER_P1_UP)  || steerGet(STEER_P2_UP),
+		steerGet(STEER_P1_DOWN) || steerGet(STEER_P2_DOWN),
+		steerGet(STEER_P1_LEFT) || steerGet(STEER_P2_LEFT),
+		steerGet(STEER_P1_RIGHT) || steerGet(STEER_P2_RIGHT),
+		steerGet(STEER_P1_FIRE) || steerGet(STEER_P2_FIRE),
 	};
 
 	tUwCoordYX sOrigin = commGetOrigin();

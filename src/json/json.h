@@ -25,7 +25,7 @@ UWORD jsonGetElementInStruct(
 
 UWORD jsonGetDom(const tJson *pJson,const char *szPattern);
 
-ULONG jsonTokToUlong(const tJson *pJson,UWORD uwTok,LONG lBase);
+ULONG jsonTokToUlong(const tJson *pJson,UWORD uwTok);
 
 UWORD jsonStrLen(const tJson *pJson, UWORD uwTok);
 

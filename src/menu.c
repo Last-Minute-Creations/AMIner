@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "menu.h"
-#include <ace/managers/key.h>
 #include <ace/managers/joy.h>
 #include <ace/managers/game.h>
 #include "game.h"
@@ -383,14 +382,12 @@ void menuGsLoop(void) {
 }
 
 void menuGsLoopScore(void) {
+	commProcess();
 	if(hiScoreIsEntering()) {
 		hiScoreEnteringProcess();
 	}
 	else {
-		if(
-			keyUse(KEY_ESCAPE) || keyUse(KEY_RETURN) ||
-			joyUse(JOY1_FIRE) || joyUse(JOY2_FIRE)
-		) {
+		if(commNavUse(COMM_NAV_BTN)) {
 			menuInitialDraw(g_pMainBuffer->pScroll->pFront);
 			gameChangeLoop(menuGsLoop);
 			return;

@@ -1,17 +1,26 @@
 {
 	"initialCash": 10000,
 	"upgradeCosts": [1000, 5000, 25000, 150000],
-	"hull": {
-		"base": 100,
-		"addPerLevel": 20
-	},
-	"drill": {
-		"base": 1000,
-		"addPerLevel": 250
-	},
-	"cargo": {
-		"base": 50,
-		"addPerLevel": 20
+	"inventory": {
+		"parts" : {
+			"hull": {
+				"base": 100,
+				"addPerLevel": 20
+			},
+			"drill": {
+				"base": 1000,
+				"addPerLevel": 250
+			},
+			"cargo": {
+				"base": 50,
+				"addPerLevel": 20
+			}
+		},
+		"items": {
+			"tnt": {"price": 100, "max": 5},
+			"nuke": {"price": 1000, "max": 1},
+			"teleport": {"price": 750, "max": 3},
+		}
 	},
 	"drillingCost": 15,
 	"restock": {
@@ -20,9 +29,4 @@
 		"hullPrice": 2
 	},
 	"dinoDepths": [80, 200, 400, 600, 800, 1000, 1500, 2000, 2500],
-	"utilCost": {
-		"tnt": 100,
-		"nuke": 1000,
-		"teleport": 750
-	}
 }
