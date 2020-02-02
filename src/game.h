@@ -37,5 +37,6 @@ extern UBYTE g_is2pPlaying;
 extern UBYTE g_is1pKbd, g_is2pKbd;
 extern UBYTE g_isChallenge, g_isChallengeEnd;
 extern UBYTE g_isAtari;
+extern tBobNew g_pBombMarkers[3];
 
 #endif // _GAME_H_

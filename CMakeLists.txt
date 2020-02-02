@@ -56,16 +56,19 @@ convertBitmaps(
 		_res/drill_2.png _res/tool_2.png _res/wreck_2.png
 		_res/track.png _res/jet.png _res/bones.png _res/smoke.png
 		_res/explosion.png _res/teleport.png _res/hud/mode_cursor.png
+		_res/bomb_marker.png
 	DESTINATIONS
 		data/drill.bm data/tool.bm data/wreck.bm
 		data/drill_2.bm data/tool_2.bm data/wreck_2.bm
 		data/track.bm data/jet.bm data/bones.bm data/smoke.bm
 		data/explosion.bm data/teleport.bm data/mode_cursor.bm
+		data/bomb_marker.bm
 	MASKS
 		data/drill_mask.bm data/tool_mask.bm data/wreck_mask.bm
 		NONE NONE NONE
 		data/track_mask.bm data/jet_mask.bm data/bones_mask.bm data/smoke_mask.bm
 		data/explosion_mask.bm data/teleport_mask.bm data/mode_cursor_mask.bm
+		data/bomb_marker_mask.bm
 )
 
 convertFont(aminer _res/uni54 data/uni54.fnt)

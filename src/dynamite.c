@@ -32,51 +32,46 @@ static void dynamitePushXY(tDynamite *pDynamite, UWORD uwX, UWORD uwY) {
 	++pDynamite->ubCount;
 }
 
-void dynamiteTrigger(
-	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubDynamiteType
+UBYTE dynamiteTrigger(
+	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubCount,
+	tBombDir eDir
 ) {
-	if(pDynamite->ubCount != 0) {
-		return;
+	UBYTE ubTntUsed = 0;
+	if(pDynamite->ubCount != 0 || ubCount == 0) {
+		return 0;
 	}
-	UBYTE isLeft = (uwTileX > 1);
-	UBYTE isRight = (uwTileX < 10);
-	switch(ubDynamiteType) {
-		case DYNAMITE_TYPE_5x5:
-		case DYNAMITE_TYPE_3X3:
-			if(isLeft) {
-				dynamitePushXY(pDynamite, uwTileX - 1, uwTileY - 1);
-				dynamitePushXY(pDynamite, uwTileX - 1, uwTileY + 0);
-				dynamitePushXY(pDynamite, uwTileX - 1, uwTileY + 1);
-			}
-			dynamitePushXY(pDynamite, uwTileX, uwTileY + 1);
-			if(isRight) {
-				dynamitePushXY(pDynamite, uwTileX + 1, uwTileY + 1);
-				dynamitePushXY(pDynamite, uwTileX + 1, uwTileY + 0);
-				dynamitePushXY(pDynamite, uwTileX + 1, uwTileY - 1);
-			}
-			dynamitePushXY(pDynamite, uwTileX, uwTileY - 1);
+	BYTE bDeltaX = 0, bDeltaY = 0;
+	switch(eDir) {
+		case BOMB_DIR_LEFT:
+			bDeltaX = -1;
+			break;
+		case BOMB_DIR_RIGHT:
+			bDeltaX = 1;
+			break;
+		case BOMB_DIR_UP:
+			bDeltaY = -1;
+			break;
+		case BOMB_DIR_DOWN:
+			bDeltaY = 1;
+			break;
+		case BOMB_DIR_NONE:
+		default:
+			return 0;
+	}
+	for(UBYTE i = 0; i < ubCount; ++i) {
+		uwTileX += bDeltaX;
+		uwTileY += bDeltaY;
+		if(1 <= uwTileX && uwTileX <= 10) {
 			dynamitePushXY(pDynamite, uwTileX, uwTileY);
+			++ubTntUsed;
+		}
+		else {
 			break;
-			break;
-		case DYNAMITE_TYPE_VERT:
-			dynamitePushXY(pDynamite, uwTileX, uwTileY - 2);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY + 2);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY - 1);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY + 1);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY);
-			break;
-		case DYNAMITE_TYPE_HORZ:
-			if(isLeft) {
-				dynamitePushXY(pDynamite, uwTileX - 1, uwTileY);
-			}
-			if(isRight) {
-				dynamitePushXY(pDynamite, uwTileX + 1, uwTileY);
-			}
-			dynamitePushXY(pDynamite, uwTileX, uwTileY);
-			break;
+		}
 	}
 	const tUwCoordYX *pFirst = &pDynamite->pCoords[pDynamite->ubCount - 1];
 	explosionAdd(
 		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pDynamite, 1, 0
 	);
+	return ubTntUsed;
 }

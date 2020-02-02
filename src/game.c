@@ -69,6 +69,7 @@ UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
 tStringArray g_sPlanMessages;
+tBobNew g_pBombMarkers[3];
 
 void gameTryPushBob(tBobNew *pBob) {
 	if(
@@ -149,15 +150,92 @@ static void gameProcessHotkeys(void) {
 
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 
+static UBYTE s_pBombCount[2];
+static tBombDir s_pLastDir[2];
+
+static void addBombInDir(UBYTE ubPlayer, tBombDir eDir, tBombDir eOpposite) {
+	if(eDir == eOpposite && s_pBombCount[ubPlayer]) {
+		// opposite dir
+		--s_pBombCount[ubPlayer];
+	}
+	else if(eDir == s_pLastDir[ubPlayer]) {
+		// same dir
+		if(s_pBombCount[ubPlayer] < 3) {
+			++s_pBombCount[ubPlayer];
+		}
+	}
+	else {
+		// other dir
+		s_pBombCount[ubPlayer] = 1;
+	}
+	s_pLastDir[ubPlayer] = eDir;
+}
+
 static void gameProcessModeTnt(UBYTE ubPlayer) {
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
-	if(pSelection->isPress) {
+	if(steerUse(pSelection->eSteerLeft)) {
+		addBombInDir(ubPlayer, BOMB_DIR_LEFT, BOMB_DIR_RIGHT);
+	}
+	else if(steerUse(pSelection->eSteerRight)) {
+		addBombInDir(ubPlayer, BOMB_DIR_RIGHT, BOMB_DIR_LEFT);
+	}
+	else if(steerUse(pSelection->eSteerUp)) {
+		addBombInDir(ubPlayer, BOMB_DIR_UP, BOMB_DIR_DOWN);
+	}
+	else if(steerUse(pSelection->eSteerDown)) {
+		addBombInDir(ubPlayer, BOMB_DIR_DOWN, BOMB_DIR_UP);
+	}
+	else if(pSelection->isPress) {
 		dynamiteTrigger(
 			&g_pVehicles[ubPlayer].sDynamite,
 			(g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
 			(g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
-			DYNAMITE_TYPE_3X3
+			s_pBombCount[ubPlayer], s_pLastDir[ubPlayer]
 		);
+		s_pBombCount[ubPlayer] = 0;
+		s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
+		s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
+	}
+}
+
+static void gameDisplayModeTnt(UBYTE ubPlayer) {
+	if(
+		s_pModeSelection[ubPlayer].eMode != MODE_TNT ||
+		s_pModeSelection[ubPlayer].isSelecting
+	) {
+		return;
+	}
+	UWORD uwTileX = (g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5;
+	UWORD uwTileY = (g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5;
+	BYTE bDeltaX = 0, bDeltaY = 0;
+	switch(s_pLastDir[ubPlayer]) {
+		case BOMB_DIR_LEFT:
+			bDeltaX = -1;
+			break;
+		case BOMB_DIR_RIGHT:
+			bDeltaX = 1;
+			break;
+		case BOMB_DIR_UP:
+			bDeltaY = -1;
+			break;
+		case BOMB_DIR_DOWN:
+			bDeltaY = 1;
+			break;
+		case BOMB_DIR_NONE:
+		default:
+			return;
+	}
+	for(UBYTE i = 0; i < s_pBombCount[ubPlayer]; ++i) {
+		uwTileX += bDeltaX;
+		uwTileY += bDeltaY;
+		if(1 <= uwTileX && uwTileX <= 10) {
+			g_pBombMarkers[i].sPos.uwX = (uwTileX << 5) + 8;
+			g_pBombMarkers[i].sPos.uwY = (uwTileY << 5) + 11;
+			gameTryPushBob(&g_pBombMarkers[i]);
+		}
+		else {
+			break;
+		}
 	}
 }
 
@@ -223,6 +301,10 @@ static void gameProcessModeSelection(UBYTE ubPlayerIdx) {
 		if(pSelection->isSelecting) {
 			pSelection->isSelecting = 0;
 			hudHideMode();
+			if(pSelection->eMode == MODE_TNT) {
+				s_pBombCount[ubPlayerIdx] = 0;
+				s_pLastDir[ubPlayerIdx] = BOMB_DIR_NONE;
+			}
 		}
 		else {
 			pSelection->isPress = 1;
@@ -394,6 +476,8 @@ void gameGsLoop(void) {
 	}
 	debugColor(0x808);
 	explosionManagerProcess();
+	gameDisplayModeTnt(0);
+	gameDisplayModeTnt(1);
 	coreProcessAfterBobs();
 
 	if(g_isChallengeEnd && g_pVehicles[0].ubDrillDir == DRILL_DIR_NONE && (

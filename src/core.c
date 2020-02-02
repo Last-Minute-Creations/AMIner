@@ -29,6 +29,8 @@ static UWORD *s_pColorBg;
 static tView *s_pView;
 static tVPort *s_pVpMain;
 tTileBufferManager *g_pMainBuffer;
+static tBitMap *s_pBombMarker, *s_pBombMarkerMask;
+
 
 static void mainPaletteProcess(UBYTE ubFadeLevel) {
 	tFadeState eState = fadeGetState();
@@ -135,6 +137,13 @@ void coreGsCreate(void) {
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
 
+	s_pBombMarker = bitmapCreateFromFile("data/bomb_marker.bm", 0);
+	s_pBombMarkerMask = bitmapCreateFromFile("data/bomb_marker_mask.bm", 0);
+
+	for(UBYTE i = 0; i < 3; ++i) {
+		bobNewInit(&g_pBombMarkers[i], 16, 10, 1, s_pBombMarker, s_pBombMarkerMask, 0, 0);
+	}
+
 	menuPreload();
 	bobNewAllocateBgBuffers();
 	systemUnuse();
@@ -181,6 +190,9 @@ void coreGsDestroy(void) {
 	sampleDestroy(g_pSampleDrill);
 	sampleDestroy(g_pSampleOre);
 	sampleDestroy(g_pSampleTeleport);
+
+	bitmapDestroy(s_pBombMarker);
+	bitmapDestroy(s_pBombMarkerMask);
 
 	explosionManagerDestroy();
 	langDestroy();
