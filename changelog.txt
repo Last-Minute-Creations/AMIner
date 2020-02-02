@@ -1,3 +1,11 @@
+20.2.2
+
+- Added mode selection
+  - Short action button press is action, longer enters mode selection
+	- Implemented teleport, tnt and drill modes
+- Added buyable upgrades in shop
+- Removed tnt/teleport access via debug buttons
+
 19.10.8
 - There are now explosions in game
 - Added various dynamite types on K/L/O buttons
