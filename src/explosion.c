@@ -6,11 +6,15 @@
 #include "bob_new.h"
 #include "game.h"
 
+#include <ace/managers/audio.h>
+
 #define EXPLOSION_MAX 6
 #define EXPLOSION_COUNTER_MAX 4
 #define EXPLOSION_FRAME_HEIGHT 32
 #define EXPLOSION_FRAME_PEAK 5
 #define EXPLOSION_FRAME_COUNT 10
+
+#define EXPLOSION_AUDIO_CHANNEL AUDIO_CHANNEL_1
 
 typedef struct tExplosion {
 	tBobNew sBob;
@@ -26,12 +30,15 @@ static tExplosion *s_pExplosionNext = 0;
 
 static tBitMap *s_pBoomFrames, *s_pBoomFramesMask;
 static tBitMap *s_pTpFrames, *s_pTpFramesMask;
+static tSample *s_pSampleBoom;
 
 void explosionManagerCreate(void) {
 	s_pBoomFrames = bitmapCreateFromFile("data/explosion.bm", 0);
 	s_pBoomFramesMask = bitmapCreateFromFile("data/explosion_mask.bm", 0);
 	s_pTpFrames = bitmapCreateFromFile("data/teleport.bm", 0);
 	s_pTpFramesMask = bitmapCreateFromFile("data/teleport_mask.bm", 0);
+
+	s_pSampleBoom = sampleCreateFromFile("data/sfx/explosion.raw8", 22050);
 
 	s_pExplosionNext = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i) {
@@ -51,6 +58,8 @@ void explosionManagerDestroy(void) {
 	bitmapDestroy(s_pBoomFramesMask);
 	bitmapDestroy(s_pTpFrames);
 	bitmapDestroy(s_pTpFramesMask);
+
+	sampleDestroy(s_pSampleBoom);
 }
 
 void explosionAdd(
@@ -94,6 +103,7 @@ void explosionAdd(
 		s_pExplosionNext->sBob.pMask = s_pBoomFramesMask;
 	}
 	bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
+	audioPlay(EXPLOSION_AUDIO_CHANNEL, s_pSampleBoom, AUDIO_VOLUME_MAX, 1);
 }
 
 void explosionManagerProcess(void) {
