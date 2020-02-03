@@ -1,5 +1,9 @@
-20.2.2
+20.2.3
+- Added commrade key press/release sounds
+- Added TNT/explosion sound
+- Added teleport sound
 
+20.2.2
 - Added mode selection
   - Short action button press is action, longer enters mode selection
 	- Implemented teleport, tnt and drill modes

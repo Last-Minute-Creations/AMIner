@@ -30,7 +30,7 @@ static tExplosion *s_pExplosionNext = 0;
 
 static tBitMap *s_pBoomFrames, *s_pBoomFramesMask;
 static tBitMap *s_pTpFrames, *s_pTpFramesMask;
-static tSample *s_pSampleBoom;
+static tSample *s_pSampleBoom, *s_pSampleTeleport;
 
 void explosionManagerCreate(void) {
 	s_pBoomFrames = bitmapCreateFromFile("data/explosion.bm", 0);
@@ -39,6 +39,7 @@ void explosionManagerCreate(void) {
 	s_pTpFramesMask = bitmapCreateFromFile("data/teleport_mask.bm", 0);
 
 	s_pSampleBoom = sampleCreateFromFile("data/sfx/explosion.raw8", 22050);
+	s_pSampleTeleport = sampleCreateFromFile("data/sfx/teleport.raw8", 22050);
 
 	s_pExplosionNext = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i) {
@@ -60,6 +61,7 @@ void explosionManagerDestroy(void) {
 	bitmapDestroy(s_pTpFramesMask);
 
 	sampleDestroy(s_pSampleBoom);
+	sampleDestroy(s_pSampleTeleport);
 }
 
 void explosionAdd(
@@ -103,7 +105,10 @@ void explosionAdd(
 		s_pExplosionNext->sBob.pMask = s_pBoomFramesMask;
 	}
 	bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
-	audioPlay(EXPLOSION_AUDIO_CHANNEL, s_pSampleBoom, AUDIO_VOLUME_MAX, 1);
+	audioPlay(
+		EXPLOSION_AUDIO_CHANNEL, isTeleport ? s_pSampleTeleport : s_pSampleBoom,
+		AUDIO_VOLUME_MAX, 1
+	);
 }
 
 void explosionManagerProcess(void) {
