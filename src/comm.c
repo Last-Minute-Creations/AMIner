@@ -6,6 +6,8 @@
 #include "core.h"
 #include "steer.h"
 #include "game.h"
+#include <ace/managers/audio.h>
+#include <ace/managers/rand.h>
 
 typedef enum _tBtnState {
 	BTN_STATE_NACTIVE = 0,
@@ -19,6 +21,8 @@ static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
 static tTextBitMap *s_pLineBuffer;
 static UBYTE s_isShown = 0;
+static tSample *s_pSamplesKeyPress[4];
+static tSample *s_pSamplesKeyRelease[4];
 
 void commCreate(void) {
 	s_pBmRestore = bitmapCreate(
@@ -28,10 +32,24 @@ void commCreate(void) {
 	s_pBg = bitmapCreateFromFile("data/comm_bg.bm", 0);
 	s_pButtons = bitmapCreateFromFile("data/comm_buttons.bm", 0);
 	s_pLineBuffer = fontCreateTextBitMap(COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
+
+	for(UBYTE i = 0; i < 4; ++i) {
+		char szPath[40];
+		sprintf(szPath, "data/sfx/key_press_%hhu.raw8", i);
+		s_pSamplesKeyPress[i] = sampleCreateFromFile(szPath, 48000);
+		sprintf(szPath, "data/sfx/key_release_%hhu.raw8", i);
+		s_pSamplesKeyRelease[i] = sampleCreateFromFile(szPath, 48000);
+	}
+
 	s_isShown = 0;
 }
 
 void commDestroy(void) {
+	for(UBYTE i = 0; i < 4; ++i) {
+		sampleDestroy(s_pSamplesKeyPress[i]);
+		sampleDestroy(s_pSamplesKeyRelease[i]);
+	}
+
 	bitmapDestroy(s_pBmRestore);
 	bitmapDestroy(s_pBg);
 	bitmapDestroy(s_pButtons);
@@ -103,6 +121,7 @@ void commProcess(void) {
 	for(UBYTE i = 0; i < COMM_NAV_COUNT; ++i) {
 		if(pTests[i]) {
 			if(s_pNav[i] == BTN_STATE_NACTIVE) {
+				audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyPress[ubRand() & 3], AUDIO_VOLUME_MAX, 1);
 				s_pNav[i] = BTN_STATE_ACTIVE;
 				blitCopy(
 					s_pButtons, 0, pBtnPos[i][2], s_pBmDraw,
@@ -113,6 +132,7 @@ void commProcess(void) {
 			}
 		}
 		else if(s_pNav[i] != BTN_STATE_NACTIVE) {
+			audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyRelease[ubRand() & 3], AUDIO_VOLUME_MAX, 1);
 			s_pNav[i] = BTN_STATE_NACTIVE;
 			blitCopy(
 				s_pButtons, 0, pBtnPos[i][2] + pBtnPos[i][3], s_pBmDraw,

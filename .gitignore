@@ -1,10 +1,5 @@
 build/
 
-data/*
-!data/*.mod
-!data/*.raw8
-!data/*.json
-
 \.vscode/
 
 _res/tiles/

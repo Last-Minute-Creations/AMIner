@@ -174,7 +174,7 @@ static UBYTE menuEnter(void) {
 
 //---------------------------------------------------------------- MENU COMP END
 
-tSample *s_pSampleEnter, *s_pSampleToggle, *s_pSampleNavigate, *s_pSampleAtari;
+tSample *s_pSampleAtari;
 
 static UBYTE s_pKeyHistory[8] = {0};
 static UBYTE s_pKeyKonami[8] = {
@@ -195,7 +195,6 @@ static void menuEnableAtari(void) {
 }
 
 void onStart(void) {
-	audioPlay(AUDIO_CHANNEL_0, s_pSampleEnter, AUDIO_VOLUME_MAX, 1);
 	commEraseAll();
 	gameStart();
 	commHide();
@@ -242,19 +241,11 @@ void menuInitialDraw(tBitMap *pDisplayBuffer) {
 
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
-
-	s_pSampleEnter = sampleCreateFromFile("data/sfx/menu_enter.raw8", 22050);
-	s_pSampleToggle = sampleCreateFromFile("data/sfx/menu_toggle.raw8", 22050);
-	s_pSampleNavigate = sampleCreateFromFile("data/sfx/menu_navigate.raw8", 22050);
 	s_pSampleAtari = sampleCreateFromFile("data/sfx/atari.raw8", 22050);
 }
 
 void menuUnload(void) {
 	bitmapDestroy(s_pLogo);
-
-	sampleDestroy(s_pSampleEnter);
-	sampleDestroy(s_pSampleToggle);
-	sampleDestroy(s_pSampleNavigate);
 	sampleDestroy(s_pSampleAtari);
 }
 
@@ -276,27 +267,19 @@ static void menuProcessSelecting(void) {
 	UBYTE ubNewKey = 0;
 	if(commNavUse(COMM_NAV_UP)) {
 		ubNewKey = KEY_UP;
-		if(menuNavigate(-1)) {
-			audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
-		}
+		menuNavigate(-1);
 	}
 	else if(commNavUse(COMM_NAV_DOWN)) {
 		ubNewKey = KEY_DOWN;
-		if(menuNavigate(+1)) {
-			audioPlay(AUDIO_CHANNEL_0, s_pSampleNavigate, AUDIO_VOLUME_MAX, 1);
-		}
+		menuNavigate(+1);
 	}
 	else if(commNavUse(COMM_NAV_LEFT)) {
 		ubNewKey = KEY_LEFT;
-		if(menuToggle(-1)) {
-			audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
-		}
+		menuToggle(-1);
 	}
 	else if(commNavUse(COMM_NAV_RIGHT)) {
 		ubNewKey = KEY_RIGHT;
-		if(menuToggle(+1)) {
-			audioPlay(AUDIO_CHANNEL_0, s_pSampleToggle, AUDIO_VOLUME_MAX, 1);
-		}
+		menuToggle(+1);
 	}
 	else if(commNavUse(COMM_NAV_BTN)) {
 		menuEnter();
