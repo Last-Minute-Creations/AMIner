@@ -53,9 +53,11 @@ UBYTE steerUpdateFromFile(tFile *pFile) {
 }
 
 UBYTE steerUse(UWORD uwInput) {
-	UWORD uwSteer = steerGet(uwInput) & s_uwSteerUnused;
-	s_uwSteerUnused &= ~uwSteer;
-	return uwSteer;
+	UBYTE isPressed = ((steerGet(uwInput) & s_uwSteerUnused) == uwInput);
+	if(isPressed) {
+		s_uwSteerUnused &= ~uwInput;
+	}
+	return isPressed;
 }
 
 UWORD g_uwSteer;

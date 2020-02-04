@@ -16,6 +16,8 @@ typedef enum _tBombDir {
 typedef struct _tDynamite {
 	tUwCoordYX pCoords[VEHICLE_DYNAMITE_MAX];
 	UBYTE ubCount;
+	UBYTE ubCurrent;
+	UBYTE ubPlayer;
 } tDynamite;
 
 UBYTE dynamiteTrigger(

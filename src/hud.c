@@ -160,17 +160,18 @@ UBYTE hudGetSelection(void) {
 //------------------------------------------------------------------------- MODE
 
 static void hudDrawModeIcon(tMode eMode) {
-	UWORD uwOffsX = HUD_ORIGIN_X + (eMode + 1) * 40 - 1;
+	static const UWORD uwModeWidth = 40 - 1;
+	UWORD uwOffsX = HUD_ORIGIN_X + (eMode + 1) * uwModeWidth;
 	UWORD uwOffsY = HUD_ORIGIN_Y + HUD_PAGE_MODE * 31 + 1;
 
 	// Erase selection
 	blitRect(
-		s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1, 16, 15, HUD_COLOR_BG
+		s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1, uwModeWidth, 15, HUD_COLOR_BG
 	);
 
 	// Draw icon
 	UWORD uwIconOffs = eMode * MODE_ICON_HEIGHT;
-	if(!s_pModeCounters[eMode]) {
+	if(eMode != MODE_DRILL && !s_pModeCounters[eMode]) {
 		uwIconOffs += MODE_DISABLED_OFFS_Y;
 	}
 	blitCopy(
@@ -196,14 +197,16 @@ static void hudDrawModeIcon(tMode eMode) {
 	}
 
 	// Draw count
-	char szCount[6];
-	sprintf(szCount, "%hu", s_pModeCounters[eMode]);
-	fontFillTextBitMap(s_pFont, s_pLineBuffer, "0");
-	fontDrawTextBitMap(
-		s_pHudBuffer->pBack, s_pLineBuffer,
-		uwOffsX + 1 + 16, uwOffsY + MODE_ICON_HEIGHT / 2,
-		HUD_COLOR_BAR_FULL, FONT_COOKIE | FONT_VCENTER
-	);
+	if(eMode != MODE_DRILL) {
+		char szCount[6];
+		sprintf(szCount, "%hu", s_pModeCounters[eMode]);
+		fontFillTextBitMap(s_pFont, s_pLineBuffer, szCount);
+		fontDrawTextBitMap(
+			s_pHudBuffer->pBack, s_pLineBuffer,
+			uwOffsX + 1 + 16, uwOffsY + MODE_ICON_HEIGHT / 2,
+			HUD_COLOR_BAR_FULL, FONT_COOKIE | FONT_VCENTER
+		);
+	}
 }
 
 void hudSetModeCounter(tMode eMode, WORD wCount) {

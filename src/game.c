@@ -38,8 +38,6 @@ typedef enum _tCameraType {
 typedef struct _tModeSelection {
 	tMode eMode;
 	UBYTE isSelecting;
-	UBYTE isPress;
-	UBYTE ubPushTime;
 	tSteer eSteerFire;
 	tSteer eSteerLeft, eSteerRight, eSteerUp, eSteerDown;
 } tModeSelection;
@@ -82,7 +80,6 @@ void gameTryPushBob(tBobNew *pBob) {
 
 void modeReset(UBYTE ubPlayer) {
 	s_pModeSelection[ubPlayer].isSelecting = 0;
-	s_pModeSelection[ubPlayer].ubPushTime = 0;
 	s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
 	hudSetMode(ubPlayer, MODE_DRILL);
 }
@@ -99,6 +96,9 @@ void gameStart(void) {
 	modeReset(1);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
+	for(tMode eMode = 0; eMode < MODE_COUNT; ++eMode) {
+		hudSetModeCounter(eMode, 0);
+	}
 	hudReset(g_isChallenge, g_is2pPlaying);
 	groundLayerReset(1);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
@@ -154,11 +154,11 @@ static UBYTE s_pBombCount[2];
 static tBombDir s_pLastDir[2];
 
 static void addBombInDir(UBYTE ubPlayer, tBombDir eDir, tBombDir eOpposite) {
-	if(eDir == eOpposite && s_pBombCount[ubPlayer]) {
+	if(s_pLastDir[ubPlayer] == eOpposite && s_pBombCount[ubPlayer]) {
 		// opposite dir
 		--s_pBombCount[ubPlayer];
 	}
-	else if(eDir == s_pLastDir[ubPlayer]) {
+	else if(s_pLastDir[ubPlayer] == eDir) {
 		// same dir
 		if(s_pBombCount[ubPlayer] < 3) {
 			++s_pBombCount[ubPlayer];
@@ -167,8 +167,8 @@ static void addBombInDir(UBYTE ubPlayer, tBombDir eDir, tBombDir eOpposite) {
 	else {
 		// other dir
 		s_pBombCount[ubPlayer] = 1;
+		s_pLastDir[ubPlayer] = eDir;
 	}
-	s_pLastDir[ubPlayer] = eDir;
 }
 
 static void gameProcessModeTnt(UBYTE ubPlayer) {
@@ -185,7 +185,7 @@ static void gameProcessModeTnt(UBYTE ubPlayer) {
 	else if(steerUse(pSelection->eSteerDown)) {
 		addBombInDir(ubPlayer, BOMB_DIR_DOWN, BOMB_DIR_UP);
 	}
-	else if(pSelection->isPress) {
+	else if(steerUse(pSelection->eSteerFire)) {
 		dynamiteTrigger(
 			&g_pVehicles[ubPlayer].sDynamite,
 			(g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
@@ -241,13 +241,9 @@ static void gameDisplayModeTnt(UBYTE ubPlayer) {
 
 static void gameProcessModeTeleport(UBYTE ubPlayer) {
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
-	if(!pSelection->isSelecting && pSelection->eMode == MODE_TELEPORT) {
-		if(pSelection->isPress) {
-			vehicleTeleport(&g_pVehicles[ubPlayer], 160, s_pBaseTeleportY[0]);
-			pSelection->eMode = MODE_DRILL;
-			hudSetMode(0, pSelection->eMode);
-		}
-	}
+	vehicleTeleport(&g_pVehicles[ubPlayer], 160, s_pBaseTeleportY[0]);
+	pSelection->eMode = MODE_DRILL;
+	hudSetMode(0, pSelection->eMode);
 }
 
 static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
@@ -256,68 +252,61 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	}
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
 
-	// Normal press
-	if(pSelection->isPress && vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-		gamePushState(commShopGsCreate, commShopGsLoop, commShopGsDestroy);
-		return  1;
-	}
-
-	BYTE bDirX = 0, bDirY = 0;
-	if(steerGet(pSelection->eSteerRight)) { bDirX += 1; }
-	if(steerGet(pSelection->eSteerLeft)) { bDirX -= 1; }
-	if(steerGet(pSelection->eSteerDown)) { bDirY += 1; }
-	if(steerGet(pSelection->eSteerUp)) { bDirY -= 1; }
-	vehicleMove(&g_pVehicles[ubPlayer], bDirX, bDirY);
-	return 0;
-}
-
-static void gameProcessModeSelection(UBYTE ubPlayerIdx) {
-	tModeSelection *pSelection = &s_pModeSelection[ubPlayerIdx];
-	pSelection->isPress = 0;
 	if(steerUse(pSelection->eSteerFire)) {
-		pSelection->ubPushTime = 1;
-	}
-	else if(steerGet(pSelection->eSteerFire)) {
-		if(pSelection->ubPushTime < 10) {
-			++pSelection->ubPushTime;
-		}
-		else if(!pSelection->isSelecting) {
-			// Long press - process hud selection
+		if(!pSelection->isSelecting) {
+			if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+				gamePushState(commShopGsCreate, commShopGsLoop, commShopGsDestroy);
+				return 1;
+			}
 			pSelection->isSelecting = 1;
 			hudShowMode();
 		}
-		if(pSelection->isSelecting) {
-			if(steerUse(pSelection->eSteerLeft) && pSelection->eMode > 0) {
-				--pSelection->eMode;
-			}
-			else if(steerUse(pSelection->eSteerRight) && pSelection->eMode < MODE_COUNT - 1) {
-				++pSelection->eMode;
-			}
-			hudSetMode(ubPlayerIdx, pSelection->eMode);
-		}
-	}
-	else if(pSelection->ubPushTime) {
-		pSelection->ubPushTime = 0;
-		if(pSelection->isSelecting) {
+		else {
 			pSelection->isSelecting = 0;
 			hudHideMode();
 			if(pSelection->eMode == MODE_TNT) {
-				s_pBombCount[ubPlayerIdx] = 0;
-				s_pLastDir[ubPlayerIdx] = BOMB_DIR_NONE;
+				s_pBombCount[ubPlayer] = 0;
+				s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
 			}
 		}
-		else {
-			pSelection->isPress = 1;
-		}
 	}
-	return;
+	if(pSelection->isSelecting) {
+		if(steerUse(pSelection->eSteerLeft)) {
+			if(pSelection->eMode > 0) {
+				--pSelection->eMode;
+			}
+			else {
+				pSelection->eMode = MODE_COUNT - 1;
+			}
+		}
+		else if(steerUse(pSelection->eSteerRight)) {
+			if(pSelection->eMode < MODE_COUNT - 1) {
+			++pSelection->eMode;
+			}
+			else {
+				pSelection->eMode = 0;
+			}
+		}
+		hudSetMode(ubPlayer, pSelection->eMode);
+	}
+	else {
+		BYTE bDirX = 0, bDirY = 0;
+		if(steerGet(pSelection->eSteerRight)) { bDirX += 1; }
+		if(steerGet(pSelection->eSteerLeft)) { bDirX -= 1; }
+		if(steerGet(pSelection->eSteerDown)) { bDirY += 1; }
+		if(steerGet(pSelection->eSteerUp)) { bDirY -= 1; }
+		vehicleMove(&g_pVehicles[ubPlayer], bDirX, bDirY);
+	}
+	return 0;
 }
 
 static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 	UBYTE isReturnImmediately = 0;
 	if((ubPlayer == 0 || g_is2pPlaying)) {
-		gameProcessModeSelection(ubPlayer);
-		if(!s_pModeSelection[ubPlayer].isSelecting) {
+		if(s_pModeSelection[ubPlayer].isSelecting) {
+			isReturnImmediately = gameProcessModeDrill(ubPlayer);
+		}
+		else {
 			switch(s_pModeSelection[ubPlayer].eMode) {
 				case MODE_DRILL:
 					isReturnImmediately = gameProcessModeDrill(ubPlayer);
@@ -337,7 +326,6 @@ static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 	}
 	return isReturnImmediately;
 }
-
 
 static void gameCameraProcess(void) {
 	if(g_isChallenge) {

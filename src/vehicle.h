@@ -129,6 +129,8 @@ void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
 
 uint8_t vehiclesAreClose(void);
 
+void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY);
+
 extern tVehicle g_pVehicles[2];
 extern tStringArray g_sMessages;
 

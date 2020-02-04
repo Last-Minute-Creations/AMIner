@@ -107,7 +107,7 @@ tStringArray stringArrayCreateFromDomElements(tJson *pJson, UBYTE ubCount, ...) 
 void stringArrayDestroy(tStringArray *pArray) {
 	logBlockBegin("stringArrayDestroy(pArray: %p)", pArray);
 	for(UWORD i = 0; i < pArray->ubCount; ++i) {
-		logWrite("Freeing string %hhu (0x%p): '%s'", i, pArray->pStrings[i], pArray->pStrings[i]);
+		logWrite("Freeing string %hhu (0x%p): '%s'\n", i, pArray->pStrings[i], pArray->pStrings[i]);
 		stringDestroy(pArray->pStrings[i]);
 	}
 	memFree(pArray->pStrings, sizeof(char*) * pArray->ubCount);

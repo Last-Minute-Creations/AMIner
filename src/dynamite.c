@@ -1,28 +1,27 @@
 #include "dynamite.h"
 #include "explosion.h"
 #include "tile.h"
+#include "vehicle.h"
+#include <ace/managers/log.h>
 
 void onExplosionPeak(ULONG ulData) {
 	tDynamite *pDynamite = (tDynamite*)ulData;
-	if(pDynamite->ubCount > 0) {
-		UWORD uwX = pDynamite->pCoords[pDynamite->ubCount - 1].uwX;
-		UWORD uwY = pDynamite->pCoords[pDynamite->ubCount - 1].uwY;
-		// Hurt player if is on explosion tile
-		// TODO
+	UWORD uwX = pDynamite->pCoords[pDynamite->ubCurrent].uwX;
+	UWORD uwY = pDynamite->pCoords[pDynamite->ubCurrent].uwY;
+	// TODO Hurt player if is on explosion tile?
 
-		// Remove last tile from list
-		if(tileIsExplodable(uwX, uwY)) {
-			tileExcavate(uwX, uwY);
-		}
-		// Decrease count and add explosion on last one
-		--pDynamite->ubCount;
-		if(pDynamite->ubCount > 0) {
-			explosionAdd(
-				pDynamite->pCoords[pDynamite->ubCount - 1].uwX << 5,
-				pDynamite->pCoords[pDynamite->ubCount - 1].uwY << 5,
-				onExplosionPeak, ulData, 1, 0
-			);
-		}
+	// Excavate tile under explosion
+	if(tileIsDrillable(uwX, uwY)) {
+		vehicleExcavateTile(&g_pVehicles[pDynamite->ubPlayer], uwX, uwY);
+	}
+
+	// Trigger next explosion
+	if(++pDynamite->ubCurrent < pDynamite->ubCount) {
+		explosionAdd(
+			pDynamite->pCoords[pDynamite->ubCurrent].uwX << 5,
+			pDynamite->pCoords[pDynamite->ubCurrent].uwY << 5,
+			onExplosionPeak, ulData, 1, 0
+		);
 	}
 }
 
@@ -33,11 +32,10 @@ static void dynamitePushXY(tDynamite *pDynamite, UWORD uwX, UWORD uwY) {
 }
 
 UBYTE dynamiteTrigger(
-	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubCount,
+	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubNewCount,
 	tBombDir eDir
 ) {
-	UBYTE ubTntUsed = 0;
-	if(pDynamite->ubCount != 0 || ubCount == 0) {
+	if(pDynamite->ubCurrent != pDynamite->ubCount || ubNewCount == 0) {
 		return 0;
 	}
 	BYTE bDeltaX = 0, bDeltaY = 0;
@@ -58,18 +56,20 @@ UBYTE dynamiteTrigger(
 		default:
 			return 0;
 	}
-	for(UBYTE i = 0; i < ubCount; ++i) {
+	pDynamite->ubCount = 0;
+	pDynamite->ubCurrent = 0;
+	UBYTE ubTntUsed;
+	for(ubTntUsed = 0; ubTntUsed < ubNewCount; ++ubTntUsed) {
 		uwTileX += bDeltaX;
 		uwTileY += bDeltaY;
 		if(1 <= uwTileX && uwTileX <= 10) {
 			dynamitePushXY(pDynamite, uwTileX, uwTileY);
-			++ubTntUsed;
 		}
 		else {
 			break;
 		}
 	}
-	const tUwCoordYX *pFirst = &pDynamite->pCoords[pDynamite->ubCount - 1];
+	const tUwCoordYX *pFirst = &pDynamite->pCoords[0];
 	explosionAdd(
 		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pDynamite, 1, 0
 	);

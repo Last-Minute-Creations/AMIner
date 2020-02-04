@@ -243,6 +243,7 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 		s_pSmokeFrames, s_pSmokeMask, 0, 0
 	);
 	pVehicle->ubPlayerIdx = ubIdx;
+	pVehicle->sDynamite.ubPlayer = ubIdx;
 
 	vehicleReset(pVehicle);
 
@@ -422,9 +423,9 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 	return -wRestockValue;
 }
 
-static void vehicleExcavateTile(tVehicle *pVehicle) {
+void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	// Load mineral to vehicle
-	UBYTE ubTile = g_pMainBuffer->pTileData[pVehicle->sDrillTile.uwX][pVehicle->sDrillTile.uwY];
+	UBYTE ubTile = g_pMainBuffer->pTileData[uwTileX][uwTileY];
 	if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
 		char szMessage[50];
 		if(dinoGetBoneCount() < 9) {
@@ -488,7 +489,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle) {
 
 	if(g_isChallenge) {
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_1 + 9) {
-			if(pVehicle->sDrillTile.uwY == TILE_ROW_CHALLENGE_FINISH) {
+			if(uwTileY == TILE_ROW_CHALLENGE_FINISH) {
 				pVehicle->lCash += pVehicle->uwCargoScore;
 				vehicleRestock(pVehicle, 0);
 				gameChallengeEnd();
@@ -515,7 +516,7 @@ static void vehicleExcavateTile(tVehicle *pVehicle) {
 		}
 	}
 
-	tileExcavate(pVehicle->sDrillTile.uwX, pVehicle->sDrillTile.uwY);
+	tileExcavate(uwTileX, uwTileY);
 }
 
 static void vehicleProcessMovement(tVehicle *pVehicle) {
@@ -882,7 +883,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 
 			if(isDoneX && isDoneY) {
-				vehicleExcavateTile(pVehicle);
+				vehicleExcavateTile(pVehicle, pVehicle->sDrillTile.uwX, pVehicle->sDrillTile.uwY);
 				if(pVehicle->ubDrillDir == DRILL_DIR_H) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
 					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;

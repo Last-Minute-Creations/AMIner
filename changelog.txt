@@ -1,7 +1,13 @@
+20.2.4
+- Changed mode selection controls to not requiring action button holding
+- TNT-exploded minerals now are automatically collected
+- Fixed counters not working on mode selection HUD panel
+- Fixed order of TNT explosions
+
 20.2.3
 - Added commrade key press/release sounds
 - Added TNT/explosion sound
-- Added teleport sound
+- Added support for teleport sound
 
 20.2.2
 - Added mode selection

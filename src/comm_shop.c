@@ -141,6 +141,12 @@ static void commShopProcessWorkshop(void) {
 				) && commShopWorkshopBuyFor(pItem->uwPrice)) {
 					inventorySetItemCount(eItemName, pItem->ubCount + 1);
 					commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
+					static const tMode pItemToMode[INVENTORY_ITEM_COUNT] = {
+						[INVENTORY_ITEM_TNT] = MODE_TNT,
+						[INVENTORY_ITEM_NUKE] = MODE_NUKE,
+						[INVENTORY_ITEM_TELEPORT] = MODE_TELEPORT
+					};
+					hudSetModeCounter(pItemToMode[eItemName], pItem->ubCount);
 				}
 			}
 		}
