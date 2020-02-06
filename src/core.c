@@ -115,7 +115,7 @@ void coreGsCreate(void) {
 	audioCreate();
 	g_pSampleDrill = sampleCreateFromFile("data/sfx/drill1.raw8", 8000);
 	g_pSampleOre = sampleCreateFromFile("data/sfx/ore2.raw8", 8000);
-	g_pSampleTeleport = sampleCreateFromFile("data/sfx/teleport.raw8", 8000);
+	g_pSamplePenalty = sampleCreateFromFile("data/sfx/penalty.raw8", 8000);
 
 #ifdef GAME_DEBUG
 	randInit(2184);
@@ -189,7 +189,7 @@ void coreGsDestroy(void) {
 	audioDestroy();
 	sampleDestroy(g_pSampleDrill);
 	sampleDestroy(g_pSampleOre);
-	sampleDestroy(g_pSampleTeleport);
+	sampleDestroy(g_pSamplePenalty);
 
 	bitmapDestroy(s_pBombMarker);
 	bitmapDestroy(s_pBombMarkerMask);

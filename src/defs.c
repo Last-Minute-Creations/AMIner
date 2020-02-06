@@ -123,6 +123,10 @@ void langCreate(const char *szLangPrefix) {
 		"tutorial.inShop", "tutorial.onMoveToPlan"
 	);
 
+	g_sShopMsgs = stringArrayCreateFromDomElements(
+		pJson, 3, "shop.timeRemaining", "shop.accolades", "shop.rebukes"
+	);
+
 	g_sMessages = stringArrayCreateFromDomElements(
 		pJson, MSG_COUNT, "challengeCheckpoint", "challengeTeleport",
 		"drillDepleted", "cargoFull", "restock", "foundBone"
@@ -134,6 +138,7 @@ void langCreate(const char *szLangPrefix) {
 
 void langDestroy(void) {
 	logBlockBegin("langDestroy()");
+	stringArrayDestroy(&g_sShopMsgs);
 	stringArrayDestroy(&g_sShopNames);
 	stringArrayDestroy(&g_sWarehouseColNames);
 

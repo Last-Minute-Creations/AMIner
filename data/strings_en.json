@@ -59,5 +59,10 @@
 	"drillDepleted": "Drill depleted!",
 	"cargoFull": "Cargo full!",
 	"restock": "Restock!",
-	"foundBone": "Found bone no. %hhu!"
+	"foundBone": "Found bone no. %hhu!",
+	"shop": {
+		"timeRemaining": "Time remaining:",
+		"accolades": "Accolades:",
+		"rebukes": "Rebukes:"
+	}
 }

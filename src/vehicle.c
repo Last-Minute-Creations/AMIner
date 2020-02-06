@@ -356,7 +356,7 @@ static inline UBYTE vehicleStartDrilling(
 				);
 				audioPlay(
 					AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
-					g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
+					g_pSamplePenalty, AUDIO_VOLUME_MAX, 1
 				);
 				ubCooldown = 25;
 			}
@@ -463,7 +463,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			ubColor = COLOR_REDEST;
 			audioPlay(
 				AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
-				g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
+				g_pSamplePenalty, AUDIO_VOLUME_MAX, 1
 			);
 		}
 		else {
@@ -542,7 +542,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 		audioPlay(
 			AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx,
-			g_pSampleTeleport, AUDIO_VOLUME_MAX, 1
+			g_pSamplePenalty, AUDIO_VOLUME_MAX, 1
 		);
 		UWORD uwTeleportPenalty = 50;
 		textBobSetText(
@@ -721,7 +721,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 
 	// Drilling
-	if(isOnGround && !pVehicle->sDynamite.ubCount) {
+	if(isOnGround && !dynamiteIsActive(&pVehicle->sDynamite)) {
 		if(pVehicle->sSteer.bX > 0 && tileIsDrillable(uwTileRight, uwTileMid)) {
 			vehicleStartDrilling(pVehicle, uwTileRight, uwTileMid, DRILL_DIR_H);
 		}

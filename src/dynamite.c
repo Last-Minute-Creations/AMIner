@@ -35,7 +35,7 @@ UBYTE dynamiteTrigger(
 	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubNewCount,
 	tBombDir eDir
 ) {
-	if(pDynamite->ubCurrent != pDynamite->ubCount || ubNewCount == 0) {
+	if(dynamiteIsActive(pDynamite) || ubNewCount == 0) {
 		return 0;
 	}
 	BYTE bDeltaX = 0, bDeltaY = 0;
@@ -74,4 +74,9 @@ UBYTE dynamiteTrigger(
 		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pDynamite, 1, 0
 	);
 	return ubTntUsed;
+}
+
+UBYTE dynamiteIsActive(const tDynamite *pDynamite) {
+	UBYTE isActive = pDynamite->ubCurrent < pDynamite->ubCount;
+	return isActive;
 }

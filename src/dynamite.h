@@ -25,4 +25,6 @@ UBYTE dynamiteTrigger(
 	tBombDir eDir
 );
 
+UBYTE dynamiteIsActive(const tDynamite *pDynamite);
+
 #endif // _DYNAMITE_H_

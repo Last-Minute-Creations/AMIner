@@ -1,3 +1,12 @@
+20.2.6
+- Fixed not being able to drill sometimes
+- Detonating TNTs now decrease their count in inventory
+- Fixed bricking controls when choosing nuke mode
+- Fixed action button being frozen as pressed on starting game
+- Modified audio handling, hopefully for the better
+- Added rebuke/accolade counters
+- Added teleport sound
+
 20.2.4
 - Changed mode selection controls to not requiring action button holding
 - TNT-exploded minerals now are automatically collected

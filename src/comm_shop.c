@@ -21,6 +21,12 @@ static UBYTE s_isBtnPress = 0;
 tBitMap *s_pBmDraw;
 tCommLed s_eTab;
 
+typedef enum _tShopMessageNames {
+	SHOP_MSG_TIME_REMAINING,
+	SHOP_MSG_ACCOLADES,
+	SHOP_MSG_REBUKES,
+} tShopMessageNames;
+
 //----------------------------------------------------------------------- OFFICE
 
 static void commShopDrawOffice(void) {
@@ -30,6 +36,7 @@ static void commShopDrawOffice(void) {
 //--------------------------------------------------------------------- WORKSHOP
 
 tStringArray g_sShopNames;
+tStringArray g_sShopMsgs;
 
 static UBYTE s_ubWorkshopPos = 0;
 static UBYTE s_isOnExitBtn = 0;
@@ -293,14 +300,35 @@ static void commShopDrawWarehouse(void) {
 	buttonSelect(0);
 	buttonDrawAll(s_pBmDraw);
 
-	commDrawText(
-		COMM_DISPLAY_WIDTH - 25, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight,
-		"Time remaining:", FONT_COOKIE | FONT_SHADOW | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT
+	char szBfr[40];
+
+	// Time remaining
+	sprintf(
+		szBfr, "%s %03d",
+		g_sShopMsgs.pStrings[SHOP_MSG_TIME_REMAINING],
+		(pPlan->wTimeRemaining + 9) / 10
 	);
-	char szBfr[5];
-	sprintf(szBfr, "%d", (pPlan->wTimeRemaining + 9) / 10);
 	commDrawText(
-		COMM_DISPLAY_WIDTH - 25 + 5, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight, szBfr,
+		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,
+		FONT_COOKIE | FONT_SHADOW | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT
+	);
+
+	// Accolades
+	sprintf(
+		szBfr, "%s %hhu",
+		g_sShopMsgs.pStrings[SHOP_MSG_ACCOLADES], gameGetAccolades()
+	);
+	commDrawText(
+		0, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight, szBfr,
+		FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
+	);
+
+	// Rebukes
+	sprintf(
+		szBfr, "%s %hhu", g_sShopMsgs.pStrings[SHOP_MSG_REBUKES], gameGetRebukes()
+	);
+	commDrawText(
+		0, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,
 		FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 	);
 }
@@ -382,6 +410,7 @@ static void commShopProcessWarehouse() {
 					hudSetCash(0, g_pVehicles[0].lCash);
 				}
 				if(warehouseIsPlanFulfilled()) {
+					gameAddAccolade();
 					warehouseNewPlan(1, g_is2pPlaying);
 				}
 				commEraseAll();

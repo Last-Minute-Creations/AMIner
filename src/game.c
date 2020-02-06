@@ -55,12 +55,13 @@ static tModeSelection s_pModeSelection[2] = {
 	},
 };
 
-tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
+tSample *g_pSampleDrill, *g_pSampleOre, *g_pSamplePenalty;
 
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 
 static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
+static UBYTE s_ubRebukes, s_ubAccolades;
 
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
@@ -96,6 +97,8 @@ void gameStart(void) {
 	modeReset(1);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
+	s_ubRebukes = 0;
+	s_ubAccolades = 0;
 	for(tMode eMode = 0; eMode < MODE_COUNT; ++eMode) {
 		hudSetModeCounter(eMode, 0);
 	}
@@ -186,16 +189,24 @@ static void gameProcessModeTnt(UBYTE ubPlayer) {
 		addBombInDir(ubPlayer, BOMB_DIR_DOWN, BOMB_DIR_UP);
 	}
 	else if(steerUse(pSelection->eSteerFire)) {
-		dynamiteTrigger(
+		UBYTE ubTntCount = inventoryGetItemDef(INVENTORY_ITEM_TNT)->ubCount;
+		ubTntCount -= dynamiteTrigger(
 			&g_pVehicles[ubPlayer].sDynamite,
 			(g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
 			(g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
-			s_pBombCount[ubPlayer], s_pLastDir[ubPlayer]
+			MIN(s_pBombCount[ubPlayer], ubTntCount), s_pLastDir[ubPlayer]
 		);
+		inventorySetItemCount(INVENTORY_ITEM_TNT, ubTntCount);
+		hudSetModeCounter(MODE_TNT, ubTntCount);
 		s_pBombCount[ubPlayer] = 0;
 		s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
 		s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
 	}
+}
+
+static void gameProcessNuke(UBYTE ubPlayer) {
+	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
+	pSelection->eMode = MODE_DRILL;
 }
 
 static void gameDisplayModeTnt(UBYTE ubPlayer) {
@@ -315,6 +326,7 @@ static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 					gameProcessModeTnt(ubPlayer);
 					break;
 				case MODE_NUKE:
+					gameProcessNuke(ubPlayer);
 					break;
 				case MODE_TELEPORT:
 					gameProcessModeTeleport(ubPlayer);
@@ -389,6 +401,22 @@ static void gameCameraProcess(void) {
 	}
 }
 
+void gameAddAccolade(void) {
+	++s_ubAccolades;
+}
+
+void gameAddRebuke(void) {
+	++s_ubRebukes;
+}
+
+UBYTE gameGetAccolades(void) {
+	return s_ubAccolades;
+}
+
+UBYTE gameGetRebukes(void) {
+	return s_ubRebukes;
+}
+
 //-------------------------------------------------------------------- CHALLENGE
 
 void gameChallengeEnd(void) {
@@ -448,10 +476,12 @@ void gameGsLoop(void) {
 		if(warehouseTryFulfillPlan()) {
 			hudShowMessage(0, g_sPlanMessages.pStrings[0]);
 			warehouseNewPlan(1, g_is2pPlaying);
+			gameAddAccolade();
 		}
 		else {
 			hudShowMessage(0, g_sPlanMessages.pStrings[1]);
 			warehouseNewPlan(0, g_is2pPlaying);
+			gameAddRebuke();
 		}
 	}
 

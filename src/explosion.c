@@ -23,6 +23,7 @@ typedef struct tExplosion {
 	UBYTE ubFrame;
 	UBYTE ubCnt;
 	UBYTE isQuick;
+	UBYTE isTeleport;
 } tExplosion;
 
 static tExplosion s_pExplosions[EXPLOSION_MAX];
@@ -31,6 +32,14 @@ static tExplosion *s_pExplosionNext = 0;
 static tBitMap *s_pBoomFrames, *s_pBoomFramesMask;
 static tBitMap *s_pTpFrames, *s_pTpFramesMask;
 static tSample *s_pSampleBoom, *s_pSampleTeleport;
+
+static UWORD s_uwTeleportFrameCntMax;
+
+UBYTE audioGetSampleLengthInFrames(tSample *pSample) {
+	UWORD uwSamplingRateHz = (3546895 + (pSample->uwPeriod / 2)) / pSample->uwPeriod;
+	UWORD uwFrameCount = (pSample->uwLength * 50 + uwSamplingRateHz - 1) / uwSamplingRateHz;
+	return uwFrameCount;
+}
 
 void explosionManagerCreate(void) {
 	s_pBoomFrames = bitmapCreateFromFile("data/explosion.bm", 0);
@@ -51,6 +60,9 @@ void explosionManagerCreate(void) {
 			s_pBoomFrames, s_pBoomFramesMask, 0, 0
 		);
 	}
+	s_uwTeleportFrameCntMax = (
+		audioGetSampleLengthInFrames(s_pSampleTeleport) + EXPLOSION_FRAME_COUNT - 1
+	) / (EXPLOSION_FRAME_COUNT * 2);
 
 }
 
@@ -96,6 +108,7 @@ void explosionAdd(
 	s_pExplosionNext->cbOnPeak = cbOnPeak;
 	s_pExplosionNext->ulCbData = ulCbData;
 	s_pExplosionNext->isQuick = isQuick;
+	s_pExplosionNext->isTeleport = isTeleport;
 	if(isTeleport) {
 		s_pExplosionNext->sBob.pBitmap = s_pTpFrames;
 		s_pExplosionNext->sBob.pMask = s_pTpFramesMask;
@@ -114,8 +127,15 @@ void explosionAdd(
 void explosionManagerProcess(void) {
 	tExplosion *pExplosion = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i, ++pExplosion) {
+		UBYTE uwCntMax;
+		if(pExplosion->isTeleport) {
+			uwCntMax = s_uwTeleportFrameCntMax;
+		}
+		else {
+			uwCntMax = EXPLOSION_COUNTER_MAX >> pExplosion->isQuick;
+		}
 		if(pExplosion->ubFrame < EXPLOSION_FRAME_COUNT) {
-			if(pExplosion->ubCnt >= EXPLOSION_COUNTER_MAX >> pExplosion->isQuick) {
+			if(pExplosion->ubCnt >= uwCntMax) {
 				pExplosion->ubCnt = 0;
 				++pExplosion->ubFrame;
 				if(pExplosion->ubFrame == EXPLOSION_FRAME_PEAK && pExplosion->cbOnPeak) {

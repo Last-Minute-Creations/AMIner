@@ -257,6 +257,17 @@ void menuGsCreate(void) {
 static void menuProcessSelecting(void) {
 	commProcess();
 	hudUpdate();
+
+	UBYTE isBtnPress = 0;
+	static UBYTE isShift = 0;
+	if(commNavCheck(COMM_NAV_BTN)) {
+		isShift = 1;
+	}
+	else if(isShift) {
+		isBtnPress = 1;
+		isShift = 0;
+	}
+
 	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
 		if(!s_pOptions[ubMenuPos].isHidden && s_pOptions[ubMenuPos].isDirty) {
 			menuDrawPos(ubMenuPos, s_pLogo->Rows + 10);
@@ -281,7 +292,7 @@ static void menuProcessSelecting(void) {
 		ubNewKey = KEY_RIGHT;
 		menuToggle(+1);
 	}
-	else if(commNavUse(COMM_NAV_BTN)) {
+	else if(isBtnPress) {
 		menuEnter();
 	}
 

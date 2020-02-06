@@ -11,8 +11,7 @@
 #define WORKSHOP_ITEM_COUNT 4
 #define WAREHOUSE_COL_COUNT 4
 
-extern tStringArray g_sShopNames;
-tStringArray g_sWarehouseColNames;
+extern tStringArray g_sShopNames, g_sShopMsgs, g_sWarehouseColNames;
 
 void commShopGsCreate(void);
 

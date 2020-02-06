@@ -29,7 +29,15 @@ void gameGsLoopEnterScore(void);
 
 void gameTryPushBob(tBobNew *pBob);
 
-extern tSample *g_pSampleDrill, *g_pSampleOre, *g_pSampleTeleport;
+void gameAddAccolade(void);
+
+void gameAddRebuke(void);
+
+UBYTE gameGetAccolades(void);
+
+UBYTE gameGetRebukes(void);
+
+extern tSample *g_pSampleDrill, *g_pSampleOre, *g_pSamplePenalty;
 extern tStringArray g_sPlanMessages;
 
 // Game config
