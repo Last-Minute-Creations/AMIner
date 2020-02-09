@@ -54,6 +54,13 @@ UBYTE tileIsDrillable(UWORD uwX, UWORD uwY) {
 	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_ROCK_1;
 }
 
+UBYTE tileIsHardToDrill(UWORD uwX, UWORD uwY) {
+	return (
+		g_pMainBuffer->pTileData[uwX][uwY] >= TILE_EMERALD_1 &&
+		TILE_MOONSTONE_3 <= g_pMainBuffer->pTileData[uwX][uwY]
+	);
+}
+
 static UWORD chanceTrapezoid(
 	UWORD uwCurr, UWORD uwStart, UWORD uwPeakStart, UWORD uwPeakEnd, UWORD uwEnd,
 	UWORD uwMin, UWORD uwMax

@@ -339,9 +339,12 @@ static inline UBYTE vehicleStartDrilling(
 	}
 
 	// Calculate layer difficulty
-	BYTE bLayerDifficulty = groundLayerGetDifficultyAtDepth(uwTileY << 5);
+	BYTE bDifficulty = groundLayerGetDifficultyAtDepth(uwTileY << 5);
+	if(tileIsHardToDrill(uwTileX, uwTileY)) {
+		bDifficulty += 2;
+	}
 	BYTE bDrillLevel = inventoryGetPartDef(INVENTORY_PART_DRILL)->ubLevel;
-	BYTE bDrillDuration = MAX(1, bLayerDifficulty - bDrillLevel);
+	BYTE bDrillDuration = MAX(1, bDifficulty - bDrillLevel);
 	UBYTE ubDrillCost = g_ubDrillingCost * bDrillDuration;
 
 	// Check vehicle's drill depletion
@@ -1002,6 +1005,13 @@ uint8_t vehiclesAreClose(void) {
 static void vehicleOnTeleportInPeak(ULONG ulData) {
 	tVehicle *pVehicle = (tVehicle*)ulData;
 	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
+	UWORD uwMaxHealth = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
+	if(ubRandMax(100) <= 5) {
+		vehicleHullDamage(pVehicle, uwMaxHealth);
+	}
+	else if(ubRandMax(100) <= 20) {
+		vehicleHullDamage(pVehicle, uwMaxHealth / 2);
+	}
 }
 
 static void vehicleOnTeleportOutPeak(ULONG ulData) {

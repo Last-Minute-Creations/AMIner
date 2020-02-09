@@ -91,7 +91,7 @@ static UBYTE s_ubActivePos;
 static UBYTE s_isScoreShowAfterRollIn = 0;
 
 static void menuDrawPos(UBYTE ubPos, UWORD uwOffsTop) {
-	UWORD uwOffsY = uwOffsTop + ubPos * (g_pFont->uwHeight + 2);
+	UWORD uwOffsY = uwOffsTop + ubPos * (g_pFont->uwHeight);
 	commErase(0, uwOffsY, COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
 
 	char szBfr[50];

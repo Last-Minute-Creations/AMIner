@@ -20,6 +20,7 @@ LONG g_lInitialCash;
 UBYTE g_ubUpgradeLevels;
 UBYTE g_ubDrillingCost;
 UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
+UBYTE g_ubPlansPerAccolade;
 
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[9];
@@ -28,6 +29,7 @@ void defsInit(void) {
 	tJson *pJson = jsonCreate("data/game.json");
 
 	g_lInitialCash = jsonTokToUlong(pJson, jsonGetDom(pJson, "initialCash"));
+	g_ubPlansPerAccolade = jsonTokToUlong(pJson, jsonGetDom(pJson, "plansPerAccolade"));
 
 	// Upgrade costs
 	UWORD uwIdxUpgradeCosts = jsonGetDom(pJson, "upgradeCosts");

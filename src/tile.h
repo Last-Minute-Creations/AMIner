@@ -48,6 +48,8 @@ UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 UBYTE tileIsDrillable(UWORD uwX, UWORD uwY);
 
+UBYTE tileIsHardToDrill(UWORD uwX, UWORD uwY);
+
 void tileInit(UBYTE isCoalOnly, UBYTE isChallenge);
 
 void tileExcavate(UWORD uwX, UWORD uwY);

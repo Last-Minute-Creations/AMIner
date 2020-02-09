@@ -91,14 +91,14 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 
 	systemUnuse();
 
-	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
-	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight;
+	UBYTE ubLineHeight = g_pFont->uwHeight - 2;
+	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight - 1;
 	s_ubPageCount = (s_uwLineCount + (ubLinesPerPage - 1)) / ubLinesPerPage;
 }
 
 static void commMsgDrawPage(UBYTE ubPage) {
-	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
-	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight;
+	UBYTE ubLineHeight = g_pFont->uwHeight - 2;
+	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight - 1;
 	UWORD uwLineStart = ubPage * ubLinesPerPage;
 	commEraseAll();
 	UWORD uwLineY = 0;

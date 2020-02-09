@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "steer.h"
 #include "inventory.h"
+#include "defs.h"
 
 #define CAMERA_SPEED 4
 
@@ -61,7 +62,7 @@ static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 
 static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
-static UBYTE s_ubRebukes, s_ubAccolades;
+static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
 
 tFont *g_pFont;
 UBYTE g_is2pPlaying;
@@ -99,6 +100,7 @@ void gameStart(void) {
 	vehicleReset(&g_pVehicles[1]);
 	s_ubRebukes = 0;
 	s_ubAccolades = 0;
+	s_ubAccoladesFract = 0;
 	for(tMode eMode = 0; eMode < MODE_COUNT; ++eMode) {
 		hudSetModeCounter(eMode, 0);
 	}
@@ -402,7 +404,10 @@ static void gameCameraProcess(void) {
 }
 
 void gameAddAccolade(void) {
-	++s_ubAccolades;
+	if(++s_ubAccoladesFract >= g_ubPlansPerAccolade) {
+		s_ubAccoladesFract = 0;
+		++s_ubAccolades;
+	}
 }
 
 void gameAddRebuke(void) {

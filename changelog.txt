@@ -1,3 +1,9 @@
+20.2.9
+- One accolade now requires configurable number of plans to fulfill
+- Drilling through minerals inside the stone should be harder now
+- Teleporting gives now a chance to damage or destroy machine
+- Changes in typesetting
+
 20.2.6
 - Fixed not being able to drill sometimes
 - Detonating TNTs now decrease their count in inventory

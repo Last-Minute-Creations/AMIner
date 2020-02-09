@@ -293,7 +293,7 @@ static void commShopDrawWarehouse(void) {
 
 	// Buttons
 	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 3;
-	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 5 * ubLineHeight;
+	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 4 * ubLineHeight;
 	buttonRmAll();
 	buttonAdd("Confirm", uwBtnX, uwBtnY);
 	buttonAdd("Exit", uwBtnX * 2, uwBtnY);

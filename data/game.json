@@ -1,6 +1,6 @@
 {
-	"initialCash": 10000,
-	"upgradeCosts": [1000, 5000, 25000, 150000],
+	"initialCash": 0,
+	"upgradeCosts": [100, 300, 600, 1000],
 	"inventory": {
 		"parts" : {
 			"hull": {
@@ -29,4 +29,5 @@
 		"hullPrice": 2
 	},
 	"dinoDepths": [80, 200, 400, 600, 800, 1000, 1500, 2000, 2500],
+	"plansPerAccolade": 10
 }

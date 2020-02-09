@@ -81,6 +81,7 @@ typedef struct _tHudPlayerData {
 static tVPort *s_pVpHud;
 static tSimpleBufferManager *s_pHudBuffer;
 static const tFont *s_pFont;
+static UBYTE s_ubLineHeight;
 static tTextBitMap *s_pLineBuffer;
 static UBYTE s_isBitmapFilled = 0;
 static tHudPlayerData s_pPlayerData[2];
@@ -252,31 +253,32 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	s_pModeCursorMask = bitmapCreateFromFile("data/mode_cursor_mask.bm", 0);
 
 	s_pFont = pFont;
-	s_pLineBuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, pFont->uwHeight);
+	s_ubLineHeight = 7;
+	s_pLineBuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, s_pFont->uwHeight);
 
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_1_Y,
+		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_1_Y - 3,
 		"Player 1", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_2_Y,
+		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_2_Y - 3,
 		"Player 2", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 	);
 
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, ROW_1_Y,
+		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, ROW_1_Y - 3,
 		"Drill:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, ROW_1_Y,
+		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, ROW_1_Y - 3,
 		"Cargo:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, ROW_1_Y,
+		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, ROW_1_Y - 3,
 		"Hull:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, ROW_1_Y,
+		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, ROW_1_Y - 3,
 		"Cash:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	hudReset(0, 0);
@@ -304,13 +306,13 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 		// Clear depth label and use it as cash
 		blitRect(
 			s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1 - ubLabelWidth, ROW_2_Y,
-			ubLabelWidth, s_pFont->uwHeight, HUD_COLOR_BG
+			ubLabelWidth, s_ubLineHeight, HUD_COLOR_BG
 		);
 	}
 	else {
 		// Depth instead of 2p cash
 		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, ROW_2_Y,
+			s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, ROW_2_Y - 3,
 			"Depth:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 		);
 	}
@@ -414,11 +416,11 @@ void hudUpdate(void) {
 				// decreased clear height 'cuz digits are smaller than whole font
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_DEPTH_X, ROW_2_Y,
-					320 - (GAUGE_DEPTH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 2, HUD_COLOR_BG
+					320 - (GAUGE_DEPTH_X + HUD_ORIGIN_X), s_ubLineHeight - 2, HUD_COLOR_BG
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
-					GAUGE_DEPTH_X, ROW_2_Y, HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+					GAUGE_DEPTH_X, ROW_2_Y - 3, HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 				);
 				s_isBitmapFilled = 0;
 				s_eState = STATE_MAIN_PREPARE_CASH;
@@ -468,11 +470,11 @@ void hudUpdate(void) {
 				UBYTE ubY = (s_isChallenge ? s_ubHudOffsY : ROW_1_Y);
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_CASH_X, ubY,
-					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 1, HUD_COLOR_BG
+					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_ubLineHeight - 1, HUD_COLOR_BG
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
-					GAUGE_CASH_X, ubY, HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+					GAUGE_CASH_X, ubY - 3, HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 				);
 				s_isBitmapFilled = 0;
 				s_eState = STATE_MAIN_DRAW_FUEL;
@@ -577,8 +579,9 @@ void hudUpdate(void) {
 			s_sMsgCharPos.uwX += HUD_FACE_SIZE + 1;
 			blitRect(
 				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
-				283, 2 * s_pFont->uwHeight + 1, HUD_COLOR_BG
+				283, 2 * s_ubLineHeight + 1, HUD_COLOR_BG
 			);
+			s_sMsgCharPos.uwY -= 2;
 
 			hudShowPage(HUD_PAGE_MSG);
 			s_ubMsgCharIdx = 0;
@@ -596,7 +599,7 @@ void hudUpdate(void) {
 		case STATE_MSG_DRAW_LETTER:
 			if(s_szMsg[s_ubMsgCharIdx] == '\n') {
 				s_sMsgCharPos.uwX = HUD_ORIGIN_X + HUD_FACE_SIZE + 1;
-				s_sMsgCharPos.uwY += s_pFont->uwHeight + 1;
+				s_sMsgCharPos.uwY += s_ubLineHeight + 1;
 				isLineOverflow = 0;
 			}
 			else {
@@ -647,14 +650,14 @@ void hudUpdate(void) {
 				const UWORD uwPageOriginY = HUD_PAGE_PAUSE * HUD_HEIGHT + HUD_ORIGIN_Y;
 				blitRect(
 					s_pHudBuffer->pBack, HUD_ORIGIN_X, uwPageOriginY,
-					320 - 2 * HUD_ORIGIN_X, 2 * s_pFont->uwHeight + 1, HUD_COLOR_BG
+					320 - 2 * HUD_ORIGIN_X, 2 * s_ubLineHeight + 1, HUD_COLOR_BG
 				);
 
 				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Game paused");
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 2,
-					uwPageOriginY, HUD_COLOR_BAR_FULL, FONT_COOKIE | FONT_HCENTER
+					uwPageOriginY - 3, HUD_COLOR_BAR_FULL, FONT_COOKIE | FONT_HCENTER
 				);
 				hudShowPage(HUD_PAGE_PAUSE);
 				s_eState = STATE_PAUSE_LOOP;
@@ -668,7 +671,7 @@ void hudUpdate(void) {
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 3,
-					uwPageOriginY + s_pFont->uwHeight,
+					uwPageOriginY - 3 + s_ubLineHeight,
 					(s_ubSelection == 0) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
 					FONT_COOKIE | FONT_HCENTER
 				);
@@ -677,7 +680,7 @@ void hudUpdate(void) {
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,
-					uwPageOriginY + s_pFont->uwHeight,
+					uwPageOriginY - 3 + s_ubLineHeight,
 					(s_ubSelection == 1) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
 					FONT_COOKIE | FONT_HCENTER
 				);
