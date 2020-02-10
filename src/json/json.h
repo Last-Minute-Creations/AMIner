@@ -30,7 +30,7 @@ ULONG jsonTokToUlong(const tJson *pJson,UWORD uwTok);
 UWORD jsonStrLen(const tJson *pJson, UWORD uwTok);
 
 UWORD jsonTokStrCpy(
-	const tJson *pJson, UWORD uwTok, char *pDst, UWORD uwMaxLength
+	const tJson *pJson, UWORD uwTok, char *pDst, UWORD uwMaxBytes
 );
 
 #endif // GUARD_OF_JSON_H

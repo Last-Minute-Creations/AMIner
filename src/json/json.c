@@ -4,6 +4,7 @@
 #include <ace/managers/memory.h>
 #include <ace/managers/system.h>
 #include <ace/utils/file.h>
+#include "utf8.h"
 
 tJson *jsonCreate(const char *szFilePath) {
 	systemUse();
@@ -164,19 +165,33 @@ ULONG jsonTokToUlong(const tJson *pJson, UWORD uwTok) {
 }
 
 UWORD jsonStrLen(const tJson *pJson, UWORD uwTok) {
-	UWORD uwLength = pJson->pTokens[uwTok].end - pJson->pTokens[uwTok].start;
+  ULONG ulCodepoint, ulState = 0;
+	UWORD uwLength = 0;
+	for(UWORD i = pJson->pTokens[uwTok].start; i <= pJson->pTokens[uwTok].end; ++i) {
+		UBYTE ubCharCode = (UBYTE)pJson->szData[i];
+		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
+			continue;
+		}
+		++uwLength;
+	}
 	return uwLength;
 }
 
 UWORD jsonTokStrCpy(
-	const tJson *pJson, UWORD uwTok, char *pDst, UWORD uwMaxLength
+	const tJson *pJson, UWORD uwTok, char *pDst, UWORD uwMaxBytes
 ) {
-	UWORD uwCpyLength = jsonStrLen(pJson, uwTok);
-	if(uwMaxLength) {
-		uwCpyLength = MIN(uwCpyLength, uwMaxLength-1);
+	UWORD uwLength = 0;
+	ULONG ulCodepoint, ulState = 0;
+	for(UWORD i = pJson->pTokens[uwTok].start; i <= pJson->pTokens[uwTok].end; ++i) {
+		UBYTE ubCharCode = (UBYTE)pJson->szData[i];
+		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
+			continue;
+		}
+		pDst[uwLength] = ulCodepoint;
+		if(++uwLength == uwMaxBytes) {
+			break;
+		}
 	}
-	memcpy(pDst, pJson->szData + pJson->pTokens[uwTok].start, uwCpyLength);
-	pDst[uwCpyLength] = '\0';
-	return uwCpyLength;
+	pDst[uwLength-1] = '\0';
+	return uwLength;
 }
-
