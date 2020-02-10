@@ -19,7 +19,7 @@
 		"items": {
 			"tnt": {"price": 100, "max": 5},
 			"nuke": {"price": 1000, "max": 1},
-			"teleport": {"price": 750, "max": 3},
+			"teleport": {"price": 750, "max": 3}
 		}
 	},
 	"drillingCost": 15,

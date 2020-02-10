@@ -641,9 +641,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			isOnGround = 1;
 			pVehicle->fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
 			if(pVehicle->fDy > 2 * fix16_one) {
-				vehicleHullDamage(pVehicle, fix16_to_int(fix16_div(
-					pVehicle->fDy - 2 * fix16_one, (fix16_one / 2)
-				) * 2));
+				vehicleHullDamage(pVehicle, fix16_to_int(pVehicle->fDy - 2 * fix16_one));
 			}
 			pVehicle->fDy = 0;
 		}

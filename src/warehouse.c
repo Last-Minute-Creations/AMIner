@@ -91,6 +91,7 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 		}
 	} while(!isDone);
 	s_sCurrentPlan.wTimeMax = 4 * 1000; // Two times fuel capacity for 2p
+	s_sCurrentPlan.wTimeMax += 200; // Add for nice division into 30 days
 	s_sCurrentPlan.wTimeRemaining = s_sCurrentPlan.wTimeMax;
 	logBlockEnd("warehouseNewPlan()");
 }

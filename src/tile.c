@@ -46,19 +46,16 @@ UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	return (
 		(TILE_BASE_GROUND_1 <= ubTile && ubTile <= TILE_BASE_GROUND_9) ||
-		ubTile >= TILE_STONE_1
+		ubTile >= TILE_DIRT_1
 	);
 }
 
 UBYTE tileIsDrillable(UWORD uwX, UWORD uwY) {
-	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_ROCK_1;
+	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_DIRT_1;
 }
 
 UBYTE tileIsHardToDrill(UWORD uwX, UWORD uwY) {
-	return (
-		g_pMainBuffer->pTileData[uwX][uwY] >= TILE_EMERALD_1 &&
-		TILE_MOONSTONE_3 <= g_pMainBuffer->pTileData[uwX][uwY]
-	);
+	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_STONE_1;
 }
 
 static UWORD chanceTrapezoid(
@@ -183,7 +180,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 				uwWhat < (uwChance += uwChanceAir) &&
 				tileIsSolid(x - 1, y) && tileIsSolid(x, y - 1)
 			) {
-				pTiles[x][y] = TILE_CAVE_BG+15;
+				pTiles[x][y] = TILE_CAVE_BG_1+15;
 			}
 			else if(uwWhat < (uwChance += uwChanceSilver)) {
 				pTiles[x][y] = (
@@ -221,10 +218,10 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 				);
 			}
 			else {
-				pTiles[x][y] = TILE_ROCK_1 + ((x & 1) ^ (y & 1));
+				pTiles[x][y] = TILE_DIRT_1 + ((x & 1) ^ (y & 1));
 			}
 			// For quick tests
-			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG + 12;
+			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG_1 + 12;
 		}
 	}
 
@@ -254,7 +251,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	// Fill left invisible col with rocks
 	commProgress(100, g_sLoadMsgs.pStrings[MSG_LOADING_FINISHING]);
 	for(UWORD y = 0; y < uwEndY; ++y) {
-		pTiles[0][y] = TILE_ROCK_1;
+		pTiles[0][y] = TILE_DIRT_1;
 	}
 
 	if(isChallenge) {
@@ -270,7 +267,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 }
 
 void tileExcavate(UWORD uwX, UWORD uwY) {
-	UBYTE ubBg = TILE_CAVE_BG;
+	UBYTE ubBg = TILE_CAVE_BG_1;
 
 	// up
 	if(tileIsSolid(uwX, uwY-1)) {
