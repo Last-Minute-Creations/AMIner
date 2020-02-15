@@ -7,6 +7,7 @@
 
 #include <ace/utils/extview.h>
 #include <ace/utils/font.h>
+#include "string_array.h"
 
 typedef enum _tHudPlayer {
 	PLAYER_1 = 0,
@@ -20,6 +21,22 @@ typedef enum _tMode {
 	MODE_TELEPORT,
 	MODE_COUNT
 } tMode;
+
+typedef enum _tMsgHud {
+	MSG_HUD_P1,
+	MSG_HUD_P2,
+	MSG_HUD_DRILL,
+	MSG_HUD_CARGO,
+	MSG_HUD_HULL,
+	MSG_HUD_CASH,
+	MSG_HUD_DEPTH,
+	MSG_HUD_PAUSED,
+	MSG_HUD_RESUME,
+	MSG_HUD_QUIT,
+	MSG_HUD_COUNT
+} tMsgHud;
+
+extern tStringArray g_sMsgHud;
 
 void hudCreate(tView *pView, const tFont *pFont);
 

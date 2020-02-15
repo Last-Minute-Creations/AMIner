@@ -13,6 +13,11 @@ typedef struct _tJson {
 	FWORD fwTokenCount;
 } tJson;
 
+typedef struct _tJsonRemap {
+	ULONG ulCodepoint;
+	UBYTE ubFontCode;
+} tJsonRemap;
+
 tJson *jsonCreate(const char *szFilePath);
 
 void jsonDestroy(tJson *pJson);
@@ -30,7 +35,8 @@ ULONG jsonTokToUlong(const tJson *pJson,UWORD uwTok);
 UWORD jsonStrLen(const tJson *pJson, UWORD uwTok);
 
 UWORD jsonTokStrCpy(
-	const tJson *pJson, UWORD uwTok, char *pDst, UWORD uwMaxBytes
+	const tJson *pJson, const tJsonRemap *pRemap, UWORD uwTok, char *pDst,
+	UWORD uwMaxBytes
 );
 
 #endif // GUARD_OF_JSON_H

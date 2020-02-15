@@ -25,6 +25,15 @@ typedef enum _tShopMessageNames {
 	SHOP_MSG_TIME_REMAINING,
 	SHOP_MSG_ACCOLADES,
 	SHOP_MSG_REBUKES,
+	SHOP_MSG_MK,
+	SHOP_MSG_UPGRADE_TO_MK,
+	SHOP_MSG_STOCK,
+	SHOP_MSG_BUY,
+	SHOP_MSG_EXIT,
+	SHOP_MSG_CONFIRM,
+	SHOP_MSG_ALREADY_MAX,
+	SHOP_MSG_ALREADY_FULL,
+	SHOP_MSG_COUNT,
 } tShopMessageNames;
 
 //----------------------------------------------------------------------- OFFICE
@@ -60,20 +69,20 @@ static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 	char szBfr[50];
 	if(ubPart < INVENTORY_PART_COUNT) {
 		UBYTE ubLevel = inventoryGetPartDef(s_ubWorkshopPos)->ubLevel;
-		sprintf(szBfr, "Mk%hhu", ubLevel + 1);
+		sprintf(szBfr, "%s%hhu", g_sShopMsgs.pStrings[SHOP_MSG_MK], ubLevel + 1);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 		if(ubLevel < g_ubUpgradeLevels) {
 			uwOffs += ubRowSize;
-			sprintf(szBfr, "Upgrade to Mk%hhu: %lu\x1F", ubLevel + 2, g_pUpgradeCosts[ubLevel]);
+			sprintf(szBfr, "%s%hhu: %lu\x1F", g_sShopMsgs.pStrings[SHOP_MSG_UPGRADE_TO_MK], ubLevel + 2, g_pUpgradeCosts[ubLevel]);
 			commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 		}
 	}
 	else {
 		const tItem *pItem = inventoryGetItemDef(s_ubWorkshopPos - INVENTORY_PART_COUNT);
-		sprintf(szBfr, "Stock: %hu/%hu", pItem->ubCount, pItem->ubMax);
+		sprintf(szBfr, "%s: %hu/%hu", g_sShopMsgs.pStrings[SHOP_MSG_STOCK], pItem->ubCount, pItem->ubMax);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 		uwOffs += ubRowSize;
-		sprintf(szBfr, "Buy: %hu\x1F", pItem->uwPrice);
+		sprintf(szBfr, "%s: %hu\x1F", g_sShopMsgs.pStrings[SHOP_MSG_BUY], pItem->uwPrice);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 	}
 }
@@ -86,8 +95,8 @@ static void commShopDrawWorkshop(void) {
 	UWORD uwBtnY1 = COMM_DISPLAY_HEIGHT - 4 * g_pFont->uwHeight;
 	UWORD uwBtnY2 = COMM_DISPLAY_HEIGHT - 2 * g_pFont->uwHeight;
 	buttonRmAll();
-	buttonAdd("Buy", uwBtnX, uwBtnY1);
-	buttonAdd("Exit", uwBtnX, uwBtnY2);
+	buttonAdd(g_sShopMsgs.pStrings[SHOP_MSG_BUY], uwBtnX, uwBtnY1);
+	buttonAdd(g_sShopMsgs.pStrings[SHOP_MSG_EXIT], uwBtnX, uwBtnY2);
 	buttonSelect(0);
 	buttonDrawAll(s_pBmDraw);
 	s_isOnExitBtn = 0;
@@ -132,7 +141,7 @@ static void commShopProcessWorkshop(void) {
 				const tPart *pPart = inventoryGetPartDef(s_ubWorkshopPos);
 				UBYTE ubLevel = pPart->ubLevel;
 				if(!commShopWorkshopBuyIsFull(
-					ubLevel, g_ubUpgradeLevels, "you already have max level!"
+					ubLevel, g_ubUpgradeLevels, g_sShopMsgs.pStrings[SHOP_MSG_ALREADY_MAX]
 				) && commShopWorkshopBuyFor(g_pUpgradeCosts[ubLevel])) {
 					inventorySetPartLevel(s_ubWorkshopPos, ubLevel+1);
 					commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
@@ -144,7 +153,7 @@ static void commShopProcessWorkshop(void) {
 				logWrite("try to buy item %p, %hhu/%hhu\n", pItem, pItem->ubCount, pItem->ubMax);
 				// item - TNT, nuke, teleport
 				if(!commShopWorkshopBuyIsFull(
-					pItem->ubCount, pItem->ubMax, "you're already full!"
+					pItem->ubCount, pItem->ubMax, g_sShopMsgs.pStrings[SHOP_MSG_ALREADY_FULL]
 				) && commShopWorkshopBuyFor(pItem->uwPrice)) {
 					inventorySetItemCount(eItemName, pItem->ubCount + 1);
 					commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
@@ -295,8 +304,8 @@ static void commShopDrawWarehouse(void) {
 	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 3;
 	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 4 * ubLineHeight;
 	buttonRmAll();
-	buttonAdd("Confirm", uwBtnX, uwBtnY);
-	buttonAdd("Exit", uwBtnX * 2, uwBtnY);
+	buttonAdd(g_sShopMsgs.pStrings[SHOP_MSG_CONFIRM], uwBtnX, uwBtnY);
+	buttonAdd(g_sShopMsgs.pStrings[SHOP_MSG_EXIT], uwBtnX * 2, uwBtnY);
 	buttonSelect(0);
 	buttonDrawAll(s_pBmDraw);
 

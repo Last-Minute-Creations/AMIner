@@ -30,7 +30,9 @@ static tView *s_pView;
 static tVPort *s_pVpMain;
 tTileBufferManager *g_pMainBuffer;
 static tBitMap *s_pBombMarker, *s_pBombMarkerMask;
+static const char *s_szLangPrefix;
 
+tFont *g_pFont;
 
 static void mainPaletteProcess(UBYTE ubFadeLevel) {
 	tFadeState eState = fadeGetState();
@@ -79,13 +81,12 @@ void coreProcessAfterBobs(void) {
 
 void coreGsCreate(void) {
 	defsInit();
-	langCreate("en");
+	langCreate(s_szLangPrefix);
 	hiScoreLoad();
 	s_pView = viewCreate(0,
 		TAG_VIEW_GLOBAL_CLUT, 1,
 	TAG_END);
 
-	g_pFont = fontCreate("data/uni54.fnt");
 	textBobManagerCreate(g_pFont);
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
 	dinoCreate();
@@ -199,4 +200,8 @@ void coreGsDestroy(void) {
 
   hudDestroy();
   viewDestroy(s_pView);
+}
+
+void coreSetLangPrefix(const char * const szPrefix) {
+	s_szLangPrefix = szPrefix;
 }

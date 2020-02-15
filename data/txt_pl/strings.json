@@ -1,0 +1,92 @@
+{
+	"shopNames": ["Wiertło", "Ładownia", "Kadłub", "Karbid"],
+	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
+	"planMessages": {
+		"doneAfk": [
+			"Plan zrealizowany z pomocą rezerw.",
+			"Przysłali nowy plan"
+		],
+		"notDone": "Towarzyszu, planu nie zrobiliście. Nagana i nowy plan."
+	},
+	"hiScore": {
+		"new": "Nowy rekord! Wpisz imię.",
+		"press": "Naciśnij FIRE lub ENTER aby kontynuować",
+		"score": "Wynik",
+		"winP1": "Gracz 1 wygrał!",
+		"winP2": "Gracz 2 wygrał!",
+		"draw": "Remis!"
+	},
+	"menu": {
+		"enumMode": ["600% normy", "Zawody"],
+		"enumP1": ["Dżoj", "WSAD"],
+		"enumP2": ["Dżoj", "Strzałki"],
+		"enumOnOff": ["WYŁ", "WŁ"],
+		"enumPlayerCount": ["Jeden", "Dwóch"],
+		"captions": [
+			"Start gry",
+			"Tryb",
+			"Gracze",
+			"Gracz 1 sterowanie",
+			"Gracz 2 sterowanie",
+			"Tryb ATARI",
+			"Rekordy",
+			"Wyjdź z gry"
+		]
+	},
+	"minerals": [
+		"Srebro", "Złoto", "Szmaragd", "Rubin", "Amelinium", "Wongel"
+	],
+	"loadMsgs": [
+		"Zakopywanie minerałów", "Generowanie problemów", "Ruchy tektoniczne"
+	],
+	"tutorial": {
+		"start": "Towarzyszu, wykopcie no 3 rudy srebra",
+		"onDugOut": [
+			"Wiertło się zużywa a ładownia zapełnia kiedy kopiecie.",
+			"W magazynie możecie wymienić wiertło i zostawić urobek."
+		],
+		"nearShop": [
+			"Towarzyszu, naciśnijcie ENTER / FIRE / SPACE aby wejść do magazynu.",
+			"Urobek możecie sprzedać albo wykorzystać do planu."
+		],
+		"inShop": [
+			"Potrzebujecie 3 srebra by wykonać plan. Ustawcie się na nim",
+			"i przesuńcie do kolumny plan a następnie wciśnijcie Potwierdź"
+		],
+		"onMoveToPlan": [
+			"Gratulacje Towarzyszu! Wykonaliście swój pierwszy plan.",
+			"Róbcie tak dalej a szybko awansujecie!"
+		]
+	},
+	"challengeCheckpoint": "Kontrola!",
+	"challengeTeleport": "Teleportacja:",
+	"drillDepleted": "Wiertło zużyte",
+	"cargoFull": "Ładownia pełna!",
+	"restock": "Rozładunek!",
+	"foundBone": "Znaleźliście kość nr %hhu!",
+	"shop": {
+		"timeRemaining": "Pozostało czasu:",
+		"accolades": "Pochwały:",
+		"rebukes": "Nagany:",
+		"mk": "Wz",
+		"upgradeToMk": "Ulepsz do Wz",
+		"stock": "Stan",
+		"buy": "Kup",
+		"exit": "Wyjdź",
+		"confirm": "Zatwierdź",
+		"alreadyMax": "you already have max level!",
+		"alreadyFull": "you're already full!"
+	},
+	"hud": {
+		"p1": "Gracz 1",
+		"p2": "Gracz 2",
+		"drill": "Wiert.:",
+		"cargo": "Ład.:",
+		"hull": "Kadł.:",
+		"cash": "Kasa:",
+		"depth": "Głęb.:",
+		"paused": "Pauza gry",
+		"resume": "Wznów",
+		"quit": "Wyjdź"
+	}
+}

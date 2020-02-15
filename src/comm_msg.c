@@ -123,7 +123,7 @@ void commMsgGsCreate(void) {
 	}
 
 	s_uwLineCount = 0;
-	readLines("data/intro.txt", COMM_DISPLAY_WIDTH);
+	readLines("data/txt_en/intro.txt", COMM_DISPLAY_WIDTH);
 
 	s_pBuffer = g_pMainBuffer->pScroll->pBack;
 

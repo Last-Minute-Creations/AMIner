@@ -14,6 +14,23 @@
 #define STATE_FADE_OUT 1
 #define STATE_WAIT 2
 
+typedef enum _tLang {
+	LANG_EN,
+	LANG_PL,
+	LANG_COUNT
+} tLang;
+
+static const char *s_pLanguageNames[LANG_COUNT] = {
+	[LANG_EN] = "English",
+	[LANG_PL] = "Polish",
+};
+
+static const char *s_pLanguagePrefixes[LANG_COUNT] = {
+	[LANG_EN] = "en",
+	[LANG_PL] = "pl",
+};
+
+static tLang s_eLangCurr = 0;
 static tView *s_pView;
 static tVPort *s_pVp;
 static tSimpleBufferManager *s_pBfr;
@@ -22,6 +39,18 @@ static UBYTE s_ubState;
 
 static UWORD s_pPaletteRef[32];
 static UBYTE s_ubFadeoutCnt;
+static tTextBitMap *s_pLineBuffer;
+
+static void drawLanguages(void) {
+	for(tLang eLang = 0; eLang < LANG_COUNT; ++eLang) {
+		fontFillTextBitMap(g_pFont, s_pLineBuffer, s_pLanguageNames[eLang]);
+		fontDrawTextBitMap(
+			s_pBfr->pBack, s_pLineBuffer,
+			160, 9 + 171 + 10 + g_pFont->uwHeight * eLang,
+			eLang == s_eLangCurr ? 4 : 3, FONT_HCENTER
+		);
+	}
+}
 
 void logoGsCreate(void) {
 	logBlockBegin("logoGsCreate()");
@@ -43,9 +72,11 @@ void logoGsCreate(void) {
 
 	paletteLoad("data/lmc.plt", s_pPaletteRef, 1 << s_pVp->ubBPP);
 
+	g_pFont = fontCreate("data/uni54.fnt");
+	s_pLineBuffer = fontCreateTextBitMap(320, g_pFont->uwHeight);
+
 	bitmapLoadFromFile(
-		s_pBfr->pBack, "data/lmc.bm",
-		(s_pVp->uwWidth - 128) / 2, (s_pVp->uwHeight - 171) / 2
+		s_pBfr->pBack, "data/lmc.bm", (s_pVp->uwWidth - 128) / 2, 9
 	);
 
 	s_ubFadeoutCnt = 0;
@@ -62,12 +93,11 @@ void logoGsLoop(void) {
 		joyUse(JOY1 + JOY_FIRE) | joyUse(JOY2 + JOY_FIRE)
 	);
 	if(s_ubState == STATE_FADE_IN) {
-		if(isAnyPressed) {
-			s_ubState = STATE_FADE_OUT;
-		}
-		else if(s_ubFadeoutCnt >= 50) {
+		if(s_ubFadeoutCnt >= 50) {
 			s_ubState = STATE_WAIT;
 			s_ubFrame = 0;
+			s_eLangCurr = 0;
+			drawLanguages();
 		}
 		else {
 			++s_ubFadeoutCnt;
@@ -75,8 +105,24 @@ void logoGsLoop(void) {
 		}
 	}
 	else if(s_ubState == STATE_WAIT) {
-		++s_ubFrame;
-		if(s_ubFrame >= 100 || isAnyPressed) {
+		// ++s_ubFrame;
+		if(keyUse(KEY_UP) || keyUse(KEY_W) || joyUse(JOY1_UP) || joyUse(JOY2_UP)) {
+			if(s_eLangCurr == 0) {
+				s_eLangCurr = LANG_COUNT - 1;
+			}
+			else {
+				--s_eLangCurr;
+			}
+			drawLanguages();
+		}
+		else if(keyUse(KEY_DOWN) || keyUse(KEY_S) || joyUse(JOY1_DOWN) || joyUse(JOY2_DOWN)) {
+			if(++s_eLangCurr == LANG_COUNT) {
+				s_eLangCurr = 0;
+			}
+			drawLanguages();
+		}
+		if(isAnyPressed) {
+			coreSetLangPrefix(s_pLanguagePrefixes[s_eLangCurr]);
 			s_ubState = STATE_FADE_OUT;
 		}
 	}
@@ -99,5 +145,6 @@ void logoGsDestroy(void) {
 	systemUse();
 	logBlockBegin("logoGsDestroy()");
 	viewDestroy(s_pView);
+	fontDestroyTextBitMap(s_pLineBuffer);
 	logBlockEnd("logoGsDestroy()");
 }

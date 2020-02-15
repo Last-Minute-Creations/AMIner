@@ -37,7 +37,6 @@ typedef enum _tTile {
 typedef struct _tTileDef {
 	UBYTE ubMineral;
 	UBYTE ubSlots;
-	const char *szMsg;
 } tTileDef;
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);

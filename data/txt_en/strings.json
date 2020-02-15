@@ -8,9 +8,13 @@
 		],
 		"notDone": "Comrade, plan not done, warning and new plan"
 	},
-	"hiScoreMessages": {
+	"hiScore": {
 		"new": "New hi-score! Enter your name!",
-		"press": "Press FIRE or ENTER to continue"
+		"press": "Press FIRE or ENTER to continue",
+		"score": "Score",
+		"winP1": "Player 1 wins!",
+		"winP2": "Player 2 wins!",
+		"draw": "Draw!"
 	},
 	"menu": {
 		"enumMode": ["Campaign", "Challenge"],
@@ -63,6 +67,26 @@
 	"shop": {
 		"timeRemaining": "Time remaining:",
 		"accolades": "Accolades:",
-		"rebukes": "Rebukes:"
+		"rebukes": "Rebukes:",
+		"mk": "Mk",
+		"upgradeToMk": "Upgrade to Mk",
+		"stock": "Stock",
+		"buy": "Buy",
+		"exit": "Exit",
+		"confirm": "Confirm",
+		"alreadyMax": "you already have max level!",
+		"alreadyFull": "you're already full!"
+	},
+	"hud": {
+		"p1": "Player 1",
+		"p2": "Player 2",
+		"drill": "Drill:",
+		"cargo": "Cargo:",
+		"hull": "Hull:",
+		"cash": "Cash:",
+		"depth": "Depth:",
+		"paused": "Game paused",
+		"resume": "Resume",
+		"quit": "Quit"
 	}
 }

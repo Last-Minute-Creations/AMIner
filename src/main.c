@@ -8,18 +8,18 @@
 #include "logo.h"
 
 void genericCreate(void) {
-  keyCreate();
+	keyCreate();
 	joyOpen(0);
-  gamePushState(logoGsCreate, logoGsLoop, logoGsDestroy);
+	gamePushState(logoGsCreate, logoGsLoop, logoGsDestroy);
 }
 
 void genericProcess(void) {
-  keyProcess();
+	keyProcess();
 	joyProcess();
-  gameProcess();
+	gameProcess();
 }
 
 void genericDestroy(void) {
-  keyDestroy();
+	keyDestroy();
 	joyClose();
 }

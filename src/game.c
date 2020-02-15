@@ -64,7 +64,6 @@ static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
 static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
 
-tFont *g_pFont;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
@@ -431,7 +430,10 @@ void gameChallengeEnd(void) {
 void gameChallengeResult(void) {
 	if(!g_is2pPlaying) {
 		char szBfr[30];
-		sprintf(szBfr, "Score: %ld", g_pVehicles[0].lCash);
+		sprintf(
+			szBfr, "%s: %ld",
+			g_sHiScoreMessages.pStrings[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
+		);
 		hiScoreSetup(g_pVehicles[0].lCash, szBfr);
 		menuGsEnter(1);
 	}
@@ -439,13 +441,13 @@ void gameChallengeResult(void) {
 		// No entering hi score for 2 players, just summary who wins
 		const char *pMsg;
 		if(g_pVehicles[0].lCash > g_pVehicles[1].lCash) {
-			pMsg = "Player 1 wins!";
+			pMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_WIN_P1];
 		}
 		else if(g_pVehicles[0].lCash < g_pVehicles[1].lCash) {
-			pMsg = "Player 2 wins!";
+			pMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_WIN_P2];
 		}
 		else {
-			pMsg = "Draw!";
+			pMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_DRAW];
 		}
 		hiScoreSetup(0, pMsg);
 		menuGsEnter(1);

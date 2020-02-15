@@ -18,6 +18,8 @@ void coreGsLoop(void);
 
 void coreGsDestroy(void);
 
+void coreSetLangPrefix(const char * const szPrefix);
+
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
 

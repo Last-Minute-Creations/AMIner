@@ -114,6 +114,9 @@ static tHudPage s_eModeReturnPage;
 static tHudState s_eModeReturnState;
 static UBYTE s_ubHudShowStack;
 
+// Texts
+tStringArray g_sMsgHud;
+
 //----------------------------------------------------------------------- STATIC
 
 static void hudResetStateMachine(void) {
@@ -258,28 +261,32 @@ void hudCreate(tView *pView, const tFont *pFont) {
 
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_1_Y - 3,
-		"Player 1", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+		g_sMsgHud.pStrings[MSG_HUD_P1], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 	);
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_2_Y - 3,
-		"Player 2", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+		g_sMsgHud.pStrings[MSG_HUD_P2], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 	);
 
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, ROW_1_Y - 3,
-		"Drill:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		g_sMsgHud.pStrings[MSG_HUD_DRILL], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, ROW_1_Y - 3,
-		"Cargo:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		g_sMsgHud.pStrings[MSG_HUD_CARGO], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, ROW_1_Y - 3,
-		"Hull:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		g_sMsgHud.pStrings[MSG_HUD_HULL], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	fontDrawStr(
 		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, ROW_1_Y - 3,
-		"Cash:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		g_sMsgHud.pStrings[MSG_HUD_CASH], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 	);
 	hudReset(0, 0);
 }
@@ -301,7 +308,9 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	s_isChallenge = isChallenge;
 	s_is2pPlaying = is2pPlaying;
 	s_ubHudShowStack = 0;
-	const UBYTE ubLabelWidth = fontMeasureText(s_pFont, "Depth:").uwX;
+	const UBYTE ubLabelWidth = fontMeasureText(
+		s_pFont, g_sMsgHud.pStrings[MSG_HUD_DEPTH]
+	).uwX;
 	if(isChallenge) {
 		// Clear depth label and use it as cash
 		blitRect(
@@ -313,7 +322,8 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 		// Depth instead of 2p cash
 		fontDrawStr(
 			s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, ROW_2_Y - 3,
-			"Depth:", HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+			g_sMsgHud.pStrings[MSG_HUD_DEPTH], HUD_COLOR_BAR_FULL,
+			FONT_LAZY | FONT_COOKIE | FONT_RIGHT
 		);
 	}
 
@@ -653,7 +663,7 @@ void hudUpdate(void) {
 					320 - 2 * HUD_ORIGIN_X, 2 * s_ubLineHeight + 1, HUD_COLOR_BG
 				);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Game paused");
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_sMsgHud.pStrings[MSG_HUD_PAUSED]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 2,
@@ -667,7 +677,7 @@ void hudUpdate(void) {
 		case STATE_PAUSE_LOOP:
 			if(s_ubSelection != s_ubSelectionPrev) {
 				const UWORD uwPageOriginY = HUD_PAGE_PAUSE * HUD_HEIGHT + HUD_ORIGIN_Y;
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Resume");
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_sMsgHud.pStrings[MSG_HUD_RESUME]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 3,
@@ -676,7 +686,7 @@ void hudUpdate(void) {
 					FONT_COOKIE | FONT_HCENTER
 				);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Quit");
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_sMsgHud.pStrings[MSG_HUD_QUIT]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,

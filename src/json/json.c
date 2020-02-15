@@ -167,7 +167,7 @@ ULONG jsonTokToUlong(const tJson *pJson, UWORD uwTok) {
 UWORD jsonStrLen(const tJson *pJson, UWORD uwTok) {
   ULONG ulCodepoint, ulState = 0;
 	UWORD uwLength = 0;
-	for(UWORD i = pJson->pTokens[uwTok].start; i <= pJson->pTokens[uwTok].end; ++i) {
+	for(UWORD i = pJson->pTokens[uwTok].start; i < pJson->pTokens[uwTok].end; ++i) {
 		UBYTE ubCharCode = (UBYTE)pJson->szData[i];
 		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
 			continue;
@@ -178,20 +178,36 @@ UWORD jsonStrLen(const tJson *pJson, UWORD uwTok) {
 }
 
 UWORD jsonTokStrCpy(
-	const tJson *pJson, UWORD uwTok, char *pDst, UWORD uwMaxBytes
+	const tJson *pJson, const tJsonRemap *pRemap, UWORD uwTok, char *pDst,
+	UWORD uwMaxBytes
 ) {
 	UWORD uwLength = 0;
 	ULONG ulCodepoint, ulState = 0;
-	for(UWORD i = pJson->pTokens[uwTok].start; i <= pJson->pTokens[uwTok].end; ++i) {
+	for(UWORD i = pJson->pTokens[uwTok].start; i < pJson->pTokens[uwTok].end; ++i) {
 		UBYTE ubCharCode = (UBYTE)pJson->szData[i];
 		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
 			continue;
 		}
+
+		// By default, write codepoint truncated to byte
 		pDst[uwLength] = ulCodepoint;
-		if(++uwLength == uwMaxBytes) {
+
+		// Remap if remap array has been passed
+		if(pRemap) {
+			UWORD j;
+			for(j = 0; pRemap[j].ulCodepoint != 0; ++j) {
+				if(pRemap[j].ulCodepoint == ulCodepoint) {
+					pDst[uwLength] = pRemap[j].ubFontCode;
+					break;
+				}
+			}
+		}
+
+		// Stop if max size has been reached
+		if(++uwLength >= uwMaxBytes - 1) {
 			break;
 		}
 	}
-	pDst[uwLength-1] = '\0';
+	pDst[uwLength] = '\0';
 	return uwLength;
 }

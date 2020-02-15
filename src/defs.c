@@ -15,6 +15,7 @@
 #include "vehicle.h"
 #include "tile.h"
 #include "inventory.h"
+#include "hud.h"
 
 LONG g_lInitialCash;
 UBYTE g_ubUpgradeLevels;
@@ -24,6 +25,28 @@ UBYTE g_ubPlansPerAccolade;
 
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[9];
+
+static const tJsonRemap s_pRemap[] = {
+	{323, 145}, // "Ń"
+	{377, 144}, // "Ź"
+	{260, 143}, // "Ą"
+	{346, 142}, // "Ś"
+	{280, 141}, // "Ę"
+	{262, 140}, // "Ć"
+	{321, 139}, // "Ł"
+	{211, 138}, // "Ó"
+	{379, 137}, // "Ż"
+	{324, 136}, // "ń"
+	{378, 135}, // "ź"
+	{261, 134}, // "ą"
+	{347, 133}, // "ś"
+	{281, 132}, // "ę"
+	{263, 131}, // "ć"
+	{322, 130}, // "ł"
+	{243, 129}, // "ó"
+	{380, 128}, // "ż"
+	{0, 0} // Terminator
+};
 
 void defsInit(void) {
 	tJson *pJson = jsonCreate("data/game.json");
@@ -90,7 +113,7 @@ void defsInit(void) {
 void langCreate(const char *szLangPrefix) {
 	logBlockBegin("langCreate()");
 	char szPath[100];
-	sprintf(szPath, "data/strings_%s.json", szLangPrefix);
+	sprintf(szPath, "data/txt_%s/strings.json", szLangPrefix);
 	tJson *pJson = jsonCreate(szPath);
 	if(!pJson) {
 		logWrite("ERR: %s not found\n", szPath);
@@ -98,40 +121,49 @@ void langCreate(const char *szLangPrefix) {
 	}
 
 	// Shop names
-	g_sShopNames = stringArrayCreateFromDom(pJson, "shopNames");
-	g_sWarehouseColNames = stringArrayCreateFromDom(pJson, "warehouseColNames");
+	g_sShopNames = stringArrayCreateFromDom(pJson, s_pRemap, "shopNames");
+	g_sWarehouseColNames = stringArrayCreateFromDom(pJson, s_pRemap, "warehouseColNames");
 
 	// Plan messages
 	g_sPlanMessages = stringArrayCreateFromDomElements(
-		pJson, 2, "planMessages.doneAfk", "planMessages.notDone"
+		pJson, s_pRemap, 2, "planMessages.doneAfk", "planMessages.notDone"
 	);
 
 	// Hi score messages
 	g_sHiScoreMessages = stringArrayCreateFromDomElements(
-		pJson, 2, "hiScoreMessages.new", "hiScoreMessages.press"
+		pJson, s_pRemap, MSG_HI_SCORE_COUNT, "hiScore.new", "hiScore.press",
+		"hiScore.score", "hiScore.winP1", "hiScore.winP2", "hiScore.draw"
 	);
 
-	g_sMenuEnumMode = stringArrayCreateFromDom(pJson, "menu.enumMode");
-	g_sMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, "menu.enumPlayerCount");
-	g_sMenuEnumP1 = stringArrayCreateFromDom(pJson, "menu.enumP1");
-	g_sMenuEnumP2 = stringArrayCreateFromDom(pJson, "menu.enumP2");
-	g_sMenuEnumOnOff = stringArrayCreateFromDom(pJson, "menu.enumOnOff");
-	g_sMenuCaptions = stringArrayCreateFromDom(pJson, "menu.captions");
-	g_sMineralNames = stringArrayCreateFromDom(pJson, "minerals");
-	g_sLoadMsgs = stringArrayCreateFromDom(pJson, "loadMsgs");
+	g_sMenuEnumMode = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumMode");
+	g_sMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumPlayerCount");
+	g_sMenuEnumP1 = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumP1");
+	g_sMenuEnumP2 = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumP2");
+	g_sMenuEnumOnOff = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumOnOff");
+	g_sMenuCaptions = stringArrayCreateFromDom(pJson, s_pRemap, "menu.captions");
+	g_sMineralNames = stringArrayCreateFromDom(pJson, s_pRemap, "minerals");
+	g_sLoadMsgs = stringArrayCreateFromDom(pJson, s_pRemap, "loadMsgs");
 
 	g_sTutorialMsgs = stringArrayCreateFromDomElements(
-		pJson, 5, "tutorial.start", "tutorial.onDugOut", "tutorial.nearShop",
+		pJson, s_pRemap, 5, "tutorial.start", "tutorial.onDugOut", "tutorial.nearShop",
 		"tutorial.inShop", "tutorial.onMoveToPlan"
 	);
 
 	g_sShopMsgs = stringArrayCreateFromDomElements(
-		pJson, 3, "shop.timeRemaining", "shop.accolades", "shop.rebukes"
+		pJson, s_pRemap, 11, "shop.timeRemaining", "shop.accolades", "shop.rebukes",
+		"shop.mk", "shop.upgradeToMk", "shop.stock", "shop.buy", "shop.exit",
+		"shop.confirm", "shop.alreadyMax", "shop.alreadyFull"
 	);
 
 	g_sMessages = stringArrayCreateFromDomElements(
-		pJson, MSG_COUNT, "challengeCheckpoint", "challengeTeleport",
+		pJson, s_pRemap, MSG_COUNT, "challengeCheckpoint", "challengeTeleport",
 		"drillDepleted", "cargoFull", "restock", "foundBone"
+	);
+
+	g_sMsgHud = stringArrayCreateFromDomElements(
+		pJson, s_pRemap, MSG_HUD_COUNT, "hud.p1", "hud.p2", "hud.drill",
+		"hud.cargo", "hud.hull", "hud.cash", "hud.depth",
+		"hud.paused", "hud.resume", "hud.quit"
 	);
 
 	jsonDestroy(pJson);
@@ -158,5 +190,6 @@ void langDestroy(void) {
 
 	stringArrayDestroy(&g_sTutorialMsgs);
 	stringArrayDestroy(&g_sMessages);
+	stringArrayDestroy(&g_sMsgHud);
 	logBlockEnd("langDestroy()");
 }

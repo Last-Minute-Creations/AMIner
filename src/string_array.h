@@ -12,11 +12,12 @@ typedef struct _tStringArray {
 	char **pStrings;
 } tStringArray;
 
-
-tStringArray stringArrayCreateFromDom(tJson *pJson, const char *szDom);
+tStringArray stringArrayCreateFromDom(
+	tJson *pJson, const tJsonRemap *pRemap, const char *szDom
+);
 
 tStringArray stringArrayCreateFromDomElements(
-	tJson *pJson, UBYTE ubCount, ...
+	tJson *pJson, const tJsonRemap *pRemap, UBYTE ubCount, ...
 );
 
 void stringArrayDestroy(tStringArray *pArray);

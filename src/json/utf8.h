@@ -5,12 +5,12 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
+#include <ace/types.h>
 
 #define UTF8_ACCEPT 0
 #define UTF8_REJECT 1
 
-static const uint8_t utf8d[] = {
+static const UBYTE utf8d[] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 00..1f
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 20..3f
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 40..5f
@@ -27,8 +27,8 @@ static const uint8_t utf8d[] = {
   1,3,1,1,1,1,1,3,1,3,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // s7..s8
 };
 
-static inline uint32_t decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
-  uint32_t type = utf8d[byte];
+static inline ULONG decode(ULONG* state, ULONG* codep, ULONG byte) {
+  ULONG type = utf8d[byte];
 
   *codep = (*state != UTF8_ACCEPT) ?
     (byte & 0x3fu) | (*codep << 6) :

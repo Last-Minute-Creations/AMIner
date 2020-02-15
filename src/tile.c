@@ -21,25 +21,25 @@ typedef enum _tMsgLoading {
 tStringArray g_sLoadMsgs;
 
 const tTileDef const g_pTileDefs[TILE_COUNT] = {
-	{.szMsg = 0, .ubSlots = 0, .ubMineral = MINERAL_TYPE_COUNT},
-	[TILE_SILVER_1] = {.szMsg = "Silver x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_SILVER},
-	[TILE_SILVER_2] = {.szMsg = "Silver x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_SILVER},
-	[TILE_SILVER_3] = {.szMsg = "Silver x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_SILVER},
-	[TILE_GOLD_1] = {.szMsg = "Gold x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_GOLD},
-	[TILE_GOLD_2] = {.szMsg = "Gold x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_GOLD},
-	[TILE_GOLD_3] = {.szMsg = "Gold x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_GOLD},
-	[TILE_EMERALD_1] = {.szMsg = "Emerald x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_EMERALD},
-	[TILE_EMERALD_2] = {.szMsg = "Emerald x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_EMERALD},
-	[TILE_EMERALD_3] = {.szMsg = "Emerald x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_EMERALD},
-	[TILE_RUBY_1] = {.szMsg = "Ruby x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_RUBY},
-	[TILE_RUBY_2] = {.szMsg = "Ruby x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_RUBY},
-	[TILE_RUBY_3] = {.szMsg = "Ruby x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_RUBY},
-	[TILE_MOONSTONE_1] = {.szMsg = "Moonstone x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_MOONSTONE},
-	[TILE_MOONSTONE_2] = {.szMsg = "Moonstone x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_MOONSTONE},
-	[TILE_MOONSTONE_3] = {.szMsg = "Moonstone x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_MOONSTONE},
-	[TILE_COAL_1] = {.szMsg = "Coal x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_COAL},
-	[TILE_COAL_2] = {.szMsg = "Coal x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_COAL},
-	[TILE_COAL_3] = {.szMsg = "Coal x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_COAL}
+	{.ubSlots = 0, .ubMineral = MINERAL_TYPE_COUNT},
+	[TILE_SILVER_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_SILVER},
+	[TILE_SILVER_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_SILVER},
+	[TILE_SILVER_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_SILVER},
+	[TILE_GOLD_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_GOLD},
+	[TILE_GOLD_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_GOLD},
+	[TILE_GOLD_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_GOLD},
+	[TILE_EMERALD_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_EMERALD},
+	[TILE_EMERALD_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_EMERALD},
+	[TILE_EMERALD_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_EMERALD},
+	[TILE_RUBY_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_RUBY},
+	[TILE_RUBY_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_RUBY},
+	[TILE_RUBY_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_RUBY},
+	[TILE_MOONSTONE_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_MOONSTONE},
+	[TILE_MOONSTONE_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_MOONSTONE},
+	[TILE_MOONSTONE_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_MOONSTONE},
+	[TILE_COAL_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_COAL},
+	[TILE_COAL_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_COAL},
+	[TILE_COAL_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_COAL}
 };
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {

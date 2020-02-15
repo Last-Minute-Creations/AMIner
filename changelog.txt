@@ -1,3 +1,8 @@
+20.2.15
+- Time remaining is represented as 30 days
+- You can drill through stone and stoney minerals
+- Polish translation is working now
+
 20.2.9
 - One accolade now requires configurable number of plans to fulfill
 - Drilling through minerals inside the stone should be harder now

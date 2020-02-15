@@ -9,31 +9,31 @@
 
 //----------------------------------------------------------------- STRING ALLOC
 
-static char *stringCreateFromTok(const tJson *pJson, UWORD uwTokIdx) {
+static char *stringCreateFromTok(
+	const tJson *pJson, const tJsonRemap *pRemap, UWORD uwTokIdx
+) {
 	char *szDestination = 0;
 	if(pJson->pTokens[uwTokIdx].type == JSMN_ARRAY) {
 		UWORD uwAllocSize = 0;
-		logWrite("Allocating string from array\n");
 		for(UBYTE i = 0; i < pJson->pTokens[uwTokIdx].size; ++i) {
 			UWORD uwArrIdx = jsonGetElementInArray(pJson, uwTokIdx, i);
-			logWrite("Line length: %hu\n", jsonStrLen(pJson, uwArrIdx));
 			uwAllocSize += jsonStrLen(pJson, uwArrIdx) + 1;
 		}
-		logWrite("Total alloc: %hu\n", uwAllocSize);
 		szDestination = memAllocFast(uwAllocSize);
 		UWORD uwOffs = 0;
 		for(UBYTE i = 0; i < pJson->pTokens[uwTokIdx].size; ++i) {
 			UWORD uwArrIdx = jsonGetElementInArray(pJson, uwTokIdx, i);
-			uwOffs += jsonTokStrCpy(pJson, uwArrIdx, &szDestination[uwOffs], uwAllocSize - uwOffs);
+			uwOffs += jsonTokStrCpy(
+				pJson, pRemap, uwArrIdx, &szDestination[uwOffs], uwAllocSize - uwOffs
+			);
 			szDestination[uwOffs++] = '\n';
 		}
 		szDestination[uwAllocSize - 1] = '\0';
 	}
 	else if(pJson->pTokens[uwTokIdx].type == JSMN_STRING) {
 		UWORD uwAllocSize = jsonStrLen(pJson, uwTokIdx) + 1;
-		logWrite("Allocating json string: %hu\n", uwAllocSize);
 		szDestination = memAllocFast(uwAllocSize);
-		jsonTokStrCpy(pJson, uwTokIdx, szDestination, uwAllocSize);
+		jsonTokStrCpy(pJson, pRemap, uwTokIdx, szDestination, uwAllocSize);
 	}
 	else {
 		logWrite("ERR: unknown json node type: %d\n", pJson->pTokens[uwTokIdx].type);
@@ -41,13 +41,15 @@ static char *stringCreateFromTok(const tJson *pJson, UWORD uwTokIdx) {
 	return szDestination;
 }
 
-static char *stringCreateFromDom(const tJson *pJson, const char *szDom) {
+static char *stringCreateFromDom(
+	const tJson *pJson, const tJsonRemap *pRemap, const char *szDom
+) {
 	UWORD uwIdx = jsonGetDom(pJson, szDom);
 	if(uwIdx == 0) {
 		logWrite("ERR: %s not found\n", szDom);
 		return 0;
 	}
-	return stringCreateFromTok(pJson, uwIdx);
+	return stringCreateFromTok(pJson, pRemap, uwIdx);
 }
 
 static void stringDestroy(char *szString) {
@@ -65,8 +67,13 @@ static tStringArray stringArrayCreate(UBYTE ubCount) {
 	return sArray;
 }
 
-tStringArray stringArrayCreateFromDom(tJson *pJson, const char *szDom) {
-	logBlockBegin("stringArrayCreateFromDom(pJson: %p, szDom: '%s')", pJson, szDom);
+tStringArray stringArrayCreateFromDom(
+	tJson *pJson, const tJsonRemap *pRemap, const char *szDom
+) {
+	logBlockBegin(
+		"stringArrayCreateFromDom(pJson: %p, pRemap: %p, szDom: '%s')",
+		pJson, pRemap, szDom
+	);
 	UWORD uwTokArray = jsonGetDom(pJson, szDom);
 	if(!uwTokArray) {
 		logWrite("ERR: json not found: '%s'\n", szDom);
@@ -81,22 +88,23 @@ tStringArray stringArrayCreateFromDom(tJson *pJson, const char *szDom) {
 			logWrite("ERR: json array element not found: '%s'[%hhu]", szDom, i);
 		}
 		else {
-			sArray.pStrings[i] = stringCreateFromTok(pJson, uwTokElement);
+			sArray.pStrings[i] = stringCreateFromTok(pJson, pRemap, uwTokElement);
 		}
 	}
 	logBlockEnd("stringArrayCreateFromDom()");
 	return sArray;
 }
 
-tStringArray stringArrayCreateFromDomElements(tJson *pJson, UBYTE ubCount, ...) {
+tStringArray stringArrayCreateFromDomElements(
+	tJson *pJson, const tJsonRemap *pRemap, UBYTE ubCount, ...
+) {
 	logBlockBegin("stringArrayCreateFromDom(pJson: %p, ubCount: '%hhu')", pJson, ubCount);
 	tStringArray sArray = stringArrayCreate(ubCount);
 	va_list vaArgs;
 	va_start(vaArgs, ubCount);
 	for(UBYTE i = 0; i < ubCount; ++i) {
 		const char *szDom = va_arg(vaArgs, const char*);
-		logWrite("szDom: '%s'\n", szDom);
-		sArray.pStrings[i] = stringCreateFromDom(pJson, szDom);
+		sArray.pStrings[i] = stringCreateFromDom(pJson, pRemap, szDom);
 	}
 	va_end(vaArgs);
 	logBlockEnd("stringArrayCreateFromDomElements()");
