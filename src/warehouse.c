@@ -111,3 +111,8 @@ void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount) {
 void warehouseElapseTime(UBYTE ubTime) {
 	s_sCurrentPlan.wTimeRemaining = MAX(0, s_sCurrentPlan.wTimeRemaining - ubTime);
 }
+
+WORD warehouseGetRemainingDays(const tPlan *pPlan) {
+	WORD wRemainingDays = (pPlan->wTimeRemaining + (140-1)) / 140;
+	return wRemainingDays;
+}

@@ -47,4 +47,6 @@ void warehouseElapseTime(UBYTE ubTime);
 
 void warehousePlanUnlockMineral(tMineralType eMineral);
 
+WORD warehouseGetRemainingDays(const tPlan *pPlan);
+
 #endif // _WAREHOUSE_H_

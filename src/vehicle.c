@@ -339,9 +339,12 @@ static inline UBYTE vehicleStartDrilling(
 	}
 
 	// Calculate layer difficulty
-	BYTE bDifficulty = groundLayerGetDifficultyAtDepth(uwTileY << 5);
+	BYTE bDifficulty;
 	if(tileIsHardToDrill(uwTileX, uwTileY)) {
-		bDifficulty += 2;
+		bDifficulty = 10;
+	}
+	else {
+		bDifficulty = groundLayerGetDifficultyAtDepth(uwTileY << 5);
 	}
 	BYTE bDrillLevel = inventoryGetPartDef(INVENTORY_PART_DRILL)->ubLevel;
 	BYTE bDrillDuration = MAX(1, bDifficulty - bDrillLevel);

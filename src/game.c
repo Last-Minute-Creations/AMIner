@@ -63,6 +63,7 @@ static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
 static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
+static UBYTE s_isReminderShown;
 
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
@@ -100,6 +101,7 @@ void gameStart(void) {
 	s_ubRebukes = 0;
 	s_ubAccolades = 0;
 	s_ubAccoladesFract = 0;
+	s_isReminderShown = 0;
 	for(tMode eMode = 0; eMode < MODE_COUNT; ++eMode) {
 		hudSetModeCounter(eMode, 0);
 	}
@@ -479,17 +481,32 @@ void gameGsLoop(void) {
 	vehicleProcessText();
 
 	// Process plan being complete
-	if(warehouseGetPlan()->wTimeRemaining <= 0 || keyUse(KEY_U)) {
+	WORD wRemainingDays = warehouseGetRemainingDays(warehouseGetPlan());
+	if(wRemainingDays <= 0) {
 		if(warehouseTryFulfillPlan()) {
-			hudShowMessage(0, g_sPlanMessages.pStrings[0]);
+			hudShowMessage(0, g_sPlanMessages.pStrings[MSG_PLAN_DONE_AFK]);
 			warehouseNewPlan(1, g_is2pPlaying);
 			gameAddAccolade();
 		}
 		else {
-			hudShowMessage(0, g_sPlanMessages.pStrings[1]);
+			hudShowMessage(0, g_sPlanMessages.pStrings[MSG_PLAN_NOT_DONE]);
 			warehouseNewPlan(0, g_is2pPlaying);
 			gameAddRebuke();
 		}
+	}
+	else if(
+		wRemainingDays == 15 || wRemainingDays == 5 || wRemainingDays == 3 ||
+		wRemainingDays == 2 || wRemainingDays == 1
+	) {
+		if(!s_isReminderShown) {
+			s_isReminderShown = 1;
+			char szBfr[50];
+			sprintf(szBfr, g_sPlanMessages.pStrings[MSG_PLAN_REMAINING], wRemainingDays);
+			hudShowMessage(0, szBfr);
+		}
+	}
+	else {
+		s_isReminderShown = 0;
 	}
 
 	coreProcessBeforeBobs();

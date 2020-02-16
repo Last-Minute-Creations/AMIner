@@ -313,9 +313,8 @@ static void commShopDrawWarehouse(void) {
 
 	// Time remaining
 	sprintf(
-		szBfr, "%s %d",
-		g_sShopMsgs.pStrings[SHOP_MSG_TIME_REMAINING],
-		(pPlan->wTimeRemaining + (140-1)) / 140
+		szBfr, g_sShopMsgs.pStrings[SHOP_MSG_TIME_REMAINING],
+		warehouseGetRemainingDays(pPlan)
 	);
 	commDrawText(
 		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,

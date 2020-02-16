@@ -37,6 +37,13 @@ UBYTE gameGetAccolades(void);
 
 UBYTE gameGetRebukes(void);
 
+typedef enum _tPlanMessages {
+	MSG_PLAN_DONE_AFK,
+	MSG_PLAN_NOT_DONE,
+	MSG_PLAN_REMAINING,
+	MSG_PLAN_COUNT
+} tPlanMessages;
+
 extern tSample *g_pSampleDrill, *g_pSampleOre, *g_pSamplePenalty;
 extern tStringArray g_sPlanMessages;
 

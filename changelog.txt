@@ -1,3 +1,8 @@
+20.2.16
+- Mietek will now remind you that plan is due soon
+- Drilling through stone has constant difficulty of 10
+- Better language selection gfx
+
 20.2.15
 - Time remaining is represented as 30 days
 - You can drill through stone and stoney minerals

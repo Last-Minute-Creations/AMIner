@@ -6,7 +6,8 @@
 			"We've fulfilled plan with your reserves.",
 			"New has arrived"
 		],
-		"notDone": "Comrade, plan not done, warning and new plan"
+		"notDone": "Comrade, plan not done, warning and new plan",
+		"remaining": "Boss, %hd days remaining to complete the plan."
 	},
 	"hiScore": {
 		"new": "New hi-score! Enter your name!",
@@ -65,7 +66,7 @@
 	"restock": "Restock!",
 	"foundBone": "Found bone no. %hhu!",
 	"shop": {
-		"timeRemaining": "Time remaining:",
+		"timeRemaining": "%d days remaining",
 		"accolades": "Accolades:",
 		"rebukes": "Rebukes:",
 		"mk": "Mk",

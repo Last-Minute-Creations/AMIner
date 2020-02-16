@@ -14,6 +14,8 @@
 #define STATE_FADE_OUT 1
 #define STATE_WAIT 2
 
+#define RGB(r,g,b) ((((r) >> 4) << 8) | (((g) >> 4) << 4) | (((b) >> 4) << 0))
+
 typedef enum _tLang {
 	LANG_EN,
 	LANG_PL,
@@ -171,7 +173,7 @@ UBYTE lmcFadeOut(void) {
 //------------------------------------------------------------------------- LANG
 
 static const char *s_pLanguageNames[LANG_COUNT] = {
-	[LANG_EN] = "Johnny English",
+	[LANG_EN] = "D\x80ony English",
 	[LANG_PL] = "Mietek Polisz",
 };
 
@@ -180,8 +182,8 @@ static const char *s_pLanguagePrefixes[LANG_COUNT] = {
 	[LANG_PL] = "pl",
 };
 
-#define FACE_WIDTH (72)
-#define FACE_HEIGHT (60)
+#define FACE_WIDTH (64)
+#define FACE_HEIGHT (64)
 #define FACE_DIST (30)
 #define FACE_OFFS_Y ((256 - FACE_HEIGHT) / 2)
 #define FACE_OFFS_X ((320 - (2 * FACE_WIDTH + FACE_DIST)) / 2)
@@ -196,7 +198,7 @@ static void drawLangNames(void) {
 			s_pBfr->pBack, s_pLineBuffer,
 			FACE_OFFS_X + eLang * FACE_DELTA_X + FACE_WIDTH / 2,
 			FACE_OFFS_Y + FACE_HEIGHT + 2,
-			eLang == s_eLangCurr ? 4 : 3, FONT_HCENTER
+			eLang == s_eLangCurr ? 30 : 28, FONT_HCENTER
 		);
 	}
 }
@@ -208,8 +210,13 @@ void langFadeIn(void) {
 		tBitMap *pFaces = bitmapCreateFromFile("data/lang_select.bm", 0);
 		systemUnuse();
 
-		// Set first color to black
+		// Set first color to black, fill rest with colors from layer 1
 		s_pPaletteRef[0] = 0x0000;
+		s_pPaletteRef[27] = RGB(51, 34, 0);
+		s_pPaletteRef[28] = RGB(102, 68, 0);
+		s_pPaletteRef[29] = RGB(153, 102, 17);
+		s_pPaletteRef[30] = RGB(204, 136, 34);
+		s_pPaletteRef[31] = RGB(255, 170, 51);
 
 		// Clear that lousy logo
 		blitRect(
@@ -235,7 +242,7 @@ void langFadeIn(void) {
 		fontDrawTextBitMap(
 			s_pBfr->pBack, s_pLineBuffer,
 			320 / 2, FACE_OFFS_Y - (g_pFont->uwHeight + 2),
-			14, FONT_LAZY | FONT_HCENTER
+			30, FONT_LAZY | FONT_HCENTER | FONT_BOTTOM
 		);
 
 		drawLangNames();

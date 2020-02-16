@@ -126,7 +126,7 @@ void langCreate(const char *szLangPrefix) {
 
 	// Plan messages
 	g_sPlanMessages = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, 2, "planMessages.doneAfk", "planMessages.notDone"
+		pJson, s_pRemap, MSG_PLAN_COUNT, "planMessages.doneAfk", "planMessages.notDone", "planMessages.remaining"
 	);
 
 	// Hi score messages

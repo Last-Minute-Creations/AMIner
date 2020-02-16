@@ -6,7 +6,8 @@
 			"Plan zrealizowany z pomocą rezerw.",
 			"Przysłali nowy plan"
 		],
-		"notDone": "Towarzyszu, planu nie zrobiliście. Nagana i nowy plan."
+		"notDone": "Towarzyszu, planu nie zrobiliście. Nagana i nowy plan.",
+		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan."
 	},
 	"hiScore": {
 		"new": "Nowy rekord! Wpisz imię.",
@@ -65,7 +66,7 @@
 	"restock": "Rozładunek!",
 	"foundBone": "Znaleźliście kość nr %hhu!",
 	"shop": {
-		"timeRemaining": "Pozostało czasu:",
+		"timeRemaining": "Pozostało %d dni",
 		"accolades": "Pochwały:",
 		"rebukes": "Nagany:",
 		"mk": "Wz",
