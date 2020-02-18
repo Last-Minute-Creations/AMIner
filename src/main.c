@@ -6,11 +6,17 @@
 #include <ace/managers/key.h>
 #include <ace/managers/joy.h>
 #include "logo.h"
+#include "sorry.h"
 
 void genericCreate(void) {
 	keyCreate();
 	joyOpen(0);
-	gamePushState(logoGsCreate, logoGsLoop, logoGsDestroy);
+	if(memGetChipSize() < (1024+512) * 1024) {
+		gamePushState(sorryGsCreate, sorryGsLoop, sorryGsDestroy);
+	}
+	else {
+		gamePushState(logoGsCreate, logoGsLoop, logoGsDestroy);
+	}
 }
 
 void genericProcess(void) {
