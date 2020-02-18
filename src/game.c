@@ -91,6 +91,7 @@ void gameStart(void) {
 	g_isChallengeEnd = 0;
 	dinoReset();
 	tutorialReset();
+	officeResetPpl();
 	tileInit(g_isAtari, g_isChallenge);
 	warehouseReset(g_is2pPlaying);
 	inventoryReset();

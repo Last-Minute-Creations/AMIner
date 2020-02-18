@@ -4,6 +4,7 @@
 
 #include "comm_shop.h"
 #include <ace/managers/game.h>
+#include <ace/managers/system.h>
 #include "comm.h"
 #include "core.h"
 #include "game.h"
@@ -16,10 +17,13 @@
 #include "defs.h"
 #include "inventory.h"
 
-static UBYTE s_isShown;
-static UBYTE s_isBtnPress = 0;
-tBitMap *s_pBmDraw;
-tCommLed s_eTab;
+typedef enum _tOfficePpl {
+	OFFICE_PPL_MIETEK,
+	OFFICE_PPL_KRYSTYNA,
+	OFFICE_PPL_PUTIN,
+	OFFICE_PPL_URZEDAS,
+	OFFICE_PPL_COUNT,
+} tOfficePpl;
 
 typedef enum _tShopMessageNames {
 	SHOP_MSG_TIME_REMAINING,
@@ -36,10 +40,90 @@ typedef enum _tShopMessageNames {
 	SHOP_MSG_COUNT,
 } tShopMessageNames;
 
+static UBYTE s_isShown;
+static UBYTE s_isBtnPress = 0;
+static tBitMap *s_pBmDraw;
+static tCommLed s_eTab;
+
 //----------------------------------------------------------------------- OFFICE
+
+static tBitMap *s_pFaces, *s_pSelection;
+
+static tOfficePpl s_pActivePpl[OFFICE_PPL_COUNT];
+static UBYTE s_ubOfficeSelectionCount;
+static BYTE s_bOfficeSelectionCurr;
+
+static void officeDrawFace(BYTE bPos) {
+	const UBYTE ubSpaceX = (COMM_DISPLAY_WIDTH - 2*2 - 4 * 32) / 3;
+	const UBYTE ubSpaceY = 10;
+	const tUwCoordYX sOrigin = commGetOriginDisplay();
+
+	UWORD uwX = sOrigin.uwX + 2 + (bPos % 4) * (32 + ubSpaceX);
+	UWORD uwY = sOrigin.uwY + 2 + (bPos / 4) * (32 + ubSpaceY);
+
+	blitRect(s_pBmDraw, uwX - 2, uwY - 2, 36, 36, COMM_DISPLAY_COLOR_BG);
+
+	// Draw selection
+	if(bPos == s_bOfficeSelectionCurr) {
+		blitCopy(s_pSelection, 0, 0,  s_pBmDraw, uwX - 2, uwY - 2, 16, 9, MINTERM_COOKIE, 0xFF);
+		blitCopy(s_pSelection, 0, 9,  s_pBmDraw, uwX - 2 + 36 - 16, uwY - 2, 16, 9, MINTERM_COOKIE, 0xFF);
+		blitCopy(s_pSelection, 0, 18, s_pBmDraw, uwX - 2, uwY - 2 + 36 - 9, 16, 9, MINTERM_COOKIE, 0xFF);
+		blitCopy(s_pSelection, 0, 27, s_pBmDraw, uwX - 2 + 36 - 16, uwY - 2 + 36 - 9, 16, 9, MINTERM_COOKIE, 0xFF);
+	}
+
+	blitCopy(
+		s_pFaces, 0, s_pActivePpl[bPos] * 32, s_pBmDraw, uwX, uwY,
+		32, 32, MINTERM_COOKIE, 0xFF
+	);
+}
 
 static void commShopDrawOffice(void) {
 
+	s_ubOfficeSelectionCount = 0;
+	s_bOfficeSelectionCurr = 0;
+	for(tOfficePpl i = 0; i < OFFICE_PPL_COUNT; ++i) {
+		if(s_pActivePpl[i] == OFFICE_PPL_COUNT) {
+			break;
+		}
+		officeDrawFace(i);
+		++s_ubOfficeSelectionCount;
+	}
+}
+
+static void commShopProcessOffice(void) {
+	BYTE bOldSelection = s_bOfficeSelectionCurr;
+	if(commNavUse(COMM_NAV_LEFT)) {
+		--s_bOfficeSelectionCurr;
+	}
+	else if(commNavUse(COMM_NAV_RIGHT)) {
+		++s_bOfficeSelectionCurr;
+	}
+	else if(commNavUse(COMM_NAV_DOWN)) {
+		s_bOfficeSelectionCurr += 4;
+	}
+	else if(commNavUse(COMM_NAV_UP)) {
+		s_bOfficeSelectionCurr -= 4;
+	}
+	while(s_bOfficeSelectionCurr < 0) {
+		s_bOfficeSelectionCurr += s_ubOfficeSelectionCount;
+	}
+	while(s_bOfficeSelectionCurr >= s_ubOfficeSelectionCount) {
+		s_bOfficeSelectionCurr -= s_ubOfficeSelectionCount;
+	}
+	if(s_bOfficeSelectionCurr != bOldSelection) {
+		officeDrawFace(bOldSelection);
+		officeDrawFace(s_bOfficeSelectionCurr);
+	}
+}
+
+void officeResetPpl(void) {
+	for(tOfficePpl i = 0; i < OFFICE_PPL_COUNT; ++i) {
+		s_pActivePpl[i] = OFFICE_PPL_COUNT;
+	}
+	UBYTE ubPos = 0;
+	// s_pActivePpl[ubPos++] = OFFICE_PPL_MIETEK;
+	s_pActivePpl[ubPos++] = OFFICE_PPL_KRYSTYNA;
+	s_pActivePpl[ubPos++] = OFFICE_PPL_URZEDAS;
 }
 
 //--------------------------------------------------------------------- WORKSHOP
@@ -465,6 +549,10 @@ void commShopGsCreate(void) {
 	}
 
 	s_pBmDraw = g_pMainBuffer->pScroll->pBack;
+	systemUse();
+	s_pFaces = bitmapCreateFromFile("data/comm_faces_office.bm", 0);
+	s_pSelection = bitmapCreateFromFile("data/comm_office_selection.bm", 0);
+	systemUnuse();
 
 	s_eTab = COMM_LED_WAREHOUSE;
 	commShopShowTab(s_eTab);
@@ -531,6 +619,7 @@ void commShopGsLoop(void) {
 	else {
 		switch(s_eTab) {
 			case COMM_LED_OFFICE:
+				commShopProcessOffice();
 				break;
 			case COMM_LED_WORKSHOP:
 				commShopProcessWorkshop();
@@ -548,6 +637,12 @@ void commShopGsDestroy(void) {
 	if(!s_isShown) {
 		return;
 	}
+
+	systemUse();
+	bitmapDestroy(s_pFaces);
+	bitmapDestroy(s_pSelection);
+	systemUnuse();
+
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);

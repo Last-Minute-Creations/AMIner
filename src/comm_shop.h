@@ -21,4 +21,6 @@ void commShopGsDestroy(void);
 
 UBYTE commShopIsActive(void);
 
+void officeResetPpl(void);
+
 #endif // _COMM_SHOP_H_

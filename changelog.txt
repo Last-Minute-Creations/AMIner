@@ -1,3 +1,9 @@
+20.2.18
+- Fixed fall damage being too low
+- Added portait selection in commrade office
+- Added "Sorry" screen for low-spec Amigas
+- Challenge checkpoints are now easier to drill
+
 20.2.16
 - Mietek will now remind you that plan is due soon
 - Drilling through stone has constant difficulty of 10

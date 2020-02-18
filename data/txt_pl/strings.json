@@ -85,9 +85,14 @@
 		"cargo": "Ład.:",
 		"hull": "Kadł.:",
 		"cash": "Kasa:",
-		"depth": "Głęb.:",
+		"depth": "Poziom:",
 		"paused": "Pauza gry",
 		"resume": "Wznów",
 		"quit": "Wyjdź"
+	},
+	"krystyna": {
+		"guest": "Panie Dyrektorze, ma Pan gościa. Zapraszam do gabinetu.",
+		"urzedas": "Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne. Mówiłam że Pan Dyrektor ma naradę ale się uparł i czeka. Zapraszam do gabinetu.",
+		"commissar": "Panie Dyrektorze, Komisarz Putienko wzywa do gabinetu. Natychmiast!"
 	}
 }

@@ -39,9 +39,11 @@ convertBitmaps(
 	INTERLEAVED SOURCES
 		_res/commrade/bg.png _res/commrade/buttons.png _res/commrade/faces.png
 		_res/hud/hud.png _res/hud/mode_icons.png _res/logo.png _res/lang_select.png
+		_res/commrade/faces_office.png _res/commrade/office_selection.png
 	DESTINATIONS
 		data/comm_bg.bm data/comm_buttons.bm data/comm_faces.bm
 		data/hud.bm data/mode_icons.bm data/logo.bm data/lang_select.bm
+		data/comm_faces_office.bm data/comm_office_selection.bm
 )
 
 convertBitmaps(
