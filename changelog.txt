@@ -1,3 +1,7 @@
+20.2.20
+- Implemented office panel in commrade
+- Bribes kinda work
+
 20.2.18
 - Fixed fall damage being too low
 - Added portait selection in commrade office

@@ -126,7 +126,8 @@ void langCreate(const char *szLangPrefix) {
 
 	// Plan messages
 	g_sPlanMessages = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, MSG_PLAN_COUNT, "planMessages.doneAfk", "planMessages.notDone", "planMessages.remaining"
+		pJson, s_pRemap, MSG_PLAN_COUNT, "planMessages.doneAfk",
+		"planMessages.notDone", "planMessages.remaining", "planMessages.extending"
 	);
 
 	// Hi score messages
@@ -166,12 +167,22 @@ void langCreate(const char *szLangPrefix) {
 		"hud.paused", "hud.resume", "hud.quit"
 	);
 
+	g_sOfficePageNames = stringArrayCreateFromDomElements(
+		pJson, s_pRemap, 10,
+		"officePages.main", "officePages.listMietek", "officePages.listKrystyna",
+		"officePages.listPutin", "officePages.listUrzedas",
+		"officePages.dossierKrystyna", "officePages.dossierUrzedas",
+		"officePages.bribe", "officePages.favor",
+		"officePages.accounting"
+	);
+
 	jsonDestroy(pJson);
 	logBlockEnd("langCreate()");
 }
 
 void langDestroy(void) {
 	logBlockBegin("langDestroy()");
+	stringArrayDestroy(&g_sOfficePageNames);
 	stringArrayDestroy(&g_sShopMsgs);
 	stringArrayDestroy(&g_sShopNames);
 	stringArrayDestroy(&g_sWarehouseColNames);

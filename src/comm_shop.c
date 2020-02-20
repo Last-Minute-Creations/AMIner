@@ -5,6 +5,7 @@
 #include "comm_shop.h"
 #include <ace/managers/game.h>
 #include <ace/managers/system.h>
+#include <ace/managers/rand.h>
 #include "comm.h"
 #include "core.h"
 #include "game.h"
@@ -17,6 +18,10 @@
 #include "defs.h"
 #include "inventory.h"
 
+/**
+ * @brief List of people in the office.
+ * Must be the exact same order as in office page list!
+ */
 typedef enum _tOfficePpl {
 	OFFICE_PPL_MIETEK,
 	OFFICE_PPL_KRYSTYNA,
@@ -24,6 +29,20 @@ typedef enum _tOfficePpl {
 	OFFICE_PPL_URZEDAS,
 	OFFICE_PPL_COUNT,
 } tOfficePpl;
+
+typedef enum _tOfficePage {
+	OFFICE_PAGE_MAIN,
+	OFFICE_PAGE_LIST_MIETEK,
+	OFFICE_PAGE_LIST_KRYSTYNA,
+	OFFICE_PAGE_LIST_PUTIN,
+	OFFICE_PAGE_LIST_URZEDAS,
+	OFFICE_PAGE_DOSSIER_KRYSTYNA,
+	OFFICE_PAGE_DOSSIER_URZEDAS,
+	OFFICE_PAGE_BRIBE,
+	OFFICE_PAGE_FAVOR,
+	OFFICE_PAGE_ACCOUNTING,
+	OFFICE_PAGE_COUNT
+} tOfficePage;
 
 typedef enum _tShopMessageNames {
 	SHOP_MSG_TIME_REMAINING,
@@ -45,15 +64,174 @@ static UBYTE s_isBtnPress = 0;
 static tBitMap *s_pBmDraw;
 static tCommLed s_eTab;
 
+static const tOfficePage s_pOfficePages[OFFICE_PPL_COUNT][4] = {
+	[OFFICE_PPL_MIETEK] = {
+		OFFICE_PAGE_MAIN
+	},
+	[OFFICE_PPL_KRYSTYNA] = {
+		OFFICE_PAGE_DOSSIER_KRYSTYNA, OFFICE_PAGE_ACCOUNTING, OFFICE_PAGE_MAIN
+	},
+	[OFFICE_PPL_PUTIN] = {
+		OFFICE_PAGE_MAIN
+	},
+	[OFFICE_PPL_URZEDAS] = {
+		OFFICE_PAGE_DOSSIER_URZEDAS, OFFICE_PAGE_FAVOR, OFFICE_PAGE_BRIBE, OFFICE_PAGE_MAIN
+	},
+};
+
+tStringArray g_sOfficePageNames;
+
 //----------------------------------------------------------------------- OFFICE
 
 static tBitMap *s_pFaces, *s_pSelection;
 
-static tOfficePpl s_pActivePpl[OFFICE_PPL_COUNT];
+static tOfficePpl s_pActivePpl[OFFICE_PPL_COUNT]; // Key: pos in office, val: ppl
+static tOfficePage s_eOfficePage;
 static UBYTE s_ubOfficeSelectionCount;
 static BYTE s_bOfficeSelectionCurr;
+static UBYTE s_ubFavorsLeft, s_ubBribeChanceFail, s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
 
-static void officeDrawFace(BYTE bPos) {
+static void officeMakePageCurrent(tOfficePage ePage);
+
+static void drawAcceptDecline(void) {
+	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - 3 * g_pFont->uwHeight;
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, uwOffsY, "Accept", FONT_COOKIE | FONT_CENTER, (
+			s_bOfficeSelectionCurr == 0 ?
+			COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
+		)
+	);
+
+	uwOffsY += g_pFont->uwHeight;
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, uwOffsY, "Decline", FONT_COOKIE | FONT_CENTER, (
+			s_bOfficeSelectionCurr == 1 ?
+			COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
+		)
+	);
+}
+
+static void officePreparePageFavor(void) {
+
+}
+
+static void officeProcessPageFavor(void) {
+
+}
+
+static UBYTE drawLongText(
+	const char *szText, UBYTE ubLineHeight, UWORD uwStartX, UWORD uwStartY
+) {
+	UBYTE ubLinesWritten = 1;
+
+	UBYTE ubTextLength = strlen(szText);
+	UWORD uwLineWidth = 0;
+	UWORD uwCurrY = uwStartY;
+	UBYTE ubCharsInLine = 0;
+	char szLineBfr[50];
+	for(uint8_t i = 0; i < ubTextLength; ++i) {
+		UBYTE ubCharWidth = fontGlyphWidth(g_pFont, szText[i]) + 1;
+		if(uwLineWidth + ubCharWidth >= (COMM_DISPLAY_WIDTH - uwStartX)) {
+			szLineBfr[ubCharsInLine] = '\0';
+			commDrawText(uwStartX, uwCurrY, szLineBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+			uwLineWidth = 0;
+			ubCharsInLine = 0;
+			++ubLinesWritten;
+			uwCurrY += ubLineHeight;
+		}
+		szLineBfr[ubCharsInLine++] = szText[i];
+		uwLineWidth += ubCharWidth;
+	}
+
+	if(ubCharsInLine) {
+		szLineBfr[ubCharsInLine] = '\0';
+		commDrawText(uwStartX, uwCurrY, szLineBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+	}
+
+	return ubLinesWritten;
+}
+
+static void officePreparePageBribe(void) {
+	const tPlan *pPlan = warehouseGetPlan();
+	char szBfr[100];
+	UWORD uwPosY = 0;
+	UWORD uwCost;
+
+	if(!pPlan->isPenaltyCountdownStarted) {
+		sprintf(szBfr, "Bribe for extra %hhu days for finishing plan in time.", 14);
+		uwCost = 100;
+		for(UBYTE i = s_ubBribeAccoladeCount; i--;) {
+			uwCost = (uwCost * 120 / 100);
+		}
+	}
+	else {
+		sprintf(szBfr, "Bribe for extra %hhu days before getting a penalty.", 14);
+		uwCost = 200;
+		for(UBYTE i = s_ubBribeRebukeCount; i--;) {
+			uwCost = (uwCost * 120 / 100);
+		}
+	}
+	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
+
+	uwPosY += drawLongText(szBfr, ubLineHeight, 0, uwPosY) * ubLineHeight;
+
+	sprintf(
+		szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
+		s_ubBribeChanceFail
+	);
+	uwPosY += drawLongText(szBfr,  ubLineHeight, 0, uwPosY) * ubLineHeight;
+
+	sprintf(szBfr, "It will cost you %hu\x1F.", uwCost);
+	uwPosY += drawLongText(szBfr,  ubLineHeight, 0, uwPosY) * ubLineHeight;
+
+	s_ubOfficeSelectionCount = 2;
+	drawAcceptDecline();
+}
+
+static void officeProcessPageBribe(void) {
+	BYTE bPrevPos = s_bOfficeSelectionCurr;
+	if(commNavUse(COMM_NAV_DOWN)) {
+		if(++s_bOfficeSelectionCurr >= s_ubOfficeSelectionCount) {
+			s_bOfficeSelectionCurr = 0;
+		}
+	}
+	else if(commNavUse(COMM_NAV_UP)) {
+		if(--s_bOfficeSelectionCurr < 0) {
+			s_bOfficeSelectionCurr = s_ubOfficeSelectionCount - 1;
+		}
+	}
+
+	if(bPrevPos != s_bOfficeSelectionCurr) {
+		drawAcceptDecline();
+	}
+
+
+	if(s_isBtnPress) {
+		if(s_bOfficeSelectionCurr == 0) {
+			if(ubRandMax(100) > s_ubBribeChanceFail) {
+				// Success
+				const tPlan *pPlan = warehouseGetPlan();
+				if(!pPlan->isPenaltyCountdownStarted) {
+					// accolade bribe
+					++s_ubBribeAccoladeCount;
+					s_ubBribeChanceFail = MIN(s_ubBribeChanceFail + 2, 100);
+				}
+				else {
+					// rebuke bribe
+					++s_ubBribeRebukeCount;
+					s_ubBribeChanceFail = MIN(s_ubBribeChanceFail + 5, 100);
+				}
+				warehouseAddDaysToPlan(14, 1);
+			}
+			else {
+				gameAddRebuke();
+			}
+		}
+		officeMakePageCurrent(OFFICE_PAGE_MAIN);
+	}
+}
+
+static void officeDrawFaceAtPos(BYTE bPos) {
 	const UBYTE ubSpaceX = (COMM_DISPLAY_WIDTH - 2*2 - 4 * 32) / 3;
 	const UBYTE ubSpaceY = 10;
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
@@ -77,20 +255,62 @@ static void officeDrawFace(BYTE bPos) {
 	);
 }
 
-static void commShopDrawOffice(void) {
+static void officeDrawListPos(tOfficePage eListPage, UBYTE ubPos) {
+	UBYTE ubColor = (
+		ubPos == s_bOfficeSelectionCurr ?
+		COMM_DISPLAY_COLOR_TEXT :
+		COMM_DISPLAY_COLOR_TEXT_DARK
+	);
+	commDrawText(
+		0, 10 * ubPos, g_sOfficePageNames.pStrings[eListPage], FONT_COOKIE, ubColor
+	);
+}
 
-	s_ubOfficeSelectionCount = 0;
-	s_bOfficeSelectionCurr = 0;
+static void officePreparePageList(tOfficePage ePage) {
+	tOfficePpl ePpl = ePage - OFFICE_PAGE_LIST_MIETEK;
+
+	tOfficePage eListPage;
+	do {
+		eListPage = s_pOfficePages[ePpl][s_ubOfficeSelectionCount];
+		officeDrawListPos(eListPage, s_ubOfficeSelectionCount);
+		++s_ubOfficeSelectionCount;
+	} while(eListPage != OFFICE_PAGE_MAIN);
+}
+
+static void officeProcessPageList(const tOfficePage *pPages) {
+	BYTE bPrevPos = s_bOfficeSelectionCurr;
+	if(commNavUse(COMM_NAV_DOWN)) {
+		if(++s_bOfficeSelectionCurr >= s_ubOfficeSelectionCount) {
+			s_bOfficeSelectionCurr = 0;
+		}
+	}
+	else if(commNavUse(COMM_NAV_UP)) {
+		if(--s_bOfficeSelectionCurr < 0) {
+			s_bOfficeSelectionCurr = s_ubOfficeSelectionCount - 1;
+		}
+	}
+
+	if(bPrevPos != s_bOfficeSelectionCurr) {
+		officeDrawListPos(pPages[bPrevPos], bPrevPos);
+		officeDrawListPos(pPages[s_bOfficeSelectionCurr], s_bOfficeSelectionCurr);
+	}
+	else if(s_isBtnPress) {
+		officeMakePageCurrent(pPages[s_bOfficeSelectionCurr]);
+	}
+}
+
+static void officePreparePageMain(void) {
+	s_eOfficePage = OFFICE_PAGE_MAIN;
 	for(tOfficePpl i = 0; i < OFFICE_PPL_COUNT; ++i) {
 		if(s_pActivePpl[i] == OFFICE_PPL_COUNT) {
 			break;
 		}
-		officeDrawFace(i);
+		officeDrawFaceAtPos(i);
 		++s_ubOfficeSelectionCount;
 	}
 }
 
-static void commShopProcessOffice(void) {
+static void officeProcessPageMain(void) {
 	BYTE bOldSelection = s_bOfficeSelectionCurr;
 	if(commNavUse(COMM_NAV_LEFT)) {
 		--s_bOfficeSelectionCurr;
@@ -111,8 +331,61 @@ static void commShopProcessOffice(void) {
 		s_bOfficeSelectionCurr -= s_ubOfficeSelectionCount;
 	}
 	if(s_bOfficeSelectionCurr != bOldSelection) {
-		officeDrawFace(bOldSelection);
-		officeDrawFace(s_bOfficeSelectionCurr);
+		officeDrawFaceAtPos(bOldSelection);
+		officeDrawFaceAtPos(s_bOfficeSelectionCurr);
+	}
+
+	if(s_isBtnPress) {
+		officeMakePageCurrent(
+			OFFICE_PAGE_LIST_MIETEK + s_pActivePpl[s_bOfficeSelectionCurr]
+		);
+	}
+}
+
+static void commShopProcessOffice(void) {
+	switch(s_eOfficePage) {
+		case OFFICE_PAGE_LIST_MIETEK:
+		case OFFICE_PAGE_LIST_KRYSTYNA:
+		case OFFICE_PAGE_LIST_PUTIN:
+		case OFFICE_PAGE_LIST_URZEDAS:
+			officeProcessPageList(s_pOfficePages[s_eOfficePage - OFFICE_PAGE_LIST_MIETEK]);
+			break;
+		case OFFICE_PAGE_BRIBE:
+			officeProcessPageBribe();
+			break;
+		case OFFICE_PAGE_FAVOR:
+			officeProcessPageFavor();
+			break;
+		case OFFICE_PAGE_MAIN:
+		default:
+			officeProcessPageMain();
+			break;
+	}
+}
+
+static void officeMakePageCurrent(tOfficePage ePage) {
+	logWrite("Make current page: %d\n", ePage);
+	commEraseAll();
+	s_bOfficeSelectionCurr = 0;
+	s_ubOfficeSelectionCount = 0;
+	s_eOfficePage = ePage;
+	switch(ePage) {
+		case OFFICE_PAGE_LIST_MIETEK:
+		case OFFICE_PAGE_LIST_KRYSTYNA:
+		case OFFICE_PAGE_LIST_PUTIN:
+		case OFFICE_PAGE_LIST_URZEDAS:
+			officePreparePageList(ePage);
+			break;
+		case OFFICE_PAGE_BRIBE:
+			officePreparePageBribe();
+			break;
+		case OFFICE_PAGE_FAVOR:
+			officePreparePageFavor();
+			break;
+		case OFFICE_PAGE_MAIN:
+		default:
+			officePreparePageMain();
+			break;
 	}
 }
 
@@ -124,6 +397,12 @@ void officeResetPpl(void) {
 	// s_pActivePpl[ubPos++] = OFFICE_PPL_MIETEK;
 	s_pActivePpl[ubPos++] = OFFICE_PPL_KRYSTYNA;
 	s_pActivePpl[ubPos++] = OFFICE_PPL_URZEDAS;
+
+	// Reset counters
+	s_ubFavorsLeft = 10;
+	s_ubBribeChanceFail = 0;
+	s_ubBribeAccoladeCount = 0;
+	s_ubBribeRebukeCount = 0;
 }
 
 //--------------------------------------------------------------------- WORKSHOP
@@ -524,7 +803,7 @@ static void commShopShowTab(tCommLed eTab) {
 	commEraseAll();
 	switch(eTab) {
 		case COMM_LED_OFFICE:
-			commShopDrawOffice();
+			officeMakePageCurrent(OFFICE_PAGE_MAIN);
 			break;
 		case COMM_LED_WORKSHOP:
 			commShopDrawWorkshop();

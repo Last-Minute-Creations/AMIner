@@ -12,6 +12,7 @@
 #define WAREHOUSE_COL_COUNT 4
 
 extern tStringArray g_sShopNames, g_sShopMsgs, g_sWarehouseColNames;
+extern tStringArray g_sOfficePageNames;
 
 void commShopGsCreate(void);
 

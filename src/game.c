@@ -482,7 +482,8 @@ void gameGsLoop(void) {
 	vehicleProcessText();
 
 	// Process plan being complete
-	WORD wRemainingDays = warehouseGetRemainingDays(warehouseGetPlan());
+	const tPlan *pPlan = warehouseGetPlan();
+	WORD wRemainingDays = warehouseGetRemainingDays(pPlan);
 	if(wRemainingDays <= 0) {
 		if(warehouseTryFulfillPlan()) {
 			hudShowMessage(0, g_sPlanMessages.pStrings[MSG_PLAN_DONE_AFK]);
@@ -490,9 +491,17 @@ void gameGsLoop(void) {
 			gameAddAccolade();
 		}
 		else {
-			hudShowMessage(0, g_sPlanMessages.pStrings[MSG_PLAN_NOT_DONE]);
-			warehouseNewPlan(0, g_is2pPlaying);
-			gameAddRebuke();
+			if(!pPlan->isExtendedTime) {
+				char szBfr[100];
+				sprintf(szBfr, g_sPlanMessages.pStrings[MSG_PLAN_EXTENDING], 14);
+				hudShowMessage(0, szBfr);
+				warehouseAddDaysToPlan(14, 0);
+			}
+			else {
+				hudShowMessage(0, g_sPlanMessages.pStrings[MSG_PLAN_NOT_DONE]);
+				warehouseNewPlan(0, g_is2pPlaying);
+				gameAddRebuke();
+			}
 		}
 	}
 	else if(

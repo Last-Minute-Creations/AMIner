@@ -7,7 +7,11 @@
 			"Przysłali nowy plan"
 		],
 		"notDone": "Towarzyszu, planu nie zrobiliście. Nagana i nowy plan.",
-		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan."
+		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan.",
+		"extending": [
+			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
+			"niewykonany. Dał nam jeszcze %hhu dni."
+		]
 	},
 	"hiScore": {
 		"new": "Nowy rekord! Wpisz imię.",
@@ -94,5 +98,17 @@
 		"guest": "Panie Dyrektorze, ma Pan gościa. Zapraszam do gabinetu.",
 		"urzedas": "Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne. Mówiłam że Pan Dyrektor ma naradę ale się uparł i czeka. Zapraszam do gabinetu.",
 		"commissar": "Panie Dyrektorze, Komisarz Putienko wzywa do gabinetu. Natychmiast!"
+	},
+	"officePages": {
+		"main": "Powrót",
+		"listMietek": "Mietek",
+		"listKrystyna": "Krystyna",
+		"listPutin": "Komisarz Putienko",
+		"listUrzedas": "Urzędas",
+		"dossierKrystyna": "Dossier",
+		"dossierUrzedas": "Dossier",
+		"bribe": "Łapówka",
+		"favor": "Przysługa",
+		"accounting": "Kreatywna Księgowość"
 	}
 }

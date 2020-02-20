@@ -8,6 +8,8 @@
 #include <ace/managers/log.h>
 #include <ace/managers/rand.h>
 
+#define TIME_PER_DAY (140)
+
 // Not spent on plan, not sold
 static UWORD s_pStock[MINERAL_TYPE_COUNT] = {0};
 
@@ -15,7 +17,7 @@ static tPlan s_sCurrentPlan;
 static const tPlan s_sFirstPlan = {
 	.pMinerals = {{0}},
 	.ulMineralsUnlocked = 1 << MINERAL_TYPE_SILVER,
-	.ulTargetSum = 15
+	.ulTargetSum = 15,
 };
 
 void warehouseReset(UBYTE is2pPlaying) {
@@ -93,6 +95,8 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 	s_sCurrentPlan.wTimeMax = 4 * 1000; // Two times fuel capacity for 2p
 	s_sCurrentPlan.wTimeMax += 200; // Add for nice division into 30 days
 	s_sCurrentPlan.wTimeRemaining = s_sCurrentPlan.wTimeMax;
+	s_sCurrentPlan.isExtendedTime = 0;
+	s_sCurrentPlan.isPenaltyCountdownStarted = 0;
 	logBlockEnd("warehouseNewPlan()");
 }
 
@@ -113,6 +117,13 @@ void warehouseElapseTime(UBYTE ubTime) {
 }
 
 WORD warehouseGetRemainingDays(const tPlan *pPlan) {
-	WORD wRemainingDays = (pPlan->wTimeRemaining + (140-1)) / 140;
+	WORD wRemainingDays = (pPlan->wTimeRemaining + TIME_PER_DAY - 1) / TIME_PER_DAY;
 	return wRemainingDays;
+}
+
+void warehouseAddDaysToPlan(UBYTE ubDays, UBYTE isBribe) {
+	if(isBribe) {
+		s_sCurrentPlan.isExtendedTime = 1;
+	}
+	s_sCurrentPlan.wTimeRemaining += ubDays * TIME_PER_DAY;
 }

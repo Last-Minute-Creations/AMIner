@@ -41,6 +41,7 @@ typedef enum _tPlanMessages {
 	MSG_PLAN_DONE_AFK,
 	MSG_PLAN_NOT_DONE,
 	MSG_PLAN_REMAINING,
+	MSG_PLAN_EXTENDING,
 	MSG_PLAN_COUNT
 } tPlanMessages;
 
