@@ -26,7 +26,7 @@ UBYTE g_ubPlansPerAccolade;
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[9];
 
-static const tJsonRemap s_pRemap[] = {
+const tCodeRemap g_pRemap[19] = {
 	{323, 145}, // "Ń"
 	{377, 144}, // "Ź"
 	{260, 143}, // "Ą"
@@ -121,54 +121,54 @@ void langCreate(const char *szLangPrefix) {
 	}
 
 	// Shop names
-	g_sShopNames = stringArrayCreateFromDom(pJson, s_pRemap, "shopNames");
-	g_sWarehouseColNames = stringArrayCreateFromDom(pJson, s_pRemap, "warehouseColNames");
+	g_sShopNames = stringArrayCreateFromDom(pJson, g_pRemap, "shopNames");
+	g_sWarehouseColNames = stringArrayCreateFromDom(pJson, g_pRemap, "warehouseColNames");
 
 	// Plan messages
 	g_sPlanMessages = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, MSG_PLAN_COUNT, "planMessages.doneAfk",
+		pJson, g_pRemap, MSG_PLAN_COUNT, "planMessages.doneAfk",
 		"planMessages.notDone", "planMessages.remaining", "planMessages.extending"
 	);
 
 	// Hi score messages
 	g_sHiScoreMessages = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, MSG_HI_SCORE_COUNT, "hiScore.new", "hiScore.press",
+		pJson, g_pRemap, MSG_HI_SCORE_COUNT, "hiScore.new", "hiScore.press",
 		"hiScore.score", "hiScore.winP1", "hiScore.winP2", "hiScore.draw"
 	);
 
-	g_sMenuEnumMode = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumMode");
-	g_sMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumPlayerCount");
-	g_sMenuEnumP1 = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumP1");
-	g_sMenuEnumP2 = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumP2");
-	g_sMenuEnumOnOff = stringArrayCreateFromDom(pJson, s_pRemap, "menu.enumOnOff");
-	g_sMenuCaptions = stringArrayCreateFromDom(pJson, s_pRemap, "menu.captions");
-	g_sMineralNames = stringArrayCreateFromDom(pJson, s_pRemap, "minerals");
-	g_sLoadMsgs = stringArrayCreateFromDom(pJson, s_pRemap, "loadMsgs");
+	g_sMenuEnumMode = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumMode");
+	g_sMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumPlayerCount");
+	g_sMenuEnumP1 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP1");
+	g_sMenuEnumP2 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP2");
+	g_sMenuEnumOnOff = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumOnOff");
+	g_sMenuCaptions = stringArrayCreateFromDom(pJson, g_pRemap, "menu.captions");
+	g_sMineralNames = stringArrayCreateFromDom(pJson, g_pRemap, "minerals");
+	g_sLoadMsgs = stringArrayCreateFromDom(pJson, g_pRemap, "loadMsgs");
 
 	g_sTutorialMsgs = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, 5, "tutorial.start", "tutorial.onDugOut", "tutorial.nearShop",
+		pJson, g_pRemap, 5, "tutorial.start", "tutorial.onDugOut", "tutorial.nearShop",
 		"tutorial.inShop", "tutorial.onMoveToPlan"
 	);
 
 	g_sShopMsgs = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, 11, "shop.timeRemaining", "shop.accolades", "shop.rebukes",
+		pJson, g_pRemap, 11, "shop.timeRemaining", "shop.accolades", "shop.rebukes",
 		"shop.mk", "shop.upgradeToMk", "shop.stock", "shop.buy", "shop.exit",
 		"shop.confirm", "shop.alreadyMax", "shop.alreadyFull"
 	);
 
 	g_sMessages = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, MSG_COUNT, "challengeCheckpoint", "challengeTeleport",
+		pJson, g_pRemap, MSG_COUNT, "challengeCheckpoint", "challengeTeleport",
 		"drillDepleted", "cargoFull", "restock", "foundBone"
 	);
 
 	g_sMsgHud = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, MSG_HUD_COUNT, "hud.p1", "hud.p2", "hud.drill",
+		pJson, g_pRemap, MSG_HUD_COUNT, "hud.p1", "hud.p2", "hud.drill",
 		"hud.cargo", "hud.hull", "hud.cash", "hud.depth",
 		"hud.paused", "hud.resume", "hud.quit"
 	);
 
 	g_sOfficePageNames = stringArrayCreateFromDomElements(
-		pJson, s_pRemap, 10,
+		pJson, g_pRemap, 10,
 		"officePages.main", "officePages.listMietek", "officePages.listKrystyna",
 		"officePages.listPutin", "officePages.listUrzedas",
 		"officePages.dossierKrystyna", "officePages.dossierUrzedas",

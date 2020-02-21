@@ -10,7 +10,7 @@
 //----------------------------------------------------------------- STRING ALLOC
 
 static char *stringCreateFromTok(
-	const tJson *pJson, const tJsonRemap *pRemap, UWORD uwTokIdx
+	const tJson *pJson, const tCodeRemap *pRemap, UWORD uwTokIdx
 ) {
 	char *szDestination = 0;
 	if(pJson->pTokens[uwTokIdx].type == JSMN_ARRAY) {
@@ -42,7 +42,7 @@ static char *stringCreateFromTok(
 }
 
 static char *stringCreateFromDom(
-	const tJson *pJson, const tJsonRemap *pRemap, const char *szDom
+	const tJson *pJson, const tCodeRemap *pRemap, const char *szDom
 ) {
 	UWORD uwIdx = jsonGetDom(pJson, szDom);
 	if(uwIdx == 0) {
@@ -68,7 +68,7 @@ static tStringArray stringArrayCreate(UBYTE ubCount) {
 }
 
 tStringArray stringArrayCreateFromDom(
-	tJson *pJson, const tJsonRemap *pRemap, const char *szDom
+	tJson *pJson, const tCodeRemap *pRemap, const char *szDom
 ) {
 	logBlockBegin(
 		"stringArrayCreateFromDom(pJson: %p, pRemap: %p, szDom: '%s')",
@@ -96,7 +96,7 @@ tStringArray stringArrayCreateFromDom(
 }
 
 tStringArray stringArrayCreateFromDomElements(
-	tJson *pJson, const tJsonRemap *pRemap, UBYTE ubCount, ...
+	tJson *pJson, const tCodeRemap *pRemap, UBYTE ubCount, ...
 ) {
 	logBlockBegin("stringArrayCreateFromDom(pJson: %p, ubCount: '%hhu')", pJson, ubCount);
 	tStringArray sArray = stringArrayCreate(ubCount);

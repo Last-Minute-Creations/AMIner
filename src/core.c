@@ -20,6 +20,7 @@
 #include "tile.h"
 #include "explosion.h"
 #include "comm.h"
+#include "comm_shop.h"
 #include "defs.h"
 
 static tBitMap *s_pTiles;
@@ -134,6 +135,7 @@ void coreGsCreate(void) {
 	explosionManagerCreate();
 	groundLayerCreate(s_pVpMain);
 	commCreate();
+	commShopAlloc();
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
@@ -185,6 +187,7 @@ void coreGsDestroy(void) {
 	vehicleDestroy(&g_pVehicles[1]);
 	vehicleBitmapsDestroy();
 	commDestroy();
+	commShopDealloc();
 	bobNewManagerDestroy();
 
 	audioDestroy();
@@ -204,4 +207,8 @@ void coreGsDestroy(void) {
 
 void coreSetLangPrefix(const char * const szPrefix) {
 	s_szLangPrefix = szPrefix;
+}
+
+const char * coreGetLangPrefix(void) {
+	return s_szLangPrefix;
 }

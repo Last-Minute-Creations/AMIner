@@ -178,7 +178,7 @@ UWORD jsonStrLen(const tJson *pJson, UWORD uwTok) {
 }
 
 UWORD jsonTokStrCpy(
-	const tJson *pJson, const tJsonRemap *pRemap, UWORD uwTok, char *pDst,
+	const tJson *pJson, const tCodeRemap *pRemap, UWORD uwTok, char *pDst,
 	UWORD uwMaxBytes
 ) {
 	UWORD uwLength = 0;
@@ -189,18 +189,13 @@ UWORD jsonTokStrCpy(
 			continue;
 		}
 
-		// By default, write codepoint truncated to byte
-		pDst[uwLength] = ulCodepoint;
-
-		// Remap if remap array has been passed
 		if(pRemap) {
-			UWORD j;
-			for(j = 0; pRemap[j].ulCodepoint != 0; ++j) {
-				if(pRemap[j].ulCodepoint == ulCodepoint) {
-					pDst[uwLength] = pRemap[j].ubFontCode;
-					break;
-				}
-			}
+			// Remap if remap array has been passed
+			pDst[uwLength] = remapChar(pRemap, ulCodepoint);
+		}
+		else {
+			// By default, write codepoint truncated to byte
+			pDst[uwLength] = ulCodepoint;
 		}
 
 		// Stop if max size has been reached

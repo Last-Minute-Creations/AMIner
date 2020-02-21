@@ -9,6 +9,8 @@
 #include "core.h"
 #include "color.h"
 #include "comm.h"
+#include "defs.h"
+#include <json/utf8.h>
 
 #define LINES_MAX 100
 
@@ -29,7 +31,9 @@ static void freeLines(void) {
 	s_ubPageCount = 0;
 }
 
-static void readLines(const char *szFilePath, UWORD uwMaxLength) {
+static void readLines(
+	const tCodeRemap *pRemap, const char *szFilePath, UWORD uwMaxLength
+) {
 	systemUse();
 	freeLines();
 	tFile *pFileLines = fileOpen(szFilePath, "r");
@@ -43,12 +47,23 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 	UWORD uwLinePxLength = 0;
 	UBYTE ubSpacePxLength = fontGlyphWidth(g_pFont, ' ') + 1;
 
+	ULONG ulCodepoint, ulState = 0;
 	while(!fileIsEof(pFileLines)) {
 		// Read one word and measure it when complete
-		char c;
-		fileRead(pFileLines, &c, 1);
-		if(c > ' ') {
-			szWordBfr[ubWordBytes] = c;
+		UBYTE ubCharCode;
+		fileRead(pFileLines, &ubCharCode, 1);
+		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
+			continue;
+		}
+		if(pRemap) {
+			ubCharCode = remapChar(pRemap, ulCodepoint);
+		}
+		else {
+			ubCharCode = ulCodepoint;
+		}
+
+		if(ubCharCode > ' ') {
+			szWordBfr[ubWordBytes] = ubCharCode;
 			++ubWordBytes;
 			continue;
 		}
@@ -74,7 +89,7 @@ static void readLines(const char *szFilePath, UWORD uwMaxLength) {
 			uwLinePxLength += ubSpacePxLength + uwWordPxLength;
 		}
 		ubWordBytes = 0;
-		if(c == '\n') {
+		if(ubCharCode == '\n') {
 			// If it's end of line, save current line and start new one
 			s_pLines[s_uwLineCount] = memAllocFast(strlen(szLineBfr) + 1);
 			strcpy(s_pLines[s_uwLineCount], szLineBfr);
@@ -123,7 +138,9 @@ void commMsgGsCreate(void) {
 	}
 
 	s_uwLineCount = 0;
-	readLines("data/txt_en/intro.txt", COMM_DISPLAY_WIDTH);
+	char szPath[30];
+	sprintf(szPath, "data/txt_%s/intro.txt", coreGetLangPrefix());
+	readLines(g_pRemap, szPath, COMM_DISPLAY_WIDTH);
 
 	s_pBuffer = g_pMainBuffer->pScroll->pBack;
 

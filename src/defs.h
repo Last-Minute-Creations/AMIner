@@ -6,6 +6,7 @@
 #define _DEFS_H_
 
 #include <ace/types.h>
+#include <json/utf8_remap.h>
 
 extern LONG g_lInitialCash;
 extern UBYTE g_ubUpgradeLevels, g_ubPlansPerAccolade;
@@ -20,5 +21,7 @@ void defsInit(void);
 void langCreate(const char *szLangPrefix);
 
 void langDestroy(void);
+
+const tCodeRemap g_pRemap[19];
 
 #endif // _DEFS_H_

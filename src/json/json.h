@@ -5,6 +5,7 @@
 // JSMN_PARENT_LINKS breaks things up!
 // #define JSMN_PARENT_LINKS /* Speeds things up */
 #include "jsmn.h"
+#include "utf8_remap.h"
 #include <ace/types.h>
 
 typedef struct _tJson {
@@ -12,11 +13,6 @@ typedef struct _tJson {
 	jsmntok_t *pTokens;
 	FWORD fwTokenCount;
 } tJson;
-
-typedef struct _tJsonRemap {
-	ULONG ulCodepoint;
-	UBYTE ubFontCode;
-} tJsonRemap;
 
 tJson *jsonCreate(const char *szFilePath);
 
@@ -35,7 +31,7 @@ ULONG jsonTokToUlong(const tJson *pJson,UWORD uwTok);
 UWORD jsonStrLen(const tJson *pJson, UWORD uwTok);
 
 UWORD jsonTokStrCpy(
-	const tJson *pJson, const tJsonRemap *pRemap, UWORD uwTok, char *pDst,
+	const tJson *pJson, const tCodeRemap *pRemap, UWORD uwTok, char *pDst,
 	UWORD uwMaxBytes
 );
 

@@ -13,11 +13,11 @@ typedef struct _tStringArray {
 } tStringArray;
 
 tStringArray stringArrayCreateFromDom(
-	tJson *pJson, const tJsonRemap *pRemap, const char *szDom
+	tJson *pJson, const tCodeRemap *pRemap, const char *szDom
 );
 
 tStringArray stringArrayCreateFromDomElements(
-	tJson *pJson, const tJsonRemap *pRemap, UBYTE ubCount, ...
+	tJson *pJson, const tCodeRemap *pRemap, UBYTE ubCount, ...
 );
 
 void stringArrayDestroy(tStringArray *pArray);
