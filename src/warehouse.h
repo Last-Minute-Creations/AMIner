@@ -53,4 +53,6 @@ WORD warehouseGetRemainingDays(const tPlan *pPlan);
 
 void warehouseAddDaysToPlan(UBYTE ubDays, UBYTE isBribe);
 
+UWORD warehouseGetPlanRemainingCost(const tPlan *pPlan);
+
 #endif // _WAREHOUSE_H_

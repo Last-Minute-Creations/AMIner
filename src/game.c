@@ -488,7 +488,7 @@ void gameGsLoop(void) {
 		if(warehouseTryFulfillPlan()) {
 			hudShowMessage(0, g_sPlanMessages.pStrings[MSG_PLAN_DONE_AFK]);
 			warehouseNewPlan(1, g_is2pPlaying);
-			gameAddAccolade();
+			officeReduceAccountingChanceFail();
 		}
 		else {
 			if(!pPlan->isExtendedTime) {

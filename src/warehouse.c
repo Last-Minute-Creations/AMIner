@@ -4,6 +4,7 @@
 
 #include "warehouse.h"
 #include "mineral.h"
+#include "game.h"
 #include <ace/macros.h>
 #include <ace/managers/log.h>
 #include <ace/managers/rand.h>
@@ -68,6 +69,7 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 		"warehouseNewPlan(isBigger: %hhu, is2pPlaying: %hhu)", isBigger, is2pPlaying
 	);
 	if(isBigger) {
+		gameAddAccolade();
 		if(is2pPlaying) {
 			s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum * 3 / 4;
 		}
@@ -126,4 +128,16 @@ void warehouseAddDaysToPlan(UBYTE ubDays, UBYTE isBribe) {
 		s_sCurrentPlan.isExtendedTime = 1;
 	}
 	s_sCurrentPlan.wTimeRemaining += ubDays * TIME_PER_DAY;
+}
+
+UWORD warehouseGetPlanRemainingCost(const tPlan *pPlan) {
+	UWORD uwRemainingCost = 0;
+	for(UBYTE i = MINERAL_TYPE_COUNT; i--;) {
+		const tPlanMineral *pMineral = &pPlan->pMinerals[i];
+		UWORD uwCount = pMineral->uwTargetCount - pMineral->uwCurrentCount;
+		UBYTE ubReward = g_pMinerals[i].ubReward;
+
+		uwRemainingCost += uwCount * ubReward;
+	}
+	return uwRemainingCost;
 }

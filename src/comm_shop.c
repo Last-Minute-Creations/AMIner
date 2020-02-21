@@ -59,6 +59,11 @@ typedef enum _tShopMessageNames {
 	SHOP_MSG_COUNT,
 } tShopMessageNames;
 
+typedef enum _tOfficeControls {
+	OFFICE_CONTROLS_ACCEPT_DECLINE,
+	OFFICE_CONTROLS_OK,
+} tOfficeControls;
+
 static UBYTE s_isShown;
 static UBYTE s_isBtnPress = 0;
 static tBitMap *s_pBmDraw;
@@ -81,7 +86,7 @@ static const tOfficePage s_pOfficePages[OFFICE_PPL_COUNT][4] = {
 
 tStringArray g_sOfficePageNames;
 
-//----------------------------------------------------------------------- OFFICE
+//---------------------------------------------------------------- OFFICE COMMON
 
 static tBitMap *s_pFaces, *s_pSelection;
 
@@ -89,12 +94,14 @@ static tOfficePpl s_pActivePpl[OFFICE_PPL_COUNT]; // Key: pos in office, val: pp
 static tOfficePage s_eOfficePage;
 static UBYTE s_ubOfficeSelectionCount;
 static BYTE s_bOfficeSelectionCurr;
-static UBYTE s_ubFavorsLeft, s_ubBribeChanceFail, s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
+static UBYTE s_ubFavorsLeft, s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
+static BYTE s_bBribeChanceFail, s_bAccountingChanceFail;
+static tOfficeControls s_eControls;
 
 static void officeMakePageCurrent(tOfficePage ePage);
 
 static void drawAcceptDecline(void) {
-	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - 3 * g_pFont->uwHeight;
+	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - 2 * g_pFont->uwHeight;
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, uwOffsY, "Accept", FONT_COOKIE | FONT_CENTER, (
 			s_bOfficeSelectionCurr == 0 ?
@@ -109,14 +116,21 @@ static void drawAcceptDecline(void) {
 			COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 		)
 	);
+	s_eControls = OFFICE_CONTROLS_ACCEPT_DECLINE;
+	s_ubOfficeSelectionCount = 2;
 }
 
-static void officePreparePageFavor(void) {
+static void drawOk(void) {
+	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - 2 * g_pFont->uwHeight;
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, uwOffsY, "OK", FONT_COOKIE | FONT_CENTER, (
+			s_bOfficeSelectionCurr == 1 ?
+			COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
+		)
+	);
 
-}
-
-static void officeProcessPageFavor(void) {
-
+	s_eControls = OFFICE_CONTROLS_OK;
+	s_ubOfficeSelectionCount = 1;
 }
 
 static UBYTE drawLongText(
@@ -151,44 +165,32 @@ static UBYTE drawLongText(
 	return ubLinesWritten;
 }
 
-static void officePreparePageBribe(void) {
-	const tPlan *pPlan = warehouseGetPlan();
-	char szBfr[100];
-	UWORD uwPosY = 0;
-	UWORD uwCost;
+//------------------------------------------------------- OFFICE PAGE ACCOUNTING
 
-	if(!pPlan->isPenaltyCountdownStarted) {
-		sprintf(szBfr, "Bribe for extra %hhu days for finishing plan in time.", 14);
-		uwCost = 100;
-		for(UBYTE i = s_ubBribeAccoladeCount; i--;) {
-			uwCost = (uwCost * 120 / 100);
-		}
-	}
-	else {
-		sprintf(szBfr, "Bribe for extra %hhu days before getting a penalty.", 14);
-		uwCost = 200;
-		for(UBYTE i = s_ubBribeRebukeCount; i--;) {
-			uwCost = (uwCost * 120 / 100);
-		}
-	}
+static void officePreparePageAccounting(void) {
+	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
 
-	uwPosY += drawLongText(szBfr, ubLineHeight, 0, uwPosY) * ubLineHeight;
+	UWORD uwCost = warehouseGetPlanRemainingCost(warehouseGetPlan()) / 2;
 
+	uwPosY += drawLongText(
+		"I can do some Creative Acccounting for you and fulfill your plan instantly."
+		" For a price, of course.", ubLineHeight, 0, uwPosY
+	) * ubLineHeight;
+	char szBfr[150];
+	uwPosY += ubLineHeight / 2;
 	sprintf(
 		szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
-		s_ubBribeChanceFail
+		s_bAccountingChanceFail
 	);
 	uwPosY += drawLongText(szBfr,  ubLineHeight, 0, uwPosY) * ubLineHeight;
-
 	sprintf(szBfr, "It will cost you %hu\x1F.", uwCost);
-	uwPosY += drawLongText(szBfr,  ubLineHeight, 0, uwPosY) * ubLineHeight;
+	uwPosY += drawLongText(szBfr, ubLineHeight, 0, uwPosY) * ubLineHeight;
 
-	s_ubOfficeSelectionCount = 2;
 	drawAcceptDecline();
 }
 
-static void officeProcessPageBribe(void) {
+static void officeProcessPageAccounting(void) {
 	BYTE bPrevPos = s_bOfficeSelectionCurr;
 	if(commNavUse(COMM_NAV_DOWN)) {
 		if(++s_bOfficeSelectionCurr >= s_ubOfficeSelectionCount) {
@@ -205,31 +207,182 @@ static void officeProcessPageBribe(void) {
 		drawAcceptDecline();
 	}
 
-
 	if(s_isBtnPress) {
 		if(s_bOfficeSelectionCurr == 0) {
-			if(ubRandMax(100) > s_ubBribeChanceFail) {
-				// Success
-				const tPlan *pPlan = warehouseGetPlan();
-				if(!pPlan->isPenaltyCountdownStarted) {
-					// accolade bribe
-					++s_ubBribeAccoladeCount;
-					s_ubBribeChanceFail = MIN(s_ubBribeChanceFail + 2, 100);
-				}
-				else {
-					// rebuke bribe
-					++s_ubBribeRebukeCount;
-					s_ubBribeChanceFail = MIN(s_ubBribeChanceFail + 5, 100);
-				}
-				warehouseAddDaysToPlan(14, 1);
+			if(ubRandMinMax(1, 100) > s_bAccountingChanceFail) {
+				warehouseNewPlan(1, g_is2pPlaying);
 			}
 			else {
 				gameAddRebuke();
 			}
+
+			s_bAccountingChanceFail = MIN(s_bAccountingChanceFail + 6, 100);
 		}
 		officeMakePageCurrent(OFFICE_PAGE_MAIN);
 	}
 }
+
+void officeReduceAccountingChanceFail(void) {
+	s_bAccountingChanceFail = MAX(0, s_bAccountingChanceFail - 2);
+}
+
+//------------------------------------------------------------ OFFICE PAGE FAVOR
+
+static void officePreparePageFavor(void) {
+	UWORD uwPosY = 0;
+	UBYTE ubLineHeight = g_pFont->uwHeight + 1;
+	WORD wDays = warehouseGetRemainingDays(warehouseGetPlan());
+	if(s_ubFavorsLeft > 0 && wDays >= 25) {
+
+		uwPosY += drawLongText(
+			"I like working with you Comrade, I really do."
+			" I heard that current plan is tough for you. If you want,"
+			" I can make some calls and try to do something about it.",
+			ubLineHeight, 0, uwPosY
+		) * ubLineHeight;
+
+		uwPosY += ubLineHeight / 2;
+		uwPosY += drawLongText("Urz\x84""das can replace current plan with another one.", ubLineHeight, 0, uwPosY) * ubLineHeight;
+		char szBfr[100];
+		sprintf(szBfr, "You have %hhu favors left.", s_ubFavorsLeft);
+		uwPosY += drawLongText(szBfr, ubLineHeight, 0, uwPosY) * ubLineHeight;
+
+		drawAcceptDecline();
+	}
+	else {
+		uwPosY += drawLongText("You ask me for too much, Comrade. Do some real work, will you?", ubLineHeight, 0, uwPosY) * ubLineHeight;
+		drawOk();
+	}
+}
+
+static void officeProcessPageFavor(void) {
+	if(s_eControls == OFFICE_CONTROLS_ACCEPT_DECLINE) {
+		BYTE bPrevPos = s_bOfficeSelectionCurr;
+		if(commNavUse(COMM_NAV_DOWN)) {
+			if(++s_bOfficeSelectionCurr >= s_ubOfficeSelectionCount) {
+				s_bOfficeSelectionCurr = 0;
+			}
+		}
+		else if(commNavUse(COMM_NAV_UP)) {
+			if(--s_bOfficeSelectionCurr < 0) {
+				s_bOfficeSelectionCurr = s_ubOfficeSelectionCount - 1;
+			}
+		}
+
+		if(bPrevPos != s_bOfficeSelectionCurr) {
+			drawAcceptDecline();
+		}
+
+		if(s_isBtnPress) {
+			if(s_bOfficeSelectionCurr == 0) {
+				--s_ubFavorsLeft;
+				warehouseNewPlan(0, g_is2pPlaying);
+			}
+			officeMakePageCurrent(OFFICE_PAGE_MAIN);
+		}
+	}
+	else {
+		if(s_isBtnPress) {
+			officeMakePageCurrent(OFFICE_PAGE_MAIN);
+		}
+	}
+}
+
+//------------------------------------------------------------ OFFICE PAGE BRIBE
+
+static void officePreparePageBribe(void) {
+	const UBYTE ubLineHeight = g_pFont->uwHeight + 1;
+	const tPlan *pPlan = warehouseGetPlan();
+	char szBfr[150];
+	UWORD uwPosY = 0;
+	UWORD uwCost;
+
+	if(!pPlan->isExtendedTime) {
+		if(!pPlan->isPenaltyCountdownStarted) {
+			sprintf(szBfr, "Bribe for extra %hhu days for finishing plan in time.", 14);
+			uwCost = 100;
+			for(UBYTE i = s_ubBribeAccoladeCount; i--;) {
+				uwCost = (uwCost * 120 / 100);
+			}
+		}
+		else {
+			sprintf(szBfr, "Bribe for extra %hhu days before getting a penalty.", 14);
+			uwCost = 200;
+			for(UBYTE i = s_ubBribeRebukeCount; i--;) {
+				uwCost = (uwCost * 120 / 100);
+			}
+		}
+		uwPosY += drawLongText(szBfr, ubLineHeight, 0, uwPosY) * ubLineHeight;
+
+		uwPosY += ubLineHeight / 2;
+		sprintf(
+			szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
+			s_bBribeChanceFail
+		);
+		uwPosY += drawLongText(szBfr,  ubLineHeight, 0, uwPosY) * ubLineHeight;
+		sprintf(szBfr, "It will cost you %hu\x1F.", uwCost);
+		uwPosY += drawLongText(szBfr,  ubLineHeight, 0, uwPosY) * ubLineHeight;
+
+		drawAcceptDecline();
+	}
+	else {
+		uwPosY += drawLongText("Comrade, not now... there's too much heat!",  ubLineHeight, 0, uwPosY) * ubLineHeight;
+		drawOk();
+	}
+}
+
+static void officeProcessPageBribe(void) {
+// #error take cash for a bribe!
+
+	if(s_eControls == OFFICE_CONTROLS_ACCEPT_DECLINE) {
+		BYTE bPrevPos = s_bOfficeSelectionCurr;
+		if(commNavUse(COMM_NAV_DOWN)) {
+			if(++s_bOfficeSelectionCurr >= s_ubOfficeSelectionCount) {
+				s_bOfficeSelectionCurr = 0;
+			}
+		}
+		else if(commNavUse(COMM_NAV_UP)) {
+			if(--s_bOfficeSelectionCurr < 0) {
+				s_bOfficeSelectionCurr = s_ubOfficeSelectionCount - 1;
+			}
+		}
+
+		if(bPrevPos != s_bOfficeSelectionCurr) {
+			drawAcceptDecline();
+		}
+
+		if(s_isBtnPress) {
+			if(s_bOfficeSelectionCurr == 0) {
+				if(ubRandMinMax(1, 100) > s_bBribeChanceFail) {
+					// Success
+					const tPlan *pPlan = warehouseGetPlan();
+					if(!pPlan->isPenaltyCountdownStarted) {
+						// accolade bribe
+						++s_ubBribeAccoladeCount;
+						s_bBribeChanceFail = MIN(s_bBribeChanceFail + 2, 100);
+					}
+					else {
+						// rebuke bribe
+						++s_ubBribeRebukeCount;
+						s_bBribeChanceFail = MIN(s_bBribeChanceFail + 5, 100);
+					}
+					warehouseAddDaysToPlan(14, 1);
+				}
+				else {
+					gameAddRebuke();
+				}
+			}
+			officeMakePageCurrent(OFFICE_PAGE_MAIN);
+		}
+	}
+	else {
+		if(s_isBtnPress) {
+			officeMakePageCurrent(OFFICE_PAGE_MAIN);
+		}
+	}
+}
+
+//------------------------------------------------------------- OFFICE PAGE MAIN
 
 static void officeDrawFaceAtPos(BYTE bPos) {
 	const UBYTE ubSpaceX = (COMM_DISPLAY_WIDTH - 2*2 - 4 * 32) / 3;
@@ -253,50 +406,6 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 		s_pFaces, 0, s_pActivePpl[bPos] * 32, s_pBmDraw, uwX, uwY,
 		32, 32, MINTERM_COOKIE, 0xFF
 	);
-}
-
-static void officeDrawListPos(tOfficePage eListPage, UBYTE ubPos) {
-	UBYTE ubColor = (
-		ubPos == s_bOfficeSelectionCurr ?
-		COMM_DISPLAY_COLOR_TEXT :
-		COMM_DISPLAY_COLOR_TEXT_DARK
-	);
-	commDrawText(
-		0, 10 * ubPos, g_sOfficePageNames.pStrings[eListPage], FONT_COOKIE, ubColor
-	);
-}
-
-static void officePreparePageList(tOfficePage ePage) {
-	tOfficePpl ePpl = ePage - OFFICE_PAGE_LIST_MIETEK;
-
-	tOfficePage eListPage;
-	do {
-		eListPage = s_pOfficePages[ePpl][s_ubOfficeSelectionCount];
-		officeDrawListPos(eListPage, s_ubOfficeSelectionCount);
-		++s_ubOfficeSelectionCount;
-	} while(eListPage != OFFICE_PAGE_MAIN);
-}
-
-static void officeProcessPageList(const tOfficePage *pPages) {
-	BYTE bPrevPos = s_bOfficeSelectionCurr;
-	if(commNavUse(COMM_NAV_DOWN)) {
-		if(++s_bOfficeSelectionCurr >= s_ubOfficeSelectionCount) {
-			s_bOfficeSelectionCurr = 0;
-		}
-	}
-	else if(commNavUse(COMM_NAV_UP)) {
-		if(--s_bOfficeSelectionCurr < 0) {
-			s_bOfficeSelectionCurr = s_ubOfficeSelectionCount - 1;
-		}
-	}
-
-	if(bPrevPos != s_bOfficeSelectionCurr) {
-		officeDrawListPos(pPages[bPrevPos], bPrevPos);
-		officeDrawListPos(pPages[s_bOfficeSelectionCurr], s_bOfficeSelectionCurr);
-	}
-	else if(s_isBtnPress) {
-		officeMakePageCurrent(pPages[s_bOfficeSelectionCurr]);
-	}
 }
 
 static void officePreparePageMain(void) {
@@ -342,6 +451,52 @@ static void officeProcessPageMain(void) {
 	}
 }
 
+//------------------------------------------------------------- OFFICE PAGE LIST
+
+static void officeDrawListPos(tOfficePage eListPage, UBYTE ubPos) {
+	UBYTE ubColor = (
+		ubPos == s_bOfficeSelectionCurr ?
+		COMM_DISPLAY_COLOR_TEXT :
+		COMM_DISPLAY_COLOR_TEXT_DARK
+	);
+	commDrawText(
+		0, 10 * ubPos, g_sOfficePageNames.pStrings[eListPage], FONT_COOKIE, ubColor
+	);
+}
+
+static void officePreparePageList(tOfficePage ePage) {
+	tOfficePpl ePpl = ePage - OFFICE_PAGE_LIST_MIETEK;
+
+	tOfficePage eListPage;
+	do {
+		eListPage = s_pOfficePages[ePpl][s_ubOfficeSelectionCount];
+		officeDrawListPos(eListPage, s_ubOfficeSelectionCount);
+		++s_ubOfficeSelectionCount;
+	} while(eListPage != OFFICE_PAGE_MAIN);
+}
+
+static void officeProcessPageList(const tOfficePage *pPages) {
+	BYTE bPrevPos = s_bOfficeSelectionCurr;
+	if(commNavUse(COMM_NAV_DOWN)) {
+		if(++s_bOfficeSelectionCurr >= s_ubOfficeSelectionCount) {
+			s_bOfficeSelectionCurr = 0;
+		}
+	}
+	else if(commNavUse(COMM_NAV_UP)) {
+		if(--s_bOfficeSelectionCurr < 0) {
+			s_bOfficeSelectionCurr = s_ubOfficeSelectionCount - 1;
+		}
+	}
+
+	if(bPrevPos != s_bOfficeSelectionCurr) {
+		officeDrawListPos(pPages[bPrevPos], bPrevPos);
+		officeDrawListPos(pPages[s_bOfficeSelectionCurr], s_bOfficeSelectionCurr);
+	}
+	else if(s_isBtnPress) {
+		officeMakePageCurrent(pPages[s_bOfficeSelectionCurr]);
+	}
+}
+
 static void commShopProcessOffice(void) {
 	switch(s_eOfficePage) {
 		case OFFICE_PAGE_LIST_MIETEK:
@@ -356,12 +511,17 @@ static void commShopProcessOffice(void) {
 		case OFFICE_PAGE_FAVOR:
 			officeProcessPageFavor();
 			break;
+		case OFFICE_PAGE_ACCOUNTING:
+			officeProcessPageAccounting();
+			break;
 		case OFFICE_PAGE_MAIN:
 		default:
 			officeProcessPageMain();
 			break;
 	}
 }
+
+//---------------------------------------------------------- OFFICE PAGE CURRENT
 
 static void officeMakePageCurrent(tOfficePage ePage) {
 	logWrite("Make current page: %d\n", ePage);
@@ -382,6 +542,9 @@ static void officeMakePageCurrent(tOfficePage ePage) {
 		case OFFICE_PAGE_FAVOR:
 			officePreparePageFavor();
 			break;
+		case OFFICE_PAGE_ACCOUNTING:
+			officePreparePageAccounting();
+			break;
 		case OFFICE_PAGE_MAIN:
 		default:
 			officePreparePageMain();
@@ -400,7 +563,8 @@ void officeResetPpl(void) {
 
 	// Reset counters
 	s_ubFavorsLeft = 10;
-	s_ubBribeChanceFail = 0;
+	s_bBribeChanceFail = 0;
+	s_bAccountingChanceFail = 5;
 	s_ubBribeAccoladeCount = 0;
 	s_ubBribeRebukeCount = 0;
 }
@@ -781,8 +945,8 @@ static void commShopProcessWarehouse() {
 					hudSetCash(0, g_pVehicles[0].lCash);
 				}
 				if(warehouseIsPlanFulfilled()) {
-					gameAddAccolade();
 					warehouseNewPlan(1, g_is2pPlaying);
+					officeReduceAccountingChanceFail();
 				}
 				commEraseAll();
 				commShopDrawWarehouse();
@@ -816,6 +980,22 @@ static void commShopShowTab(tCommLed eTab) {
 	}
 }
 
+//------------------------------------------------------------------------ ALLOC
+
+void commShopAlloc(void) {
+	systemUse();
+	s_pFaces = bitmapCreateFromFile("data/comm_faces_office.bm", 0);
+	s_pSelection = bitmapCreateFromFile("data/comm_office_selection.bm", 0);
+	systemUnuse();
+}
+
+void commShopDealloc(void) {
+	systemUse();
+	bitmapDestroy(s_pFaces);
+	bitmapDestroy(s_pSelection);
+	systemUnuse();
+}
+
 //-------------------------------------------------------------------- GAMESTATE
 
 void commShopGsCreate(void) {
@@ -828,10 +1008,6 @@ void commShopGsCreate(void) {
 	}
 
 	s_pBmDraw = g_pMainBuffer->pScroll->pBack;
-	systemUse();
-	s_pFaces = bitmapCreateFromFile("data/comm_faces_office.bm", 0);
-	s_pSelection = bitmapCreateFromFile("data/comm_office_selection.bm", 0);
-	systemUnuse();
 
 	s_eTab = COMM_LED_WAREHOUSE;
 	commShopShowTab(s_eTab);
@@ -916,11 +1092,6 @@ void commShopGsDestroy(void) {
 	if(!s_isShown) {
 		return;
 	}
-
-	systemUse();
-	bitmapDestroy(s_pFaces);
-	bitmapDestroy(s_pSelection);
-	systemUnuse();
 
 	viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	copProcessBlocks();

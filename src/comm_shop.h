@@ -14,6 +14,10 @@
 extern tStringArray g_sShopNames, g_sShopMsgs, g_sWarehouseColNames;
 extern tStringArray g_sOfficePageNames;
 
+void commShopAlloc(void);
+
+void commShopDealloc(void);
+
 void commShopGsCreate(void);
 
 void commShopGsLoop(void);
@@ -23,5 +27,7 @@ void commShopGsDestroy(void);
 UBYTE commShopIsActive(void);
 
 void officeResetPpl(void);
+
+void officeReduceAccountingChanceFail(void);
 
 #endif // _COMM_SHOP_H_

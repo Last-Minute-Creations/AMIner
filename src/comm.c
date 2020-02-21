@@ -8,6 +8,7 @@
 #include "game.h"
 #include <ace/managers/audio.h>
 #include <ace/managers/rand.h>
+#include <ace/managers/system.h>
 
 typedef enum _tBtnState {
 	BTN_STATE_NACTIVE = 0,
@@ -25,6 +26,7 @@ static tSample *s_pSamplesKeyPress[4];
 static tSample *s_pSamplesKeyRelease[4];
 
 void commCreate(void) {
+	systemUse();
 	s_pBmRestore = bitmapCreate(
 		COMM_WIDTH, COMM_HEIGHT,
 		g_pMainBuffer->sCommon.pVPort->ubBPP, BMF_INTERLEAVED
@@ -40,11 +42,13 @@ void commCreate(void) {
 		sprintf(szPath, "data/sfx/key_release_%hhu.raw8", i);
 		s_pSamplesKeyRelease[i] = sampleCreateFromFile(szPath, 48000);
 	}
+	systemUnuse();
 
 	s_isShown = 0;
 }
 
 void commDestroy(void) {
+	systemUse();
 	for(UBYTE i = 0; i < 4; ++i) {
 		sampleDestroy(s_pSamplesKeyPress[i]);
 		sampleDestroy(s_pSamplesKeyRelease[i]);
@@ -54,6 +58,7 @@ void commDestroy(void) {
 	bitmapDestroy(s_pBg);
 	bitmapDestroy(s_pButtons);
 	fontDestroyTextBitMap(s_pLineBuffer);
+	systemUnuse();
 }
 
 void commSetActiveLed(tCommLed eLed) {
