@@ -142,19 +142,42 @@ static UBYTE drawLongText(
 	UWORD uwLineWidth = 0;
 	UWORD uwCurrY = uwStartY;
 	UBYTE ubCharsInLine = 0;
+	UBYTE ubLastSpace = 0xFF; // next char, actually
+	UWORD uwLastSpaceWidth = 0;
 	char szLineBfr[50];
 	for(uint8_t i = 0; i < ubTextLength; ++i) {
 		UBYTE ubCharWidth = fontGlyphWidth(g_pFont, szText[i]) + 1;
 		if(uwLineWidth + ubCharWidth >= (COMM_DISPLAY_WIDTH - uwStartX)) {
-			szLineBfr[ubCharsInLine] = '\0';
+			if(ubLastSpace != 0xFF) {
+				szLineBfr[ubLastSpace - 1] = '\0';
+			}
+			else {
+				szLineBfr[ubCharsInLine] = '\0';
+			}
 			commDrawText(uwStartX, uwCurrY, szLineBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
-			uwLineWidth = 0;
-			ubCharsInLine = 0;
+			if(ubLastSpace != 0xFF) {
+				ubCharsInLine -= ubLastSpace;
+				for(UBYTE j = 0; j < ubCharsInLine; ++j) {
+					szLineBfr[j] = szLineBfr[ubLastSpace + j];
+				}
+				uwLineWidth -= uwLastSpaceWidth;
+			}
+			else {
+				uwLineWidth = 0;
+				ubCharsInLine = 0;
+			}
+			ubLastSpace = 0xFF;
+			uwLastSpaceWidth = 0;
 			++ubLinesWritten;
 			uwCurrY += ubLineHeight;
 		}
-		szLineBfr[ubCharsInLine++] = szText[i];
+
 		uwLineWidth += ubCharWidth;
+		szLineBfr[ubCharsInLine++] = szText[i];
+		if(szText[i] == ' ') {
+			ubLastSpace = ubCharsInLine;
+			uwLastSpaceWidth = uwLineWidth;
+		}
 	}
 
 	if(ubCharsInLine) {

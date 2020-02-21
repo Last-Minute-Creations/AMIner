@@ -1,3 +1,10 @@
+20.2.21
+- decreased X speed and acceleration of KRTEK
+- intro text is now properly localized
+- removed loadings from floppy when opening base's commrade UI
+- added favors and creative accounting
+- better text folding in office
+
 20.2.20
 - Implemented office panel in commrade
 - Bribes kinda work
