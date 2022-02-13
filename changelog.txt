@@ -1,3 +1,7 @@
+20.3.13
+- dossier now works
+- rewritten commrade page handling, expect lots of bugs!
+
 20.2.21
 - decreased X speed and acceleration of KRTEK
 - intro text is now properly localized
