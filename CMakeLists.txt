@@ -48,6 +48,7 @@ file(MAKE_DIRECTORY ${GEN_DIR})
 # Copy already processed files
 file(GLOB COPY_FILES ${RES_DIR}/copied/*)
 file(COPY ${COPY_FILES} DESTINATION ${DATA_DIR})
+file(COPY ${RES_DIR}/aminer.info DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Palette
 set(palette_aminer_unique "${RES_DIR}/palettes/aminer_editing.gpl")
