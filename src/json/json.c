@@ -96,7 +96,7 @@ UWORD jsonGetElementInStruct(
 			// We're outside of parent - nothing found
 			return 0;
 		}
-		const char *pNextElementName = pJson->szData + pJson->pTokens[i].start;
+		const char *pNextElementName = &pJson->szData[pJson->pTokens[i].start];
 		if(
 			!memcmp(pNextElementName, szElement, strlen(szElement)) &&
 			pNextElementName[strlen(szElement)] == '"'
