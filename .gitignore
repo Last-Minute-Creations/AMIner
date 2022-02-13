@@ -1,15 +1,3 @@
 build/
-
 \.vscode/
-
-_res/tiles/
 _res/32col/
-_res/base0/
-_res/base1/
-_res/checkpoint/
-_res/placeholders
-
-aminer
-aminer\.adf
-*.log
-scores.dat
