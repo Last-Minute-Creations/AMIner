@@ -5,6 +5,7 @@
 #ifndef _CORE_H_
 #define _CORE_H_
 
+#include "aminer.h"
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/utils/font.h>
 
@@ -12,17 +13,12 @@ void coreProcessBeforeBobs(void);
 
 void coreProcessAfterBobs(void);
 
-void coreGsCreate(void);
-
-void coreGsLoop(void);
-
-void coreGsDestroy(void);
-
 void coreSetLangPrefix(const char * const szPrefix);
 
 const char * coreGetLangPrefix(void);
 
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
+extern tState g_sStateCore;
 
 #endif // _CORE_H_

@@ -5,21 +5,17 @@
 #ifndef _MENU_H_
 #define _MENU_H_
 
-#include <ace/types.h>
+#include "aminer.h"
 #include <string_array.h>
 
-void menuGsCreate(void);
-
-void menuGsLoop(void);
-
-void menuGsDestroy(void);
+extern tState g_sStateMenu;
 
 void menuPreload(void);
 void menuUnload(void);
 
 void menuGsEnter(UBYTE isScoreShow);
 
-extern tStringArray g_sMenuCaptions, g_sMenuEnumMode,
-	g_sMenuEnumP1, g_sMenuEnumP2, g_sMenuEnumOnOff, g_sMenuEnumPlayerCount;
+extern char **g_pMenuCaptions, **g_pMenuEnumMode, **g_pMenuEnumP1, **g_pMenuEnumP2,
+	**g_pMenuEnumOnOff, **g_pMenuEnumPlayerCount;
 
 #endif // _MENU_H_

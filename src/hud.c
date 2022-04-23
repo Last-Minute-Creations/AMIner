@@ -6,6 +6,7 @@
 #include <ace/managers/viewport/simplebuffer.h>
 #include <ace/utils/palette.h>
 #include <ace/utils/chunky.h>
+#include "defs.h"
 
 #define HUD_COLOR_BG 11
 #define HUD_COLOR_BAR_FULL 14
@@ -114,9 +115,6 @@ static tHudPage s_eModeReturnPage;
 static tHudState s_eModeReturnState;
 static UBYTE s_ubHudShowStack;
 
-// Texts
-tStringArray g_sMsgHud;
-
 //----------------------------------------------------------------------- STATIC
 
 static void hudResetStateMachine(void) {
@@ -181,7 +179,7 @@ static void hudDrawModeIcon(tMode eMode) {
 	blitCopy(
 		s_pModeIcons, 0, uwIconOffs,
 		s_pHudBuffer->pBack, uwOffsX + 1, uwOffsY,
-		16, MODE_ICON_HEIGHT, MINTERM_COOKIE, 0xFF
+		16, MODE_ICON_HEIGHT, MINTERM_COOKIE
 	);
 
 	// Draw selection
@@ -260,40 +258,40 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	s_pLineBuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, s_pFont->uwHeight);
 
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_1_Y - 3,
-		g_sMsgHud.pStrings[MSG_HUD_P1], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+		s_pFont, s_pHudBuffer->pBack, HUD_ORIGIN_X, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_P1], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE, s_pLineBuffer
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_2_Y - 3,
-		g_sMsgHud.pStrings[MSG_HUD_P2], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+		s_pFont, s_pHudBuffer->pBack, HUD_ORIGIN_X, ROW_2_Y - 3,
+		g_pMsgs[MSG_HUD_P2], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE, s_pLineBuffer
 	);
 
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, ROW_1_Y - 3,
-		g_sMsgHud.pStrings[MSG_HUD_DRILL], HUD_COLOR_BAR_FULL,
-		FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		s_pFont, s_pHudBuffer->pBack, GAUGE_DRILL_X - 1, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_DRILL], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, ROW_1_Y - 3,
-		g_sMsgHud.pStrings[MSG_HUD_CARGO], HUD_COLOR_BAR_FULL,
-		FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		s_pFont, s_pHudBuffer->pBack, GAUGE_CARGO_X - 1, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_CARGO], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, ROW_1_Y - 3,
-		g_sMsgHud.pStrings[MSG_HUD_HULL], HUD_COLOR_BAR_FULL,
-		FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		s_pFont, s_pHudBuffer->pBack, GAUGE_HULL_X - 1, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_HULL], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, ROW_1_Y - 3,
-		g_sMsgHud.pStrings[MSG_HUD_CASH], HUD_COLOR_BAR_FULL,
-		FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		s_pFont, s_pHudBuffer->pBack, GAUGE_CASH_X - 1, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_CASH], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	hudReset(0, 0);
 }
 
 void hudShowMessage(UBYTE ubFace, const char *szMsg) {
 	logWrite("Showing HUD message: '%s'\n", szMsg);
-	CopyMem(szMsg, s_szMsg, MIN(strlen(szMsg) + 1, HUD_MSG_LEN_MAX));
+	strncpy(s_szMsg, szMsg, HUD_MSG_LEN_MAX);
 	s_eState = STATE_MSG_NOISE_IN;
 	s_uwFrameDelay = 25;
 	s_uwStateCounter = 0;
@@ -309,7 +307,7 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	s_is2pPlaying = is2pPlaying;
 	s_ubHudShowStack = 0;
 	const UBYTE ubLabelWidth = fontMeasureText(
-		s_pFont, g_sMsgHud.pStrings[MSG_HUD_DEPTH]
+		s_pFont, g_pMsgs[MSG_HUD_DEPTH]
 	).uwX;
 	if(isChallenge) {
 		// Clear depth label and use it as cash
@@ -321,9 +319,9 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	else {
 		// Depth instead of 2p cash
 		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, ROW_2_Y - 3,
-			g_sMsgHud.pStrings[MSG_HUD_DEPTH], HUD_COLOR_BAR_FULL,
-			FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+			s_pFont, s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1, ROW_2_Y - 3,
+			g_pMsgs[MSG_HUD_DEPTH], HUD_COLOR_BAR_FULL,
+			FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 		);
 	}
 
@@ -421,6 +419,7 @@ void hudUpdate(void) {
 				isDrawPending = 1;
 				break;
 			}
+			// fallthrough if value is the same
 		case STATE_MAIN_DRAW_DEPTH:
 			if(isDrawPending) {
 				// decreased clear height 'cuz digits are smaller than whole font
@@ -437,6 +436,7 @@ void hudUpdate(void) {
 				isDrawPending = 0;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_PREPARE_CASH:
 			if(s_isChallenge) {
 				lCash = s_pPlayerData[s_ePlayer].lCash;
@@ -459,13 +459,13 @@ void hudUpdate(void) {
 				UWORD k = (ulDisp / 1000U) % 1000U;
 				UWORD u = ulDisp % 1000U;
 				if(ulDisp >= 1000000U) {
-					sprintf(&szBfr[ubOffs], "%lu.%03lu.%03lu\x1F", m, k, u);
+					sprintf(&szBfr[ubOffs], "%hu.%03hu.%03hu\x1F", m, k, u);
 				}
 				else if(ulDisp >= 1000U) {
-					sprintf(&szBfr[ubOffs], "%lu.%03lu\x1F", k, u);
+					sprintf(&szBfr[ubOffs], "%hu.%03u\x1F", k, u);
 				}
 				else {
-					sprintf(&szBfr[ubOffs], "%lu\x1F", u);
+					sprintf(&szBfr[ubOffs], "%hu\x1F", u);
 				}
 				fontFillTextBitMap(s_pFont, s_pLineBuffer, szBfr);
 				s_isBitmapFilled = 1;
@@ -474,6 +474,7 @@ void hudUpdate(void) {
 				isDrawPending = 1;
 				break;
 			}
+			// fallthrough if value is the same
 		case STATE_MAIN_DRAW_CASH:
 			if(isDrawPending) {
 				// decreased clear height 'cuz digits are smaller than whole font
@@ -491,6 +492,7 @@ void hudUpdate(void) {
 				isDrawPending = 0;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_DRAW_FUEL:
 			ubPercent = 0;
 			if(pData->uwDrillMax) {
@@ -512,6 +514,7 @@ void hudUpdate(void) {
 				s_eState = STATE_MAIN_DRAW_CARGO;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_DRAW_CARGO:
 			ubPercent = 0;
 			if(pData->ubCargoMax) {
@@ -533,6 +536,7 @@ void hudUpdate(void) {
 				s_eState = STATE_MAIN_DRAW_HULL;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_DRAW_HULL:
 			ubPercent = 0;
 			if(pData->uwHullMax) {
@@ -554,6 +558,7 @@ void hudUpdate(void) {
 				s_eState = STATE_MAIN_DRAW_END;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_DRAW_END:
 			// Cycle players and start again
 			if(s_ePlayer == PLAYER_1) {
@@ -584,7 +589,7 @@ void hudUpdate(void) {
 			blitCopy(
 				s_pFaces, 0, s_ubFaceToDraw * HUD_FACE_SIZE,
 				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
-				HUD_FACE_SIZE, HUD_FACE_SIZE, MINTERM_COOKIE, 0xFF
+				HUD_FACE_SIZE, HUD_FACE_SIZE, MINTERM_COOKIE
 			);
 			s_sMsgCharPos.uwX += HUD_FACE_SIZE + 1;
 			blitRect(
@@ -663,7 +668,7 @@ void hudUpdate(void) {
 					320 - 2 * HUD_ORIGIN_X, 2 * s_ubLineHeight + 1, HUD_COLOR_BG
 				);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_sMsgHud.pStrings[MSG_HUD_PAUSED]);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_PAUSED]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 2,
@@ -677,7 +682,7 @@ void hudUpdate(void) {
 		case STATE_PAUSE_LOOP:
 			if(s_ubSelection != s_ubSelectionPrev) {
 				const UWORD uwPageOriginY = HUD_PAGE_PAUSE * HUD_HEIGHT + HUD_ORIGIN_Y;
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_sMsgHud.pStrings[MSG_HUD_RESUME]);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_RESUME]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 3,
@@ -686,7 +691,7 @@ void hudUpdate(void) {
 					FONT_COOKIE | FONT_HCENTER
 				);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_sMsgHud.pStrings[MSG_HUD_QUIT]);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_QUIT]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,

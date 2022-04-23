@@ -60,7 +60,7 @@ UBYTE warehouseTryFulfillPlan(void) {
 		}
 	}
 	// We can fulfill plan from current stock, so replace it with reduced one
-	CopyMem(pNewStock, s_pStock, MINERAL_TYPE_COUNT * sizeof(pNewStock[0]));
+	memcpy(s_pStock, pNewStock, MINERAL_TYPE_COUNT * sizeof(pNewStock[0]));
 	return 1;
 }
 
@@ -83,7 +83,7 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 	UBYTE isDone = 0;
 	LONG lCostRemaining = s_sCurrentPlan.ulTargetSum;
 	do {
-		UBYTE ubMineral = ubRandMax(MINERAL_TYPE_COUNT - 1);
+		UBYTE ubMineral = uwRandMax(MINERAL_TYPE_COUNT - 1);
 		if(s_sCurrentPlan.ulMineralsUnlocked & (1 << ubMineral)) {
 			UBYTE ubReward = g_pMinerals[ubMineral].ubReward;
 			UWORD uwCount = uwRandMax((lCostRemaining + ubReward - 1) / ubReward);

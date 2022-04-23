@@ -7,8 +7,9 @@
 #include <ace/managers/system.h>
 #include <ace/managers/timer.h>
 #include <ace/utils/bitmap.h>
+#include <comm/base.h>
+#include "defs.h"
 #include "core.h"
-#include "comm.h"
 #include "game.h"
 
 #define SCORE_NAME_LENGTH 20
@@ -19,8 +20,6 @@ typedef struct _tHiScore {
 	LONG lScore;
 	char szName[SCORE_NAME_LENGTH];
 } tHiScore;
-
-tStringArray g_sHiScoreMessages;
 
 static tHiScore s_pScores[SCORE_COUNT];
 
@@ -54,10 +53,10 @@ void hiScoreLoad(void) {
 			fileRead(pFile, &s_pScores[i], sizeof(s_pScores[i]));
 		}
 		fileClose(pFile);
-		CopyMem(s_pScores, s_pPrevScores, sizeof(s_pPrevScores));
+		memcpy(s_pPrevScores, s_pScores, sizeof(s_pPrevScores));
 	}
 	else {
-		CopyMem(s_pPrevScores, s_pScores, sizeof(s_pScores));
+		memcpy(s_pScores, s_pPrevScores, sizeof(s_pScores));
 	}
 	systemUnuse();
 }
@@ -70,7 +69,7 @@ static void hiScoreSave(void) {
 			fileWrite(pFile, &s_pScores[i], sizeof(s_pScores[i]));
 		}
 		fileClose(pFile);
-		CopyMem(s_pScores, s_pPrevScores, sizeof(s_pPrevScores));
+		memcpy(s_pPrevScores, s_pScores, sizeof(s_pPrevScores));
 	}
 	systemUnuse();
 }
@@ -79,10 +78,10 @@ static void hiScoreDrawPosition(UBYTE ubPos) {
 	UWORD uwY = 5 + (ubPos * 10);
 
 	// Clear BG
-	commErase(0, uwY, COMM_DISPLAY_WIDTH, g_pFont->uwHeight + 1);
+	commErase(0, uwY, COMM_DISPLAY_WIDTH, commGetLineHeight());
 
 	// Score name
-	char szBfr[SCORE_NAME_LENGTH];
+	char szBfr[SCORE_NAME_LENGTH + 5];
 	sprintf(szBfr, "%hhu. %s", ubPos + 1, s_pScores[ubPos].szName);
 	commDrawText(
 		16, uwY, szBfr, FONT_LAZY | FONT_COOKIE | FONT_SHADOW,
@@ -107,13 +106,9 @@ void hiScoreDrawAll(void) {
 		0, COMM_DISPLAY_HEIGHT - g_pFont->uwHeight,
 		COMM_DISPLAY_WIDTH, g_pFont->uwHeight
 	);
-	const char *szMsg;
-	if(hiScoreIsEntering()) {
-		szMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_NEW];
-	}
-	else {
-		szMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_PRESS];
-	}
+	const char *szMsg = (
+		g_pMsgs[hiScoreIsEnteringNew() ? MSG_HI_SCORE_NEW : MSG_HI_SCORE_PRESS]
+	);
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szMsg,
 		FONT_LAZY | FONT_COOKIE | FONT_HCENTER | FONT_BOTTOM,
@@ -123,7 +118,7 @@ void hiScoreDrawAll(void) {
 
 void hiScoreEnteringProcess(void) {
 	commProcess();
-	if(commNavUse(COMM_NAV_BTN)) {
+	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(s_ubNewNameLength) {
 			hiScoreSave();
 		}
@@ -131,7 +126,7 @@ void hiScoreEnteringProcess(void) {
 			// No entry provided - revert to old scores
 			// not as hiScoreLoadFromFile() because it won't work if file was
 			// not yet created
-			CopyMem(s_pPrevScores, s_pScores, sizeof(s_pScores));
+			memcpy(s_pScores, s_pPrevScores, sizeof(s_pScores));
 		}
 		s_isEnteringHiScore = 0;
 		hiScoreDrawAll();
@@ -184,7 +179,7 @@ void hiScoreEnteringProcess(void) {
 	}
 }
 
-UBYTE hiScoreIsEntering(void) {
+UBYTE hiScoreIsEnteringNew(void) {
 	return s_isEnteringHiScore;
 }
 

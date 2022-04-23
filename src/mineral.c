@@ -4,7 +4,7 @@
 
 #include "mineral.h"
 
-tStringArray g_sMineralNames;
+char **g_pMineralNames;
 
 const tMineralDef g_pMinerals[MINERAL_TYPE_COUNT] = {
 	[MINERAL_TYPE_SILVER] = {.ubReward = 5, .ubTitleColor = 9},

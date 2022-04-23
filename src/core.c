@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "core.h"
-#include <ace/managers/game.h>
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
 #include <ace/utils/palette.h>
@@ -19,8 +18,7 @@
 #include "hi_score.h"
 #include "tile.h"
 #include "explosion.h"
-#include "comm.h"
-#include "comm_shop.h"
+#include <comm/base.h>
 #include "defs.h"
 
 static tBitMap *s_pTiles;
@@ -80,7 +78,7 @@ void coreProcessAfterBobs(void) {
 	vPortWaitForEnd(s_pVpMain);
 }
 
-void coreGsCreate(void) {
+static void coreGsCreate(void) {
 	defsInit();
 	langCreate(s_szLangPrefix);
 	hiScoreLoad();
@@ -110,7 +108,7 @@ void coreGsCreate(void) {
 	TAG_END);
 
 	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
-	memset(s_pVpMain->pPalette, 0, 1 << GAME_BPP);
+	memset(s_pVpMain->pPalette, 0, sizeof(s_pVpMain->pPalette));
 	s_pColorBg = &s_pVpMain->pPalette[0];
 
 	baseTileCreate(g_pMainBuffer);
@@ -123,7 +121,8 @@ void coreGsCreate(void) {
 	randInit(2184);
 #else
 	// Seed from beam pos Y & X
-	randInit((g_pRayPos->bfPosY << 8) | g_pRayPos->bfPosX);
+	tRayPos sRayPos = getRayPos();
+	randInit((sRayPos.bfPosY << 8) | sRayPos.bfPosX);
 #endif
 
 	tileInit(0, 1);
@@ -135,7 +134,6 @@ void coreGsCreate(void) {
 	explosionManagerCreate();
 	groundLayerCreate(s_pVpMain);
 	commCreate();
-	commShopAlloc();
 	vehicleBitmapsCreate();
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
@@ -166,15 +164,15 @@ void coreGsCreate(void) {
 	g_isAtari = 0;
 
 	hudReset(0, 0);
-	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
+	statePush(g_pGameStateManager, &g_sStateMenu);
 }
 
-void coreGsLoop(void) {
+static void coreGsLoop(void) {
 	// you shouldn't be here!
-	gameClose();
+	statePopAll(g_pGameStateManager);
 }
 
-void coreGsDestroy(void) {
+static void coreGsDestroy(void) {
 	systemUse();
 
 	menuUnload();
@@ -187,7 +185,6 @@ void coreGsDestroy(void) {
 	vehicleDestroy(&g_pVehicles[1]);
 	vehicleBitmapsDestroy();
 	commDestroy();
-	commShopDealloc();
 	bobNewManagerDestroy();
 
 	audioDestroy();
@@ -212,3 +209,7 @@ void coreSetLangPrefix(const char * const szPrefix) {
 const char * coreGetLangPrefix(void) {
 	return s_szLangPrefix;
 }
+
+tState g_sStateCore = {
+	.cbCreate = coreGsCreate, .cbLoop = coreGsLoop, .cbDestroy = coreGsDestroy
+};

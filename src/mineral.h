@@ -25,6 +25,6 @@ typedef struct _tMineralDef {
 } tMineralDef;
 
 extern const tMineralDef g_pMinerals[MINERAL_TYPE_COUNT];
-extern tStringArray g_sMineralNames;
+extern char **g_pMineralNames;
 
 #endif // _MINERAL_H_

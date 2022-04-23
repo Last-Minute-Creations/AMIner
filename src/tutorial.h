@@ -20,6 +20,4 @@ void tutorialReset(void);
  */
 UBYTE tutorialProcess(void);
 
-extern tStringArray g_sTutorialMsgs;
-
 #endif // _TUTORIAL_H_

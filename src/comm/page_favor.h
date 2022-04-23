@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef _SORRY_H_
-#define _SORRY_H_
+#ifndef _AMINER_COMM_PAGE_FAVOR_H_
+#define _AMINER_COMM_PAGE_FAVOR_H_
 
-#include "aminer.h"
+void pageFavorCreate(void);
 
-extern tState g_sStateSorry;
+void pageFavorReset(void);
 
-#endif // _SORRY_H_
+#endif // _AMINER_COMM_PAGE_FAVOR_H_

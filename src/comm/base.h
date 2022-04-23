@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef _COMM_H_
-#define _COMM_H_
+#ifndef _AMINER_COMM_BASE_H_
+#define _AMINER_COMM_BASE_H_
 
-#include <ace/types.h>
 #include <ace/utils/font.h>
 
 #define COMM_WIDTH (320-64)
@@ -19,6 +18,10 @@
 #define COMM_DISPLAY_COLOR_TEXT 14
 #define COMM_DISPLAY_COLOR_TEXT_DARK 13
 
+typedef void (*tPageProcess)(void);
+
+typedef void (*tPageCleanup)(void);
+
 typedef enum _tCommNav {
 	COMM_NAV_UP,
 	COMM_NAV_DOWN,
@@ -27,6 +30,13 @@ typedef enum _tCommNav {
 	COMM_NAV_BTN,
 	COMM_NAV_COUNT
 } tCommNav;
+
+typedef enum _tCommNavEx {
+	COMM_NAV_EX_BTN_CLICK,
+	COMM_NAV_EX_SHIFT_LEFT,
+	COMM_NAV_EX_SHIFT_RIGHT,
+	COMM_NAV_EX_COUNT
+} tCommNavEx;
 
 typedef enum _tCommLed {
 	COMM_LED_OFFICE,
@@ -49,6 +59,10 @@ UBYTE commNavCheck(tCommNav eNav);
 
 UBYTE commNavUse(tCommNav eNav);
 
+UBYTE commNavExUse(tCommNavEx eNavEx);
+
+tBitMap *commGetDisplayBuffer(void);
+
 tUwCoordYX commGetOrigin(void);
 
 tUwCoordYX commGetOriginDisplay(void);
@@ -59,10 +73,31 @@ void commDrawText(
 	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
 );
 
+/**
+ * @brief Draws multiline text, dividing it where whitespace occurs.
+ *
+ * @param szText Text to display.
+ * @param uwStartX Start X position of each line, relative to Commrade screen origin.
+ * @param uwStartY Stary Y position of first line, relative to Commrade screen origin.
+ * @return Number of lines written.
+ */
+UBYTE commDrawMultilineText(const char *szText, UWORD uwStartX, UWORD uwStartY);
+
 void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight);
 
 void commEraseAll(void);
 
 void commProgress(UBYTE ubPercent, const char *szDescription);
 
-#endif // _COMM_H_
+UBYTE commBreakTextToWidth(const char *szInput, UWORD uwMaxLineWidth);
+
+UBYTE commGetLineHeight(void);
+
+void commRegisterPage(tPageProcess cbProcess, tPageCleanup cbCleanup);
+
+UBYTE commProcessPage(void);
+
+extern tBitMap *g_pCommBmFaces;
+extern tBitMap *g_pCommBmSelection;
+
+#endif // _AMINER_COMM_BASE_H_

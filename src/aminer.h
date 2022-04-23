@@ -2,13 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef _AMINER_COMM_MSG_H_
-#define _AMINER_COMM_MSG_H_
+#ifndef _AMINER_AMINER_H_
+#define _AMINER_AMINER_H_
 
-void commMsgGsCreate(void);
+#include <ace/managers/state.h>
 
-void commMsgGsLoop(void);
+extern tStateManager *g_pGameStateManager;
 
-void commMsgGsDestroy(void);
-
-#endif // _AMINER_COMM_MSG_H_
+#endif // _AMINER_AMINER_H_

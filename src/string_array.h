@@ -7,19 +7,23 @@
 
 #include "json/json.h"
 
-typedef struct _tStringArray {
-	UBYTE ubCount;
-	char **pStrings;
-} tStringArray;
+/**
+ * Array of string pointers terimnated with nullptr
+ */
 
-tStringArray stringArrayCreateFromDom(
+#define STRING_ARRAY_EMPTY_POS ((char*)-1)
+#define STRING_ARRAY_TERMINATOR ((char*)0)
+
+char **stringArrayCreateFromDom(
 	tJson *pJson, const tCodeRemap *pRemap, const char *szDom
 );
 
-tStringArray stringArrayCreateFromDomElements(
-	tJson *pJson, const tCodeRemap *pRemap, UBYTE ubCount, ...
+char **stringArrayCreateFromDomElements(
+	tJson *pJson, const tCodeRemap *pRemap, const char **pNames
 );
 
-void stringArrayDestroy(tStringArray *pArray);
+void stringArrayDestroy(char **pArray);
+
+UBYTE stringArrayGetCount(const char **pArray);
 
 #endif // _STRING_ARRAY_H_

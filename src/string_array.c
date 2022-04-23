@@ -44,12 +44,17 @@ static char *stringCreateFromTok(
 static char *stringCreateFromDom(
 	const tJson *pJson, const tCodeRemap *pRemap, const char *szDom
 ) {
+	char *szDestination;
 	UWORD uwIdx = jsonGetDom(pJson, szDom);
 	if(uwIdx == 0) {
 		logWrite("ERR: %s not found\n", szDom);
-		return 0;
+		szDestination = memAllocFast(strlen(szDom) + 1);
+		strcpy(szDestination, szDom);
 	}
-	return stringCreateFromTok(pJson, pRemap, uwIdx);
+	else {
+		szDestination = stringCreateFromTok(pJson, pRemap, uwIdx);
+	}
+	return szDestination;
 }
 
 static void stringDestroy(char *szString) {
@@ -58,16 +63,21 @@ static void stringDestroy(char *szString) {
 
 //----------------------------------------------------------------- STRING ARRAY
 
-static tStringArray stringArrayCreate(UBYTE ubCount) {
-	tStringArray sArray;
-	sArray.ubCount = ubCount;
+static char **stringArrayCreate(UBYTE ubCount) {
+	logBlockBegin("stringArrayCreate(ubCount: %hu)", ubCount);
+	char **pArray = 0;
 	if(ubCount) {
-		sArray.pStrings = memAllocFastClear(ubCount * sizeof(char*));
+		pArray = memAllocFast((ubCount + 1) * sizeof(char*));
+		for(UBYTE i = 0; i < ubCount; ++i) {
+			pArray[i] = STRING_ARRAY_EMPTY_POS;
+		}
 	}
-	return sArray;
+	pArray[ubCount] = STRING_ARRAY_TERMINATOR;
+	logBlockEnd("stringArrayCreate()");
+	return pArray;
 }
 
-tStringArray stringArrayCreateFromDom(
+char **stringArrayCreateFromDom(
 	tJson *pJson, const tCodeRemap *pRemap, const char *szDom
 ) {
 	logBlockBegin(
@@ -80,44 +90,58 @@ tStringArray stringArrayCreateFromDom(
 		logBlockEnd("stringArrayCreateFromDom()");
 		return stringArrayCreate(0);
 	}
-	tStringArray sArray = stringArrayCreate(pJson->pTokens[uwTokArray].size);
+	UBYTE ubCount = pJson->pTokens[uwTokArray].size;
+	char **pArray = stringArrayCreate(ubCount);
 
-	for(UWORD i = 0; i < sArray.ubCount; ++i) {
+	for(UWORD i = 0; i < ubCount; ++i) {
 		UWORD uwTokElement = jsonGetElementInArray(pJson, uwTokArray, i);
 		if(!uwTokElement) {
 			logWrite("ERR: json array element not found: '%s'[%hhu]", szDom, i);
 		}
 		else {
-			sArray.pStrings[i] = stringCreateFromTok(pJson, pRemap, uwTokElement);
+			pArray[i] = stringCreateFromTok(pJson, pRemap, uwTokElement);
 		}
 	}
 	logBlockEnd("stringArrayCreateFromDom()");
-	return sArray;
+	return pArray;
 }
 
-tStringArray stringArrayCreateFromDomElements(
-	tJson *pJson, const tCodeRemap *pRemap, UBYTE ubCount, ...
+char **stringArrayCreateFromDomElements(
+	tJson *pJson, const tCodeRemap *pRemap, const char **pNames
 ) {
-	logBlockBegin("stringArrayCreateFromDom(pJson: %p, ubCount: '%hhu')", pJson, ubCount);
-	tStringArray sArray = stringArrayCreate(ubCount);
-	va_list vaArgs;
-	va_start(vaArgs, ubCount);
+	logBlockBegin(
+		"stringArrayCreateFromDom(pJson: %p, pRemap: %p, pNames: %p)",
+		pJson, pRemap, pNames
+	);
+	UBYTE ubCount = stringArrayGetCount(pNames);
+	char **pArray = stringArrayCreate(ubCount);
 	for(UBYTE i = 0; i < ubCount; ++i) {
-		const char *szDom = va_arg(vaArgs, const char*);
-		sArray.pStrings[i] = stringCreateFromDom(pJson, pRemap, szDom);
+		const char *szDom = pNames[i];
+		pArray[i] = stringCreateFromDom(pJson, pRemap, szDom);
 	}
-	va_end(vaArgs);
 	logBlockEnd("stringArrayCreateFromDomElements()");
-	return sArray;
+	return pArray;
 }
 
-
-void stringArrayDestroy(tStringArray *pArray) {
+void stringArrayDestroy(char **pArray) {
 	logBlockBegin("stringArrayDestroy(pArray: %p)", pArray);
-	for(UWORD i = 0; i < pArray->ubCount; ++i) {
-		logWrite("Freeing string %hhu (0x%p): '%s'\n", i, pArray->pStrings[i], pArray->pStrings[i]);
-		stringDestroy(pArray->pStrings[i]);
+	UBYTE ubCount;
+	for(ubCount = 0; pArray[ubCount] != STRING_ARRAY_TERMINATOR; ++ubCount) {
+		if(pArray[ubCount] != STRING_ARRAY_EMPTY_POS) {
+			logWrite(
+				"Freeing string %hhu (0x%p): '%s'\n",
+				ubCount, pArray[ubCount], pArray[ubCount]
+			);
+			stringDestroy(pArray[ubCount]);
+		}
 	}
-	memFree(pArray->pStrings, sizeof(char*) * pArray->ubCount);
+	// Free string pointers + terminator
+	memFree(pArray, sizeof(char*) * (ubCount + 1));
 	logBlockEnd("stringArrayDestroy()");
+}
+
+UBYTE stringArrayGetCount(const char **pArray) {
+	UBYTE ubCount;
+	for(ubCount = 0; pArray[ubCount] != STRING_ARRAY_TERMINATOR; ++ubCount) { }
+	return ubCount;
 }

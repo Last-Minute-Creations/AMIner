@@ -2,11 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef _SORRY_H_
-#define _SORRY_H_
+#ifndef _COMM_SHOP_H_
+#define _COMM_SHOP_H_
 
 #include "aminer.h"
 
-extern tState g_sStateSorry;
+extern tState g_sStateShop;
 
-#endif // _SORRY_H_
+UBYTE commShopIsActive(void);
+
+void pageAccountingReduceChanceFail(void);
+
+#endif // _COMM_SHOP_H_

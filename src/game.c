@@ -4,15 +4,13 @@
 
 #include "game.h"
 #include <ace/managers/key.h>
-#include <ace/managers/game.h>
 #include <ace/utils/custom.h>
 #include <ace/managers/blit.h>
+#include <comm/gs_shop.h>
+#include <comm/page_office.h>
 #include "vehicle.h"
 #include "hud.h"
 #include "tile.h"
-#include "comm.h"
-#include "comm_shop.h"
-#include "comm_msg.h"
 #include "menu.h"
 #include "hi_score.h"
 #include "ground_layer.h"
@@ -68,7 +66,6 @@ static UBYTE s_isReminderShown;
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
-tStringArray g_sPlanMessages;
 tBobNew g_pBombMarkers[3];
 
 void gameTryPushBob(tBobNew *pBob) {
@@ -91,7 +88,7 @@ void gameStart(void) {
 	g_isChallengeEnd = 0;
 	dinoReset();
 	tutorialReset();
-	officeResetPpl();
+	pageOfficeReset();
 	tileInit(g_isAtari, g_isChallenge);
 	warehouseReset(g_is2pPlaying);
 	inventoryReset();
@@ -113,7 +110,7 @@ void gameStart(void) {
 
 static void gameProcessHotkeys(void) {
   if(keyUse(KEY_ESCAPE) || keyUse(KEY_P)) {
-		gameChangeState(pauseGsCreate, pauseGsLoop, pauseGsDestroy);
+		stateChange(g_pGameStateManager, &g_sStatePause);
 		return;
   }
 	if(keyUse(KEY_B)) {
@@ -270,7 +267,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	if(steerUse(pSelection->eSteerFire)) {
 		if(!pSelection->isSelecting) {
 			if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-				gamePushState(commShopGsCreate, commShopGsLoop, commShopGsDestroy);
+				statePush(g_pGameStateManager, &g_sStateShop);
 				return 1;
 			}
 			pSelection->isSelecting = 1;
@@ -435,7 +432,7 @@ void gameChallengeResult(void) {
 		char szBfr[30];
 		sprintf(
 			szBfr, "%s: %ld",
-			g_sHiScoreMessages.pStrings[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
+			g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
 		);
 		hiScoreSetup(g_pVehicles[0].lCash, szBfr);
 		menuGsEnter(1);
@@ -444,13 +441,13 @@ void gameChallengeResult(void) {
 		// No entering hi score for 2 players, just summary who wins
 		const char *pMsg;
 		if(g_pVehicles[0].lCash > g_pVehicles[1].lCash) {
-			pMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_WIN_P1];
+			pMsg = g_pMsgs[MSG_HI_SCORE_WIN_P1];
 		}
 		else if(g_pVehicles[0].lCash < g_pVehicles[1].lCash) {
-			pMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_WIN_P2];
+			pMsg = g_pMsgs[MSG_HI_SCORE_WIN_P2];
 		}
 		else {
-			pMsg = g_sHiScoreMessages.pStrings[MSG_HI_SCORE_DRAW];
+			pMsg = g_pMsgs[MSG_HI_SCORE_DRAW];
 		}
 		hiScoreSetup(0, pMsg);
 		menuGsEnter(1);
@@ -460,11 +457,11 @@ void gameChallengeResult(void) {
 
 //-------------------------------------------------------------------- GAMESTATE
 
-void gameGsCreate(void) {
+static void gameGsCreate(void) {
 
 }
 
-void gameGsLoop(void) {
+static void gameGsLoop(void) {
 	if(!g_isChallenge) {
 		if(tutorialProcess()) {
 			return;
@@ -486,19 +483,19 @@ void gameGsLoop(void) {
 	WORD wRemainingDays = warehouseGetRemainingDays(pPlan);
 	if(wRemainingDays <= 0) {
 		if(warehouseTryFulfillPlan()) {
-			hudShowMessage(0, g_sPlanMessages.pStrings[MSG_PLAN_DONE_AFK]);
+			hudShowMessage(0, g_pMsgs[MSG_PLAN_DONE_AFK]);
 			warehouseNewPlan(1, g_is2pPlaying);
-			officeReduceAccountingChanceFail();
+			pageAccountingReduceChanceFail();
 		}
 		else {
 			if(!pPlan->isExtendedTime) {
 				char szBfr[100];
-				sprintf(szBfr, g_sPlanMessages.pStrings[MSG_PLAN_EXTENDING], 14);
+				sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
 				hudShowMessage(0, szBfr);
 				warehouseAddDaysToPlan(14, 0);
 			}
 			else {
-				hudShowMessage(0, g_sPlanMessages.pStrings[MSG_PLAN_NOT_DONE]);
+				hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
 				warehouseNewPlan(0, g_is2pPlaying);
 				gameAddRebuke();
 			}
@@ -511,7 +508,7 @@ void gameGsLoop(void) {
 		if(!s_isReminderShown) {
 			s_isReminderShown = 1;
 			char szBfr[50];
-			sprintf(szBfr, g_sPlanMessages.pStrings[MSG_PLAN_REMAINING], wRemainingDays);
+			sprintf(szBfr, g_pMsgs[MSG_PLAN_REMAINING], wRemainingDays);
 			hudShowMessage(0, szBfr);
 		}
 	}
@@ -539,6 +536,10 @@ void gameGsLoop(void) {
 	}
 }
 
-void gameGsDestroy(void) {
+static void gameGsDestroy(void) {
 
 }
+
+tState g_sStateGame = {
+	.cbCreate = gameGsCreate, .cbLoop = gameGsLoop, .cbDestroy = gameGsDestroy
+};

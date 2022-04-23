@@ -5,22 +5,14 @@
 #include "tile.h"
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/managers/rand.h>
+#include <comm/base.h>
 #include "game.h"
 #include "core.h"
 #include "hud.h"
 #include "mineral.h"
-#include "comm.h"
 #include "defs.h"
 
-typedef enum _tMsgLoading {
-	MSG_LOADING_GEN_TERRAIN,
-	MSG_LOADING_GEN_BASES,
-	MSG_LOADING_FINISHING,
-} tMsgLoading;
-
-tStringArray g_sLoadMsgs;
-
-const tTileDef const g_pTileDefs[TILE_COUNT] = {
+const tTileDef g_pTileDefs[TILE_COUNT] = {
 	{.ubSlots = 0, .ubMineral = MINERAL_TYPE_COUNT},
 	[TILE_SILVER_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_SILVER},
 	[TILE_SILVER_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_SILVER},
@@ -134,7 +126,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	UBYTE ubPercentTiles = (100 - 10 * s_ubBaseCount);
 	for(UWORD x = 1; x < uwEndX; ++x) {
 		UBYTE ubPercent = (x * ubPercentTiles) / uwEndX;
-		commProgress(ubPercent, g_sLoadMsgs.pStrings[MSG_LOADING_GEN_TERRAIN]);
+		commProgress(ubPercent, g_pMsgs[MSG_LOADING_GEN_TERRAIN]);
 		for(UWORD y = TILE_ROW_BASE_DIRT + 2; y < uwEndY; ++y) {
 			// 2000 is max
 			UWORD uwWhat = (uwRand() * 1000) / 65535;
@@ -174,7 +166,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			}
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
-				pTiles[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_4);
+				pTiles[x][y] = uwRandMinMax(TILE_STONE_1, TILE_STONE_4);
 			}
 			else if(
 				uwWhat < (uwChance += uwChanceAir) &&
@@ -185,36 +177,36 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			else if(uwWhat < (uwChance += uwChanceSilver)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_SILVER_1, TILE_SILVER_3)
+						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: uwRandMinMax(TILE_SILVER_1, TILE_SILVER_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceGold)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_GOLD_1, TILE_GOLD_3)
+						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: uwRandMinMax(TILE_GOLD_1, TILE_GOLD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceEmerald)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_EMERALD_1, TILE_EMERALD_3)
+						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: uwRandMinMax(TILE_EMERALD_1, TILE_EMERALD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceRuby)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_RUBY_1, TILE_RUBY_3)
+						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: uwRandMinMax(TILE_RUBY_1, TILE_RUBY_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceMoonstone)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_MOONSTONE_1, TILE_MOONSTONE_3)
+						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
+						: uwRandMinMax(TILE_MOONSTONE_1, TILE_MOONSTONE_3)
 				);
 			}
 			else {
@@ -228,7 +220,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	// Draw bases
 	for(UBYTE ubBase = 0; ubBase < s_ubBaseCount; ++ubBase) {
 		UBYTE ubPercent = ((100 - ubPercentTiles) * ubBase / s_ubBaseCount);
-		commProgress(ubPercentTiles + ubPercent, g_sLoadMsgs.pStrings[MSG_LOADING_GEN_BASES]);
+		commProgress(ubPercentTiles + ubPercent, g_pMsgs[MSG_LOADING_GEN_BASES]);
 		const tBase *pBase = &s_pBases[ubBase];
 		for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
 			for(UWORD x = 1; x < 1 + 10; ++x) {
@@ -249,7 +241,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	pTiles[9][g_pDinoDepths[8]] = TILE_BONE_1;
 
 	// Fill left invisible col with rocks
-	commProgress(100, g_sLoadMsgs.pStrings[MSG_LOADING_FINISHING]);
+	commProgress(100, g_pMsgs[MSG_LOADING_FINISHING]);
 	for(UWORD y = 0; y < uwEndY; ++y) {
 		pTiles[0][y] = TILE_DIRT_1;
 	}

@@ -4,8 +4,8 @@
 
 #include "logo.h"
 #include <ace/managers/viewport/simplebuffer.h>
-#include <ace/managers/game.h>
 #include <ace/managers/system.h>
+#include <ace/managers/key.h>
 #include <ace/managers/joy.h>
 #include <ace/utils/palette.h>
 #include "core.h"
@@ -16,11 +16,11 @@
 
 #define RGB(r,g,b) ((((r) >> 4) << 8) | (((g) >> 4) << 4) | (((b) >> 4) << 0))
 
-typedef enum _tLang {
-	LANG_EN,
-	LANG_PL,
-	LANG_COUNT
-} tLang;
+typedef enum _tLanguage {
+	LANGUAGE_EN,
+	LANGUAGE_PL,
+	LANGUAGE_COUNT
+} tLanguage;
 
 typedef void (*tCbLogo)(void);
 typedef UBYTE (*tCbFadeOut)(void);
@@ -45,7 +45,7 @@ static tCbLogo s_cbFadeIn = 0, s_cbWait = 0;
 static tCbFadeOut s_cbFadeOut = 0;
 static UBYTE s_isAnyPressed = 0;
 
-void logoGsCreate(void) {
+static void logoGsCreate(void) {
 	logBlockBegin("logoGsCreate()");
 
 	s_pView = viewCreate(0,
@@ -78,7 +78,7 @@ void logoGsCreate(void) {
 	viewLoad(s_pView);
 }
 
-void logoGsLoop(void) {
+static void logoGsLoop(void) {
 	s_isAnyPressed = (
 		keyUse(KEY_RETURN) | keyUse(KEY_ESCAPE) | keyUse(KEY_SPACE) |
 		joyUse(JOY1 + JOY_FIRE) | joyUse(JOY2 + JOY_FIRE)
@@ -120,7 +120,7 @@ void logoGsLoop(void) {
 	viewUpdateCLUT(s_pView);
 }
 
-void logoGsDestroy(void) {
+static void logoGsDestroy(void) {
 	systemUse();
 	logBlockBegin("logoGsDestroy()");
 	viewDestroy(s_pView);
@@ -144,7 +144,7 @@ void lmcFadeIn(void) {
 		blitCopy(
 			pLogo, 0, 0, s_pBfr->pBack,
 			(s_pVp->uwWidth - LOGO_WIDTH) / 2, (s_pVp->uwHeight - LOGO_HEIGHT) / 2,
-			LOGO_WIDTH, LOGO_HEIGHT, MINTERM_COOKIE, 0xFF
+			LOGO_WIDTH, LOGO_HEIGHT, MINTERM_COOKIE
 		);
 
 		systemUse();
@@ -172,14 +172,14 @@ UBYTE lmcFadeOut(void) {
 
 //------------------------------------------------------------------------- LANG
 
-static const char *s_pLanguageNames[LANG_COUNT] = {
-	[LANG_EN] = "D\x80ony English",
-	[LANG_PL] = "Mietek Polisz",
+static const char *s_pLanguageNames[LANGUAGE_COUNT] = {
+	[LANGUAGE_EN] = "D\x80ony English",
+	[LANGUAGE_PL] = "Mietek Polisz",
 };
 
-static const char *s_pLanguagePrefixes[LANG_COUNT] = {
-	[LANG_EN] = "en",
-	[LANG_PL] = "pl",
+static const char *s_pLanguagePrefixes[LANGUAGE_COUNT] = {
+	[LANGUAGE_EN] = "en",
+	[LANGUAGE_PL] = "pl",
 };
 
 #define FACE_WIDTH (64)
@@ -189,10 +189,10 @@ static const char *s_pLanguagePrefixes[LANG_COUNT] = {
 #define FACE_OFFS_X ((320 - (2 * FACE_WIDTH + FACE_DIST)) / 2)
 #define FACE_DELTA_X (FACE_WIDTH + FACE_DIST)
 
-static tLang s_eLangCurr = 0;
+static tLanguage s_eLangCurr = 0;
 
 static void drawLangNames(void) {
-	for(tLang eLang = 0; eLang < LANG_COUNT; ++eLang) {
+	for(tLanguage eLang = 0; eLang < LANGUAGE_COUNT; ++eLang) {
 		fontFillTextBitMap(g_pFont, s_pLineBuffer, s_pLanguageNames[eLang]);
 		fontDrawTextBitMap(
 			s_pBfr->pBack, s_pLineBuffer,
@@ -225,11 +225,11 @@ void langFadeIn(void) {
 			LOGO_WIDTH, LOGO_HEIGHT, 0
 		);
 
-		for(tLang eLang = 0; eLang < LANG_COUNT; ++eLang) {
+		for(tLanguage eLang = 0; eLang < LANGUAGE_COUNT; ++eLang) {
 			blitCopy(
 				pFaces, 0, eLang * FACE_HEIGHT, s_pBfr->pBack,
 				FACE_OFFS_X + eLang * FACE_DELTA_X, FACE_OFFS_Y,
-				FACE_WIDTH, FACE_HEIGHT, MINTERM_COOKIE, 0xFF
+				FACE_WIDTH, FACE_HEIGHT, MINTERM_COOKIE
 			);
 		}
 
@@ -255,7 +255,7 @@ void langWait(void) {
 		joyUse(JOY1_LEFT) || joyUse(JOY2_LEFT)
 	) {
 		if(s_eLangCurr == 0) {
-			s_eLangCurr = LANG_COUNT - 1;
+			s_eLangCurr = LANGUAGE_COUNT - 1;
 		}
 		else {
 			--s_eLangCurr;
@@ -266,7 +266,7 @@ void langWait(void) {
 		keyUse(KEY_RIGHT) || keyUse(KEY_D) ||
 		joyUse(JOY1_RIGHT) || joyUse(JOY2_RIGHT)
 	) {
-		if(++s_eLangCurr == LANG_COUNT) {
+		if(++s_eLangCurr == LANGUAGE_COUNT) {
 			s_eLangCurr = 0;
 		}
 		drawLangNames();
@@ -278,6 +278,10 @@ void langWait(void) {
 }
 
 UBYTE langFadeOut(void) {
-	gameChangeState(coreGsCreate, coreGsLoop, coreGsDestroy);
+	stateChange(g_pGameStateManager, &g_sStateCore);
 	return 1;
 }
+
+tState g_sStateLogo = {
+	.cbCreate = logoGsCreate, .cbLoop = logoGsLoop, .cbDestroy = logoGsDestroy
+};

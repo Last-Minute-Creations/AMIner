@@ -4,7 +4,6 @@
 
 #include "sorry.h"
 #include <ace/managers/viewport/simplebuffer.h>
-#include <ace/managers/game.h>
 #include <ace/managers/key.h>
 #include <ace/managers/joy.h>
 #include <ace/managers/system.h>
@@ -18,7 +17,7 @@ static tVPort *s_pVp;
 static tSimpleBufferManager *s_pBfr;
 static tFont *s_pFont;
 
-void sorryGsCreate(void) {
+static void sorryGsCreate(void) {
 logBlockBegin("logoGsCreate()");
 
 	s_pView = viewCreate(0,
@@ -48,44 +47,50 @@ logBlockBegin("logoGsCreate()");
 	tBitMap *pBitMap = bitmapCreateFromFile("data/lang_select.bm", 0);
 	blitCopy(
 		pBitMap, 0, 64, s_pBfr->pBack, (320 - 64) / 2, (256 - 64) / 2,
-		64, 64, MINTERM_COPY, 0xFF
+		64, 64, MINTERM_COPY
 	);
 	bitmapDestroy(pBitMap);
 
 	s_pFont = fontCreate("data/uni54.fnt");
+	tTextBitMap *pTextBuffer = fontCreateTextBitMap(320, s_pFont->uwHeight);
 	fontDrawStr(
-		s_pBfr->pBack, s_pFont, 160, 128 - 32 - 12,
+		s_pFont, s_pBfr->pBack, 160, 128 - 32 - 12,
 		"Kiedy p\x82""aczesz (bo nie masz ramu), On to widzi",
-		18, FONT_BOTTOM | FONT_HCENTER | FONT_LAZY
+		18, FONT_BOTTOM | FONT_HCENTER | FONT_LAZY, pTextBuffer
 	);
 	fontDrawStr(
-		s_pBfr->pBack, s_pFont, 160, 128 + 32 + 12,
+		s_pFont, s_pBfr->pBack, 160, 128 + 32 + 12,
 		"Min. 2MB CHIP RAM, sorry Ci\x84 bardzo!",
-		14, FONT_TOP | FONT_HCENTER | FONT_LAZY
+		14, FONT_TOP | FONT_HCENTER | FONT_LAZY, pTextBuffer
 	);
 	fontDrawStr(
-		s_pBfr->pBack, s_pFont, 160, 128 + 32 + 24,
+		s_pFont, s_pBfr->pBack, 160, 128 + 32 + 24,
 		"Press ENTER, SPACE, FIRE or ESCAPE...",
-		14, FONT_TOP | FONT_HCENTER | FONT_LAZY
+		14, FONT_TOP | FONT_HCENTER | FONT_LAZY, pTextBuffer
 	);
+	fontDestroyTextBitMap(pTextBuffer);
 
 	systemUnuse();
 	viewLoad(s_pView);
 }
 
-void sorryGsLoop(void) {
+static void sorryGsLoop(void) {
 	if(
 		keyUse(KEY_RETURN) || keyUse(KEY_ESCAPE) || keyUse(KEY_SPACE) ||
 		joyUse(JOY1_FIRE) || joyUse(JOY2_FIRE)
 	) {
-		gameClose();
+		statePopAll(g_pGameStateManager);
 		return;
 	}
 	vPortWaitForEnd(s_pVp);
 }
 
-void sorryGsDestroy(void) {
+static void sorryGsDestroy(void) {
 	systemUse();
 	viewDestroy(s_pView);
 	fontDestroy(s_pFont);
 }
+
+tState g_sStateSorry = {
+	.cbCreate = sorryGsCreate, .cbLoop = sorryGsLoop, .cbDestroy = sorryGsDestroy
+};

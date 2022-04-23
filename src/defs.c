@@ -5,8 +5,8 @@
 #include "defs.h"
 #include "json/json.h"
 #include <ace/managers/log.h>
-
-#include "comm_shop.h"
+#include <comm/page_workshop.h>
+#include <comm/page_warehouse.h>
 #include "hi_score.h"
 #include "menu.h"
 #include "game.h"
@@ -25,6 +25,77 @@ UBYTE g_ubPlansPerAccolade;
 
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[9];
+
+const char * s_pLangDom[] = {
+	// Plan
+	[MSG_PLAN_DONE_AFK] = "planMessages.doneAfk",
+	[MSG_PLAN_NOT_DONE] = "planMessages.notDone",
+	[MSG_PLAN_REMAINING] = "planMessages.remaining",
+	[MSG_PLAN_EXTENDING] = "planMessages.extending",
+	// Hi score
+	[MSG_HI_SCORE_NEW] = "hiScore.new",
+	[MSG_HI_SCORE_PRESS] = "hiScore.press",
+	[MSG_HI_SCORE_WIN_SCORE] = "hiScore.score",
+	[MSG_HI_SCORE_WIN_P1] = "hiScore.winP1",
+	[MSG_HI_SCORE_WIN_P2] = "hiScore.winP2",
+	[MSG_HI_SCORE_DRAW] = "hiScore.draw",
+	// Tutorial
+	[MSG_TUTORIAL_GO_DIG] =  "tutorial.start",
+	[MSG_TUTORIAL_ON_DUG] =  "tutorial.onDugOut",
+	[MSG_TUTORIAL_NEAR_SHOP] = "tutorial.nearShop",
+	[MSG_TUTORIAL_IN_SHOP] = "tutorial.inShop",
+	[MSG_TUTORIAL_ON_MOVE_TO_PLAN] = "tutorial.onMoveToPlan",
+	// Shop
+	[MSG_COMM_TIME_REMAINING] = "shop.timeRemaining",
+	[MSG_COMM_ACCOLADES] = "shop.accolades",
+	[MSG_COMM_REBUKES] = "shop.rebukes",
+	[MSG_COMM_MK] = "shop.mk",
+	[MSG_COMM_UPGRADE_TO_MK] = "shop.upgradeToMk",
+	[MSG_COMM_STOCK] = "shop.stock",
+	[MSG_COMM_BUY] = "shop.buy",
+	[MSG_COMM_EXIT] = "shop.exit",
+	[MSG_COMM_CONFIRM] = "shop.confirm",
+	[MSG_COMM_ALREADY_MAX] = "shop.alreadyMax",
+	[MSG_COMM_ALREADY_FULL] = "shop.alreadyFull",
+	// Challenge
+	[MSG_CHALLENGE_CHECKPOINT] = "challenge.checkpoint",
+	[MSG_CHALLENGE_TELEPORT] = "challenge.teleport",
+	// Misc
+	[MSG_MISC_DRILL_DEPLETED] = "misc.drillDepleted",
+	[MSG_MISC_CARGO_FULL] = "misc.cargoFull",
+	[MSG_MISC_RESTOCK] = "misc.restock",
+	[MSG_MISC_FOUND_BONE] = "misc.foundBone",
+	// HUD
+	[MSG_HUD_P1] = "hud.p1",
+	[MSG_HUD_P2] = "hud.p2",
+	[MSG_HUD_DRILL] = "hud.drill",
+	[MSG_HUD_CARGO] = "hud.cargo",
+	[MSG_HUD_HULL] = "hud.hull",
+	[MSG_HUD_CASH] = "hud.cash",
+	[MSG_HUD_DEPTH] = "hud.depth",
+	[MSG_HUD_PAUSED] = "hud.paused",
+	[MSG_HUD_RESUME] = "hud.resume",
+	[MSG_HUD_QUIT] = "hud.quit",
+	// Loading
+	[MSG_LOADING_GEN_TERRAIN] = "loading.genTerrain",
+	[MSG_LOADING_GEN_BASES] = "loading.genBases",
+	[MSG_LOADING_FINISHING] = "loading.finishing",
+	// Office
+	[MSG_PAGE_MAIN] = "officePages.main",
+	[MSG_PAGE_LIST_MIETEK] = "officePages.listMietek",
+	[MSG_PAGE_LIST_KRYSTYNA] = "officePages.listKrystyna",
+	[MSG_PAGE_LIST_PUTIN] = "officePages.listPutin",
+	[MSG_PAGE_LIST_URZEDAS] = "officePages.listUrzedas",
+	[MSG_PAGE_DOSSIER_KRYSTYNA] = "officePages.dossierKrystyna",
+	[MSG_PAGE_DOSSIER_URZEDAS] = "officePages.dossierUrzedas",
+	[MSG_PAGE_BRIBE] = "officePages.bribe",
+	[MSG_PAGE_FAVOR] = "officePages.favor",
+	[MSG_PAGE_ACCOUNTING] = "officePages.accounting",
+	// Count
+	[MSG_COUNT] = 0
+};
+
+char **g_pMsgs;
 
 const tCodeRemap g_pRemap[19] = {
 	{323, 145}, // "Ń"
@@ -121,60 +192,17 @@ void langCreate(const char *szLangPrefix) {
 	}
 
 	// Shop names
-	g_sShopNames = stringArrayCreateFromDom(pJson, g_pRemap, "shopNames");
-	g_sWarehouseColNames = stringArrayCreateFromDom(pJson, g_pRemap, "warehouseColNames");
+	g_pShopNames = stringArrayCreateFromDom(pJson, g_pRemap, "shopNames");
+	g_pWarehouseColNames = stringArrayCreateFromDom(pJson, g_pRemap, "warehouseColNames");
+	g_pMenuEnumMode = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumMode");
+	g_pMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumPlayerCount");
+	g_pMenuEnumP1 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP1");
+	g_pMenuEnumP2 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP2");
+	g_pMenuEnumOnOff = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumOnOff");
+	g_pMenuCaptions = stringArrayCreateFromDom(pJson, g_pRemap, "menu.captions");
+	g_pMineralNames = stringArrayCreateFromDom(pJson, g_pRemap, "minerals");
 
-	// Plan messages
-	g_sPlanMessages = stringArrayCreateFromDomElements(
-		pJson, g_pRemap, MSG_PLAN_COUNT, "planMessages.doneAfk",
-		"planMessages.notDone", "planMessages.remaining", "planMessages.extending"
-	);
-
-	// Hi score messages
-	g_sHiScoreMessages = stringArrayCreateFromDomElements(
-		pJson, g_pRemap, MSG_HI_SCORE_COUNT, "hiScore.new", "hiScore.press",
-		"hiScore.score", "hiScore.winP1", "hiScore.winP2", "hiScore.draw"
-	);
-
-	g_sMenuEnumMode = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumMode");
-	g_sMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumPlayerCount");
-	g_sMenuEnumP1 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP1");
-	g_sMenuEnumP2 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP2");
-	g_sMenuEnumOnOff = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumOnOff");
-	g_sMenuCaptions = stringArrayCreateFromDom(pJson, g_pRemap, "menu.captions");
-	g_sMineralNames = stringArrayCreateFromDom(pJson, g_pRemap, "minerals");
-	g_sLoadMsgs = stringArrayCreateFromDom(pJson, g_pRemap, "loadMsgs");
-
-	g_sTutorialMsgs = stringArrayCreateFromDomElements(
-		pJson, g_pRemap, 5, "tutorial.start", "tutorial.onDugOut", "tutorial.nearShop",
-		"tutorial.inShop", "tutorial.onMoveToPlan"
-	);
-
-	g_sShopMsgs = stringArrayCreateFromDomElements(
-		pJson, g_pRemap, 11, "shop.timeRemaining", "shop.accolades", "shop.rebukes",
-		"shop.mk", "shop.upgradeToMk", "shop.stock", "shop.buy", "shop.exit",
-		"shop.confirm", "shop.alreadyMax", "shop.alreadyFull"
-	);
-
-	g_sMessages = stringArrayCreateFromDomElements(
-		pJson, g_pRemap, MSG_COUNT, "challengeCheckpoint", "challengeTeleport",
-		"drillDepleted", "cargoFull", "restock", "foundBone"
-	);
-
-	g_sMsgHud = stringArrayCreateFromDomElements(
-		pJson, g_pRemap, MSG_HUD_COUNT, "hud.p1", "hud.p2", "hud.drill",
-		"hud.cargo", "hud.hull", "hud.cash", "hud.depth",
-		"hud.paused", "hud.resume", "hud.quit"
-	);
-
-	g_sOfficePageNames = stringArrayCreateFromDomElements(
-		pJson, g_pRemap, 10,
-		"officePages.main", "officePages.listMietek", "officePages.listKrystyna",
-		"officePages.listPutin", "officePages.listUrzedas",
-		"officePages.dossierKrystyna", "officePages.dossierUrzedas",
-		"officePages.bribe", "officePages.favor",
-		"officePages.accounting"
-	);
+	g_pMsgs = stringArrayCreateFromDomElements(pJson, g_pRemap, s_pLangDom);
 
 	jsonDestroy(pJson);
 	logBlockEnd("langCreate()");
@@ -182,25 +210,15 @@ void langCreate(const char *szLangPrefix) {
 
 void langDestroy(void) {
 	logBlockBegin("langDestroy()");
-	stringArrayDestroy(&g_sOfficePageNames);
-	stringArrayDestroy(&g_sShopMsgs);
-	stringArrayDestroy(&g_sShopNames);
-	stringArrayDestroy(&g_sWarehouseColNames);
-
-	stringArrayDestroy(&g_sPlanMessages);
-	stringArrayDestroy(&g_sHiScoreMessages);
-
-	stringArrayDestroy(&g_sMenuEnumMode);
-	stringArrayDestroy(&g_sMenuEnumPlayerCount);
-	stringArrayDestroy(&g_sMenuEnumP1);
-	stringArrayDestroy(&g_sMenuEnumP2);
-	stringArrayDestroy(&g_sMenuEnumOnOff);
-	stringArrayDestroy(&g_sMenuCaptions);
-	stringArrayDestroy(&g_sMineralNames);
-	stringArrayDestroy(&g_sLoadMsgs);
-
-	stringArrayDestroy(&g_sTutorialMsgs);
-	stringArrayDestroy(&g_sMessages);
-	stringArrayDestroy(&g_sMsgHud);
+	stringArrayDestroy(g_pShopNames);
+	stringArrayDestroy(g_pWarehouseColNames);
+	stringArrayDestroy(g_pMenuEnumMode);
+	stringArrayDestroy(g_pMenuEnumPlayerCount);
+	stringArrayDestroy(g_pMenuEnumP1);
+	stringArrayDestroy(g_pMenuEnumP2);
+	stringArrayDestroy(g_pMenuEnumOnOff);
+	stringArrayDestroy(g_pMenuCaptions);
+	stringArrayDestroy(g_pMineralNames);
+	stringArrayDestroy(g_pMsgs);
 	logBlockEnd("langDestroy()");
 }

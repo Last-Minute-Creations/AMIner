@@ -118,10 +118,10 @@ void explosionAdd(
 		s_pExplosionNext->sBob.pMask = s_pBoomFramesMask;
 	}
 	bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
-	audioPlay(
-		EXPLOSION_AUDIO_CHANNEL, isTeleport ? s_pSampleTeleport : s_pSampleBoom,
-		AUDIO_VOLUME_MAX, 1
-	);
+	// audioPlay(
+	// 	EXPLOSION_AUDIO_CHANNEL, isTeleport ? s_pSampleTeleport : s_pSampleBoom,
+	// 	AUDIO_VOLUME_MAX, 1
+	// );
 }
 
 void explosionManagerProcess(void) {

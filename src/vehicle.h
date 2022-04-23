@@ -16,16 +16,6 @@
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 24
 
-typedef enum _tMsgName {
-	MSG_CHALLENGE_CHECKPOINT,
-	MSG_CHALLENGE_TELEPORT,
-	MSG_DRILL_DEPLETED,
-	MSG_CARGO_FULL,
-	MSG_RESTOCK,
-	MSG_FOUND_BONE,
-	MSG_COUNT
-} tMsgName;
-
 typedef enum _tDrillDir {
 	DRILL_DIR_NONE = 0,
 	DRILL_DIR_H,
@@ -132,6 +122,5 @@ uint8_t vehiclesAreClose(void);
 void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY);
 
 extern tVehicle g_pVehicles[2];
-extern tStringArray g_sMessages;
 
 #endif // _VEHICLE_H_

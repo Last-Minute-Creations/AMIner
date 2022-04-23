@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "comm.h"
-#include "core.h"
-#include "steer.h"
-#include "game.h"
+#include "base.h"
 #include <ace/managers/audio.h>
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
+#include "../core.h"
+#include "../steer.h"
+#include "../game.h"
 
 typedef enum _tBtnState {
 	BTN_STATE_NACTIVE = 0,
@@ -19,11 +19,13 @@ typedef enum _tBtnState {
 static tBitMap *s_pBmRestore;
 static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
+static UBYTE s_pNavEx[COMM_NAV_EX_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
 static tTextBitMap *s_pLineBuffer;
 static UBYTE s_isShown = 0;
 static tSample *s_pSamplesKeyPress[4];
 static tSample *s_pSamplesKeyRelease[4];
+tBitMap *g_pCommBmFaces, *g_pCommBmSelection;
 
 void commCreate(void) {
 	systemUse();
@@ -33,7 +35,9 @@ void commCreate(void) {
 	);
 	s_pBg = bitmapCreateFromFile("data/comm_bg.bm", 0);
 	s_pButtons = bitmapCreateFromFile("data/comm_buttons.bm", 0);
-	s_pLineBuffer = fontCreateTextBitMap(COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
+	s_pLineBuffer = fontCreateTextBitMap(
+		ROUND_TO_MULTIPLE(COMM_DISPLAY_WIDTH, 16), g_pFont->uwHeight
+	);
 
 	for(UBYTE i = 0; i < 4; ++i) {
 		char szPath[40];
@@ -43,6 +47,9 @@ void commCreate(void) {
 		s_pSamplesKeyRelease[i] = sampleCreateFromFile(szPath, 48000);
 	}
 	systemUnuse();
+
+	g_pCommBmFaces = bitmapCreateFromFile("data/comm_faces_office.bm", 0);
+	g_pCommBmSelection = bitmapCreateFromFile("data/comm_office_selection.bm", 0);
 
 	s_isShown = 0;
 }
@@ -58,6 +65,10 @@ void commDestroy(void) {
 	bitmapDestroy(s_pBg);
 	bitmapDestroy(s_pButtons);
 	fontDestroyTextBitMap(s_pLineBuffer);
+
+	bitmapDestroy(g_pCommBmFaces);
+	bitmapDestroy(g_pCommBmSelection);
+
 	systemUnuse();
 }
 
@@ -73,7 +84,7 @@ void commSetActiveLed(tCommLed eLed) {
 		blitCopy(
 			s_pButtons, 0, (i == eLed ? ubGrnLedY : 0),
 			s_pBmDraw, sOrigin.uwX + pLedX[i], sOrigin.uwY + ubLedY,
-			ubLedWidth, ubLedHeight, MINTERM_COOKIE, 0xFF
+			ubLedWidth, ubLedHeight, MINTERM_COOKIE
 		);
 	}
 }
@@ -126,26 +137,60 @@ void commProcess(void) {
 	for(UBYTE i = 0; i < COMM_NAV_COUNT; ++i) {
 		if(pTests[i]) {
 			if(s_pNav[i] == BTN_STATE_NACTIVE) {
-				audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyPress[ubRand() & 3], AUDIO_VOLUME_MAX, 1);
+				// audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyPress[uwRand() & 3], AUDIO_VOLUME_MAX, 1);
 				s_pNav[i] = BTN_STATE_ACTIVE;
 				blitCopy(
 					s_pButtons, 0, pBtnPos[i][2], s_pBmDraw,
 					sOrigin.uwX + pBtnPos[i][0],
 					sOrigin.uwY + pBtnPos[i][1],
-					16, pBtnPos[i][3], MINTERM_COOKIE, 0xFF
+					16, pBtnPos[i][3], MINTERM_COOKIE
 				);
 			}
 		}
 		else if(s_pNav[i] != BTN_STATE_NACTIVE) {
-			audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyRelease[ubRand() & 3], AUDIO_VOLUME_MAX, 1);
+			// audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyRelease[uwRand() & 3], AUDIO_VOLUME_MAX, 1);
 			s_pNav[i] = BTN_STATE_NACTIVE;
 			blitCopy(
 				s_pButtons, 0, pBtnPos[i][2] + pBtnPos[i][3], s_pBmDraw,
 				sOrigin.uwX + pBtnPos[i][0],
 				sOrigin.uwY + pBtnPos[i][1],
-				16, pBtnPos[i][3], MINTERM_COOKIE, 0xFF
+				16, pBtnPos[i][3], MINTERM_COOKIE
 			);
 		}
+	}
+
+	// Process ex events
+	static UBYTE isShift = 0;
+	static UBYTE wasShiftAction = 0;
+	if(commNavCheck(COMM_NAV_BTN)) {
+		isShift = 1;
+	}
+	else {
+		s_pNavEx[COMM_NAV_EX_BTN_CLICK] = BTN_STATE_NACTIVE;
+		if(isShift) {
+			if(!wasShiftAction) {
+				// Btn released and no other pressed in the meantime
+				s_pNavEx[COMM_NAV_EX_BTN_CLICK] = BTN_STATE_ACTIVE;
+			}
+			isShift = 0;
+			wasShiftAction = 0;
+		}
+	}
+
+	// Tab nav using shift+left / shift+right
+	if(isShift) {
+		if(commNavUse(COMM_NAV_LEFT)) {
+			s_pNavEx[COMM_NAV_EX_SHIFT_LEFT] = BTN_STATE_ACTIVE;
+			wasShiftAction = 1;
+		}
+		else if(commNavUse(COMM_NAV_RIGHT)) {
+			s_pNavEx[COMM_NAV_EX_SHIFT_RIGHT] = BTN_STATE_ACTIVE;
+			wasShiftAction = 1;
+		}
+	}
+	else {
+		s_pNavEx[COMM_NAV_EX_SHIFT_LEFT] = BTN_STATE_NACTIVE;
+		s_pNavEx[COMM_NAV_EX_SHIFT_RIGHT] = BTN_STATE_NACTIVE;
 	}
 }
 
@@ -163,6 +208,14 @@ UBYTE commNavUse(tCommNav eNav) {
 	return 0;
 }
 
+UBYTE commNavExUse(tCommNavEx eNavEx) {
+	if(s_pNavEx[eNavEx] == BTN_STATE_ACTIVE) {
+		s_pNavEx[eNavEx] = BTN_STATE_USED;
+		return 1;
+	}
+	return 0;
+}
+
 void commHide(void) {
 	if(!s_isShown) {
 		return;
@@ -174,6 +227,10 @@ void commHide(void) {
 		s_pBmRestore, 0, 0, s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
 		COMM_WIDTH, COMM_HEIGHT
 	);
+}
+
+tBitMap *commGetDisplayBuffer(void) {
+	return s_pBmDraw;
 }
 
 tUwCoordYX commGetOrigin(void) {
@@ -202,13 +259,48 @@ tUwCoordYX commGetOriginDisplay(void) {
 void commDrawText(
 	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
 ) {
-	fontFillTextBitMap(g_pFont, s_pLineBuffer, szText);
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
-	fontDrawTextBitMap(
-		s_pBmDraw, s_pLineBuffer,
-		sOrigin.uwX + uwX, sOrigin.uwY + uwY, ubColor, ubFontFlags
+	fontDrawStr(
+		g_pFont, s_pBmDraw, sOrigin.uwX + uwX, sOrigin.uwY + uwY,
+		szText, ubColor, ubFontFlags, s_pLineBuffer
 	);
 }
+
+UBYTE commDrawMultilineText(
+	const char *szText, UWORD uwStartX, UWORD uwStartY
+) {
+	UWORD uwTextOffs = 0;
+	UBYTE ubLinesWritten = 0;
+	UWORD uwCurrY = uwStartY;
+	UBYTE ubLineHeight = commGetLineHeight();
+	char szLineBfr[50];
+	do {
+		// Measure chars in line
+		UBYTE ubCharsInLine = commBreakTextToWidth(
+			&szText[uwTextOffs], COMM_DISPLAY_WIDTH - uwStartX
+		);
+
+		// Copy to line buffer and draw
+		memcpy(szLineBfr, &szText[uwTextOffs], ubCharsInLine);
+		szLineBfr[ubCharsInLine] = '\0';
+		if(szLineBfr[ubCharsInLine - 1] == '\n') {
+			szLineBfr[ubCharsInLine - 1] = ' ';
+		}
+		commDrawText(uwStartX, uwCurrY, szLineBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+
+		// Advance
+		uwTextOffs += ubCharsInLine;
+		++ubLinesWritten;
+		uwCurrY += ubLineHeight;
+	} while(szText[uwTextOffs] != '\0');
+
+	return ubLinesWritten;
+}
+
+UBYTE commGetLineHeight(void) {
+	return g_pFont->uwHeight + 1;
+}
+
 
 void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight) {
 	const tUwCoordYX sPosDisplay = commGetOriginDisplay();
@@ -271,4 +363,55 @@ void commProgress(UBYTE ubPercent, const char *szDescription) {
 		ubBarWidth * ubPercent / 100, ubBarHeight, COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
+}
+
+UBYTE commBreakTextToWidth(const char *szInput, UWORD uwMaxLineWidth) {
+	UWORD uwLineWidth = 0;
+	UBYTE ubCharsInLine = 0;
+	UBYTE ubLastSpace = 0xFF; // next char, actually
+
+	while(*szInput != '\0') {
+		UBYTE ubCharWidth = fontGlyphWidth(g_pFont, *szInput) + 1;
+		if(uwLineWidth + ubCharWidth >= uwMaxLineWidth) {
+			if(ubLastSpace != 0xFF) {
+				ubCharsInLine = ubLastSpace;
+			}
+			break;
+		}
+		uwLineWidth += ubCharWidth;
+		ubCharsInLine++;
+		if(*szInput == ' ') {
+			ubLastSpace = ubCharsInLine;
+		}
+		else if(*szInput == '\n') {
+			break;
+		}
+		++szInput;
+	}
+	return ubCharsInLine;
+}
+
+tPageProcess s_pPageProcess = 0;
+tPageCleanup s_pPageCleanup = 0;
+
+void commRegisterPage(tPageProcess cbProcess, tPageCleanup cbCleanup) {
+	logBlockBegin(
+		"commRegisterPage(cbProcess: %p, cbCleanup: %p)", cbProcess, cbCleanup
+	);
+	if(s_pPageCleanup) {
+		s_pPageCleanup();
+	}
+	commEraseAll();
+
+	s_pPageProcess = cbProcess;
+	s_pPageCleanup = cbCleanup;
+	logBlockEnd("commRegisterPage()");
+}
+
+UBYTE commProcessPage(void) {
+	if(s_pPageProcess) {
+		s_pPageProcess();
+		return 1;
+	}
+	return 0;
 }

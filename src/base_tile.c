@@ -15,8 +15,8 @@ tTileBufferManager *s_pManager;
 static void baseTileLoad(UBYTE ubBaseIdx) {
 	const tBitMap *pBase = s_pBaseTiles[ubBaseIdx];
 	tBitMap *pTiles = s_pManager->pTileSet;
-	CopyMemQuick(
-		pBase->Planes[0], pTiles->Planes[0],
+	memcpy(
+		pTiles->Planes[0], pBase->Planes[0],
 		pBase->Rows * pBase->BytesPerRow
 	);
 	s_ubBaseCurrent = ubBaseIdx;
@@ -45,18 +45,18 @@ void baseTileProcess(void) {
 		tBitMap *pTiles = s_pManager->pTileSet;
 		if(uwCamY >= TILE_ROW_CHALLENGE_CHECKPOINT_3 * 32) {
 			if(!s_isFinishLoaded) {
-				CopyMem(
-					&s_pCheckpointTiles->Planes[0][10 * TILE_BYTE_COUNT],
+				memcpy(
 					&pTiles->Planes[0][TILE_CHECKPOINT_1 * TILE_BYTE_COUNT],
+					&s_pCheckpointTiles->Planes[0][10 * TILE_BYTE_COUNT],
 					10 * TILE_BYTE_COUNT
 				);
 				s_isFinishLoaded = 1;
 			}
 		}
 		else if(s_isFinishLoaded) {
-			CopyMem(
-				s_pCheckpointTiles->Planes[0],
+			memcpy(
 				&pTiles->Planes[0][TILE_CHECKPOINT_1 * TILE_BYTE_COUNT],
+				s_pCheckpointTiles->Planes[0],
 				10 * TILE_BYTE_COUNT
 			);
 			s_isFinishLoaded = 0;

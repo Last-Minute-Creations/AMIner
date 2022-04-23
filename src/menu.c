@@ -4,7 +4,8 @@
 
 #include "menu.h"
 #include <ace/managers/joy.h>
-#include <ace/managers/game.h>
+#include <ace/managers/key.h>
+#include <comm/base.h>
 #include "game.h"
 #include "bob_new.h"
 #include "text_bob.h"
@@ -12,7 +13,6 @@
 #include "build_ver.h"
 #include "base_tile.h"
 #include "hi_score.h"
-#include "comm.h"
 #include "hud.h"
 #include "core.h"
 
@@ -40,7 +40,7 @@ typedef struct _tOption {
 			UBYTE ubMax;
 			UBYTE ubDefault;
 			UBYTE isCyclic;
-			const tStringArray *pEnumLabels;
+			char *** const pEnumLabels;
 		} sOptUb;
 		struct {
 			tOptionSelectCb cbSelect;
@@ -52,30 +52,32 @@ void onStart(void);
 void onExit(void);
 void onShowScores(void);
 
-tStringArray g_sMenuCaptions, g_sMenuEnumMode,
-	g_sMenuEnumP1, g_sMenuEnumP2, g_sMenuEnumOnOff, g_sMenuEnumPlayerCount;
+char **g_pMenuCaptions, **g_pMenuEnumMode, **g_pMenuEnumP1, **g_pMenuEnumP2,
+	**g_pMenuEnumOnOff, **g_pMenuEnumPlayerCount;
+
+static tState s_sStateMenuScore;
 
 static tOption s_pOptions[] = {
 	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onStart}},
 	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_isChallenge, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
-		.pEnumLabels = &g_sMenuEnumMode
+		.pEnumLabels = &g_pMenuEnumMode
 	}},
 	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_is2pPlaying, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
-		.pEnumLabels = &g_sMenuEnumPlayerCount
+		.pEnumLabels = &g_pMenuEnumPlayerCount
 	}},
 	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_is1pKbd, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
-		.pEnumLabels = &g_sMenuEnumP1
+		.pEnumLabels = &g_pMenuEnumP1
 	}},
 	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_is2pKbd, .ubMax = 1, .isCyclic = 1, .ubDefault = 1,
-		.pEnumLabels = &g_sMenuEnumP2
+		.pEnumLabels = &g_pMenuEnumP2
 	}},
 	{OPTION_TYPE_UINT8, .isHidden = 1, .sOptUb = {
 		.pVar = &g_isAtari, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
-		.pEnumLabels = &g_sMenuEnumOnOff
+		.pEnumLabels = &g_pMenuEnumOnOff
 	}},
 	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onShowScores}},
 	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onExit}},
@@ -99,21 +101,22 @@ static void menuDrawPos(UBYTE ubPos, UWORD uwOffsTop) {
 	if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_UINT8) {
 		if(s_pOptions[ubPos].sOptUb.pEnumLabels) {
 			sprintf(
-				szBfr, "%s: %s", g_sMenuCaptions.pStrings[ubPos],
-				s_pOptions[ubPos].sOptUb.pEnumLabels->pStrings[*s_pOptions[ubPos].sOptUb.pVar]
+				szBfr, "%s: %s", g_pMenuCaptions[ubPos],
+				(*s_pOptions[ubPos].sOptUb.pEnumLabels)[*s_pOptions[ubPos].sOptUb.pVar]
 			);
 		}
 		else {
 			sprintf(
-				szBfr, "%s: %hhu", g_sMenuCaptions.pStrings[ubPos],
+				szBfr, "%s: %hhu", g_pMenuCaptions[ubPos],
 				*s_pOptions[ubPos].sOptUb.pVar
 			);
 		}
 		szText = szBfr;
 	}
 	else if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_CALLBACK) {
-		szText = g_sMenuCaptions.pStrings[ubPos];
+		szText = g_pMenuCaptions[ubPos];
 	}
+
 	if(szText != 0) {
 		commDrawText(COMM_DISPLAY_WIDTH / 2, uwOffsY, szText,
 			FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW,
@@ -189,7 +192,7 @@ static void menuEnableAtari(void) {
 	UBYTE isAtariHidden = s_pOptions[5].isHidden;
 	if(isAtariHidden) {
 		menuSetHidden(5, 0);
-		audioPlay(AUDIO_CHANNEL_1, s_pSampleAtari, AUDIO_VOLUME_MAX, 1);
+		// audioPlay(AUDIO_CHANNEL_1, s_pSampleAtari, AUDIO_VOLUME_MAX, 1);
 		s_pOptions[5].isDirty = 1;
 	}
 }
@@ -203,17 +206,14 @@ void onStart(void) {
 	s_eMenuState = MENU_STATE_ROLL_OUT;
 }
 
-void menuGsLoopScore(void);
-
 void onShowScores(void) {
 	commEraseAll();
 	hiScoreSetup(0, 0);
-	hiScoreDrawAll();
-	gameChangeLoop(menuGsLoopScore);
+	statePush(g_pGameStateManager, &s_sStateMenuScore);
 }
 
 void onExit(void) {
-	gameClose();
+	statePopAll(g_pGameStateManager);
 }
 
 void menuInitialDraw(tBitMap *pDisplayBuffer) {
@@ -223,11 +223,12 @@ void menuInitialDraw(tBitMap *pDisplayBuffer) {
 	blitCopy(
 		s_pLogo, 0, 0, pDisplayBuffer,
 		sOrigin.uwX + (COMM_DISPLAY_WIDTH - uwLogoWidth) / 2, sOrigin.uwY,
-		uwLogoWidth, s_pLogo->Rows, MINTERM_COOKIE, 0xFF
+		uwLogoWidth, s_pLogo->Rows, MINTERM_COOKIE
 	);
 
 	char szVersion[15];
 	sprintf(szVersion, "v.%d.%d.%d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
+
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szVersion,
 		FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW | FONT_BOTTOM,
@@ -249,7 +250,7 @@ void menuUnload(void) {
 	sampleDestroy(s_pSampleAtari);
 }
 
-void menuGsCreate(void) {
+static void menuGsCreate(void) {
 	s_eMenuState = MENU_STATE_ROLL_IN;
 	hudShowMain();
 }
@@ -257,16 +258,6 @@ void menuGsCreate(void) {
 static void menuProcessSelecting(void) {
 	commProcess();
 	hudUpdate();
-
-	UBYTE isBtnPress = 0;
-	static UBYTE isShift = 0;
-	if(commNavCheck(COMM_NAV_BTN)) {
-		isShift = 1;
-	}
-	else if(isShift) {
-		isBtnPress = 1;
-		isShift = 0;
-	}
 
 	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
 		if(!s_pOptions[ubMenuPos].isHidden && s_pOptions[ubMenuPos].isDirty) {
@@ -292,7 +283,7 @@ static void menuProcessSelecting(void) {
 		ubNewKey = KEY_RIGHT;
 		menuToggle(+1);
 	}
-	else if(isBtnPress) {
+	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		menuEnter();
 	}
 
@@ -333,8 +324,7 @@ static void menuProcessRollIn(void) {
 			// TODO do something
 		}
 		if(s_isScoreShowAfterRollIn) {
-			hiScoreDrawAll();
-			gameChangeLoop(menuGsLoopScore);
+			statePush(g_pGameStateManager, &s_sStateMenuScore);
 		}
 		else {
 			menuInitialDraw(g_pMainBuffer->pScroll->pBack);
@@ -352,14 +342,14 @@ static void menuProcessRollOut(void) {
 		*pCamY -= 4;
 	}
 	else {
-		gameChangeState(gameGsCreate, gameGsLoop, gameGsDestroy);
+		stateChange(g_pGameStateManager, &g_sStateGame);
 	}
 	coreProcessAfterBobs();
 }
 
-void menuGsLoop(void) {
+static void menuGsLoop(void) {
   if(keyUse(KEY_ESCAPE)) {
-    gameClose();
+    statePopAll(g_pGameStateManager);
 		return;
   }
 
@@ -375,23 +365,30 @@ void menuGsLoop(void) {
 	}
 }
 
-void menuGsLoopScore(void) {
+static void menuGsDestroy(void) {
+
+}
+
+static void menuScoreGsCreate(void) {
+	hiScoreDrawAll();
+}
+
+static void menuScoreGsLoop(void) {
 	commProcess();
-	if(hiScoreIsEntering()) {
+	if(hiScoreIsEnteringNew()) {
 		hiScoreEnteringProcess();
 	}
 	else {
-		if(commNavUse(COMM_NAV_BTN)) {
-			menuInitialDraw(g_pMainBuffer->pScroll->pFront);
-			gameChangeLoop(menuGsLoop);
+		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+			statePop(g_pGameStateManager);
 			return;
 		}
 	}
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 }
 
-void menuGsDestroy(void) {
-
+static void menuScoreGsDestroy(void) {
+	menuInitialDraw(g_pMainBuffer->pScroll->pFront);
 }
 
 void menuGsEnter(UBYTE isScoreShow) {
@@ -400,5 +397,13 @@ void menuGsEnter(UBYTE isScoreShow) {
 	if(!isScoreShow) {
 		hudReset(0, 0);
 	}
-	gameChangeState(menuGsCreate, menuGsLoop, menuGsDestroy);
+	stateChange(g_pGameStateManager, &g_sStateMenu);
 }
+
+tState g_sStateMenu = {
+	.cbCreate = menuGsCreate, .cbLoop = menuGsLoop, .cbDestroy = menuGsDestroy
+};
+
+static tState s_sStateMenuScore = {
+	.cbCreate = menuScoreGsCreate, .cbLoop = menuScoreGsLoop, .cbDestroy = menuScoreGsDestroy
+};

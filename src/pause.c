@@ -1,5 +1,4 @@
 #include "pause.h"
-#include <ace/managers/game.h>
 #include "hud.h"
 #include "game.h"
 #include "core.h"
@@ -21,7 +20,7 @@ void pauseGsLoop(void) {
 	}
 	else if(steerGet(STEER_P1_FIRE) || steerGet(STEER_P2_FIRE)) {
 		if(hudGetSelection() == 0) {
-			gameChangeState(gameGsCreate, gameGsLoop, gameGsDestroy);
+			stateChange(g_pGameStateManager, &g_sStateGame);
 		}
 		else {
 			menuGsEnter(0);
@@ -39,3 +38,7 @@ void pauseGsLoop(void) {
 void pauseGsDestroy(void) {
 	hudPause(0);
 }
+
+tState g_sStatePause = {
+	.cbCreate = pauseGsCreate, .cbLoop = pauseGsLoop, .cbDestroy = pauseGsDestroy
+};
