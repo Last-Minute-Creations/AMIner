@@ -35,28 +35,33 @@ static void readLines(
 	// Read whole file to plain buffer
 	char szFileContents[fileGetSize(szFilePath)];
 	tFile *pFileLines = fileOpen(szFilePath, "r");
+
 	if(!pFileLines) {
 		logWrite("ERR: Couldn't read lines from '%s'\n", szFilePath);
 		logBlockEnd("readLines()");
 		systemUnuse();
 		return;
 	}
+
 	UWORD uwTextLength = 0;
 	ULONG ulCodepoint, ulState = 0;
-	while(!fileIsEof(pFileLines)) {
-		UBYTE ubCharCode;
-		fileRead(pFileLines, &ubCharCode, 1);
+	UBYTE ubCharCode;
+
+	while(fileRead(pFileLines, &ubCharCode, 1)) {
 		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
 			continue;
 		}
+
 		if(pRemap) {
 			ubCharCode = remapChar(pRemap, ulCodepoint);
 		}
 		else {
 			ubCharCode = ulCodepoint;
 		}
+
 		szFileContents[uwTextLength++] = ubCharCode;
 	}
+
 	fileClose(pFileLines);
 
 	// Split text into lines
@@ -68,6 +73,7 @@ static void readLines(
 		s_pLines[s_uwLineCount] = memAllocFast(ubLineLength + 1);
 		memcpy(s_pLines[s_uwLineCount], &szFileContents[uwPos], ubLineLength);
 		s_pLines[s_uwLineCount][ubLineLength] = '\0';
+
 		if(s_pLines[s_uwLineCount][ubLineLength - 1] == '\n') {
 			s_pLines[s_uwLineCount][ubLineLength - 1] = ' ';
 		}
