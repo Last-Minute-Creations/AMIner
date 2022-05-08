@@ -378,20 +378,29 @@ UBYTE commBreakTextToWidth(const char *szInput, UWORD uwMaxLineWidth) {
 
 	while(*szInput != '\0') {
 		UBYTE ubCharWidth = fontGlyphWidth(g_pFont, *szInput) + 1;
+
 		if(uwLineWidth + ubCharWidth >= uwMaxLineWidth) {
 			if(ubLastSpace != 0xFF) {
 				ubCharsInLine = ubLastSpace;
 			}
+
 			break;
 		}
+
 		uwLineWidth += ubCharWidth;
 		ubCharsInLine++;
+
 		if(*szInput == ' ') {
 			ubLastSpace = ubCharsInLine;
+		}
+		else if(*szInput == '\r') {
+			logWrite("ERR: CR character detected - use LF line endings!");
+			break;
 		}
 		else if(*szInput == '\n') {
 			break;
 		}
+
 		++szInput;
 	}
 	return ubCharsInLine;
