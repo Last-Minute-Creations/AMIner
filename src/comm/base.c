@@ -301,12 +301,18 @@ UBYTE commGetLineHeight(void) {
 	return g_pFont->uwHeight + 1;
 }
 
-
 void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight) {
+#if defined(COMM_DEBUG)
+	static UBYTE ubDebugColor = 0;
+	const UBYTE ubClearColor = ubDebugColor;
+	ubDebugColor = (ubDebugColor + 1) & 31;
+#else
+	const UBYTE ubClearColor = COMM_DISPLAY_COLOR_BG;
+#endif
 	const tUwCoordYX sPosDisplay = commGetOriginDisplay();
 	blitRect(
 		s_pBmDraw, sPosDisplay.uwX + uwX, sPosDisplay.uwY + uwY,
-		uwWidth, uwHeight, COMM_DISPLAY_COLOR_BG
+		uwWidth, uwHeight, ubClearColor
 	);
 }
 
