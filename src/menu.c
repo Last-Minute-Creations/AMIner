@@ -10,7 +10,6 @@
 #include "bob_new.h"
 #include "text_bob.h"
 #include "ground_layer.h"
-#include "build_ver.h"
 #include "base_tile.h"
 #include "hi_score.h"
 #include "hud.h"
@@ -226,9 +225,7 @@ void menuInitialDraw(tBitMap *pDisplayBuffer) {
 		uwLogoWidth, s_pLogo->Rows, MINTERM_COOKIE
 	);
 
-	char szVersion[15];
-	sprintf(szVersion, "v.%d.%d.%d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
-
+	const char szVersion[15] = "v." AMINER_VERSION;
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szVersion,
 		FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW | FONT_BOTTOM,
