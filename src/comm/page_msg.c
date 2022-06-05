@@ -119,10 +119,17 @@ static void commMsgDrawPage(UBYTE ubPage) {
 
 static void pageMsgProcess(void) {
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		if(s_cbOnClose) {
-			s_cbOnClose();
+		if(s_ubCurrPage < s_ubPageCount - 1) {
+			++s_ubCurrPage;
+			commMsgDrawPage(s_ubCurrPage);
 		}
-		return;
+		else {
+			if(s_cbOnClose) {
+				s_cbOnClose();
+			}
+
+			return;
+		}
 	}
 
 	if(s_ubCurrPage > 0 && commNavUse(COMM_NAV_UP)) {
