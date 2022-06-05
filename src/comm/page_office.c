@@ -9,6 +9,8 @@
 #include <comm/page_bribe.h>
 #include <comm/page_accounting.h>
 
+#define PPL_PER_ROW 4
+
 /**
  * @brief List of people in the office.
  * Must be the exact same order as in office page list!
@@ -49,12 +51,12 @@ static BYTE s_bSelectionCurr, s_bSelectionCount;
 //------------------------------------------------------------- OFFICE PAGE MAIN
 
 static void officeDrawFaceAtPos(BYTE bPos) {
-	const UBYTE ubSpaceX = (COMM_DISPLAY_WIDTH - 2*2 - 4 * 32) / 3;
+	const UBYTE ubSpaceX = (COMM_DISPLAY_WIDTH - 2*2 - PPL_PER_ROW * 32) / 3;
 	const UBYTE ubSpaceY = 10;
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
 
-	UWORD uwX = sOrigin.uwX + 2 + (bPos % 4) * (32 + ubSpaceX);
-	UWORD uwY = sOrigin.uwY + 2 + (bPos / 4) * (32 + ubSpaceY);
+	UWORD uwX = sOrigin.uwX + 2 + (bPos % PPL_PER_ROW) * (32 + ubSpaceX);
+	UWORD uwY = sOrigin.uwY + 2 + (bPos / PPL_PER_ROW) * (32 + ubSpaceY);
 
 	tBitMap *pBmDraw = commGetDisplayBuffer();
 	blitRect(pBmDraw, uwX - 2, uwY - 2, 36, 36, COMM_DISPLAY_COLOR_BG);
@@ -75,6 +77,7 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 
 static void pageOfficeProcess(void) {
 	BYTE bOldSelection = s_bSelectionCurr;
+
 	if(commNavUse(COMM_NAV_LEFT)) {
 		--s_bSelectionCurr;
 	}
@@ -82,17 +85,20 @@ static void pageOfficeProcess(void) {
 		++s_bSelectionCurr;
 	}
 	else if(commNavUse(COMM_NAV_DOWN)) {
-		s_bSelectionCurr += 4;
+		s_bSelectionCurr += PPL_PER_ROW;
 	}
-	else if(commNavUse(COMM_NAV_UP)) {
-		s_bSelectionCurr -= 4;
+	else if(commNavUse(COMM_NAV_UP)){
+		s_bSelectionCurr -= PPL_PER_ROW;
 	}
+
 	while(s_bSelectionCurr < 0) {
 		s_bSelectionCurr += s_bSelectionCount;
 	}
+
 	while(s_bSelectionCurr >= s_bSelectionCount) {
 		s_bSelectionCurr -= s_bSelectionCount;
 	}
+
 	if(s_bSelectionCurr != bOldSelection) {
 		officeDrawFaceAtPos(bOldSelection);
 		officeDrawFaceAtPos(s_bSelectionCurr);
@@ -105,6 +111,7 @@ static void pageOfficeProcess(void) {
 
 void pageOfficeCreate(void) {
 	commRegisterPage(pageOfficeProcess, 0);
+	s_bSelectionCount = 0;
 	for(tOfficePpl i = 0; i < OFFICE_PPL_COUNT; ++i) {
 		if(s_pActivePpl[i] == OFFICE_PPL_COUNT) {
 			break;
