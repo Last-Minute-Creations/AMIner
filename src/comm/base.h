@@ -45,17 +45,23 @@ typedef enum _tCommLed {
 	COMM_LED_COUNT
 } tCommLed;
 
+typedef enum _tBtnState {
+	BTN_STATE_NACTIVE = 0,
+	BTN_STATE_ACTIVE = 1,
+	BTN_STATE_USED
+} tBtnState;
+
 void commCreate(void);
 
 void commDestroy(void);
 
 void commProcess(void);
 
-UBYTE commShow(void);
+UBYTE commTryShow(void);
 
 void commHide(void);
 
-UBYTE commNavCheck(tCommNav eNav);
+tBtnState commNavCheck(tCommNav eNav);
 
 UBYTE commNavUse(tCommNav eNav);
 

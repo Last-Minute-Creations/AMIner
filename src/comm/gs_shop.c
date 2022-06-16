@@ -36,7 +36,7 @@ static void commShopShowTab(tCommLed eTab) {
 }
 
 static void commGsShopCreate(void) {
-	s_isShown = commShow();
+	s_isShown = commTryShow();
 	if(!s_isShown) {
 		// Camera not placed properly
 		statePop(g_pGameStateManager);

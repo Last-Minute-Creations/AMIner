@@ -10,12 +10,6 @@
 #include "../steer.h"
 #include "../game.h"
 
-typedef enum _tBtnState {
-	BTN_STATE_NACTIVE = 0,
-	BTN_STATE_ACTIVE = 1,
-	BTN_STATE_USED
-} tBtnState;
-
 static tBitMap *s_pBmRestore;
 static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
@@ -89,7 +83,7 @@ void commSetActiveLed(tCommLed eLed) {
 	}
 }
 
-UBYTE commShow(void) {
+UBYTE commTryShow(void) {
 	tUwCoordYX sOrigin = commGetOrigin();
 	if(g_pMainBuffer->uwMarginedHeight - sOrigin.uwX < COMM_HEIGHT) {
 		// Not positioned evenly
@@ -110,6 +104,10 @@ UBYTE commShow(void) {
 		s_pBg, 0, 0, s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
 		COMM_WIDTH, COMM_HEIGHT
 	);
+
+	// Skip the initial fire press
+	s_pNav[COMM_NAV_BTN] = BTN_STATE_USED;
+
 	return 1;
 }
 
@@ -162,7 +160,7 @@ void commProcess(void) {
 	// Process ex events
 	static UBYTE isShift = 0;
 	static UBYTE wasShiftAction = 0;
-	if(commNavCheck(COMM_NAV_BTN)) {
+	if(commNavCheck(COMM_NAV_BTN) == BTN_STATE_ACTIVE) {
 		isShift = 1;
 	}
 	else {
@@ -194,7 +192,7 @@ void commProcess(void) {
 	}
 }
 
-UBYTE commNavCheck(tCommNav eNav) {
+tBtnState commNavCheck(tCommNav eNav) {
 	return s_pNav[eNav];
 }
 

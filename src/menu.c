@@ -317,7 +317,7 @@ static void menuProcessRollIn(void) {
 		s_ubActivePos = 0;
 		s_uwOffsY = 16 + s_pLogo->Rows + 30;
 
-		if(!commShow()) {
+		if(!commTryShow()) {
 			// TODO do something
 		}
 		if(s_isScoreShowAfterRollIn) {
