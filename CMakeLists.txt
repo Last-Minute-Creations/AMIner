@@ -48,7 +48,11 @@ file(MAKE_DIRECTORY ${GEN_DIR})
 # Copy already processed files
 file(GLOB COPY_FILES ${RES_DIR}/copied/*)
 file(COPY ${COPY_FILES} DESTINATION ${DATA_DIR})
-file(COPY ${RES_DIR}/aminer.info DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+set(AMINER_INFO_DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${AMINER_OUTPUT_EXECUTABLE}.info")
+add_custom_command(
+	TARGET ${AMINER_EXECUTABLE} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy ${RES_DIR}/aminer.info ${AMINER_INFO_DESTINATION}
+)
 
 # Palette
 set(palette_aminer_unique "${RES_DIR}/palettes/aminer_editing.gpl")
@@ -152,6 +156,6 @@ target_compile_definitions(${AMINER_EXECUTABLE} PRIVATE AMINER_VERSION="${VERSIO
 set(AMINER_ZIP_NAME "${CMAKE_PROJECT_NAME}_${VER_MAJOR}_${VER_MINOR}_${VER_FIX}")
 add_custom_target(generateZip COMMAND
 	${CMAKE_COMMAND} -E tar "cf" "${AMINER_ZIP_NAME}.zip" --format=zip
-	"${CMAKE_CURRENT_BINARY_DIR}/${AMINER_OUTPUT_EXECUTABLE}" "${DATA_DIR}"
+	"${CMAKE_CURRENT_BINARY_DIR}/${AMINER_OUTPUT_EXECUTABLE}" "${AMINER_INFO_DESTINATION}" "${DATA_DIR}"
 	COMMENT "Generating ${AMINER_ZIP_NAME}.zip"
 )
