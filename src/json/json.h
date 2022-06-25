@@ -1,9 +1,8 @@
-#ifndef GUARD_OF_JSON_H
-#define GUARD_OF_JSON_H
+#ifndef _JSON_JSON_H_
+#define _JSON_JSON_H_
 
-#define JSMN_STRICT       /* Strict JSON parsing */
-// JSMN_PARENT_LINKS breaks things up!
-// #define JSMN_PARENT_LINKS /* Speeds things up */
+#define JSMN_STRICT
+#define JSMN_HEADER
 #include "jsmn.h"
 #include "utf8_remap.h"
 #include <ace/types.h>
@@ -11,7 +10,7 @@
 typedef struct _tJson {
 	char *szData;
 	jsmntok_t *pTokens;
-	FWORD fwTokenCount;
+	WORD wTokenCount;
 } tJson;
 
 tJson *jsonCreate(const char *szFilePath);
@@ -35,4 +34,4 @@ UWORD jsonTokStrCpy(
 	UWORD uwMaxBytes
 );
 
-#endif // GUARD_OF_JSON_H
+#endif // _JSON_JSON_H_

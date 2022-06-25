@@ -1,3 +1,7 @@
+// Load jsmn in non-header mode before json.h loads otherwise
+#define JSMN_STRICT
+#include "jsmn.h"
+
 #include "json.h"
 #include <stdlib.h>
 #include <ace/managers/log.h>
@@ -9,11 +13,11 @@
 tJson *jsonCreate(const char *szFilePath) {
 	systemUse();
 	logBlockBegin("jsonCreate(szFilePath: '%s')", szFilePath);
-	tJson *pJson = memAllocFast(sizeof(tJson));
+	tJson *pJson = memAllocFast(sizeof(*pJson));
 
 	// Read whole file to string
 	LONG lFileSize = fileGetSize(szFilePath);
-	pJson->szData = memAllocFast(lFileSize+1);
+	pJson->szData = memAllocFast(lFileSize + 1);
 	tFile *pFile = fileOpen(szFilePath, "rb");
 	if(!pFile) {
 		logWrite("ERR: File doesn't exist\n");
@@ -29,23 +33,23 @@ tJson *jsonCreate(const char *szFilePath) {
 	jsmn_init(&sJsonParser);
 
 	// Count tokens & alloc
-	pJson->fwTokenCount = jsmn_parse(&sJsonParser, pJson->szData, lFileSize+1, 0, 0);
-	if(pJson->fwTokenCount < 0) {
+	pJson->wTokenCount = jsmn_parse(&sJsonParser, pJson->szData, lFileSize+1, 0, 0);
+	if(pJson->wTokenCount < 0) {
 		logWrite(
-			"ERR: JSON during token counting: %"PRI_FWORD"\n", pJson->fwTokenCount
+			"ERR: JSON during token counting: %hu\n", pJson->wTokenCount
 		);
 		logBlockEnd("jsonCreate()");
 		return 0;
 	}
-	pJson->pTokens = memAllocFast(pJson->fwTokenCount * sizeof(jsmntok_t));
+	pJson->pTokens = memAllocFast(pJson->wTokenCount * sizeof(pJson->pTokens[0]));
 
 	// Read tokens
 	jsmn_init(&sJsonParser);
-	FWORD fwResult = jsmn_parse(
-		&sJsonParser, pJson->szData, lFileSize+1, pJson->pTokens, pJson->fwTokenCount
+	WORD wResult = jsmn_parse(
+		&sJsonParser, pJson->szData, lFileSize+1, pJson->pTokens, pJson->wTokenCount
 	);
-	if(fwResult < 0) {
-		logWrite("ERR: JSON during tokenize: %"PRI_FWORD"\n", fwResult);
+	if(wResult < 0) {
+		logWrite("ERR: JSON during tokenize: %hu\n", wResult);
 		logBlockEnd("jsonCreate()");
 		return 0;
 	}
@@ -55,9 +59,11 @@ tJson *jsonCreate(const char *szFilePath) {
 }
 
 void jsonDestroy(tJson *pJson) {
-	memFree(pJson->pTokens, sizeof(jsmntok_t) * pJson->fwTokenCount);
+	logBlockBegin("jsonDestroy(pJson: %p)", pJson);
+	memFree(pJson->pTokens, sizeof(pJson->pTokens[0]) * pJson->wTokenCount);
 	memFree(pJson->szData, strlen(pJson->szData) + 1);
-	memFree(pJson, sizeof(tJson));
+	memFree(pJson, sizeof(*pJson));
+	logBlockEnd("jsonDestroy()");
 }
 
 UWORD jsonGetElementInArray(
@@ -67,7 +73,7 @@ UWORD jsonGetElementInArray(
 	if(pJson->pTokens[uwParentIdx].type != JSMN_ARRAY) {
 		return 0;
 	}
-	for(UWORD i = uwParentIdx+1; i < pJson->fwTokenCount; ++i) {
+	for(UWORD i = uwParentIdx+1; i < pJson->wTokenCount; ++i) {
 		if(pJson->pTokens[i].start > pJson->pTokens[uwParentIdx].end) {
 			// We're outside of parent - nothing found
 			return 0;
@@ -91,7 +97,7 @@ UWORD jsonGetElementInArray(
 UWORD jsonGetElementInStruct(
 	const tJson *pJson, UWORD uwParentIdx, const char *szElement
 ) {
-	for(UWORD i = uwParentIdx+1; i < pJson->fwTokenCount; ++i) {
+	for(UWORD i = uwParentIdx+1; i < pJson->wTokenCount; ++i) {
 		if(pJson->pTokens[i].start > pJson->pTokens[uwParentIdx].end) {
 			// We're outside of parent - nothing found
 			return 0;

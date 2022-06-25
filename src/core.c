@@ -203,7 +203,9 @@ static void coreGsDestroy(void) {
 }
 
 void coreSetLangPrefix(const char * const szPrefix) {
+	logBlockBegin("coreSetLangPrefix(szPrefix: %s)", szPrefix);
 	s_szLangPrefix = szPrefix;
+	logBlockEnd("coreSetLangPrefix()");
 }
 
 const char * coreGetLangPrefix(void) {

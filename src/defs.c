@@ -182,7 +182,7 @@ void defsInit(void) {
 }
 
 void langCreate(const char *szLangPrefix) {
-	logBlockBegin("langCreate()");
+	logBlockBegin("langCreate(szLangPrefix: %s)", szLangPrefix);
 	char szPath[100];
 	sprintf(szPath, "data/txt_%s/strings.json", szLangPrefix);
 	tJson *pJson = jsonCreate(szPath);
