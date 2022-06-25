@@ -13,15 +13,17 @@ static UBYTE s_ubFavorsLeft;
 
 static void pageFavorProcess(void) {
 	if(buttonGetPreset() == BUTTON_PRESET_ACCEPT_DECLINE) {
-		BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
+		BYTE bButtonPrev = buttonGetSelected();
+		BYTE bButtonCurr = bButtonPrev;
 		BYTE bButtonCount = buttonGetCount();
-		if(commNavUse(COMM_NAV_DOWN)) {
+		if(commNavUse(COMM_NAV_RIGHT)) {
 			bButtonCurr = MIN(bButtonCurr + 1, bButtonCount - 1);
 		}
-		else if(commNavUse(COMM_NAV_UP)) {
+		else if(commNavUse(COMM_NAV_LEFT)) {
 			bButtonCurr = MAX(bButtonCurr - 1, 0);
 		}
 		if(bButtonPrev != bButtonCurr) {
+			buttonSelect(bButtonCurr);
 			buttonDrawAll(commGetDisplayBuffer());
 		}
 
@@ -61,6 +63,7 @@ void pageFavorCreate(void) {
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 		buttonInitAcceptDecline("Accept", "Decline");
+		buttonDrawAll(commGetDisplayBuffer());
 	}
 	else {
 		uwPosY += commDrawMultilineText("You ask me for too much, Comrade. Do some real work, will you?", 0, uwPosY) * ubLineHeight;

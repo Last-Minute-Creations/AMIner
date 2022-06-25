@@ -103,11 +103,13 @@ void buttonInitAcceptDecline(
 	const char *szTextAccept, const char *szTextDecline
 ) {
 	buttonRmAll();
-	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - (3 * buttonGetHeight()) / 2;
-	buttonAdd(szTextAccept, COMM_DISPLAY_WIDTH / 2, uwOffsY);
+	UBYTE ubButtonHeight = buttonGetHeight();
+	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - ubButtonHeight;
+	UWORD uwOffsX = COMM_DISPLAY_WIDTH / 3;
+	buttonAdd(szTextAccept, uwOffsX, uwOffsY);
 
-	uwOffsY += buttonGetHeight();
-	buttonAdd(szTextDecline, COMM_DISPLAY_WIDTH / 2, uwOffsY);
+	uwOffsX *= 2;
+	buttonAdd(szTextDecline, uwOffsX, uwOffsY);
 	s_ePreset = BUTTON_PRESET_ACCEPT_DECLINE;
 	buttonSelect(0);
 }

@@ -18,13 +18,14 @@ static void pageBribeProcess(void) {
 	if(buttonGetPreset() == BUTTON_PRESET_ACCEPT_DECLINE) {
 		BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
 		BYTE bButtonCount = buttonGetCount();
-		if(commNavUse(COMM_NAV_DOWN)) {
+		if(commNavUse(COMM_NAV_RIGHT)) {
 			bButtonCurr = MIN(bButtonCurr + 1, bButtonCount - 1);
 		}
-		else if(commNavUse(COMM_NAV_UP)) {
+		else if(commNavUse(COMM_NAV_LEFT)) {
 			bButtonCurr = MAX(bButtonCurr - 1, 0);
 		}
 		if(bButtonPrev != bButtonCurr) {
+			buttonSelect(bButtonCurr);
 			buttonDrawAll(commGetDisplayBuffer());
 		}
 
@@ -94,6 +95,7 @@ void pageBribeCreate(void) {
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 		buttonInitAcceptDecline("Accept", "Decline");
+		buttonDrawAll(commGetDisplayBuffer());
 	}
 	else {
 		uwPosY += commDrawMultilineText("Comrade, not now... there's too much heat!", 0, uwPosY) * ubLineHeight;
