@@ -135,7 +135,7 @@ void commProcess(void) {
 	for(UBYTE i = 0; i < COMM_NAV_COUNT; ++i) {
 		if(pTests[i]) {
 			if(s_pNav[i] == BTN_STATE_NACTIVE) {
-				// audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyPress[uwRand() & 3], AUDIO_VOLUME_MAX, 1);
+				// audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyPress[randUw(&g_sRand) & 3], AUDIO_VOLUME_MAX, 1);
 				s_pNav[i] = BTN_STATE_ACTIVE;
 				blitCopy(
 					s_pButtons, 0, pBtnPos[i][2], s_pBmDraw,
@@ -146,7 +146,7 @@ void commProcess(void) {
 			}
 		}
 		else if(s_pNav[i] != BTN_STATE_NACTIVE) {
-			// audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyRelease[uwRand() & 3], AUDIO_VOLUME_MAX, 1);
+			// audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyRelease[randUw(&g_sRand) & 3], AUDIO_VOLUME_MAX, 1);
 			s_pNav[i] = BTN_STATE_NACTIVE;
 			blitCopy(
 				s_pButtons, 0, pBtnPos[i][2] + pBtnPos[i][3], s_pBmDraw,

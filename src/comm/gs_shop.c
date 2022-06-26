@@ -4,7 +4,6 @@
 
 #include "gs_shop.h"
 #include <ace/managers/system.h>
-#include <ace/managers/rand.h>
 #include <comm/base.h>
 #include <comm/page_warehouse.h>
 #include <comm/page_workshop.h>

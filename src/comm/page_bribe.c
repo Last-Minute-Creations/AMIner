@@ -2,12 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include <ace/managers/rand.h>
 #include <comm/base.h>
 #include <comm/page_office.h>
 #include <comm/button.h>
 #include "../warehouse.h"
 #include "../game.h"
+#include "../core.h"
 
 static UBYTE s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
 static BYTE s_bBribeChanceFail;
@@ -31,7 +31,7 @@ static void pageBribeProcess(void) {
 
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(bButtonCurr == 0) {
-				if(uwRandMinMax(1, 100) > s_bBribeChanceFail) {
+				if(randUwMinMax(&g_sRand, 1, 100) > s_bBribeChanceFail) {
 					// Success
 					const tPlan *pPlan = warehouseGetPlan();
 					if(!pPlan->isPenaltyCountdownStarted) {

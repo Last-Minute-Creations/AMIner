@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "page_accounting.h"
-#include <ace/managers/rand.h>
 #include <comm/base.h>
 #include <comm/page_office.h>
 #include <comm/button.h>
+#include "../core.h"
 #include "../game.h"
 #include "../warehouse.h"
 
@@ -28,7 +28,7 @@ static void pageAccountingProcess(void) {
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(bButtonCurr == 0) {
-			if(uwRandMinMax(1, 100) > s_bAccountingChanceFail) {
+			if(randUwMinMax(&g_sRand, 1, 100) > s_bAccountingChanceFail) {
 				warehouseNewPlan(1, g_is2pPlaying);
 			}
 			else {

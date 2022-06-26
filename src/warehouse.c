@@ -5,9 +5,9 @@
 #include "warehouse.h"
 #include "mineral.h"
 #include "game.h"
+#include "core.h"
 #include <ace/macros.h>
 #include <ace/managers/log.h>
-#include <ace/managers/rand.h>
 
 #define TIME_PER_DAY (140)
 
@@ -83,10 +83,10 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 	UBYTE isDone = 0;
 	LONG lCostRemaining = s_sCurrentPlan.ulTargetSum;
 	do {
-		UBYTE ubMineral = uwRandMax(MINERAL_TYPE_COUNT - 1);
+		UBYTE ubMineral = randUwMax(&g_sRand, MINERAL_TYPE_COUNT - 1);
 		if(s_sCurrentPlan.ulMineralsUnlocked & (1 << ubMineral)) {
 			UBYTE ubReward = g_pMinerals[ubMineral].ubReward;
-			UWORD uwCount = uwRandMax((lCostRemaining + ubReward - 1) / ubReward);
+			UWORD uwCount = randUwMax(&g_sRand, (lCostRemaining + ubReward - 1) / ubReward);
 			s_sCurrentPlan.pMinerals[ubMineral].uwTargetCount += uwCount;
 			lCostRemaining -= uwCount * ubReward;
 			if(lCostRemaining <= 0) {

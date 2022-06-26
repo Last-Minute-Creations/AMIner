@@ -912,8 +912,8 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			}
 			else {
 				// Body shake
-				pVehicle->sBobBody.sPos.uwX += uwRand() & 1;
-				pVehicle->sBobBody.sPos.uwY += uwRand() & 1;
+				pVehicle->sBobBody.sPos.uwX += randUw(&g_sRand) & 1;
+				pVehicle->sBobBody.sPos.uwY += randUw(&g_sRand) & 1;
 
 				// Anim counter for Tool / track drill
 				UBYTE ubAnim = 0;
@@ -1008,10 +1008,10 @@ static void vehicleOnTeleportInPeak(ULONG ulData) {
 	tVehicle *pVehicle = (tVehicle*)ulData;
 	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 	UWORD uwMaxHealth = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
-	if(uwRandMax(100) <= 5) {
+	if(randUwMax(&g_sRand, 100) <= 5) {
 		vehicleHullDamage(pVehicle, uwMaxHealth);
 	}
-	else if(uwRandMax(100) <= 20) {
+	else if(randUwMax(&g_sRand, 100) <= 20) {
 		vehicleHullDamage(pVehicle, uwMaxHealth / 2);
 	}
 }

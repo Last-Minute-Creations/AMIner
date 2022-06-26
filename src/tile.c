@@ -129,7 +129,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 		commProgress(ubPercent, g_pMsgs[MSG_LOADING_GEN_TERRAIN]);
 		for(UWORD y = TILE_ROW_BASE_DIRT + 2; y < uwEndY; ++y) {
 			// 2000 is max
-			UWORD uwWhat = (uwRand() * 1000) / 65535;
+			UWORD uwWhat = (randUw(&g_sRand) * 1000) / 65535;
 			UWORD uwChanceAir = 50;
 			UWORD uwChanceRock, uwChanceSilver, uwChanceGold, uwChanceEmerald, uwChanceRuby, uwChanceMoonstone;
 			if(g_isChallenge) {
@@ -166,7 +166,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			}
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
-				pTiles[x][y] = uwRandMinMax(TILE_STONE_1, TILE_STONE_4);
+				pTiles[x][y] = randUwMinMax(&g_sRand, TILE_STONE_1, TILE_STONE_4);
 			}
 			else if(
 				uwWhat < (uwChance += uwChanceAir) &&
@@ -177,36 +177,36 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			else if(uwWhat < (uwChance += uwChanceSilver)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: uwRandMinMax(TILE_SILVER_1, TILE_SILVER_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_SILVER_1, TILE_SILVER_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceGold)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: uwRandMinMax(TILE_GOLD_1, TILE_GOLD_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_GOLD_1, TILE_GOLD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceEmerald)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: uwRandMinMax(TILE_EMERALD_1, TILE_EMERALD_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_EMERALD_1, TILE_EMERALD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceRuby)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: uwRandMinMax(TILE_RUBY_1, TILE_RUBY_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_RUBY_1, TILE_RUBY_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceMoonstone)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? uwRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: uwRandMinMax(TILE_MOONSTONE_1, TILE_MOONSTONE_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_MOONSTONE_1, TILE_MOONSTONE_3)
 				);
 			}
 			else {

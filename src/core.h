@@ -8,6 +8,7 @@
 #include "aminer.h"
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/utils/font.h>
+#include <ace/managers/rand.h>
 
 void coreProcessBeforeBobs(void);
 
@@ -19,6 +20,7 @@ const char * coreGetLangPrefix(void);
 
 extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
+extern tRandManager g_sRand;
 extern tState g_sStateCore;
 
 #endif // _CORE_H_

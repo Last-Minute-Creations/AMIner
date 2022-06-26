@@ -27,11 +27,8 @@ static UWORD *s_pColorBg;
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
-tTileBufferManager *g_pMainBuffer;
 static tBitMap *s_pBombMarker, *s_pBombMarkerMask;
 static const char *s_szLangPrefix;
-
-tFont *g_pFont;
 
 static void mainPaletteProcess(UBYTE ubFadeLevel) {
 	tFadeState eState = fadeGetState();
@@ -118,11 +115,11 @@ static void coreGsCreate(void) {
 	g_pSamplePenalty = sampleCreateFromFile("data/sfx/penalty.raw8", 8000);
 
 #ifdef GAME_DEBUG
-	randInit(2184);
+	randInit(&g_sRand, 2184, 1911);
 #else
 	// Seed from beam pos Y & X
 	tRayPos sRayPos = getRayPos();
-	randInit((sRayPos.bfPosY << 8) | sRayPos.bfPosX);
+	randInit(&g_sRand, 1 + (sRayPos.bfPosY << 8), 1 + sRayPos.bfPosX);
 #endif
 
 	tileInit(0, 1);
@@ -211,6 +208,12 @@ void coreSetLangPrefix(const char * const szPrefix) {
 const char * coreGetLangPrefix(void) {
 	return s_szLangPrefix;
 }
+
+//---------------------------------------------------------------------- GLOBALS
+
+tTileBufferManager *g_pMainBuffer;
+tFont *g_pFont;
+tRandManager g_sRand;
 
 tState g_sStateCore = {
 	.cbCreate = coreGsCreate, .cbLoop = coreGsLoop, .cbDestroy = coreGsDestroy
