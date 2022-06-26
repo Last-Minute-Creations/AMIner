@@ -1,3 +1,26 @@
+22.6.26
+- spawn vehicle on ground to avoid initial fall damage
+- fixed urzędas pl dossier garbled text
+- reworked RNG code
+- tweaked HUD offsets to better accomodate pl texts
+
+22.6.25
+- updated jsmn
+- bundle executable icon in release zip
+- accounting, bribes and favours should be working right now
+- build: rolled back to GCC11 because GCC12 doesn't work properly
+
+22.6.16
+- fixed immediately selecting first npc in office when accessing commrade
+
+22.5.8
+- fire button now scrolls through long messages instead of immediately exiting
+- fixed going out of bounds in office screen
+- better game versioning, add generating zip files
+- detect CR characters in commBreakTextToWidth()
+- don't use fileIsEof()
+- game is now buildable using Bartman toolchain
+
 20.3.13
 - dossier now works
 - rewritten commrade page handling, expect lots of bugs!
