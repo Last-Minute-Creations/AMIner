@@ -137,7 +137,7 @@ void vehicleResetPos(tVehicle *pVehicle) {
 	else {
 		uwX = g_isChallenge ? 96 : 320-64;
 	}
-	UWORD uwY = (TILE_ROW_BASE_DIRT - 2) * 32;
+	UWORD uwY = (TILE_ROW_BASE_DIRT - 1) * 32;
 	vehicleSetPos(pVehicle, uwX, uwY);
 }
 
