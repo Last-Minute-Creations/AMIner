@@ -33,7 +33,6 @@ static void readLines(
 	freeLines();
 
 	// Read whole file to plain buffer
-	char szFileContents[fileGetSize(szFilePath)];
 	tFile *pFileLines = fileOpen(szFilePath, "r");
 
 	if(!pFileLines) {
@@ -46,6 +45,8 @@ static void readLines(
 	UWORD uwTextLength = 0;
 	ULONG ulCodepoint, ulState = 0;
 	UBYTE ubCharCode;
+	UWORD uwFileContentsBufferSize = fileGetSize(szFilePath) + 1;
+	char *szFileContents = memAllocFast(uwFileContentsBufferSize);
 
 	while(fileRead(pFileLines, &ubCharCode, 1)) {
 		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
@@ -86,6 +87,7 @@ static void readLines(
 		logWrite("ERR: line count %hu >= LINES MAX %d", s_uwLineCount, LINES_MAX);
 	}
 
+	memFree(szFileContents, uwFileContentsBufferSize);
 	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / commGetLineHeight() - 1;
 	s_ubPageCount = (s_uwLineCount + (ubLinesPerPage - 1)) / ubLinesPerPage;
 
