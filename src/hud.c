@@ -6,6 +6,7 @@
 #include <ace/managers/viewport/simplebuffer.h>
 #include <ace/utils/palette.h>
 #include <ace/utils/chunky.h>
+#include <ace/utils/string.h>
 #include "defs.h"
 
 #define HUD_COLOR_BG 11
@@ -18,14 +19,14 @@
 #define HUD_FACE_SIZE 16
 
 #define GAUGE_DRILL_X (HUD_ORIGIN_X + 65)
-#define GAUGE_CARGO_X (HUD_ORIGIN_X + 128)
+#define GAUGE_CARGO_X (HUD_ORIGIN_X + 125)
 #define GAUGE_HULL_X (HUD_ORIGIN_X + 182)
 #define GAUGE_DEPTH_X (HUD_ORIGIN_X + 248)
 #define GAUGE_CASH_X (HUD_ORIGIN_X + 248)
 
 #define ROW_1_Y (HUD_ORIGIN_Y + 0)
 #define ROW_2_Y (HUD_ORIGIN_Y + 9)
-#define HUD_MSG_LEN_MAX 250
+#define HUD_MSG_BFR_SIZE 250
 #define HUD_MSG_WAIT_CNT 150
 
 #define MODE_ICON_HEIGHT 12
@@ -97,7 +98,7 @@ static tHudPage s_ePageCurrent = HUD_PAGE_MAIN;
 static UWORD s_uwMsgLen;
 static tUwCoordYX s_sMsgCharPos;
 static UBYTE s_ubMsgCharIdx;
-static char s_szMsg[HUD_MSG_LEN_MAX];
+static char s_szMsg[HUD_MSG_BFR_SIZE];
 static char s_szLetter[2] = {'\0'};
 static tBitMap *s_pFaces;
 static UBYTE s_ubFaceToDraw;
@@ -291,7 +292,7 @@ void hudCreate(tView *pView, const tFont *pFont) {
 
 void hudShowMessage(UBYTE ubFace, const char *szMsg) {
 	logWrite("Showing HUD message: '%s'\n", szMsg);
-	strncpy(s_szMsg, szMsg, HUD_MSG_LEN_MAX);
+	stringCopyLimited(szMsg, s_szMsg, HUD_MSG_BFR_SIZE);
 	s_eState = STATE_MSG_NOISE_IN;
 	s_uwFrameDelay = 25;
 	s_uwStateCounter = 0;
