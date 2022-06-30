@@ -41,7 +41,7 @@ static void mainPaletteProcess(UBYTE ubFadeLevel) {
 void coreProcessBeforeBobs(void) {
 	// Undraw all bobs
 	debugColor(0x008);
-	bobNewBegin();
+	bobNewBegin(g_pMainBuffer->pScroll->pBack);
 
 	// Draw pending tiles
 	tileBufferQueueProcess(g_pMainBuffer);
@@ -143,7 +143,7 @@ static void coreGsCreate(void) {
 	}
 
 	menuPreload();
-	bobNewAllocateBgBuffers();
+	bobNewReallocateBgBuffers();
 	systemUnuse();
 
 	g_pMainBuffer->pCamera->uPos.uwX = 32;

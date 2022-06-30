@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef _BOB_NEW_H_
-#define _BOB_NEW_H_
+#ifndef BOB_NEW_H
+#define BOB_NEW_H
 
 #include <ace/types.h>
 #include <ace/managers/blit.h>
@@ -17,12 +17,12 @@
  * bobNewInit(&sBob1, ...)
  * bobNewInit(&sBob2, ...)
  * bobNewInit(&sBobN, ...)
- * bobNewAllocateBgBuffers()
+ * bobNewReallocateBgBuffers()
  *
  * in gamestate loop:
  * bobNewBegin()
  * someCalcHereOrOtherBlitterOperationsHere()
- * bobNewPush(&sBobX)
+ * bobNewPush(&sBobX) <-- no other blitting past this point
  * someCalcHere()
  * bobNewPush(&sBobY)
  * bobNewPush(&sBobZ)
@@ -52,14 +52,14 @@
  * You can safely change sPos to set new position. Rest is read-only and should
  * only be changed by provided fns.
  */
-typedef struct _tBobNew {
+typedef struct tBobNew {
+	tBitMap *pBitmap;
+	tBitMap *pMask;
 	tUwCoordYX pOldPositions[2];
 	tUwCoordYX sPos;
 	UWORD uwWidth;
 	UWORD uwHeight;
 	UBYTE isUndrawRequired;
-	tBitMap *pBitmap;
-	tBitMap *pMask;
 	UWORD uwOffsetY;
 	// Platform-dependent private fields. Don't rely on them externally.
 	UWORD _uwBlitSize;
@@ -71,14 +71,14 @@ typedef struct _tBobNew {
  * If you use single buffering, pass same pointer in pFront and pBack.
  *
  * After calling this fn you should call series of bobNewInit() followed by
- * single bobNewAllocateBgBuffers().
+ * single bobNewReallocateBgBuffers().
  *
  * @param pFront Double buffering's front buffer bitmap.
  * @param pBack Double buffering's back buffer bitmap.
  * @param uwAvailHeight True available height for Y-scroll in passed bitmap.
  *
  * @see bobNewInit()
- * @see bobNewAllocateBgBuffers()
+ * @see bobNewReallocateBgBuffers()
  * @see bobNewManagerDestroy()
  */
 void bobNewManagerCreate(tBitMap *pFront, tBitMap *pBack, UWORD uwAvailHeight);
@@ -89,6 +89,8 @@ void bobNewManagerCreate(tBitMap *pFront, tBitMap *pBack, UWORD uwAvailHeight);
  * @see bobNewManagerCreate()
  */
 void bobNewManagerDestroy(void);
+
+void bobNewManagerReset(void);
 
 /**
  * @brief Initializes new bob for use with manager.
@@ -114,7 +116,7 @@ void bobNewInit(
  *
  * After call to this function, you can't call bobNewInit() anymore!
  */
-void bobNewAllocateBgBuffers(void);
+void bobNewReallocateBgBuffers(void);
 
 /**
  * @brief Changes bob's animation frame.
@@ -134,7 +136,7 @@ void bobNewSetBitMapOffset(tBobNew *pBob, UWORD uwOffsetY);
  *
  * @see bobNewPush()
  */
-void bobNewBegin(void);
+void bobNewBegin(tBitMap *pBuffer);
 
 /**
  * @brief Adds next bob to draw queue.
@@ -142,6 +144,8 @@ void bobNewBegin(void);
  * undrawn if needed.
  * There is no z-order, thus bobs are drawn in order of pushing.
  * When this function operates, it calls bobNewProcessNext().
+ * Don't modify bob's struct past calling this fn - there is no guarantee when
+ * bob system will access its data!
  *
  * @param pBob Pointer to bob to be drawn.
  *
@@ -183,4 +187,4 @@ void bobNewEnd(void);
 
 void bobNewDiscardUndraw(void);
 
-#endif // _BOB_NEW_H_
+#endif // BOB_NEW_H
