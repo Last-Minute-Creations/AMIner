@@ -64,6 +64,141 @@ convertPalette(${AMINER_EXECUTABLE} ${palette_aminer_gpl} ${palette_aminer})
 convertPalette(${AMINER_EXECUTABLE} ${palette_lmc_gpl} ${palette_lmc})
 set(transparency_hex "#993399")
 
+#-------------------------------------------------------------------------- BODY
+file(MAKE_DIRECTORY ${GEN_DIR}/drill)
+file(MAKE_DIRECTORY ${GEN_DIR}/drill_2)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	DESTINATIONS
+		${GEN_DIR}/drill/0.png 0 76 32 20
+		${GEN_DIR}/drill/1.png 0 44 32 20
+		${GEN_DIR}/drill/2.png 0 12 32 20
+		${GEN_DIR}/drill/3.png 159 12 32 20
+		${GEN_DIR}/drill/4.png 96 76 32 20
+		${GEN_DIR}/drill/5.png 96 44 32 20
+		${GEN_DIR}/drill/6.png 96 12 32 20
+		${GEN_DIR}/drill/7.png 192 12 32 20
+)
+
+convertTileset(
+	TARGET ${AMINER_EXECUTABLE} SIZE 32 HEIGHT 20
+	SOURCE ${GEN_DIR}/drill DESTINATION ${GEN_DIR}/drill.png
+	TILES 0.png 1.png 2.png 3.png 4.png 5.png 6.png 7.png
+)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	DESTINATIONS
+		${GEN_DIR}/drill_2/0.png 0 236 32 20
+		${GEN_DIR}/drill_2/1.png 0 204 32 20
+		${GEN_DIR}/drill_2/2.png 0 172 32 20
+		${GEN_DIR}/drill_2/3.png 255 12 32 20
+		${GEN_DIR}/drill_2/4.png 96 236 32 20
+		${GEN_DIR}/drill_2/5.png 96 204 32 20
+		${GEN_DIR}/drill_2/6.png 96 172 32 20
+		${GEN_DIR}/drill_2/7.png 288 12 32 20
+)
+
+convertTileset(
+	TARGET ${AMINER_EXECUTABLE} SIZE 32 HEIGHT 20
+	SOURCE ${GEN_DIR}/drill_2 DESTINATION ${GEN_DIR}/drill_2.png
+	TILES 0.png 1.png 2.png 3.png 4.png 5.png 6.png 7.png
+)
+
+#------------------------------------------------------------------------- WRECK
+
+file(MAKE_DIRECTORY ${GEN_DIR}/wreck)
+file(MAKE_DIRECTORY ${GEN_DIR}/wreck_2)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	DESTINATIONS
+		${GEN_DIR}/wreck/0.png 0 109 48 21
+		${GEN_DIR}/wreck/1.png 86 109 48 21
+)
+
+convertTileset(
+	TARGET ${AMINER_EXECUTABLE} SIZE 48 HEIGHT 21
+	SOURCE ${GEN_DIR}/wreck DESTINATION ${GEN_DIR}/wreck.png
+	TILES 0.png 1.png
+)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	DESTINATIONS
+		${GEN_DIR}/wreck_2/0.png 0 269 48 21
+		${GEN_DIR}/wreck_2/1.png 86 269 48 21
+)
+
+convertTileset(
+	TARGET ${AMINER_EXECUTABLE} SIZE 48 HEIGHT 21
+	SOURCE ${GEN_DIR}/wreck_2 DESTINATION ${GEN_DIR}/wreck_2.png
+	TILES 0.png 1.png
+)
+
+#-------------------------------------------------------------------------- TOOL
+file(MAKE_DIRECTORY ${GEN_DIR}/tool)
+file(MAKE_DIRECTORY ${GEN_DIR}/tool_2)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	DESTINATIONS
+		# right
+		${GEN_DIR}/tool/0.png 33 64 16 16
+		${GEN_DIR}/tool/1.png 33 80 16 16
+		${GEN_DIR}/tool/2.png 33 32 16 16
+		${GEN_DIR}/tool/3.png 33 48 16 16
+		${GEN_DIR}/tool/4.png 33 0 16 16
+		${GEN_DIR}/tool/5.png 33 16 16 16
+		${GEN_DIR}/tool/6.png 160 96 16 16
+		${GEN_DIR}/tool/7.png 160 112 16 16
+		# left
+		${GEN_DIR}/tool/8.png  79 64 16 16
+		${GEN_DIR}/tool/9.png  79 80 16 16
+		${GEN_DIR}/tool/10.png 79 32 16 16
+		${GEN_DIR}/tool/11.png 79 48 16 16
+		${GEN_DIR}/tool/12.png 79 0 16 16
+		${GEN_DIR}/tool/13.png 79 16 16 16
+		${GEN_DIR}/tool/14.png 208 96 16 16
+		${GEN_DIR}/tool/15.png 208 112 16 16
+)
+
+convertTileset(
+	TARGET ${AMINER_EXECUTABLE} SIZE 16
+	SOURCE ${GEN_DIR}/tool DESTINATION ${GEN_DIR}/tool.png
+	TILES
+		0.png 1.png 2.png 3.png 4.png 5.png 6.png 7.png
+		8.png 9.png 10.png 11.png 12.png 13.png 14.png 15.png
+)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	DESTINATIONS
+		# right
+		${GEN_DIR}/tool_2/0.png 33 224 16 16
+		${GEN_DIR}/tool_2/1.png 33 240 16 16
+		${GEN_DIR}/tool_2/2.png 33 192 16 16
+		${GEN_DIR}/tool_2/3.png 33 208 16 16
+		${GEN_DIR}/tool_2/4.png 33 160 16 16
+		${GEN_DIR}/tool_2/5.png 33 176 16 16
+		${GEN_DIR}/tool_2/6.png 256 96 16 16
+		${GEN_DIR}/tool_2/7.png 256 112 16 16
+		# left
+		${GEN_DIR}/tool_2/8.png  79 224 16 16
+		${GEN_DIR}/tool_2/9.png  79 240 16 16
+		${GEN_DIR}/tool_2/10.png 79 192 16 16
+		${GEN_DIR}/tool_2/11.png 79 208 16 16
+		${GEN_DIR}/tool_2/12.png 79 160 16 16
+		${GEN_DIR}/tool_2/13.png 79 176 16 16
+		${GEN_DIR}/tool_2/14.png 304 96 16 16
+		${GEN_DIR}/tool_2/15.png 304 112 16 16
+)
+
+convertTileset(
+	TARGET ${AMINER_EXECUTABLE} SIZE 16
+	SOURCE ${GEN_DIR}/tool_2 DESTINATION ${GEN_DIR}/tool_2.png
+	TILES
+		0.png 1.png 2.png 3.png 4.png 5.png 6.png 7.png
+		8.png 9.png 10.png 11.png 12.png 13.png 14.png 15.png
+)
+
+#-------------------------------------------------------- CONVERT TO ACE FORMATS
+
 convertBitmaps(
 	TARGET ${AMINER_EXECUTABLE} PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCES
@@ -84,8 +219,8 @@ convertBitmaps(
 convertBitmaps(
 	TARGET ${AMINER_EXECUTABLE} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
 	INTERLEAVED SOURCES
-		${RES_DIR}/drill.png ${RES_DIR}/tool.png ${RES_DIR}/wreck.png
-		${RES_DIR}/drill_2.png ${RES_DIR}/tool_2.png ${RES_DIR}/wreck_2.png
+		${GEN_DIR}/drill.png ${GEN_DIR}/tool.png ${GEN_DIR}/wreck.png
+		${GEN_DIR}/drill_2.png ${GEN_DIR}/tool_2.png ${GEN_DIR}/wreck_2.png
 		${RES_DIR}/track.png ${RES_DIR}/jet.png ${RES_DIR}/bones.png ${RES_DIR}/smoke.png
 		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png ${RES_DIR}/hud/mode_cursor.png
 		${RES_DIR}/bomb_marker.png
