@@ -6,6 +6,7 @@
 #define _TUTORIAL_H_
 
 #include <ace/types.h>
+#include "string_array.h"
 
 /**
  * @brief Resets tutorial state.

@@ -1,10 +1,8 @@
 #ifndef _PAUSE_H_
 #define _PAUSE_H_
 
-void pauseGsCreate(void);
+#include "aminer.h"
 
-void pauseGsLoop(void);
-
-void pauseGsDestroy(void);
+extern tState g_sStatePause;
 
 #endif // _PAUSE_H_

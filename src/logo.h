@@ -5,10 +5,8 @@
 #ifndef _LOGO_H_
 #define _LOGO_H_
 
-void logoGsCreate(void);
+#include "aminer.h"
 
-void logoGsLoop(void);
-
-void logoGsDestroy(void);
+extern tState g_sStateLogo;
 
 #endif // _LOGO_H_

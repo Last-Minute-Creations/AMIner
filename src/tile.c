@@ -5,49 +5,49 @@
 #include "tile.h"
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/managers/rand.h>
+#include <comm/base.h>
 #include "game.h"
 #include "core.h"
 #include "hud.h"
 #include "mineral.h"
-#include "comm.h"
+#include "defs.h"
 
-const tTileDef const g_pTileDefs[TILE_COUNT] = {
-	{.szMsg = 0, .ubSlots = 0, .ubMineral = MINERAL_TYPE_COUNT},
-	[TILE_SILVER_1] = {.szMsg = "Silver x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_SILVER},
-	[TILE_SILVER_2] = {.szMsg = "Silver x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_SILVER},
-	[TILE_SILVER_3] = {.szMsg = "Silver x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_SILVER},
-	[TILE_GOLD_1] = {.szMsg = "Gold x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_GOLD},
-	[TILE_GOLD_2] = {.szMsg = "Gold x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_GOLD},
-	[TILE_GOLD_3] = {.szMsg = "Gold x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_GOLD},
-	[TILE_EMERALD_1] = {.szMsg = "Emerald x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_EMERALD},
-	[TILE_EMERALD_2] = {.szMsg = "Emerald x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_EMERALD},
-	[TILE_EMERALD_3] = {.szMsg = "Emerald x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_EMERALD},
-	[TILE_RUBY_1] = {.szMsg = "Ruby x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_RUBY},
-	[TILE_RUBY_2] = {.szMsg = "Ruby x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_RUBY},
-	[TILE_RUBY_3] = {.szMsg = "Ruby x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_RUBY},
-	[TILE_MOONSTONE_1] = {.szMsg = "Moonstone x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_MOONSTONE},
-	[TILE_MOONSTONE_2] = {.szMsg = "Moonstone x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_MOONSTONE},
-	[TILE_MOONSTONE_3] = {.szMsg = "Moonstone x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_MOONSTONE},
-	[TILE_COAL_1] = {.szMsg = "Coal x1", .ubSlots = 1, .ubMineral = MINERAL_TYPE_COAL},
-	[TILE_COAL_2] = {.szMsg = "Coal x2", .ubSlots = 2, .ubMineral = MINERAL_TYPE_COAL},
-	[TILE_COAL_3] = {.szMsg = "Coal x3", .ubSlots = 3, .ubMineral = MINERAL_TYPE_COAL}
+const tTileDef g_pTileDefs[TILE_COUNT] = {
+	{.ubSlots = 0, .ubMineral = MINERAL_TYPE_COUNT},
+	[TILE_SILVER_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_SILVER},
+	[TILE_SILVER_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_SILVER},
+	[TILE_SILVER_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_SILVER},
+	[TILE_GOLD_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_GOLD},
+	[TILE_GOLD_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_GOLD},
+	[TILE_GOLD_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_GOLD},
+	[TILE_EMERALD_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_EMERALD},
+	[TILE_EMERALD_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_EMERALD},
+	[TILE_EMERALD_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_EMERALD},
+	[TILE_RUBY_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_RUBY},
+	[TILE_RUBY_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_RUBY},
+	[TILE_RUBY_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_RUBY},
+	[TILE_MOONSTONE_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_MOONSTONE},
+	[TILE_MOONSTONE_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_MOONSTONE},
+	[TILE_MOONSTONE_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_MOONSTONE},
+	[TILE_COAL_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_COAL},
+	[TILE_COAL_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_COAL},
+	[TILE_COAL_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_COAL}
 };
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	return (
 		(TILE_BASE_GROUND_1 <= ubTile && ubTile <= TILE_BASE_GROUND_9) ||
-		ubTile >= TILE_STONE_1
+		ubTile >= TILE_DIRT_1
 	);
 }
 
 UBYTE tileIsDrillable(UWORD uwX, UWORD uwY) {
-	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_ROCK_1;
+	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_DIRT_1;
 }
 
-UBYTE tileIsExplodable(UWORD uwX, UWORD uwY) {
-	const UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
-	return ubTile >= TILE_STONE_1 && ubTile != TILE_BONE_HEAD;
+UBYTE tileIsHardToDrill(UWORD uwX, UWORD uwY) {
+	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_STONE_1;
 }
 
 static UWORD chanceTrapezoid(
@@ -126,10 +126,10 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	UBYTE ubPercentTiles = (100 - 10 * s_ubBaseCount);
 	for(UWORD x = 1; x < uwEndX; ++x) {
 		UBYTE ubPercent = (x * ubPercentTiles) / uwEndX;
-		commProgress(ubPercent, "Generating terrain");
+		commProgress(ubPercent, g_pMsgs[MSG_LOADING_GEN_TERRAIN]);
 		for(UWORD y = TILE_ROW_BASE_DIRT + 2; y < uwEndY; ++y) {
 			// 2000 is max
-			UWORD uwWhat = (uwRand() * 1000) / 65535;
+			UWORD uwWhat = (randUw(&g_sRand) * 1000) / 65535;
 			UWORD uwChanceAir = 50;
 			UWORD uwChanceRock, uwChanceSilver, uwChanceGold, uwChanceEmerald, uwChanceRuby, uwChanceMoonstone;
 			if(g_isChallenge) {
@@ -166,61 +166,61 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 			}
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
-				pTiles[x][y] = ubRandMinMax(TILE_STONE_1, TILE_STONE_4);
+				pTiles[x][y] = randUwMinMax(&g_sRand, TILE_STONE_1, TILE_STONE_4);
 			}
 			else if(
 				uwWhat < (uwChance += uwChanceAir) &&
 				tileIsSolid(x - 1, y) && tileIsSolid(x, y - 1)
 			) {
-				pTiles[x][y] = TILE_CAVE_BG+15;
+				pTiles[x][y] = TILE_CAVE_BG_1+15;
 			}
 			else if(uwWhat < (uwChance += uwChanceSilver)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_SILVER_1, TILE_SILVER_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_SILVER_1, TILE_SILVER_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceGold)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_GOLD_1, TILE_GOLD_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_GOLD_1, TILE_GOLD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceEmerald)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_EMERALD_1, TILE_EMERALD_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_EMERALD_1, TILE_EMERALD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceRuby)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_RUBY_1, TILE_RUBY_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_RUBY_1, TILE_RUBY_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceMoonstone)) {
 				pTiles[x][y] = (
 					isCoalOnly
-						? ubRandMinMax(TILE_COAL_1, TILE_COAL_2)
-						: ubRandMinMax(TILE_MOONSTONE_1, TILE_MOONSTONE_3)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_MOONSTONE_1, TILE_MOONSTONE_3)
 				);
 			}
 			else {
-				pTiles[x][y] = TILE_ROCK_1 + ((x & 1) ^ (y & 1));
+				pTiles[x][y] = TILE_DIRT_1 + ((x & 1) ^ (y & 1));
 			}
 			// For quick tests
-			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG + 12;
+			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG_1 + 12;
 		}
 	}
 
 	// Draw bases
 	for(UBYTE ubBase = 0; ubBase < s_ubBaseCount; ++ubBase) {
 		UBYTE ubPercent = ((100 - ubPercentTiles) * ubBase / s_ubBaseCount);
-		commProgress(ubPercentTiles + ubPercent, "Generating bases");
+		commProgress(ubPercentTiles + ubPercent, g_pMsgs[MSG_LOADING_GEN_BASES]);
 		const tBase *pBase = &s_pBases[ubBase];
 		for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
 			for(UWORD x = 1; x < 1 + 10; ++x) {
@@ -230,20 +230,20 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 	}
 
 	// Dino bones
-	pTiles[5][80] = TILE_BONE_HEAD;
-	pTiles[3][200] = TILE_BONE_1;
-	pTiles[7][400] = TILE_BONE_1;
-	pTiles[1][600] = TILE_BONE_1;
-	pTiles[5][800] = TILE_BONE_1;
-	pTiles[6][1000] = TILE_BONE_1;
-	pTiles[8][1500] = TILE_BONE_1;
-	pTiles[2][2000] = TILE_BONE_1;
-	pTiles[9][2500] = TILE_BONE_1;
+	pTiles[5][g_pDinoDepths[0]] = TILE_BONE_HEAD;
+	pTiles[3][g_pDinoDepths[1]] = TILE_BONE_1;
+	pTiles[7][g_pDinoDepths[2]] = TILE_BONE_1;
+	pTiles[1][g_pDinoDepths[3]] = TILE_BONE_1;
+	pTiles[4][g_pDinoDepths[4]] = TILE_BONE_1;
+	pTiles[6][g_pDinoDepths[5]] = TILE_BONE_1;
+	pTiles[8][g_pDinoDepths[6]] = TILE_BONE_1;
+	pTiles[2][g_pDinoDepths[7]] = TILE_BONE_1;
+	pTiles[9][g_pDinoDepths[8]] = TILE_BONE_1;
 
 	// Fill left invisible col with rocks
-	commProgress(100, "Finishing touches");
+	commProgress(100, g_pMsgs[MSG_LOADING_FINISHING]);
 	for(UWORD y = 0; y < uwEndY; ++y) {
-		pTiles[0][y] = TILE_ROCK_1;
+		pTiles[0][y] = TILE_DIRT_1;
 	}
 
 	if(isChallenge) {
@@ -259,7 +259,7 @@ void tileInit(UBYTE isCoalOnly, UBYTE isChallenge) {
 }
 
 void tileExcavate(UWORD uwX, UWORD uwY) {
-	UBYTE ubBg = TILE_CAVE_BG;
+	UBYTE ubBg = TILE_CAVE_BG_1;
 
 	// up
 	if(tileIsSolid(uwX, uwY-1)) {

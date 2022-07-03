@@ -6,10 +6,12 @@
 #include <ace/managers/viewport/simplebuffer.h>
 #include <ace/utils/palette.h>
 #include <ace/utils/chunky.h>
+#include <ace/utils/string.h>
+#include "defs.h"
 
-#define COLOR_BG 11
-#define COLOR_BAR_FULL 14
-#define COLOR_BAR_EMPTY 12
+#define HUD_COLOR_BG 11
+#define HUD_COLOR_BAR_FULL 14
+#define HUD_COLOR_BAR_EMPTY 12
 
 #define HUD_HEIGHT 31
 #define HUD_ORIGIN_X 11
@@ -17,15 +19,29 @@
 #define HUD_FACE_SIZE 16
 
 #define GAUGE_DRILL_X (HUD_ORIGIN_X + 65)
-#define GAUGE_CARGO_X (HUD_ORIGIN_X + 128)
+#define GAUGE_CARGO_X (HUD_ORIGIN_X + 125)
 #define GAUGE_HULL_X (HUD_ORIGIN_X + 182)
 #define GAUGE_DEPTH_X (HUD_ORIGIN_X + 248)
 #define GAUGE_CASH_X (HUD_ORIGIN_X + 248)
 
 #define ROW_1_Y (HUD_ORIGIN_Y + 0)
 #define ROW_2_Y (HUD_ORIGIN_Y + 9)
-#define HUD_MSG_LEN_MAX 250
+#define HUD_MSG_BFR_SIZE 250
 #define HUD_MSG_WAIT_CNT 150
+
+#define MODE_ICON_HEIGHT 12
+#define MODE_DISABLED_OFFS_Y 3 * MODE_ICON_HEIGHT
+
+typedef enum _tHudPage {
+	HUD_PAGE_MAIN,
+	HUD_PAGE_NOISE_1,
+	HUD_PAGE_NOISE_2,
+	HUD_PAGE_NOISE_3,
+	HUD_PAGE_MSG,
+	HUD_PAGE_PAUSE,
+	HUD_PAGE_MODE,
+	HUD_PAGE_COUNT,
+} tHudPage;
 
 typedef enum _tHudState {
 	// State machine for drawing main HUD
@@ -49,6 +65,9 @@ typedef enum _tHudState {
 	STATE_PAUSE_INITIAL_DRAW,
 	STATE_PAUSE_LOOP,
 	// State machine for drawing aux HUD
+	STATE_MODE_SHOW,
+	STATE_MODE_LOOP,
+	STATE_MODE_HIDE,
 } tHudState;
 
 typedef struct _tHudPlayerData {
@@ -58,26 +77,163 @@ typedef struct _tHudPlayerData {
 	UBYTE ubCargo, ubCargoMax;
 	UWORD uwHull, uwHullMax;
 	UBYTE ubHullDisp, ubCargoDisp, ubDrillDisp;
+	tMode eMode, eModePrev;
 } tHudPlayerData;
 
 static tVPort *s_pVpHud;
 static tSimpleBufferManager *s_pHudBuffer;
 static const tFont *s_pFont;
+static UBYTE s_ubLineHeight;
 static tTextBitMap *s_pLineBuffer;
+static UBYTE s_isBitmapFilled = 0;
 static tHudPlayerData s_pPlayerData[2];
 static tHudState s_eState;
 static tHudPlayer s_ePlayer;
 static UBYTE s_ubHudOffsY;
 static UBYTE s_isChallenge, s_is2pPlaying;
 static UWORD s_uwFrameDelay, s_uwStateCounter;
+static tHudPage s_ePageCurrent = HUD_PAGE_MAIN;
+
+// Message vars
 static UWORD s_uwMsgLen;
 static tUwCoordYX s_sMsgCharPos;
 static UBYTE s_ubMsgCharIdx;
-static char s_szMsg[HUD_MSG_LEN_MAX];
+static char s_szMsg[HUD_MSG_BFR_SIZE];
 static char s_szLetter[2] = {'\0'};
 static tBitMap *s_pFaces;
 static UBYTE s_ubFaceToDraw;
+
+// Pause vars
 static UBYTE s_ubSelection, s_ubSelectionPrev;
+
+// Mode vars
+static tBitMap *s_pModeIcons, *s_pModeCursor, *s_pModeCursorMask;
+static WORD s_pModeCounters[MODE_COUNT] = {-1, 0, 0, 0};
+static WORD s_pModeCountersPrev[MODE_COUNT] = {-1, 0, 0, 0};
+static tMode s_eModeToDraw;
+static UBYTE s_isPendingModeShow;
+static tHudPage s_eModeReturnPage;
+static tHudState s_eModeReturnState;
+static UBYTE s_ubHudShowStack;
+
+//----------------------------------------------------------------------- STATIC
+
+static void hudResetStateMachine(void) {
+	s_eState = (
+		s_isChallenge ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH
+	);
+	s_ePlayer = PLAYER_1;
+	s_ubHudOffsY = ROW_1_Y;
+	s_isBitmapFilled = 0;
+}
+
+static void hudShowPage(tHudPage eHudPage) {
+	s_ePageCurrent = eHudPage;
+	cameraSetCoord(s_pHudBuffer->pCamera, 0, eHudPage * 31);
+}
+
+//------------------------------------------------------------------------ PAUSE
+
+void hudPause(UBYTE isPaused) {
+	if(isPaused) {
+		s_eState = STATE_PAUSE_INITIAL_DRAW;
+	}
+	else {
+		hudShowMain();
+		hudResetStateMachine();
+		// TODO: perhaps reset to last "safe" state? E.g. begin of msg display
+	}
+}
+
+UBYTE hudIsPaused(void) {
+	return (
+		s_eState == STATE_PAUSE_INITIAL_DRAW ||
+		s_eState == STATE_PAUSE_LOOP
+	);
+}
+
+void hudSelect(UBYTE ubSelection) {
+	s_ubSelection = ubSelection;
+}
+
+UBYTE hudGetSelection(void) {
+	return s_ubSelection;
+}
+
+//------------------------------------------------------------------------- MODE
+
+static void hudDrawModeIcon(tMode eMode) {
+	static const UWORD uwModeWidth = 40 - 1;
+	UWORD uwOffsX = HUD_ORIGIN_X + (eMode + 1) * uwModeWidth;
+	UWORD uwOffsY = HUD_ORIGIN_Y + HUD_PAGE_MODE * 31 + 1;
+
+	// Erase selection
+	blitRect(
+		s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1, uwModeWidth, 15, HUD_COLOR_BG
+	);
+
+	// Draw icon
+	UWORD uwIconOffs = eMode * MODE_ICON_HEIGHT;
+	if(eMode != MODE_DRILL && !s_pModeCounters[eMode]) {
+		uwIconOffs += MODE_DISABLED_OFFS_Y;
+	}
+	blitCopy(
+		s_pModeIcons, 0, uwIconOffs,
+		s_pHudBuffer->pBack, uwOffsX + 1, uwOffsY,
+		16, MODE_ICON_HEIGHT, MINTERM_COOKIE
+	);
+
+	// Draw selection
+	if(s_pPlayerData[PLAYER_1].eMode == eMode) {
+		blitCopyMask(
+			s_pModeCursor, 0, 0,
+			s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1,
+			16, 15, (UWORD*)s_pModeCursorMask->Planes[0]
+		);
+	}
+	if(s_is2pPlaying && s_pPlayerData[PLAYER_2].eMode == eMode) {
+		blitCopyMask(
+			s_pModeCursor, 0, 15,
+			s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1,
+			16, 15, (UWORD*)s_pModeCursorMask->Planes[0]
+		);
+	}
+
+	// Draw count
+	if(eMode != MODE_DRILL) {
+		char szCount[6];
+		sprintf(szCount, "%hu", s_pModeCounters[eMode]);
+		fontFillTextBitMap(s_pFont, s_pLineBuffer, szCount);
+		fontDrawTextBitMap(
+			s_pHudBuffer->pBack, s_pLineBuffer,
+			uwOffsX + 1 + 16, uwOffsY + MODE_ICON_HEIGHT / 2,
+			HUD_COLOR_BAR_FULL, FONT_COOKIE | FONT_VCENTER
+		);
+	}
+}
+
+void hudSetModeCounter(tMode eMode, WORD wCount) {
+	s_pModeCounters[eMode] = wCount;
+}
+
+void hudSetMode(tHudPlayer ePlayer, tMode eMode) {
+	s_pPlayerData[ePlayer].eMode = eMode;
+}
+
+void hudShowMode(void) {
+	if(++s_ubHudShowStack == 1) {
+		s_isPendingModeShow = 1;
+		s_eModeToDraw = MODE_DRILL;
+	}
+}
+
+void hudHideMode(void) {
+	if(--s_ubHudShowStack == 0) {
+		s_eState = STATE_MODE_HIDE;
+	}
+}
+
+//------------------------------------------------------------------------- MAIN
 
 void hudCreate(tView *pView, const tFont *pFont) {
   s_pVpHud = vPortCreate(0,
@@ -89,50 +245,54 @@ void hudCreate(tView *pView, const tFont *pFont) {
   s_pHudBuffer = simpleBufferCreate(0,
     TAG_SIMPLEBUFFER_VPORT, s_pVpHud,
     TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_INTERLEAVED,
-		TAG_SIMPLEBUFFER_BOUND_HEIGHT, 31 * 5,
+		TAG_SIMPLEBUFFER_BOUND_HEIGHT, 31 * HUD_PAGE_COUNT,
   TAG_END);
 
 	bitmapLoadFromFile(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
 	s_pFaces = bitmapCreateFromFile("data/comm_faces.bm", 0);
+	s_pModeIcons = bitmapCreateFromFile("data/mode_icons.bm", 0);
+	s_pModeCursor = bitmapCreateFromFile("data/mode_cursor.bm", 0);
+	s_pModeCursorMask = bitmapCreateFromFile("data/mode_cursor_mask.bm", 0);
 
 	s_pFont = pFont;
-	s_pLineBuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, pFont->uwHeight);
+	s_ubLineHeight = 7;
+	s_pLineBuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, s_pFont->uwHeight);
 
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_1_Y,
-		"Player 1", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+		s_pFont, s_pHudBuffer->pBack, HUD_ORIGIN_X, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_P1], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE, s_pLineBuffer
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, HUD_ORIGIN_X, ROW_2_Y,
-		"Player 2", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+		s_pFont, s_pHudBuffer->pBack, HUD_ORIGIN_X, ROW_2_Y - 3,
+		g_pMsgs[MSG_HUD_P2], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE, s_pLineBuffer
 	);
 
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_DRILL_X - 1, ROW_1_Y,
-		"Drill:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		s_pFont, s_pHudBuffer->pBack, GAUGE_DRILL_X - 1, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_DRILL], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_CARGO_X - 1, ROW_1_Y,
-		"Cargo:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		s_pFont, s_pHudBuffer->pBack, GAUGE_CARGO_X - 1, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_CARGO], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_HULL_X - 1, ROW_1_Y,
-		"Hull:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		s_pFont, s_pHudBuffer->pBack, GAUGE_HULL_X - 1, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_HULL], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	fontDrawStr(
-		s_pHudBuffer->pBack, s_pFont, GAUGE_CASH_X - 1, ROW_1_Y,
-		"Cash:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+		s_pFont, s_pHudBuffer->pBack, GAUGE_CASH_X - 1, ROW_1_Y - 3,
+		g_pMsgs[MSG_HUD_CASH], HUD_COLOR_BAR_FULL,
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	hudReset(0, 0);
 }
 
-static void hudShowPage(UBYTE ubPage) {
-	cameraSetCoord(s_pHudBuffer->pCamera, 0, ubPage * 31);
-}
-
 void hudShowMessage(UBYTE ubFace, const char *szMsg) {
 	logWrite("Showing HUD message: '%s'\n", szMsg);
-	CopyMem(szMsg, s_szMsg, MIN(strlen(szMsg) + 1, HUD_MSG_LEN_MAX));
+	stringCopyLimited(szMsg, s_szMsg, HUD_MSG_BFR_SIZE);
 	s_eState = STATE_MSG_NOISE_IN;
 	s_uwFrameDelay = 25;
 	s_uwStateCounter = 0;
@@ -143,30 +303,26 @@ void hudSet2pPlaying(UBYTE isPlaying) {
 	s_is2pPlaying = isPlaying;
 }
 
-static void hudResetStateMachine(void) {
-	s_eState = (
-		s_isChallenge ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH
-	);
-	s_ePlayer = PLAYER_1;
-	s_ubHudOffsY = ROW_1_Y;
-}
-
 void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 	s_isChallenge = isChallenge;
 	s_is2pPlaying = is2pPlaying;
-	const UBYTE ubLabelWidth = fontMeasureText(s_pFont, "Depth:").uwX;
+	s_ubHudShowStack = 0;
+	const UBYTE ubLabelWidth = fontMeasureText(
+		s_pFont, g_pMsgs[MSG_HUD_DEPTH]
+	).uwX;
 	if(isChallenge) {
 		// Clear depth label and use it as cash
 		blitRect(
 			s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1 - ubLabelWidth, ROW_2_Y,
-			ubLabelWidth, s_pFont->uwHeight, COLOR_BG
+			ubLabelWidth, s_ubLineHeight, HUD_COLOR_BG
 		);
 	}
 	else {
 		// Depth instead of 2p cash
 		fontDrawStr(
-			s_pHudBuffer->pBack, s_pFont, GAUGE_DEPTH_X - 1, ROW_2_Y,
-			"Depth:", COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE | FONT_RIGHT
+			s_pFont, s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1, ROW_2_Y - 3,
+			g_pMsgs[MSG_HUD_DEPTH], HUD_COLOR_BAR_FULL,
+			FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 		);
 	}
 
@@ -176,11 +332,11 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 		for(UBYTE b = 0; b < 10; ++b) {
 			blitRect(
 				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, ROW_1_Y,
-				2, 5, COLOR_BAR_EMPTY
+				2, 5, HUD_COLOR_BAR_EMPTY
 			);
 			blitRect(
 				s_pHudBuffer->pBack, pBarOffsX[i] + 3 * b, ROW_2_Y,
-				2, 5, COLOR_BAR_EMPTY
+				2, 5, HUD_COLOR_BAR_EMPTY
 			);
 		}
 	}
@@ -258,26 +414,30 @@ void hudUpdate(void) {
 			if(uwDepth != pData->uwDepthDisp) {
 				sprintf(szBfr, "%u.%um", uwDepth / 10, uwDepth % 10);
 				fontFillTextBitMap(s_pFont, s_pLineBuffer, szBfr);
+				s_isBitmapFilled = 1;
 				pData->uwDepthDisp = uwDepth;
 				s_eState = STATE_MAIN_DRAW_DEPTH;
 				isDrawPending = 1;
 				break;
 			}
+			// fallthrough if value is the same
 		case STATE_MAIN_DRAW_DEPTH:
 			if(isDrawPending) {
 				// decreased clear height 'cuz digits are smaller than whole font
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_DEPTH_X, ROW_2_Y,
-					320 - (GAUGE_DEPTH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 2, COLOR_BG
+					320 - (GAUGE_DEPTH_X + HUD_ORIGIN_X), s_ubLineHeight - 2, HUD_COLOR_BG
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
-					GAUGE_DEPTH_X, ROW_2_Y, COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+					GAUGE_DEPTH_X, ROW_2_Y - 3, HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 				);
+				s_isBitmapFilled = 0;
 				s_eState = STATE_MAIN_PREPARE_CASH;
 				isDrawPending = 0;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_PREPARE_CASH:
 			if(s_isChallenge) {
 				lCash = s_pPlayerData[s_ePlayer].lCash;
@@ -300,36 +460,40 @@ void hudUpdate(void) {
 				UWORD k = (ulDisp / 1000U) % 1000U;
 				UWORD u = ulDisp % 1000U;
 				if(ulDisp >= 1000000U) {
-					sprintf(&szBfr[ubOffs], "%lu.%03lu.%03lu\x1F", m, k, u);
+					sprintf(&szBfr[ubOffs], "%hu.%03hu.%03hu\x1F", m, k, u);
 				}
 				else if(ulDisp >= 1000U) {
-					sprintf(&szBfr[ubOffs], "%lu.%03lu\x1F", k, u);
+					sprintf(&szBfr[ubOffs], "%hu.%03u\x1F", k, u);
 				}
 				else {
-					sprintf(&szBfr[ubOffs], "%lu\x1F", u);
+					sprintf(&szBfr[ubOffs], "%hu\x1F", u);
 				}
 				fontFillTextBitMap(s_pFont, s_pLineBuffer, szBfr);
+				s_isBitmapFilled = 1;
 				pData->lCashDisp = lCash;
 				s_eState = STATE_MAIN_DRAW_CASH;
 				isDrawPending = 1;
 				break;
 			}
+			// fallthrough if value is the same
 		case STATE_MAIN_DRAW_CASH:
 			if(isDrawPending) {
 				// decreased clear height 'cuz digits are smaller than whole font
 				UBYTE ubY = (s_isChallenge ? s_ubHudOffsY : ROW_1_Y);
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_CASH_X, ubY,
-					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_pFont->uwHeight - 1, COLOR_BG
+					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_ubLineHeight - 1, HUD_COLOR_BG
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
-					GAUGE_CASH_X, ubY, COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
+					GAUGE_CASH_X, ubY - 3, HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE
 				);
+				s_isBitmapFilled = 0;
 				s_eState = STATE_MAIN_DRAW_FUEL;
 				isDrawPending = 0;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_DRAW_FUEL:
 			ubPercent = 0;
 			if(pData->uwDrillMax) {
@@ -340,17 +504,18 @@ void hudUpdate(void) {
 				if(ubPercent > pData->ubDrillDisp) {
 					ubDraw = pData->ubDrillDisp;
 					++pData->ubDrillDisp;
-					ubColor = COLOR_BAR_FULL;
+					ubColor = HUD_COLOR_BAR_FULL;
 				}
 				else {
 					--pData->ubDrillDisp;
 					ubDraw = pData->ubDrillDisp;
-					ubColor = COLOR_BAR_EMPTY;
+					ubColor = HUD_COLOR_BAR_EMPTY;
 				}
 				hudDrawStateBarPercent(GAUGE_DRILL_X, s_ubHudOffsY, ubDraw, ubColor);
 				s_eState = STATE_MAIN_DRAW_CARGO;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_DRAW_CARGO:
 			ubPercent = 0;
 			if(pData->ubCargoMax) {
@@ -361,17 +526,18 @@ void hudUpdate(void) {
 				if(ubPercent > pData->ubCargoDisp) {
 					ubDraw = pData->ubCargoDisp;
 					++pData->ubCargoDisp;
-					ubColor = COLOR_BAR_FULL;
+					ubColor = HUD_COLOR_BAR_FULL;
 				}
 				else {
 					--pData->ubCargoDisp;
 					ubDraw = pData->ubCargoDisp;
-					ubColor = COLOR_BAR_EMPTY;
+					ubColor = HUD_COLOR_BAR_EMPTY;
 				}
 				hudDrawStateBarPercent(GAUGE_CARGO_X, s_ubHudOffsY, ubDraw, ubColor);
 				s_eState = STATE_MAIN_DRAW_HULL;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_DRAW_HULL:
 			ubPercent = 0;
 			if(pData->uwHullMax) {
@@ -382,17 +548,18 @@ void hudUpdate(void) {
 				if(ubPercent > pData->ubHullDisp) {
 					ubDraw = pData->ubHullDisp;
 					++pData->ubHullDisp;
-					ubColor = COLOR_BAR_FULL;
+					ubColor = HUD_COLOR_BAR_FULL;
 				}
 				else {
 					--pData->ubHullDisp;
 					ubDraw = pData->ubHullDisp;
-					ubColor = COLOR_BAR_EMPTY;
+					ubColor = HUD_COLOR_BAR_EMPTY;
 				}
 				hudDrawStateBarPercent(GAUGE_HULL_X, s_ubHudOffsY, ubDraw, ubColor);
 				s_eState = STATE_MAIN_DRAW_END;
 				break;
 			}
+			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_DRAW_END:
 			// Cycle players and start again
 			if(s_ePlayer == PLAYER_1) {
@@ -411,7 +578,7 @@ void hudUpdate(void) {
 				s_eState = STATE_MSG_DRAW_FACE;
 			}
 			else if(++s_uwStateCounter >= 4) {
-				hudShowPage(1 + (s_uwFrameDelay % 3));
+				hudShowPage(HUD_PAGE_NOISE_1 + (s_uwFrameDelay % 3));
 				s_uwStateCounter = 0;
 			}
 			break;
@@ -423,15 +590,16 @@ void hudUpdate(void) {
 			blitCopy(
 				s_pFaces, 0, s_ubFaceToDraw * HUD_FACE_SIZE,
 				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
-				HUD_FACE_SIZE, HUD_FACE_SIZE, MINTERM_COOKIE, 0xFF
+				HUD_FACE_SIZE, HUD_FACE_SIZE, MINTERM_COOKIE
 			);
 			s_sMsgCharPos.uwX += HUD_FACE_SIZE + 1;
 			blitRect(
 				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
-				283, 2 * s_pFont->uwHeight + 1, COLOR_BG
+				283, 2 * s_ubLineHeight + 1, HUD_COLOR_BG
 			);
+			s_sMsgCharPos.uwY -= 2;
 
-			hudShowPage(4);
+			hudShowPage(HUD_PAGE_MSG);
 			s_ubMsgCharIdx = 0;
 			s_uwMsgLen = strlen(s_szMsg);
 			s_eState = STATE_MSG_PREPARE_LETTER;
@@ -441,12 +609,13 @@ void hudUpdate(void) {
 			if(s_szMsg[s_ubMsgCharIdx] != '\n') {
 				fontFillTextBitMap(s_pFont, s_pLineBuffer, s_szLetter);
 			}
+			s_isBitmapFilled = 1;
 			s_eState = STATE_MSG_DRAW_LETTER;
 			break;
 		case STATE_MSG_DRAW_LETTER:
 			if(s_szMsg[s_ubMsgCharIdx] == '\n') {
 				s_sMsgCharPos.uwX = HUD_ORIGIN_X + HUD_FACE_SIZE + 1;
-				s_sMsgCharPos.uwY += s_pFont->uwHeight + 1;
+				s_sMsgCharPos.uwY += s_ubLineHeight + 1;
 				isLineOverflow = 0;
 			}
 			else {
@@ -457,7 +626,7 @@ void hudUpdate(void) {
 				) {
 					fontDrawTextBitMap(
 						s_pHudBuffer->pBack, s_pLineBuffer,
-						s_sMsgCharPos.uwX, s_sMsgCharPos.uwY, COLOR_BAR_FULL, FONT_COOKIE
+						s_sMsgCharPos.uwX, s_sMsgCharPos.uwY, HUD_COLOR_BAR_FULL, FONT_COOKIE
 					);
 					s_sMsgCharPos.uwX += ubGlyphWidth + 1;
 				}
@@ -465,6 +634,7 @@ void hudUpdate(void) {
 					isLineOverflow = 1;
 				}
 			}
+			s_isBitmapFilled = 0;
 			if(++s_ubMsgCharIdx >= s_uwMsgLen) {
 				s_eState = STATE_MSG_WAIT_OUT;
 				s_uwFrameDelay = 0;
@@ -484,87 +654,102 @@ void hudUpdate(void) {
 				s_eState = STATE_MSG_END;
 			}
 			else if(++s_uwStateCounter >= 4) {
-				hudShowPage(1 + (s_uwFrameDelay % 3));
+				hudShowPage(HUD_PAGE_NOISE_1 + (s_uwFrameDelay % 3));
 				s_uwStateCounter = 0;
 			}
 			break;
 		case STATE_MSG_END:
-			hudShowPage(0);
+			hudShowPage(HUD_PAGE_MAIN);
 			hudResetStateMachine();
 			break;
-		case STATE_PAUSE_INITIAL_DRAW:
+		case STATE_PAUSE_INITIAL_DRAW: {
+				const UWORD uwPageOriginY = HUD_PAGE_PAUSE * HUD_HEIGHT + HUD_ORIGIN_Y;
 				blitRect(
-					s_pHudBuffer->pBack, HUD_ORIGIN_X, 4 * HUD_HEIGHT + HUD_ORIGIN_Y,
-					320 - 2 * HUD_ORIGIN_X, 2 * s_pFont->uwHeight + 1, COLOR_BG
+					s_pHudBuffer->pBack, HUD_ORIGIN_X, uwPageOriginY,
+					320 - 2 * HUD_ORIGIN_X, 2 * s_ubLineHeight + 1, HUD_COLOR_BG
 				);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Game paused");
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_PAUSED]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 2,
-					4 * HUD_HEIGHT + HUD_ORIGIN_Y, COLOR_BAR_FULL, FONT_COOKIE | FONT_HCENTER
+					uwPageOriginY - 3, HUD_COLOR_BAR_FULL, FONT_COOKIE | FONT_HCENTER
 				);
-				hudShowPage(4);
+				hudShowPage(HUD_PAGE_PAUSE);
 				s_eState = STATE_PAUSE_LOOP;
 				s_ubSelection = 0;
 				s_ubSelectionPrev = 1;
-			break;
+		} break;
 		case STATE_PAUSE_LOOP:
 			if(s_ubSelection != s_ubSelectionPrev) {
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Resume");
+				const UWORD uwPageOriginY = HUD_PAGE_PAUSE * HUD_HEIGHT + HUD_ORIGIN_Y;
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_RESUME]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 3,
-					4 * HUD_HEIGHT + HUD_ORIGIN_Y + s_pFont->uwHeight,
-					(s_ubSelection == 0) ? COLOR_BAR_FULL : COLOR_BAR_EMPTY,
+					uwPageOriginY - 3 + s_ubLineHeight,
+					(s_ubSelection == 0) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
 					FONT_COOKIE | FONT_HCENTER
 				);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, "Quit");
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_QUIT]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,
-					4 * HUD_HEIGHT + HUD_ORIGIN_Y + s_pFont->uwHeight,
-					(s_ubSelection == 1) ? COLOR_BAR_FULL : COLOR_BAR_EMPTY,
+					uwPageOriginY - 3 + s_ubLineHeight,
+					(s_ubSelection == 1) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
 					FONT_COOKIE | FONT_HCENTER
 				);
 				s_ubSelectionPrev = s_ubSelection;
 			}
 			break;
+		case STATE_MODE_SHOW:
+			s_eModeReturnPage = s_ePageCurrent;
+			if(s_eModeToDraw < MODE_COUNT) {
+				hudDrawModeIcon(s_eModeToDraw);
+				++s_eModeToDraw;
+			}
+			else {
+				hudShowPage(HUD_PAGE_MODE);
+				s_eState = STATE_MODE_LOOP;
+			}
+			break;
+		case STATE_MODE_LOOP:
+			if(s_ePlayer == PLAYER_1 || s_is2pPlaying) {
+				tHudPlayerData *pData = &s_pPlayerData[s_ePlayer];
+				if(pData->eModePrev != pData->eMode) {
+					hudDrawModeIcon(pData->eModePrev);
+					hudDrawModeIcon(pData->eMode);
+					pData->eModePrev = pData->eMode;
+				}
+				else if(s_pModeCountersPrev[pData->eMode] != s_pModeCounters[pData->eMode]) {
+					hudDrawModeIcon(pData->eMode);
+					s_pModeCountersPrev[pData->eMode] = s_pModeCounters[pData->eMode];
+				}
+			}
+			// Cycle players and start again
+			s_ePlayer = (s_ePlayer == PLAYER_1) ? PLAYER_2 : PLAYER_1;
+		break;
+		case STATE_MODE_HIDE:
+			hudShowPage(s_eModeReturnPage);
+			s_eState = s_eModeReturnState;
+			break;
+	}
+	if(s_isPendingModeShow && !s_isBitmapFilled) {
+		s_eModeReturnState = s_eState;
+		s_eState = STATE_MODE_SHOW;
+		s_isPendingModeShow = 0;
 	}
 }
 
 void hudDestroy(void) {
 	fontDestroyTextBitMap(s_pLineBuffer);
 	bitmapDestroy(s_pFaces);
+	bitmapDestroy(s_pModeIcons);
+	bitmapDestroy(s_pModeCursor);
+	bitmapDestroy(s_pModeCursorMask);
 }
 
 void hudShowMain(void) {
-	hudShowPage(0);
-}
-
-void hudPause(UBYTE isPaused) {
-	if(isPaused) {
-		s_eState = STATE_PAUSE_INITIAL_DRAW;
-	}
-	else {
-		hudShowPage(0);
-		hudResetStateMachine();
-		// TODO: perhaps reset to last "safe" state? E.g. begin of msg display
-	}
-}
-
-UBYTE hudIsPaused(void) {
-	return (
-		s_eState == STATE_PAUSE_INITIAL_DRAW ||
-		s_eState == STATE_PAUSE_LOOP
-	);
-}
-
-void hudSelect(UBYTE ubSelection) {
-	s_ubSelection = ubSelection;
-}
-
-UBYTE hudGetSelection(void) {
-	return s_ubSelection;
+	hudShowPage(HUD_PAGE_MAIN);
 }

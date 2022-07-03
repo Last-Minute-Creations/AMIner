@@ -11,6 +11,8 @@
 typedef struct _tTextBob {
 	const tFont *pFont;
 	char szText[100];
+	tBitMap *pTextBm;
+	tBitMap *pTextMask;
 	tBobNew sBob;
 	UWORD uwWidth;
 	UWORD uwDestPosY;

@@ -1,0 +1,120 @@
+{
+	"shopNames": ["Drill", "Cargo bay", "Hull", "Dynamite"],
+	"warehouseColNames": ["Mineral", "Sell", "Stock", "Plan"],
+	"planMessages": {
+		"doneAfk": [
+			"We've fulfilled plan with your reserves.",
+			"New has arrived"
+		],
+		"notDone": "Comrade, plan not done, warning and new plan",
+		"remaining": "Boss, %hd days remaining to complete the plan.",
+		"extending": [
+			"Boss, Plan is overdue. Urzedas says you've got",
+			"about %hhu days before you get in trouble."
+		]
+	},
+	"hiScore": {
+		"new": "New hi-score! Enter your name!",
+		"press": "Press FIRE or ENTER to continue",
+		"score": "Score",
+		"winP1": "Player 1 wins!",
+		"winP2": "Player 2 wins!",
+		"draw": "Draw!"
+	},
+	"menu": {
+		"enumMode": ["Campaign", "Challenge"],
+		"enumP1": ["Joy", "WSAD"],
+		"enumP2": ["Joy", "Arrows"],
+		"enumOnOff": ["OFF", "ON"],
+		"enumPlayerCount": ["One", "Two"],
+		"captions": [
+			"Start game",
+			"Mode",
+			"Players",
+			"Player 1 controls",
+			"Player 2 controls",
+			"ATARI Mode",
+			"Hi-Scores",
+			"Exit to workbench"
+		]
+	},
+	"minerals": [
+		"Silver", "Gold", "Emerald", "Ruby", "Moonstone", "Coal"
+	],
+	"loading": {
+		"genTerrain": "Generating terrain",
+		"genBases": "Generating bases",
+		"finishing": "Finishing touches"
+	},
+	"tutorial": {
+		"start": "Comrade, go dig 3 ores of silver!",
+		"onDugOut": [
+			"Your drill gets damaged and cargo bay filled as you dig.",
+			"Get to the warehouse to leave minerals and replace drill."
+		],
+		"nearShop": [
+			"Comrade, press ENTER or FIRE or SPACE to enter shop.",
+			"You can sell ore or use it for fulfilling plans."
+		],
+		"inShop": [
+			"You need to spend 3 silver to fulfill the plan. Navigate to it",
+			"and move minerals to plan column, then press Confirm."
+		],
+		"onMoveToPlan": [
+			"Congratulations comrade, you've fulfilled your first plan.",
+			"Keep doing it and surely you will be promoted!"
+		]
+	},
+	"challenge": {
+		"checkpoint": "Checkpoint!",
+		"teleport": "Teleport:"
+	},
+	"misc": {
+		"drillDepleted": "Drill depleted!",
+		"cargoFull": "Cargo full!",
+		"restock": "Restock!",
+		"foundBone": "Found bone no. %hhu!"
+	},
+	"shop": {
+		"timeRemaining": "%d days remaining",
+		"accolades": "Accolades:",
+		"rebukes": "Rebukes:",
+		"mk": "Mk",
+		"upgradeToMk": "Upgrade to Mk",
+		"stock": "Stock",
+		"buy": "Buy",
+		"exit": "Exit",
+		"confirm": "Confirm",
+		"alreadyMax": "you already have max level!",
+		"alreadyFull": "you're already full!"
+	},
+	"hud": {
+		"p1": "Player 1",
+		"p2": "Player 2",
+		"drill": "Drill:",
+		"cargo": "Cargo:",
+		"hull": "Hull:",
+		"cash": "Cash:",
+		"depth": "Depth:",
+		"paused": "Game paused",
+		"resume": "Resume",
+		"quit": "Quit"
+	},
+	"krystyna": {
+		"guest": "Mr Director, you have guest. He is waiting in your office",
+		"urzedas": "Mr Director, Urzedas wants to see you. Says its important. I told him you have meeting but he refuse to go. He is waiting in the Office",
+		"commissar": "Mr Director, Commissar Putienko calls you to his office. Immediately!"
+	},
+	"officePages": {
+		"main": "Back",
+		"listMietek": "Mietek",
+		"listKrystyna": "Krystyna",
+		"listPutin": "Commissar Putienko",
+		"listUrzedas": "Urzedas",
+		"dossierKrystyna": "Dossier",
+		"dossierUrzedas": "Dossier",
+		"bribe": "Bribe",
+		"favor": "Favor",
+		"accounting": "Creative Accounting"
+	}
+}

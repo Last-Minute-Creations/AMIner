@@ -7,11 +7,20 @@
 
 #include <ace/utils/extview.h>
 #include <ace/utils/font.h>
+#include "string_array.h"
 
 typedef enum _tHudPlayer {
 	PLAYER_1 = 0,
 	PLAYER_2
 } tHudPlayer;
+
+typedef enum _tMode {
+	MODE_DRILL,
+	MODE_TNT,
+	MODE_NUKE,
+	MODE_TELEPORT,
+	MODE_COUNT
+} tMode;
 
 void hudCreate(tView *pView, const tFont *pFont);
 
@@ -42,5 +51,15 @@ void hudPause(UBYTE isPaused);
 UBYTE hudGetSelection(void);
 
 void hudSelect(UBYTE ubSelection);
+
+//------------------------------------------------------------------------- MODE
+
+void hudSetModeCounter(tMode eMode, WORD wCount);
+
+void hudSetMode(tHudPlayer ePlayer, tMode eMode);
+
+void hudShowMode(void);
+
+void hudHideMode(void);
 
 #endif // _HUD_H_

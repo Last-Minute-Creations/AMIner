@@ -43,7 +43,5 @@ set(BASE1_41 256 256 "base1.png") # TILE_BASE_GROUND_8
 set(BASE1_42 288 256 "base1.png") # TILE_BASE_GROUND_9
 
 tileExtractFromPng(
-	${TARGET_NAME} "BASE1"
-	"${CMAKE_CURRENT_SOURCE_DIR}/_res/base1"
-	"${CMAKE_CURRENT_SOURCE_DIR}/data/base1.bm"
+	${AMINER_EXECUTABLE} "BASE1" "${GEN_DIR}/base1" "${DATA_DIR}/base1.bm"
 )

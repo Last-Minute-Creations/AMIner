@@ -6,10 +6,11 @@
 #define _HI_SCORE_H_
 
 #include <ace/types.h>
+#include "string_array.h"
 
 void hiScoreEnteringProcess(void);
 
-UBYTE hiScoreIsEntering(void);
+UBYTE hiScoreIsEnteringNew(void);
 
 void hiScoreSetup(LONG lScore, const char *szResult);
 

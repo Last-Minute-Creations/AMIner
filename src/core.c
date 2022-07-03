@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "core.h"
-#include <ace/managers/game.h>
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
 #include <ace/utils/palette.h>
@@ -19,7 +18,8 @@
 #include "hi_score.h"
 #include "tile.h"
 #include "explosion.h"
-#include "comm.h"
+#include <comm/base.h>
+#include "defs.h"
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
@@ -27,7 +27,8 @@ static UWORD *s_pColorBg;
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
-tTileBufferManager *g_pMainBuffer;
+static tBitMap *s_pBombMarker, *s_pBombMarkerMask;
+static const char *s_szLangPrefix;
 
 static void mainPaletteProcess(UBYTE ubFadeLevel) {
 	tFadeState eState = fadeGetState();
@@ -40,7 +41,7 @@ static void mainPaletteProcess(UBYTE ubFadeLevel) {
 void coreProcessBeforeBobs(void) {
 	// Undraw all bobs
 	debugColor(0x008);
-	bobNewBegin();
+	bobNewBegin(g_pMainBuffer->pScroll->pBack);
 
 	// Draw pending tiles
 	tileBufferQueueProcess(g_pMainBuffer);
@@ -74,13 +75,14 @@ void coreProcessAfterBobs(void) {
 	vPortWaitForEnd(s_pVpMain);
 }
 
-void coreGsCreate(void) {
+static void coreGsCreate(void) {
+	defsInit();
+	langCreate(s_szLangPrefix);
 	hiScoreLoad();
 	s_pView = viewCreate(0,
 		TAG_VIEW_GLOBAL_CLUT, 1,
 	TAG_END);
 
-	g_pFont = fontCreate("data/uni54.fnt");
 	textBobManagerCreate(g_pFont);
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
 	dinoCreate();
@@ -103,20 +105,21 @@ void coreGsCreate(void) {
 	TAG_END);
 
 	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
-	memset(s_pVpMain->pPalette, 0, 1 << GAME_BPP);
+	memset(s_pVpMain->pPalette, 0, sizeof(s_pVpMain->pPalette));
 	s_pColorBg = &s_pVpMain->pPalette[0];
 
 	baseTileCreate(g_pMainBuffer);
 	audioCreate();
 	g_pSampleDrill = sampleCreateFromFile("data/sfx/drill1.raw8", 8000);
 	g_pSampleOre = sampleCreateFromFile("data/sfx/ore2.raw8", 8000);
-	g_pSampleTeleport = sampleCreateFromFile("data/sfx/teleport.raw8", 8000);
+	g_pSamplePenalty = sampleCreateFromFile("data/sfx/penalty.raw8", 8000);
 
 #ifdef GAME_DEBUG
-	randInit(2184);
+	randInit(&g_sRand, 2184, 1911);
 #else
 	// Seed from beam pos Y & X
-	randInit((g_pRayPos->bfPosY << 8) | g_pRayPos->bfPosX);
+	tRayPos sRayPos = getRayPos();
+	randInit(&g_sRand, 1 + (sRayPos.bfPosY << 8), 1 + sRayPos.bfPosX);
 #endif
 
 	tileInit(0, 1);
@@ -132,8 +135,20 @@ void coreGsCreate(void) {
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);
 
+	s_pBombMarker = bitmapCreateFromFile("data/bomb_marker.bm", 0);
+	s_pBombMarkerMask = bitmapCreateFromFile("data/bomb_marker_mask.bm", 0);
+
+	for(UBYTE i = 0; i < 3; ++i) {
+		bobNewInit(
+			&g_pBombMarkers[i], 16, 10, 1,
+			bobNewCalcFrameAddress(s_pBombMarker, 0),
+			bobNewCalcFrameAddress(s_pBombMarkerMask, 0),
+			0, 0
+		);
+	}
+
 	menuPreload();
-	bobNewAllocateBgBuffers();
+	bobNewReallocateBgBuffers();
 	systemUnuse();
 
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
@@ -151,16 +166,16 @@ void coreGsCreate(void) {
 	g_isAtari = 0;
 
 	hudReset(0, 0);
-	gamePushState(menuGsCreate, menuGsLoop, menuGsDestroy);
+	statePush(g_pGameStateManager, &g_sStateMenu);
 }
 
-void coreGsLoop(void) {
+static void coreGsLoop(void) {
 	// you shouldn't be here!
-	gameClose();
+	statePopAll(g_pGameStateManager);
 }
 
-void coreGsDestroy(void) {
-systemUse();
+static void coreGsDestroy(void) {
+	systemUse();
 
 	menuUnload();
 	bitmapDestroy(s_pTiles);
@@ -177,10 +192,34 @@ systemUse();
 	audioDestroy();
 	sampleDestroy(g_pSampleDrill);
 	sampleDestroy(g_pSampleOre);
-	sampleDestroy(g_pSampleTeleport);
+	sampleDestroy(g_pSamplePenalty);
+
+	bitmapDestroy(s_pBombMarker);
+	bitmapDestroy(s_pBombMarkerMask);
 
 	explosionManagerDestroy();
+	langDestroy();
 
   hudDestroy();
   viewDestroy(s_pView);
 }
+
+void coreSetLangPrefix(const char * const szPrefix) {
+	logBlockBegin("coreSetLangPrefix(szPrefix: %s)", szPrefix);
+	s_szLangPrefix = szPrefix;
+	logBlockEnd("coreSetLangPrefix()");
+}
+
+const char * coreGetLangPrefix(void) {
+	return s_szLangPrefix;
+}
+
+//---------------------------------------------------------------------- GLOBALS
+
+tTileBufferManager *g_pMainBuffer;
+tFont *g_pFont;
+tRandManager g_sRand;
+
+tState g_sStateCore = {
+	.cbCreate = coreGsCreate, .cbLoop = coreGsLoop, .cbDestroy = coreGsDestroy
+};

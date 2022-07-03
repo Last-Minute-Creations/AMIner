@@ -9,5 +9,6 @@
 #define COLOR_REDEST 17
 #define COLOR_GREEN 3
 #define COLOR_GOLD 16
+#define COLOR_WHITE 9
 
 #endif // _COLOR_H_

@@ -5,20 +5,26 @@
 
 #define VEHICLE_DYNAMITE_MAX 25
 
-typedef enum _eDynamiteType {
-	DYNAMITE_TYPE_3X3,
-	DYNAMITE_TYPE_VERT,
-	DYNAMITE_TYPE_HORZ,
-	DYNAMITE_TYPE_5x5
-} eDynamite;
+typedef enum _tBombDir {
+	BOMB_DIR_NONE,
+	BOMB_DIR_LEFT,
+	BOMB_DIR_RIGHT,
+	BOMB_DIR_UP,
+	BOMB_DIR_DOWN,
+} tBombDir;
 
 typedef struct _tDynamite {
 	tUwCoordYX pCoords[VEHICLE_DYNAMITE_MAX];
 	UBYTE ubCount;
+	UBYTE ubCurrent;
+	UBYTE ubPlayer;
 } tDynamite;
 
-void dynamiteTrigger(
-	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubDynamiteType
+UBYTE dynamiteTrigger(
+	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubCount,
+	tBombDir eDir
 );
+
+UBYTE dynamiteIsActive(const tDynamite *pDynamite);
 
 #endif // _DYNAMITE_H_

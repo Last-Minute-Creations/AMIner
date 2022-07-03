@@ -11,7 +11,7 @@
 // Undraw stack must be accessible during adding new bobs, so the most safe
 // approach is to have two lists - undraw list gets populated after draw
 // and depopulated during undraw
-typedef struct _tBobQueue {
+typedef struct tBobQueue {
 	UBYTE ubUndrawCount;
 	tBobNew **pBobs;
 	tBitMap *pBg;
@@ -34,6 +34,45 @@ static UWORD s_uwBgBufferLength;
 
 tBobQueue s_pQueues[2];
 
+static void bobNewDeallocBuffers(void) {
+	blitWait();
+	systemUse();
+	if(s_pQueues[0].pBobs && s_ubMaxBobCount) {
+		memFree(s_pQueues[0].pBobs, sizeof(tBobNew*) * s_ubMaxBobCount);
+		s_pQueues[0].pBobs = 0;
+	}
+	if(s_pQueues[1].pBobs && s_ubMaxBobCount) {
+		memFree(s_pQueues[1].pBobs, sizeof(tBobNew*) * s_ubMaxBobCount);
+		s_pQueues[1].pBobs = 0;
+	}
+	s_ubMaxBobCount = 0;
+	if(s_pQueues[0].pBg) {
+		bitmapDestroy(s_pQueues[0].pBg);
+		s_pQueues[0].pBg = 0;
+	}
+	if(s_pQueues[1].pBg) {
+		bitmapDestroy(s_pQueues[1].pBg);
+		s_pQueues[1].pBg = 0;
+	}
+	systemUnuse();
+}
+
+void bobNewManagerReset(void) {
+	bobNewDeallocBuffers();
+
+	// Don't reset s_ubBufferCurr - we still may need to keep track which buffer
+	// is in the front and which in the back
+	// E.g. multiple states in single buffer manager:
+	// fade-out, reset bobs, fade-in, start display
+
+	s_uwBgBufferLength = 0;
+	s_isPushingDone = 0;
+	s_ubBobsPushed = 0;
+	s_ubBobsSaved = 0;
+	s_ubBobsDrawn = 0;
+	bobNewDiscardUndraw();
+}
+
 void bobNewManagerCreate(
 	tBitMap *pFront, tBitMap *pBack, UWORD uwAvailHeight
 ) {
@@ -42,21 +81,16 @@ void bobNewManagerCreate(
 		pFront, pBack, uwAvailHeight
 	);
 	s_ubBpp = pFront->Depth;
-	s_ubMaxBobCount = 0;
-
 	s_pQueues[0].pDst = pBack;
 	s_pQueues[1].pDst = pFront;
 
-	s_isPushingDone = 0;
+	s_pQueues[0].pBg = 0;
+	s_pQueues[1].pBg = 0;
+	s_ubMaxBobCount = 0;
+	bobNewManagerReset();
 	s_ubBufferCurr = 0;
-	s_ubBobsPushed = 0;
-	s_ubBobsSaved = 0;
-	s_ubBobsDrawn = 0;
-	s_pQueues[0].ubUndrawCount = 0;
-	s_pQueues[1].ubUndrawCount = 0;
 	s_uwAvailHeight = uwAvailHeight;
 
-	s_uwBgBufferLength = 0;
 	s_pQueues[0].pBg = 0;
 	s_pQueues[1].pBg = 0;
 	s_pQueues[0].pBobs = 0;
@@ -64,33 +98,23 @@ void bobNewManagerCreate(
 	logBlockEnd("bobNewManagerCreate()");
 }
 
-void bobNewAllocateBgBuffers(void) {
+void bobNewReallocateBgBuffers(void) {
 	systemUse();
-	logBlockBegin("bobNewAllocateBgBuffers()");
+	logBlockBegin("bobNewReallocateBgBuffers()");
 	s_pQueues[0].pBobs = memAllocFast(sizeof(tBobNew*) * s_ubMaxBobCount);
 	s_pQueues[1].pBobs = memAllocFast(sizeof(tBobNew*) * s_ubMaxBobCount);
 	s_pQueues[0].pBg = bitmapCreate(16, s_uwBgBufferLength, s_ubBpp, BMF_INTERLEAVED);
 	s_pQueues[1].pBg = bitmapCreate(16, s_uwBgBufferLength, s_ubBpp, BMF_INTERLEAVED);
+	logWrite(
+		"New bg buffer length: %hu, max bobs: %hhu\n",
+		s_uwBgBufferLength, s_ubMaxBobCount
+	);
+	logBlockEnd("bobNewReallocateBgBuffers()");
 	systemUnuse();
-	logBlockEnd("bobNewAllocateBgBuffers()");
 }
 
 void bobNewManagerDestroy(void) {
-	blitWait();
-	systemUse();
-	if(s_pQueues[0].pBg) {
-		bitmapDestroy(s_pQueues[0].pBg);
-	}
-	if(s_pQueues[1].pBg) {
-		bitmapDestroy(s_pQueues[1].pBg);
-	}
-	if(s_pQueues[0].pBobs) {
-		memFree(s_pQueues[0].pBobs, sizeof(tBobNew*) * s_ubMaxBobCount);
-	}
-	if(s_pQueues[1].pBobs) {
-		memFree(s_pQueues[1].pBobs, sizeof(tBobNew*) * s_ubMaxBobCount);
-	}
-	systemUnuse();
+	bobNewDeallocBuffers();
 }
 
 void bobNewPush(tBobNew *pBob) {
@@ -104,17 +128,15 @@ void bobNewPush(tBobNew *pBob) {
 
 void bobNewInit(
 	tBobNew *pBob, UWORD uwWidth, UWORD uwHeight, UBYTE isUndrawRequired,
-	tBitMap *pBitMap, tBitMap *pMask, UWORD uwX, UWORD uwY
+	UBYTE *pFrameData, UBYTE *pMaskData, UWORD uwX, UWORD uwY
 ) {
 	pBob->uwWidth = uwWidth;
 	pBob->uwHeight = uwHeight;
 	pBob->isUndrawRequired = isUndrawRequired;
-	pBob->pBitmap = pBitMap;
-	pBob->pMask = pMask;
 	UWORD uwBlitWords = (uwWidth+15) / 16 + 1; // One word more for aligned copy
 	pBob->_uwBlitSize = ((uwHeight*s_ubBpp) << 6) | uwBlitWords;
 	pBob->_wModuloUndrawSave = bitmapGetByteWidth(s_pQueues[0].pDst) - uwBlitWords*2;
-	pBob->uwOffsetY = 0;
+	bobNewSetFrame(pBob, pFrameData, pMaskData);
 
 	pBob->sPos.uwX = uwX;
 	pBob->sPos.uwY = uwY;
@@ -125,18 +147,26 @@ void bobNewInit(
 
 	s_uwBgBufferLength += uwBlitWords * uwHeight * s_ubBpp;
 	++s_ubMaxBobCount;
+	// logWrite("Added bob, now max: %hhu\n", s_ubMaxBobCount);
 }
 
-void bobNewSetBitMapOffset(tBobNew *pBob, UWORD uwOffsetY) {
-	pBob->uwOffsetY = uwOffsetY * pBob->pBitmap->BytesPerRow;
+void bobNewSetFrame(tBobNew *pBob, UBYTE *pFrameData, UBYTE *pMaskData) {
+	pBob->pFrameData = pFrameData;
+	pBob->pMaskData = pMaskData;
+}
+
+UBYTE *bobNewCalcFrameAddress(tBitMap *pBitmap, UWORD uwOffsetY) {
+	return &pBitmap->Planes[0][pBitmap->BytesPerRow * uwOffsetY];
 }
 
 UBYTE bobNewProcessNext(void) {
 	if(s_ubBobsSaved < s_ubBobsPushed) {
 		tBobQueue *pQueue = &s_pQueues[s_ubBufferCurr];
 		if(!s_ubBobsSaved) {
-			// Prepare for saving
-			// Bltcon0/1, bltaxwm could be reset between Begin and ProcessNext
+			// Prepare for saving.
+			// Bltcon0/1, bltaxwm could be reset between Begin and ProcessNext.
+			// I tried to change A->D to C->D bug afwm/alwm need to be set
+			// for mask-copying bobs, so there's no perf to be gained.
 			UWORD uwBltCon0 = USEA|USED | MINTERM_A;
 			g_pCustom->bltcon0 = uwBltCon0;
 			g_pCustom->bltcon1 = 0;
@@ -144,8 +174,7 @@ UBYTE bobNewProcessNext(void) {
 			g_pCustom->bltalwm = 0xFFFF;
 
 			g_pCustom->bltdmod = 0;
-			ULONG ulD = (ULONG)(pQueue->pBg->Planes[0]);
-			g_pCustom->bltdpt = (APTR)ulD;
+			g_pCustom->bltdpt = pQueue->pBg->Planes[0];
 		}
 		const tBobNew *pBob = pQueue->pBobs[s_ubBobsSaved];
 		++s_ubBobsSaved;
@@ -154,9 +183,9 @@ UBYTE bobNewProcessNext(void) {
 				pQueue->pDst->BytesPerRow * (pBob->sPos.uwY & (s_uwAvailHeight-1)) +
 				pBob->sPos.uwX / 8
 			);
-			ULONG ulA = (ULONG)(pQueue->pDst->Planes[0]) + ulSrcOffs;
+			UBYTE *pA = &pQueue->pDst->Planes[0][ulSrcOffs];
 			g_pCustom->bltamod = pBob->_wModuloUndrawSave;
-			g_pCustom->bltapt = (APTR)ulA;
+			g_pCustom->bltapt = (APTR)pA;
 			UWORD uwPartHeight = s_uwAvailHeight - (pBob->sPos.uwY & (s_uwAvailHeight-1));
 			if(uwPartHeight >= pBob->uwHeight) {
 				g_pCustom->bltsize = pBob->_uwBlitSize;
@@ -164,9 +193,9 @@ UBYTE bobNewProcessNext(void) {
 			else {
 				UWORD uwBlitWords = (pBob->uwWidth+15) / 16 + 1;
 				g_pCustom->bltsize =((uwPartHeight * s_ubBpp) << 6) | uwBlitWords;
-				ulA = (ULONG)(pQueue->pDst->Planes[0]) + pBob->sPos.uwX / 8;
+				pA = &pQueue->pDst->Planes[0][pBob->sPos.uwX / 8];
 				blitWait();
-				g_pCustom->bltapt = (APTR)ulA;
+				g_pCustom->bltapt = pA;
 				g_pCustom->bltsize =(((pBob->uwHeight - uwPartHeight) * s_ubBpp) << 6) | uwBlitWords;
 			}
 		}
@@ -183,16 +212,14 @@ UBYTE bobNewProcessNext(void) {
 			tBobNew *pBob = pQueue->pBobs[s_ubBobsDrawn];
 			const tUwCoordYX * pPos = &pBob->sPos;
 			++s_ubBobsDrawn;
-
 			UBYTE ubDstOffs = pPos->uwX & 0xF;
 			UWORD uwBlitWidth = (pBob->uwWidth + ubDstOffs + 15) & 0xFFF0;
 			UWORD uwBlitWords = uwBlitWidth >> 4;
 			UWORD uwBlitSize = ((pBob->uwHeight * s_ubBpp) << 6) | uwBlitWords;
 			WORD wSrcModulo = (pBob->uwWidth >> 3) - (uwBlitWords<<1);
-			UWORD uwLastMask = 0xFFFF << (uwBlitWidth-pBob->uwWidth);
 			UWORD uwBltCon1 = ubDstOffs << BSHIFTSHIFT;
 			UWORD uwBltCon0;
-			if(pBob->pMask) {
+			if(pBob->pMaskData) {
 				uwBltCon0 = uwBltCon1 | USEA|USEB|USEC|USED | MINTERM_COOKIE;
 			}
 			else {
@@ -200,39 +227,42 @@ UBYTE bobNewProcessNext(void) {
 				// TODO setting B & C regs isn't necessary - few write cycles less
 				uwBltCon0 = uwBltCon1 | USEB|USED | MINTERM_B;
 			}
-			ULONG ulSrcOffs = pBob->uwOffsetY;
 			ULONG ulDstOffs = (
 				pQueue->pDst->BytesPerRow * (pPos->uwY & (s_uwAvailHeight-1)) + pPos->uwX / 8
 			);
 
 			WORD wDstModulo = bitmapGetByteWidth(pQueue->pDst) - (uwBlitWords<<1);
-			ULONG ulA = (ULONG)(pBob->pMask->Planes[0] + ulSrcOffs);
-			ULONG ulB = (ULONG)(pBob->pBitmap->Planes[0] + ulSrcOffs);
-			ULONG ulCD = (ULONG)(pQueue->pDst->Planes[0]) + ulDstOffs;
+			UBYTE *pB = pBob->pFrameData;
+			UBYTE *pCD = &pQueue->pDst->Planes[0][ulDstOffs];
 
 			g_pCustom->bltcon0 = uwBltCon0;
 			g_pCustom->bltcon1 = uwBltCon1;
-			g_pCustom->bltalwm = uwLastMask;
 
-			g_pCustom->bltamod = wSrcModulo;
+			if(pBob->pMaskData) {
+				UWORD uwLastMask = 0xFFFF << (uwBlitWidth-pBob->uwWidth);
+				UBYTE *pA = pBob->pMaskData;
+				g_pCustom->bltalwm = uwLastMask;
+				g_pCustom->bltamod = wSrcModulo;
+				g_pCustom->bltapt = (APTR)pA;
+			}
+
 			g_pCustom->bltbmod = wSrcModulo;
 			g_pCustom->bltcmod = wDstModulo;
 			g_pCustom->bltdmod = wDstModulo;
 
-			g_pCustom->bltapt = (APTR)ulA;
-			g_pCustom->bltbpt = (APTR)ulB;
-			g_pCustom->bltcpt = (APTR)ulCD;
-			g_pCustom->bltdpt = (APTR)ulCD;
+			g_pCustom->bltbpt = (APTR)pB;
+			g_pCustom->bltcpt = (APTR)pCD;
+			g_pCustom->bltdpt = (APTR)pCD;
 			UWORD uwPartHeight = s_uwAvailHeight - (pBob->sPos.uwY & (s_uwAvailHeight-1));
 			if(uwPartHeight >= pBob->uwHeight) {
 				g_pCustom->bltsize = uwBlitSize;
 			}
 			else {
 				g_pCustom->bltsize =((uwPartHeight * s_ubBpp) << 6) | uwBlitWords;
-				ulCD = (ULONG)(pQueue->pDst->Planes[0]) + pBob->sPos.uwX / 8;
+				pCD = &pQueue->pDst->Planes[0][pBob->sPos.uwX / 8];
 				blitWait();
-				g_pCustom->bltcpt = (APTR)ulCD;
-				g_pCustom->bltdpt = (APTR)ulCD;
+				g_pCustom->bltcpt = (APTR)pCD;
+				g_pCustom->bltdpt = (APTR)pCD;
 				g_pCustom->bltsize =(((pBob->uwHeight - uwPartHeight) * s_ubBpp) << 6) | uwBlitWords;
 			}
 
@@ -244,7 +274,23 @@ UBYTE bobNewProcessNext(void) {
 	return 0;
 }
 
-void bobNewBegin(void) {
+static void bobNewCheckGood(const tBitMap *pBack) {
+#if defined(ACE_DEBUG)
+	if(s_pQueues[s_ubBufferCurr].pDst != pBack) {
+		logWrite(
+			"ERR: bobNew manager operates on wrong buffer! Proper current: %p (%hhu), Other: %p, Arg: %p\n",
+			s_pQueues[s_ubBufferCurr].pDst, s_ubBufferCurr, s_pQueues[!s_ubBufferCurr].pDst, pBack
+		);
+		if(s_pQueues[!s_ubBufferCurr].pDst == pBack) {
+			logWrite("ERR: Wrong bob buffer as curr!\n");
+			s_ubBufferCurr = !s_ubBufferCurr;
+		}
+	}
+#endif
+}
+
+void bobNewBegin(tBitMap *pBuffer) {
+	bobNewCheckGood(pBuffer);
 	tBobQueue *pQueue = &s_pQueues[s_ubBufferCurr];
 
 	// Prepare for undraw
@@ -255,8 +301,8 @@ void bobNewBegin(void) {
 	g_pCustom->bltafwm = 0xFFFF;
 	g_pCustom->bltalwm = 0xFFFF;
 	g_pCustom->bltamod = 0;
-	ULONG ulA = (ULONG)(pQueue->pBg->Planes[0]);
-	g_pCustom->bltapt = (APTR)ulA;
+	UBYTE *pA = pQueue->pBg->Planes[0];
+	g_pCustom->bltapt = pA;
 #ifdef GAME_DEBUG
 	UWORD uwDrawnHeight = 0;
 #endif
@@ -269,9 +315,10 @@ void bobNewBegin(void) {
 				pQueue->pDst->BytesPerRow * (pBob->pOldPositions[s_ubBufferCurr].uwY & (s_uwAvailHeight-1)) +
 				pBob->pOldPositions[s_ubBufferCurr].uwX / 8
 			);
-			ULONG ulD = (ULONG)(pQueue->pDst->Planes[0]) + ulDstOffs;
+			UBYTE *pD = &pQueue->pDst->Planes[0][ulDstOffs];
+			blitWait();
 			g_pCustom->bltdmod = pBob->_wModuloUndrawSave;
-			g_pCustom->bltdpt = (APTR)ulD;
+			g_pCustom->bltdpt = (APTR)pD;
 			UWORD uwPartHeight = s_uwAvailHeight - (pBob->pOldPositions[s_ubBufferCurr].uwY & (s_uwAvailHeight-1));
 			if(uwPartHeight >= pBob->uwHeight) {
 				g_pCustom->bltsize = pBob->_uwBlitSize;
@@ -279,9 +326,9 @@ void bobNewBegin(void) {
 			else {
 				UWORD uwBlitWords = (pBob->uwWidth+15) / 16 + 1;
 				g_pCustom->bltsize =((uwPartHeight * s_ubBpp) << 6) | uwBlitWords;
-				ulD = (ULONG)(pQueue->pDst->Planes[0]) + pBob->pOldPositions[s_ubBufferCurr].uwX / 8;
+				pD = &pQueue->pDst->Planes[0][pBob->pOldPositions[s_ubBufferCurr].uwX / 8];
 				blitWait();
-				g_pCustom->bltdpt = (APTR)ulD;
+				g_pCustom->bltdpt = pD;
 				g_pCustom->bltsize =(((pBob->uwHeight - uwPartHeight) * s_ubBpp) << 6) | uwBlitWords;
 			}
 
@@ -289,7 +336,6 @@ void bobNewBegin(void) {
 			UWORD uwBlitWords = (pBob->uwWidth+15) / 16 + 1;
 			uwDrawnHeight += uwBlitWords * pBob->uwHeight;
 #endif
-			blitWait();
 		}
 	}
 #ifdef GAME_DEBUG

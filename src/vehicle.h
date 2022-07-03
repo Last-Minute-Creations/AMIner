@@ -11,6 +11,7 @@
 #include "text_bob.h"
 #include "mineral.h"
 #include "dynamite.h"
+#include "string_array.h"
 
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 24
@@ -55,8 +56,6 @@ typedef struct _tVehicle {
 	fix16_t fY;
 	fix16_t fDx;
 	fix16_t fDy;
-	fix16_t fDestX;
-	fix16_t fDestY;
 	UBYTE ubVehicleState;
 	UBYTE isFacingRight;
 	UBYTE ubTrackFrame;
@@ -66,8 +65,13 @@ typedef struct _tVehicle {
 	UBYTE ubJetAnimFrame;
 	UBYTE ubJetAnimCnt;
 	UBYTE ubToolAnimCnt;
+	// Drilling
 	UBYTE ubDrillDir;
 	UBYTE ubDrillVAnimCnt;
+	fix16_t fDrillDestX, fDrillDestY;
+	fix16_t fDrillDelta;
+	tUwCoordYX sDrillTile;
+	// Anims
 	UBYTE ubSmokeAnimFrame;
 	UBYTE ubSmokeAnimCnt;
 	UBYTE ubTeleportAnimFrame;
@@ -76,21 +80,18 @@ typedef struct _tVehicle {
 	UWORD uwTeleportY;
 	UBYTE ubDrillState;
 	// Cargo
-	UBYTE ubCargoMax;
-	UBYTE ubCargoCurr;
+	UBYTE uwCargoCurr;
 	UWORD uwCargoScore;
 	UWORD pStock[MINERAL_TYPE_COUNT];
 	// Score, fuel, hull
 	LONG lCash;
 	UWORD uwDrillCurr;
-	UWORD uwDrillMax;
 	UWORD wHullCurr;
-	UWORD wHullMax;
-	UWORD uwDrillTileX;
-	UWORD uwDrillTileY;
 	UBYTE ubPlayerIdx;
 	UBYTE ubDestructionState;
 	tDynamite sDynamite;
+	// Damage frames
+	UBYTE ubDamageFrames;
 } tVehicle;
 
 void vehicleBitmapsCreate(void);
@@ -119,6 +120,8 @@ void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
 
 uint8_t vehiclesAreClose(void);
 
-tVehicle g_pVehicles[2];
+void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY);
+
+extern tVehicle g_pVehicles[2];
 
 #endif // _VEHICLE_H_

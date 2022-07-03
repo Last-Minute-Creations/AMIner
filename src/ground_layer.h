@@ -9,4 +9,8 @@ void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel);
 
 void groundLayerReset(UBYTE ubLowerLayer);
 
+UWORD groundLayerGetLowerAtDepth(UWORD uwY);
+
+UBYTE groundLayerGetDifficultyAtDepth(UWORD uwDepth);
+
 #endif // _AMINER_GROUND_LAYER_H_

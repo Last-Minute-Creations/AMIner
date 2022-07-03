@@ -1,28 +1,27 @@
 #include "dynamite.h"
 #include "explosion.h"
 #include "tile.h"
+#include "vehicle.h"
+#include <ace/managers/log.h>
 
 void onExplosionPeak(ULONG ulData) {
 	tDynamite *pDynamite = (tDynamite*)ulData;
-	if(pDynamite->ubCount > 0) {
-		UWORD uwX = pDynamite->pCoords[pDynamite->ubCount - 1].uwX;
-		UWORD uwY = pDynamite->pCoords[pDynamite->ubCount - 1].uwY;
-		// Hurt player if is on explosion tile
-		// TODO
+	UWORD uwX = pDynamite->pCoords[pDynamite->ubCurrent].uwX;
+	UWORD uwY = pDynamite->pCoords[pDynamite->ubCurrent].uwY;
+	// TODO Hurt player if is on explosion tile?
 
-		// Remove last tile from list
-		if(tileIsExplodable(uwX, uwY)) {
-			tileExcavate(uwX, uwY);
-		}
-		// Decrease count and add explosion on last one
-		--pDynamite->ubCount;
-		if(pDynamite->ubCount > 0) {
-			explosionAdd(
-				pDynamite->pCoords[pDynamite->ubCount - 1].uwX << 5,
-				pDynamite->pCoords[pDynamite->ubCount - 1].uwY << 5,
-				onExplosionPeak, ulData, 1, 0
-			);
-		}
+	// Excavate tile under explosion
+	if(tileIsDrillable(uwX, uwY)) {
+		vehicleExcavateTile(&g_pVehicles[pDynamite->ubPlayer], uwX, uwY);
+	}
+
+	// Trigger next explosion
+	if(++pDynamite->ubCurrent < pDynamite->ubCount) {
+		explosionAdd(
+			pDynamite->pCoords[pDynamite->ubCurrent].uwX << 5,
+			pDynamite->pCoords[pDynamite->ubCurrent].uwY << 5,
+			onExplosionPeak, ulData, 1, 0
+		);
 	}
 }
 
@@ -32,51 +31,52 @@ static void dynamitePushXY(tDynamite *pDynamite, UWORD uwX, UWORD uwY) {
 	++pDynamite->ubCount;
 }
 
-void dynamiteTrigger(
-	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubDynamiteType
+UBYTE dynamiteTrigger(
+	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubNewCount,
+	tBombDir eDir
 ) {
-	if(pDynamite->ubCount != 0) {
-		return;
+	if(dynamiteIsActive(pDynamite) || ubNewCount == 0) {
+		return 0;
 	}
-	UBYTE isLeft = (uwTileX > 1);
-	UBYTE isRight = (uwTileX < 10);
-	switch(ubDynamiteType) {
-		case DYNAMITE_TYPE_5x5:
-		case DYNAMITE_TYPE_3X3:
-			if(isLeft) {
-				dynamitePushXY(pDynamite, uwTileX - 1, uwTileY - 1);
-				dynamitePushXY(pDynamite, uwTileX - 1, uwTileY + 0);
-				dynamitePushXY(pDynamite, uwTileX - 1, uwTileY + 1);
-			}
-			dynamitePushXY(pDynamite, uwTileX, uwTileY + 1);
-			if(isRight) {
-				dynamitePushXY(pDynamite, uwTileX + 1, uwTileY + 1);
-				dynamitePushXY(pDynamite, uwTileX + 1, uwTileY + 0);
-				dynamitePushXY(pDynamite, uwTileX + 1, uwTileY - 1);
-			}
-			dynamitePushXY(pDynamite, uwTileX, uwTileY - 1);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY);
+	BYTE bDeltaX = 0, bDeltaY = 0;
+	switch(eDir) {
+		case BOMB_DIR_LEFT:
+			bDeltaX = -1;
 			break;
+		case BOMB_DIR_RIGHT:
+			bDeltaX = 1;
 			break;
-		case DYNAMITE_TYPE_VERT:
-			dynamitePushXY(pDynamite, uwTileX, uwTileY - 2);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY + 2);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY - 1);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY + 1);
-			dynamitePushXY(pDynamite, uwTileX, uwTileY);
+		case BOMB_DIR_UP:
+			bDeltaY = -1;
 			break;
-		case DYNAMITE_TYPE_HORZ:
-			if(isLeft) {
-				dynamitePushXY(pDynamite, uwTileX - 1, uwTileY);
-			}
-			if(isRight) {
-				dynamitePushXY(pDynamite, uwTileX + 1, uwTileY);
-			}
-			dynamitePushXY(pDynamite, uwTileX, uwTileY);
+		case BOMB_DIR_DOWN:
+			bDeltaY = 1;
 			break;
+		case BOMB_DIR_NONE:
+		default:
+			return 0;
 	}
-	const tUwCoordYX *pFirst = &pDynamite->pCoords[pDynamite->ubCount - 1];
+	pDynamite->ubCount = 0;
+	pDynamite->ubCurrent = 0;
+	UBYTE ubTntUsed;
+	for(ubTntUsed = 0; ubTntUsed < ubNewCount; ++ubTntUsed) {
+		uwTileX += bDeltaX;
+		uwTileY += bDeltaY;
+		if(1 <= uwTileX && uwTileX <= 10) {
+			dynamitePushXY(pDynamite, uwTileX, uwTileY);
+		}
+		else {
+			break;
+		}
+	}
+	const tUwCoordYX *pFirst = &pDynamite->pCoords[0];
 	explosionAdd(
 		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pDynamite, 1, 0
 	);
+	return ubTntUsed;
+}
+
+UBYTE dynamiteIsActive(const tDynamite *pDynamite) {
+	UBYTE isActive = pDynamite->ubCurrent < pDynamite->ubCount;
+	return isActive;
 }

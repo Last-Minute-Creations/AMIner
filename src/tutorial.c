@@ -4,12 +4,12 @@
 
 #include "tutorial.h"
 #include "game.h"
-#include <ace/managers/game.h>
-#include "comm_shop.h"
-#include "comm_msg.h"
+#include <comm/gs_msg.h>
+#include <comm/gs_shop.h>
 #include "warehouse.h"
 #include "vehicle.h"
 #include "hud.h"
+#include "defs.h"
 
 typedef enum _tTutorialState {
 	TUTORIAL_SHOW_MESSAGE_INTRO = 0,
@@ -31,47 +31,35 @@ UBYTE tutorialProcess(void) {
 	UBYTE isEarlyReturn = 0;
 	switch(s_eTutorialState) {
 		case TUTORIAL_SHOW_MESSAGE_INTRO:
-			gamePushState(commMsgGsCreate, commMsgGsLoop, commMsgGsDestroy);
+			statePush(g_pGameStateManager, &g_sStateMsg);
 			++s_eTutorialState;
 			isEarlyReturn = 1;
 			break;
 		case TUTORIAL_SHOW_MESSAGE_TO_DIG:
-			hudShowMessage(0, "Comrade, go dig 3 ores of silver!");
+			hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_GO_DIG]);
 			++s_eTutorialState;
 			break;
 		case TUTORIAL_WAITING_FOR_DIG:
 			if(g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] + g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] >= 3) {
-				hudShowMessage(0,
-					"Your drill gets damaged and cargo bay filled as you dig.\n"
-					"Get to the warehouse to leave minerals and replace drill."
-				);
+				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_ON_DUG]);
 				++s_eTutorialState;
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_RESTOCK:
 			if(g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] + g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] == 0) {
-				hudShowMessage(0,
-					"Comrade, press ENTER or FIRE or SPACE to enter shop.\n"
-					"You can sell ore or use it for fulfilling plans."
-				);
+				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_NEAR_SHOP]);
 				++s_eTutorialState;
 			}
 			break;
 		case TUTORIAL_SHOW_PLAN_FILL_MSG:
 			if(commShopIsActive()) {
-				hudShowMessage(0,
-					"You need to spend 3 silver to fulfill the plan. Navigate to it\n"
-					"and move minerals to plan column, then press Confirm."
-				);
+				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_IN_SHOP]);
 				++s_eTutorialState;
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_PLAN_DONE:
 			if(warehouseGetPlan()->pMinerals[MINERAL_TYPE_SILVER].uwTargetCount != 3) {
-				hudShowMessage(0,
-					"Congratulations comrade, you've fulfilled your first plan.\n"
-					"Keep doing it and surely you will be promoted!"
-				);
+				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_ON_MOVE_TO_PLAN]);
 				++s_eTutorialState;
 			}
 			break;
