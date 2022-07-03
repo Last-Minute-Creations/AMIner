@@ -128,17 +128,15 @@ void bobNewPush(tBobNew *pBob) {
 
 void bobNewInit(
 	tBobNew *pBob, UWORD uwWidth, UWORD uwHeight, UBYTE isUndrawRequired,
-	tBitMap *pBitMap, tBitMap *pMask, UWORD uwX, UWORD uwY
+	UBYTE *pFrameData, UBYTE *pMaskData, UWORD uwX, UWORD uwY
 ) {
 	pBob->uwWidth = uwWidth;
 	pBob->uwHeight = uwHeight;
 	pBob->isUndrawRequired = isUndrawRequired;
-	pBob->pBitmap = pBitMap;
-	pBob->pMask = pMask;
 	UWORD uwBlitWords = (uwWidth+15) / 16 + 1; // One word more for aligned copy
 	pBob->_uwBlitSize = ((uwHeight*s_ubBpp) << 6) | uwBlitWords;
 	pBob->_wModuloUndrawSave = bitmapGetByteWidth(s_pQueues[0].pDst) - uwBlitWords*2;
-	pBob->uwOffsetY = 0;
+	bobNewSetFrame(pBob, pFrameData, pMaskData);
 
 	pBob->sPos.uwX = uwX;
 	pBob->sPos.uwY = uwY;
@@ -152,8 +150,13 @@ void bobNewInit(
 	// logWrite("Added bob, now max: %hhu\n", s_ubMaxBobCount);
 }
 
-void bobNewSetBitMapOffset(tBobNew *pBob, UWORD uwOffsetY) {
-	pBob->uwOffsetY = uwOffsetY * pBob->pBitmap->BytesPerRow;
+void bobNewSetFrame(tBobNew *pBob, UBYTE *pFrameData, UBYTE *pMaskData) {
+	pBob->pFrameData = pFrameData;
+	pBob->pMaskData = pMaskData;
+}
+
+UBYTE *bobNewCalcFrameAddress(tBitMap *pBitmap, UWORD uwOffsetY) {
+	return &pBitmap->Planes[0][pBitmap->BytesPerRow * uwOffsetY];
 }
 
 UBYTE bobNewProcessNext(void) {
@@ -216,7 +219,7 @@ UBYTE bobNewProcessNext(void) {
 			WORD wSrcModulo = (pBob->uwWidth >> 3) - (uwBlitWords<<1);
 			UWORD uwBltCon1 = ubDstOffs << BSHIFTSHIFT;
 			UWORD uwBltCon0;
-			if(pBob->pMask) {
+			if(pBob->pMaskData) {
 				uwBltCon0 = uwBltCon1 | USEA|USEB|USEC|USED | MINTERM_COOKIE;
 			}
 			else {
@@ -224,21 +227,20 @@ UBYTE bobNewProcessNext(void) {
 				// TODO setting B & C regs isn't necessary - few write cycles less
 				uwBltCon0 = uwBltCon1 | USEB|USED | MINTERM_B;
 			}
-			ULONG ulSrcOffs = pBob->uwOffsetY;
 			ULONG ulDstOffs = (
 				pQueue->pDst->BytesPerRow * (pPos->uwY & (s_uwAvailHeight-1)) + pPos->uwX / 8
 			);
 
 			WORD wDstModulo = bitmapGetByteWidth(pQueue->pDst) - (uwBlitWords<<1);
-			UBYTE *pB = &pBob->pBitmap->Planes[0][ulSrcOffs];
+			UBYTE *pB = pBob->pFrameData;
 			UBYTE *pCD = &pQueue->pDst->Planes[0][ulDstOffs];
 
 			g_pCustom->bltcon0 = uwBltCon0;
 			g_pCustom->bltcon1 = uwBltCon1;
 
-			if(pBob->pMask) {
+			if(pBob->pMaskData) {
 				UWORD uwLastMask = 0xFFFF << (uwBlitWidth-pBob->uwWidth);
-				UBYTE *pA = &pBob->pMask->Planes[0][ulSrcOffs];
+				UBYTE *pA = pBob->pMaskData;
 				g_pCustom->bltalwm = uwLastMask;
 				g_pCustom->bltamod = wSrcModulo;
 				g_pCustom->bltapt = (APTR)pA;

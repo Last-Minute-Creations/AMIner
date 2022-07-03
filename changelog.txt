@@ -1,3 +1,6 @@
+22.7.3
+- added white frames after receiving damage
+
 22.6.26
 - spawn vehicle on ground to avoid initial fall damage
 - fixed urzędas pl dossier garbled text

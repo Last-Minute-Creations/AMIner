@@ -26,14 +26,17 @@ void textBobCreate(
 	pTextBob->pFont = pFont;
 	pTextBob->uwWidth = ((sBounds.uwX + 2 + 15) / 16) * 16;
 	UWORD uwHeight = sBounds.uwY + 2;
-	tBitMap *pTextBm = bitmapCreate(
+	pTextBob->pTextBm = bitmapCreate(
 		pTextBob->uwWidth, uwHeight, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);
-	tBitMap *pTextMask = bitmapCreate(
+	pTextBob->pTextMask = bitmapCreate(
 		pTextBob->uwWidth, uwHeight, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);
 	bobNewInit(
-		&pTextBob->sBob, pTextBob->uwWidth, uwHeight, 1, pTextBm, pTextMask, 0, 0
+		&pTextBob->sBob, pTextBob->uwWidth, uwHeight, 1,
+		bobNewCalcFrameAddress(pTextBob->pTextBm, 0),
+		bobNewCalcFrameAddress(pTextBob->pTextMask, 0),
+		0, 0
 	);
 	pTextBob->isUpdateRequired = 0;
 	logBlockEnd("textBobCreate()");
@@ -81,28 +84,28 @@ void textBobUpdate(tTextBob *pTextBob) {
 	}
 	fontFillTextBitMap(pTextBob->pFont, s_pTextBitmap, pTextBob->szText);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pBitmap, s_pTextBitmap, 1, 1, pTextBob->ubColor, 0
+		pTextBob->pTextBm, s_pTextBitmap, 1, 1, pTextBob->ubColor, 0
 	);
 	// Mask outline
 	blitRect(
-		pTextBob->sBob.pMask, 0, 0,
-		pTextBob->sBob.uwWidth, pTextBob->sBob.pMask->Rows, 0
+		pTextBob->pTextMask, 0, 0,
+		pTextBob->sBob.uwWidth, pTextBob->pTextMask->Rows, 0
 	);
-	UBYTE ubMaskColor = (1 << pTextBob->sBob.pMask->Depth) - 1;
+	UBYTE ubMaskColor = (1 << pTextBob->pTextMask->Depth) - 1;
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 1, 1, ubMaskColor, 0
-	);
-	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 1, 0, ubMaskColor, FONT_COOKIE
+		pTextBob->pTextMask, s_pTextBitmap, 1, 1, ubMaskColor, 0
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 1, 2, ubMaskColor, FONT_COOKIE
+		pTextBob->pTextMask, s_pTextBitmap, 1, 0, ubMaskColor, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 0, 1, ubMaskColor, FONT_COOKIE
+		pTextBob->pTextMask, s_pTextBitmap, 1, 2, ubMaskColor, FONT_COOKIE
 	);
 	fontDrawTextBitMap(
-		pTextBob->sBob.pMask, s_pTextBitmap, 2, 1, ubMaskColor, FONT_COOKIE
+		pTextBob->pTextMask, s_pTextBitmap, 0, 1, ubMaskColor, FONT_COOKIE
+	);
+	fontDrawTextBitMap(
+		pTextBob->pTextMask, s_pTextBitmap, 2, 1, ubMaskColor, FONT_COOKIE
 	);
 	pTextBob->isUpdateRequired = 0;
 }
@@ -123,6 +126,6 @@ void textBobAnimate(tTextBob *pTextBob) {
 }
 
 void textBobDestroy(tTextBob *pTextBob) {
-	bitmapDestroy(pTextBob->sBob.pBitmap);
-	bitmapDestroy(pTextBob->sBob.pMask);
+	bitmapDestroy(pTextBob->pTextBm);
+	bitmapDestroy(pTextBob->pTextMask);
 }

@@ -57,7 +57,9 @@ void explosionManagerCreate(void) {
 
 		bobNewInit(
 			&s_pExplosions[i].sBob, EXPLOSION_FRAME_HEIGHT, EXPLOSION_FRAME_HEIGHT, 1,
-			s_pBoomFrames, s_pBoomFramesMask, 0, 0
+			bobNewCalcFrameAddress(s_pBoomFrames, 0),
+			bobNewCalcFrameAddress(s_pBoomFramesMask, 0),
+			0, 0
 		);
 	}
 	s_uwTeleportFrameCntMax = (
@@ -110,14 +112,19 @@ void explosionAdd(
 	s_pExplosionNext->isQuick = isQuick;
 	s_pExplosionNext->isTeleport = isTeleport;
 	if(isTeleport) {
-		s_pExplosionNext->sBob.pBitmap = s_pTpFrames;
-		s_pExplosionNext->sBob.pMask = s_pTpFramesMask;
+		bobNewSetFrame(
+			&s_pExplosionNext->sBob,
+			bobNewCalcFrameAddress(s_pTpFrames, 0),
+			bobNewCalcFrameAddress(s_pTpFramesMask, 0)
+		);
 	}
 	else {
-		s_pExplosionNext->sBob.pBitmap = s_pBoomFrames;
-		s_pExplosionNext->sBob.pMask = s_pBoomFramesMask;
+		bobNewSetFrame(
+			&s_pExplosionNext->sBob,
+			bobNewCalcFrameAddress(s_pBoomFrames, 0),
+			bobNewCalcFrameAddress(s_pBoomFramesMask, 0)
+		);
 	}
-	bobNewSetBitMapOffset(&s_pExplosionNext->sBob, 0);
 	// audioPlay(
 	// 	EXPLOSION_AUDIO_CHANNEL, isTeleport ? s_pSampleTeleport : s_pSampleBoom,
 	// 	AUDIO_VOLUME_MAX, 1
@@ -141,9 +148,21 @@ void explosionManagerProcess(void) {
 				if(pExplosion->ubFrame == EXPLOSION_FRAME_PEAK && pExplosion->cbOnPeak) {
 					pExplosion->cbOnPeak(pExplosion->ulCbData);
 				}
-				bobNewSetBitMapOffset(
-					&pExplosion->sBob, pExplosion->ubFrame * EXPLOSION_FRAME_HEIGHT
-				);
+				UWORD uwFrameOffsetY = pExplosion->ubFrame * EXPLOSION_FRAME_HEIGHT;
+				if(pExplosion->isTeleport) {
+					bobNewSetFrame(
+						&s_pExplosionNext->sBob,
+						bobNewCalcFrameAddress(s_pTpFrames, uwFrameOffsetY),
+						bobNewCalcFrameAddress(s_pTpFramesMask, uwFrameOffsetY)
+					);
+				}
+				else {
+					bobNewSetFrame(
+						&s_pExplosionNext->sBob,
+						bobNewCalcFrameAddress(s_pBoomFrames, uwFrameOffsetY),
+						bobNewCalcFrameAddress(s_pBoomFramesMask, uwFrameOffsetY)
+					);
+				}
 			}
 			else {
 				++pExplosion->ubCnt;

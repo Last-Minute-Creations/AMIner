@@ -139,7 +139,12 @@ static void coreGsCreate(void) {
 	s_pBombMarkerMask = bitmapCreateFromFile("data/bomb_marker_mask.bm", 0);
 
 	for(UBYTE i = 0; i < 3; ++i) {
-		bobNewInit(&g_pBombMarkers[i], 16, 10, 1, s_pBombMarker, s_pBombMarkerMask, 0, 0);
+		bobNewInit(
+			&g_pBombMarkers[i], 16, 10, 1,
+			bobNewCalcFrameAddress(s_pBombMarker, 0),
+			bobNewCalcFrameAddress(s_pBombMarkerMask, 0),
+			0, 0
+		);
 	}
 
 	menuPreload();

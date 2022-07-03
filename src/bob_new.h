@@ -53,14 +53,13 @@
  * only be changed by provided fns.
  */
 typedef struct tBobNew {
-	tBitMap *pBitmap;
-	tBitMap *pMask;
+	UBYTE *pFrameData;
+	UBYTE *pMaskData;
 	tUwCoordYX pOldPositions[2];
 	tUwCoordYX sPos;
 	UWORD uwWidth;
 	UWORD uwHeight;
 	UBYTE isUndrawRequired;
-	UWORD uwOffsetY;
 	// Platform-dependent private fields. Don't rely on them externally.
 	UWORD _uwBlitSize;
 	WORD _wModuloUndrawSave;
@@ -99,14 +98,14 @@ void bobNewManagerReset(void);
  * @param uwWidth Bob's width.
  * @param uwHeight Bob's height.
  * @param isUndrawRequired If set to 1, its background will be undrawn.
- * @param pBitMap Pointer to bitmap storing animation frames, one beneath another.
- * @param pMask Pointer to transparency mask of pBitmap.
+ * @param pFrameData Pointer to frame to be displayed.
+ * @param pMaskData Pointer to transparency mask of pFrameData.
  * @param uwX Initial X position.
  * @param uwY Initial Y position.
  */
 void bobNewInit(
 	tBobNew *pBob, UWORD uwWidth, UWORD uwHeight, UBYTE isUndrawRequired,
-	tBitMap *pBitMap, tBitMap *pMask, UWORD uwX, UWORD uwY
+	UBYTE *pFrameData, UBYTE *pMaskData, UWORD uwX, UWORD uwY
 );
 
 /**
@@ -125,9 +124,22 @@ void bobNewReallocateBgBuffers(void);
  * hence exclusively supported by this manager.
  *
  * @param pBob Bob which should have its frame changed.
- * @param uwOffsetY Y offset of next frame, in bitmap lines.
+ * @param pFrameData Pointer to frame to be displayed.
+ * @param pMaskData Pointer to transparency mask of pFrameData.
  */
-void bobNewSetBitMapOffset(tBobNew *pBob, UWORD uwOffsetY);
+void bobNewSetFrame(tBobNew *pBob, UBYTE *pFrameData, UBYTE *pMaskData);
+
+/**
+ * @brief Calculates byte address of a frame located at given Y offset.
+ *
+ * This function assumes that bitmap is exactly 1 frame-wide and next frames
+ * are located one after another.
+ *
+ * @param pBitmap Bitmap which stores animation frames/masks.
+ * @param uwOffsetY Y Offset of frame which address is to be calculated.
+ * @return Byte address of frame/mask data of given frame.
+ */
+UBYTE *bobNewCalcFrameAddress(tBitMap *pBitmap, UWORD uwOffsetY);
 
 /**
  * @brief Undraws all bobs, restoring BG to its former state.

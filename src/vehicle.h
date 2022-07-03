@@ -90,7 +90,8 @@ typedef struct _tVehicle {
 	UBYTE ubPlayerIdx;
 	UBYTE ubDestructionState;
 	tDynamite sDynamite;
-	// Upgrade levels
+	// Damage frames
+	UBYTE ubDamageFrames;
 } tVehicle;
 
 void vehicleBitmapsCreate(void);

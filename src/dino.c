@@ -39,10 +39,11 @@ void dinoCreate(void) {
 
 	for(UBYTE i = 0; i < DINO_BOB_COUNT; ++i) {
 		bobNewInit(
-			&s_pDinoBobs[i], 80, pDinoHeights[i], 0, s_pBones, s_pBonesMask,
+			&s_pDinoBobs[i], 80, pDinoHeights[i], 0,
+			bobNewCalcFrameAddress(s_pBones, pDinoFrameOffs[i]),
+			bobNewCalcFrameAddress(s_pBonesMask, pDinoFrameOffs[i]),
 			s_pDinoPos[i].uwX, s_pDinoPos[i].uwY
 		);
-		bobNewSetBitMapOffset(&s_pDinoBobs[i], pDinoFrameOffs[i]);
 	}
 	dinoReset();
 }
