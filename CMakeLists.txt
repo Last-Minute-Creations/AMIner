@@ -197,6 +197,27 @@ convertTileset(
 		8.png 9.png 10.png 11.png 12.png 13.png 14.png 15.png
 )
 
+#------------------------------------------------------------------------- TRACK
+file(MAKE_DIRECTORY ${GEN_DIR}/track)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	DESTINATIONS
+		# right
+		${GEN_DIR}/track/0.png 159 34 32 7
+		${GEN_DIR}/track/1.png 159 41 32 7
+		${GEN_DIR}/track/2.png 159 48 32 7
+		${GEN_DIR}/track/3.png 159 55 32 7
+		${GEN_DIR}/track/4.png 159 79 32 7
+		${GEN_DIR}/track/5.png 159 61 32 7
+		${GEN_DIR}/track/6.png 159 69 32 8
+)
+
+convertTileset(
+	TARGET ${AMINER_EXECUTABLE} VARIABLE_HEIGHT SIZE 32
+	SOURCE ${GEN_DIR}/track DESTINATION ${GEN_DIR}/track.png
+	TILES 0.png 1.png 2.png 3.png 4.png 5.png 6.png
+)
+
 #-------------------------------------------------------- CONVERT TO ACE FORMATS
 
 convertBitmaps(
@@ -221,7 +242,7 @@ convertBitmaps(
 	INTERLEAVED SOURCES
 		${GEN_DIR}/drill.png ${GEN_DIR}/tool.png ${GEN_DIR}/wreck.png
 		${GEN_DIR}/drill_2.png ${GEN_DIR}/tool_2.png ${GEN_DIR}/wreck_2.png
-		${RES_DIR}/track.png ${RES_DIR}/jet.png ${RES_DIR}/bones.png ${RES_DIR}/smoke.png
+		${GEN_DIR}/track.png ${RES_DIR}/jet.png ${RES_DIR}/bones.png ${RES_DIR}/smoke.png
 		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png ${RES_DIR}/hud/mode_cursor.png
 		${RES_DIR}/bomb_marker.png
 	DESTINATIONS
