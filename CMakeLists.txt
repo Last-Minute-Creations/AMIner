@@ -218,6 +218,13 @@ convertTileset(
 	TILES 0.png 1.png 2.png 3.png 4.png 5.png 6.png
 )
 
+#------------------------------------------------------------------------- BONES
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
+	DESTINATIONS
+		${GEN_DIR}/bones.png 0 384 80 265
+)
+
 #-------------------------------------------------------- CONVERT TO ACE FORMATS
 
 convertBitmaps(
@@ -242,7 +249,7 @@ convertBitmaps(
 	INTERLEAVED SOURCES
 		${GEN_DIR}/drill.png ${GEN_DIR}/tool.png ${GEN_DIR}/wreck.png
 		${GEN_DIR}/drill_2.png ${GEN_DIR}/tool_2.png ${GEN_DIR}/wreck_2.png
-		${GEN_DIR}/track.png ${RES_DIR}/jet.png ${RES_DIR}/bones.png ${RES_DIR}/smoke.png
+		${GEN_DIR}/track.png ${RES_DIR}/jet.png ${GEN_DIR}/bones.png ${RES_DIR}/smoke.png
 		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png ${RES_DIR}/hud/mode_cursor.png
 		${RES_DIR}/bomb_marker.png
 	DESTINATIONS
