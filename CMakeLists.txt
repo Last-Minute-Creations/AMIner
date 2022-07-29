@@ -69,39 +69,41 @@ file(MAKE_DIRECTORY ${GEN_DIR}/drill)
 file(MAKE_DIRECTORY ${GEN_DIR}/drill_2)
 
 extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	GENERATED_FILE_LIST "FRAMES_DRILL_P1"
 	DESTINATIONS
-		${GEN_DIR}/drill/0.png 0 76 32 20
-		${GEN_DIR}/drill/1.png 0 44 32 20
-		${GEN_DIR}/drill/2.png 0 12 32 20
-		${GEN_DIR}/drill/3.png 159 12 32 20
-		${GEN_DIR}/drill/4.png 96 76 32 20
-		${GEN_DIR}/drill/5.png 96 44 32 20
-		${GEN_DIR}/drill/6.png 96 12 32 20
-		${GEN_DIR}/drill/7.png 192 12 32 20
+	${GEN_DIR}/drill/0.png 0 76 32 20
+	${GEN_DIR}/drill/1.png 0 44 32 20
+	${GEN_DIR}/drill/2.png 0 12 32 20
+	${GEN_DIR}/drill/3.png 159 12 32 20
+	${GEN_DIR}/drill/4.png 96 76 32 20
+	${GEN_DIR}/drill/5.png 96 44 32 20
+	${GEN_DIR}/drill/6.png 96 12 32 20
+	${GEN_DIR}/drill/7.png 192 12 32 20
 )
 
 convertTileset(
 	TARGET ${AMINER_EXECUTABLE} SIZE 32 HEIGHT 20
 	SOURCE ${GEN_DIR}/drill DESTINATION ${GEN_DIR}/drill.png
-	TILES 0.png 1.png 2.png 3.png 4.png 5.png 6.png 7.png
+	TILE_PATHS ${FRAMES_DRILL_P1}
 )
 
 extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	GENERATED_FILE_LIST "FRAMES_DRILL_P2"
 	DESTINATIONS
-		${GEN_DIR}/drill_2/0.png 0 236 32 20
-		${GEN_DIR}/drill_2/1.png 0 204 32 20
-		${GEN_DIR}/drill_2/2.png 0 172 32 20
-		${GEN_DIR}/drill_2/3.png 255 12 32 20
-		${GEN_DIR}/drill_2/4.png 96 236 32 20
-		${GEN_DIR}/drill_2/5.png 96 204 32 20
-		${GEN_DIR}/drill_2/6.png 96 172 32 20
-		${GEN_DIR}/drill_2/7.png 288 12 32 20
+	${GEN_DIR}/drill_2/0.png 0 236 32 20
+	${GEN_DIR}/drill_2/1.png 0 204 32 20
+	${GEN_DIR}/drill_2/2.png 0 172 32 20
+	${GEN_DIR}/drill_2/3.png 255 12 32 20
+	${GEN_DIR}/drill_2/4.png 96 236 32 20
+	${GEN_DIR}/drill_2/5.png 96 204 32 20
+	${GEN_DIR}/drill_2/6.png 96 172 32 20
+	${GEN_DIR}/drill_2/7.png 288 12 32 20
 )
 
 convertTileset(
 	TARGET ${AMINER_EXECUTABLE} SIZE 32 HEIGHT 20
 	SOURCE ${GEN_DIR}/drill_2 DESTINATION ${GEN_DIR}/drill_2.png
-	TILES 0.png 1.png 2.png 3.png 4.png 5.png 6.png 7.png
+	TILE_PATHS ${FRAMES_DRILL_P2}
 )
 
 #------------------------------------------------------------------------- WRECK
@@ -110,6 +112,7 @@ file(MAKE_DIRECTORY ${GEN_DIR}/wreck)
 file(MAKE_DIRECTORY ${GEN_DIR}/wreck_2)
 
 extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	GENERATED_FILE_LIST "FRAMES_WRECK_P1"
 	DESTINATIONS
 		${GEN_DIR}/wreck/0.png 0 109 48 21
 		${GEN_DIR}/wreck/1.png 86 109 48 21
@@ -118,10 +121,11 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
 convertTileset(
 	TARGET ${AMINER_EXECUTABLE} SIZE 48 HEIGHT 21
 	SOURCE ${GEN_DIR}/wreck DESTINATION ${GEN_DIR}/wreck.png
-	TILES 0.png 1.png
+	TILE_PATHS ${FRAMES_WRECK_P1}
 )
 
 extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	GENERATED_FILE_LIST "FRAMES_WRECK_P2"
 	DESTINATIONS
 		${GEN_DIR}/wreck_2/0.png 0 269 48 21
 		${GEN_DIR}/wreck_2/1.png 86 269 48 21
@@ -130,7 +134,7 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
 convertTileset(
 	TARGET ${AMINER_EXECUTABLE} SIZE 48 HEIGHT 21
 	SOURCE ${GEN_DIR}/wreck_2 DESTINATION ${GEN_DIR}/wreck_2.png
-	TILES 0.png 1.png
+	TILE_PATHS ${FRAMES_WRECK_P2}
 )
 
 #-------------------------------------------------------------------------- TOOL
@@ -138,6 +142,7 @@ file(MAKE_DIRECTORY ${GEN_DIR}/tool)
 file(MAKE_DIRECTORY ${GEN_DIR}/tool_2)
 
 extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	GENERATED_FILE_LIST "FRAMES_TOOL_P1"
 	DESTINATIONS
 		# right
 		${GEN_DIR}/tool/0.png 33 64 16 16
@@ -162,12 +167,11 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
 convertTileset(
 	TARGET ${AMINER_EXECUTABLE} SIZE 16
 	SOURCE ${GEN_DIR}/tool DESTINATION ${GEN_DIR}/tool.png
-	TILES
-		0.png 1.png 2.png 3.png 4.png 5.png 6.png 7.png
-		8.png 9.png 10.png 11.png 12.png 13.png 14.png 15.png
+	TILE_PATHS ${FRAMES_TOOL_P1}
 )
 
 extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	GENERATED_FILE_LIST "FRAMES_TOOL_P2"
 	DESTINATIONS
 		# right
 		${GEN_DIR}/tool_2/0.png 33 224 16 16
@@ -192,15 +196,14 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
 convertTileset(
 	TARGET ${AMINER_EXECUTABLE} SIZE 16
 	SOURCE ${GEN_DIR}/tool_2 DESTINATION ${GEN_DIR}/tool_2.png
-	TILES
-		0.png 1.png 2.png 3.png 4.png 5.png 6.png 7.png
-		8.png 9.png 10.png 11.png 12.png 13.png 14.png 15.png
+	TILE_PATHS ${FRAMES_TOOL_P2}
 )
 
 #------------------------------------------------------------------------- TRACK
 file(MAKE_DIRECTORY ${GEN_DIR}/track)
 
 extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+	GENERATED_FILE_LIST "FRAMES_TRACK"
 	DESTINATIONS
 		# right
 		${GEN_DIR}/track/0.png 159 34 32 7
@@ -215,7 +218,7 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
 convertTileset(
 	TARGET ${AMINER_EXECUTABLE} VARIABLE_HEIGHT SIZE 32
 	SOURCE ${GEN_DIR}/track DESTINATION ${GEN_DIR}/track.png
-	TILES 0.png 1.png 2.png 3.png 4.png 5.png 6.png
+	TILE_PATHS ${FRAMES_TRACK}
 )
 
 #------------------------------------------------------------------------- BONES
@@ -269,36 +272,6 @@ convertBitmaps(
 convertFont(
 	TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/uni54 DESTINATION ${DATA_DIR}/uni54.fnt
 )
-
-function(tileExtractFromPng TARGET_EXECUTABLE TILE_PREFIX TILESET_DIR TILESET_OUTPUT)
-	set(TILE_IDX 0)
-	set(TILESET_DEPENDS "")
-	file(MAKE_DIRECTORY ${TILESET_DIR})
-	set(GENERATED_FILES "")
-	while(TILE_IDX LESS "256")
-		set(TILE_LIST ${TILE_PREFIX}_${TILE_IDX}) # var name to read next
-		if(${TILE_LIST})
-			LIST(GET ${TILE_LIST} 0 TILE_x)
-			LIST(GET ${TILE_LIST} 1 TILE_y)
-			LIST(GET ${TILE_LIST} 2 TILE_src)
-			SET(TILE_PNG_PATH "${TILESET_DIR}/${TILE_IDX}.png")
-			SET(SRC_PNG_PATH "${RES_DIR}/${TILE_src}")
-			list(APPEND GENERATED_FILES "${TILE_IDX}.png")
-
-			extractBitmaps(
-				TARGET ${TARGET_EXECUTABLE} SOURCE ${SRC_PNG_PATH} DESTINATIONS
-				${TILE_PNG_PATH} ${TILE_x} ${TILE_y} 32 32
-			)
-		endif()
-		math(EXPR TILE_IDX "${TILE_IDX} + 1")
-	endwhile()
-
-	convertTileset(
-		TARGET ${TARGET_EXECUTABLE} SIZE 32 PALETTE ${palette_aminer_unique}
-		INTERLEAVED SOURCE ${TILESET_DIR} DESTINATION ${TILESET_OUTPUT}
-		TILES ${GENERATED_FILES}
-	)
-endfunction()
 
 include("base0.cmake")
 include("base1.cmake")

@@ -1,57 +1,88 @@
-set(TILE_43 66 0 "dirt.png") # TILE_CAVE_BG_1
-# TILE_CAVE_BG with edges:
-	set(TILE_44 66 66 "dirt.png")  # N
-	set(TILE_45 0 99 "dirt.png")   # S
-	set(TILE_46 33 66 "dirt.png")  # NS
-	set(TILE_47 99 66 "dirt.png")  # E
-	set(TILE_48 66 99 "dirt.png")  # NE
-	set(TILE_49 99 99 "dirt.png")  # SE
-	set(TILE_50 0 33 "dirt.png")   # NSE
-	set(TILE_51 33 99 "dirt.png")  # W
-	set(TILE_52 33 132 "dirt.png") # NW
-	set(TILE_53 0 132 "dirt.png")  # SW
-	set(TILE_54 99 33 "dirt.png")  # NSW
-	set(TILE_55 0 66 "dirt.png")   # EW
-	set(TILE_56 66 33 "dirt.png")  # NEW
-	set(TILE_57 33 33 "dirt.png")  # SEW
-	set(TILE_58 99 0 "dirt.png")   # NSEW
-set(TILE_59 0 0 "dirt.png") # TILE_DIRT_1
-set(TILE_60 33 0 "dirt.png") # TILE_DIRT_2
-set(TILE_61 34 1 "minerals.png") # TILE_SILVER_1
-set(TILE_62 34 34 "minerals.png") # TILE_SILVER_2
-set(TILE_63 34 67 "minerals.png") # TILE_SILVER_3
-set(TILE_64 1 1 "minerals.png") # TILE_GOLD_1
-set(TILE_65 1 34 "minerals.png") # TILE_GOLD_2
-set(TILE_66 1 67 "minerals.png") # TILE_GOLD_3
-set(TILE_67 1 298 "minerals.png") # TILE_COAL_1
-set(TILE_68 34 298 "minerals.png") # TILE_COAL_2
-set(TILE_69 67 298 "minerals.png") # TILE_COAL_3
-set(TILE_70 0 0 "checkpoint.png") # TILE_CHECKPOINT_1
-set(TILE_71 32 0 "checkpoint.png") # TILE_CHECKPOINT_2
-set(TILE_72 64 0 "checkpoint.png") # TILE_CHECKPOINT_3
-set(TILE_73 96 0 "checkpoint.png") # TILE_CHECKPOINT_4
-set(TILE_74 128 0 "checkpoint.png") # TILE_CHECKPOINT_5
-set(TILE_75 160 0 "checkpoint.png") # TILE_CHECKPOINT_6
-set(TILE_76 192 0 "checkpoint.png") # TILE_CHECKPOINT_7
-set(TILE_77 224 0 "checkpoint.png") # TILE_CHECKPOINT_8
-set(TILE_78 256 0 "checkpoint.png") # TILE_CHECKPOINT_9
-set(TILE_79 288 0 "checkpoint.png") # TILE_CHECKPOINT_10
-set(TILE_80 198 33 "dirt.png") # TILE_STONE_1
-set(TILE_81 198 66 "dirt.png") # TILE_STONE_2
-set(TILE_82 198 99 "dirt.png") # TILE_STONE_2
-set(TILE_83 198 132 "dirt.png") # TILE_STONE_2
-set(TILE_84 67 232 "minerals.png") # TILE_EMERALD_1
-set(TILE_85 34 232 "minerals.png") # TILE_EMERALD_2
-set(TILE_86 1 232 "minerals.png") # TILE_EMERALD_3
-set(TILE_87 67 199 "minerals.png") # TILE_RUBY_1
-set(TILE_88 34 199 "minerals.png") # TILE_RUBY_2
-set(TILE_89 1 199 "minerals.png") # TILE_RUBY_3
-set(TILE_90 67 265 "minerals.png") # TILE_MOONSTONE_1
-set(TILE_91 34 265 "minerals.png") # TILE_MOONSTONE_2
-set(TILE_92 1 265 "minerals.png") # TILE_MOONSTONE_3
-set(TILE_93 33 331 "minerals.png") # TILE_BONE_HEAD
-set(TILE_94 1 331 "minerals.png") # TILE_BONE_1
+file(MAKE_DIRECTORY ${GEN_DIR}/tiles)
 
-tileExtractFromPng(
-	${AMINER_EXECUTABLE} "TILE" "${GEN_DIR}/tiles" "${DATA_DIR}/tiles.bm"
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/dirt.png
+	GENERATED_FILE_LIST "TILES_MAIN_LIST_1"
+	DESTINATIONS
+	${GEN_DIR}/tiles/43.png 66 0 32 32 # TILE_CAVE_BG_1
+	# TILE_CAVE_BG with edges:
+	${GEN_DIR}/tiles/44.png 66 66 32 32 # N
+	${GEN_DIR}/tiles/45.png  0 99 32 32 # S
+	${GEN_DIR}/tiles/46.png 33 66 32 32 # NS
+	${GEN_DIR}/tiles/47.png 99 66 32 32 # E
+	${GEN_DIR}/tiles/48.png 66 99 32 32 # NE
+	${GEN_DIR}/tiles/49.png 99 99 32 32 # SE
+	${GEN_DIR}/tiles/50.png  0 33 32 32 # NSE
+	${GEN_DIR}/tiles/51.png 33 99 32 32 # W
+	${GEN_DIR}/tiles/52.png 33 132 32 32 # NW
+	${GEN_DIR}/tiles/53.png  0 132 32 32 # SW
+	${GEN_DIR}/tiles/54.png 99 33 32 32 # NSW
+	${GEN_DIR}/tiles/55.png  0 66 32 32 # EW
+	${GEN_DIR}/tiles/56.png 66 33 32 32 # NEW
+	${GEN_DIR}/tiles/57.png 33 33 32 32 # SEW
+	${GEN_DIR}/tiles/58.png 99  0 32 32 # NSEW
+	${GEN_DIR}/tiles/59.png  0  0 32 32 # TILE_DIRT_1
+	${GEN_DIR}/tiles/60.png 33  0 32 32 # TILE_DIRT_2
+)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/dirt.png
+	GENERATED_FILE_LIST "TILES_MAIN_LIST_2"
+	DESTINATIONS
+		${GEN_DIR}/tiles/80.png 198  33 32 32 # TILE_STONE_1
+		${GEN_DIR}/tiles/81.png 198  66 32 32 # TILE_STONE_2
+		${GEN_DIR}/tiles/82.png 198  99 32 32 # TILE_STONE_2
+		${GEN_DIR}/tiles/83.png 198 132 32 32 # TILE_STONE_2
+)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
+	GENERATED_FILE_LIST "TILES_MAIN_LIST_3"
+	DESTINATIONS
+	${GEN_DIR}/tiles/61.png 34   1 32 32 # TILE_SILVER_1
+	${GEN_DIR}/tiles/62.png 34  34 32 32 # TILE_SILVER_2
+	${GEN_DIR}/tiles/63.png 34  67 32 32 # TILE_SILVER_3
+	${GEN_DIR}/tiles/64.png  1   1 32 32 # TILE_GOLD_1
+	${GEN_DIR}/tiles/65.png  1  34 32 32 # TILE_GOLD_2
+	${GEN_DIR}/tiles/66.png  1  67 32 32 # TILE_GOLD_3
+	${GEN_DIR}/tiles/67.png  1 298 32 32 # TILE_COAL_1
+	${GEN_DIR}/tiles/68.png 34 298 32 32 # TILE_COAL_2
+	${GEN_DIR}/tiles/69.png 67 298 32 32 # TILE_COAL_3
+)
+
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/checkpoint.png
+	GENERATED_FILE_LIST "TILES_MAIN_LIST_4"
+	DESTINATIONS
+	${GEN_DIR}/tiles/70.png   0 0 32 32 # TILE_CHECKPOINT_1
+	${GEN_DIR}/tiles/71.png  32 0 32 32 # TILE_CHECKPOINT_2
+	${GEN_DIR}/tiles/72.png  64 0 32 32 # TILE_CHECKPOINT_3
+	${GEN_DIR}/tiles/73.png  96 0 32 32 # TILE_CHECKPOINT_4
+	${GEN_DIR}/tiles/74.png 128 0 32 32 # TILE_CHECKPOINT_5
+	${GEN_DIR}/tiles/75.png 160 0 32 32 # TILE_CHECKPOINT_6
+	${GEN_DIR}/tiles/76.png 192 0 32 32 # TILE_CHECKPOINT_7
+	${GEN_DIR}/tiles/77.png 224 0 32 32 # TILE_CHECKPOINT_8
+	${GEN_DIR}/tiles/78.png 256 0 32 32 # TILE_CHECKPOINT_9
+	${GEN_DIR}/tiles/79.png 288 0 32 32 # TILE_CHECKPOINT_10
+	)
+
+	extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
+	GENERATED_FILE_LIST "TILES_MAIN_LIST_5"
+	DESTINATIONS
+		${GEN_DIR}/tiles/84.png 67 232 32 32 # TILE_EMERALD_1
+		${GEN_DIR}/tiles/85.png 34 232 32 32 # TILE_EMERALD_2
+		${GEN_DIR}/tiles/86.png  1 232 32 32 # TILE_EMERALD_3
+		${GEN_DIR}/tiles/87.png 67 199 32 32 # TILE_RUBY_1
+		${GEN_DIR}/tiles/88.png 34 199 32 32 # TILE_RUBY_2
+		${GEN_DIR}/tiles/89.png  1 199 32 32 # TILE_RUBY_3
+		${GEN_DIR}/tiles/90.png 67 265 32 32 # TILE_MOONSTONE_1
+		${GEN_DIR}/tiles/91.png 34 265 32 32 # TILE_MOONSTONE_2
+		${GEN_DIR}/tiles/92.png  1 265 32 32 # TILE_MOONSTONE_3
+		${GEN_DIR}/tiles/93.png 34 331 32 32 # TILE_BONE_HEAD
+		${GEN_DIR}/tiles/94.png  1 331 32 32 # TILE_BONE_1
+)
+
+
+convertTileset(
+	TARGET ${AMINER_EXECUTABLE} SIZE 32 PALETTE ${palette_aminer_unique}
+	INTERLEAVED SOURCE ${GEN_DIR}/tiles DESTINATION ${DATA_DIR}/tiles.bm
+	TILE_PATHS
+		${TILES_MAIN_LIST_1} ${TILES_MAIN_LIST_2} ${TILES_MAIN_LIST_3}
+		${TILES_MAIN_LIST_4} ${TILES_MAIN_LIST_5}
 )
