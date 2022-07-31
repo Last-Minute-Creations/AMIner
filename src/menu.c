@@ -176,7 +176,7 @@ static UBYTE menuEnter(void) {
 
 //---------------------------------------------------------------- MENU COMP END
 
-tSample *s_pSampleAtari;
+tPtplayerSfx *s_pSfxAtari;
 
 static UBYTE s_pKeyHistory[8] = {0};
 static UBYTE s_pKeyKonami[8] = {
@@ -191,7 +191,7 @@ static void menuEnableAtari(void) {
 	UBYTE isAtariHidden = s_pOptions[5].isHidden;
 	if(isAtariHidden) {
 		menuSetHidden(5, 0);
-		// audioPlay(AUDIO_CHANNEL_1, s_pSampleAtari, AUDIO_VOLUME_MAX, 1);
+		ptplayerSfxPlay(s_pSfxAtari, 0, 64, 1);
 		s_pOptions[5].isDirty = 1;
 	}
 }
@@ -239,12 +239,12 @@ void menuInitialDraw(tBitMap *pDisplayBuffer) {
 
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
-	s_pSampleAtari = sampleCreateFromFile("data/sfx/atari.raw8", 22050);
+	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx");
 }
 
 void menuUnload(void) {
 	bitmapDestroy(s_pLogo);
-	sampleDestroy(s_pSampleAtari);
+	ptplayerSfxDestroy(s_pSfxAtari);
 }
 
 static void menuGsCreate(void) {

@@ -4,8 +4,8 @@
 
 #include "game.h"
 #include <ace/managers/key.h>
-#include <ace/utils/custom.h>
 #include <ace/managers/blit.h>
+#include <ace/utils/custom.h>
 #include <comm/gs_shop.h>
 #include <comm/page_office.h>
 #include "vehicle.h"
@@ -54,7 +54,7 @@ static tModeSelection s_pModeSelection[2] = {
 	},
 };
 
-tSample *g_pSampleDrill, *g_pSampleOre, *g_pSamplePenalty;
+tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 

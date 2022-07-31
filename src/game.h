@@ -6,7 +6,7 @@
 #define _GAME_H_
 
 #include "aminer.h"
-#include <ace/managers/audio.h>
+#include <ace/managers/ptplayer.h>
 #include "bob_new.h"
 #include "string_array.h"
 
@@ -32,7 +32,7 @@ UBYTE gameGetAccolades(void);
 
 UBYTE gameGetRebukes(void);
 
-extern tSample *g_pSampleDrill, *g_pSampleOre, *g_pSamplePenalty;
+extern tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 
 // Game config
 extern UBYTE g_is2pPlaying;

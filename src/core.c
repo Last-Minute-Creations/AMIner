@@ -109,10 +109,10 @@ static void coreGsCreate(void) {
 	s_pColorBg = &s_pVpMain->pPalette[0];
 
 	baseTileCreate(g_pMainBuffer);
-	audioCreate();
-	g_pSampleDrill = sampleCreateFromFile("data/sfx/drill1.raw8", 8000);
-	g_pSampleOre = sampleCreateFromFile("data/sfx/ore2.raw8", 8000);
-	g_pSamplePenalty = sampleCreateFromFile("data/sfx/penalty.raw8", 8000);
+	ptplayerCreate(1);
+	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx");
+	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx");
+	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx");
 
 #ifdef GAME_DEBUG
 	randInit(&g_sRand, 2184, 1911);
@@ -189,10 +189,10 @@ static void coreGsDestroy(void) {
 	commDestroy();
 	bobNewManagerDestroy();
 
-	audioDestroy();
-	sampleDestroy(g_pSampleDrill);
-	sampleDestroy(g_pSampleOre);
-	sampleDestroy(g_pSamplePenalty);
+	ptplayerSfxDestroy(g_pSfxDrill);
+	ptplayerSfxDestroy(g_pSfxOre);
+	ptplayerSfxDestroy(g_pSfxPenalty);
+	ptplayerDestroy();
 
 	bitmapDestroy(s_pBombMarker);
 	bitmapDestroy(s_pBombMarkerMask);

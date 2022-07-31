@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "base.h"
-#include <ace/managers/audio.h>
+#include <ace/managers/ptplayer.h>
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
 #include "../core.h"
@@ -17,8 +17,8 @@ static UBYTE s_pNavEx[COMM_NAV_EX_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
 static tTextBitMap *s_pLineBuffer;
 static UBYTE s_isShown = 0;
-static tSample *s_pSamplesKeyPress[4];
-static tSample *s_pSamplesKeyRelease[4];
+static tPtplayerSfx *s_pSfxKeyPress[4];
+static tPtplayerSfx *s_pSfxKeyRelease[4];
 tBitMap *g_pCommBmFaces, *g_pCommBmSelection;
 
 void commCreate(void) {
@@ -35,10 +35,10 @@ void commCreate(void) {
 
 	for(UBYTE i = 0; i < 4; ++i) {
 		char szPath[40];
-		sprintf(szPath, "data/sfx/key_press_%hhu.raw8", i);
-		s_pSamplesKeyPress[i] = sampleCreateFromFile(szPath, 48000);
-		sprintf(szPath, "data/sfx/key_release_%hhu.raw8", i);
-		s_pSamplesKeyRelease[i] = sampleCreateFromFile(szPath, 48000);
+		sprintf(szPath, "data/sfx/key_press_%hhu.sfx", i);
+		s_pSfxKeyPress[i] = ptplayerSfxCreateFromFile(szPath);
+		sprintf(szPath, "data/sfx/key_release_%hhu.sfx", i);
+		s_pSfxKeyRelease[i] = ptplayerSfxCreateFromFile(szPath);
 	}
 	systemUnuse();
 
@@ -51,8 +51,8 @@ void commCreate(void) {
 void commDestroy(void) {
 	systemUse();
 	for(UBYTE i = 0; i < 4; ++i) {
-		sampleDestroy(s_pSamplesKeyPress[i]);
-		sampleDestroy(s_pSamplesKeyRelease[i]);
+		ptplayerSfxDestroy(s_pSfxKeyPress[i]);
+		ptplayerSfxDestroy(s_pSfxKeyRelease[i]);
 	}
 
 	bitmapDestroy(s_pBmRestore);
@@ -135,7 +135,7 @@ void commProcess(void) {
 	for(UBYTE i = 0; i < COMM_NAV_COUNT; ++i) {
 		if(pTests[i]) {
 			if(s_pNav[i] == BTN_STATE_NACTIVE) {
-				// audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyPress[randUw(&g_sRand) & 3], AUDIO_VOLUME_MAX, 1);
+				ptplayerSfxPlay(s_pSfxKeyPress[randUw(&g_sRand) & 3], 0, 64, 1);
 				s_pNav[i] = BTN_STATE_ACTIVE;
 				blitCopy(
 					s_pButtons, 0, pBtnPos[i][2], s_pBmDraw,
@@ -146,7 +146,7 @@ void commProcess(void) {
 			}
 		}
 		else if(s_pNav[i] != BTN_STATE_NACTIVE) {
-			// audioPlay(AUDIO_CHANNEL_0, s_pSamplesKeyRelease[randUw(&g_sRand) & 3], AUDIO_VOLUME_MAX, 1);
+			ptplayerSfxPlay(s_pSfxKeyRelease[randUw(&g_sRand) & 3], 0, 64, 1);
 			s_pNav[i] = BTN_STATE_NACTIVE;
 			blitCopy(
 				s_pButtons, 0, pBtnPos[i][2] + pBtnPos[i][3], s_pBmDraw,
