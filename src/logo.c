@@ -173,7 +173,7 @@ UBYTE lmcFadeOut(void) {
 //------------------------------------------------------------------------- LANG
 
 static const char *s_pLanguageNames[LANGUAGE_COUNT] = {
-	[LANGUAGE_EN] = "D\x80ony English",
+	[LANGUAGE_EN] = "Johnny English",
 	[LANGUAGE_PL] = "Mietek Polisz",
 };
 

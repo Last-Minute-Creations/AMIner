@@ -68,7 +68,7 @@ set(transparency_hex "#993399")
 file(MAKE_DIRECTORY ${GEN_DIR}/drill)
 file(MAKE_DIRECTORY ${GEN_DIR}/drill_2)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_DRILL_P1"
 	DESTINATIONS
 	${GEN_DIR}/drill/0.png 0 76 32 20
@@ -87,7 +87,7 @@ convertTileset(
 	TILE_PATHS ${FRAMES_DRILL_P1}
 )
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_DRILL_P2"
 	DESTINATIONS
 	${GEN_DIR}/drill_2/0.png 0 236 32 20
@@ -111,7 +111,7 @@ convertTileset(
 file(MAKE_DIRECTORY ${GEN_DIR}/wreck)
 file(MAKE_DIRECTORY ${GEN_DIR}/wreck_2)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_WRECK_P1"
 	DESTINATIONS
 		${GEN_DIR}/wreck/0.png 0 109 48 21
@@ -124,7 +124,7 @@ convertTileset(
 	TILE_PATHS ${FRAMES_WRECK_P1}
 )
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_WRECK_P2"
 	DESTINATIONS
 		${GEN_DIR}/wreck_2/0.png 0 269 48 21
@@ -141,7 +141,7 @@ convertTileset(
 file(MAKE_DIRECTORY ${GEN_DIR}/tool)
 file(MAKE_DIRECTORY ${GEN_DIR}/tool_2)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_TOOL_P1"
 	DESTINATIONS
 		# right
@@ -170,7 +170,7 @@ convertTileset(
 	TILE_PATHS ${FRAMES_TOOL_P1}
 )
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_TOOL_P2"
 	DESTINATIONS
 		# right
@@ -202,7 +202,7 @@ convertTileset(
 #------------------------------------------------------------------------- TRACK
 file(MAKE_DIRECTORY ${GEN_DIR}/track)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/32col/maszinu.png
+extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_TRACK"
 	DESTINATIONS
 		# right
