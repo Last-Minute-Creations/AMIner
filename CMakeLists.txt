@@ -286,66 +286,80 @@ file(MAKE_DIRECTORY ${DATA_DIR}/sfx)
 
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/atari.wav DESTINATION ${DATA_DIR}/sfx/atari.sfx
+	STRICT SOURCE ${RES_DIR}/audio/atari.wav
+	DESTINATION ${DATA_DIR}/sfx/atari.sfx
 )
 
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/drill1.wav DESTINATION ${DATA_DIR}/sfx/drill1.sfx
+	STRICT SOURCE ${RES_DIR}/audio/drill1.wav
+	DESTINATION ${DATA_DIR}/sfx/drill1.sfx
 )
 
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/ore2.wav DESTINATION ${DATA_DIR}/sfx/ore2.sfx
+	STRICT SOURCE ${RES_DIR}/audio/ore2.wav
+	DESTINATION ${DATA_DIR}/sfx/ore2.sfx
 )
 
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/penalty.wav DESTINATION ${DATA_DIR}/sfx/penalty.sfx
+	STRICT SOURCE ${RES_DIR}/audio/penalty.wav
+	DESTINATION ${DATA_DIR}/sfx/penalty.sfx
 )
 
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/explosion.wav DESTINATION ${DATA_DIR}/sfx/explosion.sfx
+	STRICT SOURCE ${RES_DIR}/audio/explosion.wav
+	DESTINATION ${DATA_DIR}/sfx/explosion.sfx
 )
 
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/teleport.wav DESTINATION ${DATA_DIR}/sfx/teleport.sfx
+	STRICT SOURCE ${RES_DIR}/audio/teleport.wav
+	DESTINATION ${DATA_DIR}/sfx/teleport.sfx
 )
 
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_press_0.wav DESTINATION ${DATA_DIR}/sfx/key_press_0.sfx
+	STRICT SOURCE ${RES_DIR}/audio/key_press_0.wav
+	DESTINATION ${DATA_DIR}/sfx/key_press_0.sfx
 )
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_press_1.wav DESTINATION ${DATA_DIR}/sfx/key_press_1.sfx
+	STRICT SOURCE ${RES_DIR}/audio/key_press_1.wav
+	DESTINATION ${DATA_DIR}/sfx/key_press_1.sfx
 )
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_press_2.wav DESTINATION ${DATA_DIR}/sfx/key_press_2.sfx
+	STRICT SOURCE ${RES_DIR}/audio/key_press_2.wav
+	DESTINATION ${DATA_DIR}/sfx/key_press_2.sfx
 )
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_press_3.wav DESTINATION ${DATA_DIR}/sfx/key_press_3.sfx
+	STRICT SOURCE ${RES_DIR}/audio/key_press_3.wav
+	DESTINATION ${DATA_DIR}/sfx/key_press_3.sfx
 )
 
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_release_0.wav DESTINATION ${DATA_DIR}/sfx/key_release_0.sfx
+	STRICT SOURCE ${RES_DIR}/audio/key_release_0.wav
+	DESTINATION ${DATA_DIR}/sfx/key_release_0.sfx
 )
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_release_1.wav DESTINATION ${DATA_DIR}/sfx/key_release_1.sfx
+	STRICT SOURCE ${RES_DIR}/audio/key_release_1.wav
+	DESTINATION ${DATA_DIR}/sfx/key_release_1.sfx
 )
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_release_2.wav DESTINATION ${DATA_DIR}/sfx/key_release_2.sfx
+	STRICT SOURCE ${RES_DIR}/audio/key_release_2.wav
+	DESTINATION ${DATA_DIR}/sfx/key_release_2.sfx
 )
 convertAudio(
 	TARGET ${AMINER_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_release_3.wav DESTINATION ${DATA_DIR}/sfx/key_release_3.sfx
+	STRICT SOURCE ${RES_DIR}/audio/key_release_3.wav
+	DESTINATION ${DATA_DIR}/sfx/key_release_3.sfx
 )
 
 # Version stuff
