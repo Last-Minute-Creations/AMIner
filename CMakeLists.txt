@@ -362,6 +362,38 @@ convertAudio(
 	DESTINATION ${DATA_DIR}/sfx/key_release_3.sfx
 )
 
+#------------------------------------------------------------------------- MUSIC
+file(MAKE_DIRECTORY ${DATA_DIR}/music)
+
+mergeMods(
+	TARGET ${AMINER_EXECUTABLE}
+	SOURCES
+		${RES_DIR}/music/czolowka.mod
+		${RES_DIR}/music/coal-prelude.mod
+		${RES_DIR}/music/dumka.mod
+		${RES_DIR}/music/inzynier.mod
+		${RES_DIR}/music/piesnoatari.mod
+		${RES_DIR}/music/popescu.mod
+		${RES_DIR}/music/roboczy.mod
+		${RES_DIR}/music/tancjor1.mod
+		${RES_DIR}/music/tancjordrugoj.mod
+		${RES_DIR}/music/wintowka.mod
+		${RES_DIR}/music/zima.mod
+	DESTINATIONS
+		${DATA_DIR}/music/menu.mod
+		${DATA_DIR}/music/music0.mod
+		${DATA_DIR}/music/music1.mod
+		${DATA_DIR}/music/music2.mod
+		${DATA_DIR}/music/music3.mod
+		${DATA_DIR}/music/music4.mod
+		${DATA_DIR}/music/music5.mod
+		${DATA_DIR}/music/music6.mod
+		${DATA_DIR}/music/music7.mod
+		${DATA_DIR}/music/music8.mod
+		${DATA_DIR}/music/music9.mod
+	SAMPLE_PACK ${DATA_DIR}/music/samples.samplepack
+)
+
 # Version stuff
 string(TIMESTAMP YEAR "%y")
 string(TIMESTAMP DAY "%d")
