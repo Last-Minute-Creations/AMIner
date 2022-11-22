@@ -10,6 +10,8 @@
 #include "../steer.h"
 #include "../game.h"
 
+#define SFX_CHANNEL_KEY 3
+
 static tBitMap *s_pBmRestore;
 static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
@@ -135,7 +137,7 @@ void commProcess(void) {
 	for(UBYTE i = 0; i < COMM_NAV_COUNT; ++i) {
 		if(pTests[i]) {
 			if(s_pNav[i] == BTN_STATE_NACTIVE) {
-				ptplayerSfxPlay(s_pSfxKeyPress[randUw(&g_sRand) & 3], 0, 64, 1);
+				ptplayerSfxPlay(s_pSfxKeyPress[randUw(&g_sRand) & 3], SFX_CHANNEL_KEY, 64, 1);
 				s_pNav[i] = BTN_STATE_ACTIVE;
 				blitCopy(
 					s_pButtons, 0, pBtnPos[i][2], s_pBmDraw,
@@ -146,7 +148,7 @@ void commProcess(void) {
 			}
 		}
 		else if(s_pNav[i] != BTN_STATE_NACTIVE) {
-			ptplayerSfxPlay(s_pSfxKeyRelease[randUw(&g_sRand) & 3], 0, 64, 1);
+			ptplayerSfxPlay(s_pSfxKeyRelease[randUw(&g_sRand) & 3], SFX_CHANNEL_KEY, 64, 1);
 			s_pNav[i] = BTN_STATE_NACTIVE;
 			blitCopy(
 				s_pButtons, 0, pBtnPos[i][2] + pBtnPos[i][3], s_pBmDraw,

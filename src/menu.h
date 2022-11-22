@@ -7,6 +7,7 @@
 
 #include "aminer.h"
 #include <string_array.h>
+#include <ace/managers/ptplayer.h>
 
 extern tState g_sStateMenu;
 
@@ -15,7 +16,8 @@ void menuUnload(void);
 
 void menuGsEnter(UBYTE isScoreShow);
 
-extern char **g_pMenuCaptions, **g_pMenuEnumMode, **g_pMenuEnumP1, **g_pMenuEnumP2,
-	**g_pMenuEnumOnOff, **g_pMenuEnumPlayerCount;
+extern char **g_pMenuCaptions, **g_pMenuEnumMode, **g_pMenuEnumP1,
+	**g_pMenuEnumP2, **g_pMenuEnumOnOff, **g_pMenuEnumPlayerCount;
+extern tPtplayerMod *g_pMenuMod;
 
 #endif // _MENU_H_

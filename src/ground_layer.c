@@ -1,4 +1,5 @@
 #include "ground_layer.h"
+#include <ace/generic/screen.h>
 #include <ace/utils/extview.h>
 #include <ace/utils/palette.h>
 
@@ -79,7 +80,7 @@ void groundLayerCreate(const tVPort *pVp) {
 	logBlockBegin("groundLayerCreate(pVp: %p)", pVp);
 	tView *pView = pVp->pView;
 	s_pCopList = pView->pCopList;
-	s_uwVpStartY = pVp->uwOffsY + 0x2C;
+	s_uwVpStartY = pVp->uwOffsY + SCREEN_PAL_YOFFSET;
 	s_uwVpHeight = pVp->uwHeight;
 	s_isCopperActive = 0;
 	s_pColorsBelow = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);

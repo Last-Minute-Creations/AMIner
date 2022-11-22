@@ -55,6 +55,7 @@ static tModeSelection s_pModeSelection[2] = {
 };
 
 tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
+tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 
@@ -62,6 +63,7 @@ static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
 static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
 static UBYTE s_isReminderShown;
+static UBYTE s_ubCurrentMod;
 
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
@@ -452,13 +454,22 @@ void gameChallengeResult(void) {
 		hiScoreSetup(0, pMsg);
 		menuGsEnter(1);
 	}
+}
 
+static void onSongEnd(void) {
+	if(++s_ubCurrentMod >= GAME_MOD_COUNT) {
+		s_ubCurrentMod = 0;
+	}
+	ptplayerLoadMod(g_pGameMods[s_ubCurrentMod], g_pModSampleData, 0);
+	ptplayerEnableMusic(1);
 }
 
 //-------------------------------------------------------------------- GAMESTATE
 
 static void gameGsCreate(void) {
-
+	s_ubCurrentMod = GAME_MOD_COUNT;
+	ptplayerConfigureSongRepeat(0, onSongEnd);
+	onSongEnd();
 }
 
 static void gameGsLoop(void) {
@@ -537,7 +548,7 @@ static void gameGsLoop(void) {
 }
 
 static void gameGsDestroy(void) {
-
+	ptplayerStop();
 }
 
 tState g_sStateGame = {

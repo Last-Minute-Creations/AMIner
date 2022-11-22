@@ -113,6 +113,13 @@ static void coreGsCreate(void) {
 	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx");
 	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx");
 	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx");
+	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
+		char szModPath[30];
+		sprintf(szModPath, "data/music/game%hhu.mod", i);
+		g_pGameMods[i] = ptplayerModCreate(szModPath);
+	}
+	g_pMenuMod = ptplayerModCreate("data/music/menu.mod");
+	g_pModSampleData = ptplayerSampleDataCreate("data/music/samples.samplepack");
 
 #ifdef GAME_DEBUG
 	randInit(&g_sRand, 2184, 1911);
@@ -189,6 +196,11 @@ static void coreGsDestroy(void) {
 	commDestroy();
 	bobNewManagerDestroy();
 
+	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
+		ptplayerModDestroy(g_pGameMods[i]);
+	}
+	ptplayerSamplePackDestroy(g_pModSampleData);
+	ptplayerModDestroy(g_pMenuMod);
 	ptplayerSfxDestroy(g_pSfxDrill);
 	ptplayerSfxDestroy(g_pSfxOre);
 	ptplayerSfxDestroy(g_pSfxPenalty);
@@ -219,6 +231,7 @@ const char * coreGetLangPrefix(void) {
 tTileBufferManager *g_pMainBuffer;
 tFont *g_pFont;
 tRandManager g_sRand;
+tPtplayerSamplePack *g_pModSampleData;
 
 tState g_sStateCore = {
 	.cbCreate = coreGsCreate, .cbLoop = coreGsLoop, .cbDestroy = coreGsDestroy

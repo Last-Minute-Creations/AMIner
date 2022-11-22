@@ -15,6 +15,8 @@
 #include "hud.h"
 #include "core.h"
 
+#define SFX_CHANNEL_ATARI 3
+
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
 	MENU_STATE_SELECTING,
@@ -53,6 +55,7 @@ void onShowScores(void);
 
 char **g_pMenuCaptions, **g_pMenuEnumMode, **g_pMenuEnumP1, **g_pMenuEnumP2,
 	**g_pMenuEnumOnOff, **g_pMenuEnumPlayerCount;
+tPtplayerMod *g_pMenuMod;
 
 static tState s_sStateMenuScore;
 
@@ -191,7 +194,7 @@ static void menuEnableAtari(void) {
 	UBYTE isAtariHidden = s_pOptions[5].isHidden;
 	if(isAtariHidden) {
 		menuSetHidden(5, 0);
-		ptplayerSfxPlay(s_pSfxAtari, 0, 64, 1);
+		ptplayerSfxPlay(s_pSfxAtari, SFX_CHANNEL_ATARI, 64, 1);
 		s_pOptions[5].isDirty = 1;
 	}
 }
@@ -248,6 +251,9 @@ void menuUnload(void) {
 }
 
 static void menuGsCreate(void) {
+	ptplayerLoadMod(g_pMenuMod, g_pModSampleData, 0);
+	ptplayerEnableMusic(1);
+	ptplayerConfigureSongRepeat(0, 0);
 	s_eMenuState = MENU_STATE_ROLL_IN;
 	hudShowMain();
 }

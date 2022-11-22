@@ -381,16 +381,16 @@ mergeMods(
 		${RES_DIR}/music/zima.mod
 	DESTINATIONS
 		${DATA_DIR}/music/menu.mod
-		${DATA_DIR}/music/music0.mod
-		${DATA_DIR}/music/music1.mod
-		${DATA_DIR}/music/music2.mod
-		${DATA_DIR}/music/music3.mod
-		${DATA_DIR}/music/music4.mod
-		${DATA_DIR}/music/music5.mod
-		${DATA_DIR}/music/music6.mod
-		${DATA_DIR}/music/music7.mod
-		${DATA_DIR}/music/music8.mod
-		${DATA_DIR}/music/music9.mod
+		${DATA_DIR}/music/game0.mod
+		${DATA_DIR}/music/game1.mod
+		${DATA_DIR}/music/game2.mod
+		${DATA_DIR}/music/game3.mod
+		${DATA_DIR}/music/game4.mod
+		${DATA_DIR}/music/game5.mod
+		${DATA_DIR}/music/game6.mod
+		${DATA_DIR}/music/game7.mod
+		${DATA_DIR}/music/game8.mod
+		${DATA_DIR}/music/game9.mod
 	SAMPLE_PACK ${DATA_DIR}/music/samples.samplepack
 )
 
