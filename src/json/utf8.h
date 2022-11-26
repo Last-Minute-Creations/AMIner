@@ -31,7 +31,7 @@ static inline ULONG decode(ULONG* state, ULONG* codep, ULONG byte) {
   ULONG type = utf8d[byte];
 
   *codep = (*state != UTF8_ACCEPT) ?
-    (byte & 0x3fu) | (*codep << 6) :
+    (byte & 0x3fU) | (*codep << 6) :
     (0xff >> type) & (byte);
 
   *state = utf8d[256 + *state*16 + type];
