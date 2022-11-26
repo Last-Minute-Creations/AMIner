@@ -228,7 +228,7 @@ void menuInitialDraw(tBitMap *pDisplayBuffer) {
 		uwLogoWidth, s_pLogo->Rows, MINTERM_COOKIE
 	);
 
-	const char szVersion[15] = "v." AMINER_VERSION;
+	const char szVersion[15] = "v." GAME_VERSION;
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szVersion,
 		FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW | FONT_BOTTOM,
