@@ -4,6 +4,7 @@
 
 #include "vehicle.h"
 #include <ace/managers/rand.h>
+#include <ace/utils/string.h>
 #include "hud.h"
 #include "core.h"
 #include "game.h"
@@ -504,7 +505,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		warehousePlanUnlockMineral(ubMineralType);
 
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->uwCargoCurr, uwCargoMax);
-		char szMsgBuffer[40];
+		char szMsg[40];
 		const char *szMessage;
 		UBYTE ubColor;
 		if(pVehicle->uwCargoCurr == uwCargoMax) {
@@ -513,12 +514,12 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			ptplayerSfxPlay(g_pSfxPenalty, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 		}
 		else {
-			sprintf(
-				szMsgBuffer, "%s x%hhu",
-				g_pMineralNames[g_pTileDefs[ubTile].ubMineral],
-				g_pTileDefs[ubTile].ubSlots
-			);
-			szMessage = szMsgBuffer;
+			char *pEnd = szMsg;
+			pEnd = stringCopy(g_pMineralNames[g_pTileDefs[ubTile].ubMineral], pEnd);
+			*(pEnd++) = ' ';
+			*(pEnd++) = 'x';
+			pEnd = stringDecimalFromULong(g_pTileDefs[ubTile].ubSlots, pEnd);
+			szMessage = szMsg;
 			ubColor = pMineral->ubTitleColor;
 			ptplayerSfxPlay(g_pSfxOre, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 		}

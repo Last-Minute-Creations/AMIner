@@ -202,7 +202,7 @@ static void hudDrawModeIcon(tMode eMode) {
 	// Draw count
 	if(eMode != MODE_DRILL) {
 		char szCount[6];
-		sprintf(szCount, "%hu", s_pModeCounters[eMode]);
+		stringDecimalFromULong(s_pModeCounters[eMode], szCount);
 		fontFillTextBitMap(s_pFont, s_pLineBuffer, szCount);
 		fontDrawTextBitMap(
 			s_pHudBuffer->pBack, s_pLineBuffer,
@@ -412,7 +412,12 @@ void hudUpdate(void) {
 				uwDepth = s_pPlayerData[0].uwDepth;
 			}
 			if(uwDepth != pData->uwDepthDisp) {
-				sprintf(szBfr, "%u.%um", uwDepth / 10, uwDepth % 10);
+				char *pEnd = szBfr;
+				pEnd = stringDecimalFromULong(uwDepth / 10, pEnd);
+				*(pEnd++) = '.';
+				pEnd = stringDecimalFromULong(uwDepth % 10, pEnd);
+				*(pEnd++) = 'm';
+				*(pEnd++) = '\0';
 				fontFillTextBitMap(s_pFont, s_pLineBuffer, szBfr);
 				s_isBitmapFilled = 1;
 				pData->uwDepthDisp = uwDepth;
@@ -447,26 +452,27 @@ void hudUpdate(void) {
 			}
 			if(lCash != pData->lCashDisp) {
 				ULONG ulDisp;
-				UBYTE ubOffs = 0;
+				char *pEnd = szBfr;
 				if(lCash < 0) {
 					ulDisp = -lCash;
-					szBfr[0] = '-';
-					ubOffs = 1;
+					*(pEnd++) = '-';
 				}
 				else {
 					ulDisp = lCash;
 				}
-				UWORD m = (ulDisp / 1000U) / 1000U;
-				UWORD k = (ulDisp / 1000U) % 1000U;
-				UWORD u = ulDisp % 1000U;
-				if(ulDisp >= 1000000U) {
-					sprintf(&szBfr[ubOffs], "%hu.%03hu.%03hu\x1F", m, k, u);
-				}
-				else if(ulDisp >= 1000U) {
-					sprintf(&szBfr[ubOffs], "%hu.%03u\x1F", k, u);
-				}
-				else {
-					sprintf(&szBfr[ubOffs], "%hu\x1F", u);
+				char *pStart = pEnd;
+				pEnd = stringDecimalFromULong(ulDisp, pEnd);
+				*(pEnd++) = '\x1F';
+				*pEnd = '\0';
+				char *pSeparator = pEnd - 4;
+				while(pSeparator > pStart) {
+					char *pSrc = pEnd;
+					char *pDst = ++pEnd;
+					while(pDst != pSeparator) {
+						*(pDst--) = *(pSrc--);
+					}
+					*pSeparator = '.';
+					pSeparator -= 3;
 				}
 				fontFillTextBitMap(s_pFont, s_pLineBuffer, szBfr);
 				s_isBitmapFilled = 1;
