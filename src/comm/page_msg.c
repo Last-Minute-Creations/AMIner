@@ -62,6 +62,7 @@ static void readLines(
 
 		szFileContents[uwTextLength++] = ubCharCode;
 	}
+	szFileContents[uwTextLength] = '\0';
 
 	fileClose(pFileLines);
 

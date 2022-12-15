@@ -6,7 +6,10 @@
 			"Plan zrealizowany z pomocą rezerw.",
 			"Przysłali nowy plan"
 		],
-		"notDone": "Towarzyszu, planu nie zrobiliście. Nagana i nowy plan.",
+		"notDone": [
+			"Towarzyszu, planu nie zrobiliście.",
+			"Ktoś czeka w Waszym gabinecie."
+		],
 		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan.",
 		"extending": [
 			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
@@ -118,7 +121,7 @@
 		"accounting": "Kreatywna Księgowość"
 	},
 	"officePageContents": {
-		"dossierKrystyna": "Główna Księgowa zakładu. Kiedy otwiera KPiR piekło zamarza. Rozmawia z liczbami. Z zamkniętymi oczami wypełnia zeznanie podatkowe. Na czas.  Słabym punktem Pani Krystyny jest kawa, czekoladki i rajstopy. Dobrze  ulokowany suwenir potrafi otworzyć u niej niezmierzone wręcz pokłady  Kreatywnej Księgowości.",
+		"dossierKrystyna": "Główna Księgowa zakładu. Kiedy otwiera KPiR piekło zamarza. Rozmawia z liczbami. Z zamkniętymi oczami wypełnia zeznanie podatkowe. Na czas. Słabym punktem Pani Krystyny jest kawa, czekoladki i rajstopy. Dobrze ulokowany suwenir potrafi otworzyć u niej niezmierzone wręcz pokłady Kreatywnej Księgowości.",
 		"bribeA": [
 			"Towarzyszu, nie wyrobimy się z planem. Pomożecie?",
 			"No, myślę że coś da się zrobić. Załatwię Wam 2 tygodnie ale to będzie Was kosztować %hu"

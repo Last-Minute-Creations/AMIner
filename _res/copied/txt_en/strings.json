@@ -6,7 +6,10 @@
 			"We've fulfilled plan with your reserves.",
 			"New has arrived"
 		],
-		"notDone": "Comrade, plan not done, warning and new plan",
+		"notDone": [
+			"Comrade, plan not done in time.",
+			"Someone is waiting in your office."
+		],
 		"remaining": "Boss, %hd days remaining to complete the plan.",
 		"extending": [
 			"Boss, Plan is overdue. Urzedas says you've got",
