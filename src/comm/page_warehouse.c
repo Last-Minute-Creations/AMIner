@@ -239,8 +239,13 @@ static void pageWarehouseProcess(void) {
 					hudSetCash(0, g_pVehicles[0].lCash);
 				}
 				if(warehouseIsPlanFulfilled()) {
-					warehouseNewPlan(1, g_is2pPlaying);
-					pageAccountingReduceChanceFail();
+					if(!warehouseGetPlan()->isFailed) {
+						warehouseNewPlan(1, g_is2pPlaying);
+						pageAccountingReduceChanceFail();
+					}
+					else {
+						warehouseNewPlan(0, g_is2pPlaying);
+					}
 				}
 				commEraseAll();
 				redraw();

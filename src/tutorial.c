@@ -21,16 +21,31 @@ typedef enum _tTutorialState {
 	TUTORIAL_DONE
 } tTutorialState;
 
-tTutorialState s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
+static tTutorialState s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
 
-void tutorialReset(void) {
-	s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
-}
-
-UBYTE tutorialProcess(void) {
+static UBYTE tutorialProcessChallenge(void) {
 	UBYTE isEarlyReturn = 0;
 	switch(s_eTutorialState) {
 		case TUTORIAL_SHOW_MESSAGE_INTRO:
+			gsMsgInit("intro_challenge");
+			statePush(g_pGameStateManager, &g_sStateMsg);
+			s_eTutorialState = TUTORIAL_DONE;
+			isEarlyReturn = 1;
+			break;
+		case TUTORIAL_DONE:
+			break;
+		default:
+			break;
+	}
+
+	return isEarlyReturn;
+}
+
+static UBYTE tutorialProcessStory(void) {
+	UBYTE isEarlyReturn = 0;
+	switch(s_eTutorialState) {
+		case TUTORIAL_SHOW_MESSAGE_INTRO:
+			gsMsgInit("intro_campaign");
 			statePush(g_pGameStateManager, &g_sStateMsg);
 			++s_eTutorialState;
 			isEarlyReturn = 1;
@@ -58,6 +73,7 @@ UBYTE tutorialProcess(void) {
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_PLAN_DONE:
+			// Assume the plan is fulfilled when the target count of silver has changed
 			if(warehouseGetPlan()->pMinerals[MINERAL_TYPE_SILVER].uwTargetCount != 3) {
 				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_ON_MOVE_TO_PLAN]);
 				++s_eTutorialState;
@@ -67,4 +83,17 @@ UBYTE tutorialProcess(void) {
 			break;
 	}
 	return isEarlyReturn;
+}
+
+void tutorialReset(void) {
+	s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
+}
+
+UBYTE tutorialProcess(void) {
+	if(g_isChallenge) {
+		return tutorialProcessChallenge();
+	}
+	else {
+		return tutorialProcessStory();
+	}
 }

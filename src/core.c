@@ -110,6 +110,7 @@ static void coreGsCreate(void) {
 
 	baseTileCreate(g_pMainBuffer);
 	ptplayerCreate(1);
+	ptplayerSetMasterVolume(8);
 	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx");
 	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx");
 	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx");

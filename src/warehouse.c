@@ -69,7 +69,9 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 		"warehouseNewPlan(isBigger: %hhu, is2pPlaying: %hhu)", isBigger, is2pPlaying
 	);
 	if(isBigger) {
-		gameAddAccolade();
+		if(!s_sCurrentPlan.isPenaltyCountdownStarted) {
+			gameAddAccolade();
+		}
 		if(is2pPlaying) {
 			s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum * 3 / 4;
 		}
@@ -97,8 +99,9 @@ void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying) {
 	s_sCurrentPlan.wTimeMax = 4 * 1000; // Two times fuel capacity for 2p
 	s_sCurrentPlan.wTimeMax += 200; // Add for nice division into 30 days
 	s_sCurrentPlan.wTimeRemaining = s_sCurrentPlan.wTimeMax;
-	s_sCurrentPlan.isExtendedTime = 0;
+	s_sCurrentPlan.isExtendedTimeByFavor = 0;
 	s_sCurrentPlan.isPenaltyCountdownStarted = 0;
+	s_sCurrentPlan.isFailed = 0;
 	logBlockEnd("warehouseNewPlan()");
 }
 
@@ -115,7 +118,12 @@ void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount) {
 }
 
 void warehouseElapseTime(UBYTE ubTime) {
-	s_sCurrentPlan.wTimeRemaining = MAX(0, s_sCurrentPlan.wTimeRemaining - ubTime);
+	if(s_sCurrentPlan.isFailed) {
+		s_sCurrentPlan.wTimeRemaining = 0;
+	}
+	else {
+		s_sCurrentPlan.wTimeRemaining = MAX(0, s_sCurrentPlan.wTimeRemaining - ubTime);
+	}
 }
 
 WORD warehouseGetRemainingDays(const tPlan *pPlan) {
@@ -125,7 +133,7 @@ WORD warehouseGetRemainingDays(const tPlan *pPlan) {
 
 void warehouseAddDaysToPlan(UBYTE ubDays, UBYTE isBribe) {
 	if(isBribe) {
-		s_sCurrentPlan.isExtendedTime = 1;
+		s_sCurrentPlan.isExtendedTimeByFavor = 1;
 	}
 	s_sCurrentPlan.wTimeRemaining += ubDays * TIME_PER_DAY;
 }
@@ -140,4 +148,14 @@ UWORD warehouseGetPlanRemainingCost(const tPlan *pPlan) {
 		uwRemainingCost += uwCount * ubReward;
 	}
 	return uwRemainingCost;
+}
+
+void warehouseStartPenaltyCountdown() {
+	warehouseAddDaysToPlan(14, 0);
+	s_sCurrentPlan.isPenaltyCountdownStarted = 1;
+}
+
+void warehouseFailPlan() {
+	s_sCurrentPlan.isFailed = 1;
+	gameAddRebuke();
 }

@@ -19,8 +19,9 @@ typedef struct _tPlan {
 	ULONG ulTargetSum;
 	WORD wTimeMax;
 	WORD wTimeRemaining;
-	UBYTE isExtendedTime;
+	UBYTE isExtendedTimeByFavor;
 	UBYTE isPenaltyCountdownStarted;
+	UBYTE isFailed;
 } tPlan;
 
 const tPlan *warehouseGetPlan(void);
@@ -54,5 +55,9 @@ WORD warehouseGetRemainingDays(const tPlan *pPlan);
 void warehouseAddDaysToPlan(UBYTE ubDays, UBYTE isBribe);
 
 UWORD warehouseGetPlanRemainingCost(const tPlan *pPlan);
+
+void warehouseStartPenaltyCountdown(void);
+
+void warehouseFailPlan(void);
 
 #endif // _WAREHOUSE_H_

@@ -114,6 +114,7 @@ void vehicleBitmapsDestroy(void) {
 
 void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubDrillDir = DRILL_DIR_NONE;
+	pVehicle->ubDrillState = DRILL_STATE_OFF;
 	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 
 	pVehicle->ubTrackAnimCnt = 0;
@@ -436,7 +437,7 @@ static inline UBYTE vehicleStartDrilling(
 
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
-	ptplayerSfxPlay(g_pSfxDrill, SFX_CHANNEL_DRILL, 64, 255);
+	ptplayerSfxPlayLooped(g_pSfxDrill, SFX_CHANNEL_DRILL, 64);
 
 	return 1;
 }
@@ -886,6 +887,15 @@ UBYTE transitionVarToBy(fix16_t *pVar, fix16_t fDest, fix16_t fDelta) {
 	return 0;
 }
 
+static void tryStopDrillAudio(void) {
+	if(
+		g_pVehicles[0].ubDrillState != DRILL_STATE_DRILLING &&
+		(!g_is2pPlaying || g_pVehicles[1].ubDrillState != DRILL_STATE_DRILLING)
+	) {
+		ptplayerSfxStopOnChannel(SFX_CHANNEL_DRILL);
+	}
+}
+
 static void vehicleProcessDrilling(tVehicle *pVehicle) {
 	static const UBYTE pTrackAnimOffs[DRILL_V_ANIM_LEN] = {
 		0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0
@@ -909,6 +919,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			else {
 				if(!--pVehicle->ubDrillVAnimCnt) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
+					pVehicle->ubDrillState = DRILL_STATE_OFF;
 					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 				}
 				else if(pVehicle->ubDrillVAnimCnt == 5) {
@@ -942,8 +953,9 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				vehicleExcavateTile(pVehicle, pVehicle->sDrillTile.uwX, pVehicle->sDrillTile.uwY);
 				if(pVehicle->ubDrillDir == DRILL_DIR_H) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
+					pVehicle->ubDrillState = DRILL_STATE_OFF;
 					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
-					ptplayerSfxStopOnChannel(SFX_CHANNEL_DRILL);
+					tryStopDrillAudio();
 				}
 				else {
 					const UBYTE ubAdd = 4; // No grass past this point
@@ -957,7 +969,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					}
 					else {
 						pVehicle->ubDrillState = DRILL_STATE_VERT_ANIM_OUT;
-						ptplayerSfxStopOnChannel(SFX_CHANNEL_DRILL);
+						tryStopDrillAudio();
 					}
 				}
 			}

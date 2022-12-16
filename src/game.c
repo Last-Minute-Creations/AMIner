@@ -464,33 +464,12 @@ static void onSongEnd(void) {
 	ptplayerEnableMusic(1);
 }
 
-//-------------------------------------------------------------------- GAMESTATE
-
-static void gameGsCreate(void) {
-	s_ubCurrentMod = GAME_MOD_COUNT;
-	ptplayerConfigureSongRepeat(0, onSongEnd);
-	onSongEnd();
-}
-
-static void gameGsLoop(void) {
-	if(!g_isChallenge) {
-		if(tutorialProcess()) {
-			return;
-		}
-	}
-
-	debugColor(0x080);
-	gameCameraProcess();
-	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
-	gameProcessHotkeys();
-	UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
-	if(isGameStateChange) {
+static void processPlan(void) {
+	const tPlan *pPlan = warehouseGetPlan();
+	if(pPlan->isFailed) {
 		return;
 	}
-	vehicleProcessText();
 
-	// Process plan being complete
-	const tPlan *pPlan = warehouseGetPlan();
 	WORD wRemainingDays = warehouseGetRemainingDays(pPlan);
 	if(wRemainingDays <= 0) {
 		if(warehouseTryFulfillPlan()) {
@@ -499,16 +478,15 @@ static void gameGsLoop(void) {
 			pageAccountingReduceChanceFail();
 		}
 		else {
-			if(!pPlan->isExtendedTime) {
+			if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
 				char szBfr[100];
 				sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
 				hudShowMessage(0, szBfr);
-				warehouseAddDaysToPlan(14, 0);
+				warehouseStartPenaltyCountdown();
 			}
 			else {
 				hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
-				warehouseNewPlan(0, g_is2pPlaying);
-				gameAddRebuke();
+				warehouseFailPlan();
 			}
 		}
 	}
@@ -526,7 +504,32 @@ static void gameGsLoop(void) {
 	else {
 		s_isReminderShown = 0;
 	}
+}
 
+//-------------------------------------------------------------------- GAMESTATE
+
+static void gameGsCreate(void) {
+	s_ubCurrentMod = GAME_MOD_COUNT;
+	ptplayerConfigureSongRepeat(0, onSongEnd);
+	onSongEnd();
+}
+
+static void gameGsLoop(void) {
+	if(tutorialProcess()) {
+		return;
+	}
+
+	debugColor(0x080);
+	gameCameraProcess();
+	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
+	gameProcessHotkeys();
+	UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
+	if(isGameStateChange) {
+		return;
+	}
+	vehicleProcessText();
+
+	processPlan();
 	coreProcessBeforeBobs();
 	debugColor(0x088);
 	vehicleProcess(&g_pVehicles[0]);

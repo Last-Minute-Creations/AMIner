@@ -9,4 +9,6 @@
 
 extern tState g_sStateMsg;
 
+void gsMsgInit(const char *szMessageFile);
+
 #endif // _AMINER_COMM_GS_MSG_H_
