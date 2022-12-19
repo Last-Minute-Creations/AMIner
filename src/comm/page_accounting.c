@@ -9,8 +9,10 @@
 #include "../core.h"
 #include "../game.h"
 #include "../warehouse.h"
+#include "../vehicle.h"
 
 static BYTE s_bAccountingChanceFail;
+static UWORD s_uwAccountingCost;
 
 static void pageAccountingProcess(void) {
 	BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
@@ -28,6 +30,7 @@ static void pageAccountingProcess(void) {
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(bButtonCurr == 0) {
+			g_pVehicles[0].lCash -= s_uwAccountingCost;
 			if(randUwMinMax(&g_sRand, 1, 100) > s_bAccountingChanceFail) {
 				warehouseNewPlan(1, g_is2pPlaying);
 			}
@@ -46,7 +49,7 @@ void pageAccountingCreate(void) {
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
 
-	UWORD uwCost = warehouseGetPlanRemainingCost(warehouseGetPlan()) / 2;
+	s_uwAccountingCost = warehouseGetPlanRemainingCost(warehouseGetPlan()) / 2;
 
 	uwPosY += commDrawMultilineText(
 		"I can do some Creative Acccounting for you and fulfill your plan instantly."
@@ -59,7 +62,7 @@ void pageAccountingCreate(void) {
 		s_bAccountingChanceFail
 	);
 	uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
-	sprintf(szBfr, "It will cost you %hu\x1F.", uwCost);
+	sprintf(szBfr, "It will cost you %hu\x1F.", s_uwAccountingCost);
 	uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 	buttonInitAcceptDecline("Accept", "Decline");

@@ -8,9 +8,11 @@
 #include "../warehouse.h"
 #include "../game.h"
 #include "../core.h"
+#include "../vehicle.h"
 
 static UBYTE s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
 static BYTE s_bBribeChanceFail;
+static UWORD s_uwBribeCost;
 
 static void pageBribeProcess(void) {
 // #error take cash for a bribe!
@@ -31,6 +33,7 @@ static void pageBribeProcess(void) {
 
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(bButtonCurr == 0) {
+				g_pVehicles[0].lCash -= s_uwBribeCost;
 				if(randUwMinMax(&g_sRand, 1, 100) > s_bBribeChanceFail) {
 					// Success
 					const tPlan *pPlan = warehouseGetPlan();
@@ -68,7 +71,7 @@ void pageBribeCreate(void) {
 	UWORD uwPosY = 0;
 	UWORD uwCost;
 
-	if(!pPlan->isExtendedTime) {
+	if(!pPlan->isExtendedTimeByFavor) {
 		if(!pPlan->isPenaltyCountdownStarted) {
 			sprintf(szBfr, "Bribe for extra %hhu days for finishing plan in time.", 14);
 			uwCost = 100;
@@ -91,6 +94,7 @@ void pageBribeCreate(void) {
 			s_bBribeChanceFail
 		);
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
+		s_uwBribeCost = uwCost;
 		sprintf(szBfr, "It will cost you %hu\x1F.", uwCost);
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
