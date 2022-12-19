@@ -266,7 +266,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	}
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
 
-	if(steerUse(pSelection->eSteerFire)) {
+	if(steerUse(pSelection->eSteerFire) && !g_isChallenge) {
 		if(!pSelection->isSelecting) {
 			if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
 				statePush(g_pGameStateManager, &g_sStateShop);
