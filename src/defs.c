@@ -22,6 +22,7 @@ UBYTE g_ubUpgradeLevels;
 UBYTE g_ubDrillingCost;
 UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 UBYTE g_ubPlansPerAccolade;
+UBYTE g_ubAccoladesInMainStory;
 
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[9];
@@ -32,6 +33,7 @@ const char * s_pLangDom[] = {
 	[MSG_PLAN_NOT_DONE] = "planMessages.notDone",
 	[MSG_PLAN_REMAINING] = "planMessages.remaining",
 	[MSG_PLAN_EXTENDING] = "planMessages.extending",
+	[MSG_PLAN_FINAL_PLAN] = "planMessages.finalPlan",
 	// Hi score
 	[MSG_HI_SCORE_NEW] = "hiScore.new",
 	[MSG_HI_SCORE_PRESS] = "hiScore.press",
@@ -124,6 +126,7 @@ void defsInit(void) {
 
 	g_lInitialCash = jsonTokToUlong(pJson, jsonGetDom(pJson, "initialCash"));
 	g_ubPlansPerAccolade = jsonTokToUlong(pJson, jsonGetDom(pJson, "plansPerAccolade"));
+	g_ubAccoladesInMainStory = jsonTokToUlong(pJson, jsonGetDom(pJson, "accoladesInMainStory"));
 
 	// Upgrade costs
 	UWORD uwIdxUpgradeCosts = jsonGetDom(pJson, "upgradeCosts");

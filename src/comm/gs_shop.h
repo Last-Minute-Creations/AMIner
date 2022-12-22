@@ -11,6 +11,4 @@ extern tState g_sStateShop;
 
 UBYTE commShopIsActive(void);
 
-void pageAccountingReduceChanceFail(void);
-
 #endif // _COMM_SHOP_H_

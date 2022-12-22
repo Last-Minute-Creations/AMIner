@@ -5,6 +5,6 @@
 #ifndef _AMINER_COMM_PAGE_NEWS_H_
 #define _AMINER_COMM_PAGE_NEWS_H_
 
-void pageNewsCreate(void);
+void pageNewsCreate(const char *szNewsPath);
 
 #endif // _AMINER_COMM_PAGE_NEWS_H_

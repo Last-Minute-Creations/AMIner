@@ -32,7 +32,7 @@ static void pageAccountingProcess(void) {
 		if(bButtonCurr == 0) {
 			g_pVehicles[0].lCash -= s_uwAccountingCost;
 			if(randUwMinMax(&g_sRand, 1, 100) > s_bAccountingChanceFail) {
-				warehouseNewPlan(1, g_is2pPlaying);
+				warehouseAdvancePlan();
 			}
 			else {
 				gameAddRebuke();
@@ -49,7 +49,7 @@ void pageAccountingCreate(void) {
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
 
-	s_uwAccountingCost = warehouseGetPlanRemainingCost(warehouseGetPlan()) / 2;
+	s_uwAccountingCost = planGetRemainingCost(warehouseGetCurrentPlan()) / 2;
 
 	uwPosY += commDrawMultilineText(
 		"I can do some Creative Acccounting for you and fulfill your plan instantly."

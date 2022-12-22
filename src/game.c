@@ -153,26 +153,16 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 	else if(keyUse(KEY_MINUS)) {
-		warehouseElapseDay();
+		tPlan *pPlan = warehouseGetCurrentPlan();
+		planElapseDay(pPlan);
 	}
 	else if(keyUse(KEY_EQUALS)) {
 		hudShowMessage(0, g_pMsgs[MSG_PLAN_DONE_AFK]);
-		warehouseNewPlan(1, g_is2pPlaying);
-		pageAccountingReduceChanceFail();
+		warehouseAdvancePlan();
 	}
 	else if(keyUse(KEY_0)) {
-		const tPlan *pPlan = warehouseGetPlan();
-		warehouseElapseTime(pPlan->wTimeRemaining);
-		if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
-			char szBfr[100];
-			sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
-			hudShowMessage(0, szBfr);
-			warehouseStartPenaltyCountdown();
-		}
-		else {
-			hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
-			warehouseFailPlan();
-		}
+		tPlan *pPlan = warehouseGetCurrentPlan();
+		planElapseTime(pPlan, pPlan->wTimeRemaining);
 	}
 }
 
@@ -426,10 +416,14 @@ static void gameCameraProcess(void) {
 	}
 }
 
-void gameAddAccolade(void) {
+void gameAdvanceAccolade(void) {
 	if(++s_ubAccoladesFract >= g_ubPlansPerAccolade) {
 		s_ubAccoladesFract = 0;
 		++s_ubAccolades;
+
+		if(s_ubAccolades >= g_ubAccoladesInMainStory) {
+			hudShowMessage(0, g_pMsgs[MSG_PLAN_FINAL_PLAN]);
+		}
 	}
 }
 
@@ -443,6 +437,10 @@ UBYTE gameGetAccolades(void) {
 
 UBYTE gameGetRebukes(void) {
 	return s_ubRebukes;
+}
+
+UBYTE gameIsEnding(void) {
+	return s_ubAccolades >= g_ubAccoladesInMainStory;
 }
 
 //-------------------------------------------------------------------- CHALLENGE
@@ -487,28 +485,28 @@ static void onSongEnd(void) {
 }
 
 static void processPlan(void) {
-	const tPlan *pPlan = warehouseGetPlan();
+	tPlan *pPlan = warehouseGetCurrentPlan();
 	if(pPlan->isFailed) {
 		return;
 	}
 
-	WORD wRemainingDays = warehouseGetRemainingDays(pPlan);
+	WORD wRemainingDays = planGetRemainingDays(pPlan);
 	if(wRemainingDays <= 0) {
 		if(warehouseTryFulfillPlan()) {
 			hudShowMessage(0, g_pMsgs[MSG_PLAN_DONE_AFK]);
-			warehouseNewPlan(1, g_is2pPlaying);
-			pageAccountingReduceChanceFail();
+			warehouseAdvancePlan();
 		}
 		else {
 			if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
 				char szBfr[100];
 				sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
 				hudShowMessage(0, szBfr);
-				warehouseStartPenaltyCountdown();
+				planStartPenaltyCountdown(pPlan);
 			}
 			else {
 				hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
-				warehouseFailPlan();
+				planFail(pPlan);
+				gameAddRebuke();
 			}
 		}
 	}

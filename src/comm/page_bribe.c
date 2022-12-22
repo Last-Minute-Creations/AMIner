@@ -36,7 +36,7 @@ static void pageBribeProcess(void) {
 				g_pVehicles[0].lCash -= s_uwBribeCost;
 				if(randUwMinMax(&g_sRand, 1, 100) > s_bBribeChanceFail) {
 					// Success
-					const tPlan *pPlan = warehouseGetPlan();
+					tPlan *pPlan = warehouseGetCurrentPlan();
 					if(!pPlan->isPenaltyCountdownStarted) {
 						// accolade bribe
 						++s_ubBribeAccoladeCount;
@@ -47,7 +47,7 @@ static void pageBribeProcess(void) {
 						++s_ubBribeRebukeCount;
 						s_bBribeChanceFail = MIN(s_bBribeChanceFail + 5, 100);
 					}
-					warehouseAddDaysToPlan(14, 1);
+					planAddDays(pPlan, 14, 1);
 				}
 				else {
 					gameAddRebuke();
@@ -66,7 +66,7 @@ static void pageBribeProcess(void) {
 void pageBribeCreate(void) {
 	commRegisterPage(pageBribeProcess, 0);
 	const UBYTE ubLineHeight = commGetLineHeight();
-	const tPlan *pPlan = warehouseGetPlan();
+	const tPlan *pPlan = warehouseGetCurrentPlan();
 	char szBfr[150];
 	UWORD uwPosY = 0;
 	UWORD uwCost;

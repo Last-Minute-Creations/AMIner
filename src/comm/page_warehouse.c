@@ -1,7 +1,8 @@
 #include "page_warehouse.h"
-#include <comm/base.h>
-#include <comm/button.h>
-#include <comm/page_accounting.h>
+#include "comm/base.h"
+#include "comm/button.h"
+#include "comm/page_accounting.h"
+#include "comm/page_news.h"
 #include "../warehouse.h"
 #include "../core.h"
 #include "../defs.h"
@@ -114,7 +115,7 @@ static void redraw(void) {
 		COMM_DISPLAY_WIDTH, 1, COMM_DISPLAY_COLOR_TEXT
 	);
 
-	const tPlan *pPlan = warehouseGetPlan();
+	const tPlan *pPlan = warehouseGetCurrentPlan();
 	s_ubPosCount = getMineralsOnList(pPlan, s_pMineralsOnList);
 	s_ubPosCurr = s_ubPosCount; // move to buttons on start
 	for(UBYTE i = 0; i < s_ubPosCount; ++i) {
@@ -135,7 +136,7 @@ static void redraw(void) {
 	// Time remaining
 	sprintf(
 		szBfr, g_pMsgs[MSG_COMM_TIME_REMAINING],
-		warehouseGetRemainingDays(pPlan)
+		planGetRemainingDays(pPlan)
 	);
 	commDrawText(
 		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,
@@ -175,11 +176,11 @@ static void pageWarehouseProcess(void) {
 	if(s_ubPosCurr != ubPosPrev) {
 		// Deselect previous pos
 		if(ubPosPrev < s_ubPosCount) {
-			drawRow(ubPosPrev, warehouseGetPlan());
+			drawRow(ubPosPrev, warehouseGetCurrentPlan());
 		}
 		// Select new pos
 		if(s_ubPosCurr < s_ubPosCount) {
-			drawRow(s_ubPosCurr, warehouseGetPlan());
+			drawRow(s_ubPosCurr, warehouseGetCurrentPlan());
 			if(ubPosPrev >= s_ubPosCount) {
 				buttonSelect(BUTTON_INVALID);
 				isButtonRefresh = 1;
@@ -196,12 +197,12 @@ static void pageWarehouseProcess(void) {
 		if(commNavUse(COMM_NAV_LEFT) && s_pTmpStock[ubMineral]) {
 			++s_pTmpSell[ubMineral];
 			--s_pTmpStock[ubMineral];
-			drawRow(ubPosPrev, warehouseGetPlan());
+			drawRow(ubPosPrev, warehouseGetCurrentPlan());
 		}
 		else if(commNavUse(COMM_NAV_RIGHT) && s_pTmpStock[ubMineral]) {
 			++s_pTmpPlan[ubMineral];
 			--s_pTmpStock[ubMineral];
-			drawRow(ubPosPrev, warehouseGetPlan());
+			drawRow(ubPosPrev, warehouseGetCurrentPlan());
 		}
 	}
 	else {
@@ -238,13 +239,11 @@ static void pageWarehouseProcess(void) {
 					s_pTmpStock[ubMineral] = 0;
 					hudSetCash(0, g_pVehicles[0].lCash);
 				}
-				if(warehouseIsPlanFulfilled()) {
-					if(!warehouseGetPlan()->isFailed) {
-						warehouseNewPlan(1, g_is2pPlaying);
-						pageAccountingReduceChanceFail();
-					}
-					else {
-						warehouseNewPlan(0, g_is2pPlaying);
+				if(planIsFulfilled(warehouseGetCurrentPlan())) {
+					warehouseAdvancePlan();
+					if(gameIsEnding()) {
+						pageNewsCreate("outro_win");
+						return;
 					}
 				}
 				commEraseAll();

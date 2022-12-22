@@ -15,6 +15,7 @@ typedef enum _tMsg {
 	MSG_PLAN_NOT_DONE,
 	MSG_PLAN_REMAINING,
 	MSG_PLAN_EXTENDING,
+	MSG_PLAN_FINAL_PLAN,
 	// Hi score
 	MSG_HI_SCORE_NEW,
 	MSG_HI_SCORE_PRESS,
@@ -79,7 +80,7 @@ typedef enum _tMsg {
 } tMsg;
 
 extern LONG g_lInitialCash;
-extern UBYTE g_ubUpgradeLevels, g_ubPlansPerAccolade;
+extern UBYTE g_ubUpgradeLevels, g_ubPlansPerAccolade, g_ubAccoladesInMainStory;
 extern UBYTE g_ubDrillingCost;
 extern UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 

@@ -4,6 +4,7 @@
 #include <json/utf8.h>
 #include "../defs.h"
 #include "../core.h"
+#include "menu.h"
 
 #define SCROLL_SPEED_SLOW 1
 #define SCROLL_SPEED_FAST 8
@@ -70,7 +71,7 @@ static void pageNewsProcess(void) {
 		);
 	}
 	else {
-		commRegisterPage(0, 0);
+		menuGsEnter(0);
 	}
 }
 
@@ -78,7 +79,7 @@ static void pageNewsDestroy(void) {
 	bitmapDestroy(s_pScrollBitmap);
 }
 
-void pageNewsCreate(void) {
+void pageNewsCreate(const char *szNewsPath) {
 	logBlockBegin("pageNewsCreate()");
 	s_pScrollBitmap = bitmapCreate(SCROLL_WIDTH_BUFFER, g_pFont->uwHeight, 1, BMF_CLEAR);
 	s_pCurrentChar = s_szScroll;

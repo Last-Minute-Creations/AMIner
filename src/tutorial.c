@@ -74,7 +74,7 @@ static UBYTE tutorialProcessStory(void) {
 			break;
 		case TUTORIAL_WAITING_FOR_PLAN_DONE:
 			// Assume the plan is fulfilled when the target count of silver has changed
-			if(warehouseGetPlan()->pMinerals[MINERAL_TYPE_SILVER].uwTargetCount != 3) {
+			if(warehouseGetCurrentPlan()->pMinerals[MINERAL_TYPE_SILVER].uwTargetCount != 3) {
 				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_ON_MOVE_TO_PLAN]);
 				++s_eTutorialState;
 			}

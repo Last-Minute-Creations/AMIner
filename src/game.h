@@ -25,13 +25,15 @@ void gameGsLoopEnterScore(void);
 
 void gameTryPushBob(tBobNew *pBob);
 
-void gameAddAccolade(void);
+void gameAdvanceAccolade(void);
 
 void gameAddRebuke(void);
 
 UBYTE gameGetAccolades(void);
 
 UBYTE gameGetRebukes(void);
+
+UBYTE gameIsEnding(void);
 
 extern tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];

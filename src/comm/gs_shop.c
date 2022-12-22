@@ -8,9 +8,11 @@
 #include <comm/page_warehouse.h>
 #include <comm/page_workshop.h>
 #include <comm/page_office.h>
+#include <comm/page_news.h>
 #include "core.h"
 #include "hud.h"
 #include "tutorial.h"
+#include "game.h"
 
 static tCommLed s_eTab;
 static UBYTE s_isShown;
@@ -19,6 +21,11 @@ static void commShopShowTab(tCommLed eTab) {
 	s_eTab = eTab;
 	commSetActiveLed(eTab);
 	commEraseAll();
+
+	if(gameIsEnding()) {
+		pageNewsCreate("outro_win");
+		return;
+	}
 	switch(eTab) {
 		case COMM_LED_OFFICE:
 			pageOfficeCreate();

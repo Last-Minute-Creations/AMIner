@@ -14,6 +14,9 @@
 		"extending": [
 			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
 			"niewykonany. Dał nam jeszcze %hhu dni."
+		],
+		"finalPlan": [
+			"Panie Derektorze, szybko do biura!"
 		]
 	},
 	"hiScore": {

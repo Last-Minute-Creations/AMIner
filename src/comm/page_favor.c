@@ -30,7 +30,7 @@ static void pageFavorProcess(void) {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(bButtonCurr == 0) {
 				--s_ubFavorsLeft;
-				warehouseNewPlan(0, g_is2pPlaying);
+				warehouseRerollPlan();
 			}
 			pageOfficeCreate();
 		}
@@ -46,7 +46,7 @@ void pageFavorCreate(void) {
 	commRegisterPage(pageFavorProcess, 0);
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
-	WORD wDays = warehouseGetRemainingDays(warehouseGetPlan());
+	WORD wDays = planGetRemainingDays(warehouseGetCurrentPlan());
 	if(s_ubFavorsLeft > 0 && wDays >= 25) {
 
 		uwPosY += commDrawMultilineText(
