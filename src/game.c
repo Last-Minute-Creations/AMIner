@@ -152,6 +152,28 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+	else if(keyUse(KEY_MINUS)) {
+		warehouseElapseDay();
+	}
+	else if(keyUse(KEY_EQUALS)) {
+		hudShowMessage(0, g_pMsgs[MSG_PLAN_DONE_AFK]);
+		warehouseNewPlan(1, g_is2pPlaying);
+		pageAccountingReduceChanceFail();
+	}
+	else if(keyUse(KEY_0)) {
+		const tPlan *pPlan = warehouseGetPlan();
+		warehouseElapseTime(pPlan->wTimeRemaining);
+		if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
+			char szBfr[100];
+			sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
+			hudShowMessage(0, szBfr);
+			warehouseStartPenaltyCountdown();
+		}
+		else {
+			hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
+			warehouseFailPlan();
+		}
+	}
 }
 
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};

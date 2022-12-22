@@ -46,7 +46,9 @@ void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount);
 
 void warehouseReset(UBYTE is2pPlaying);
 
-void warehouseElapseTime(UBYTE ubTime);
+void warehouseElapseDay(void);
+
+void warehouseElapseTime(UWORD uwTime);
 
 void warehousePlanUnlockMineral(tMineralType eMineral);
 

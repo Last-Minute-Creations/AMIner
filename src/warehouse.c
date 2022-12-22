@@ -9,7 +9,7 @@
 #include <ace/macros.h>
 #include <ace/managers/log.h>
 
-#define TIME_PER_DAY (140)
+#define TIME_PER_DAY 140
 
 // Not spent on plan, not sold
 static UWORD s_pStock[MINERAL_TYPE_COUNT] = {0};
@@ -117,12 +117,16 @@ void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount) {
 	s_pStock[ubMineralType] = uwCount;
 }
 
-void warehouseElapseTime(UBYTE ubTime) {
+void warehouseElapseDay(void) {
+	warehouseElapseTime(TIME_PER_DAY);
+}
+
+void warehouseElapseTime(UWORD uwTime) {
 	if(s_sCurrentPlan.isFailed) {
 		s_sCurrentPlan.wTimeRemaining = 0;
 	}
 	else {
-		s_sCurrentPlan.wTimeRemaining = MAX(0, s_sCurrentPlan.wTimeRemaining - ubTime);
+		s_sCurrentPlan.wTimeRemaining = MAX(0, s_sCurrentPlan.wTimeRemaining - uwTime);
 	}
 }
 
