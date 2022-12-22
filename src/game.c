@@ -92,7 +92,7 @@ void gameStart(void) {
 	tutorialReset();
 	pageOfficeReset();
 	tileInit(g_isAtari, g_isChallenge);
-	warehouseReset(g_is2pPlaying);
+	warehouseReset();
 	inventoryReset();
 	modeReset(0);
 	modeReset(1);
@@ -439,8 +439,16 @@ UBYTE gameGetRebukes(void) {
 	return s_ubRebukes;
 }
 
-UBYTE gameIsEnding(void) {
-	return s_ubAccolades >= g_ubAccoladesInMainStory;
+tEnding gameGetEnding(void) {
+	if (s_ubAccolades >= g_ubAccoladesInMainStory) {
+		return ENDING_ACCOLADES;
+	}
+
+	if(s_ubRebukes >= g_ubRebukesInMainStory) {
+		return ENDING_REBUKES;
+	}
+
+	return ENDING_NONE;
 }
 
 //-------------------------------------------------------------------- CHALLENGE

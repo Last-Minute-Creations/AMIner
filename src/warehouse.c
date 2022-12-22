@@ -20,7 +20,7 @@ static const tPlan s_sFirstPlan = {
 	.ulTargetSum = 15,
 };
 
-void warehouseReset(UBYTE is2pPlaying) {
+void warehouseReset(void) {
 	memset(s_pStock, 0, sizeof(s_pStock));
 	s_sCurrentPlan = s_sFirstPlan;
 	planReset(warehouseGetCurrentPlan());

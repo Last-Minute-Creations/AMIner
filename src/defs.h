@@ -80,7 +80,9 @@ typedef enum _tMsg {
 } tMsg;
 
 extern LONG g_lInitialCash;
-extern UBYTE g_ubUpgradeLevels, g_ubPlansPerAccolade, g_ubAccoladesInMainStory;
+extern UBYTE g_ubUpgradeLevels, g_ubPlansPerAccolade;
+extern UBYTE g_ubAccoladesInMainStory;
+extern UBYTE g_ubRebukesInMainStory;
 extern UBYTE g_ubDrillingCost;
 extern UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 

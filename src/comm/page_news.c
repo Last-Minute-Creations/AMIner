@@ -1,4 +1,4 @@
-#include "page_msg.h"
+#include "page_news.h"
 #include <ace/managers/system.h>
 #include <comm/base.h>
 #include <json/utf8.h>
@@ -79,7 +79,7 @@ static void pageNewsDestroy(void) {
 	bitmapDestroy(s_pScrollBitmap);
 }
 
-void pageNewsCreate(const char *szNewsPath) {
+void pageNewsCreate(tEnding eEnding) {
 	logBlockBegin("pageNewsCreate()");
 	s_pScrollBitmap = bitmapCreate(SCROLL_WIDTH_BUFFER, g_pFont->uwHeight, 1, BMF_CLEAR);
 	s_pCurrentChar = s_szScroll;

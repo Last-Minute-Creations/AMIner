@@ -241,8 +241,9 @@ static void pageWarehouseProcess(void) {
 				}
 				if(planIsFulfilled(warehouseGetCurrentPlan())) {
 					warehouseAdvancePlan();
-					if(gameIsEnding()) {
-						pageNewsCreate("outro_win");
+					tEnding eEnding = gameGetEnding();
+					if(eEnding) {
+						pageNewsCreate(eEnding);
 						return;
 					}
 				}

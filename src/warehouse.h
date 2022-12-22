@@ -13,7 +13,7 @@ UWORD warehouseGetStock(UBYTE ubMineralType);
 
 void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount);
 
-void warehouseReset(UBYTE is2pPlaying);
+void warehouseReset(void);
 
 tPlan *warehouseGetCurrentPlan(void);
 

@@ -22,8 +22,9 @@ static void commShopShowTab(tCommLed eTab) {
 	commSetActiveLed(eTab);
 	commEraseAll();
 
-	if(gameIsEnding()) {
-		pageNewsCreate("outro_win");
+	tEnding eEnding = gameGetEnding();
+	if(eEnding) {
+		pageNewsCreate(eEnding);
 		return;
 	}
 	switch(eTab) {

@@ -5,6 +5,8 @@
 #ifndef _AMINER_COMM_PAGE_NEWS_H_
 #define _AMINER_COMM_PAGE_NEWS_H_
 
-void pageNewsCreate(const char *szNewsPath);
+#include "game.h"
+
+void pageNewsCreate(tEnding eEnding);
 
 #endif // _AMINER_COMM_PAGE_NEWS_H_
