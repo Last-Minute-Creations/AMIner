@@ -117,11 +117,16 @@
 		"listKrystyna": "Krystyna",
 		"listPutin": "Komisarz Putienko",
 		"listUrzedas": "Urzędas",
-		"dossierKrystyna": "Dossier",
-		"dossierUrzedas": "Dossier",
-		"bribe": "Łapówka",
-		"favor": "Przysługa",
-		"accounting": "Kreatywna Księgowość"
+		"krystynaDossier": "Dossier",
+		"krystynaAccounting": "Kreatywna Księgowość",
+		"urzedasDossier": "Dossier",
+		"urzedasBribe": "Łapówka",
+		"urzedasFavor": "Przysługa",
+		"komisarzDossier": "Dossier",
+		"komisarzWelcome": "Powitanie",
+		"komisarzRebuke_1": "Pierwsza nagana",
+		"komisarzRebuke_2": "Druga nagana",
+		"komisarzRebuke_3": "Ostatnia nagana"
 	},
 	"officePageContents": {
 		"dossierKrystyna": "Główna Księgowa zakładu. Kiedy otwiera KPiR piekło zamarza. Rozmawia z liczbami. Z zamkniętymi oczami wypełnia zeznanie podatkowe. Na czas. Słabym punktem Pani Krystyny jest kawa, czekoladki i rajstopy. Dobrze ulokowany suwenir potrafi otworzyć u niej niezmierzone wręcz pokłady Kreatywnej Księgowości.",

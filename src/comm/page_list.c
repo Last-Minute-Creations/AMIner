@@ -61,24 +61,39 @@ static void pageListProcess(void) {
 	}
 	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		switch(s_pCurrentList[s_bPosCurr]) {
-			case OFFICE_PAGE_DOSSIER_KRYSTYNA:
+			case OFFICE_PAGE_KRYSTYNA_DOSSIER:
 				pageMsgCreate("dossier_krystyna", cbOnMsgClose);
 				break;
-			case OFFICE_PAGE_DOSSIER_URZEDAS:
+			case OFFICE_PAGE_KRYSTYNA_ACCOUNTING:
+				pageAccountingCreate();
+				break;
+			case OFFICE_PAGE_URZEDAS_DOSSIER:
 				pageMsgCreate("dossier_urzedas", cbOnMsgClose);
 				break;
-			case OFFICE_PAGE_BRIBE:
+			case OFFICE_PAGE_URZEDAS_BRIBE:
 				pageBribeCreate();
 				break;
-			case OFFICE_PAGE_FAVOR:
+			case OFFICE_PAGE_URZEDAS_FAVOR:
 				pageFavorCreate();
 				break;
-			case OFFICE_PAGE_ACCOUNTING:
-				pageAccountingCreate();
+			case OFFICE_PAGE_KOMISARZ_DOSSIER:
+				pageMsgCreate("dossier_komisarz", cbOnMsgClose);
+				break;
+			case OFFICE_PAGE_KOMISARZ_WELCOME:
+				pageMsgCreate("komisarz_welcome", cbOnMsgClose);
+				break;
+			case OFFICE_PAGE_KOMISARZ_REBUKE_1:
+				pageMsgCreate("komisarz_rebuke_1", cbOnMsgClose);
+				break;
+			case OFFICE_PAGE_KOMISARZ_REBUKE_2:
+				pageMsgCreate("komisarz_rebuke_2", cbOnMsgClose);
+				break;
+			case OFFICE_PAGE_KOMISARZ_REBUKE_3:
+				pageMsgCreate("komisarz_rebuke_3", cbOnMsgClose);
 				break;
 			case OFFICE_PAGE_LIST_MIETEK:
 			case OFFICE_PAGE_LIST_KRYSTYNA:
-			case OFFICE_PAGE_LIST_PUTIN:
+			case OFFICE_PAGE_LIST_KOMISARZ:
 			case OFFICE_PAGE_LIST_URZEDAS:
 			case OFFICE_PAGE_MAIN:
 			default:

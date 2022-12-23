@@ -114,10 +114,15 @@
 		"listKrystyna": "Krystyna",
 		"listPutin": "Commissar Putienko",
 		"listUrzedas": "Urzedas",
-		"dossierKrystyna": "Dossier",
-		"dossierUrzedas": "Dossier",
-		"bribe": "Bribe",
-		"favor": "Favor",
-		"accounting": "Creative Accounting"
+		"krystynaDossier": "Dossier",
+		"krystynaAccounting": "Creative Accounting",
+		"urzedasDossier": "Dossier",
+		"urzedasBribe": "Bribe",
+		"urzedasFavor": "Favor",
+		"komisarzDossier": "Dossier",
+		"komisarzWelcome": "Introduction",
+		"komisarzRebuke_1": "First rebuke",
+		"komisarzRebuke_2": "Second rebuke",
+		"komisarzRebuke_3": "Last rebuke"
 	}
 }

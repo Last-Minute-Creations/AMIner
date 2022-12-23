@@ -89,11 +89,16 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_LIST_KRYSTYNA] = "officePages.listKrystyna",
 	[MSG_PAGE_LIST_KOMISARZ] = "officePages.listPutin",
 	[MSG_PAGE_LIST_URZEDAS] = "officePages.listUrzedas",
-	[MSG_PAGE_DOSSIER_KRYSTYNA] = "officePages.dossierKrystyna",
-	[MSG_PAGE_DOSSIER_URZEDAS] = "officePages.dossierUrzedas",
-	[MSG_PAGE_BRIBE] = "officePages.bribe",
-	[MSG_PAGE_FAVOR] = "officePages.favor",
-	[MSG_PAGE_ACCOUNTING] = "officePages.accounting",
+	[MSG_PAGE_KRYSTYNA_DOSSIER] = "officePages.krystynaDossier",
+	[MSG_PAGE_KRYSTYNA_ACCOUNTING] = "officePages.krystynaAccounting",
+	[MSG_PAGE_URZEDAS_DOSSIER] = "officePages.urzedasDossier",
+	[MSG_PAGE_URZEDAS_BRIBE] = "officePages.urzedasBribe",
+	[MSG_PAGE_URZEDAS_FAVOR] = "officePages.urzedasFavor",
+	[MSG_PAGE_KOMISARZ_DOSSIER] = "officePages.komisarzDossier",
+	[MSG_PAGE_KOMISARZ_WELCOME] = "officePages.komisarzWelcome",
+	[MSG_PAGE_KOMISARZ_REBUKE_1] = "officePages.komisarzRebuke_1",
+	[MSG_PAGE_KOMISARZ_REBUKE_2] = "officePages.komisarzRebuke_2",
+	[MSG_PAGE_KOMISARZ_REBUKE_3] = "officePages.komisarzRebuke_3",
 	// Count
 	[MSG_COUNT] = 0
 };
