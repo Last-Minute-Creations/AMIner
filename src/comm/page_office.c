@@ -11,41 +11,29 @@
 
 #define PPL_PER_ROW 4
 
-/**
- * @brief List of people in the office.
- * Must be the exact same order as in office page list!
- */
-typedef enum _tOfficePpl {
-	OFFICE_PPL_MIETEK,
-	OFFICE_PPL_KRYSTYNA,
-	OFFICE_PPL_PUTIN,
-	OFFICE_PPL_URZEDAS,
-	OFFICE_PPL_COUNT,
-} tOfficePpl;
-
 typedef enum _tOfficeControls {
 	OFFICE_CONTROLS_ACCEPT_DECLINE,
 	OFFICE_CONTROLS_OK,
 } tOfficeControls;
 
-static const tOfficePage s_pOfficePages[OFFICE_PPL_COUNT][4] = {
-	[OFFICE_PPL_MIETEK] = {
+static const tOfficePage s_pOfficePages[COMM_FACE_COUNT][4] = {
+	[COMM_FACE_MIETEK] = {
 		OFFICE_PAGE_MAIN
 	},
-	[OFFICE_PPL_KRYSTYNA] = {
+	[COMM_FACE_KRYSTYNA] = {
 		OFFICE_PAGE_DOSSIER_KRYSTYNA, OFFICE_PAGE_ACCOUNTING, OFFICE_PAGE_MAIN
 	},
-	[OFFICE_PPL_PUTIN] = {
+	[COMM_FACE_KOMISARZ] = {
 		OFFICE_PAGE_MAIN
 	},
-	[OFFICE_PPL_URZEDAS] = {
+	[COMM_FACE_URZEDAS] = {
 		OFFICE_PAGE_DOSSIER_URZEDAS, OFFICE_PAGE_FAVOR, OFFICE_PAGE_BRIBE, OFFICE_PAGE_MAIN
 	},
 };
 
 //---------------------------------------------------------------- OFFICE COMMON
 
-static tOfficePpl s_pActivePpl[OFFICE_PPL_COUNT]; // Key: pos in office, val: ppl
+static tCommFace s_pActivePpl[COMM_FACE_COUNT]; // Key: pos in office, val: ppl
 static BYTE s_bSelectionCurr, s_bSelectionCount;
 
 //------------------------------------------------------------- OFFICE PAGE MAIN
@@ -55,8 +43,10 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 	const UBYTE ubSpaceY = 10;
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
 
-	UWORD uwX = sOrigin.uwX + 2 + (bPos % PPL_PER_ROW) * (32 + ubSpaceX);
-	UWORD uwY = sOrigin.uwY + 2 + (bPos / PPL_PER_ROW) * (32 + ubSpaceY);
+	UWORD uwRelativeX = 2 + (bPos % PPL_PER_ROW) * (32 + ubSpaceX);
+	UWORD uwRelativeY = 2 + (bPos / PPL_PER_ROW) * (32 + ubSpaceY);
+	UWORD uwX = sOrigin.uwX + uwRelativeX;
+	UWORD uwY = sOrigin.uwY + uwRelativeY;
 
 	tBitMap *pBmDraw = commGetDisplayBuffer();
 	blitRect(pBmDraw, uwX - 2, uwY - 2, 36, 36, COMM_DISPLAY_COLOR_BG);
@@ -69,10 +59,7 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 		blitCopy(g_pCommBmSelection, 0, 27, pBmDraw, uwX - 2 + 36 - 16, uwY - 2 + 36 - 9, 16, 9, MINTERM_COOKIE);
 	}
 
-	blitCopy(
-		g_pCommBmFaces, 0, s_pActivePpl[bPos] * 32, pBmDraw, uwX, uwY,
-		32, 32, MINTERM_COOKIE
-	);
+	commDrawFaceAt(s_pActivePpl[bPos], uwRelativeX, uwRelativeY);
 }
 
 static void pageOfficeProcess(void) {
@@ -105,15 +92,15 @@ static void pageOfficeProcess(void) {
 	}
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		pageListCreate(s_pOfficePages[s_pActivePpl[s_bSelectionCurr]]);
+		pageListCreate(s_pActivePpl[s_bSelectionCurr], s_pOfficePages[s_pActivePpl[s_bSelectionCurr]]);
 	}
 }
 
 void pageOfficeCreate(void) {
 	commRegisterPage(pageOfficeProcess, 0);
 	s_bSelectionCount = 0;
-	for(tOfficePpl i = 0; i < OFFICE_PPL_COUNT; ++i) {
-		if(s_pActivePpl[i] == OFFICE_PPL_COUNT) {
+	for(tCommFace i = 0; i < COMM_FACE_COUNT; ++i) {
+		if(s_pActivePpl[i] == COMM_FACE_COUNT) {
 			break;
 		}
 		officeDrawFaceAtPos(i);
@@ -122,13 +109,13 @@ void pageOfficeCreate(void) {
 }
 
 void pageOfficeReset(void) {
-	for(tOfficePpl i = 0; i < OFFICE_PPL_COUNT; ++i) {
-		s_pActivePpl[i] = OFFICE_PPL_COUNT;
+	for(tCommFace i = 0; i < COMM_FACE_COUNT; ++i) {
+		s_pActivePpl[i] = COMM_FACE_COUNT;
 	}
 	UBYTE ubPos = 0;
-	// s_pActivePpl[ubPos++] = OFFICE_PPL_MIETEK;
-	s_pActivePpl[ubPos++] = OFFICE_PPL_KRYSTYNA;
-	s_pActivePpl[ubPos++] = OFFICE_PPL_URZEDAS;
+	// s_pActivePpl[ubPos++] = COMM_FACE_MIETEK;
+	s_pActivePpl[ubPos++] = COMM_FACE_KRYSTYNA;
+	s_pActivePpl[ubPos++] = COMM_FACE_URZEDAS;
 
 	// Reset counters
 	pageFavorReset();

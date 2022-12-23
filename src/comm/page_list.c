@@ -12,11 +12,22 @@
 #include <comm/page_accounting.h>
 #include "../defs.h"
 
+#define PORTRAIT_X 0
+#define PORTRAIT_Y 0
+#define PORTRAIT_HEIGHT 32
+#define LIST_X 40
+#define LIST_Y 40
+#define TITLE_HEIGHT 8
+#define TITLE_X LIST_X
+#define TITLE_Y (PORTRAIT_HEIGHT - TITLE_HEIGHT)
+#define LIST_SPACING_Y 10
+
 static BYTE s_bPosCurr, s_bPosCount;
 static const tOfficePage *s_pCurrentList;
+static tCommFace s_eFace;
 
 static void cbOnMsgClose(void) {
-	pageListCreate(s_pCurrentList);
+	pageListCreate(s_eFace, s_pCurrentList);
 }
 
 static void officeDrawListPos(tOfficePage eListPage, UBYTE ubPos) {
@@ -26,7 +37,8 @@ static void officeDrawListPos(tOfficePage eListPage, UBYTE ubPos) {
 		COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	commDrawText(
-		0, 10 * ubPos, g_pMsgs[MSG_PAGE_MAIN + eListPage], FONT_COOKIE, ubColor
+		LIST_X, LIST_Y + LIST_SPACING_Y * ubPos, g_pMsgs[MSG_PAGE_MAIN + eListPage],
+		FONT_COOKIE, ubColor
 	);
 }
 
@@ -76,11 +88,16 @@ static void pageListProcess(void) {
 	}
 }
 
-void pageListCreate(const tOfficePage *pPages) {
+void pageListCreate(tCommFace eFace, const tOfficePage *pPages) {
+	s_eFace = eFace;
 	s_pCurrentList = pPages;
 	commRegisterPage(pageListProcess, 0);
-	tOfficePage eListPage;
 	s_bPosCurr = 0;
+
+	commDrawTitle(TITLE_X, TITLE_Y, g_pMsgs[MSG_PAGE_LIST_MIETEK + s_eFace]);
+	commDrawFaceAt(s_eFace, PORTRAIT_X, PORTRAIT_Y);
+
+	tOfficePage eListPage;
 	s_bPosCount = 0;
 	do {
 		eListPage = pPages[s_bPosCount];

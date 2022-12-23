@@ -297,6 +297,44 @@ UBYTE commDrawMultilineText(
 	return ubLinesWritten;
 }
 
+void commDrawTitle(UWORD uwX, UWORD uwY, const char *szTitle) {
+	// Clear old contents
+	if(s_pLineBuffer->uwActualWidth) {
+		blitRect(
+			s_pLineBuffer->pBitMap, 0, 0,
+			s_pLineBuffer->uwActualWidth, s_pLineBuffer->pBitMap->Rows, 0
+		);
+	}
+
+	char szChar[2] = {0};
+	UWORD uwEndX = 0;
+	for(const char *pNextChar = szTitle; *pNextChar != '\0'; ++pNextChar) {
+		// Prepare "bold" letter
+		szChar[0] = *pNextChar;
+		uwEndX = fontDrawStr1bpp(g_pFont, s_pLineBuffer->pBitMap, uwEndX, 0, szChar).uwX + 1;
+	}
+	s_pLineBuffer->uwActualWidth = uwEndX - 1;
+
+	const tUwCoordYX sOrigin = commGetOriginDisplay();
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pLineBuffer, sOrigin.uwX + uwX, sOrigin.uwY + uwY,
+		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+	);
+	fontDrawTextBitMap(
+		s_pBmDraw, s_pLineBuffer, sOrigin.uwX + uwX + 1, sOrigin.uwY + uwY,
+		COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+	);
+}
+
+void commDrawFaceAt(tCommFace eFace, UWORD uwX, UWORD uwY) {
+	const tUwCoordYX sOrigin = commGetOriginDisplay();
+	blitCopy(
+		g_pCommBmFaces, 0, eFace * 32, s_pBmDraw,
+		sOrigin.uwX + uwX, sOrigin.uwY + uwY,
+		32, 32, MINTERM_COOKIE
+	);
+}
+
 UBYTE commGetLineHeight(void) {
 	return g_pFont->uwHeight + 1;
 }
