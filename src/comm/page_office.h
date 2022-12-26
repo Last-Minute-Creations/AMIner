@@ -5,6 +5,8 @@
 #ifndef _COMM_PAGE_OFFICE_H_
 #define _COMM_PAGE_OFFICE_H_
 
+#include <comm/base.h>
+
 typedef enum _tOfficePage {
 	OFFICE_PAGE_MAIN,
 	OFFICE_PAGE_LIST_MIETEK,
@@ -27,5 +29,9 @@ typedef enum _tOfficePage {
 void pageOfficeReset(void);
 
 void pageOfficeCreate(void);
+
+void pageOfficeUnlockPerson(tCommFace ePerson);
+
+void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tOfficePage eSubpage);
 
 #endif // _COMM_PAGE_OFFICE_H_

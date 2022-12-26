@@ -3,47 +3,25 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "page_office.h"
-#include <comm/base.h>
 #include <comm/page_list.h>
 #include <comm/page_favor.h>
 #include <comm/page_bribe.h>
 #include <comm/page_accounting.h>
 
 #define PPL_PER_ROW 4
+#define SUBPAGES_PER_PERSON 5
 
 typedef enum _tOfficeControls {
 	OFFICE_CONTROLS_ACCEPT_DECLINE,
 	OFFICE_CONTROLS_OK,
 } tOfficeControls;
 
-static const tOfficePage s_pOfficePages[COMM_FACE_COUNT][5] = {
-	[COMM_FACE_MIETEK] = {
-		OFFICE_PAGE_MAIN
-	},
-	[COMM_FACE_KRYSTYNA] = {
-		OFFICE_PAGE_KRYSTYNA_DOSSIER,
-		OFFICE_PAGE_KRYSTYNA_ACCOUNTING,
-		OFFICE_PAGE_MAIN
-	},
-	[COMM_FACE_KOMISARZ] = {
-		OFFICE_PAGE_KOMISARZ_DOSSIER,
-		OFFICE_PAGE_KOMISARZ_REBUKE_1,
-		OFFICE_PAGE_KOMISARZ_REBUKE_2,
-		OFFICE_PAGE_KOMISARZ_REBUKE_3,
-		OFFICE_PAGE_MAIN
-	},
-	[COMM_FACE_URZEDAS] = {
-		OFFICE_PAGE_URZEDAS_DOSSIER,
-		OFFICE_PAGE_URZEDAS_FAVOR,
-		OFFICE_PAGE_URZEDAS_BRIBE,
-		OFFICE_PAGE_MAIN
-	},
-};
-
 //---------------------------------------------------------------- OFFICE COMMON
 
 static tCommFace s_pActivePpl[COMM_FACE_COUNT]; // Key: pos in office, val: ppl
+static tOfficePage s_pOfficePages[COMM_FACE_COUNT][SUBPAGES_PER_PERSON];
 static BYTE s_bSelectionCurr, s_bSelectionCount;
+static UBYTE s_ubUnlockedPplCount;
 
 //------------------------------------------------------------- OFFICE PAGE MAIN
 
@@ -118,17 +96,56 @@ void pageOfficeCreate(void) {
 }
 
 void pageOfficeReset(void) {
-	for(tCommFace i = 0; i < COMM_FACE_COUNT; ++i) {
-		s_pActivePpl[i] = COMM_FACE_COUNT;
+	// Make all ppl locked
+	for(tCommFace ePos = 0; ePos < COMM_FACE_COUNT; ++ePos) {
+		s_pActivePpl[ePos] = COMM_FACE_COUNT;
 	}
-	UBYTE ubPos = 0;
-	// s_pActivePpl[ubPos++] = COMM_FACE_MIETEK;
-	s_pActivePpl[ubPos++] = COMM_FACE_KRYSTYNA;
-	s_pActivePpl[ubPos++] = COMM_FACE_URZEDAS;
-	s_pActivePpl[ubPos++] = COMM_FACE_KOMISARZ;
+	s_ubUnlockedPplCount = 0;
+
+	// Lock all dialogue options
+	for(tCommFace ePerson = 0; ePerson < COMM_FACE_COUNT; ++ePerson) {
+		s_pOfficePages[ePerson][0] = OFFICE_PAGE_MAIN; // Serves as list terminator
+	}
+
+	// Unlock select characters
+	pageOfficeUnlockPerson(COMM_FACE_KRYSTYNA);
+	pageOfficeUnlockPerson(COMM_FACE_URZEDAS);
+	pageOfficeUnlockPerson(COMM_FACE_KOMISARZ);
+
+	// Unlock select pages
+	pageOfficeUnlockPersonSubpage(COMM_FACE_KRYSTYNA, OFFICE_PAGE_KRYSTYNA_DOSSIER);
+	pageOfficeUnlockPersonSubpage(COMM_FACE_KRYSTYNA, OFFICE_PAGE_KRYSTYNA_ACCOUNTING);
+	pageOfficeUnlockPersonSubpage(COMM_FACE_URZEDAS, OFFICE_PAGE_URZEDAS_DOSSIER);
+	pageOfficeUnlockPersonSubpage(COMM_FACE_URZEDAS, OFFICE_PAGE_URZEDAS_BRIBE);
+
+	// TODO: Unlock later on
+	pageOfficeUnlockPersonSubpage(COMM_FACE_URZEDAS, OFFICE_PAGE_URZEDAS_FAVOR);
+	pageOfficeUnlockPersonSubpage(COMM_FACE_KOMISARZ, OFFICE_PAGE_KOMISARZ_DOSSIER);
+	pageOfficeUnlockPersonSubpage(COMM_FACE_KOMISARZ, OFFICE_PAGE_KOMISARZ_REBUKE_1);
+	pageOfficeUnlockPersonSubpage(COMM_FACE_KOMISARZ, OFFICE_PAGE_KOMISARZ_REBUKE_2);
+	pageOfficeUnlockPersonSubpage(COMM_FACE_KOMISARZ, OFFICE_PAGE_KOMISARZ_REBUKE_3);
 
 	// Reset counters
 	pageFavorReset();
 	pageBribeReset();
 	pageAccountingReset();
+}
+
+void pageOfficeUnlockPerson(tCommFace ePerson) {
+	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
+}
+
+void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tOfficePage eSubpage) {
+	for(UBYTE i = 0; i < SUBPAGES_PER_PERSON - 1; ++i) {
+		if(s_pOfficePages[ePerson][i] == OFFICE_PAGE_MAIN) {
+			s_pOfficePages[ePerson][i] = eSubpage;
+			s_pOfficePages[ePerson][i + 1] = OFFICE_PAGE_MAIN;
+			return;
+		}
+	}
+
+	logWrite(
+		"ERR: Can't add subpage %d to person %d - no more space\n",
+		eSubpage, ePerson
+	);
 }
