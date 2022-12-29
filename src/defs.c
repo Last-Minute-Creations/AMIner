@@ -5,6 +5,7 @@
 #include "defs.h"
 #include "json/json.h"
 #include <ace/managers/log.h>
+#include <fixmath/fix16.h>
 #include <comm/page_workshop.h>
 #include <comm/page_warehouse.h>
 #include "hi_score.h"
@@ -24,6 +25,8 @@ UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 UBYTE g_ubPlansPerAccolade;
 UBYTE g_ubAccoladesInMainStory;
 UBYTE g_ubRebukesInMainStory;
+fix16_t g_fPlanIncreaseRatioSingleplayer;
+fix16_t g_fPlanIncreaseRatioMultiplayer;
 
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[9];
@@ -134,6 +137,8 @@ void defsInit(void) {
 	g_ubPlansPerAccolade = jsonTokToUlong(pJson, jsonGetDom(pJson, "plansPerAccolade"));
 	g_ubAccoladesInMainStory = jsonTokToUlong(pJson, jsonGetDom(pJson, "accoladesInMainStory"));
 	g_ubRebukesInMainStory = jsonTokToUlong(pJson, jsonGetDom(pJson, "rebukesInMainStory"));
+	g_fPlanIncreaseRatioSingleplayer = jsonTokToFix(pJson, jsonGetDom(pJson, "planIncreaseRatioSingleplayer"));
+	g_fPlanIncreaseRatioMultiplayer = jsonTokToFix(pJson, jsonGetDom(pJson, "planIncreaseRatioMultiplayer"));
 
 	// Upgrade costs
 	UWORD uwIdxUpgradeCosts = jsonGetDom(pJson, "upgradeCosts");

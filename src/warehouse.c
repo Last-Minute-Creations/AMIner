@@ -5,9 +5,11 @@
 #include "warehouse.h"
 #include <ace/macros.h>
 #include <ace/managers/log.h>
+#include <fixmath/fix16.h>
 #include "mineral.h"
 #include "game.h"
 #include "core.h"
+#include "defs.h"
 #include "comm/page_accounting.h"
 
 // Not spent on plan, not sold
@@ -39,12 +41,16 @@ void warehouseAdvancePlan(void) {
 		if(!s_sCurrentPlan.isPenaltyCountdownStarted) {
 			gameAdvanceAccolade();
 		}
-		if(g_is2pPlaying) {
-			s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum * 3 / 4;
-		}
-		else {
-			s_sCurrentPlan.ulTargetSum += s_sCurrentPlan.ulTargetSum * 1 / 2;
-		}
+
+		fix16_t fRatio = (
+			g_is2pPlaying ?
+			g_fPlanIncreaseRatioMultiplayer :
+			g_fPlanIncreaseRatioSingleplayer
+		);
+		s_sCurrentPlan.ulTargetSum += fix16_to_int(fix16_mul(
+			fix16_from_int(s_sCurrentPlan.ulTargetSum),
+			fRatio
+		));
 
 		planReset(warehouseGetCurrentPlan());
 		pageAccountingReduceChanceFail();

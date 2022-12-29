@@ -216,3 +216,14 @@ UWORD jsonTokStrCpy(
 	pDst[uwLength] = '\0';
 	return uwLength;
 }
+
+fix16_t jsonTokToFix(const tJson *pJson, UWORD uwTok) {
+	// fix16_from_str isn't happy with null terminator at the end,
+	// so temporarily add it - ugly as hell but beats allocating buffer on stack
+	char cEnd = pJson->szData[pJson->pTokens[uwTok].end];
+	pJson->szData[pJson->pTokens[uwTok].end] = '\0';
+	fix16_t fValue = fix16_from_str(&pJson->szData[pJson->pTokens[uwTok].start]);
+	pJson->szData[pJson->pTokens[uwTok].end] = cEnd;
+
+	return fValue;
+}

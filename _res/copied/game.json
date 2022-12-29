@@ -31,5 +31,7 @@
 	"dinoDepths": [80, 200, 400, 600, 800, 1000, 1500, 2000, 2500],
 	"plansPerAccolade": 10,
 	"accoladesInMainStory": 5,
-	"rebukesInMainStory": 3
+	"rebukesInMainStory": 3,
+	"planIncreaseRatioSingleplayer": 0.25,
+	"planIncreaseRatioMultiplayer": 0.5
 }

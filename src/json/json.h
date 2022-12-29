@@ -11,6 +11,7 @@
 #include "jsmn.h"
 #include "utf8_remap.h"
 #include <ace/types.h>
+#include <fixmath/fix16.h>
 
 typedef struct tJson {
 	char *szData;
@@ -34,9 +35,22 @@ ULONG jsonTokToUlong(const tJson *pJson,UWORD uwTok);
 
 UWORD jsonStrLen(const tJson *pJson, UWORD uwTok);
 
+/**
+ * @brief Copies the string value of token to specified buffer.
+ * If value is longer than the buffer, the value gets trimmed, and terminated with null character.
+ *
+ * @param pJson Source JSON data.
+ * @param pRemap Character remap definition, set to zero to skip.
+ * @param uwTok Source JSON token index.
+ * @param pDst Destination buffer.
+ * @param uwMaxBytes Size of destination buffer, including the null terminator.
+ * @return Length of copied string.
+ */
 UWORD jsonTokStrCpy(
 	const tJson *pJson, const tCodeRemap *pRemap, UWORD uwTok, char *pDst,
 	UWORD uwMaxBytes
 );
+
+fix16_t jsonTokToFix(const tJson *pJson, UWORD uwTok);
 
 #endif // JSON_JSON_H
