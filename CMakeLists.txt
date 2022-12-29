@@ -243,11 +243,11 @@ convertBitmaps(
 	INTERLEAVED SOURCES
 		${RES_DIR}/commrade/bg.png ${RES_DIR}/commrade/buttons.png ${RES_DIR}/commrade/faces.png
 		${RES_DIR}/hud/hud.png ${RES_DIR}/hud/mode_icons.png ${RES_DIR}/logo.png ${RES_DIR}/lang_select.png
-		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png
+		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png ${RES_DIR}/commrade/news.png
 	DESTINATIONS
 		${DATA_DIR}/comm_bg.bm ${DATA_DIR}/comm_buttons.bm ${DATA_DIR}/comm_faces.bm
 		${DATA_DIR}/hud.bm ${DATA_DIR}/mode_icons.bm ${DATA_DIR}/logo.bm ${DATA_DIR}/lang_select.bm
-		${DATA_DIR}/comm_faces_office.bm ${DATA_DIR}/comm_office_selection.bm
+		${DATA_DIR}/comm_faces_office.bm ${DATA_DIR}/comm_office_selection.bm ${DATA_DIR}/comm_news.bm
 )
 
 convertBitmaps(

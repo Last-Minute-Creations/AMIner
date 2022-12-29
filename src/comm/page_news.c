@@ -8,11 +8,11 @@
 
 #define SCROLL_SPEED_SLOW 1
 #define SCROLL_SPEED_FAST 8
-#define SCROLL_WIDTH_VISIBLE 172
-#define SCROLL_WIDTH_BUFFER 192
+#define SCROLL_WIDTH_VISIBLE 160
+#define SCROLL_WIDTH_BUFFER 176
 
 static const char *s_szScroll = "Dzisiaj w godzinach popoludniowych w siedzibie Ministerstwa na uroczystej Gali zostaly wreczone odznaczenia, awanse oraz nominacje na nowe stanowiska w Resorcie. Dyrektorzy kopaln otrzymali odznaki: Zasluzony Przodownik Pracy Socjalistycznej, Zasluzony dla Gornictwa LRD. Wszyscy rowniez otrzymali nowe przydzialy na odcinkach wymagajacych jeszcze wiekszego poswiecenia i zaangazowania. Minister dziekowal zebranym za ofiarna prace i trud w realizacji postawionego celu przekroczenia normy wydobycia o 600%. Celu, ktory udalo sie zrealizowac z nawiazka. Minister wyrazil rowniez nadzieje iz na nowych stanowiskach i w nowych zakladach czlonkowie Resortu stana na wysokosci zadania tak jak robili to dotychczas. Wszystkich nagrodzono gromkimi brawami a nastepnie rozpoczela sie czesc konsumpcyjno - artystyczna. Zabawy i tance w rytm nowoczesnej muzyki granej przez specjalnie w tym celu zaproszone slawy estrady trwaly do bialego rana. Gratulujemy Wam Towarzysze. Jestescie wzorem do nasladowania. Narod jest z Was dumny.";
-static tBitMap *s_pScrollBitmap;
+static tBitMap *s_pBitmapScroll;
 static const char *s_pCurrentChar;
 static WORD s_wDrawnTextEnd;
 static WORD s_wClearedBgEnd;
@@ -22,7 +22,7 @@ static WORD s_wClearedBgEnd;
  */
 static void pageNewsFillScrollWithText(void) {
 	if(s_wClearedBgEnd > 0 && s_wClearedBgEnd < SCROLL_WIDTH_BUFFER) {
-		blitRect(s_pScrollBitmap, s_wClearedBgEnd, 0, SCROLL_WIDTH_BUFFER - s_wClearedBgEnd, g_pFont->uwHeight, 0);
+		blitRect(s_pBitmapScroll, s_wClearedBgEnd, 0, SCROLL_WIDTH_BUFFER - s_wClearedBgEnd, g_pFont->uwHeight, 0);
 		s_wClearedBgEnd = SCROLL_WIDTH_BUFFER;
 	}
 
@@ -35,7 +35,7 @@ static void pageNewsFillScrollWithText(void) {
 
 		szCurrentChar[0] = *s_pCurrentChar;
 		++s_pCurrentChar;
-		fontDrawStr1bpp(g_pFont, s_pScrollBitmap, s_wDrawnTextEnd, 0, szCurrentChar);
+		fontDrawStr1bpp(g_pFont, s_pBitmapScroll, s_wDrawnTextEnd, 0, szCurrentChar);
 		s_wDrawnTextEnd += ubDrawWidth;
 	}
 }
@@ -44,7 +44,7 @@ static void pageNewsProcess(void) {
 	UBYTE ubSpeed = commNavCheck(COMM_NAV_BTN) ? SCROLL_SPEED_FAST : SCROLL_SPEED_SLOW;
 
 	// Shift scroll contents right
-	UBYTE *pStart = &s_pScrollBitmap->Planes[0][s_pScrollBitmap->BytesPerRow * s_pScrollBitmap->Rows - sizeof(UWORD)];
+	UBYTE *pStart = &s_pBitmapScroll->Planes[0][s_pBitmapScroll->BytesPerRow * s_pBitmapScroll->Rows - sizeof(UWORD)];
 	UWORD uwBlitSize = (g_pFont->uwHeight << HSIZEBITS) | (SCROLL_WIDTH_BUFFER / 16);
 	UWORD uwBltCon0 = (ubSpeed << ASHIFTSHIFT) | USEA|USED | MINTERM_A;
 	blitWait();
@@ -64,9 +64,9 @@ static void pageNewsProcess(void) {
 		pageNewsFillScrollWithText();
 
 		blitCopy(
-			s_pScrollBitmap, 0, 0,
-			commGetDisplayBuffer(), commGetOriginDisplay().uwX - 3,
-			commGetOriginDisplay().uwY + COMM_DISPLAY_HEIGHT - g_pFont->uwHeight - 3,
+			s_pBitmapScroll, 0, 0,
+			commGetDisplayBuffer(), commGetOriginDisplay().uwX + 2,
+			commGetOriginDisplay().uwY + COMM_DISPLAY_HEIGHT - g_pFont->uwHeight - 4,
 			SCROLL_WIDTH_VISIBLE, g_pFont->uwHeight, MINTERM_COOKIE
 		);
 	}
@@ -76,16 +76,24 @@ static void pageNewsProcess(void) {
 }
 
 static void pageNewsDestroy(void) {
-	bitmapDestroy(s_pScrollBitmap);
+	bitmapDestroy(s_pBitmapScroll);
 }
 
 void pageNewsCreate(tEnding eEnding) {
 	logBlockBegin("pageNewsCreate()");
-	s_pScrollBitmap = bitmapCreate(SCROLL_WIDTH_BUFFER, g_pFont->uwHeight, 1, BMF_CLEAR);
+	commRegisterPage(pageNewsProcess, pageNewsDestroy);
+
+	tUwCoordYX sOrigin = commGetOrigin();
+	tBitMap *pBitmapNews = bitmapCreateFromFile("data/comm_news.bm", 0);
+	blitCopy(
+		pBitmapNews, 0, 0, commGetDisplayBuffer(), sOrigin.uwX + 25, sOrigin.uwY + 28,
+		bitmapGetByteWidth(pBitmapNews) * 8, pBitmapNews->Rows, MINTERM_COOKIE
+	);
+	bitmapDestroy(pBitmapNews);
+
+	s_pBitmapScroll = bitmapCreate(SCROLL_WIDTH_BUFFER, g_pFont->uwHeight, 1, BMF_CLEAR);
 	s_pCurrentChar = s_szScroll;
 	s_wDrawnTextEnd = SCROLL_WIDTH_VISIBLE;
 	s_wClearedBgEnd = SCROLL_WIDTH_BUFFER;
-	commRegisterPage(pageNewsProcess, pageNewsDestroy);
-	commEraseAll();
 	logBlockEnd("pageNewsCreate()");
 }
