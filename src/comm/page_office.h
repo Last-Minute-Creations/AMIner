@@ -34,4 +34,8 @@ void pageOfficeUnlockPerson(tCommFace ePerson);
 
 void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tOfficePage eSubpage);
 
+void pageOfficeOpenSubpage(tOfficePage eCameFrom, tOfficePage eTarget);
+
+void pageOfficeGoBack(void);
+
 #endif // _COMM_PAGE_OFFICE_H_

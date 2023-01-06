@@ -4,8 +4,10 @@
 
 #include "page_office.h"
 #include <comm/page_list.h>
+#include <comm/page_msg.h>
 #include <comm/page_favor.h>
 #include <comm/page_bribe.h>
+#include <comm/page_news.h>
 #include <comm/page_accounting.h>
 
 #define PPL_PER_ROW 4
@@ -22,6 +24,7 @@ static tCommFace s_pActivePpl[COMM_FACE_COUNT]; // Key: pos in office, val: ppl
 static tOfficePage s_pOfficePages[COMM_FACE_COUNT][SUBPAGES_PER_PERSON];
 static BYTE s_bSelectionCurr, s_bSelectionCount;
 static UBYTE s_ubUnlockedPplCount;
+static tOfficePage s_eCameFrom;
 
 //------------------------------------------------------------- OFFICE PAGE MAIN
 
@@ -83,9 +86,16 @@ static void pageOfficeProcess(void) {
 	}
 }
 
+static void onBackFromLastRebuke(void) {
+	pageNewsCreate(ENDING_REBUKES);
+}
+
+//------------------------------------------------------------------- PUBLIC FNS
+
 void pageOfficeCreate(void) {
 	commRegisterPage(pageOfficeProcess, 0);
 	s_bSelectionCount = 0;
+	s_eCameFrom = OFFICE_PAGE_COUNT;
 	for(tCommFace i = 0; i < COMM_FACE_COUNT; ++i) {
 		if(s_pActivePpl[i] == COMM_FACE_COUNT) {
 			break;
@@ -148,4 +158,55 @@ void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tOfficePage eSubpage) {
 		"ERR: Can't add subpage %d to person %d - no more space\n",
 		eSubpage, ePerson
 	);
+}
+
+void pageOfficeOpenSubpage(tOfficePage eCameFrom, tOfficePage eTarget) {
+	s_eCameFrom = eCameFrom;
+	switch(eTarget) {
+		case OFFICE_PAGE_KRYSTYNA_DOSSIER:
+			pageMsgCreate("dossier_krystyna", pageOfficeGoBack);
+			break;
+		case OFFICE_PAGE_KRYSTYNA_ACCOUNTING:
+			pageAccountingCreate();
+			break;
+		case OFFICE_PAGE_URZEDAS_DOSSIER:
+			pageMsgCreate("dossier_urzedas", pageOfficeGoBack);
+			break;
+		case OFFICE_PAGE_URZEDAS_BRIBE:
+			pageBribeCreate();
+			break;
+		case OFFICE_PAGE_URZEDAS_FAVOR:
+			pageFavorCreate();
+			break;
+		case OFFICE_PAGE_KOMISARZ_DOSSIER:
+			pageMsgCreate("dossier_komisarz", pageOfficeGoBack);
+			break;
+		case OFFICE_PAGE_KOMISARZ_WELCOME:
+			pageMsgCreate("komisarz_welcome", pageOfficeGoBack);
+			break;
+		case OFFICE_PAGE_KOMISARZ_REBUKE_1:
+			pageMsgCreate("komisarz_rebuke_1", pageOfficeGoBack);
+			break;
+		case OFFICE_PAGE_KOMISARZ_REBUKE_2:
+			pageMsgCreate("komisarz_rebuke_2", pageOfficeGoBack);
+			break;
+		case OFFICE_PAGE_KOMISARZ_REBUKE_3:
+			pageMsgCreate("komisarz_rebuke_3", onBackFromLastRebuke);
+			break;
+		case OFFICE_PAGE_LIST_MIETEK:
+		case OFFICE_PAGE_LIST_KRYSTYNA:
+		case OFFICE_PAGE_LIST_KOMISARZ:
+		case OFFICE_PAGE_LIST_URZEDAS: {
+			tCommFace eFace = eTarget - OFFICE_PAGE_LIST_MIETEK + COMM_FACE_MIETEK;
+			pageListCreate(eFace, s_pOfficePages[eFace]);
+		} break;
+		case OFFICE_PAGE_MAIN:
+		default:
+			pageOfficeCreate();
+			break;
+	}
+}
+
+void pageOfficeGoBack(void) {
+	pageOfficeOpenSubpage(OFFICE_PAGE_COUNT, s_eCameFrom);
 }

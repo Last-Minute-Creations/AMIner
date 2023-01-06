@@ -40,7 +40,7 @@ static void pageAccountingProcess(void) {
 
 			s_bAccountingChanceFail = MIN(s_bAccountingChanceFail + 6, 100);
 		}
-		pageOfficeCreate();
+		pageOfficeGoBack();
 	}
 }
 

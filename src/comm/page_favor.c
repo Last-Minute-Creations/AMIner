@@ -32,12 +32,12 @@ static void pageFavorProcess(void) {
 				--s_ubFavorsLeft;
 				warehouseRerollPlan();
 			}
-			pageOfficeCreate();
+			pageOfficeGoBack();
 		}
 	}
 	else {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			pageOfficeCreate();
+			pageOfficeGoBack();
 		}
 	}
 }
