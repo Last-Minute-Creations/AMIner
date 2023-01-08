@@ -6,6 +6,7 @@
 #include <comm/base.h>
 #include <comm/button.h>
 #include <comm/page_office.h>
+#include <comm/gs_shop.h>
 #include "../game.h"
 #include "../warehouse.h"
 
@@ -32,12 +33,12 @@ static void pageFavorProcess(void) {
 				--s_ubFavorsLeft;
 				warehouseRerollPlan();
 			}
-			pageOfficeGoBack();
+			commShopGoBack();
 		}
 	}
 	else {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			pageOfficeGoBack();
+			commShopGoBack();
 		}
 	}
 }

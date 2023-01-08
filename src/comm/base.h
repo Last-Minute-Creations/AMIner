@@ -50,12 +50,12 @@ typedef enum _tCommNavEx {
 	COMM_NAV_EX_COUNT
 } tCommNavEx;
 
-typedef enum _tCommLed {
-	COMM_LED_OFFICE,
-	COMM_LED_WORKSHOP,
-	COMM_LED_WAREHOUSE,
-	COMM_LED_COUNT
-} tCommLed;
+typedef enum _tCommTab {
+	COMM_TAB_OFFICE,
+	COMM_TAB_WORKSHOP,
+	COMM_TAB_WAREHOUSE,
+	COMM_TAB_COUNT
+} tCommTab;
 
 typedef enum _tBtnState {
 	BTN_STATE_NACTIVE = 0,
@@ -85,7 +85,7 @@ tUwCoordYX commGetOrigin(void);
 
 tUwCoordYX commGetOriginDisplay(void);
 
-void commSetActiveLed(tCommLed eLed);
+void commSetActiveLed(tCommTab eLed);
 
 void commDrawText(
 	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor

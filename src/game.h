@@ -13,12 +13,6 @@
 #define GAME_BPP 5
 #define GAME_MOD_COUNT 10
 
-typedef enum _tEnding {
-	ENDING_NONE = 0,
-	ENDING_ACCOLADES,
-	ENDING_REBUKES,
-} tEnding;
-
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void gameGsLoopChallengeEnd(void);
@@ -38,8 +32,6 @@ void gameAddRebuke(void);
 UBYTE gameGetAccolades(void);
 
 UBYTE gameGetRebukes(void);
-
-tEnding gameGetEnding(void);
 
 extern tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];

@@ -6,6 +6,7 @@
 #include <comm/base.h>
 #include <comm/page_office.h>
 #include <comm/button.h>
+#include <comm/gs_shop.h>
 #include "../core.h"
 #include "../game.h"
 #include "../warehouse.h"
@@ -40,7 +41,7 @@ static void pageAccountingProcess(void) {
 
 			s_bAccountingChanceFail = MIN(s_bAccountingChanceFail + 6, 100);
 		}
-		pageOfficeGoBack();
+		commShopGoBack();
 	}
 }
 

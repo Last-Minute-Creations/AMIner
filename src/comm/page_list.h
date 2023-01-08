@@ -9,6 +9,6 @@
 #include "comm/page_office.h"
 #include "comm/base.h"
 
-void pageListCreate(tCommFace eFace, const tOfficePage *pPages);
+void pageListCreate(tCommFace eFace);
 
 #endif // _AMINER_COMM_PAGE_LIST_H_

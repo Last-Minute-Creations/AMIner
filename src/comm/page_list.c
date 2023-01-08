@@ -10,6 +10,7 @@
 #include <comm/page_bribe.h>
 #include <comm/page_favor.h>
 #include <comm/page_accounting.h>
+#include "gs_shop.h"
 #include "../defs.h"
 
 #define PORTRAIT_X 0
@@ -23,17 +24,17 @@
 #define LIST_SPACING_Y 10
 
 static BYTE s_bPosCurr, s_bPosCount;
-static const tOfficePage *s_pCurrentList;
+static const tCommShopPage *s_pCurrentList;
 static tCommFace s_eFace;
 
-static void officeDrawListPos(tOfficePage eListPage, UBYTE ubPos) {
+static void officeDrawListPos(tCommShopPage eListPage, UBYTE ubPos) {
 	UBYTE ubColor = (
 		ubPos == s_bPosCurr ?
 		COMM_DISPLAY_COLOR_TEXT :
 		COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	commDrawText(
-		LIST_X, LIST_Y + LIST_SPACING_Y * ubPos, g_pMsgs[MSG_PAGE_MAIN + eListPage],
+		LIST_X, LIST_Y + LIST_SPACING_Y * ubPos, g_pMsgs[MSG_PAGE_LIST_MIETEK + eListPage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK],
 		FONT_COOKIE, ubColor
 	);
 }
@@ -56,13 +57,15 @@ static void pageListProcess(void) {
 		officeDrawListPos(s_pCurrentList[s_bPosCurr], s_bPosCurr);
 	}
 	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		pageOfficeOpenSubpage(
-			OFFICE_PAGE_LIST_MIETEK + s_eFace - COMM_FACE_MIETEK, s_pCurrentList[s_bPosCurr]
+		commShopChangePage(
+			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_eFace - COMM_FACE_MIETEK,
+			s_pCurrentList[s_bPosCurr]
 		);
 	}
 }
 
-void pageListCreate(tCommFace eFace, const tOfficePage *pPages) {
+void pageListCreate(tCommFace eFace) {
+	const tCommShopPage *pPages = officeGetPagesForFace(eFace);
 	s_eFace = eFace;
 	s_pCurrentList = pPages;
 	commRegisterPage(pageListProcess, 0);
@@ -71,11 +74,11 @@ void pageListCreate(tCommFace eFace, const tOfficePage *pPages) {
 	commDrawTitle(TITLE_X, TITLE_Y, g_pMsgs[MSG_PAGE_LIST_MIETEK + s_eFace]);
 	commDrawFaceAt(s_eFace, PORTRAIT_X, PORTRAIT_Y);
 
-	tOfficePage eListPage;
+	tCommShopPage eListPage;
 	s_bPosCount = 0;
 	do {
 		eListPage = pPages[s_bPosCount];
 		officeDrawListPos(eListPage, s_bPosCount);
 		++s_bPosCount;
-	} while(eListPage != OFFICE_PAGE_MAIN);
+	} while(eListPage != COMM_SHOP_PAGE_OFFICE_MAIN);
 }

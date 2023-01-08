@@ -6,25 +6,7 @@
 #define _COMM_PAGE_OFFICE_H_
 
 #include <comm/base.h>
-
-typedef enum _tOfficePage {
-	OFFICE_PAGE_MAIN,
-	OFFICE_PAGE_LIST_MIETEK,
-	OFFICE_PAGE_LIST_KRYSTYNA,
-	OFFICE_PAGE_LIST_KOMISARZ,
-	OFFICE_PAGE_LIST_URZEDAS,
-	OFFICE_PAGE_KRYSTYNA_DOSSIER,
-	OFFICE_PAGE_KRYSTYNA_ACCOUNTING,
-	OFFICE_PAGE_URZEDAS_DOSSIER,
-	OFFICE_PAGE_URZEDAS_BRIBE,
-	OFFICE_PAGE_URZEDAS_FAVOR,
-	OFFICE_PAGE_KOMISARZ_DOSSIER,
-	OFFICE_PAGE_KOMISARZ_WELCOME,
-	OFFICE_PAGE_KOMISARZ_REBUKE_1,
-	OFFICE_PAGE_KOMISARZ_REBUKE_2,
-	OFFICE_PAGE_KOMISARZ_REBUKE_3,
-	OFFICE_PAGE_COUNT
-} tOfficePage;
+#include <comm/gs_shop.h>
 
 void pageOfficeReset(void);
 
@@ -32,10 +14,8 @@ void pageOfficeCreate(void);
 
 void pageOfficeUnlockPerson(tCommFace ePerson);
 
-void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tOfficePage eSubpage);
+void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tCommShopPage eSubpage);
 
-void pageOfficeOpenSubpage(tOfficePage eCameFrom, tOfficePage eTarget);
-
-void pageOfficeGoBack(void);
+const tCommShopPage *officeGetPagesForFace(tCommFace eFace);
 
 #endif // _COMM_PAGE_OFFICE_H_

@@ -7,6 +7,11 @@
 
 #include "game.h"
 
-void pageNewsCreate(tEnding eEnding);
+typedef enum tNewsKind {
+	NEWS_KIND_REBUKES,
+	NEWS_KIND_ACCOLADES,
+} tNewsKind;
+
+void pageNewsCreate(tNewsKind eEnding);
 
 #endif // _AMINER_COMM_PAGE_NEWS_H_

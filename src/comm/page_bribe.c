@@ -53,12 +53,12 @@ static void pageBribeProcess(void) {
 					gameAddRebuke();
 				}
 			}
-			pageOfficeGoBack();
+			commShopGoBack();
 		}
 	}
 	else {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			pageOfficeGoBack();
+			commShopGoBack();
 		}
 	}
 }

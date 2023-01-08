@@ -68,7 +68,7 @@ void commDestroy(void) {
 	systemUnuse();
 }
 
-void commSetActiveLed(tCommLed eLed) {
+void commSetActiveLed(tCommTab eLed) {
 	const UBYTE ubLedWidth = 16;
 	const UBYTE ubLedHeight = 13;
 	const UBYTE ubGrnLedY = ubLedHeight;
@@ -76,7 +76,7 @@ void commSetActiveLed(tCommLed eLed) {
 	const UBYTE ubLedY = 169;
 
 	tUwCoordYX sOrigin = commGetOrigin();
-	for(UBYTE i = 0; i < COMM_LED_COUNT; ++i) {
+	for(UBYTE i = 0; i < COMM_TAB_COUNT; ++i) {
 		blitCopy(
 			s_pButtons, 0, (i == eLed ? ubGrnLedY : 0),
 			s_pBmDraw, sOrigin.uwX + pLedX[i], sOrigin.uwY + ubLedY,

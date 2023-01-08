@@ -8,6 +8,7 @@
 #include <ace/utils/custom.h>
 #include <comm/gs_shop.h>
 #include <comm/page_office.h>
+#include <comm/inbox.h>
 #include "vehicle.h"
 #include "hud.h"
 #include "tile.h"
@@ -423,12 +424,23 @@ void gameAdvanceAccolade(void) {
 
 		if(s_ubAccolades >= g_ubAccoladesInMainStory) {
 			hudShowMessage(0, g_pMsgs[MSG_PLAN_FINAL_PLAN]);
+			inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES);
 		}
 	}
 }
 
 void gameAddRebuke(void) {
-	++s_ubRebukes;
+	if(s_ubRebukes < g_ubRebukesInMainStory) {
+		++s_ubRebukes;
+	}
+	tCommShopPage ePage = CLAMP(
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1 + s_ubRebukes - 1,
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1,
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3
+	);
+
+	pageOfficeUnlockPersonSubpage(COMM_FACE_KOMISARZ, ePage);
+	inboxPushBack(ePage);
 }
 
 UBYTE gameGetAccolades(void) {
@@ -437,18 +449,6 @@ UBYTE gameGetAccolades(void) {
 
 UBYTE gameGetRebukes(void) {
 	return s_ubRebukes;
-}
-
-tEnding gameGetEnding(void) {
-	if (s_ubAccolades >= g_ubAccoladesInMainStory) {
-		return ENDING_ACCOLADES;
-	}
-
-	if(s_ubRebukes >= g_ubRebukesInMainStory) {
-		return ENDING_REBUKES;
-	}
-
-	return ENDING_NONE;
 }
 
 //-------------------------------------------------------------------- CHALLENGE

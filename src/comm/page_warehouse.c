@@ -241,11 +241,6 @@ static void pageWarehouseProcess(void) {
 				}
 				if(planIsFulfilled(warehouseGetCurrentPlan())) {
 					warehouseAdvancePlan();
-					tEnding eEnding = gameGetEnding();
-					if(eEnding) {
-						pageNewsCreate(eEnding);
-						return;
-					}
 				}
 				commEraseAll();
 				redraw();
