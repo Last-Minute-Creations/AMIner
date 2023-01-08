@@ -500,22 +500,16 @@ static void processPlan(void) {
 
 	WORD wRemainingDays = planGetRemainingDays(pPlan);
 	if(wRemainingDays <= 0) {
-		if(warehouseTryFulfillPlan()) {
-			hudShowMessage(0, g_pMsgs[MSG_PLAN_DONE_AFK]);
-			warehouseAdvancePlan();
+		if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
+			char szBfr[100];
+			sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
+			hudShowMessage(0, szBfr);
+			planStartPenaltyCountdown(pPlan);
 		}
 		else {
-			if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
-				char szBfr[100];
-				sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
-				hudShowMessage(0, szBfr);
-				planStartPenaltyCountdown(pPlan);
-			}
-			else {
-				hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
-				planFail(pPlan);
-				gameAddRebuke();
-			}
+			hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
+			planFail(pPlan);
+			gameAddRebuke();
 		}
 	}
 	else if(

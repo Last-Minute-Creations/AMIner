@@ -17,14 +17,6 @@ void warehouseReset(void);
 
 tPlan *warehouseGetCurrentPlan(void);
 
-/**
- * @brief Tries to fulfill plan using minerals from non-spent stock.
- * If successful, it will remove used minerals from stock.
- *
- * @return 1 On success, otherwise 0.
- */
-UBYTE warehouseTryFulfillPlan(void);
-
 //------------------------------------------------------------------------- PLAN
 
 void warehouseAdvancePlan(void);
