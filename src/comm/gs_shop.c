@@ -64,7 +64,7 @@ static void onBack(void) {
 }
 
 static void onBackFromLastRebuke(void) {
-	commShopChangePage(COMM_SHOP_PAGE_COUNT, COMM_SHOP_PAGE_NEWS_REBUKES);
+	menuGsEnter(0);
 }
 
 static void commGsShopCreate(void) {
@@ -196,9 +196,6 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			tCommFace eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + COMM_FACE_MIETEK;
 			pageListCreate(eFace);
 		} break;
-		case COMM_SHOP_PAGE_NEWS_REBUKES:
-			pageNewsCreate(NEWS_KIND_REBUKES);
-			break;
 		case COMM_SHOP_PAGE_NEWS_ACCOLADES:
 			pageNewsCreate(NEWS_KIND_ACCOLADES);
 			break;

@@ -8,7 +8,6 @@
 #include "game.h"
 
 typedef enum tNewsKind {
-	NEWS_KIND_REBUKES,
 	NEWS_KIND_ACCOLADES,
 } tNewsKind;
 

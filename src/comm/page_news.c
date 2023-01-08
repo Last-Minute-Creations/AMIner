@@ -79,8 +79,8 @@ static void pageNewsDestroy(void) {
 	bitmapDestroy(s_pBitmapScroll);
 }
 
-void pageNewsCreate(tNewsKind eEnding) {
-	logBlockBegin("pageNewsCreate(eEnding: %d)", eEnding);
+void pageNewsCreate(tNewsKind eNewsKind) {
+	logBlockBegin("pageNewsCreate(eNewsKind: %d)", eNewsKind);
 	commRegisterPage(pageNewsProcess, pageNewsDestroy);
 
 	tUwCoordYX sOrigin = commGetOrigin();
