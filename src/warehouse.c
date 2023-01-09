@@ -64,23 +64,6 @@ void warehouseRerollPlan(void) {
 	planReset(warehouseGetCurrentPlan());
 }
 
-UBYTE warehouseTryFulfillPlan(void) {
-	UWORD pNewStock[MINERAL_TYPE_COUNT];
-	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
-		const tPlanMineral *pMineral = &s_sCurrentPlan.pMinerals[i];
-		UWORD uwTotal = pMineral->uwCurrentCount + s_pStock[i];
-		if(uwTotal < pMineral->uwTargetCount) {
-			return 0;
-		}
-		else {
-			pNewStock[i] = uwTotal - pMineral->uwTargetCount;
-		}
-	}
-	// We can fulfill plan from current stock, so replace it with reduced one
-	memcpy(s_pStock, pNewStock, MINERAL_TYPE_COUNT * sizeof(pNewStock[0]));
-	return 1;
-}
-
 UWORD warehouseGetStock(UBYTE ubMineralType) {
 	return s_pStock[ubMineralType];
 }
