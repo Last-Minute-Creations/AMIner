@@ -20,7 +20,6 @@ typedef struct _tPlan {
 	WORD wTimeRemaining;
 	UBYTE isExtendedTimeByFavor;
 	UBYTE isPenaltyCountdownStarted;
-	UBYTE isFailed;
 } tPlan;
 
 UBYTE planIsFulfilled(const tPlan *pPlan);

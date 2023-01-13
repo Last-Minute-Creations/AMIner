@@ -24,10 +24,7 @@ void planElapseDay(tPlan *pPlan) {
 }
 
 void planElapseTime(tPlan *pPlan, UWORD uwTime) {
-	if(pPlan->isFailed) {
-		pPlan->wTimeRemaining = 0;
-	}
-	else {
+	if(pPlan->wTimeRemaining) {
 		pPlan->wTimeRemaining = MAX(0, pPlan->wTimeRemaining - uwTime);
 	}
 }
@@ -51,10 +48,6 @@ void planAddDays(tPlan *pPlan, UBYTE ubDays, UBYTE isFavor) {
 void planStartPenaltyCountdown(tPlan *pPlan) {
 	planAddDays(pPlan, 14, 0);
 	pPlan->isPenaltyCountdownStarted = 1;
-}
-
-void planFail(tPlan *pPlan) {
-	pPlan->isFailed = 1;
 }
 
 UWORD planGetRemainingCost(const tPlan *pPlan) {
@@ -93,6 +86,5 @@ void planReset(tPlan *pPlan) {
 	pPlan->wTimeRemaining = pPlan->wTimeMax;
 	pPlan->isExtendedTimeByFavor = 0;
 	pPlan->isPenaltyCountdownStarted = 0;
-	pPlan->isFailed = 0;
 	logBlockEnd("planReset()");
 }

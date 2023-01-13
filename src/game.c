@@ -159,7 +159,7 @@ static void gameProcessHotkeys(void) {
 	}
 	else if(keyUse(KEY_EQUALS)) {
 		hudShowMessage(0, g_pMsgs[MSG_HUD_PLAN_DONE]);
-		warehouseNextPlan();
+		warehouseNextPlan(0);
 	}
 	else if(keyUse(KEY_0)) {
 		tPlan *pPlan = warehouseGetCurrentPlan();
@@ -500,9 +500,6 @@ static void onSongEnd(void) {
 
 static void processPlan(void) {
 	tPlan *pPlan = warehouseGetCurrentPlan();
-	if(pPlan->isFailed) {
-		return;
-	}
 
 	WORD wRemainingDays = planGetRemainingDays(pPlan);
 	if(wRemainingDays <= 0) {
@@ -514,7 +511,7 @@ static void processPlan(void) {
 		}
 		else {
 			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_REBUKE]);
-			planFail(pPlan);
+			warehouseNextPlan(1);
 			gameAddRebuke();
 		}
 	}
@@ -524,9 +521,9 @@ static void processPlan(void) {
 	) {
 		if(!s_isReminderShown) {
 			s_isReminderShown = 1;
-			char szBfr[50];
-			sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
-			hudShowMessage(0, szBfr);
+			char szBuffer[50];
+			sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
+			hudShowMessage(0, szBuffer);
 		}
 	}
 	else {

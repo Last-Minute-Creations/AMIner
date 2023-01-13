@@ -240,7 +240,7 @@ static void pageWarehouseProcess(void) {
 					hudSetCash(0, g_pVehicles[0].lCash);
 				}
 				if(planIsFulfilled(warehouseGetCurrentPlan())) {
-					warehouseNextPlan();
+					warehouseNextPlan(0);
 				}
 				commEraseAll();
 				redraw();

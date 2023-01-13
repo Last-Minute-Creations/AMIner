@@ -33,7 +33,7 @@ static void pageAccountingProcess(void) {
 		if(bButtonCurr == 0) {
 			g_pVehicles[0].lCash -= s_uwAccountingCost;
 			if(randUwMinMax(&g_sRand, 1, 100) > s_bAccountingChanceFail) {
-				warehouseNextPlan();
+				warehouseNextPlan(0);
 			}
 			else {
 				gameAddRebuke();

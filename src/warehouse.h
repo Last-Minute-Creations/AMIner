@@ -19,7 +19,7 @@ tPlan *warehouseGetCurrentPlan(void);
 
 //------------------------------------------------------------------------- PLAN
 
-void warehouseNextPlan(void);
+void warehouseNextPlan(UBYTE isFailed);
 
 void warehouseRerollPlan(void);
 

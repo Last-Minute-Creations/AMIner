@@ -36,8 +36,8 @@ void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount) {
 	s_sCurrentPlan.pMinerals[ubMineralType].uwCurrentCount = ubCount;
 }
 
-void warehouseNextPlan(void) {
-	if(!warehouseGetCurrentPlan()->isFailed) {
+void warehouseNextPlan(UBYTE isFailed) {
+	if(!isFailed) {
 		if(!s_sCurrentPlan.isPenaltyCountdownStarted) {
 			gameAdvanceAccolade();
 		}
