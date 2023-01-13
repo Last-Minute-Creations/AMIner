@@ -12,8 +12,10 @@ typedef struct tInboxMessage {
 	// TODO: something to tell shop which next page to show - for going to default state, triggering rebuke game over
 } tInboxMessage;
 
-void inboxPushBack(tCommShopPage ePage);
+void inboxPushBack(tCommShopPage ePage, UBYTE isUrgent);
 
 UBYTE inboxTryPopBack(tCommShopPage *ePage);
+
+UBYTE inboxIsUrgent(void);
 
 #endif // _AMINER_COMM_INBOX_H_

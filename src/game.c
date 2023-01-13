@@ -279,24 +279,31 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	}
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
 
-	if(steerUse(pSelection->eSteerFire) && !g_isChallenge) {
-		if(!pSelection->isSelecting) {
-			if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-				statePush(g_pGameStateManager, &g_sStateShop);
-				return 1;
+	if(!g_isChallenge) {
+		if(steerUse(pSelection->eSteerFire)) {
+			if(!pSelection->isSelecting) {
+				if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+					statePush(g_pGameStateManager, &g_sStateShop);
+					return 1;
+				}
+				pSelection->isSelecting = 1;
+				hudShowMode();
 			}
-			pSelection->isSelecting = 1;
-			hudShowMode();
+			else {
+				pSelection->isSelecting = 0;
+				hudHideMode();
+				if(pSelection->eMode == MODE_TNT) {
+					s_pBombCount[ubPlayer] = 0;
+					s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
+				}
+			}
 		}
-		else {
-			pSelection->isSelecting = 0;
-			hudHideMode();
-			if(pSelection->eMode == MODE_TNT) {
-				s_pBombCount[ubPlayer] = 0;
-				s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
-			}
+		else if(inboxIsUrgent() && vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+			statePush(g_pGameStateManager, &g_sStateShop);
+			return 1;
 		}
 	}
+
 	if(pSelection->isSelecting) {
 		if(steerUse(pSelection->eSteerLeft)) {
 			if(pSelection->eMode > 0) {
@@ -423,8 +430,7 @@ void gameAdvanceAccolade(void) {
 		++s_ubAccolades;
 
 		if(s_ubAccolades >= g_ubAccoladesInMainStory) {
-			hudShowMessage(0, g_pMsgs[MSG_PLAN_FINAL_PLAN]);
-			inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES);
+			inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES, 0);
 		}
 	}
 }
@@ -439,8 +445,8 @@ void gameAddRebuke(void) {
 		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3
 	);
 
-	pageOfficeUnlockPersonSubpage(COMM_FACE_KOMISARZ, ePage);
-	inboxPushBack(ePage);
+	pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, ePage);
+	inboxPushBack(ePage, 1);
 }
 
 UBYTE gameGetAccolades(void) {

@@ -9,16 +9,19 @@
 
 static tCommShopPage s_pInbox[INBOX_SIZE];
 static UWORD s_uwPendingInboxCount;
+static UBYTE s_isUrgent;
 
 void inboxCreate(void) {
 	s_uwPendingInboxCount = 0;
+	s_isUrgent = 0;
 }
 
-void inboxPushBack(tCommShopPage ePage) {
+void inboxPushBack(tCommShopPage ePage, UBYTE isUrgent) {
 	if(s_uwPendingInboxCount >= INBOX_SIZE) {
 		logWrite("ERR: No more room for message %d in inbox\n", ePage);
 	}
 
+	s_isUrgent |= isUrgent;
 	s_pInbox[s_uwPendingInboxCount++] = ePage;
 }
 
@@ -28,5 +31,10 @@ UBYTE inboxTryPopBack(tCommShopPage *ePage) {
 	}
 
 	*ePage = s_pInbox[--s_uwPendingInboxCount];
+	s_isUrgent = 0;
 	return 1;
+}
+
+UBYTE inboxIsUrgent(void) {
+	return s_isUrgent;
 }
