@@ -32,12 +32,6 @@ LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[9];
 
 const char * s_pLangDom[] = {
-	// Plan
-	[MSG_PLAN_DONE_AFK] = "planMessages.doneAfk",
-	[MSG_PLAN_NOT_DONE] = "planMessages.notDone",
-	[MSG_PLAN_REMAINING] = "planMessages.remaining",
-	[MSG_PLAN_EXTENDING] = "planMessages.extending",
-	[MSG_PLAN_FINAL_PLAN] = "planMessages.finalPlan",
 	// Hi score
 	[MSG_HI_SCORE_NEW] = "hiScore.new",
 	[MSG_HI_SCORE_PRESS] = "hiScore.press",
@@ -71,7 +65,7 @@ const char * s_pLangDom[] = {
 	[MSG_MISC_CARGO_FULL] = "misc.cargoFull",
 	[MSG_MISC_RESTOCK] = "misc.restock",
 	[MSG_MISC_FOUND_BONE] = "misc.foundBone",
-	// HUD
+	// HUD: UI
 	[MSG_HUD_P1] = "hud.p1",
 	[MSG_HUD_P2] = "hud.p2",
 	[MSG_HUD_DRILL] = "hud.drill",
@@ -82,6 +76,12 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_PAUSED] = "hud.paused",
 	[MSG_HUD_RESUME] = "hud.resume",
 	[MSG_HUD_QUIT] = "hud.quit",
+	// HUD: Misc
+	// HUD: Plan
+	[MSG_HUD_PLAN_DONE] = "hudMessages.planDone",
+	[MSG_HUD_PLAN_REMAINING] = "hudMessages.remaining",
+	[MSG_HUD_PLAN_EXTENDING] = "hudMessages.extending",
+	[MSG_HUD_REBUKE] = "hudMessages.rebuke",
 	// Loading
 	[MSG_LOADING_GEN_TERRAIN] = "loading.genTerrain",
 	[MSG_LOADING_GEN_BASES] = "loading.genBases",

@@ -25,7 +25,7 @@
 
 static BYTE s_bPosCurr, s_bPosCount;
 static const tCommShopPage *s_pCurrentList;
-static tCommFace s_eFace;
+static tFaceId s_eFace;
 
 static void officeDrawListPos(tCommShopPage eListPage, UBYTE ubPos) {
 	UBYTE ubColor = (
@@ -58,13 +58,13 @@ static void pageListProcess(void) {
 	}
 	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		commShopChangePage(
-			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_eFace - COMM_FACE_MIETEK,
+			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_eFace - FACE_ID_MIETEK,
 			s_pCurrentList[s_bPosCurr]
 		);
 	}
 }
 
-void pageListCreate(tCommFace eFace) {
+void pageListCreate(tFaceId eFace) {
 	const tCommShopPage *pPages = officeGetPagesForFace(eFace);
 	s_eFace = eFace;
 	s_pCurrentList = pPages;

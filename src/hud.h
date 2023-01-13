@@ -8,6 +8,7 @@
 #include <ace/utils/extview.h>
 #include <ace/utils/font.h>
 #include "string_array.h"
+#include "face_id.h"
 
 typedef enum _tHudPlayer {
 	PLAYER_1 = 0,
@@ -42,7 +43,7 @@ void hudSetHull(UBYTE ubPlayer, UWORD uwHull, UWORD uwHullMax);
 
 void hudUpdate(void);
 
-void hudShowMessage(UBYTE ubFace, const char *szMsg);
+void hudShowMessage(tFaceId eFace, const char *szMsg);
 
 void hudShowMain(void);
 

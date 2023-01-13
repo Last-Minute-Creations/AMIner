@@ -101,7 +101,7 @@ static UBYTE s_ubMsgCharIdx;
 static char s_szMsg[HUD_MSG_BFR_SIZE];
 static char s_szLetter[2] = {'\0'};
 static tBitMap *s_pFaces;
-static UBYTE s_ubFaceToDraw;
+static tFaceId s_eFaceToDraw;
 
 // Pause vars
 static UBYTE s_ubSelection, s_ubSelectionPrev;
@@ -290,13 +290,13 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	hudReset(0, 0);
 }
 
-void hudShowMessage(UBYTE ubFace, const char *szMsg) {
+void hudShowMessage(tFaceId eFace, const char *szMsg) {
 	logWrite("Showing HUD message: '%s'\n", szMsg);
 	stringCopyLimited(szMsg, s_szMsg, HUD_MSG_BFR_SIZE);
 	s_eState = STATE_MSG_NOISE_IN;
 	s_uwFrameDelay = 25;
 	s_uwStateCounter = 0;
-	s_ubFaceToDraw = ubFace;
+	s_eFaceToDraw = eFace;
 }
 
 void hudSet2pPlaying(UBYTE isPlaying) {
@@ -594,7 +594,7 @@ void hudUpdate(void) {
 			s_sMsgCharPos.uwY = 4 * HUD_HEIGHT + HUD_ORIGIN_Y;
 
 			blitCopy(
-				s_pFaces, 0, s_ubFaceToDraw * HUD_FACE_SIZE,
+				s_pFaces, 0, s_eFaceToDraw * HUD_FACE_SIZE,
 				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
 				HUD_FACE_SIZE, HUD_FACE_SIZE, MINTERM_COOKIE
 			);

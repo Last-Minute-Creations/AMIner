@@ -18,8 +18,8 @@ typedef enum _tOfficeControls {
 
 //---------------------------------------------------------------- OFFICE COMMON
 
-static tCommFace s_pActivePpl[COMM_FACE_COUNT]; // Key: pos in office, val: ppl
-static tCommShopPage s_pOfficePages[COMM_FACE_COUNT][SUBPAGES_PER_PERSON];
+static tFaceId s_pActivePpl[FACE_ID_COUNT]; // Key: pos in office, val: ppl
+static tCommShopPage s_pOfficePages[FACE_ID_COUNT][SUBPAGES_PER_PERSON];
 static BYTE s_bSelectionCurr, s_bSelectionCount;
 static UBYTE s_ubUnlockedPplCount;
 
@@ -81,7 +81,7 @@ static void pageOfficeProcess(void) {
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		commShopChangePage(
 			COMM_SHOP_PAGE_OFFICE_MAIN,
-			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_pActivePpl[s_bSelectionCurr] - COMM_FACE_MIETEK
+			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_pActivePpl[s_bSelectionCurr] - FACE_ID_MIETEK
 		);
 	}
 }
@@ -91,8 +91,8 @@ static void pageOfficeProcess(void) {
 void pageOfficeCreate(void) {
 	commRegisterPage(pageOfficeProcess, 0);
 	s_bSelectionCount = 0;
-	for(tCommFace i = 0; i < COMM_FACE_COUNT; ++i) {
-		if(s_pActivePpl[i] == COMM_FACE_COUNT) {
+	for(tFaceId i = 0; i < FACE_ID_COUNT; ++i) {
+		if(s_pActivePpl[i] == FACE_ID_COUNT) {
 			break;
 		}
 		officeDrawFaceAtPos(i);
@@ -102,30 +102,30 @@ void pageOfficeCreate(void) {
 
 void pageOfficeReset(void) {
 	// Make all ppl locked
-	for(tCommFace ePos = 0; ePos < COMM_FACE_COUNT; ++ePos) {
-		s_pActivePpl[ePos] = COMM_FACE_COUNT;
+	for(tFaceId ePos = 0; ePos < FACE_ID_COUNT; ++ePos) {
+		s_pActivePpl[ePos] = FACE_ID_COUNT;
 	}
 	s_ubUnlockedPplCount = 0;
 
 	// Lock all dialogue options
-	for(tCommFace ePerson = 0; ePerson < COMM_FACE_COUNT; ++ePerson) {
+	for(tFaceId ePerson = 0; ePerson < FACE_ID_COUNT; ++ePerson) {
 		s_pOfficePages[ePerson][0] = COMM_SHOP_PAGE_OFFICE_MAIN; // Serves as list terminator
 	}
 
 	// Unlock select characters
-	pageOfficeUnlockPerson(COMM_FACE_KRYSTYNA);
-	pageOfficeUnlockPerson(COMM_FACE_URZEDAS);
-	pageOfficeUnlockPerson(COMM_FACE_KOMISARZ);
+	pageOfficeUnlockPerson(FACE_ID_KRYSTYNA);
+	pageOfficeUnlockPerson(FACE_ID_URZEDAS);
+	pageOfficeUnlockPerson(FACE_ID_KOMISARZ);
 
 	// Unlock select pages
-	pageOfficeUnlockPersonSubpage(COMM_FACE_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER);
-	pageOfficeUnlockPersonSubpage(COMM_FACE_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING);
-	pageOfficeUnlockPersonSubpage(COMM_FACE_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER);
-	pageOfficeUnlockPersonSubpage(COMM_FACE_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE);
+	pageOfficeUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER);
+	pageOfficeUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING);
+	pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER);
+	pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE);
 
 	// TODO: Unlock later on
-	pageOfficeUnlockPersonSubpage(COMM_FACE_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
-	pageOfficeUnlockPersonSubpage(COMM_FACE_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER);
+	pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
+	pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER);
 
 	// Reset counters
 	pageFavorReset();
@@ -133,11 +133,11 @@ void pageOfficeReset(void) {
 	pageAccountingReset();
 }
 
-void pageOfficeUnlockPerson(tCommFace ePerson) {
+void pageOfficeUnlockPerson(tFaceId ePerson) {
 	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
 }
 
-void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tCommShopPage eSubpage) {
+void pageOfficeUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
 	for(UBYTE i = 0; i < SUBPAGES_PER_PERSON - 1; ++i) {
 		if(s_pOfficePages[ePerson][i] == COMM_SHOP_PAGE_OFFICE_MAIN) {
 			s_pOfficePages[ePerson][i] = eSubpage;
@@ -152,6 +152,6 @@ void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tCommShopPage eSubpage) {
 	);
 }
 
-const tCommShopPage *officeGetPagesForFace(tCommFace eFace) {
+const tCommShopPage *officeGetPagesForFace(tFaceId eFace) {
 	return s_pOfficePages[eFace];
 }

@@ -1,22 +1,19 @@
 {
 	"shopNames": ["Wiertło", "Ładownia", "Kadłub", "Karbid"],
 	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
-	"planMessages": {
-		"doneAfk": [
+	"hudMessages": {
+		"planDone": [
 			"Plan zrealizowany z pomocą rezerw.",
 			"Przysłali nowy plan"
-		],
-		"notDone": [
-			"Towarzyszu, planu nie zrobiliście.",
-			"Ktoś czeka w Waszym gabinecie."
 		],
 		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan.",
 		"extending": [
 			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
 			"niewykonany. Dał nam jeszcze %hhu dni."
 		],
-		"finalPlan": [
-			"Panie Derektorze, szybko do biura!"
+		"rebuke": [
+			"Panie Dyrektorze, Komisarz Putienko wzywa do gabinetu.",
+			"Natychmiast!"
 		]
 	},
 	"hiScore": {
@@ -108,8 +105,7 @@
 	},
 	"krystyna": {
 		"guest": "Panie Dyrektorze, ma Pan gościa. Zapraszam do gabinetu.",
-		"urzedas": "Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne. Mówiłam że Pan Dyrektor ma naradę ale się uparł i czeka. Zapraszam do gabinetu.",
-		"commissar": "Panie Dyrektorze, Komisarz Putienko wzywa do gabinetu. Natychmiast!"
+		"urzedas": "Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne. Mówiłam że Pan Dyrektor ma naradę ale się uparł i czeka. Zapraszam do gabinetu."
 	},
 	"officePages": {
 		"main": "Powrót",

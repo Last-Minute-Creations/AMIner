@@ -12,10 +12,10 @@ void pageOfficeReset(void);
 
 void pageOfficeCreate(void);
 
-void pageOfficeUnlockPerson(tCommFace ePerson);
+void pageOfficeUnlockPerson(tFaceId ePerson);
 
-void pageOfficeUnlockPersonSubpage(tCommFace ePerson, tCommShopPage eSubpage);
+void pageOfficeUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
 
-const tCommShopPage *officeGetPagesForFace(tCommFace eFace);
+const tCommShopPage *officeGetPagesForFace(tFaceId eFace);
 
 #endif // _COMM_PAGE_OFFICE_H_

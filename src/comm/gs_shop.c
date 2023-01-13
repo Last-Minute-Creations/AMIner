@@ -19,6 +19,7 @@
 #include "tutorial.h"
 #include "game.h"
 #include "inbox.h"
+#include "menu.h"
 
 static tCommTab s_eTab;
 static UBYTE s_isShown;
@@ -193,7 +194,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
 		case COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS: {
-			tCommFace eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + COMM_FACE_MIETEK;
+			tFaceId eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + FACE_ID_MIETEK;
 			pageListCreate(eFace);
 		} break;
 		case COMM_SHOP_PAGE_NEWS_ACCOLADES:

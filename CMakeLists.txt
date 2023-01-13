@@ -241,7 +241,7 @@ include("checkpoint.cmake")
 convertBitmaps(
 	TARGET ${GAME_EXECUTABLE} PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCES
-		${RES_DIR}/commrade/bg.png ${RES_DIR}/commrade/buttons.png ${RES_DIR}/commrade/faces.png
+		${RES_DIR}/commrade/bg.png ${RES_DIR}/commrade/buttons.png ${RES_DIR}/commrade/faces_hud.png
 		${RES_DIR}/hud/hud.png ${RES_DIR}/hud/mode_icons.png ${RES_DIR}/logo.png ${RES_DIR}/lang_select.png
 		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png ${RES_DIR}/commrade/news.png
 	DESTINATIONS

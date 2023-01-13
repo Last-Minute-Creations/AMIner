@@ -508,12 +508,12 @@ static void processPlan(void) {
 	if(wRemainingDays <= 0) {
 		if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
 			char szBfr[100];
-			sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
+			sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
 			hudShowMessage(0, szBfr);
 			planStartPenaltyCountdown(pPlan);
 		}
 		else {
-			hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
+			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_REBUKE]);
 			planFail(pPlan);
 			gameAddRebuke();
 		}
@@ -525,7 +525,7 @@ static void processPlan(void) {
 		if(!s_isReminderShown) {
 			s_isReminderShown = 1;
 			char szBfr[50];
-			sprintf(szBfr, g_pMsgs[MSG_PLAN_REMAINING], wRemainingDays);
+			sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
 			hudShowMessage(0, szBfr);
 		}
 	}

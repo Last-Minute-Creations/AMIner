@@ -6,6 +6,7 @@
 #define _AMINER_COMM_BASE_H_
 
 #include <ace/utils/font.h>
+#include "face_id.h"
 
 #define COMM_WIDTH (320-64)
 #define COMM_HEIGHT (192)
@@ -21,18 +22,6 @@
 typedef void (*tPageProcess)(void);
 
 typedef void (*tPageCleanup)(void);
-
-/**
- * @brief Face to display in commrade.
- * Must be same order as in tMsg enum!
- */
-typedef enum _tCommFace {
-	COMM_FACE_MIETEK,
-	COMM_FACE_KRYSTYNA,
-	COMM_FACE_KOMISARZ,
-	COMM_FACE_URZEDAS,
-	COMM_FACE_COUNT,
-} tCommFace;
 
 typedef enum _tCommNav {
 	COMM_NAV_UP,
@@ -103,7 +92,7 @@ UBYTE commDrawMultilineText(const char *szText, UWORD uwStartX, UWORD uwStartY);
 
 void commDrawTitle(UWORD uwX, UWORD uwY, const char *szTitle);
 
-void commDrawFaceAt(tCommFace eFace, UWORD uwX, UWORD uwY);
+void commDrawFaceAt(tFaceId eFace, UWORD uwX, UWORD uwY);
 
 void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight);
 

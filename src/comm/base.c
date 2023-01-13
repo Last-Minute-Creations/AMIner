@@ -326,7 +326,7 @@ void commDrawTitle(UWORD uwX, UWORD uwY, const char *szTitle) {
 	);
 }
 
-void commDrawFaceAt(tCommFace eFace, UWORD uwX, UWORD uwY) {
+void commDrawFaceAt(tFaceId eFace, UWORD uwX, UWORD uwY) {
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
 	blitCopy(
 		g_pCommBmFaces, 0, eFace * 32, s_pBmDraw,
