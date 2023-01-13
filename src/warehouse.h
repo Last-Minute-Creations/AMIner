@@ -19,7 +19,7 @@ tPlan *warehouseGetCurrentPlan(void);
 
 //------------------------------------------------------------------------- PLAN
 
-void warehouseAdvancePlan(void);
+void warehouseNextPlan(void);
 
 void warehouseRerollPlan(void);
 

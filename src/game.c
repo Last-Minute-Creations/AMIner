@@ -158,8 +158,8 @@ static void gameProcessHotkeys(void) {
 		planElapseDay(pPlan);
 	}
 	else if(keyUse(KEY_EQUALS)) {
-		hudShowMessage(0, g_pMsgs[MSG_PLAN_DONE_AFK]);
-		warehouseAdvancePlan();
+		hudShowMessage(0, g_pMsgs[MSG_HUD_PLAN_DONE]);
+		warehouseNextPlan();
 	}
 	else if(keyUse(KEY_0)) {
 		tPlan *pPlan = warehouseGetCurrentPlan();

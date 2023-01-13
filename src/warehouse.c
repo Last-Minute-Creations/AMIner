@@ -36,28 +36,26 @@ void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount) {
 	s_sCurrentPlan.pMinerals[ubMineralType].uwCurrentCount = ubCount;
 }
 
-void warehouseAdvancePlan(void) {
+void warehouseNextPlan(void) {
 	if(!warehouseGetCurrentPlan()->isFailed) {
 		if(!s_sCurrentPlan.isPenaltyCountdownStarted) {
 			gameAdvanceAccolade();
 		}
-
-		fix16_t fRatio = (
-			g_is2pPlaying ?
-			g_fPlanIncreaseRatioMultiplayer :
-			g_fPlanIncreaseRatioSingleplayer
-		);
-		s_sCurrentPlan.ulTargetSum += fix16_to_int(fix16_mul(
-			fix16_from_int(s_sCurrentPlan.ulTargetSum),
-			fRatio
-		));
-
-		planReset(warehouseGetCurrentPlan());
 		pageAccountingReduceChanceFail();
 	}
-	else {
-		planReset(warehouseGetCurrentPlan());
-	}
+
+	// Increase the plan target sum by relevant ratio
+	fix16_t fRatio = (
+		g_is2pPlaying ?
+		g_fPlanIncreaseRatioMultiplayer :
+		g_fPlanIncreaseRatioSingleplayer
+	);
+	s_sCurrentPlan.ulTargetSum += fix16_to_int(fix16_mul(
+		fix16_from_int(s_sCurrentPlan.ulTargetSum),
+		fRatio
+	));
+
+	planReset(warehouseGetCurrentPlan());
 }
 
 void warehouseRerollPlan(void) {
