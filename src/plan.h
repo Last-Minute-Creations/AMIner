@@ -18,15 +18,17 @@ typedef struct _tPlan {
 	ULONG ulTargetSum;
 	WORD wTimeMax;
 	WORD wTimeRemaining;
+	UWORD uwIndex;
 	UBYTE isExtendedTimeByFavor;
 	UBYTE isPenaltyCountdownStarted;
+	UBYTE isActive;
 } tPlan;
 
 UBYTE planIsFulfilled(const tPlan *pPlan);
 
-void planElapseDay(tPlan *pPlan);
-
 void planElapseTime(tPlan *pPlan, UWORD uwTime);
+
+void planStart(tPlan *pPlan);
 
 void planUnlockMineral(tPlan *pPlan, tMineralType eMineral);
 
@@ -40,6 +42,6 @@ void planFail(tPlan *pPlan);
 
 UWORD planGetRemainingCost(const tPlan *pPlan);
 
-void planReset(tPlan *pPlan);
+void planReset(tPlan *pPlan, UBYTE isActive, UBYTE isNext);
 
 #endif // _PLAN_H_

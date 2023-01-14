@@ -81,10 +81,12 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_QUIT] = "hud.quit",
 	// HUD: Misc
 	// HUD: Plan
-	[MSG_HUD_PLAN_DONE] = "hudMessages.planDone",
+	[MSG_HUD_NEW_PLAN] = "hudMessages.newPlan",
 	[MSG_HUD_PLAN_REMAINING] = "hudMessages.remaining",
 	[MSG_HUD_PLAN_EXTENDING] = "hudMessages.extending",
 	[MSG_HUD_REBUKE] = "hudMessages.rebuke",
+	[MSG_HUD_GUEST] = "hudMessages.guest",
+	[MSG_HUD_WAITING_URZEDAS] = "hudMessages.waitingUrzedas",
 	// Loading
 	[MSG_LOADING_GEN_TERRAIN] = "loading.genTerrain",
 	[MSG_LOADING_GEN_BASES] = "loading.genBases",

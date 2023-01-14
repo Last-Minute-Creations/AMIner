@@ -65,6 +65,7 @@ static tVPort *s_pVpMain;
 static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
 static UBYTE s_isReminderShown;
 static UBYTE s_ubCurrentMod;
+static ULONG s_ulGameTime;
 
 UBYTE g_is2pPlaying;
 UBYTE g_is1pKbd, g_is2pKbd;
@@ -154,16 +155,15 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 	else if(keyUse(KEY_MINUS)) {
-		tPlan *pPlan = warehouseGetCurrentPlan();
-		planElapseDay(pPlan);
+		gameElapseDay();
 	}
 	else if(keyUse(KEY_EQUALS)) {
-		hudShowMessage(0, g_pMsgs[MSG_HUD_PLAN_DONE]);
+		hudShowMessage(0, g_pMsgs[MSG_HUD_NEW_PLAN]);
 		warehouseNextPlan(0);
 	}
 	else if(keyUse(KEY_0)) {
 		tPlan *pPlan = warehouseGetCurrentPlan();
-		planElapseTime(pPlan, pPlan->wTimeRemaining);
+		gameElapseTime(pPlan->wTimeRemaining);
 	}
 }
 
@@ -531,9 +531,42 @@ static void processPlan(void) {
 	}
 }
 
+void gameElapseTime(UWORD uwTime) {
+	if(ULONG_MAX - s_ulGameTime > uwTime) {
+		s_ulGameTime += uwTime;
+	}
+	else {
+		s_ulGameTime = ULONG_MAX;
+	}
+
+	tPlan *pPlan = warehouseGetCurrentPlan();
+	planElapseTime(pPlan, uwTime);
+	if(!pPlan->isActive && pPlan->wTimeRemaining == 0 && pPlan->uwIndex > 0) {
+		// first plan start (index 0) is handled by tutorial
+		hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_NEW_PLAN]);
+		planStart(pPlan);
+	}
+}
+
+void gameElapseDay(void) {
+	gameElapseTime(GAME_TIME_PER_DAY);
+}
+
+ULONG gameGetTime(void) {
+	return s_ulGameTime;
+}
+
+UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays) {
+	if(s_ulGameTime - ulStart >= ubDays * GAME_TIME_PER_DAY) {
+		return 1;
+	}
+	return 0;
+}
+
 //-------------------------------------------------------------------- GAMESTATE
 
 static void gameGsCreate(void) {
+	s_ulGameTime = 0;
 	s_ubCurrentMod = GAME_MOD_COUNT;
 	ptplayerConfigureSongRepeat(0, onSongEnd);
 	onSongEnd();

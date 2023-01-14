@@ -2,10 +2,7 @@
 	"shopNames": ["Wiertło", "Ładownia", "Kadłub", "Karbid"],
 	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
 	"hudMessages": {
-		"planDone": [
-			"Plan zrealizowany z pomocą rezerw.",
-			"Przysłali nowy plan"
-		],
+		"newPlan": "Panie Derektorze, przysłali nowy plan",
 		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan.",
 		"extending": [
 			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
@@ -14,6 +11,11 @@
 		"rebuke": [
 			"Panie Dyrektorze, Komisarz Putienko wzywa do gabinetu.",
 			"Natychmiast!"
+		],
+		"guest": "Panie Dyrektorze, ma Pan gościa. Zapraszam do gabinetu.",
+		"waitingUrzedas": [
+			"Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne. Mówiłam,",
+			"że Pan Dyrektor ma naradę ale się uparł i czeka. Zapraszam do gabinetu."
 		]
 	},
 	"hiScore": {
@@ -117,10 +119,6 @@
 		"paused": "Pauza gry",
 		"resume": "Wznów",
 		"quit": "Wyjdź"
-	},
-	"krystyna": {
-		"guest": "Panie Dyrektorze, ma Pan gościa. Zapraszam do gabinetu.",
-		"urzedas": "Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne. Mówiłam że Pan Dyrektor ma naradę ale się uparł i czeka. Zapraszam do gabinetu."
 	},
 	"officePages": {
 		"main": "Powrót",

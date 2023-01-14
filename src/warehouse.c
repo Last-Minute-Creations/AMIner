@@ -20,12 +20,14 @@ static const tPlan s_sFirstPlan = {
 	.pMinerals = {{0}},
 	.ulMineralsUnlocked = 1 << MINERAL_TYPE_SILVER,
 	.ulTargetSum = 15,
+	.uwIndex = 0,
+	.isActive = 0,
 };
 
 void warehouseReset(void) {
 	memset(s_pStock, 0, sizeof(s_pStock));
 	s_sCurrentPlan = s_sFirstPlan;
-	planReset(warehouseGetCurrentPlan());
+	planReset(&s_sCurrentPlan, 0, 0);
 }
 
 tPlan *warehouseGetCurrentPlan(void) {
@@ -55,11 +57,11 @@ void warehouseNextPlan(UBYTE isFailed) {
 		fRatio
 	));
 
-	planReset(warehouseGetCurrentPlan());
+	planReset(warehouseGetCurrentPlan(), 0, 1);
 }
 
 void warehouseRerollPlan(void) {
-	planReset(warehouseGetCurrentPlan());
+	planReset(warehouseGetCurrentPlan(), 1, 0);
 }
 
 UWORD warehouseGetStock(UBYTE ubMineralType) {

@@ -159,6 +159,12 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER:
 			pageMsgCreate("urzedas_dossier", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME:
+			pageMsgCreate("urzedas_welcome", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN:
+			pageMsgCreate("urzedas_first_plan", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
 			break;

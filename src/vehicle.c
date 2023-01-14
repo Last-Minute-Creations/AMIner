@@ -420,7 +420,7 @@ static inline UBYTE vehicleStartDrilling(
 			return 0;
 		}
 		pVehicle->uwDrillCurr -= ubDrillCost;
-		planElapseTime(warehouseGetCurrentPlan(), ubDrillCost);
+		gameElapseTime(ubDrillCost);
 	}
 
 	pVehicle->ubDrillState = (

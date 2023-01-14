@@ -9,7 +9,7 @@
 #include <comm/gs_shop.h>
 
 #define PPL_PER_ROW 4
-#define SUBPAGES_PER_PERSON 5
+#define SUBPAGES_PER_PERSON 6
 
 typedef enum _tOfficeControls {
 	OFFICE_CONTROLS_ACCEPT_DECLINE,
@@ -115,19 +115,13 @@ void pageOfficeReset(void) {
 	// Unlock select characters
 	pageOfficeUnlockPerson(FACE_ID_MIETEK);
 	pageOfficeUnlockPerson(FACE_ID_KRYSTYNA);
-	pageOfficeUnlockPerson(FACE_ID_URZEDAS);
-	pageOfficeUnlockPerson(FACE_ID_KOMISARZ);
 
 	// Unlock select pages
-	pageOfficeUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME);
 	pageOfficeUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER);
 	pageOfficeUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING);
-	pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER);
-	pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE);
 
 	// TODO: Unlock later on
 	pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
-	pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER);
 
 	// Reset counters
 	pageFavorReset();

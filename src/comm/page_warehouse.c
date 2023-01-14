@@ -1,4 +1,5 @@
 #include "page_warehouse.h"
+#include <ace/utils/string.h>
 #include "comm/base.h"
 #include "comm/button.h"
 #include "comm/page_accounting.h"
@@ -92,10 +93,15 @@ static void drawRow(UBYTE ubPos, const tPlan *pPlan) {
 	);
 
 	// Plan
-	sprintf(
-		szBfr, "%hu/%hu",
-		s_pTmpPlan[ubMineral], pPlan->pMinerals[ubMineral].uwTargetCount
-	);
+	if(pPlan->isActive) {
+		sprintf(
+			szBfr, "%hu/%hu",
+			s_pTmpPlan[ubMineral], pPlan->pMinerals[ubMineral].uwTargetCount
+		);
+	}
+	else {
+		stringCopy("-", szBfr);
+	}
 	commDrawText(s_pColOffs[3], uwRowOffsY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 }
 
@@ -134,14 +140,16 @@ static void redraw(void) {
 	char szBfr[40];
 
 	// Time remaining
-	sprintf(
-		szBfr, g_pMsgs[MSG_COMM_TIME_REMAINING],
-		planGetRemainingDays(pPlan)
-	);
-	commDrawText(
-		COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,
-		FONT_COOKIE | FONT_SHADOW | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT
-	);
+	if(pPlan->isActive) {
+		sprintf(
+			szBfr, g_pMsgs[MSG_COMM_TIME_REMAINING],
+			planGetRemainingDays(pPlan)
+		);
+		commDrawText(
+			COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,
+			FONT_COOKIE | FONT_SHADOW | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT
+		);
+	}
 
 	// Accolades
 	sprintf(
@@ -199,7 +207,10 @@ static void pageWarehouseProcess(void) {
 			--s_pTmpStock[ubMineral];
 			drawRow(ubPosPrev, warehouseGetCurrentPlan());
 		}
-		else if(commNavUse(COMM_NAV_RIGHT) && s_pTmpStock[ubMineral]) {
+		else if(
+			commNavUse(COMM_NAV_RIGHT) && s_pTmpStock[ubMineral] &&
+			warehouseGetCurrentPlan()->isActive
+		) {
 			++s_pTmpPlan[ubMineral];
 			--s_pTmpStock[ubMineral];
 			drawRow(ubPosPrev, warehouseGetCurrentPlan());

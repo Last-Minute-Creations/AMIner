@@ -12,6 +12,7 @@
 
 #define GAME_BPP 5
 #define GAME_MOD_COUNT 10
+#define GAME_TIME_PER_DAY 140
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
@@ -32,6 +33,14 @@ void gameAddRebuke(void);
 UBYTE gameGetAccolades(void);
 
 UBYTE gameGetRebukes(void);
+
+void gameElapseTime(UWORD uwTime);
+
+void gameElapseDay(void);
+
+ULONG gameGetTime(void);
+
+UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays);
 
 extern tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];

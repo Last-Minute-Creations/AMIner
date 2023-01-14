@@ -6,8 +6,7 @@
 #include <ace/macros.h>
 #include <ace/managers/log.h>
 #include "core.h"
-
-#define PLAN_TIME_PER_DAY 140
+#include "game.h"
 
 UBYTE planIsFulfilled(const tPlan *pPlan) {
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
@@ -19,14 +18,19 @@ UBYTE planIsFulfilled(const tPlan *pPlan) {
 	return 1;
 }
 
-void planElapseDay(tPlan *pPlan) {
-	planElapseTime(pPlan, PLAN_TIME_PER_DAY);
-}
-
 void planElapseTime(tPlan *pPlan, UWORD uwTime) {
 	if(pPlan->wTimeRemaining) {
 		pPlan->wTimeRemaining = MAX(0, pPlan->wTimeRemaining - uwTime);
 	}
+}
+
+void planStart(tPlan *pPlan) {
+		if(!pPlan->isActive) {
+			logWrite("ERR: Plan already started\n");
+		}
+
+		pPlan->isActive = 1;
+		pPlan->wTimeRemaining = pPlan->wTimeMax;
 }
 
 void planUnlockMineral(tPlan *pPlan, tMineralType eMineral) {
@@ -34,7 +38,7 @@ void planUnlockMineral(tPlan *pPlan, tMineralType eMineral) {
 }
 
 WORD planGetRemainingDays(const tPlan *pPlan) {
-	WORD wRemainingDays = (pPlan->wTimeRemaining + PLAN_TIME_PER_DAY - 1) / PLAN_TIME_PER_DAY;
+	WORD wRemainingDays = (pPlan->wTimeRemaining + GAME_TIME_PER_DAY - 1) / GAME_TIME_PER_DAY;
 	return wRemainingDays;
 }
 
@@ -42,7 +46,7 @@ void planAddDays(tPlan *pPlan, UBYTE ubDays, UBYTE isFavor) {
 	if(isFavor) {
 		pPlan->isExtendedTimeByFavor = 1;
 	}
-	pPlan->wTimeRemaining += ubDays * PLAN_TIME_PER_DAY;
+	pPlan->wTimeRemaining += ubDays * GAME_TIME_PER_DAY;
 }
 
 void planStartPenaltyCountdown(tPlan *pPlan) {
@@ -62,8 +66,8 @@ UWORD planGetRemainingCost(const tPlan *pPlan) {
 	return uwRemainingCost;
 }
 
-void planReset(tPlan *pPlan) {
-	logBlockBegin("planReset()");
+void planReset(tPlan *pPlan, UBYTE isActive, UBYTE isNext) {
+	logBlockBegin("planReset(isActive: %hhu, isNext: %hhu)", isActive, isNext);
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		pPlan->pMinerals[i] = (tPlanMineral){0};
 	};
@@ -86,5 +90,9 @@ void planReset(tPlan *pPlan) {
 	pPlan->wTimeRemaining = pPlan->wTimeMax;
 	pPlan->isExtendedTimeByFavor = 0;
 	pPlan->isPenaltyCountdownStarted = 0;
+	pPlan->isActive = isActive;
+	if(isNext) {
+		++pPlan->uwIndex;
+	}
 	logBlockEnd("planReset()");
 }

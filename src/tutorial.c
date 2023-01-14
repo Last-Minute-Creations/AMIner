@@ -7,6 +7,7 @@
 #include <comm/gs_msg.h>
 #include <comm/gs_shop.h>
 #include <comm/inbox.h>
+#include <comm/page_office.h>
 #include "warehouse.h"
 #include "vehicle.h"
 #include "hud.h"
@@ -14,7 +15,13 @@
 
 typedef enum _tTutorialState {
 	TUTORIAL_SHOW_MESSAGE_INTRO = 0,
-	TUTORIAL_SHOW_MESSAGE_TO_DIG,
+	TUTORIAL_GO_MEET_MIETEK,
+	TUTORIAL_WAIT_FOR_URZEDAS,
+	TUTORIAL_GO_MEET_URZEDAS,
+	TUTORIAL_WAIT_FOR_KOMISARZ,
+	TUTORIAL_GO_MEET_KOMISARZ,
+	TUTORIAL_WAIT_FOR_PLAN,
+	TUTORIAL_GO_READ_PLAN,
 	TUTORIAL_WAITING_FOR_DIG,
 	TUTORIAL_WAITING_FOR_RESTOCK,
 	TUTORIAL_SHOW_PLAN_FILL_MSG,
@@ -24,6 +31,7 @@ typedef enum _tTutorialState {
 
 static tTutorialState s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
 static UBYTE s_pDescriptionShownForTabs[COMM_TAB_COUNT];
+static ULONG s_ulStartTime;
 
 static UBYTE tutorialProcessChallenge(void) {
 	UBYTE isEarlyReturn = 0;
@@ -41,6 +49,13 @@ static UBYTE tutorialProcessChallenge(void) {
 	}
 
 	return isEarlyReturn;
+}
+
+static UBYTE tutorialIsInMainOffice(void) {
+	return (
+		commShopIsActive() &&
+		commShopPageToTab(commShopGetCurrentPage()) == COMM_TAB_OFFICE
+	);
 }
 
 static UBYTE tutorialProcessStory(void) {
@@ -68,32 +83,89 @@ static UBYTE tutorialProcessStory(void) {
 			++s_eTutorialState;
 			isEarlyReturn = 1;
 			break;
-		case TUTORIAL_SHOW_MESSAGE_TO_DIG:
-			hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_GO_MEET_MIETEK]);
+		case TUTORIAL_GO_MEET_MIETEK:
+			pageOfficeUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME);
 			inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME, 0);
+			hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_GO_MEET_MIETEK]);
+			s_ulStartTime = gameGetTime();
 			++s_eTutorialState;
 			break;
-		case TUTORIAL_WAITING_FOR_DIG:
-			if(g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] + g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] >= 3) {
+		case TUTORIAL_WAIT_FOR_URZEDAS:
+			if(gameIsElapsedDays(s_ulStartTime, 3)) {
+				pageOfficeUnlockPerson(FACE_ID_URZEDAS);
+				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER);
+				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME, 1);
+				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST	]);
+				++s_eTutorialState;
+			}
+			break;
+		case TUTORIAL_GO_MEET_URZEDAS:
+			if(tutorialIsInMainOffice()) { // Message read
+				s_ulStartTime = gameGetTime();
+				++s_eTutorialState;
+			}
+			break;
+		case TUTORIAL_WAIT_FOR_KOMISARZ:
+			if(gameIsElapsedDays(s_ulStartTime, 3)) {
+				pageOfficeUnlockPerson(FACE_ID_KOMISARZ);
+				pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER);
+				pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME, 1);
+				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
+				++s_eTutorialState;
+			}
+			break;
+		case TUTORIAL_GO_MEET_KOMISARZ:
+			if(tutorialIsInMainOffice()) { // Message read
+				s_ulStartTime = gameGetTime();
+				++s_eTutorialState;
+			}
+			break;
+		case TUTORIAL_WAIT_FOR_PLAN:
+			if(gameIsElapsedDays(s_ulStartTime, 3)) {
+				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN, 1);
+				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_URZEDAS]);
+				++s_eTutorialState;
+			}
+			break;
+		case TUTORIAL_GO_READ_PLAN:
+			if(tutorialIsInMainOffice()) { // Message read
+					planStart(warehouseGetCurrentPlan());
+				++s_eTutorialState;
+			}
+			break;
+		case TUTORIAL_WAITING_FOR_DIG: {
+			UWORD uwTotal = (
+				g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] +
+				g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] +
+				warehouseGetStock(MINERAL_TYPE_SILVER)
+			);
+			const tPlan *pPlan = warehouseGetCurrentPlan();
+			if(uwTotal >= pPlan->pMinerals[MINERAL_TYPE_SILVER].uwCurrentCount) {
 				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_ON_DUG]);
 				++s_eTutorialState;
 			}
-			break;
-		case TUTORIAL_WAITING_FOR_RESTOCK:
-			if(g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] + g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] == 0) {
+		} break;
+		case TUTORIAL_WAITING_FOR_RESTOCK: {
+			UWORD uwCarried = (
+				g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] +
+				g_pVehicles[1].pStock[MINERAL_TYPE_SILVER]
+			);
+			if(uwCarried == 0) {
 				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_NEAR_SHOP]);
 				++s_eTutorialState;
 			}
-			break;
+		} break;
 		case TUTORIAL_SHOW_PLAN_FILL_MSG:
-			if(commShopIsActive()) {
+			if(commShopIsActive() && !hudIsShowingMessage()) {
 				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_IN_SHOP]);
 				++s_eTutorialState;
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_PLAN_DONE:
-			// Assume the plan is fulfilled when the target count of silver has changed
-			if(warehouseGetCurrentPlan()->pMinerals[MINERAL_TYPE_SILVER].uwTargetCount != 3) {
+			if(warehouseGetCurrentPlan()->uwIndex > 0) {
 				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_ON_MOVE_TO_PLAN]);
 				++s_eTutorialState;
 			}
