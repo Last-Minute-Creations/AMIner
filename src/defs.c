@@ -42,7 +42,6 @@ const char * s_pLangDom[] = {
 	// Tutorial
 	[MSG_TUTORIAL_GO_MEET_MIETEK] =  "tutorial.start",
 	[MSG_TUTORIAL_ON_DUG] =  "tutorial.onDugOut",
-	[MSG_TUTORIAL_NEAR_SHOP] = "tutorial.nearShop",
 	[MSG_TUTORIAL_IN_SHOP] = "tutorial.inShop",
 	[MSG_TUTORIAL_ON_MOVE_TO_PLAN] = "tutorial.onMoveToPlan",
 	[MSG_TUTORIAL_DESCRIPTION_TAB_OFFICE] = "tutorial.descriptionOffice",
@@ -101,6 +100,8 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_KRYSTYNA_DOSSIER] = "officePages.krystynaDossier",
 	[MSG_PAGE_KRYSTYNA_ACCOUNTING] = "officePages.krystynaAccounting",
 	[MSG_PAGE_URZEDAS_DOSSIER] = "officePages.urzedasDossier",
+	[MSG_PAGE_URZEDAS_WELCOME] = "officePages.urzedasWelcome",
+	[MSG_PAGE_URZEDAS_FIRST_PLAN] = "officePages.urzedasFirstPlan",
 	[MSG_PAGE_URZEDAS_BRIBE] = "officePages.urzedasBribe",
 	[MSG_PAGE_URZEDAS_FAVOR] = "officePages.urzedasFavor",
 	[MSG_PAGE_KOMISARZ_DOSSIER] = "officePages.komisarzDossier",

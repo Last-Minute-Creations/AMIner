@@ -57,12 +57,8 @@
 			"do bramy i wciśniecie guzik na wihajstrze"
 		],
 		"onDugOut": [
-			"Wiertło się zużywa a ładownia zapełnia kiedy kopiecie.",
-			"W magazynie możecie wymienić wiertło i zostawić urobek."
-		],
-		"nearShop": [
-			"Towarzyszu, naciśnijcie ENTER / FIRE / SPACE aby wejść do magazynu.",
-			"Urobek możecie sprzedać albo wykorzystać do planu."
+			"Panie Derektorze, podjedziecie kumbajnem do magazynu",
+			"i wykorzystajcie urobek do wykonania planu"
 		],
 		"inShop": [
 			"Potrzebujecie 3 srebra by wykonać plan. Ustawcie się na nim",
@@ -130,6 +126,8 @@
 		"krystynaDossier": "Dossier",
 		"krystynaAccounting": "Kreatywna Księgowość",
 		"urzedasDossier": "Dossier",
+		"urzedasWelcome": "Powitanie",
+		"urzedasFirstPlan": "Pierwszy plan",
 		"urzedasBribe": "Łapówka",
 		"urzedasFavor": "Przysługa",
 		"komisarzDossier": "Dossier",

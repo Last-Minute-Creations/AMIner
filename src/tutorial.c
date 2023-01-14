@@ -94,8 +94,9 @@ static UBYTE tutorialProcessStory(void) {
 			if(gameIsElapsedDays(s_ulStartTime, 3)) {
 				pageOfficeUnlockPerson(FACE_ID_URZEDAS);
 				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER);
+				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME);
 				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE);
-				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME, 1);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME, 0);
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST	]);
 				++s_eTutorialState;
 			}
@@ -111,7 +112,7 @@ static UBYTE tutorialProcessStory(void) {
 				pageOfficeUnlockPerson(FACE_ID_KOMISARZ);
 				pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER);
 				pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME);
-				inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME, 1);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME, 0);
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
 				++s_eTutorialState;
 			}
@@ -137,15 +138,21 @@ static UBYTE tutorialProcessStory(void) {
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_DIG: {
+			const tPlan *pPlan = warehouseGetCurrentPlan();
 			UWORD uwTotal = (
 				g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] +
-				g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] +
-				warehouseGetStock(MINERAL_TYPE_SILVER)
+				(g_is2pPlaying ? g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] : 0) +
+				warehouseGetStock(MINERAL_TYPE_SILVER) +
+				pPlan->pMinerals[MINERAL_TYPE_SILVER].uwCurrentCount
 			);
-			const tPlan *pPlan = warehouseGetCurrentPlan();
-			if(uwTotal >= pPlan->pMinerals[MINERAL_TYPE_SILVER].uwCurrentCount) {
-				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_ON_DUG]);
-				++s_eTutorialState;
+			if(uwTotal >= pPlan->pMinerals[MINERAL_TYPE_SILVER].uwTargetCount) {
+				if(!commShopIsActive()) {
+					hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_ON_DUG]);
+					++s_eTutorialState;
+				}
+				else {
+					s_eTutorialState = TUTORIAL_SHOW_PLAN_FILL_MSG;
+				}
 			}
 		} break;
 		case TUTORIAL_WAITING_FOR_RESTOCK: {
@@ -154,7 +161,6 @@ static UBYTE tutorialProcessStory(void) {
 				g_pVehicles[1].pStock[MINERAL_TYPE_SILVER]
 			);
 			if(uwCarried == 0) {
-				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_NEAR_SHOP]);
 				++s_eTutorialState;
 			}
 		} break;
