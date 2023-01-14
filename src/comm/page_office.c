@@ -113,11 +113,13 @@ void pageOfficeReset(void) {
 	}
 
 	// Unlock select characters
+	pageOfficeUnlockPerson(FACE_ID_MIETEK);
 	pageOfficeUnlockPerson(FACE_ID_KRYSTYNA);
 	pageOfficeUnlockPerson(FACE_ID_URZEDAS);
 	pageOfficeUnlockPerson(FACE_ID_KOMISARZ);
 
 	// Unlock select pages
+	pageOfficeUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME);
 	pageOfficeUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER);
 	pageOfficeUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING);
 	pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER);

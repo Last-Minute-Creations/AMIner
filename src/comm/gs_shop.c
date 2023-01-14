@@ -28,19 +28,6 @@ static tCommShopPage s_eCameFrom;
 
 //------------------------------------------------------------------ PRIVATE FNS
 
-static tCommTab commShopPageToTab(tCommShopPage ePage) {
-	switch(ePage) {
-		case COMM_SHOP_PAGE_OFFICE_MAIN:
-			return COMM_TAB_OFFICE;
-		case COMM_SHOP_PAGE_WAREHOUSE:
-			return COMM_TAB_WAREHOUSE;
-		case COMM_SHOP_PAGE_WORKSHOP:
-			return COMM_TAB_WORKSHOP;
-		default:
-			return COMM_TAB_COUNT;
-	}
-}
-
 static tCommShopPage commShopTabToPage(tCommTab eTab) {
 	switch(eTab) {
 		case COMM_TAB_OFFICE:
@@ -160,14 +147,17 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_WAREHOUSE:
 			pageWarehouseCreate();
 			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME:
+			pageMsgCreate("mietek_welcome", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER:
-			pageMsgCreate("dossier_krystyna", onBack);
+			pageMsgCreate("krystyna_dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING:
 			pageAccountingCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER:
-			pageMsgCreate("dossier_urzedas", onBack);
+			pageMsgCreate("urzedas_dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
@@ -176,7 +166,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageFavorCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER:
-			pageMsgCreate("dossier_komisarz", onBack);
+			pageMsgCreate("komisarz_dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME:
 			pageMsgCreate("komisarz_welcome", onBack);
@@ -209,6 +199,23 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 
 UBYTE commShopIsActive(void) {
 	return s_isShown;
+}
+
+tCommShopPage commShopGetCurrentPage(void) {
+	return s_eCurrentPage;
+}
+
+tCommTab commShopPageToTab(tCommShopPage ePage) {
+	switch(ePage) {
+		case COMM_SHOP_PAGE_OFFICE_MAIN:
+			return COMM_TAB_OFFICE;
+		case COMM_SHOP_PAGE_WAREHOUSE:
+			return COMM_TAB_WAREHOUSE;
+		case COMM_SHOP_PAGE_WORKSHOP:
+			return COMM_TAB_WORKSHOP;
+		default:
+			return COMM_TAB_COUNT;
+	}
 }
 
 void commShopGoBack(void) {

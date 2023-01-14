@@ -6,6 +6,7 @@
 #define _COMM_SHOP_H_
 
 #include "aminer.h"
+#include <comm/base.h>
 
 typedef enum _tCommShopPage {
 	COMM_SHOP_PAGE_WAREHOUSE,
@@ -15,6 +16,7 @@ typedef enum _tCommShopPage {
 	COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA,
 	COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ,
 	COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS,
+	COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME,
 	COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER,
 	COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING,
 	COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER,
@@ -33,6 +35,10 @@ typedef enum _tCommShopPage {
 extern tState g_sStateShop;
 
 UBYTE commShopIsActive(void);
+
+tCommShopPage commShopGetCurrentPage(void);
+
+tCommTab commShopPageToTab(tCommShopPage ePage);
 
 void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage);
 

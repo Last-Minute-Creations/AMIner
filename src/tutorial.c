@@ -6,6 +6,7 @@
 #include "game.h"
 #include <comm/gs_msg.h>
 #include <comm/gs_shop.h>
+#include <comm/inbox.h>
 #include "warehouse.h"
 #include "vehicle.h"
 #include "hud.h"
@@ -22,6 +23,7 @@ typedef enum _tTutorialState {
 } tTutorialState;
 
 static tTutorialState s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
+static UBYTE s_pDescriptionShownForTabs[COMM_TAB_COUNT];
 
 static UBYTE tutorialProcessChallenge(void) {
 	UBYTE isEarlyReturn = 0;
@@ -42,6 +44,22 @@ static UBYTE tutorialProcessChallenge(void) {
 }
 
 static UBYTE tutorialProcessStory(void) {
+	if(commShopIsActive()) {
+		tCommShopPage ePage = commShopGetCurrentPage();
+		tCommTab eTab = commShopPageToTab(ePage);
+		if(eTab != COMM_TAB_COUNT) {
+			if(!s_pDescriptionShownForTabs[eTab]) {
+				if(!hudIsShowingMessage()) {
+					s_pDescriptionShownForTabs[eTab] = 1;
+					hudShowMessage(
+						FACE_ID_MIETEK,
+						g_pMsgs[MSG_TUTORIAL_DESCRIPTION_TAB_OFFICE + eTab - COMM_TAB_OFFICE]
+					);
+				}
+			}
+		}
+	}
+
 	UBYTE isEarlyReturn = 0;
 	switch(s_eTutorialState) {
 		case TUTORIAL_SHOW_MESSAGE_INTRO:
@@ -51,31 +69,32 @@ static UBYTE tutorialProcessStory(void) {
 			isEarlyReturn = 1;
 			break;
 		case TUTORIAL_SHOW_MESSAGE_TO_DIG:
-			hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_GO_DIG]);
+			hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_GO_MEET_MIETEK]);
+			inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME, 0);
 			++s_eTutorialState;
 			break;
 		case TUTORIAL_WAITING_FOR_DIG:
 			if(g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] + g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] >= 3) {
-				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_ON_DUG]);
+				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_ON_DUG]);
 				++s_eTutorialState;
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_RESTOCK:
 			if(g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] + g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] == 0) {
-				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_NEAR_SHOP]);
+				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_NEAR_SHOP]);
 				++s_eTutorialState;
 			}
 			break;
 		case TUTORIAL_SHOW_PLAN_FILL_MSG:
 			if(commShopIsActive()) {
-				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_IN_SHOP]);
+				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_IN_SHOP]);
 				++s_eTutorialState;
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_PLAN_DONE:
 			// Assume the plan is fulfilled when the target count of silver has changed
 			if(warehouseGetCurrentPlan()->pMinerals[MINERAL_TYPE_SILVER].uwTargetCount != 3) {
-				hudShowMessage(0, g_pMsgs[MSG_TUTORIAL_ON_MOVE_TO_PLAN]);
+				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_ON_MOVE_TO_PLAN]);
 				++s_eTutorialState;
 			}
 			break;
@@ -86,6 +105,10 @@ static UBYTE tutorialProcessStory(void) {
 }
 
 void tutorialReset(void) {
+	for(UBYTE i = 0; i < COMM_TAB_COUNT; ++i) {
+		s_pDescriptionShownForTabs[i] = 0;
+	}
+
 	s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
 }
 

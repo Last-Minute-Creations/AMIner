@@ -50,7 +50,10 @@
 		"finishing": "Ruchy tektoniczne"
 	},
 	"tutorial": {
-		"start": "Towarzyszu, wykopcie no 3 rudy srebra",
+		"start": [
+			"Panie Derektorze, Kumbajnem podjedziecie",
+			"do bramy i wciśniecie guzik na wihajstrze"
+		],
 		"onDugOut": [
 			"Wiertło się zużywa a ładownia zapełnia kiedy kopiecie.",
 			"W magazynie możecie wymienić wiertło i zostawić urobek."
@@ -66,6 +69,18 @@
 		"onMoveToPlan": [
 			"Gratulacje Towarzyszu! Wykonaliście swój pierwszy plan.",
 			"Róbcie tak dalej a szybko awansujecie!"
+		],
+		"descriptionOffice": [
+			"Tu bedziecie rozmawiać z różnymi co Was",
+			"odwiedzą abo odbierać wiadomości."
+		],
+		"descriptionWorkshop": [
+			"Tu kupujecie różne treblinki i inne ulepszenia",
+			"do kumbajnu. Na dole potwierdzacie"
+		],
+		"descriptionWarehouse": [
+			"Tu w lewo szpszedajecie urobek a w prawo",
+			"bedziecie odkładać na plan. Na dole potwierdzacie."
 		]
 	},
 	"challenge":{
@@ -113,6 +128,7 @@
 		"listKrystyna": "Krystyna",
 		"listPutin": "Komisarz Putienko",
 		"listUrzedas": "Urzędas",
+		"mietekWelcome": "Powitanie",
 		"krystynaDossier": "Dossier",
 		"krystynaAccounting": "Kreatywna Księgowość",
 		"urzedasDossier": "Dossier",

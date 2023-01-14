@@ -39,6 +39,10 @@ typedef enum _tCommNavEx {
 	COMM_NAV_EX_COUNT
 } tCommNavEx;
 
+/**
+ * @brief Tabs in Commrade interface.
+ * Must be same order as MSG_TUTORIAL_DESCRIPTION_TAB_* enum!
+ */
 typedef enum _tCommTab {
 	COMM_TAB_OFFICE,
 	COMM_TAB_WORKSHOP,

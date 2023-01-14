@@ -43,6 +43,8 @@ void hudSetHull(UBYTE ubPlayer, UWORD uwHull, UWORD uwHullMax);
 
 void hudUpdate(void);
 
+UBYTE hudIsShowingMessage(void);
+
 void hudShowMessage(tFaceId eFace, const char *szMsg);
 
 void hudShowMain(void);

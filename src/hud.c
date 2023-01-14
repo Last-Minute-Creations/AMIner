@@ -290,6 +290,10 @@ void hudCreate(tView *pView, const tFont *pFont) {
 	hudReset(0, 0);
 }
 
+UBYTE hudIsShowingMessage(void) {
+	return STATE_MSG_NOISE_IN <= s_eState && s_eState <= STATE_MSG_END;
+}
+
 void hudShowMessage(tFaceId eFace, const char *szMsg) {
 	logWrite("Showing HUD message: '%s'\n", szMsg);
 	stringCopyLimited(szMsg, s_szMsg, HUD_MSG_BFR_SIZE);

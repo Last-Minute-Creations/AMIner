@@ -40,11 +40,14 @@ const char * s_pLangDom[] = {
 	[MSG_HI_SCORE_WIN_P2] = "hiScore.winP2",
 	[MSG_HI_SCORE_DRAW] = "hiScore.draw",
 	// Tutorial
-	[MSG_TUTORIAL_GO_DIG] =  "tutorial.start",
+	[MSG_TUTORIAL_GO_MEET_MIETEK] =  "tutorial.start",
 	[MSG_TUTORIAL_ON_DUG] =  "tutorial.onDugOut",
 	[MSG_TUTORIAL_NEAR_SHOP] = "tutorial.nearShop",
 	[MSG_TUTORIAL_IN_SHOP] = "tutorial.inShop",
 	[MSG_TUTORIAL_ON_MOVE_TO_PLAN] = "tutorial.onMoveToPlan",
+	[MSG_TUTORIAL_DESCRIPTION_TAB_OFFICE] = "tutorial.descriptionOffice",
+	[MSG_TUTORIAL_DESCRIPTION_TAB_WORKSHOP] = "tutorial.descriptionWorkshop",
+	[MSG_TUTORIAL_DESCRIPTION_TAB_WAREHOUSE] = "tutorial.descriptionWarehouse",
 	// Shop
 	[MSG_COMM_TIME_REMAINING] = "shop.timeRemaining",
 	[MSG_COMM_ACCOLADES] = "shop.accolades",
@@ -92,6 +95,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_LIST_KRYSTYNA] = "officePages.listKrystyna",
 	[MSG_PAGE_LIST_KOMISARZ] = "officePages.listPutin",
 	[MSG_PAGE_LIST_URZEDAS] = "officePages.listUrzedas",
+	[MSG_PAGE_MIETEK_WELCOME] = "officePages.mietekWelcome",
 	[MSG_PAGE_KRYSTYNA_DOSSIER] = "officePages.krystynaDossier",
 	[MSG_PAGE_KRYSTYNA_ACCOUNTING] = "officePages.krystynaAccounting",
 	[MSG_PAGE_URZEDAS_DOSSIER] = "officePages.urzedasDossier",
