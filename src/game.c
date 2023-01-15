@@ -500,6 +500,9 @@ static void onSongEnd(void) {
 
 static void processPlan(void) {
 	tPlan *pPlan = warehouseGetCurrentPlan();
+	if(!pPlan->isActive) {
+		return;
+	}
 
 	WORD wRemainingDays = planGetRemainingDays(pPlan);
 	if(wRemainingDays <= 0) {

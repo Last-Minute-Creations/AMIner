@@ -172,7 +172,8 @@ static UBYTE tutorialProcessStory(void) {
 			break;
 		case TUTORIAL_WAITING_FOR_PLAN_DONE:
 			if(warehouseGetCurrentPlan()->uwIndex > 0) {
-				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_ON_MOVE_TO_PLAN]);
+				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE, 0);
 				++s_eTutorialState;
 			}
 			break;

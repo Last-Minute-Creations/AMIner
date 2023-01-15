@@ -22,7 +22,6 @@
 #include "menu.h"
 
 static tCommTab s_eTab;
-static UBYTE s_isShown;
 static tCommShopPage s_eCurrentPage;
 static tCommShopPage s_eCameFrom;
 
@@ -56,8 +55,8 @@ static void onBackFromLastRebuke(void) {
 }
 
 static void commGsShopCreate(void) {
-	s_isShown = commTryShow();
-	if(!s_isShown) {
+	UBYTE isShopShown = commTryShow();
+	if(!isShopShown) {
 		// Camera not placed properly
 		statePop(g_pGameStateManager);
 		return;
@@ -87,6 +86,13 @@ static void commGsShopLoop(void) {
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 
 	if(commShopPageToTab(s_eCurrentPage) != COMM_TAB_COUNT) {
+		// Process inbox when on main tab page, e.g. after fulfilling plan
+		tCommShopPage ePage;
+		if(inboxTryPopBack(&ePage)) {
+			commShopChangePage(s_eCameFrom, ePage);
+			return;
+		}
+
 		tCommTab eOldTab = s_eTab;
 		// Tab nav using shift+left / shift+right
 		if(commNavExUse(COMM_NAV_EX_SHIFT_LEFT)) {
@@ -120,7 +126,7 @@ static void commGsShopLoop(void) {
 }
 
 static void commGsShopDestroy(void) {
-	if(!s_isShown) {
+	if(!commIsShown()) {
 		return;
 	}
 
@@ -165,6 +171,12 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN:
 			pageMsgCreate("urzedas_first_plan", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE:
+			pageMsgCreate("urzedas_plan_complete", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED:
+			pageMsgCreate("urzedas_plan_delayed", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
 			break;
@@ -204,7 +216,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 }
 
 UBYTE commShopIsActive(void) {
-	return s_isShown;
+	return commIsShown();
 }
 
 tCommShopPage commShopGetCurrentPage(void) {

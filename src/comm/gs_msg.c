@@ -11,7 +11,7 @@
 #include "color.h"
 #include "defs.h"
 
-static UBYTE s_isShown;
+static UBYTE s_isMsgShown;
 static const  char *s_szMessageFile;
 
 static void cbOnClose(void) {
@@ -19,8 +19,8 @@ static void cbOnClose(void) {
 }
 
 static void commGsMsgCreate(void) {
-	s_isShown = commTryShow();
-	if(!s_isShown) {
+	s_isMsgShown = commTryShow();
+	if(!s_isMsgShown) {
 		// Camera not placed properly
 		statePop(g_pGameStateManager);
 		return;
@@ -46,7 +46,7 @@ static void commGsMsgLoop(void) {
 }
 
 static void commGsMsgDestroy(void) {
-	if(!s_isShown) {
+	if(!s_isMsgShown) {
 		return;
 	}
 

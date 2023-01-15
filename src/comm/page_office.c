@@ -9,7 +9,7 @@
 #include <comm/gs_shop.h>
 
 #define PPL_PER_ROW 4
-#define SUBPAGES_PER_PERSON 6
+#define SUBPAGES_PER_PERSON 8
 
 typedef enum _tOfficeControls {
 	OFFICE_CONTROLS_ACCEPT_DECLINE,

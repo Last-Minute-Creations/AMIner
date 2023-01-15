@@ -2,7 +2,7 @@
 	"shopNames": ["Wiertło", "Ładownia", "Kadłub", "Karbid"],
 	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
 	"hudMessages": {
-		"newPlan": "Panie Derektorze, przysłali nowy plan",
+		"newPlan": "Panie Derektorze, dostaliście nowy plan.",
 		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan.",
 		"extending": [
 			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
@@ -61,12 +61,8 @@
 			"i wykorzystajcie urobek do wykonania planu"
 		],
 		"inShop": [
-			"Potrzebujecie 3 srebra by wykonać plan. Ustawcie się na nim",
-			"i przesuńcie do kolumny plan a następnie wciśnijcie Potwierdź"
-		],
-		"onMoveToPlan": [
-			"Gratulacje Towarzyszu! Wykonaliście swój pierwszy plan.",
-			"Róbcie tak dalej a szybko awansujecie!"
+			"Panie Derektorze, przerzućcie surowce na plan. Ustawcie się",
+			"na nich, przesuńcie wihajstrem w prawo i wciśnijcie Potwierdź"
 		],
 		"descriptionOffice": [
 			"Tu bedziecie rozmawiać z różnymi co Was",
@@ -128,6 +124,8 @@
 		"urzedasDossier": "Dossier",
 		"urzedasWelcome": "Powitanie",
 		"urzedasFirstPlan": "Pierwszy plan",
+		"planComplete": "Wykonanie planu",
+		"planDelayed": "Przedłużony plan",
 		"urzedasBribe": "Łapówka",
 		"urzedasFavor": "Przysługa",
 		"komisarzDossier": "Dossier",
@@ -137,7 +135,6 @@
 		"komisarzRebuke_3": "Ostatnia nagana"
 	},
 	"officePageContents": {
-		"dossierKrystyna": "Główna Księgowa zakładu. Kiedy otwiera KPiR piekło zamarza. Rozmawia z liczbami. Z zamkniętymi oczami wypełnia zeznanie podatkowe. Na czas. Słabym punktem Pani Krystyny jest kawa, czekoladki i rajstopy. Dobrze ulokowany suwenir potrafi otworzyć u niej niezmierzone wręcz pokłady Kreatywnej Księgowości.",
 		"bribeA": [
 			"Towarzyszu, nie wyrobimy się z planem. Pomożecie?",
 			"No, myślę że coś da się zrobić. Załatwię Wam 2 tygodnie ale to będzie Was kosztować %hu"

@@ -66,6 +66,8 @@ UBYTE commTryShow(void);
 
 void commHide(void);
 
+UBYTE commIsShown(void);
+
 tBtnState commNavCheck(tCommNav eNav);
 
 UBYTE commNavUse(tCommNav eNav);

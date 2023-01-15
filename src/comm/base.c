@@ -18,7 +18,7 @@ static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
 static UBYTE s_pNavEx[COMM_NAV_EX_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
 static tTextBitMap *s_pLineBuffer;
-static UBYTE s_isShown = 0;
+static UBYTE s_isCommShown = 0;
 static tPtplayerSfx *s_pSfxKeyPress[4];
 static tPtplayerSfx *s_pSfxKeyRelease[4];
 tBitMap *g_pCommBmFaces, *g_pCommBmSelection;
@@ -47,7 +47,7 @@ void commCreate(void) {
 	g_pCommBmFaces = bitmapCreateFromFile("data/comm_faces_office.bm", 0);
 	g_pCommBmSelection = bitmapCreateFromFile("data/comm_office_selection.bm", 0);
 
-	s_isShown = 0;
+	s_isCommShown = 0;
 }
 
 void commDestroy(void) {
@@ -91,7 +91,7 @@ UBYTE commTryShow(void) {
 		// Not positioned evenly
 		return 0;
 	}
-	s_isShown = 1;
+	s_isCommShown = 1;
 
 	s_pBmDraw = g_pMainBuffer->pScroll->pBack;
 
@@ -217,16 +217,20 @@ UBYTE commNavExUse(tCommNavEx eNavEx) {
 }
 
 void commHide(void) {
-	if(!s_isShown) {
+	if(!s_isCommShown) {
 		return;
 	}
-	s_isShown = 0;
+	s_isCommShown = 0;
 	tUwCoordYX sOrigin = commGetOrigin();
 	// Restore content beneath commrade
 	blitCopyAligned(
 		s_pBmRestore, 0, 0, s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
 		COMM_WIDTH, COMM_HEIGHT
 	);
+}
+
+UBYTE commIsShown(void) {
+	return s_isCommShown;
 }
 
 tBitMap *commGetDisplayBuffer(void) {
@@ -360,7 +364,7 @@ void commEraseAll(void) {
 
 void commProgress(UBYTE ubPercent, const char *szDescription) {
 	logWrite("Comm Progress: %hhu\n", ubPercent);
-	if(!s_isShown) {
+	if(!s_isCommShown) {
 		return;
 	}
 

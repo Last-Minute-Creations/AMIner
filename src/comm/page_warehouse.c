@@ -1,9 +1,11 @@
 #include "page_warehouse.h"
 #include <ace/utils/string.h>
-#include "comm/base.h"
-#include "comm/button.h"
-#include "comm/page_accounting.h"
-#include "comm/page_news.h"
+#include <comm/base.h>
+#include <comm/button.h>
+#include <comm/page_accounting.h>
+#include <comm/page_news.h>
+#include <comm/page_office.h>
+#include <comm/inbox.h>
 #include "../warehouse.h"
 #include "../core.h"
 #include "../defs.h"
@@ -238,7 +240,7 @@ static void pageWarehouseProcess(void) {
 	// Process button press
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		switch(buttonGetSelected()) {
-			case 0:
+			case 0: {
 				// Confirm
 				for(UBYTE i = 0; i < s_ubPosCount; ++i) {
 					UBYTE ubMineral = s_pMineralsOnList[i];
@@ -250,12 +252,21 @@ static void pageWarehouseProcess(void) {
 					s_pTmpStock[ubMineral] = 0;
 					hudSetCash(0, g_pVehicles[0].lCash);
 				}
-				if(planIsFulfilled(warehouseGetCurrentPlan())) {
+
+				tPlan *pPlan = warehouseGetCurrentPlan();
+
+				if(planIsFulfilled(pPlan)) {
+					UBYTE wasDelayed = (pPlan->uwIndex > 0 && pPlan->isPenaltyCountdownStarted);
 					warehouseNextPlan(0);
+
+					if(wasDelayed) {
+						pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED);
+						inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED, 0);
+					}
 				}
 				commEraseAll();
 				redraw();
-				break;
+			} break;
 			case 1:
 				// Exit
 				commRegisterPage(0, 0);
