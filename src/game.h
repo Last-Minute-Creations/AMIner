@@ -20,6 +20,8 @@ void gameGsLoopChallengeEnd(void);
 
 void gameStart(void);
 
+void gameTriggerSave(void);
+
 void gameSave(tFile *pFile);
 
 UBYTE gameLoad(tFile *pFile);

@@ -116,17 +116,22 @@ void gameStart(void) {
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
 }
 
+void gameTriggerSave(void) {
+	logWrite("game save");
+	systemUse();
+	tFile *pSave = fileOpen("save.dat", "wb");
+	gameSave(pSave);
+	fileClose(pSave);
+	systemUnuse();
+}
+
 static void gameProcessHotkeys(void) {
   if(keyUse(KEY_ESCAPE) || keyUse(KEY_P)) {
 		stateChange(g_pGameStateManager, &g_sStatePause);
 		return;
   }
 	if(keyUse(KEY_N)) {
-		systemUse();
-		tFile *pSave = fileOpen("save.dat", "wb");
-		gameSave(pSave);
-		fileClose(pSave);
-		systemUnuse();
+		gameTriggerSave();
 	}
 	if(keyUse(KEY_B)) {
 		debugToggle();

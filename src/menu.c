@@ -356,6 +356,7 @@ static void menuProcessRollIn(void) {
 			statePush(g_pGameStateManager, &s_sStateMenuScore);
 		}
 		else {
+			menuSetHidden(1, !fileExists("save.dat"));
 			menuInitialDraw(g_pMainBuffer->pScroll->pBack);
 		}
 	}

@@ -119,6 +119,7 @@ static void commGsShopLoop(void) {
 	}
 
 	if(!commProcessPage()) {
+		gameTriggerSave();
 		logWrite("shop quit\n");
 		statePop(g_pGameStateManager);
 		return;
