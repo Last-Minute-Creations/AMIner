@@ -6,12 +6,17 @@
 #define _DINO_H_
 
 #include <ace/types.h>
+#include <ace/utils/file.h>
 
 void dinoCreate(void);
 
 void dinoDestroy(void);
 
 void dinoReset(void);
+
+void dinoSave(tFile *pFile);
+
+UBYTE dinoLoad(tFile *pFile);
 
 void dinoProcess(void);
 

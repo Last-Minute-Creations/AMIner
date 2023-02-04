@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "menu.h"
+#include <ace/managers/system.h>
 #include <ace/managers/joy.h>
 #include <ace/managers/key.h>
 #include <comm/base.h>
@@ -50,6 +51,7 @@ typedef struct _tOption {
 } tOption;
 
 void onStart(void);
+void onLoad(void);
 void onExit(void);
 void onShowScores(void);
 
@@ -61,6 +63,7 @@ static tState s_sStateMenuScore;
 
 static tOption s_pOptions[] = {
 	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onStart}},
+	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onLoad}},
 	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
 		.pVar = &g_isChallenge, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
 		.pEnumLabels = &g_pMenuEnumMode
@@ -202,6 +205,29 @@ static void menuEnableAtari(void) {
 void onStart(void) {
 	commEraseAll();
 	gameStart();
+	commHide();
+	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
+	// copProcessBlocks();
+	s_eMenuState = MENU_STATE_ROLL_OUT;
+}
+
+void onLoad(void) {
+	commEraseAll();
+	gameStart();
+
+	systemUse();
+	tFile *pSave = fileOpen("save.dat", "rb");
+	if(pSave) {
+		if(!gameLoad(pSave)) {
+			logWrite("ERR: Failed to load game\n");
+		}
+		fileClose(pSave);
+	}
+	else {
+		logWrite("ERR: Save file not found\n");
+	}
+	systemUnuse();
+
 	commHide();
 	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	// copProcessBlocks();

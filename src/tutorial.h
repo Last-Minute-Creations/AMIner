@@ -6,12 +6,17 @@
 #define _TUTORIAL_H_
 
 #include <ace/types.h>
+#include <ace/utils/file.h>
 #include "string_array.h"
 
 /**
  * @brief Resets tutorial state.
  */
 void tutorialReset(void);
+
+void tutorialSave(tFile *pFile);
+
+UBYTE tutorialLoad(tFile *pFile);
 
 /**
  * @brief Process tutorial.

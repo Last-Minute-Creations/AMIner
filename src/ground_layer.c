@@ -2,6 +2,7 @@
 #include <ace/generic/screen.h>
 #include <ace/utils/extview.h>
 #include <ace/utils/palette.h>
+#include "save.h"
 
 #define RGB(r,g,b) ((((r) >> 4) << 8) | (((g) >> 4) << 4) | (((b) >> 4) << 0))
 
@@ -95,6 +96,28 @@ void groundLayerReset(UBYTE ubLowerLayer) {
 	s_ubLowerLayer = ubLowerLayer;
 	const tGroundLayer *pLayerCurrent = &s_pLayers[ubLowerLayer - 1];
 	groundLayerSetColorRegs(pLayerCurrent, s_ubPrevLevel);
+}
+
+void groundLayerSave(tFile *pFile) {
+	saveWriteHeader(pFile, "GDLR");
+	fileWrite(pFile, &s_isCopperActive, sizeof(s_isCopperActive));
+	fileWrite(pFile, &s_ubPrevLevel, sizeof(s_ubPrevLevel));
+	fileWrite(pFile, &s_uwVpHeight, sizeof(s_uwVpHeight));
+	fileWrite(pFile, &s_uwVpStartY, sizeof(s_uwVpStartY));
+	fileWrite(pFile, &s_ubLowerLayer, sizeof(s_ubLowerLayer));
+}
+
+UBYTE groundLayerLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "GDLR")) {
+		return 0;
+	}
+
+	fileRead(pFile, &s_isCopperActive, sizeof(s_isCopperActive));
+	fileRead(pFile, &s_ubPrevLevel, sizeof(s_ubPrevLevel));
+	fileRead(pFile, &s_uwVpHeight, sizeof(s_uwVpHeight));
+	fileRead(pFile, &s_uwVpStartY, sizeof(s_uwVpStartY));
+	fileRead(pFile, &s_ubLowerLayer, sizeof(s_ubLowerLayer));
+	return 1;
 }
 
 static void layerCopyColorsToBlock(

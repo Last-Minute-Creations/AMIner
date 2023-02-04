@@ -5,6 +5,7 @@
 #include "game.h"
 #include <ace/managers/key.h>
 #include <ace/managers/blit.h>
+#include <ace/managers/system.h>
 #include <ace/utils/custom.h>
 #include <comm/gs_shop.h>
 #include <comm/page_office.h>
@@ -27,6 +28,7 @@
 #include "steer.h"
 #include "inventory.h"
 #include "defs.h"
+#include "save.h"
 
 #define CAMERA_SPEED 4
 
@@ -57,20 +59,22 @@ static tModeSelection s_pModeSelection[2] = {
 
 tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
+UBYTE g_is2pPlaying;
+UBYTE g_is1pKbd, g_is2pKbd;
+UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
+tBobNew g_pBombMarkers[3];
 
+static const UWORD s_pBaseTeleportY[2] = {220, 3428};
+
+static UBYTE s_pBombCount[2];
+static tBombDir s_pLastDir[2];
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
-
 static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
 static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
 static UBYTE s_isReminderShown;
 static UBYTE s_ubCurrentMod;
 static ULONG s_ulGameTime;
-
-UBYTE g_is2pPlaying;
-UBYTE g_is1pKbd, g_is2pKbd;
-UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
-tBobNew g_pBombMarkers[3];
 
 void gameTryPushBob(tBobNew *pBob) {
 	if(
@@ -93,7 +97,7 @@ void gameStart(void) {
 	dinoReset();
 	tutorialReset();
 	pageOfficeReset();
-	tileInit(g_isAtari, g_isChallenge);
+	tileReset(g_isAtari, g_isChallenge);
 	warehouseReset();
 	inventoryReset();
 	modeReset(0);
@@ -117,6 +121,13 @@ static void gameProcessHotkeys(void) {
 		stateChange(g_pGameStateManager, &g_sStatePause);
 		return;
   }
+	if(keyUse(KEY_N)) {
+		systemUse();
+		tFile *pSave = fileOpen("save.dat", "wb");
+		gameSave(pSave);
+		fileClose(pSave);
+		systemUnuse();
+	}
 	if(keyUse(KEY_B)) {
 		debugToggle();
 	}
@@ -166,11 +177,6 @@ static void gameProcessHotkeys(void) {
 		gameElapseTime(pPlan->wTimeRemaining);
 	}
 }
-
-static const UWORD s_pBaseTeleportY[2] = {220, 3428};
-
-static UBYTE s_pBombCount[2];
-static tBombDir s_pLastDir[2];
 
 static void addBombInDir(UBYTE ubPlayer, tBombDir eDir, tBombDir eOpposite) {
 	if(s_pLastDir[ubPlayer] == eOpposite && s_pBombCount[ubPlayer]) {
@@ -564,6 +570,81 @@ UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays) {
 		return 1;
 	}
 	return 0;
+}
+
+void gameSave(tFile *pFile) {
+	saveWriteHeader(pFile, "GAME");
+	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
+	fileWrite(pFile, &g_is1pKbd, sizeof(g_is1pKbd));
+	fileWrite(pFile, &g_is2pKbd, sizeof(g_is2pKbd));
+	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
+	fileWrite(pFile, &g_isChallengeEnd, sizeof(g_isChallengeEnd));
+	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
+	// for(UBYTE i = 0; i < 3; ++i) {
+	// 	bobNewSave(pFile, g_pBombMarkers[i]);
+	// }
+
+	fileWrite(pFile, s_pBombCount, sizeof(s_pBombCount));
+	fileWrite(pFile, s_pLastDir, sizeof(s_pLastDir));
+	fileWrite(pFile, &s_eCameraType, sizeof(s_eCameraType));
+	fileWrite(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
+
+	fileWrite(pFile, &s_ubRebukes, sizeof(s_ubRebukes));
+	fileWrite(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
+	fileWrite(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
+	fileWrite(pFile, &s_isReminderShown, sizeof(s_isReminderShown));
+	fileWrite(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
+	fileWrite(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
+
+	dinoSave(pFile);
+	tutorialSave(pFile);
+	pageOfficeSave(pFile);
+	tileSave(pFile);
+	warehouseSave(pFile);
+	inventorySave(pFile);
+	vehicleSave(&g_pVehicles[0], pFile);
+	vehicleSave(&g_pVehicles[1], pFile);
+	hudSave(pFile);
+	groundLayerSave(pFile);
+}
+
+UBYTE gameLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "GAME")) {
+		return 0;
+	}
+
+	fileRead(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
+	fileRead(pFile, &g_is1pKbd, sizeof(g_is1pKbd));
+	fileRead(pFile, &g_is2pKbd, sizeof(g_is2pKbd));
+	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
+	fileRead(pFile, &g_isChallengeEnd, sizeof(g_isChallengeEnd));
+	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
+	// for(UBYTE i = 0; i < 3; ++i) {
+	// 	bobNewLoad(pFile, g_pBombMarkers[i]);
+	// }
+
+	fileRead(pFile, s_pBombCount, sizeof(s_pBombCount));
+	fileRead(pFile, s_pLastDir, sizeof(s_pLastDir));
+	fileRead(pFile, &s_eCameraType, sizeof(s_eCameraType));
+	fileRead(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
+
+	fileRead(pFile, &s_ubRebukes, sizeof(s_ubRebukes));
+	fileRead(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
+	fileRead(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
+	fileRead(pFile, &s_isReminderShown, sizeof(s_isReminderShown));
+	fileRead(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
+	fileRead(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
+
+	return dinoLoad(pFile) &&
+		tutorialLoad(pFile) &&
+		pageOfficeLoad(pFile) &&
+		tileLoad(pFile) &&
+		warehouseLoad(pFile) &&
+		inventoryLoad(pFile) &&
+		vehicleLoad(&g_pVehicles[0], pFile) &&
+		vehicleLoad(&g_pVehicles[1], pFile) &&
+		hudLoad(pFile) &&
+		groundLayerLoad(pFile);
 }
 
 //-------------------------------------------------------------------- GAMESTATE

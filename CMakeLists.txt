@@ -16,6 +16,7 @@ if(ELF2HUNK)
 	set(GAME_EXECUTABLE ${GAME_EXECUTABLE_STEM}.elf)
 	set(GAME_OUTPUT_EXECUTABLE ${GAME_EXECUTABLE_STEM}.exe)
 	add_executable(${GAME_EXECUTABLE} ${GAME_src})
+	target_link_options(${GAME_EXECUTABLE} PUBLIC -Wno-attributes)
 	target_link_libraries(${GAME_EXECUTABLE} -Wl,-Map=${GAME_EXECUTABLE_STEM}.map)
 	add_custom_command(
 		TARGET ${GAME_EXECUTABLE} POST_BUILD
@@ -33,6 +34,7 @@ endif()
 
 target_include_directories(${GAME_EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_options(${GAME_EXECUTABLE} PUBLIC -Wall -Wextra -Wimplicit-fallthrough=2)
+target_compile_options(${GAME_EXECUTABLE} PRIVATE -Werror -Wno-error=unused-parameter -Wimplicit-fallthrough=2)
 target_link_libraries(${GAME_EXECUTABLE} ace)
 if(GAME_DEBUG)
   target_compile_definitions(${GAME_EXECUTABLE} PRIVATE GAME_DEBUG)

@@ -31,6 +31,10 @@ void hudSet2pPlaying(UBYTE isPlaying);
 
 void hudReset(UBYTE isChallenge, UBYTE is2pPlaying);
 
+void hudSave(tFile *pFile);
+
+UBYTE hudLoad(tFile *pFile);
+
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth);
 
 void hudSetCash(UBYTE ubPlayer, LONG lCash);

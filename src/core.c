@@ -130,7 +130,7 @@ static void coreGsCreate(void) {
 	randInit(&g_sRand, 1 + (sRayPos.bfPosY << 8), 1 + sRayPos.bfPosX);
 #endif
 
-	tileInit(0, 1);
+	tileReset(0, 1);
 
 	bobNewManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,

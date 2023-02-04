@@ -7,6 +7,7 @@
 #include <comm/page_bribe.h>
 #include <comm/page_accounting.h>
 #include <comm/gs_shop.h>
+#include "save.h"
 
 #define PPL_PER_ROW 4
 #define SUBPAGES_PER_PERSON 8
@@ -16,14 +17,14 @@ typedef enum _tOfficeControls {
 	OFFICE_CONTROLS_OK,
 } tOfficeControls;
 
-//---------------------------------------------------------------- OFFICE COMMON
+//----------------------------------------------------------------- PRIVATE VARS
 
 static tFaceId s_pActivePpl[FACE_ID_COUNT]; // Key: pos in office, val: ppl
 static tCommShopPage s_pOfficePages[FACE_ID_COUNT][SUBPAGES_PER_PERSON];
-static BYTE s_bSelectionCurr, s_bSelectionCount;
+static BYTE s_bSelectionCurr;
 static UBYTE s_ubUnlockedPplCount;
 
-//------------------------------------------------------------- OFFICE PAGE MAIN
+//------------------------------------------------------------------ PRIVATE FNS
 
 static void officeDrawFaceAtPos(BYTE bPos) {
 	const UBYTE ubSpaceX = (COMM_DISPLAY_WIDTH - 2*2 - PPL_PER_ROW * 32) / 3;
@@ -66,11 +67,11 @@ static void pageOfficeProcess(void) {
 	}
 
 	while(s_bSelectionCurr < 0) {
-		s_bSelectionCurr += s_bSelectionCount;
+		s_bSelectionCurr += s_ubUnlockedPplCount;
 	}
 
-	while(s_bSelectionCurr >= s_bSelectionCount) {
-		s_bSelectionCurr -= s_bSelectionCount;
+	while(s_bSelectionCurr >= s_ubUnlockedPplCount) {
+		s_bSelectionCurr -= s_ubUnlockedPplCount;
 	}
 
 	if(s_bSelectionCurr != bOldSelection) {
@@ -88,15 +89,10 @@ static void pageOfficeProcess(void) {
 
 //------------------------------------------------------------------- PUBLIC FNS
 
-void pageOfficeCreate(void) {
+void pageOfficeShow(void) {
 	commRegisterPage(pageOfficeProcess, 0);
-	s_bSelectionCount = 0;
-	for(tFaceId i = 0; i < FACE_ID_COUNT; ++i) {
-		if(s_pActivePpl[i] == FACE_ID_COUNT) {
-			break;
-		}
+	for(tFaceId i = 0; i < s_ubUnlockedPplCount; ++i) {
 		officeDrawFaceAtPos(i);
-		++s_bSelectionCount;
 	}
 }
 
@@ -127,6 +123,24 @@ void pageOfficeReset(void) {
 	pageFavorReset();
 	pageBribeReset();
 	pageAccountingReset();
+}
+
+void pageOfficeSave(tFile *pFile) {
+	saveWriteHeader(pFile, "OFFC");
+	fileWrite(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
+	fileWrite(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * SUBPAGES_PER_PERSON);
+	fileWrite(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
+}
+
+UBYTE pageOfficeLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "OFFC")) {
+		return 0;
+	}
+
+	fileRead(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
+	fileRead(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * SUBPAGES_PER_PERSON);
+	fileRead(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
+	return 1;
 }
 
 void pageOfficeUnlockPerson(tFaceId ePerson) {

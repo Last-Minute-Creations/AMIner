@@ -210,7 +210,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MAIN:
 		default:
-			pageOfficeCreate();
+			pageOfficeShow();
 			break;
 	}
 }

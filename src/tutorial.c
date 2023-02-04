@@ -12,6 +12,7 @@
 #include "vehicle.h"
 #include "hud.h"
 #include "defs.h"
+#include "save.h"
 
 typedef enum _tTutorialState {
 	TUTORIAL_SHOW_MESSAGE_INTRO = 0,
@@ -32,6 +33,8 @@ typedef enum _tTutorialState {
 static tTutorialState s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
 static UBYTE s_pDescriptionShownForTabs[COMM_TAB_COUNT];
 static ULONG s_ulStartTime;
+
+//------------------------------------------------------------------ PRIVATE FNS
 
 static UBYTE tutorialProcessChallenge(void) {
 	UBYTE isEarlyReturn = 0;
@@ -183,12 +186,33 @@ static UBYTE tutorialProcessStory(void) {
 	return isEarlyReturn;
 }
 
+//------------------------------------------------------------------- PUBLIC FNS
+
 void tutorialReset(void) {
 	for(UBYTE i = 0; i < COMM_TAB_COUNT; ++i) {
 		s_pDescriptionShownForTabs[i] = 0;
 	}
 
 	s_eTutorialState = TUTORIAL_SHOW_MESSAGE_INTRO;
+}
+
+void tutorialSave(tFile *pFile) {
+	saveWriteHeader(pFile, "TUTR");
+	fileWrite(pFile, &s_eTutorialState, sizeof(s_eTutorialState));
+	fileWrite(pFile, s_pDescriptionShownForTabs, sizeof(s_pDescriptionShownForTabs[0]) * COMM_TAB_COUNT);
+	fileWrite(pFile, &s_ulStartTime, sizeof(s_ulStartTime));
+}
+
+UBYTE tutorialLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "TUTR")) {
+		return 0;
+	}
+
+	fileRead(pFile, &s_eTutorialState, sizeof(s_eTutorialState));
+	fileRead(pFile, s_pDescriptionShownForTabs, sizeof(s_pDescriptionShownForTabs[0]) * COMM_TAB_COUNT);
+	fileRead(pFile, &s_ulStartTime, sizeof(s_ulStartTime));
+
+	return 1;
 }
 
 UBYTE tutorialProcess(void) {

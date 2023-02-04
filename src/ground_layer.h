@@ -9,6 +9,10 @@ void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel);
 
 void groundLayerReset(UBYTE ubLowerLayer);
 
+void groundLayerSave(tFile *pFile);
+
+UBYTE groundLayerLoad(tFile *pFile);
+
 UWORD groundLayerGetLowerAtDepth(UWORD uwY);
 
 UBYTE groundLayerGetDifficultyAtDepth(UWORD uwDepth);

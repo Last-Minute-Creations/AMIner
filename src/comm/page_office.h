@@ -10,7 +10,11 @@
 
 void pageOfficeReset(void);
 
-void pageOfficeCreate(void);
+void pageOfficeSave(tFile *pFile);
+
+UBYTE pageOfficeLoad(tFile *pFile);
+
+void pageOfficeShow(void);
 
 void pageOfficeUnlockPerson(tFaceId ePerson);
 

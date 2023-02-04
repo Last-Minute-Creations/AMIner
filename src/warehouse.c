@@ -11,6 +11,7 @@
 #include "core.h"
 #include "defs.h"
 #include "comm/page_accounting.h"
+#include "save.h"
 
 // Not spent on plan, not sold
 static UWORD s_pStock[MINERAL_TYPE_COUNT] = {0};
@@ -28,6 +29,22 @@ void warehouseReset(void) {
 	memset(s_pStock, 0, sizeof(s_pStock));
 	s_sCurrentPlan = s_sFirstPlan;
 	planReset(&s_sCurrentPlan, 0, 0);
+}
+
+void warehouseSave(tFile *pFile) {
+	saveWriteHeader(pFile, "WHSE");
+	fileWrite(pFile, s_pStock, sizeof(s_pStock[0]) * MINERAL_TYPE_COUNT);
+	fileWrite(pFile, &s_sCurrentPlan, sizeof(s_sCurrentPlan));
+}
+
+UBYTE warehouseLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "WHSE")) {
+		return 0;
+	}
+
+	fileRead(pFile, s_pStock, sizeof(s_pStock[0]) * MINERAL_TYPE_COUNT);
+	fileRead(pFile, &s_sCurrentPlan, sizeof(s_sCurrentPlan));
+	return 1;
 }
 
 tPlan *warehouseGetCurrentPlan(void) {

@@ -20,6 +20,10 @@ void gameGsLoopChallengeEnd(void);
 
 void gameStart(void);
 
+void gameSave(tFile *pFile);
+
+UBYTE gameLoad(tFile *pFile);
+
 void gameChallengeEnd(void);
 
 void gameGsLoopEnterScore(void);

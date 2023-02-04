@@ -5,6 +5,7 @@
 #ifndef _WAREHOUSE_H_
 #define _WAREHOUSE_H_
 
+#include <ace/utils/file.h>
 #include "plan.h"
 
 void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount);
@@ -15,9 +16,13 @@ void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount);
 
 void warehouseReset(void);
 
-tPlan *warehouseGetCurrentPlan(void);
+void warehouseSave(tFile *pFile);
+
+UBYTE warehouseLoad(tFile *pFile);
 
 //------------------------------------------------------------------------- PLAN
+
+tPlan *warehouseGetCurrentPlan(void);
 
 void warehouseNextPlan(UBYTE isFailed);
 

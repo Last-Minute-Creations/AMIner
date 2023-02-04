@@ -16,6 +16,7 @@
 #include "ground_layer.h"
 #include "defs.h"
 #include "inventory.h"
+#include "save.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -240,6 +241,106 @@ void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
 	pVehicle->lCash = g_lInitialCash;
 	vehicleRespawn(pVehicle);
+}
+
+void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
+	saveWriteHeader(pFile, "VHCL");
+	fileWrite(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
+	// textBobSave(&pVehicle->sTextBob, pFile);
+	// bobNewSave(&pVehicle->sBobBody, pFile);
+	// bobNewSave(&pVehicle->sBobTrack, pFile);
+	// bobNewSave(&pVehicle->sBobJet, pFile);
+	// bobNewSave(&pVehicle->sBobTool, pFile);
+	// bobNewSave(&pVehicle->sBobWreck, pFile);
+	// bobNewSave(&pVehicle->sBobSmoke, pFile);
+	fileWrite(pFile, &pVehicle->fX, sizeof(pVehicle->fX));
+	fileWrite(pFile, &pVehicle->fY, sizeof(pVehicle->fY));
+	fileWrite(pFile, &pVehicle->fDx, sizeof(pVehicle->fDx));
+	fileWrite(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
+	fileWrite(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
+	fileWrite(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
+	fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
+	fileWrite(pFile, &pVehicle->ubTrackAnimCnt, sizeof(pVehicle->ubTrackAnimCnt));
+	fileWrite(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
+	fileWrite(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
+	fileWrite(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
+	fileWrite(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
+	fileWrite(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
+	fileWrite(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
+	fileWrite(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
+	fileWrite(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
+	fileWrite(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
+	fileWrite(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
+	fileWrite(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
+	fileWrite(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
+	fileWrite(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
+	fileWrite(pFile, &pVehicle->ubTeleportAnimFrame, sizeof(pVehicle->ubTeleportAnimFrame));
+	fileWrite(pFile, &pVehicle->ubTeleportAnimCnt, sizeof(pVehicle->ubTeleportAnimCnt));
+	fileWrite(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
+	fileWrite(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
+	fileWrite(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
+	fileWrite(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
+	fileWrite(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
+	fileWrite(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
+	fileWrite(pFile, &pVehicle->lCash, sizeof(pVehicle->lCash));
+	fileWrite(pFile, &pVehicle->uwDrillCurr, sizeof(pVehicle->uwDrillCurr));
+	fileWrite(pFile, &pVehicle->wHullCurr, sizeof(pVehicle->wHullCurr));
+	fileWrite(pFile, &pVehicle->ubPlayerIdx, sizeof(pVehicle->ubPlayerIdx));
+	fileWrite(pFile, &pVehicle->ubDestructionState, sizeof(pVehicle->ubDestructionState));
+	fileWrite(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
+	fileWrite(pFile, &pVehicle->ubDamageFrames, sizeof(pVehicle->ubDamageFrames));
+}
+
+UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
+	if(!saveReadHeader(pFile, "VHCL")) {
+		return 0;
+	}
+
+	fileRead(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
+	// textBobLoad(&pVehicle->sTextBob, pFile);
+	// bobNewLoad(&pVehicle->sBobBody, pFile);
+	// bobNewLoad(&pVehicle->sBobTrack, pFile);
+	// bobNewLoad(&pVehicle->sBobJet, pFile);
+	// bobNewLoad(&pVehicle->sBobTool, pFile);
+	// bobNewLoad(&pVehicle->sBobWreck, pFile);
+	// bobNewLoad(&pVehicle->sBobSmoke, pFile);
+	fileRead(pFile, &pVehicle->fX, sizeof(pVehicle->fX));
+	fileRead(pFile, &pVehicle->fY, sizeof(pVehicle->fY));
+	fileRead(pFile, &pVehicle->fDx, sizeof(pVehicle->fDx));
+	fileRead(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
+	fileRead(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
+	fileRead(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
+	fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
+	fileRead(pFile, &pVehicle->ubTrackAnimCnt, sizeof(pVehicle->ubTrackAnimCnt));
+	fileRead(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
+	fileRead(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
+	fileRead(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
+	fileRead(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
+	fileRead(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
+	fileRead(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
+	fileRead(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
+	fileRead(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
+	fileRead(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
+	fileRead(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
+	fileRead(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
+	fileRead(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
+	fileRead(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
+	fileRead(pFile, &pVehicle->ubTeleportAnimFrame, sizeof(pVehicle->ubTeleportAnimFrame));
+	fileRead(pFile, &pVehicle->ubTeleportAnimCnt, sizeof(pVehicle->ubTeleportAnimCnt));
+	fileRead(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
+	fileRead(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
+	fileRead(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
+	fileRead(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
+	fileRead(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
+	fileRead(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
+	fileRead(pFile, &pVehicle->lCash, sizeof(pVehicle->lCash));
+	fileRead(pFile, &pVehicle->uwDrillCurr, sizeof(pVehicle->uwDrillCurr));
+	fileRead(pFile, &pVehicle->wHullCurr, sizeof(pVehicle->wHullCurr));
+	fileRead(pFile, &pVehicle->ubPlayerIdx, sizeof(pVehicle->ubPlayerIdx));
+	fileRead(pFile, &pVehicle->ubDestructionState, sizeof(pVehicle->ubDestructionState));
+	fileRead(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
+	fileRead(pFile, &pVehicle->ubDamageFrames, sizeof(pVehicle->ubDamageFrames));
+	return 1;
 }
 
 void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {

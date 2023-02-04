@@ -111,6 +111,10 @@ void vehicleResetPos(tVehicle *pVehicle);
 
 void vehicleReset(tVehicle *pVehicle);
 
+void vehicleSave(tVehicle *pVehicle, tFile *pFile);
+
+UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile);
+
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);
 
 void vehicleProcessText(void);
