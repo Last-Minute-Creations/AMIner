@@ -20,6 +20,7 @@
 #include "explosion.h"
 #include <comm/base.h>
 #include "defs.h"
+#include "settings.h"
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
@@ -168,10 +169,6 @@ static void coreGsCreate(void) {
 
 	// Default config
 	g_is2pPlaying = 0;
-	g_is1pKbd = 0;
-	g_is2pKbd = 1;
-	g_isChallenge = 1;
-	g_isAtari = 0;
 
 	hudReset(0, 0);
 	statePush(g_pGameStateManager, &g_sStateMenu);

@@ -18,7 +18,7 @@ UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void gameGsLoopChallengeEnd(void);
 
-void gameStart(void);
+void gameStart(UBYTE isChallenge);
 
 void gameTriggerSave(void);
 
@@ -53,7 +53,6 @@ extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 
 // Game config
 extern UBYTE g_is2pPlaying;
-extern UBYTE g_is1pKbd, g_is2pKbd;
 extern UBYTE g_isChallenge, g_isChallengeEnd;
 extern UBYTE g_isAtari;
 extern tBobNew g_pBombMarkers[3];

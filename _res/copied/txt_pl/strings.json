@@ -27,21 +27,27 @@
 		"draw": "Remis!"
 	},
 	"menu": {
-		"enumMode": ["600% normy", "Zawody"],
 		"enumP1": ["Dżoj", "WSAD"],
 		"enumP2": ["Dżoj", "Strzałki"],
 		"enumOnOff": ["WYŁ", "WŁ"],
 		"enumPlayerCount": ["Jeden", "Dwóch"],
 		"captions": [
-			"Start gry",
+			"600% normy",
+			"Swobodny",
+			"Zawody",
+			"Ustawienia",
+			"Wyjście z gry",
+			"Nowa gra",
 			"Kontynuuj",
-			"Tryb",
 			"Gracze",
-			"Gracz 1 sterowanie",
-			"Gracz 2 sterowanie",
+			"Powrót",
 			"Tryb ATARI",
 			"Rekordy",
-			"Wyjdź z gry"
+			"Głośność muzyki",
+			"Głośność dźwięków",
+			"Gracz 1 sterowanie",
+			"Gracz 2 sterowanie",
+			"Autorzy"
 		]
 	},
 	"minerals": [

@@ -217,7 +217,6 @@ void langCreate(const char *szLangPrefix) {
 	// Shop names
 	g_pShopNames = stringArrayCreateFromDom(pJson, g_pRemap, "shopNames");
 	g_pWarehouseColNames = stringArrayCreateFromDom(pJson, g_pRemap, "warehouseColNames");
-	g_pMenuEnumMode = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumMode");
 	g_pMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumPlayerCount");
 	g_pMenuEnumP1 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP1");
 	g_pMenuEnumP2 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP2");
@@ -235,7 +234,6 @@ void langDestroy(void) {
 	logBlockBegin("langDestroy()");
 	stringArrayDestroy(g_pShopNames);
 	stringArrayDestroy(g_pWarehouseColNames);
-	stringArrayDestroy(g_pMenuEnumMode);
 	stringArrayDestroy(g_pMenuEnumPlayerCount);
 	stringArrayDestroy(g_pMenuEnumP1);
 	stringArrayDestroy(g_pMenuEnumP2);

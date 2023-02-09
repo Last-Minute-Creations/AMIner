@@ -29,6 +29,7 @@
 #include "inventory.h"
 #include "defs.h"
 #include "save.h"
+#include "settings.h"
 
 #define CAMERA_SPEED 4
 
@@ -60,7 +61,6 @@ static tModeSelection s_pModeSelection[2] = {
 tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 UBYTE g_is2pPlaying;
-UBYTE g_is1pKbd, g_is2pKbd;
 UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
 tBobNew g_pBombMarkers[3];
 
@@ -91,8 +91,9 @@ void modeReset(UBYTE ubPlayer) {
 	hudSetMode(ubPlayer, MODE_DRILL);
 }
 
-void gameStart(void) {
+void gameStart(UBYTE isChallenge) {
 	s_ubChallengeCamCnt = 0;
+	g_isChallenge = isChallenge;
 	g_isChallengeEnd = 0;
 	dinoReset();
 	tutorialReset();
@@ -157,10 +158,10 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 	else if(keyUse(KEY_F2)) {
-		g_is1pKbd = !g_is1pKbd;
+		g_sSettings.is1pKbd = !g_sSettings.is1pKbd;
 	}
 	else if(keyUse(KEY_F3)) {
-		g_is2pKbd = !g_is2pKbd;
+		g_sSettings.is2pKbd = !g_sSettings.is2pKbd;
 	}
 	else if(keyUse(KEY_F4)) {
 		if(s_eCameraType == CAMERA_TYPE_P1) {
@@ -580,8 +581,8 @@ UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays) {
 void gameSave(tFile *pFile) {
 	saveWriteHeader(pFile, "GAME");
 	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
-	fileWrite(pFile, &g_is1pKbd, sizeof(g_is1pKbd));
-	fileWrite(pFile, &g_is2pKbd, sizeof(g_is2pKbd));
+	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
+	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
 	fileWrite(pFile, &g_isChallengeEnd, sizeof(g_isChallengeEnd));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
@@ -619,8 +620,8 @@ UBYTE gameLoad(tFile *pFile) {
 	}
 
 	fileRead(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
-	fileRead(pFile, &g_is1pKbd, sizeof(g_is1pKbd));
-	fileRead(pFile, &g_is2pKbd, sizeof(g_is2pKbd));
+	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
+	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
 	fileRead(pFile, &g_isChallengeEnd, sizeof(g_isChallengeEnd));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
@@ -668,7 +669,7 @@ static void gameGsLoop(void) {
 
 	debugColor(0x080);
 	gameCameraProcess();
-	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
+	steerUpdateFromInput(g_sSettings.is1pKbd, g_sSettings.is2pKbd);
 	gameProcessHotkeys();
 	UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
 	if(isGameStateChange) {

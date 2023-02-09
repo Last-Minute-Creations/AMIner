@@ -9,6 +9,7 @@
 #include "../core.h"
 #include "../steer.h"
 #include "../game.h"
+#include "settings.h"
 
 #define SFX_CHANNEL_KEY 3
 
@@ -123,7 +124,7 @@ void commProcess(void) {
 		{218, 129, 142, 13}
 	};
 
-	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
+	steerUpdateFromInput(g_sSettings.is1pKbd, g_sSettings.is2pKbd);
 	UBYTE pTests[COMM_NAV_COUNT] = {
 		steerGet(STEER_P1_UP)  || steerGet(STEER_P2_UP),
 		steerGet(STEER_P1_DOWN) || steerGet(STEER_P2_DOWN),
