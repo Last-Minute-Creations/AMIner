@@ -20,7 +20,7 @@
 	},
 	"hiScore": {
 		"new": "Nowy rekord! Wpisz imię.",
-		"press": "Naciśnij FIRE lub ENTER aby kontynuować",
+		"press": "Naciśnij FIRE lub ENTER aby wyjść",
 		"score": "Wynik",
 		"winP1": "Gracz 1 wygrał!",
 		"winP2": "Gracz 2 wygrał!",
