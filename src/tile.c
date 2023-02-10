@@ -124,7 +124,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 	UWORD uwEndX = g_pMainBuffer->uTileBounds.uwX;
 	UWORD uwEndY = g_pMainBuffer->uTileBounds.uwY;
 	if(isChallenge) {
-		uwEndY = TILE_ROW_CHALLENGE_FINISH + 1; // without +1 it's broken
+		uwEndY = TILE_ROW_CHALLENGE_FINISH + 20; // generate a bit more to accomodate scroll
 	}
 
 	UBYTE **pTiles = g_pMainBuffer->pTileData;
@@ -228,17 +228,6 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		}
 	}
 
-	// Dino bones
-	pTiles[5][g_pDinoDepths[0]] = TILE_BONE_HEAD;
-	pTiles[3][g_pDinoDepths[1]] = TILE_BONE_1;
-	pTiles[7][g_pDinoDepths[2]] = TILE_BONE_1;
-	pTiles[1][g_pDinoDepths[3]] = TILE_BONE_1;
-	pTiles[4][g_pDinoDepths[4]] = TILE_BONE_1;
-	pTiles[6][g_pDinoDepths[5]] = TILE_BONE_1;
-	pTiles[8][g_pDinoDepths[6]] = TILE_BONE_1;
-	pTiles[2][g_pDinoDepths[7]] = TILE_BONE_1;
-	pTiles[9][g_pDinoDepths[8]] = TILE_BONE_1;
-
 	// Fill left invisible col with rocks
 	commProgress(100, g_pMsgs[MSG_LOADING_FINISHING]);
 	for(UWORD y = 0; y < uwEndY; ++y) {
@@ -254,6 +243,19 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 			pTiles[x][TILE_ROW_CHALLENGE_FINISH+1] = TILE_STONE_1 + (x & 1);
 		}
 	}
+	else {
+		// Dino bones
+		pTiles[5][g_pDinoDepths[0]] = TILE_BONE_HEAD;
+		pTiles[3][g_pDinoDepths[1]] = TILE_BONE_1;
+		pTiles[7][g_pDinoDepths[2]] = TILE_BONE_1;
+		pTiles[1][g_pDinoDepths[3]] = TILE_BONE_1;
+		pTiles[4][g_pDinoDepths[4]] = TILE_BONE_1;
+		pTiles[6][g_pDinoDepths[5]] = TILE_BONE_1;
+		pTiles[8][g_pDinoDepths[6]] = TILE_BONE_1;
+		pTiles[2][g_pDinoDepths[7]] = TILE_BONE_1;
+		pTiles[9][g_pDinoDepths[8]] = TILE_BONE_1;
+	}
+
 	logBlockEnd("tileReset()");
 }
 

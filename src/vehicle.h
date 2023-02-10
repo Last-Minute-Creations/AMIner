@@ -93,6 +93,7 @@ typedef struct _tVehicle {
 	tDynamite sDynamite;
 	// Damage frames
 	UBYTE ubDamageFrames;
+	UBYTE isChallengeEnded;
 } tVehicle;
 
 void vehicleBitmapsCreate(void);

@@ -26,8 +26,6 @@ void gameSave(tFile *pFile);
 
 UBYTE gameLoad(tFile *pFile);
 
-void gameChallengeEnd(void);
-
 void gameGsLoopEnterScore(void);
 
 void gameTryPushBob(tBobNew *pBob);
@@ -53,7 +51,7 @@ extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 
 // Game config
 extern UBYTE g_is2pPlaying;
-extern UBYTE g_isChallenge, g_isChallengeEnd;
+extern UBYTE g_isChallenge;
 extern UBYTE g_isAtari;
 extern tBobNew g_pBombMarkers[3];
 extern tState g_sStateGame;

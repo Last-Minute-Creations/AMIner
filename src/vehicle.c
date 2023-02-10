@@ -239,6 +239,7 @@ void vehicleRespawn(tVehicle *pVehicle) {
 
 void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
+	pVehicle->isChallengeEnded = 0;
 	pVehicle->lCash = g_lInitialCash;
 	vehicleRespawn(pVehicle);
 }
@@ -479,6 +480,10 @@ static inline void vehicleSetTool(
 static inline UBYTE vehicleStartDrilling(
 	tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY, UBYTE ubDrillDir
 ) {
+	if(pVehicle->isChallengeEnded) {
+		return 0;
+	}
+
 	static UBYTE ubCooldown = 0;
 
 	// Check if other player drills the same tile
@@ -578,6 +583,11 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 	return -wRestockValue;
 }
 
+static void vehicleEndChallenge(tVehicle *pVehicle) {
+	vehicleRestock(pVehicle, 0);
+	pVehicle->isChallengeEnded = 1;
+}
+
 void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	// Load mineral to vehicle
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwTileX][uwTileY];
@@ -637,8 +647,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_1 + 9) {
 			if(uwTileY == TILE_ROW_CHALLENGE_FINISH) {
 				pVehicle->lCash += pVehicle->uwCargoScore;
-				vehicleRestock(pVehicle, 0);
-				gameChallengeEnd();
+				vehicleEndChallenge(pVehicle);
 			}
 			else {
 				textBobSetText(
@@ -668,6 +677,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	const fix16_t fAccX = fix16_one / 16;
 	const fix16_t fFrictX = fix16_one / 12;
 
+	// Challenge camera teleport
 	if(
 		g_isChallenge &&
 		fix16_to_int(pVehicle->fY) < g_pMainBuffer->pCamera->uPos.uwY
@@ -699,9 +709,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->lCash -= uwTeleportPenalty;
 
 		if(uwTileY >= TILE_ROW_CHALLENGE_FINISH) {
-			gameChallengeEnd();
+			vehicleEndChallenge(pVehicle);
 		}
 	}
+
 	if(pVehicle->sSteer.bX) {
 		if(pVehicle->sSteer.bX > 0) {
 			pVehicle->fDx = MIN(pVehicle->fDx + fAccX, fMaxDx);

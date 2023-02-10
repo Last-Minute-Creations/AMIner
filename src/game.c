@@ -61,7 +61,7 @@ static tModeSelection s_pModeSelection[2] = {
 tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 UBYTE g_is2pPlaying;
-UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
+UBYTE g_isChallenge, g_isAtari;
 tBobNew g_pBombMarkers[3];
 
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};
@@ -94,7 +94,6 @@ void modeReset(UBYTE ubPlayer) {
 void gameStart(UBYTE isChallenge) {
 	s_ubChallengeCamCnt = 0;
 	g_isChallenge = isChallenge;
-	g_isChallengeEnd = 0;
 	dinoReset();
 	tutorialReset();
 	pageOfficeReset();
@@ -286,7 +285,7 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 }
 
 static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
-	if(g_isChallengeEnd) {
+	if(g_pVehicles[ubPlayer].isChallengeEnded) {
 		return 0;
 	}
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
@@ -471,10 +470,6 @@ UBYTE gameGetRebukes(void) {
 
 //-------------------------------------------------------------------- CHALLENGE
 
-void gameChallengeEnd(void) {
-	g_isChallengeEnd = 1;
-}
-
 void gameChallengeResult(void) {
 	if(!g_is2pPlaying) {
 		char szBfr[30];
@@ -584,7 +579,6 @@ void gameSave(tFile *pFile) {
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
-	fileWrite(pFile, &g_isChallengeEnd, sizeof(g_isChallengeEnd));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
 	// for(UBYTE i = 0; i < 3; ++i) {
 	// 	bobNewSave(pFile, g_pBombMarkers[i]);
@@ -623,7 +617,6 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
-	fileRead(pFile, &g_isChallengeEnd, sizeof(g_isChallengeEnd));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
 	// for(UBYTE i = 0; i < 3; ++i) {
 	// 	bobNewLoad(pFile, g_pBombMarkers[i]);
@@ -691,9 +684,10 @@ static void gameGsLoop(void) {
 	gameDisplayModeTnt(1);
 	coreProcessAfterBobs();
 
-	if(g_isChallengeEnd && g_pVehicles[0].ubDrillDir == DRILL_DIR_NONE && (
-		!g_is2pPlaying || g_pVehicles[1].ubDrillDir == DRILL_DIR_NONE
-	)) {
+	if(
+		g_pVehicles[0].isChallengeEnded &&
+		(!g_is2pPlaying || g_pVehicles[1].isChallengeEnded)
+	) {
 		gameChallengeResult();
 	}
 }
