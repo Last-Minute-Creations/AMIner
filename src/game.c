@@ -120,7 +120,7 @@ void gameStart(UBYTE isChallenge) {
 void gameTriggerSave(void) {
 	logWrite("game save");
 	systemUse();
-	tFile *pSave = fileOpen("save.dat", "wb");
+	tFile *pSave = fileOpen("save_story.dat", "wb");
 	gameSave(pSave);
 	fileClose(pSave);
 	systemUnuse();
