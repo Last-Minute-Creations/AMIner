@@ -285,9 +285,6 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 }
 
 static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
-	if(g_pVehicles[ubPlayer].isChallengeEnded) {
-		return 0;
-	}
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
 
 	if(!g_isChallenge) {
@@ -336,10 +333,12 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	}
 	else {
 		BYTE bDirX = 0, bDirY = 0;
-		if(steerGet(pSelection->eSteerRight)) { bDirX += 1; }
-		if(steerGet(pSelection->eSteerLeft)) { bDirX -= 1; }
-		if(steerGet(pSelection->eSteerDown)) { bDirY += 1; }
-		if(steerGet(pSelection->eSteerUp)) { bDirY -= 1; }
+		if(!g_pVehicles[ubPlayer].isChallengeEnded) {
+			if(steerGet(pSelection->eSteerRight)) { bDirX += 1; }
+			if(steerGet(pSelection->eSteerLeft)) { bDirX -= 1; }
+			if(steerGet(pSelection->eSteerDown)) { bDirY += 1; }
+			if(steerGet(pSelection->eSteerUp)) { bDirY -= 1; }
+		}
 		vehicleMove(&g_pVehicles[ubPlayer], bDirX, bDirY);
 	}
 	return 0;

@@ -707,7 +707,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			pVehicle->sBobBody.sPos.uwY - 48, 1
 		);
 		pVehicle->lCash -= uwTeleportPenalty;
+	}
 
+	if(g_isChallenge && !pVehicle->isChallengeEnded) {
+		UWORD uwTileY = fix16_to_int(pVehicle->fY) / 32;
 		if(uwTileY >= TILE_ROW_CHALLENGE_FINISH) {
 			vehicleEndChallenge(pVehicle);
 		}
@@ -1160,6 +1163,7 @@ void vehicleProcess(tVehicle *pVehicle) {
 		case VEHICLE_STATE_TELEPORTING_IN:
 			break;
 	}
+
 	UBYTE ubPlayerIdx = pVehicle->ubPlayerIdx;
 	UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
 	hudSetDrill(ubPlayerIdx, pVehicle->uwDrillCurr, uwDrillMax);
