@@ -260,7 +260,6 @@ tUwCoordYX commGetOriginDisplay(void) {
 	return sOrigin;
 }
 
-
 void commDrawText(
 	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
 ) {

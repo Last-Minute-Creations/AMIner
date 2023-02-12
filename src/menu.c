@@ -138,7 +138,7 @@ static void menuOnExit(void) {
 static void onMenuPosUndraw(
 	UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight
 ) {
-	commErase(uwX, uwY, uwWidth, uwHeight);
+	commErase(uwX + (COMM_DISPLAY_WIDTH - uwWidth) / 2, uwY, uwWidth, uwHeight);
 }
 
 static void onMenuPosDraw(
@@ -146,7 +146,8 @@ static void onMenuPosDraw(
 	UBYTE isActive, UWORD *pUndrawWidth
 ) {
 	commDrawText(
-		uwX, uwY, szText, FONT_SHADOW | FONT_COOKIE,
+		uwX  + COMM_DISPLAY_WIDTH / 2, uwY,
+		szText, FONT_SHADOW | FONT_COOKIE | FONT_HCENTER,
 		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	*pUndrawWidth = fontMeasureText(g_pFont, szText).uwX;
