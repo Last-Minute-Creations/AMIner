@@ -117,7 +117,7 @@
 		"depth": "Poziom:",
 		"paused": "Pauza gry",
 		"resume": "Wznów",
-		"quit": "Wyjdź"
+		"saveQuit": "Zapisz i wyjdź"
 	},
 	"officePages": {
 		"main": "Powrót",

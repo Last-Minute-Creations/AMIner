@@ -76,7 +76,7 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_DEPTH] = "hud.depth",
 	[MSG_HUD_PAUSED] = "hud.paused",
 	[MSG_HUD_RESUME] = "hud.resume",
-	[MSG_HUD_QUIT] = "hud.quit",
+	[MSG_HUD_SAVE_QUIT] = "hud.saveQuit",
 	// HUD: Misc
 	// HUD: Plan
 	[MSG_HUD_NEW_PLAN] = "hudMessages.newPlan",
