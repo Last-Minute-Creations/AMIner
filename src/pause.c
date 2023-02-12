@@ -24,6 +24,7 @@ void pauseGsLoop(void) {
 			stateChange(g_pGameStateManager, &g_sStateGame);
 		}
 		else {
+			gameTriggerSave();
 			menuGsEnter(0);
 		}
 	}
