@@ -48,7 +48,7 @@ void pageFavorCreate(void) {
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
 	WORD wDays = planGetRemainingDays(warehouseGetCurrentPlan());
-	if(s_ubFavorsLeft > 0 && wDays >= 25) {
+	if(s_ubFavorsLeft > 0 && wDays >= 15) {
 
 		uwPosY += commDrawMultilineText(
 			"I like working with you Comrade, I really do."
