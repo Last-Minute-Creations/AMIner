@@ -9,6 +9,7 @@
 #include <comm/gs_shop.h>
 #include "../game.h"
 #include "../warehouse.h"
+#include "../save.h"
 
 static UBYTE s_ubFavorsLeft;
 
@@ -74,4 +75,17 @@ void pageFavorCreate(void) {
 
 void pageFavorReset(void) {
 	s_ubFavorsLeft = 10;
+}
+
+void pageFavorSave(tFile *pFile) {
+	saveWriteHeader(pFile, "FAVR");
+	fileWrite(pFile, &s_ubFavorsLeft, sizeof(s_ubFavorsLeft));
+}
+
+UBYTE pageFavorLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "FAVR")) {
+		return 0;
+	}
+	fileRead(pFile, &s_ubFavorsLeft, sizeof(s_ubFavorsLeft));
+	return 1;
 }

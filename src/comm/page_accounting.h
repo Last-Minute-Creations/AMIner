@@ -5,10 +5,16 @@
 #ifndef _AMINER_COMM_PAGE_ACCOUNTING_H_
 #define _AMINER_COMM_PAGE_ACCOUNTING_H_
 
+#include <ace/utils/file.h>
+
 void pageAccountingCreate(void);
 
 void pageAccountingReduceChanceFail(void);
 
 void pageAccountingReset(void);
+
+void pageAccountingSave(tFile *pFile);
+
+UBYTE pageAccountingLoad(tFile *pFile);
 
 #endif // _AMINER_COMM_PAGE_ACCOUNTING_H_

@@ -5,8 +5,14 @@
 #ifndef _AMINER_COMM_PAGE_BRIBE_H_
 #define _AMINER_COMM_PAGE_BRIBE_H_
 
+#include <ace/utils/file.h>
+
 void pageBribeCreate(void);
 
 void pageBribeReset(void);
+
+void pageBribeSave(tFile *pFile);
+
+UBYTE pageBribeLoad(tFile *pFile);
 
 #endif // _AMINER_COMM_PAGE_BRIBE_H_

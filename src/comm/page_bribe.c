@@ -9,6 +9,7 @@
 #include "../game.h"
 #include "../core.h"
 #include "../vehicle.h"
+#include "../save.h"
 
 static UBYTE s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
 static BYTE s_bBribeChanceFail;
@@ -111,3 +112,22 @@ void pageBribeReset(void) {
 	s_ubBribeAccoladeCount = 0;
 	s_ubBribeRebukeCount = 0;
 }
+
+void pageBribeSave(tFile *pFile) {
+	saveWriteHeader(pFile, "BRBE");
+	fileWrite(pFile, &s_bBribeChanceFail, sizeof(s_bBribeChanceFail));
+	fileWrite(pFile, &s_ubBribeAccoladeCount, sizeof(s_ubBribeAccoladeCount));
+	fileWrite(pFile, &s_ubBribeRebukeCount, sizeof(s_ubBribeRebukeCount));
+}
+
+UBYTE pageBribeLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "FAVR")) {
+		return 0;
+	}
+
+	fileRead(pFile, &s_bBribeChanceFail, sizeof(s_bBribeChanceFail));
+	fileRead(pFile, &s_ubBribeAccoladeCount, sizeof(s_ubBribeAccoladeCount));
+	fileRead(pFile, &s_ubBribeRebukeCount, sizeof(s_ubBribeRebukeCount));
+	return 1;
+}
+

@@ -5,8 +5,14 @@
 #ifndef _AMINER_COMM_PAGE_FAVOR_H_
 #define _AMINER_COMM_PAGE_FAVOR_H_
 
+#include <ace/utils/file.h>
+
 void pageFavorCreate(void);
 
 void pageFavorReset(void);
+
+void pageFavorSave(tFile *pFile);
+
+UBYTE pageFavorLoad(tFile *pFile);
 
 #endif // _AMINER_COMM_PAGE_FAVOR_H_

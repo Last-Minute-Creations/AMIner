@@ -128,6 +128,9 @@ void pageOfficeSave(tFile *pFile) {
 	fileWrite(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * SUBPAGES_PER_PERSON);
 	fileWrite(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
 	fileWrite(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
+	pageFavorSave(pFile);
+	pageBribeSave(pFile);
+	pageAccountingSave(pFile);
 }
 
 UBYTE pageOfficeLoad(tFile *pFile) {
@@ -139,7 +142,9 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 	fileRead(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * SUBPAGES_PER_PERSON);
 	fileRead(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
 	fileRead(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
-	return 1;
+	return pageFavorLoad(pFile) &&
+		pageBribeLoad(pFile) &&
+		pageAccountingLoad(pFile);
 }
 
 void pageOfficeUnlockPerson(tFaceId ePerson) {

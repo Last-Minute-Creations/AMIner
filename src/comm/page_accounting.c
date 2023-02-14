@@ -11,6 +11,7 @@
 #include "../game.h"
 #include "../warehouse.h"
 #include "../vehicle.h"
+#include "../save.h"
 
 static BYTE s_bAccountingChanceFail;
 static UWORD s_uwAccountingCost;
@@ -76,4 +77,17 @@ void pageAccountingReduceChanceFail(void) {
 
 void pageAccountingReset(void) {
 	s_bAccountingChanceFail = 5;
+}
+
+void pageAccountingSave(tFile *pFile) {
+	saveWriteHeader(pFile, "ACTG");
+	fileWrite(pFile, &s_bAccountingChanceFail, sizeof(s_bAccountingChanceFail));
+}
+
+UBYTE pageAccountingLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "ACTG")) {
+		return 0;
+	}
+	fileRead(pFile, &s_bAccountingChanceFail, sizeof(s_bAccountingChanceFail));
+	return 1;
 }
