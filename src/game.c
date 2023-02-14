@@ -457,7 +457,7 @@ void gameAddRebuke(void) {
 		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3
 	);
 
-	pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, ePage);
+	pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, ePage);
 	inboxPushBack(ePage, 1);
 }
 

@@ -260,7 +260,7 @@ static void pageWarehouseProcess(void) {
 					warehouseNextPlan(0);
 
 					if(wasDelayed) {
-						pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED);
+						pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED);
 						inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED, 0);
 					}
 				}

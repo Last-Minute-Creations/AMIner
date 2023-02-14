@@ -87,7 +87,7 @@ static UBYTE tutorialProcessStory(void) {
 			isEarlyReturn = 1;
 			break;
 		case TUTORIAL_GO_MEET_MIETEK:
-			pageOfficeUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME);
 			inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME, 0);
 			hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_GO_MEET_MIETEK]);
 			s_ulStartTime = gameGetTime();
@@ -96,9 +96,9 @@ static UBYTE tutorialProcessStory(void) {
 		case TUTORIAL_WAIT_FOR_URZEDAS:
 			if(gameIsElapsedDays(s_ulStartTime, 3)) {
 				pageOfficeUnlockPerson(FACE_ID_URZEDAS);
-				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER);
-				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME);
-				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME, 0);
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST	]);
 				++s_eTutorialState;
@@ -113,8 +113,8 @@ static UBYTE tutorialProcessStory(void) {
 		case TUTORIAL_WAIT_FOR_KOMISARZ:
 			if(gameIsElapsedDays(s_ulStartTime, 3)) {
 				pageOfficeUnlockPerson(FACE_ID_KOMISARZ);
-				pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER);
-				pageOfficeUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME, 0);
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
 				++s_eTutorialState;
@@ -128,7 +128,7 @@ static UBYTE tutorialProcessStory(void) {
 			break;
 		case TUTORIAL_WAIT_FOR_PLAN:
 			if(gameIsElapsedDays(s_ulStartTime, 3)) {
-				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN, 1);
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_URZEDAS]);
 				++s_eTutorialState;
@@ -175,7 +175,7 @@ static UBYTE tutorialProcessStory(void) {
 			break;
 		case TUTORIAL_WAITING_FOR_PLAN_DONE:
 			if(warehouseGetCurrentPlan()->uwIndex > 0) {
-				pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE, 0);
 				++s_eTutorialState;
 			}

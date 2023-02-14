@@ -15,8 +15,6 @@ static BYTE s_bBribeChanceFail;
 static UWORD s_uwBribeCost;
 
 static void pageBribeProcess(void) {
-// #error take cash for a bribe!
-
 	if(buttonGetPreset() == BUTTON_PRESET_ACCEPT_DECLINE) {
 		BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
 		BYTE bButtonCount = buttonGetCount();
@@ -36,6 +34,7 @@ static void pageBribeProcess(void) {
 				g_pVehicles[0].lCash -= s_uwBribeCost;
 				if(randUwMinMax(&g_sRand, 1, 100) > s_bBribeChanceFail) {
 					// Success
+					pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
 					tPlan *pPlan = warehouseGetCurrentPlan();
 					if(!pPlan->isPenaltyCountdownStarted) {
 						// accolade bribe

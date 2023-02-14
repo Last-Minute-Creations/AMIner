@@ -18,7 +18,7 @@ void pageOfficeShow(void);
 
 void pageOfficeUnlockPerson(tFaceId ePerson);
 
-void pageOfficeUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
+UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
 
 const tCommShopPage *officeGetPagesForFace(tFaceId eFace);
 

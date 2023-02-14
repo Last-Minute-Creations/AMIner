@@ -113,11 +113,8 @@ void pageOfficeReset(void) {
 	pageOfficeUnlockPerson(FACE_ID_KRYSTYNA);
 
 	// Unlock select pages
-	pageOfficeUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER);
-	pageOfficeUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING);
-
-	// TODO: Unlock later on
-	pageOfficeUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
+	pageOfficeTryUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER);
+	pageOfficeTryUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING);
 
 	// Reset counters
 	pageFavorReset();
@@ -149,12 +146,16 @@ void pageOfficeUnlockPerson(tFaceId ePerson) {
 	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
 }
 
-void pageOfficeUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
+UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
 	for(UBYTE i = 0; i < SUBPAGES_PER_PERSON - 1; ++i) {
+		if(s_pOfficePages[ePerson][i] == eSubpage) {
+			// Already unlocked
+			return 0;
+		}
 		if(s_pOfficePages[ePerson][i] == COMM_SHOP_PAGE_OFFICE_MAIN) {
 			s_pOfficePages[ePerson][i] = eSubpage;
 			s_pOfficePages[ePerson][i + 1] = COMM_SHOP_PAGE_OFFICE_MAIN;
-			return;
+			return 1;
 		}
 	}
 
@@ -162,6 +163,7 @@ void pageOfficeUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
 		"ERR: Can't add subpage %d to person %d - no more space\n",
 		eSubpage, ePerson
 	);
+	return 0;
 }
 
 const tCommShopPage *officeGetPagesForFace(tFaceId eFace) {
