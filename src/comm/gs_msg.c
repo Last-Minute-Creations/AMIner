@@ -12,7 +12,9 @@
 #include "defs.h"
 
 static UBYTE s_isMsgShown;
-static const  char *s_szMessageFile;
+static const char *s_szMessageFile;
+static const char *s_szMessageTitle;
+static tFaceId s_eFace;
 
 static void cbOnClose(void) {
 	commRegisterPage(0, 0);
@@ -26,7 +28,7 @@ static void commGsMsgCreate(void) {
 		return;
 	}
 
-	pageMsgCreate(s_szMessageFile, cbOnClose);
+	pageMsgCreate(s_eFace, s_szMessageTitle, s_szMessageFile, cbOnClose);
 
 	// Process managers once so that backbuffer becomes front buffer
 	// Single buffering from now on!
@@ -56,8 +58,12 @@ static void commGsMsgDestroy(void) {
 	commHide();
 }
 
-void gsMsgInit(const char *szMessageFile) {
+void gsMsgInit(
+	tFaceId eFace, const char *szMessageFile, const char *szMessageTitle
+) {
+	s_eFace = eFace;
 	s_szMessageFile = szMessageFile;
+	s_szMessageTitle = szMessageTitle;
 }
 
 tState g_sStateMsg = {

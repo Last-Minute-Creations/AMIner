@@ -34,7 +34,8 @@ static void officeDrawListPos(tCommShopPage eListPage, UBYTE ubPos) {
 		COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	commDrawText(
-		LIST_X, LIST_Y + LIST_SPACING_Y * ubPos, g_pMsgs[MSG_PAGE_LIST_MIETEK + eListPage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK],
+		LIST_X, LIST_Y + LIST_SPACING_Y * ubPos,
+		g_pMsgs[commShopPageToTitle(eListPage)],
 		FONT_COOKIE, ubColor
 	);
 }

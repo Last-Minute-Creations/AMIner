@@ -40,7 +40,7 @@ static UBYTE tutorialProcessChallenge(void) {
 	UBYTE isEarlyReturn = 0;
 	switch(s_eTutorialState) {
 		case TUTORIAL_SHOW_MESSAGE_INTRO:
-			gsMsgInit("intro_challenge");
+			gsMsgInit(FACE_ID_MIETEK, "intro_challenge", "Wprowadzenie");
 			statePush(g_pGameStateManager, &g_sStateMsg);
 			s_eTutorialState = TUTORIAL_DONE;
 			isEarlyReturn = 1;
@@ -81,7 +81,7 @@ static UBYTE tutorialProcessStory(void) {
 	UBYTE isEarlyReturn = 0;
 	switch(s_eTutorialState) {
 		case TUTORIAL_SHOW_MESSAGE_INTRO:
-			gsMsgInit("intro_campaign");
+			gsMsgInit(FACE_ID_URZEDAS, "intro_campaign", "Wprowadzenie");
 			statePush(g_pGameStateManager, &g_sStateMsg);
 			++s_eTutorialState;
 			isEarlyReturn = 1;

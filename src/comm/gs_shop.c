@@ -147,6 +147,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 	commEraseAll();
 
 	s_eCameFrom = eCameFrom;
+	const char *szTitle = g_pMsgs[commShopPageToTitle(ePage)];
 	switch(ePage) {
 		case COMM_SHOP_PAGE_WORKSHOP:
 			pageWorkshopCreate();
@@ -155,28 +156,28 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageWarehouseCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME:
-			pageMsgCreate("mietek_welcome", onBack);
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER:
-			pageMsgCreate("krystyna_dossier", onBack);
+			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "krystyna_dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING:
 			pageAccountingCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER:
-			pageMsgCreate("urzedas_dossier", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME:
-			pageMsgCreate("urzedas_welcome", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN:
-			pageMsgCreate("urzedas_first_plan", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_first_plan", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE:
-			pageMsgCreate("urzedas_plan_complete", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_complete", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED:
-			pageMsgCreate("urzedas_plan_delayed", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_delayed", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
@@ -185,19 +186,19 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageFavorCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER:
-			pageMsgCreate("komisarz_dossier", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME:
-			pageMsgCreate("komisarz_welcome", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1:
-			pageMsgCreate("komisarz_rebuke_1", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_1", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_2:
-			pageMsgCreate("komisarz_rebuke_2", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_2", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3:
-			pageMsgCreate("komisarz_rebuke_3", onBackFromLastRebuke);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_3", onBackFromLastRebuke);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
@@ -235,6 +236,10 @@ tCommTab commShopPageToTab(tCommShopPage ePage) {
 		default:
 			return COMM_TAB_COUNT;
 	}
+}
+
+tMsg commShopPageToTitle(tCommShopPage ePage) {
+	return MSG_PAGE_LIST_MIETEK + ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK;
 }
 
 void commShopGoBack(void) {

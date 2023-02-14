@@ -7,6 +7,7 @@
 
 #include "aminer.h"
 #include <comm/base.h>
+#include "defs.h"
 
 typedef enum _tCommShopPage {
 	COMM_SHOP_PAGE_WAREHOUSE,
@@ -43,6 +44,8 @@ UBYTE commShopIsActive(void);
 tCommShopPage commShopGetCurrentPage(void);
 
 tCommTab commShopPageToTab(tCommShopPage ePage);
+
+tMsg commShopPageToTitle(tCommShopPage ePage);
 
 void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage);
 

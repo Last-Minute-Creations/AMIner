@@ -33,7 +33,7 @@ void commCreate(void) {
 	s_pBg = bitmapCreateFromFile("data/comm_bg.bm", 0);
 	s_pButtons = bitmapCreateFromFile("data/comm_buttons.bm", 0);
 	s_pLineBuffer = fontCreateTextBitMap(
-		ROUND_TO_MULTIPLE(COMM_DISPLAY_WIDTH, 16), g_pFont->uwHeight
+		SNAP_UP(COMM_DISPLAY_WIDTH, 16), g_pFont->uwHeight
 	);
 
 	for(UBYTE i = 0; i < 4; ++i) {
