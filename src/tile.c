@@ -157,11 +157,11 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 			}
 			else {
 				uwChanceRock = CLAMP(y * 500 / 2000, 0, 500);
-				uwChanceSilver = chanceTrapezoid(y, 10, 30, 50, 100, 5, 200);
-				uwChanceGold = chanceTrapezoid(y, 60, 120, 150, 250, 2, 200);
-				uwChanceEmerald = chanceTrapezoid(y, 175, 400, 450, 600, 1, 200);
-				uwChanceRuby = chanceTrapezoid(y, 500, 650, 700, 850, 1, 200);
-				uwChanceMoonstone = chanceTrapezoid(y, 175, 1000, 1500, 2000, 1, 10);
+				uwChanceSilver = 75;
+				uwChanceGold = y > 60 ? 75 : 0;
+				uwChanceEmerald = y > 200 ? 75 : 0;
+				uwChanceRuby = y  > 400 ? 75 : 0;
+				uwChanceMoonstone = y > 175 ? 75 : 0;
 			}
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
