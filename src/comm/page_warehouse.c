@@ -257,7 +257,7 @@ static void pageWarehouseProcess(void) {
 
 				if(planIsFulfilled(pPlan)) {
 					UBYTE wasDelayed = (pPlan->uwIndex > 0 && pPlan->isPenaltyCountdownStarted);
-					warehouseNextPlan(0);
+					warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 
 					if(wasDelayed) {
 						pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED);

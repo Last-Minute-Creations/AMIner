@@ -8,6 +8,12 @@
 #include <ace/utils/file.h>
 #include "plan.h"
 
+typedef enum tNextPlanReason {
+	NEXT_PLAN_REASON_FULFILLED,
+	NEXT_PLAN_REASON_FULFILLED_ACCOUNTING,
+	NEXT_PLAN_REASON_FAILED,
+} tNextPlanReason;
+
 void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount);
 
 UWORD warehouseGetStock(UBYTE ubMineralType);
@@ -24,7 +30,7 @@ UBYTE warehouseLoad(tFile *pFile);
 
 tPlan *warehouseGetCurrentPlan(void);
 
-void warehouseNextPlan(UBYTE isFailed);
+void warehouseNextPlan(tNextPlanReason eReason);
 
 void warehouseRerollPlan(void);
 

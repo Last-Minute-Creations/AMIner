@@ -177,7 +177,7 @@ static void gameProcessHotkeys(void) {
 	}
 	else if(keyUse(KEY_EQUALS)) {
 		hudShowMessage(0, g_pMsgs[MSG_HUD_NEW_PLAN]);
-		warehouseNextPlan(0);
+		warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 	}
 	else if(keyUse(KEY_0)) {
 		tPlan *pPlan = warehouseGetCurrentPlan();
@@ -522,7 +522,7 @@ static void processPlan(void) {
 		}
 		else {
 			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_REBUKE]);
-			warehouseNextPlan(1);
+			warehouseNextPlan(NEXT_PLAN_REASON_FAILED);
 			gameAddRebuke();
 		}
 	}

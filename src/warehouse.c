@@ -55,12 +55,15 @@ void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount) {
 	s_sCurrentPlan.pMinerals[ubMineralType].uwCurrentCount = ubCount;
 }
 
-void warehouseNextPlan(UBYTE isFailed) {
-	if(!isFailed) {
+void warehouseNextPlan(tNextPlanReason eReason) {
+	if(eReason != NEXT_PLAN_REASON_FAILED) {
 		if(!s_sCurrentPlan.isPenaltyCountdownStarted) {
 			gameAdvanceAccolade();
 		}
-		pageAccountingReduceChanceFail();
+
+		if(eReason == NEXT_PLAN_REASON_FULFILLED_ACCOUNTING) {
+			pageAccountingReduceChanceFail();
+		}
 	}
 
 	// Increase the plan target sum by relevant ratio
