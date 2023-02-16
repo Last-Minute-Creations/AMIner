@@ -71,7 +71,13 @@ void pageBribeCreate(void) {
 	UWORD uwPosY = 0;
 	UWORD uwCost;
 
-	if(!pPlan->isExtendedTimeByFavor) {
+	if (!pPlan->isActive) {
+		uwPosY += commDrawMultilineText(
+			"You have no active plan! What do you want me to do?", 0, uwPosY
+		) * ubLineHeight;
+		buttonInitOk("Back");
+	}
+	else if(!pPlan->isExtendedTimeByFavor) {
 		if(!pPlan->isPenaltyCountdownStarted) {
 			sprintf(szBfr, "Bribe for extra %hhu days for finishing plan in time.", 14);
 			uwCost = 100;
@@ -99,12 +105,13 @@ void pageBribeCreate(void) {
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 		buttonInitAcceptDecline("Accept", "Decline");
-		buttonDrawAll(commGetDisplayBuffer());
 	}
 	else {
 		uwPosY += commDrawMultilineText("Comrade, not now... there's too much heat!", 0, uwPosY) * ubLineHeight;
 		buttonInitOk("Back");
 	}
+
+	buttonDrawAll(commGetDisplayBuffer());
 }
 
 void pageBribeReset(void) {

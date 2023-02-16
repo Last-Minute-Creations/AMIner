@@ -48,9 +48,15 @@ void pageFavorCreate(void) {
 	commRegisterPage(pageFavorProcess, 0);
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
-	WORD wDays = planGetRemainingDays(warehouseGetCurrentPlan());
-	if(s_ubFavorsLeft > 0 && wDays >= 15) {
-
+	tPlan *pPlan = warehouseGetCurrentPlan();
+	WORD wDays = planGetRemainingDays(pPlan);
+	if (!pPlan->isActive) {
+		uwPosY += commDrawMultilineText(
+			"You have no active plan! What do you want me to do?", 0, uwPosY
+		) * ubLineHeight;
+		buttonInitOk("Back");
+	}
+	else if(s_ubFavorsLeft > 0 && wDays >= 15) {
 		uwPosY += commDrawMultilineText(
 			"I like working with you Comrade, I really do."
 			" I heard that current plan is tough for you. If you want,"
@@ -65,12 +71,13 @@ void pageFavorCreate(void) {
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 		buttonInitAcceptDecline("Accept", "Decline");
-		buttonDrawAll(commGetDisplayBuffer());
 	}
 	else {
 		uwPosY += commDrawMultilineText("You ask me for too much, Comrade. Do some real work, will you?", 0, uwPosY) * ubLineHeight;
 		buttonInitOk("Back");
 	}
+
+	buttonDrawAll(commGetDisplayBuffer());
 }
 
 void pageFavorReset(void) {

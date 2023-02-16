@@ -50,24 +50,33 @@ void pageAccountingCreate(void) {
 	commRegisterPage(pageAccountingProcess, 0);
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
+	tPlan *pPlan = warehouseGetCurrentPlan();
+	if (!pPlan->isActive) {
+		uwPosY += commDrawMultilineText(
+			"You have no active plan! What do you want me to do?", 0, uwPosY
+		) * ubLineHeight;
+		buttonInitOk("Back");
+	}
+	else {
+		s_uwAccountingCost = planGetRemainingCost(warehouseGetCurrentPlan()) / 2;
 
-	s_uwAccountingCost = planGetRemainingCost(warehouseGetCurrentPlan()) / 2;
+		uwPosY += commDrawMultilineText(
+			"I can do some Creative Acccounting for you and fulfill your plan instantly."
+			" For a price, of course.", 0, uwPosY
+		) * ubLineHeight;
+		char szBfr[150];
+		uwPosY += ubLineHeight / 2;
+		sprintf(
+			szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
+			s_bAccountingChanceFail
+		);
+		uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
+		sprintf(szBfr, "It will cost you %hu\x1F.", s_uwAccountingCost);
+		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
-	uwPosY += commDrawMultilineText(
-		"I can do some Creative Acccounting for you and fulfill your plan instantly."
-		" For a price, of course.", 0, uwPosY
-	) * ubLineHeight;
-	char szBfr[150];
-	uwPosY += ubLineHeight / 2;
-	sprintf(
-		szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
-		s_bAccountingChanceFail
-	);
-	uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
-	sprintf(szBfr, "It will cost you %hu\x1F.", s_uwAccountingCost);
-	uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
+		buttonInitAcceptDecline("Accept", "Decline");
+	}
 
-	buttonInitAcceptDecline("Accept", "Decline");
 	buttonDrawAll(commGetDisplayBuffer());
 }
 
