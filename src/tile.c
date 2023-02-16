@@ -244,6 +244,11 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		}
 	}
 	else {
+		// Rock bottom
+		for(UWORD x = 1; x < uwEndX; ++x) {
+			pTiles[x][uwEndY - 1] = TILE_STONE_1 + (x & 3);
+		}
+
 		// Dino bones
 		pTiles[5][g_pDinoDepths[0]] = TILE_BONE_HEAD;
 		pTiles[3][g_pDinoDepths[1]] = TILE_BONE_1;
