@@ -87,7 +87,7 @@ void planReset(tPlan *pPlan, UBYTE isActive, UBYTE isNext) {
 	} while(!isDone);
 	pPlan->wTimeMax = 2 * 2 * 1000; // Two times fuel capacity for 2p
 	pPlan->wTimeMax += 200; // Add for nice division into 30 days
-	pPlan->wTimeRemaining = GAME_TIME_PER_DAY * 5;
+	pPlan->wTimeRemaining = isNext ? pPlan->wTimeMax : GAME_TIME_PER_DAY * 5;
 	pPlan->isExtendedTimeByFavor = 0;
 	pPlan->isPenaltyCountdownStarted = 0;
 	pPlan->isActive = isActive;
