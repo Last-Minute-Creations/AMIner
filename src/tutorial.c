@@ -18,9 +18,7 @@ typedef enum _tTutorialState {
 	TUTORIAL_SHOW_MESSAGE_INTRO = 0,
 	TUTORIAL_GO_MEET_MIETEK,
 	TUTORIAL_WAIT_FOR_URZEDAS,
-	TUTORIAL_GO_MEET_URZEDAS,
 	TUTORIAL_WAIT_FOR_KOMISARZ,
-	TUTORIAL_GO_MEET_KOMISARZ,
 	TUTORIAL_WAIT_FOR_PLAN,
 	TUTORIAL_GO_READ_PLAN,
 	TUTORIAL_WAITING_FOR_DIG,
@@ -101,11 +99,6 @@ static UBYTE tutorialProcessStory(void) {
 				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME, 0);
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST	]);
-				++s_eTutorialState;
-			}
-			break;
-		case TUTORIAL_GO_MEET_URZEDAS:
-			if(tutorialIsInMainOffice()) { // Message read
 				s_ulStartTime = gameGetTime();
 				++s_eTutorialState;
 			}
@@ -117,11 +110,6 @@ static UBYTE tutorialProcessStory(void) {
 				pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME, 0);
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
-				++s_eTutorialState;
-			}
-			break;
-		case TUTORIAL_GO_MEET_KOMISARZ:
-			if(tutorialIsInMainOffice()) { // Message read
 				s_ulStartTime = gameGetTime();
 				++s_eTutorialState;
 			}
@@ -136,7 +124,7 @@ static UBYTE tutorialProcessStory(void) {
 			break;
 		case TUTORIAL_GO_READ_PLAN:
 			if(tutorialIsInMainOffice()) { // Message read
-					planStart(warehouseGetCurrentPlan());
+				planStart(warehouseGetCurrentPlan());
 				++s_eTutorialState;
 			}
 			break;
