@@ -3,60 +3,38 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "page_office.h"
-#include <comm/base.h>
-#include <comm/page_list.h>
 #include <comm/page_favor.h>
 #include <comm/page_bribe.h>
 #include <comm/page_accounting.h>
+#include <comm/gs_shop.h>
+#include "save.h"
 
 #define PPL_PER_ROW 4
-
-/**
- * @brief List of people in the office.
- * Must be the exact same order as in office page list!
- */
-typedef enum _tOfficePpl {
-	OFFICE_PPL_MIETEK,
-	OFFICE_PPL_KRYSTYNA,
-	OFFICE_PPL_PUTIN,
-	OFFICE_PPL_URZEDAS,
-	OFFICE_PPL_COUNT,
-} tOfficePpl;
+#define SUBPAGES_PER_PERSON 8
 
 typedef enum _tOfficeControls {
 	OFFICE_CONTROLS_ACCEPT_DECLINE,
 	OFFICE_CONTROLS_OK,
 } tOfficeControls;
 
-static const tOfficePage s_pOfficePages[OFFICE_PPL_COUNT][4] = {
-	[OFFICE_PPL_MIETEK] = {
-		OFFICE_PAGE_MAIN
-	},
-	[OFFICE_PPL_KRYSTYNA] = {
-		OFFICE_PAGE_DOSSIER_KRYSTYNA, OFFICE_PAGE_ACCOUNTING, OFFICE_PAGE_MAIN
-	},
-	[OFFICE_PPL_PUTIN] = {
-		OFFICE_PAGE_MAIN
-	},
-	[OFFICE_PPL_URZEDAS] = {
-		OFFICE_PAGE_DOSSIER_URZEDAS, OFFICE_PAGE_FAVOR, OFFICE_PAGE_BRIBE, OFFICE_PAGE_MAIN
-	},
-};
+//----------------------------------------------------------------- PRIVATE VARS
 
-//---------------------------------------------------------------- OFFICE COMMON
+static tFaceId s_pActivePpl[FACE_ID_COUNT]; // Key: pos in office, val: ppl
+static tCommShopPage s_pOfficePages[FACE_ID_COUNT][SUBPAGES_PER_PERSON];
+static BYTE s_bSelectionCurr;
+static UBYTE s_ubUnlockedPplCount;
 
-static tOfficePpl s_pActivePpl[OFFICE_PPL_COUNT]; // Key: pos in office, val: ppl
-static BYTE s_bSelectionCurr, s_bSelectionCount;
-
-//------------------------------------------------------------- OFFICE PAGE MAIN
+//------------------------------------------------------------------ PRIVATE FNS
 
 static void officeDrawFaceAtPos(BYTE bPos) {
 	const UBYTE ubSpaceX = (COMM_DISPLAY_WIDTH - 2*2 - PPL_PER_ROW * 32) / 3;
 	const UBYTE ubSpaceY = 10;
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
 
-	UWORD uwX = sOrigin.uwX + 2 + (bPos % PPL_PER_ROW) * (32 + ubSpaceX);
-	UWORD uwY = sOrigin.uwY + 2 + (bPos / PPL_PER_ROW) * (32 + ubSpaceY);
+	UWORD uwRelativeX = 2 + (bPos % PPL_PER_ROW) * (32 + ubSpaceX);
+	UWORD uwRelativeY = 2 + (bPos / PPL_PER_ROW) * (32 + ubSpaceY);
+	UWORD uwX = sOrigin.uwX + uwRelativeX;
+	UWORD uwY = sOrigin.uwY + uwRelativeY;
 
 	tBitMap *pBmDraw = commGetDisplayBuffer();
 	blitRect(pBmDraw, uwX - 2, uwY - 2, 36, 36, COMM_DISPLAY_COLOR_BG);
@@ -69,10 +47,7 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 		blitCopy(g_pCommBmSelection, 0, 27, pBmDraw, uwX - 2 + 36 - 16, uwY - 2 + 36 - 9, 16, 9, MINTERM_COOKIE);
 	}
 
-	blitCopy(
-		g_pCommBmFaces, 0, s_pActivePpl[bPos] * 32, pBmDraw, uwX, uwY,
-		32, 32, MINTERM_COOKIE
-	);
+	commDrawFaceAt(s_pActivePpl[bPos], uwRelativeX, uwRelativeY);
 }
 
 static void pageOfficeProcess(void) {
@@ -92,11 +67,11 @@ static void pageOfficeProcess(void) {
 	}
 
 	while(s_bSelectionCurr < 0) {
-		s_bSelectionCurr += s_bSelectionCount;
+		s_bSelectionCurr += s_ubUnlockedPplCount;
 	}
 
-	while(s_bSelectionCurr >= s_bSelectionCount) {
-		s_bSelectionCurr -= s_bSelectionCount;
+	while(s_bSelectionCurr >= s_ubUnlockedPplCount) {
+		s_bSelectionCurr -= s_ubUnlockedPplCount;
 	}
 
 	if(s_bSelectionCurr != bOldSelection) {
@@ -105,33 +80,97 @@ static void pageOfficeProcess(void) {
 	}
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		pageListCreate(s_pOfficePages[s_pActivePpl[s_bSelectionCurr]]);
+		commShopChangePage(
+			COMM_SHOP_PAGE_OFFICE_MAIN,
+			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_pActivePpl[s_bSelectionCurr] - FACE_ID_MIETEK
+		);
 	}
 }
 
-void pageOfficeCreate(void) {
+//------------------------------------------------------------------- PUBLIC FNS
+
+void pageOfficeShow(void) {
 	commRegisterPage(pageOfficeProcess, 0);
-	s_bSelectionCount = 0;
-	for(tOfficePpl i = 0; i < OFFICE_PPL_COUNT; ++i) {
-		if(s_pActivePpl[i] == OFFICE_PPL_COUNT) {
-			break;
-		}
+	for(tFaceId i = 0; i < s_ubUnlockedPplCount; ++i) {
 		officeDrawFaceAtPos(i);
-		++s_bSelectionCount;
 	}
 }
 
 void pageOfficeReset(void) {
-	for(tOfficePpl i = 0; i < OFFICE_PPL_COUNT; ++i) {
-		s_pActivePpl[i] = OFFICE_PPL_COUNT;
+	// Make all ppl locked
+	for(tFaceId ePos = 0; ePos < FACE_ID_COUNT; ++ePos) {
+		s_pActivePpl[ePos] = FACE_ID_COUNT;
 	}
-	UBYTE ubPos = 0;
-	// s_pActivePpl[ubPos++] = OFFICE_PPL_MIETEK;
-	s_pActivePpl[ubPos++] = OFFICE_PPL_KRYSTYNA;
-	s_pActivePpl[ubPos++] = OFFICE_PPL_URZEDAS;
+	s_ubUnlockedPplCount = 0;
+
+	// Lock all dialogue options
+	for(tFaceId ePerson = 0; ePerson < FACE_ID_COUNT; ++ePerson) {
+		s_pOfficePages[ePerson][0] = COMM_SHOP_PAGE_OFFICE_MAIN; // Serves as list terminator
+	}
+
+	// Unlock select characters
+	pageOfficeUnlockPerson(FACE_ID_MIETEK);
+	pageOfficeUnlockPerson(FACE_ID_KRYSTYNA);
+
+	// Unlock select pages
+	pageOfficeTryUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER);
+	pageOfficeTryUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING);
 
 	// Reset counters
 	pageFavorReset();
 	pageBribeReset();
 	pageAccountingReset();
+}
+
+void pageOfficeSave(tFile *pFile) {
+	saveWriteHeader(pFile, "OFFC");
+	fileWrite(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
+	fileWrite(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * SUBPAGES_PER_PERSON);
+	fileWrite(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
+	fileWrite(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
+	pageFavorSave(pFile);
+	pageBribeSave(pFile);
+	pageAccountingSave(pFile);
+}
+
+UBYTE pageOfficeLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "OFFC")) {
+		return 0;
+	}
+
+	fileRead(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
+	fileRead(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * SUBPAGES_PER_PERSON);
+	fileRead(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
+	fileRead(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
+	return pageFavorLoad(pFile) &&
+		pageBribeLoad(pFile) &&
+		pageAccountingLoad(pFile);
+}
+
+void pageOfficeUnlockPerson(tFaceId ePerson) {
+	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
+}
+
+UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
+	for(UBYTE i = 0; i < SUBPAGES_PER_PERSON - 1; ++i) {
+		if(s_pOfficePages[ePerson][i] == eSubpage) {
+			// Already unlocked
+			return 0;
+		}
+		if(s_pOfficePages[ePerson][i] == COMM_SHOP_PAGE_OFFICE_MAIN) {
+			s_pOfficePages[ePerson][i] = eSubpage;
+			s_pOfficePages[ePerson][i + 1] = COMM_SHOP_PAGE_OFFICE_MAIN;
+			return 1;
+		}
+	}
+
+	logWrite(
+		"ERR: Can't add subpage %d to person %d - no more space\n",
+		eSubpage, ePerson
+	);
+	return 0;
+}
+
+const tCommShopPage *officeGetPagesForFace(tFaceId eFace) {
+	return s_pOfficePages[eFace];
 }

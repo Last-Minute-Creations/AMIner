@@ -5,8 +5,12 @@
 #ifndef _AMINER_COMM_PAGE_MSG_H_
 #define _AMINER_COMM_PAGE_MSG_H_
 
+#include "face_id.h"
+
 typedef void (*tOnClose)(void);
 
-void pageMsgCreate(const char *szFile, tOnClose cbOnClose);
+void pageMsgCreate(
+	tFaceId eFace, const char *szTitle, const char *szFile, tOnClose cbOnClose
+);
 
 #endif // _AMINER_COMM_PAGE_MSG_H_

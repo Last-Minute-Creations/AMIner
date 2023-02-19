@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "inventory.h"
+#include "save.h"
 
 tInventory s_sInventory;
 
@@ -27,6 +28,20 @@ void inventoryReset(void) {
 	for(UBYTE i = 0; i < INVENTORY_PART_COUNT; ++i) {
 		inventorySetPartLevel(i, 0);
 	}
+}
+
+void inventorySave(tFile *pFile) {
+	saveWriteHeader(pFile, "IVTR");
+	fileWrite(pFile, &s_sInventory, sizeof(s_sInventory));
+}
+
+UBYTE inventoryLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "IVTR")) {
+		return 0;
+	}
+
+	fileRead(pFile, &s_sInventory, sizeof(s_sInventory));
+	return 1;
 }
 
 const tItem *inventoryGetItemDef(tItemName eName) {

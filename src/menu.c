@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "menu.h"
+#include <ace/managers/system.h>
 #include <ace/managers/joy.h>
 #include <ace/managers/key.h>
 #include <comm/base.h>
@@ -14,6 +15,14 @@
 #include "hi_score.h"
 #include "hud.h"
 #include "core.h"
+#include "settings.h"
+#include "menu_list.h"
+
+#define SFX_CHANNEL_ATARI 3
+#define MENU_OPTIONS_MAX 10
+#define INDEX_ATARI_INVALID 0xFF
+
+//------------------------------------------------------------------------ TYPES
 
 typedef enum _tMenuState {
 	MENU_STATE_ROLL_IN = 0,
@@ -21,162 +30,31 @@ typedef enum _tMenuState {
 	MENU_STATE_ROLL_OUT
 } tMenuState;
 
-typedef enum _tOptionType {
-	OPTION_TYPE_UINT8,
-	OPTION_TYPE_CALLBACK
-} tOptionType;
+//------------------------------------------------------------------- PROTOTYPES
 
-typedef void (*tOptionSelectCb)(void);
+static void menuOnStoryStart(void);
+static void menuOnStoryLoad(void);
+static void menuOnExit(void);
+static void menuOnShowScores(void);
+static void menuOnBackToMain();
+static void menuOnFreeStart();
+static void menuOnFreeLoad();
+static void menuOnChallengeStart();
+static void menuOnBackToMainFromSettings();
+static void menuOnEnterStory();
+static void menuOnEnterFree();
+static void menuOnEnterChallenge();
+static void menuOnEnterSettings();
+static void menuOnEnterCredits();
 
-// All options are uint8_t, enums or numbers
-typedef struct _tOption {
-	tOptionType eOptionType;
-	UBYTE isHidden;
-	UBYTE isDirty;
-	union {
-		struct {
-			UBYTE *pVar;
-			UBYTE ubMax;
-			UBYTE ubDefault;
-			UBYTE isCyclic;
-			char *** const pEnumLabels;
-		} sOptUb;
-		struct {
-			tOptionSelectCb cbSelect;
-		} sOptCb;
-	};
-} tOption;
-
-void onStart(void);
-void onExit(void);
-void onShowScores(void);
-
-char **g_pMenuCaptions, **g_pMenuEnumMode, **g_pMenuEnumP1, **g_pMenuEnumP2,
-	**g_pMenuEnumOnOff, **g_pMenuEnumPlayerCount;
+//----------------------------------------------------------------- PRIVATE VARS
 
 static tState s_sStateMenuScore;
 
-static tOption s_pOptions[] = {
-	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onStart}},
-	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
-		.pVar = &g_isChallenge, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
-		.pEnumLabels = &g_pMenuEnumMode
-	}},
-	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
-		.pVar = &g_is2pPlaying, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
-		.pEnumLabels = &g_pMenuEnumPlayerCount
-	}},
-	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
-		.pVar = &g_is1pKbd, .ubMax = 1, .isCyclic = 1, .ubDefault = 0,
-		.pEnumLabels = &g_pMenuEnumP1
-	}},
-	{OPTION_TYPE_UINT8, .isHidden = 0, .sOptUb = {
-		.pVar = &g_is2pKbd, .ubMax = 1, .isCyclic = 1, .ubDefault = 1,
-		.pEnumLabels = &g_pMenuEnumP2
-	}},
-	{OPTION_TYPE_UINT8, .isHidden = 1, .sOptUb = {
-		.pVar = &g_isAtari, .ubMax = 1, .isCyclic = 0, .ubDefault = 0,
-		.pEnumLabels = &g_pMenuEnumOnOff
-	}},
-	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onShowScores}},
-	{OPTION_TYPE_CALLBACK, .isHidden = 0, .sOptCb = {.cbSelect = onExit}},
-};
-#define MENU_POS_COUNT (sizeof(s_pOptions) / sizeof(tOption))
+static tMenuListOption s_pMenuOptions[MENU_OPTIONS_MAX];
+static UBYTE s_ubMenuOptionCount;
 
-//-------------------------------------------------------------- MENU COMP START
-
-#define MENU_COLOR_INACTIVE 13
-#define MENU_COLOR_ACTIVE 15
-
-static UBYTE s_ubActivePos;
-static UBYTE s_isScoreShowAfterRollIn = 0;
-
-static void menuDrawPos(UBYTE ubPos, UWORD uwOffsTop) {
-	UWORD uwOffsY = uwOffsTop + ubPos * (g_pFont->uwHeight);
-	commErase(0, uwOffsY, COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
-
-	char szBfr[50];
-	const char *szText = 0;
-	if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_UINT8) {
-		if(s_pOptions[ubPos].sOptUb.pEnumLabels) {
-			sprintf(
-				szBfr, "%s: %s", g_pMenuCaptions[ubPos],
-				(*s_pOptions[ubPos].sOptUb.pEnumLabels)[*s_pOptions[ubPos].sOptUb.pVar]
-			);
-		}
-		else {
-			sprintf(
-				szBfr, "%s: %hhu", g_pMenuCaptions[ubPos],
-				*s_pOptions[ubPos].sOptUb.pVar
-			);
-		}
-		szText = szBfr;
-	}
-	else if(s_pOptions[ubPos].eOptionType == OPTION_TYPE_CALLBACK) {
-		szText = g_pMenuCaptions[ubPos];
-	}
-
-	if(szText != 0) {
-		commDrawText(COMM_DISPLAY_WIDTH / 2, uwOffsY, szText,
-			FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW,
-			(ubPos == s_ubActivePos) ? MENU_COLOR_ACTIVE : MENU_COLOR_INACTIVE
-		);
-	}
-}
-
-static void menuSetHidden(UBYTE ubPos, UBYTE isHidden) {
-	s_pOptions[ubPos].isHidden = isHidden;
-}
-
-static UBYTE menuNavigate(BYTE bDir) {
-	WORD wNewPos = s_ubActivePos;
-
-	// Find next non-hidden pos
-	do {
-		wNewPos += bDir;
-	} while(0 < wNewPos && wNewPos < (WORD)MENU_POS_COUNT && s_pOptions[wNewPos].isHidden);
-
-	if(wNewPos < 0 || wNewPos >= (WORD)MENU_POS_COUNT) {
-		// Out of bounds - cancel
-		return 0;
-	}
-
-	// Update active pos and mark as dirty
-	s_pOptions[s_ubActivePos].isDirty = 1;
-	s_pOptions[wNewPos].isDirty = 1;
-	s_ubActivePos = wNewPos;
-	return 1;
-}
-
-static UBYTE menuToggle(BYTE bDelta) {
-	if(s_pOptions[s_ubActivePos].eOptionType == OPTION_TYPE_UINT8) {
-		WORD wNewVal = *s_pOptions[s_ubActivePos].sOptUb.pVar + bDelta;
-		if(wNewVal < 0 || wNewVal > s_pOptions[s_ubActivePos].sOptUb.ubMax) {
-			if(s_pOptions[s_ubActivePos].sOptUb.isCyclic) {
-				wNewVal = wNewVal < 0 ? s_pOptions[s_ubActivePos].sOptUb.ubMax : 0;
-			}
-			else {
-				return 0; // Out of bounds on non-cyclic option
-			}
-		}
-		*s_pOptions[s_ubActivePos].sOptUb.pVar = wNewVal;
-		s_pOptions[s_ubActivePos].isDirty = 1;
-		return 1;
-	}
-	return 0;
-}
-
-static UBYTE menuEnter(void) {
-	if(s_pOptions[s_ubActivePos].eOptionType == OPTION_TYPE_CALLBACK) {
-		s_pOptions[s_ubActivePos].sOptCb.cbSelect();
-		return 1;
-	}
-	return 0;
-}
-
-//---------------------------------------------------------------- MENU COMP END
-
-tPtplayerSfx *s_pSfxAtari;
+static tPtplayerSfx *s_pSfxAtari;
 
 static UBYTE s_pKeyHistory[8] = {0};
 static UBYTE s_pKeyKonami[8] = {
@@ -186,36 +64,97 @@ static UBYTE s_pKeyKonami[8] = {
 static tMenuState s_eMenuState;
 static tBitMap *s_pLogo;
 static UWORD s_uwOffsY;
+static UBYTE s_isScoreShowAfterRollIn;
+static UBYTE s_ubIndexAtari;
+
+//------------------------------------------------------------------ PUBLIC VARS
+
+char **g_pMenuCaptions;
+char **g_pMenuEnumP1;
+char **g_pMenuEnumP2;
+char **g_pMenuEnumOnOff;
+char **g_pMenuEnumPlayerCount;
+char **	g_pMenuEnumVolume;
+tPtplayerMod *g_pMenuMod;
 
 static void menuEnableAtari(void) {
-	UBYTE isAtariHidden = s_pOptions[5].isHidden;
-	if(isAtariHidden) {
-		menuSetHidden(5, 0);
-		ptplayerSfxPlay(s_pSfxAtari, 0, 64, 1);
-		s_pOptions[5].isDirty = 1;
+	if(s_ubIndexAtari != INDEX_ATARI_INVALID && g_sSettings.isAtariHidden) {
+		g_sSettings.isAtariHidden = 0;
+		menuListSetPosHidden(s_ubIndexAtari, 0); // TODO: find option
+		ptplayerSfxPlay(s_pSfxAtari, SFX_CHANNEL_ATARI, 64, 1);
 	}
 }
 
-void onStart(void) {
+static void menuStartGame(UBYTE isChallenge) {
 	commEraseAll();
-	gameStart();
+	gameStart(isChallenge);
 	commHide();
 	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	// copProcessBlocks();
 	s_eMenuState = MENU_STATE_ROLL_OUT;
 }
 
-void onShowScores(void) {
+static void menuLoadGame(const char *szSavePath) {
+	commEraseAll();
+	gameStart(1); // challenge loading is faster due to less terrain prep
+
+	systemUse();
+	tFile *pSave = fileOpen(szSavePath, "rb");
+	if(pSave) {
+		if(!gameLoad(pSave)) {
+			logWrite("ERR: Failed to load game\n");
+		}
+		fileClose(pSave);
+	}
+	else {
+		logWrite("ERR: Save file not found\n");
+	}
+	systemUnuse();
+
+	commHide();
+	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
+	// copProcessBlocks();
+	s_eMenuState = MENU_STATE_ROLL_OUT;
+}
+
+static void menuOnStoryStart(void) {
+	menuStartGame(0);
+}
+
+static void menuOnStoryLoad(void) {
+	menuLoadGame("save_story.dat");
+}
+
+static void menuOnShowScores(void) {
 	commEraseAll();
 	hiScoreSetup(0, 0);
 	statePush(g_pGameStateManager, &s_sStateMenuScore);
 }
 
-void onExit(void) {
+static void menuOnExit(void) {
 	statePopAll(g_pGameStateManager);
 }
 
-void menuInitialDraw(tBitMap *pDisplayBuffer) {
+static void onMenuPosUndraw(
+	UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight
+) {
+	commErase(uwX + (COMM_DISPLAY_WIDTH - uwWidth) / 2, uwY, uwWidth, uwHeight);
+}
+
+static void onMenuPosDraw(
+	UWORD uwX, UWORD uwY, UNUSED_ARG const char *szCaption, const char *szText,
+	UBYTE isActive, UWORD *pUndrawWidth
+) {
+	commDrawText(
+		uwX  + COMM_DISPLAY_WIDTH / 2, uwY,
+		szText, FONT_SHADOW | FONT_COOKIE | FONT_HCENTER,
+		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
+	);
+	*pUndrawWidth = fontMeasureText(g_pFont, szText).uwX;
+}
+
+static void menuRedraw(void) {
+	tBitMap *pDisplayBuffer = commGetDisplayBuffer();
 	commEraseAll();
 	UWORD uwLogoWidth = bitmapGetByteWidth(s_pLogo)*8;
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
@@ -225,29 +164,315 @@ void menuInitialDraw(tBitMap *pDisplayBuffer) {
 		uwLogoWidth, s_pLogo->Rows, MINTERM_COOKIE
 	);
 
-	const char szVersion[15] = "v." AMINER_VERSION;
+	menuListInit(
+		s_pMenuOptions, s_ubMenuOptionCount, g_pFont,
+		0, s_pLogo->Rows + 10, // commrade-relative
+		onMenuPosUndraw, onMenuPosDraw
+	);
+}
+
+static void menuOnEnterStory(void) {
+	s_ubMenuOptionCount = 0;
+	s_ubIndexAtari = INDEX_ATARI_INVALID;
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnStoryStart}
+	};
+
+	if(fileExists("save_story.dat")) {
+		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
+			.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+			.isHidden = 0,
+			.sOptCb = {.cbSelect = menuOnStoryLoad}
+		};
+	}
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_PLAYER_COUNT],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = 0,
+		.sOptUb = {
+			.pVar = &g_is2pPlaying,
+			.ubMax = 1,
+			.isCyclic = 0,
+			.pEnumLabels = (const char **)g_pMenuEnumPlayerCount
+		}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_BACK],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnBackToMain}
+	};
+
+	menuRedraw();
+}
+
+static void menuOnEnterFree(void) {
+	s_ubMenuOptionCount = 0;
+	s_ubIndexAtari = INDEX_ATARI_INVALID;
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnFreeStart}
+	};
+
+	if(fileExists("save_free.dat")) {
+		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
+			.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+			.isHidden = 0,
+			.sOptCb = {.cbSelect = menuOnFreeLoad}
+		};
+	}
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_PLAYER_COUNT],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = 0,
+		.sOptUb = {
+			.pVar = &g_is2pPlaying,
+			.ubMax = 1,
+			.isCyclic = 0,
+			.pEnumLabels = (const char **)g_pMenuEnumPlayerCount
+		}
+	};
+	s_ubIndexAtari = s_ubMenuOptionCount;
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_ATARI_MODE],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = g_sSettings.isAtariHidden,
+		.sOptUb = {
+			.pVar = &g_isAtari,
+			.ubMax = 1,
+			.isCyclic = 0,
+			.pEnumLabels = (const char **)g_pMenuEnumOnOff
+		}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_BACK],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnBackToMain}
+	};
+
+	menuRedraw();
+}
+
+static void menuOnEnterChallenge(void) {
+	s_ubMenuOptionCount = 0;
+	s_ubIndexAtari = INDEX_ATARI_INVALID;
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnChallengeStart}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_PLAYER_COUNT],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = 0,
+		.sOptUb = {
+			.pVar = &g_is2pPlaying,
+			.ubMax = 1,
+			.isCyclic = 0,
+			.pEnumLabels = (const char **)g_pMenuEnumPlayerCount
+		}
+	};
+	s_ubIndexAtari = s_ubMenuOptionCount;
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_ATARI_MODE],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = g_sSettings.isAtariHidden,
+		.sOptUb = {
+			.pVar = &g_isAtari,
+			.ubMax = 1,
+			.isCyclic = 0,
+			.pEnumLabels = (const char **)g_pMenuEnumOnOff
+		}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_HI_SCORES],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnShowScores}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_BACK],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnBackToMain}
+	};
+
+	menuRedraw();
+}
+
+static void menuOnEnterSettings(void) {
+	s_ubMenuOptionCount = 0;
+	s_ubIndexAtari = INDEX_ATARI_INVALID;
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_VOLUME_SOUND],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = 0,
+		.sOptUb = {
+			.pVar = &g_sSettings.ubSoundVolume,
+			.ubMax = 10,
+			.isCyclic = 0,
+			.pEnumLabels = (const char **)g_pMenuEnumVolume
+		}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_VOLUME_MUSIC],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = 0,
+		.sOptUb = {
+			.pVar = &g_sSettings.ubMusicVolume,
+			.ubMax = 10,
+			.isCyclic = 0,
+			.pEnumLabels = (const char **)g_pMenuEnumVolume
+		}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_STEER_P1],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = 0,
+		.sOptUb = {
+			.pVar = &g_sSettings.is1pKbd,
+			.ubMax = 1,
+			.isCyclic = 1,
+			.pEnumLabels = (const char **)g_pMenuEnumP1
+		}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_STEER_P2],
+		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+		.isHidden = 0,
+		.sOptUb = {
+			.pVar = &g_sSettings.is2pKbd,
+			.ubMax = 1,
+			.isCyclic = 1,
+			.pEnumLabels = (const char **)g_pMenuEnumP2
+		}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_BACK],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnBackToMainFromSettings}
+	};
+
+	menuRedraw();
+}
+
+static void menuOnEnterMain(void) {
+	s_ubMenuOptionCount = 0;
+	s_ubIndexAtari = INDEX_ATARI_INVALID;
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_STORY],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnEnterStory}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_FREE],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnEnterFree}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_CHALLENGE],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnEnterChallenge}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_SETTINGS],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnEnterSettings}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_CREDITS],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnEnterCredits}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_EXIT],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnExit}
+	};
+
+	menuRedraw();
+
+	static const char szVersion[15] = "v." GAME_VERSION;
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szVersion,
 		FONT_LAZY | FONT_HCENTER | FONT_COOKIE | FONT_SHADOW | FONT_BOTTOM,
 		COMM_DISPLAY_COLOR_TEXT
 	);
+}
+
+static void menuOnBackToMain(void) {
+	menuOnEnterMain();
+}
+
+static void menuOnBackToMainFromSettings(void) {
+	// TODO: save settings
+	menuOnEnterMain();
+}
+
+static void menuOnFreeStart(void) {
+	logWrite("TODO: implement menuOnFreeStart");
+}
+
+static void menuOnFreeLoad(void) {
+	menuLoadGame("save_free.dat");
+}
+
+static void menuOnChallengeStart(void) {
+	menuStartGame(1);
+}
+
+static void menuOnEnterCredits(void) {
+	logWrite("TODO: implement menuOnEnterCredits");
+}
+
+static void menuInitialDraw(void) {
 	memset(s_pKeyHistory, 0, 8);
-	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
-		s_pOptions[ubMenuPos].isDirty = 1;
-	}
-}
-
-void menuPreload(void) {
-	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
-	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx");
-}
-
-void menuUnload(void) {
-	bitmapDestroy(s_pLogo);
-	ptplayerSfxDestroy(s_pSfxAtari);
+	menuOnEnterMain();
 }
 
 static void menuGsCreate(void) {
+	ptplayerLoadMod(g_pMenuMod, g_pModSampleData, 0);
+	ptplayerEnableMusic(1);
+	ptplayerConfigureSongRepeat(0, 0);
 	s_eMenuState = MENU_STATE_ROLL_IN;
 	hudShowMain();
 }
@@ -256,32 +481,27 @@ static void menuProcessSelecting(void) {
 	commProcess();
 	hudUpdate();
 
-	for(UBYTE ubMenuPos = 0; ubMenuPos < MENU_POS_COUNT; ++ubMenuPos) {
-		if(!s_pOptions[ubMenuPos].isHidden && s_pOptions[ubMenuPos].isDirty) {
-			menuDrawPos(ubMenuPos, s_pLogo->Rows + 10);
-			s_pOptions[ubMenuPos].isDirty = 0;
-		}
-	}
+	menuListDraw();
 
 	UBYTE ubNewKey = 0;
 	if(commNavUse(COMM_NAV_UP)) {
 		ubNewKey = KEY_UP;
-		menuNavigate(-1);
+		menuListNavigate(-1);
 	}
 	else if(commNavUse(COMM_NAV_DOWN)) {
 		ubNewKey = KEY_DOWN;
-		menuNavigate(+1);
+		menuListNavigate(+1);
 	}
 	else if(commNavUse(COMM_NAV_LEFT)) {
 		ubNewKey = KEY_LEFT;
-		menuToggle(-1);
+		menuListToggle(-1);
 	}
 	else if(commNavUse(COMM_NAV_RIGHT)) {
 		ubNewKey = KEY_RIGHT;
-		menuToggle(+1);
+		menuListToggle(+1);
 	}
 	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		menuEnter();
+		menuListEnter();
 	}
 
 	if(ubNewKey) {
@@ -314,7 +534,6 @@ static void menuProcessRollIn(void) {
 	}
 	else {
 		s_eMenuState = MENU_STATE_SELECTING;
-		s_ubActivePos = 0;
 		s_uwOffsY = 16 + s_pLogo->Rows + 30;
 
 		if(!commTryShow()) {
@@ -324,7 +543,7 @@ static void menuProcessRollIn(void) {
 			statePush(g_pGameStateManager, &s_sStateMenuScore);
 		}
 		else {
-			menuInitialDraw(g_pMainBuffer->pScroll->pBack);
+			menuInitialDraw(); // g_pMainBuffer->pScroll->pBack
 		}
 	}
 
@@ -385,7 +604,19 @@ static void menuScoreGsLoop(void) {
 }
 
 static void menuScoreGsDestroy(void) {
-	menuInitialDraw(g_pMainBuffer->pScroll->pFront);
+	menuInitialDraw(); // g_pMainBuffer->pScroll->pFront
+}
+
+//------------------------------------------------------------------- PUBLIC FNS
+
+void menuPreload(void) {
+	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
+	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx");
+}
+
+void menuUnload(void) {
+	bitmapDestroy(s_pLogo);
+	ptplayerSfxDestroy(s_pSfxAtari);
 }
 
 void menuGsEnter(UBYTE isScoreShow) {
@@ -398,9 +629,13 @@ void menuGsEnter(UBYTE isScoreShow) {
 }
 
 tState g_sStateMenu = {
-	.cbCreate = menuGsCreate, .cbLoop = menuGsLoop, .cbDestroy = menuGsDestroy
+	.cbCreate = menuGsCreate,
+	.cbLoop = menuGsLoop,
+	.cbDestroy = menuGsDestroy
 };
 
 static tState s_sStateMenuScore = {
-	.cbCreate = menuScoreGsCreate, .cbLoop = menuScoreGsLoop, .cbDestroy = menuScoreGsDestroy
+	.cbCreate = menuScoreGsCreate,
+	.cbLoop = menuScoreGsLoop,
+	.cbDestroy = menuScoreGsDestroy
 };

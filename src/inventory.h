@@ -6,6 +6,7 @@
 #define _INVENTORY_H_
 
 #include <ace/types.h>
+#include <ace/utils/file.h>
 
 typedef enum _tPartName {
 	INVENTORY_PART_DRILL,
@@ -40,6 +41,10 @@ typedef struct _tInventory {
 } tInventory;
 
 void inventoryReset(void);
+
+void inventorySave(tFile *pFile);
+
+UBYTE inventoryLoad(tFile *pFile);
 
 const tItem *inventoryGetItemDef(tItemName eName);
 

@@ -117,7 +117,6 @@ void hiScoreDrawAll(void) {
 }
 
 void hiScoreEnteringProcess(void) {
-	commProcess();
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(s_ubNewNameLength) {
 			hiScoreSave();

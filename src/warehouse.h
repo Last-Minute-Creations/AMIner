@@ -5,54 +5,35 @@
 #ifndef _WAREHOUSE_H_
 #define _WAREHOUSE_H_
 
-#include <ace/types.h>
-#include "mineral.h"
+#include <ace/utils/file.h>
+#include "plan.h"
 
-typedef struct _tPlanMineral {
-	UWORD uwTargetCount;
-	UWORD uwCurrentCount;
-} tPlanMineral;
-
-typedef struct _tPlan {
-	tPlanMineral pMinerals[MINERAL_TYPE_COUNT];
-	ULONG ulMineralsUnlocked; ///< Acts as bitfield
-	ULONG ulTargetSum;
-	WORD wTimeMax;
-	WORD wTimeRemaining;
-	UBYTE isExtendedTime;
-	UBYTE isPenaltyCountdownStarted;
-} tPlan;
-
-const tPlan *warehouseGetPlan(void);
+typedef enum tNextPlanReason {
+	NEXT_PLAN_REASON_FULFILLED,
+	NEXT_PLAN_REASON_FULFILLED_ACCOUNTING,
+	NEXT_PLAN_REASON_FAILED,
+} tNextPlanReason;
 
 void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount);
-
-UBYTE warehouseIsPlanFulfilled(void);
-
-/**
- * @brief Tries to fulfill plan using minerals from non-spent stock.
- * If successful, it will remove used minerals from stock.
- *
- * @return 1 On success, otherwise 0.
- */
-UBYTE warehouseTryFulfillPlan(void);
-
-void warehouseNewPlan(UBYTE isBigger, UBYTE is2pPlaying);
 
 UWORD warehouseGetStock(UBYTE ubMineralType);
 
 void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount);
 
-void warehouseReset(UBYTE is2pPlaying);
+void warehouseReset(void);
 
-void warehouseElapseTime(UBYTE ubTime);
+void warehouseSave(tFile *pFile);
 
-void warehousePlanUnlockMineral(tMineralType eMineral);
+UBYTE warehouseLoad(tFile *pFile);
 
-WORD warehouseGetRemainingDays(const tPlan *pPlan);
+//------------------------------------------------------------------------- PLAN
 
-void warehouseAddDaysToPlan(UBYTE ubDays, UBYTE isBribe);
+tPlan *warehouseGetCurrentPlan(void);
 
-UWORD warehouseGetPlanRemainingCost(const tPlan *pPlan);
+void warehouseNextPlan(tNextPlanReason eReason);
+
+void warehouseRerollPlan(void);
+
+UWORD planGetRemainingCost(const tPlan *pPlan);
 
 #endif // _WAREHOUSE_H_

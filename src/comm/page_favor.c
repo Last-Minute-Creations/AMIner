@@ -6,8 +6,10 @@
 #include <comm/base.h>
 #include <comm/button.h>
 #include <comm/page_office.h>
+#include <comm/gs_shop.h>
 #include "../game.h"
 #include "../warehouse.h"
+#include "../save.h"
 
 static UBYTE s_ubFavorsLeft;
 
@@ -30,14 +32,14 @@ static void pageFavorProcess(void) {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(bButtonCurr == 0) {
 				--s_ubFavorsLeft;
-				warehouseNewPlan(0, g_is2pPlaying);
+				warehouseRerollPlan();
 			}
-			pageOfficeCreate();
+			commShopGoBack();
 		}
 	}
 	else {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			pageOfficeCreate();
+			commShopGoBack();
 		}
 	}
 }
@@ -46,9 +48,15 @@ void pageFavorCreate(void) {
 	commRegisterPage(pageFavorProcess, 0);
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
-	WORD wDays = warehouseGetRemainingDays(warehouseGetPlan());
-	if(s_ubFavorsLeft > 0 && wDays >= 25) {
-
+	tPlan *pPlan = warehouseGetCurrentPlan();
+	WORD wDays = planGetRemainingDays(pPlan);
+	if (!pPlan->isActive) {
+		uwPosY += commDrawMultilineText(
+			"You have no active plan! What do you want me to do?", 0, uwPosY
+		) * ubLineHeight;
+		buttonInitOk("Back");
+	}
+	else if(s_ubFavorsLeft > 0 && wDays >= 15) {
 		uwPosY += commDrawMultilineText(
 			"I like working with you Comrade, I really do."
 			" I heard that current plan is tough for you. If you want,"
@@ -63,14 +71,28 @@ void pageFavorCreate(void) {
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 		buttonInitAcceptDecline("Accept", "Decline");
-		buttonDrawAll(commGetDisplayBuffer());
 	}
 	else {
 		uwPosY += commDrawMultilineText("You ask me for too much, Comrade. Do some real work, will you?", 0, uwPosY) * ubLineHeight;
 		buttonInitOk("Back");
 	}
+
+	buttonDrawAll(commGetDisplayBuffer());
 }
 
 void pageFavorReset(void) {
 	s_ubFavorsLeft = 10;
+}
+
+void pageFavorSave(tFile *pFile) {
+	saveWriteHeader(pFile, "FAVR");
+	fileWrite(pFile, &s_ubFavorsLeft, sizeof(s_ubFavorsLeft));
+}
+
+UBYTE pageFavorLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "FAVR")) {
+		return 0;
+	}
+	fileRead(pFile, &s_ubFavorsLeft, sizeof(s_ubFavorsLeft));
+	return 1;
 }

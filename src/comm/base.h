@@ -6,6 +6,7 @@
 #define _AMINER_COMM_BASE_H_
 
 #include <ace/utils/font.h>
+#include "face_id.h"
 
 #define COMM_WIDTH (320-64)
 #define COMM_HEIGHT (192)
@@ -38,12 +39,16 @@ typedef enum _tCommNavEx {
 	COMM_NAV_EX_COUNT
 } tCommNavEx;
 
-typedef enum _tCommLed {
-	COMM_LED_OFFICE,
-	COMM_LED_WORKSHOP,
-	COMM_LED_WAREHOUSE,
-	COMM_LED_COUNT
-} tCommLed;
+/**
+ * @brief Tabs in Commrade interface.
+ * Must be same order as MSG_TUTORIAL_DESCRIPTION_TAB_* enum!
+ */
+typedef enum _tCommTab {
+	COMM_TAB_OFFICE,
+	COMM_TAB_WORKSHOP,
+	COMM_TAB_WAREHOUSE,
+	COMM_TAB_COUNT
+} tCommTab;
 
 typedef enum _tBtnState {
 	BTN_STATE_NACTIVE = 0,
@@ -61,6 +66,8 @@ UBYTE commTryShow(void);
 
 void commHide(void);
 
+UBYTE commIsShown(void);
+
 tBtnState commNavCheck(tCommNav eNav);
 
 UBYTE commNavUse(tCommNav eNav);
@@ -73,7 +80,7 @@ tUwCoordYX commGetOrigin(void);
 
 tUwCoordYX commGetOriginDisplay(void);
 
-void commSetActiveLed(tCommLed eLed);
+void commSetActiveLed(tCommTab eLed);
 
 void commDrawText(
 	UWORD uwX, UWORD uwY, const char *szText, UBYTE ubFontFlags, UBYTE ubColor
@@ -88,6 +95,10 @@ void commDrawText(
  * @return Number of lines written.
  */
 UBYTE commDrawMultilineText(const char *szText, UWORD uwStartX, UWORD uwStartY);
+
+void commDrawTitle(UWORD uwX, UWORD uwY, const char *szTitle);
+
+void commDrawFaceAt(tFaceId eFace, UWORD uwX, UWORD uwY);
 
 void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight);
 

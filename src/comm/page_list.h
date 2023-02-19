@@ -6,8 +6,9 @@
 #define _AMINER_COMM_PAGE_LIST_H_
 
 #include <ace/types.h>
-#include "page_office.h"
+#include "comm/page_office.h"
+#include "comm/base.h"
 
-void pageListCreate(const tOfficePage *pPages);
+void pageListCreate(tFaceId eFace);
 
 #endif // _AMINER_COMM_PAGE_LIST_H_

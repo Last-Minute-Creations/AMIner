@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.14.0)
 project(aminer)
 
 if(NOT AMIGA)
@@ -9,32 +9,35 @@ set(CMAKE_C_STANDARD 11)
 
 # ACE
 add_subdirectory(deps/ace ace)
-file(GLOB_RECURSE AMINER_src src/*.c src/*.h)
+file(GLOB_RECURSE GAME_src src/*.c src/*.h)
 
+set(GAME_EXECUTABLE_STEM Aminer)
 if(ELF2HUNK)
-set(AMINER_EXECUTABLE Aminer.elf)
-set(AMINER_OUTPUT_EXECUTABLE Aminer.exe)
-add_executable(${AMINER_EXECUTABLE} ${AMINER_src})
-target_link_libraries(${AMINER_EXECUTABLE} -Wl,-Map=Aminer.map)
-add_custom_command(
-	TARGET ${AMINER_EXECUTABLE} POST_BUILD
-	COMMAND ${ELF2HUNK} ${AMINER_EXECUTABLE} ${AMINER_OUTPUT_EXECUTABLE}
-)
-add_custom_command(
-	TARGET ${AMINER_EXECUTABLE} POST_BUILD
-	COMMAND ${OBJDUMP} --disassemble -S ${AMINER_EXECUTABLE} > Aminer.s
-)
+	set(GAME_EXECUTABLE ${GAME_EXECUTABLE_STEM}.elf)
+	set(GAME_OUTPUT_EXECUTABLE ${GAME_EXECUTABLE_STEM}.exe)
+	add_executable(${GAME_EXECUTABLE} ${GAME_src})
+	target_link_options(${GAME_EXECUTABLE} PUBLIC -Wno-attributes)
+	target_link_libraries(${GAME_EXECUTABLE} -Wl,-Map=${GAME_EXECUTABLE_STEM}.map)
+	add_custom_command(
+		TARGET ${GAME_EXECUTABLE} POST_BUILD
+		COMMAND ${ELF2HUNK} ${GAME_EXECUTABLE} ${GAME_OUTPUT_EXECUTABLE}
+	)
+	add_custom_command(
+		TARGET ${GAME_EXECUTABLE} POST_BUILD
+		COMMAND ${OBJDUMP} --disassemble -S ${GAME_EXECUTABLE} > ${GAME_EXECUTABLE_STEM}.s
+	)
 else()
-	SET(AMINER_EXECUTABLE Aminer)
-	SET(AMINER_OUTPUT_EXECUTABLE Aminer)
-	add_executable(${AMINER_EXECUTABLE} ${AMINER_src})
+	SET(GAME_EXECUTABLE ${GAME_EXECUTABLE_STEM})
+	SET(GAME_OUTPUT_EXECUTABLE ${GAME_EXECUTABLE_STEM})
+	add_executable(${GAME_EXECUTABLE} ${GAME_src})
 endif()
 
-target_include_directories(${AMINER_EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/src)
-target_compile_options(${AMINER_EXECUTABLE} PUBLIC -Wall -Wextra -Wimplicit-fallthrough=2)
-target_link_libraries(${AMINER_EXECUTABLE} ace)
+target_include_directories(${GAME_EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_compile_options(${GAME_EXECUTABLE} PUBLIC -Wall -Wextra -Wimplicit-fallthrough=2)
+target_compile_options(${GAME_EXECUTABLE} PRIVATE -Werror -Wno-error=unused-parameter -Wimplicit-fallthrough=2)
+target_link_libraries(${GAME_EXECUTABLE} ace)
 if(GAME_DEBUG)
-  target_compile_definitions(${AMINER_EXECUTABLE} PRIVATE GAME_DEBUG)
+  target_compile_definitions(${GAME_EXECUTABLE} PRIVATE GAME_DEBUG)
 	target_compile_definitions(ace PUBLIC ACE_DEBUG_UAE)
 endif()
 
@@ -48,10 +51,10 @@ file(MAKE_DIRECTORY ${GEN_DIR})
 # Copy already processed files
 file(GLOB COPY_FILES ${RES_DIR}/copied/*)
 file(COPY ${COPY_FILES} DESTINATION ${DATA_DIR})
-set(AMINER_INFO_DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${AMINER_OUTPUT_EXECUTABLE}.info")
+set(GAME_INFO_DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${GAME_OUTPUT_EXECUTABLE}.info")
 add_custom_command(
-	TARGET ${AMINER_EXECUTABLE} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy ${RES_DIR}/aminer.info ${AMINER_INFO_DESTINATION}
+	TARGET ${GAME_EXECUTABLE} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy ${RES_DIR}/aminer.info ${GAME_INFO_DESTINATION}
 )
 
 # Palette
@@ -60,15 +63,15 @@ file(GLOB palette_aminer_gpl ${RES_DIR}/palettes/aminer.gpl)
 file(GLOB palette_lmc_gpl ${RES_DIR}/palettes/lmc.gpl)
 set(palette_aminer "${DATA_DIR}/aminer.plt")
 set(palette_lmc "${DATA_DIR}/lmc.plt")
-convertPalette(${AMINER_EXECUTABLE} ${palette_aminer_gpl} ${palette_aminer})
-convertPalette(${AMINER_EXECUTABLE} ${palette_lmc_gpl} ${palette_lmc})
+convertPalette(${GAME_EXECUTABLE} ${palette_aminer_gpl} ${palette_aminer})
+convertPalette(${GAME_EXECUTABLE} ${palette_lmc_gpl} ${palette_lmc})
 set(transparency_hex "#993399")
 
 #-------------------------------------------------------------------------- BODY
 file(MAKE_DIRECTORY ${GEN_DIR}/drill)
 file(MAKE_DIRECTORY ${GEN_DIR}/drill_2)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_DRILL_P1"
 	DESTINATIONS
 	${GEN_DIR}/drill/0.png 0 76 32 20
@@ -82,12 +85,12 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 )
 
 convertTileset(
-	TARGET ${AMINER_EXECUTABLE} SIZE 32 HEIGHT 20
+	TARGET ${GAME_EXECUTABLE} SIZE 32 HEIGHT 20
 	SOURCE ${GEN_DIR}/drill DESTINATION ${GEN_DIR}/drill.png
 	TILE_PATHS ${FRAMES_DRILL_P1}
 )
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_DRILL_P2"
 	DESTINATIONS
 	${GEN_DIR}/drill_2/0.png 0 236 32 20
@@ -101,7 +104,7 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 )
 
 convertTileset(
-	TARGET ${AMINER_EXECUTABLE} SIZE 32 HEIGHT 20
+	TARGET ${GAME_EXECUTABLE} SIZE 32 HEIGHT 20
 	SOURCE ${GEN_DIR}/drill_2 DESTINATION ${GEN_DIR}/drill_2.png
 	TILE_PATHS ${FRAMES_DRILL_P2}
 )
@@ -111,7 +114,7 @@ convertTileset(
 file(MAKE_DIRECTORY ${GEN_DIR}/wreck)
 file(MAKE_DIRECTORY ${GEN_DIR}/wreck_2)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_WRECK_P1"
 	DESTINATIONS
 		${GEN_DIR}/wreck/0.png 0 109 48 21
@@ -119,12 +122,12 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 )
 
 convertTileset(
-	TARGET ${AMINER_EXECUTABLE} SIZE 48 HEIGHT 21
+	TARGET ${GAME_EXECUTABLE} SIZE 48 HEIGHT 21
 	SOURCE ${GEN_DIR}/wreck DESTINATION ${GEN_DIR}/wreck.png
 	TILE_PATHS ${FRAMES_WRECK_P1}
 )
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_WRECK_P2"
 	DESTINATIONS
 		${GEN_DIR}/wreck_2/0.png 0 269 48 21
@@ -132,7 +135,7 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 )
 
 convertTileset(
-	TARGET ${AMINER_EXECUTABLE} SIZE 48 HEIGHT 21
+	TARGET ${GAME_EXECUTABLE} SIZE 48 HEIGHT 21
 	SOURCE ${GEN_DIR}/wreck_2 DESTINATION ${GEN_DIR}/wreck_2.png
 	TILE_PATHS ${FRAMES_WRECK_P2}
 )
@@ -141,7 +144,7 @@ convertTileset(
 file(MAKE_DIRECTORY ${GEN_DIR}/tool)
 file(MAKE_DIRECTORY ${GEN_DIR}/tool_2)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_TOOL_P1"
 	DESTINATIONS
 		# right
@@ -165,12 +168,12 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 )
 
 convertTileset(
-	TARGET ${AMINER_EXECUTABLE} SIZE 16
+	TARGET ${GAME_EXECUTABLE} SIZE 16
 	SOURCE ${GEN_DIR}/tool DESTINATION ${GEN_DIR}/tool.png
 	TILE_PATHS ${FRAMES_TOOL_P1}
 )
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_TOOL_P2"
 	DESTINATIONS
 		# right
@@ -194,7 +197,7 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 )
 
 convertTileset(
-	TARGET ${AMINER_EXECUTABLE} SIZE 16
+	TARGET ${GAME_EXECUTABLE} SIZE 16
 	SOURCE ${GEN_DIR}/tool_2 DESTINATION ${GEN_DIR}/tool_2.png
 	TILE_PATHS ${FRAMES_TOOL_P2}
 )
@@ -202,7 +205,7 @@ convertTileset(
 #------------------------------------------------------------------------- TRACK
 file(MAKE_DIRECTORY ${GEN_DIR}/track)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 	GENERATED_FILE_LIST "FRAMES_TRACK"
 	DESTINATIONS
 		# right
@@ -216,14 +219,14 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/krtk.png
 )
 
 convertTileset(
-	TARGET ${AMINER_EXECUTABLE} VARIABLE_HEIGHT SIZE 32
+	TARGET ${GAME_EXECUTABLE} VARIABLE_HEIGHT SIZE 32
 	SOURCE ${GEN_DIR}/track DESTINATION ${GEN_DIR}/track.png
 	TILE_PATHS ${FRAMES_TRACK}
 )
 
 #------------------------------------------------------------------------- BONES
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
 	DESTINATIONS
 		${GEN_DIR}/bones.png 0 384 80 265
 )
@@ -238,24 +241,24 @@ include("checkpoint.cmake")
 #-------------------------------------------------------- CONVERT TO ACE FORMATS
 
 convertBitmaps(
-	TARGET ${AMINER_EXECUTABLE} PALETTE ${palette_aminer_unique}
+	TARGET ${GAME_EXECUTABLE} PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCES
-		${RES_DIR}/commrade/bg.png ${RES_DIR}/commrade/buttons.png ${RES_DIR}/commrade/faces.png
+		${RES_DIR}/commrade/bg.png ${RES_DIR}/commrade/buttons.png ${RES_DIR}/commrade/faces_hud.png
 		${RES_DIR}/hud/hud.png ${RES_DIR}/hud/mode_icons.png ${RES_DIR}/logo.png ${RES_DIR}/lang_select.png
-		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png
+		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png ${RES_DIR}/commrade/news.png
 	DESTINATIONS
 		${DATA_DIR}/comm_bg.bm ${DATA_DIR}/comm_buttons.bm ${DATA_DIR}/comm_faces.bm
 		${DATA_DIR}/hud.bm ${DATA_DIR}/mode_icons.bm ${DATA_DIR}/logo.bm ${DATA_DIR}/lang_select.bm
-		${DATA_DIR}/comm_faces_office.bm ${DATA_DIR}/comm_office_selection.bm
+		${DATA_DIR}/comm_faces_office.bm ${DATA_DIR}/comm_office_selection.bm ${DATA_DIR}/comm_news.bm
 )
 
 convertBitmaps(
-	TARGET ${AMINER_EXECUTABLE} PALETTE ${palette_lmc}
+	TARGET ${GAME_EXECUTABLE} PALETTE ${palette_lmc}
 	INTERLEAVED SOURCES ${RES_DIR}/lmc.png DESTINATIONS ${DATA_DIR}/lmc.bm
 )
 
 convertBitmaps(
-	TARGET ${AMINER_EXECUTABLE} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
+	TARGET ${GAME_EXECUTABLE} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_hex}
 	INTERLEAVED SOURCES
 		${GEN_DIR}/drill.png ${GEN_DIR}/tool.png ${GEN_DIR}/wreck.png
 		${GEN_DIR}/drill_2.png ${GEN_DIR}/tool_2.png ${GEN_DIR}/wreck_2.png
@@ -277,7 +280,7 @@ convertBitmaps(
 )
 
 convertFont(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	SOURCE ${RES_DIR}/uni54 DESTINATION ${DATA_DIR}/uni54.fnt
 )
 
@@ -285,79 +288,79 @@ convertFont(
 file(MAKE_DIRECTORY ${DATA_DIR}/sfx)
 
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/atari.wav
 	DESTINATION ${DATA_DIR}/sfx/atari.sfx
 )
 
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/drill1.wav
 	DESTINATION ${DATA_DIR}/sfx/drill1.sfx
 )
 
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/ore2.wav
 	DESTINATION ${DATA_DIR}/sfx/ore2.sfx
 )
 
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/penalty.wav
 	DESTINATION ${DATA_DIR}/sfx/penalty.sfx
 )
 
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/explosion.wav
 	DESTINATION ${DATA_DIR}/sfx/explosion.sfx
 )
 
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/teleport.wav
 	DESTINATION ${DATA_DIR}/sfx/teleport.sfx
 )
 
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/key_press_0.wav
 	DESTINATION ${DATA_DIR}/sfx/key_press_0.sfx
 )
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/key_press_1.wav
 	DESTINATION ${DATA_DIR}/sfx/key_press_1.sfx
 )
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/key_press_2.wav
 	DESTINATION ${DATA_DIR}/sfx/key_press_2.sfx
 )
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/key_press_3.wav
 	DESTINATION ${DATA_DIR}/sfx/key_press_3.sfx
 )
 
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/key_release_0.wav
 	DESTINATION ${DATA_DIR}/sfx/key_release_0.sfx
 )
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/key_release_1.wav
 	DESTINATION ${DATA_DIR}/sfx/key_release_1.sfx
 )
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/key_release_2.wav
 	DESTINATION ${DATA_DIR}/sfx/key_release_2.sfx
 )
 convertAudio(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/key_release_3.wav
 	DESTINATION ${DATA_DIR}/sfx/key_release_3.sfx
 )
@@ -366,7 +369,7 @@ convertAudio(
 file(MAKE_DIRECTORY ${DATA_DIR}/music)
 
 mergeMods(
-	TARGET ${AMINER_EXECUTABLE}
+	TARGET ${GAME_EXECUTABLE}
 	SOURCES
 		${RES_DIR}/music/czolowka.mod
 		${RES_DIR}/music/coal-prelude.mod
@@ -381,16 +384,16 @@ mergeMods(
 		${RES_DIR}/music/zima.mod
 	DESTINATIONS
 		${DATA_DIR}/music/menu.mod
-		${DATA_DIR}/music/music0.mod
-		${DATA_DIR}/music/music1.mod
-		${DATA_DIR}/music/music2.mod
-		${DATA_DIR}/music/music3.mod
-		${DATA_DIR}/music/music4.mod
-		${DATA_DIR}/music/music5.mod
-		${DATA_DIR}/music/music6.mod
-		${DATA_DIR}/music/music7.mod
-		${DATA_DIR}/music/music8.mod
-		${DATA_DIR}/music/music9.mod
+		${DATA_DIR}/music/game0.mod
+		${DATA_DIR}/music/game1.mod
+		${DATA_DIR}/music/game2.mod
+		${DATA_DIR}/music/game3.mod
+		${DATA_DIR}/music/game4.mod
+		${DATA_DIR}/music/game5.mod
+		${DATA_DIR}/music/game6.mod
+		${DATA_DIR}/music/game7.mod
+		${DATA_DIR}/music/game8.mod
+		${DATA_DIR}/music/game9.mod
 	SAMPLE_PACK ${DATA_DIR}/music/samples.samplepack
 )
 
@@ -402,12 +405,28 @@ MATH(EXPR VER_MAJOR "0 + ${YEAR}")
 MATH(EXPR VER_MINOR "0 + ${MONTH}")
 MATH(EXPR VER_FIX "0 + ${DAY}")
 set(VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_FIX}")
-target_compile_definitions(${AMINER_EXECUTABLE} PRIVATE AMINER_VERSION="${VERSION}")
+target_compile_definitions(${GAME_EXECUTABLE} PRIVATE GAME_VERSION="${VERSION}")
 
 # Generating ZIP
-set(AMINER_ZIP_NAME "${CMAKE_PROJECT_NAME}_${VER_MAJOR}_${VER_MINOR}_${VER_FIX}")
+set(GAME_PACKAGE_NAME "${CMAKE_PROJECT_NAME}_${VER_MAJOR}_${VER_MINOR}_${VER_FIX}")
 add_custom_target(generateZip COMMAND
-	${CMAKE_COMMAND} -E tar "cf" "${AMINER_ZIP_NAME}.zip" --format=zip
-	"${CMAKE_CURRENT_BINARY_DIR}/${AMINER_OUTPUT_EXECUTABLE}" "${AMINER_INFO_DESTINATION}" "${DATA_DIR}"
-	COMMENT "Generating ${AMINER_ZIP_NAME}.zip"
+	${CMAKE_COMMAND} -E tar "cf" "${GAME_PACKAGE_NAME}.zip" --format=zip
+	"${CMAKE_CURRENT_BINARY_DIR}/${GAME_OUTPUT_EXECUTABLE}"
+	"${CMAKE_CURRENT_BINARY_DIR}/${GAME_OUTPUT_EXECUTABLE}.info"
+	"${DATA_DIR}"
+	COMMENT "Generating ZIP file ${GAME_PACKAGE_NAME}.zip"
+)
+
+# Generating ADF
+set(ADF_DIR "${CMAKE_CURRENT_BINARY_DIR}/adf")
+add_custom_target(generateAdf
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${ADF_DIR}/s"
+	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${GAME_OUTPUT_EXECUTABLE}" "${ADF_DIR}"
+	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${GAME_OUTPUT_EXECUTABLE}.info" "${ADF_DIR}"
+	COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIR}" "${ADF_DIR}/data"
+	# COMMAND ${CMAKE_COMMAND} -E echo "c:add21k" > "${ADF_DIR}/s/startup-sequence"
+	COMMAND ${CMAKE_COMMAND} -E echo "${GAME_OUTPUT_EXECUTABLE}" > "${ADF_DIR}/s/startup-sequence"
+	COMMAND exe2adf -l ${CMAKE_PROJECT_NAME} -a "${GAME_PACKAGE_NAME}.adf" -d ${ADF_DIR}
+	COMMAND ${CMAKE_COMMAND} -E rm -rf "${ADF_DIR}"
+	COMMENT "Generating ADF file ${GAME_PACKAGE_NAME}.adf"
 )

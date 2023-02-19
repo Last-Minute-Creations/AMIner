@@ -6,7 +6,12 @@
 #define _AMINER_COMM_GS_MSG_H_
 
 #include "aminer.h"
+#include "face_id.h"
 
 extern tState g_sStateMsg;
+
+void gsMsgInit(
+	tFaceId eFace, const char *szMessageFile, const char *szMessageTitle
+);
 
 #endif // _AMINER_COMM_GS_MSG_H_

@@ -1,6 +1,6 @@
-// Load jsmn in non-header mode before json.h loads otherwise
-#define JSMN_STRICT
-#include "jsmn.h"
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "json.h"
 #include <stdlib.h>
@@ -13,17 +13,20 @@
 tJson *jsonCreate(const char *szFilePath) {
 	systemUse();
 	logBlockBegin("jsonCreate(szFilePath: '%s')", szFilePath);
-	tJson *pJson = memAllocFast(sizeof(*pJson));
 
-	// Read whole file to string
-	LONG lFileSize = fileGetSize(szFilePath);
-	pJson->szData = memAllocFast(lFileSize + 1);
+	// Open file and get its size
 	tFile *pFile = fileOpen(szFilePath, "rb");
 	if(!pFile) {
 		logWrite("ERR: File doesn't exist\n");
 		logBlockEnd("jsonCreate()");
+		systemUnuse();
 		return 0;
 	}
+	LONG lFileSize = fileGetSize(szFilePath);
+
+	// Read whole file for json processing
+	tJson *pJson = memAllocFast(sizeof(tJson));
+	pJson->szData = memAllocFast(lFileSize+1);
 	fileRead(pFile, pJson->szData, lFileSize);
 	pJson->szData[lFileSize] = '\0';
 	fileClose(pFile);
@@ -33,23 +36,23 @@ tJson *jsonCreate(const char *szFilePath) {
 	jsmn_init(&sJsonParser);
 
 	// Count tokens & alloc
-	pJson->wTokenCount = jsmn_parse(&sJsonParser, pJson->szData, lFileSize+1, 0, 0);
-	if(pJson->wTokenCount < 0) {
+	pJson->fwTokenCount = jsmn_parse(&sJsonParser, pJson->szData, lFileSize+1, 0, 0);
+	if(pJson->fwTokenCount < 0) {
 		logWrite(
-			"ERR: JSON during token counting: %hu\n", pJson->wTokenCount
+			"ERR: JSON during token counting: %"PRI_FWORD"\n", pJson->fwTokenCount
 		);
 		logBlockEnd("jsonCreate()");
 		return 0;
 	}
-	pJson->pTokens = memAllocFast(pJson->wTokenCount * sizeof(pJson->pTokens[0]));
+	pJson->pTokens = memAllocFast(pJson->fwTokenCount * sizeof(jsmntok_t));
 
 	// Read tokens
 	jsmn_init(&sJsonParser);
-	WORD wResult = jsmn_parse(
-		&sJsonParser, pJson->szData, lFileSize+1, pJson->pTokens, pJson->wTokenCount
+	FWORD fwResult = jsmn_parse(
+		&sJsonParser, pJson->szData, lFileSize+1, pJson->pTokens, pJson->fwTokenCount
 	);
-	if(wResult < 0) {
-		logWrite("ERR: JSON during tokenize: %hu\n", wResult);
+	if(fwResult < 0) {
+		logWrite("ERR: JSON during tokenize: %"PRI_FWORD"\n", fwResult);
 		logBlockEnd("jsonCreate()");
 		return 0;
 	}
@@ -59,11 +62,9 @@ tJson *jsonCreate(const char *szFilePath) {
 }
 
 void jsonDestroy(tJson *pJson) {
-	logBlockBegin("jsonDestroy(pJson: %p)", pJson);
-	memFree(pJson->pTokens, sizeof(pJson->pTokens[0]) * pJson->wTokenCount);
+	memFree(pJson->pTokens, sizeof(jsmntok_t) * pJson->fwTokenCount);
 	memFree(pJson->szData, strlen(pJson->szData) + 1);
-	memFree(pJson, sizeof(*pJson));
-	logBlockEnd("jsonDestroy()");
+	memFree(pJson, sizeof(tJson));
 }
 
 UWORD jsonGetElementInArray(
@@ -73,7 +74,7 @@ UWORD jsonGetElementInArray(
 	if(pJson->pTokens[uwParentIdx].type != JSMN_ARRAY) {
 		return 0;
 	}
-	for(UWORD i = uwParentIdx+1; i < pJson->wTokenCount; ++i) {
+	for(UWORD i = uwParentIdx+1; i < pJson->fwTokenCount; ++i) {
 		if(pJson->pTokens[i].start > pJson->pTokens[uwParentIdx].end) {
 			// We're outside of parent - nothing found
 			return 0;
@@ -97,12 +98,12 @@ UWORD jsonGetElementInArray(
 UWORD jsonGetElementInStruct(
 	const tJson *pJson, UWORD uwParentIdx, const char *szElement
 ) {
-	for(UWORD i = uwParentIdx+1; i < pJson->wTokenCount; ++i) {
+	for(UWORD i = uwParentIdx+1; i < pJson->fwTokenCount; ++i) {
 		if(pJson->pTokens[i].start > pJson->pTokens[uwParentIdx].end) {
 			// We're outside of parent - nothing found
 			return 0;
 		}
-		const char *pNextElementName = &pJson->szData[pJson->pTokens[i].start];
+		const char *pNextElementName = pJson->szData + pJson->pTokens[i].start;
 		if(
 			!memcmp(pNextElementName, szElement, strlen(szElement)) &&
 			pNextElementName[strlen(szElement)] == '"'
@@ -139,6 +140,9 @@ UWORD jsonGetDom(const tJson *pJson, const char *szPattern) {
 			}
 			uwParentTok = jsonGetElementInArray(pJson, uwParentTok, uwIdx);
 			++c;
+			if(*c == '.') {
+				++c;
+			}
 		}
 		else {
 			// Struct element - read name
@@ -211,4 +215,15 @@ UWORD jsonTokStrCpy(
 	}
 	pDst[uwLength] = '\0';
 	return uwLength;
+}
+
+fix16_t jsonTokToFix(const tJson *pJson, UWORD uwTok) {
+	// fix16_from_str isn't happy with null terminator at the end,
+	// so temporarily add it - ugly as hell but beats allocating buffer on stack
+	char cEnd = pJson->szData[pJson->pTokens[uwTok].end];
+	pJson->szData[pJson->pTokens[uwTok].end] = '\0';
+	fix16_t fValue = fix16_from_str(&pJson->szData[pJson->pTokens[uwTok].start]);
+	pJson->szData[pJson->pTokens[uwTok].end] = cEnd;
+
+	return fValue;
 }

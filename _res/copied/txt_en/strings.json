@@ -6,7 +6,10 @@
 			"We've fulfilled plan with your reserves.",
 			"New has arrived"
 		],
-		"notDone": "Comrade, plan not done, warning and new plan",
+		"notDone": [
+			"Comrade, plan not done in time.",
+			"Someone is waiting in your office."
+		],
 		"remaining": "Boss, %hd days remaining to complete the plan.",
 		"extending": [
 			"Boss, Plan is overdue. Urzedas says you've got",
@@ -111,10 +114,15 @@
 		"listKrystyna": "Krystyna",
 		"listPutin": "Commissar Putienko",
 		"listUrzedas": "Urzedas",
-		"dossierKrystyna": "Dossier",
-		"dossierUrzedas": "Dossier",
-		"bribe": "Bribe",
-		"favor": "Favor",
-		"accounting": "Creative Accounting"
+		"krystynaDossier": "Dossier",
+		"krystynaAccounting": "Creative Accounting",
+		"urzedasDossier": "Dossier",
+		"urzedasBribe": "Bribe",
+		"urzedasFavor": "Favor",
+		"komisarzDossier": "Dossier",
+		"komisarzWelcome": "Introduction",
+		"komisarzRebuke_1": "First rebuke",
+		"komisarzRebuke_2": "Second rebuke",
+		"komisarzRebuke_3": "Last rebuke"
 	}
 }

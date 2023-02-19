@@ -20,6 +20,7 @@
 #include "explosion.h"
 #include <comm/base.h>
 #include "defs.h"
+#include "settings.h"
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
@@ -97,7 +98,7 @@ static void coreGsCreate(void) {
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
 		TAG_TILEBUFFER_BOUND_TILE_X, 11,
-		TAG_TILEBUFFER_BOUND_TILE_Y, 2047,
+		TAG_TILEBUFFER_BOUND_TILE_Y, 32768 / 32,
 		TAG_TILEBUFFER_IS_DBLBUF, 1,
 		TAG_TILEBUFFER_TILE_SHIFT, 5,
 		TAG_TILEBUFFER_REDRAW_QUEUE_LENGTH, 100,
@@ -110,9 +111,17 @@ static void coreGsCreate(void) {
 
 	baseTileCreate(g_pMainBuffer);
 	ptplayerCreate(1);
+	ptplayerSetMasterVolume(8);
 	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx");
 	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx");
 	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx");
+	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
+		char szModPath[30];
+		sprintf(szModPath, "data/music/game%hhu.mod", i);
+		g_pGameMods[i] = ptplayerModCreate(szModPath);
+	}
+	g_pMenuMod = ptplayerModCreate("data/music/menu.mod");
+	g_pModSampleData = ptplayerSampleDataCreate("data/music/samples.samplepack");
 
 #ifdef GAME_DEBUG
 	randInit(&g_sRand, 2184, 1911);
@@ -122,7 +131,7 @@ static void coreGsCreate(void) {
 	randInit(&g_sRand, 1 + (sRayPos.bfPosY << 8), 1 + sRayPos.bfPosX);
 #endif
 
-	tileInit(0, 1);
+	tileReset(0, 1);
 
 	bobNewManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
@@ -160,10 +169,6 @@ static void coreGsCreate(void) {
 
 	// Default config
 	g_is2pPlaying = 0;
-	g_is1pKbd = 0;
-	g_is2pKbd = 1;
-	g_isChallenge = 1;
-	g_isAtari = 0;
 
 	hudReset(0, 0);
 	statePush(g_pGameStateManager, &g_sStateMenu);
@@ -189,6 +194,11 @@ static void coreGsDestroy(void) {
 	commDestroy();
 	bobNewManagerDestroy();
 
+	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
+		ptplayerModDestroy(g_pGameMods[i]);
+	}
+	ptplayerSamplePackDestroy(g_pModSampleData);
+	ptplayerModDestroy(g_pMenuMod);
 	ptplayerSfxDestroy(g_pSfxDrill);
 	ptplayerSfxDestroy(g_pSfxOre);
 	ptplayerSfxDestroy(g_pSfxPenalty);
@@ -219,6 +229,7 @@ const char * coreGetLangPrefix(void) {
 tTileBufferManager *g_pMainBuffer;
 tFont *g_pFont;
 tRandManager g_sRand;
+tPtplayerSamplePack *g_pModSampleData;
 
 tState g_sStateCore = {
 	.cbCreate = coreGsCreate, .cbLoop = coreGsLoop, .cbDestroy = coreGsDestroy

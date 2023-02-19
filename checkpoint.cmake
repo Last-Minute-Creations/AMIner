@@ -1,6 +1,6 @@
 file(MAKE_DIRECTORY ${GEN_DIR}/checkpoint)
 
-extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/checkpoint.png
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/checkpoint.png
 	GENERATED_FILE_LIST "TILES_CHECKPOINT_LIST"
 	DESTINATIONS
 	# Checkpoint line
@@ -28,7 +28,7 @@ extractBitmaps(TARGET ${AMINER_EXECUTABLE} SOURCE ${RES_DIR}/checkpoint.png
 )
 
 convertTileset(
-	TARGET ${AMINER_EXECUTABLE} SIZE 32 PALETTE ${palette_aminer_unique}
+	TARGET ${GAME_EXECUTABLE} SIZE 32 PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCE ${GEN_DIR}/checkpoint DESTINATION ${DATA_DIR}/checkpoint.bm
 	TILE_PATHS ${TILES_CHECKPOINT_LIST}
 )

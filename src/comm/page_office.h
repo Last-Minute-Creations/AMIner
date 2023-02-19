@@ -5,22 +5,21 @@
 #ifndef _COMM_PAGE_OFFICE_H_
 #define _COMM_PAGE_OFFICE_H_
 
-typedef enum _tOfficePage {
-	OFFICE_PAGE_MAIN,
-	OFFICE_PAGE_LIST_MIETEK,
-	OFFICE_PAGE_LIST_KRYSTYNA,
-	OFFICE_PAGE_LIST_PUTIN,
-	OFFICE_PAGE_LIST_URZEDAS,
-	OFFICE_PAGE_DOSSIER_KRYSTYNA,
-	OFFICE_PAGE_DOSSIER_URZEDAS,
-	OFFICE_PAGE_BRIBE,
-	OFFICE_PAGE_FAVOR,
-	OFFICE_PAGE_ACCOUNTING,
-	OFFICE_PAGE_COUNT
-} tOfficePage;
+#include <comm/base.h>
+#include <comm/gs_shop.h>
 
 void pageOfficeReset(void);
 
-void pageOfficeCreate(void);
+void pageOfficeSave(tFile *pFile);
+
+UBYTE pageOfficeLoad(tFile *pFile);
+
+void pageOfficeShow(void);
+
+void pageOfficeUnlockPerson(tFaceId ePerson);
+
+UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
+
+const tCommShopPage *officeGetPagesForFace(tFaceId eFace);
 
 #endif // _COMM_PAGE_OFFICE_H_

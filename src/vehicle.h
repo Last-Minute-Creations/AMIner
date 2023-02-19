@@ -19,18 +19,19 @@
 typedef enum _tDrillDir {
 	DRILL_DIR_NONE = 0,
 	DRILL_DIR_H,
-	DRILL_DIR_V
+	DRILL_DIR_V,
 } tDrillDir;
 
 typedef enum _tDrillState {
 	DRILL_STATE_VERT_ANIM_IN = 0,
 	DRILL_STATE_DRILLING,
-	DRILL_STATE_VERT_ANIM_OUT
+	DRILL_STATE_VERT_ANIM_OUT,
+	DRILL_STATE_OFF,
 } tDrillState;
 
 typedef enum _tToolState {
 	TOOL_STATE_IDLE,
-	TOOL_STATE_DRILL
+	TOOL_STATE_DRILL,
 } tToolState;
 
 typedef enum _tVehicleState {
@@ -40,7 +41,7 @@ typedef enum _tVehicleState {
 	VEHICLE_STATE_SMOKING,
 	VEHICLE_STATE_TELEPORTING_OUT,
 	VEHICLE_STATE_TELEPORTING_WAIT_FOR_CAMERA,
-	VEHICLE_STATE_TELEPORTING_IN
+	VEHICLE_STATE_TELEPORTING_IN,
 } tVehicleState;
 
 typedef struct _tVehicle {
@@ -92,6 +93,7 @@ typedef struct _tVehicle {
 	tDynamite sDynamite;
 	// Damage frames
 	UBYTE ubDamageFrames;
+	UBYTE isChallengeEnded;
 } tVehicle;
 
 void vehicleBitmapsCreate(void);
@@ -109,6 +111,10 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
 void vehicleResetPos(tVehicle *pVehicle);
 
 void vehicleReset(tVehicle *pVehicle);
+
+void vehicleSave(tVehicle *pVehicle, tFile *pFile);
+
+UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile);
 
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY);
 

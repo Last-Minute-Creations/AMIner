@@ -5,9 +5,11 @@
 #include "game.h"
 #include <ace/managers/key.h>
 #include <ace/managers/blit.h>
+#include <ace/managers/system.h>
 #include <ace/utils/custom.h>
 #include <comm/gs_shop.h>
 #include <comm/page_office.h>
+#include <comm/inbox.h>
 #include "vehicle.h"
 #include "hud.h"
 #include "tile.h"
@@ -26,6 +28,8 @@
 #include "steer.h"
 #include "inventory.h"
 #include "defs.h"
+#include "save.h"
+#include "settings.h"
 
 #define CAMERA_SPEED 4
 
@@ -55,18 +59,22 @@ static tModeSelection s_pModeSelection[2] = {
 };
 
 tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
+tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
+UBYTE g_is2pPlaying;
+UBYTE g_isChallenge, g_isAtari;
+tBobNew g_pBombMarkers[3];
 
+static const UWORD s_pBaseTeleportY[2] = {220, 3428};
+
+static UBYTE s_pBombCount[2];
+static tBombDir s_pLastDir[2];
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
-
 static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
 static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
 static UBYTE s_isReminderShown;
-
-UBYTE g_is2pPlaying;
-UBYTE g_is1pKbd, g_is2pKbd;
-UBYTE g_isChallenge, g_isChallengeEnd, g_isAtari;
-tBobNew g_pBombMarkers[3];
+static UBYTE s_ubCurrentMod;
+static ULONG s_ulGameTime;
 
 void gameTryPushBob(tBobNew *pBob) {
 	if(
@@ -83,14 +91,14 @@ void modeReset(UBYTE ubPlayer) {
 	hudSetMode(ubPlayer, MODE_DRILL);
 }
 
-void gameStart(void) {
+void gameStart(UBYTE isChallenge) {
 	s_ubChallengeCamCnt = 0;
-	g_isChallengeEnd = 0;
+	g_isChallenge = isChallenge;
 	dinoReset();
 	tutorialReset();
 	pageOfficeReset();
-	tileInit(g_isAtari, g_isChallenge);
-	warehouseReset(g_is2pPlaying);
+	tileReset(g_isAtari, g_isChallenge);
+	warehouseReset();
 	inventoryReset();
 	modeReset(0);
 	modeReset(1);
@@ -108,11 +116,25 @@ void gameStart(void) {
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
 }
 
+void gameTriggerSave(void) {
+	logWrite("game save");
+	systemUse();
+	tFile *pSave = fileOpen("save_story.tmp", "wb");
+	gameSave(pSave);
+	fileClose(pSave);
+	fileDelete("save_story.dat");
+	fileMove("save_story.tmp", "save_story.dat");
+	systemUnuse();
+}
+
 static void gameProcessHotkeys(void) {
   if(keyUse(KEY_ESCAPE) || keyUse(KEY_P)) {
 		stateChange(g_pGameStateManager, &g_sStatePause);
 		return;
   }
+	if(keyUse(KEY_N)) {
+		gameTriggerSave();
+	}
 	if(keyUse(KEY_B)) {
 		debugToggle();
 	}
@@ -137,10 +159,10 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 	else if(keyUse(KEY_F2)) {
-		g_is1pKbd = !g_is1pKbd;
+		g_sSettings.is1pKbd = !g_sSettings.is1pKbd;
 	}
 	else if(keyUse(KEY_F3)) {
-		g_is2pKbd = !g_is2pKbd;
+		g_sSettings.is2pKbd = !g_sSettings.is2pKbd;
 	}
 	else if(keyUse(KEY_F4)) {
 		if(s_eCameraType == CAMERA_TYPE_P1) {
@@ -150,12 +172,18 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+	else if(keyUse(KEY_MINUS)) {
+		gameElapseDay();
+	}
+	else if(keyUse(KEY_EQUALS)) {
+		hudShowMessage(0, g_pMsgs[MSG_HUD_NEW_PLAN]);
+		warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
+	}
+	else if(keyUse(KEY_0)) {
+		tPlan *pPlan = warehouseGetCurrentPlan();
+		gameElapseTime(pPlan->wTimeRemaining);
+	}
 }
-
-static const UWORD s_pBaseTeleportY[2] = {220, 3428};
-
-static UBYTE s_pBombCount[2];
-static tBombDir s_pLastDir[2];
 
 static void addBombInDir(UBYTE ubPlayer, tBombDir eDir, tBombDir eOpposite) {
 	if(s_pLastDir[ubPlayer] == eOpposite && s_pBombCount[ubPlayer]) {
@@ -259,29 +287,33 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 }
 
 static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
-	if(g_isChallengeEnd) {
-		return 0;
-	}
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
 
-	if(steerUse(pSelection->eSteerFire)) {
-		if(!pSelection->isSelecting) {
-			if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-				statePush(g_pGameStateManager, &g_sStateShop);
-				return 1;
+	if(!g_isChallenge) {
+		if(steerUse(pSelection->eSteerFire)) {
+			if(!pSelection->isSelecting) {
+				if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+					statePush(g_pGameStateManager, &g_sStateShop);
+					return 1;
+				}
+				pSelection->isSelecting = 1;
+				hudShowMode();
 			}
-			pSelection->isSelecting = 1;
-			hudShowMode();
+			else {
+				pSelection->isSelecting = 0;
+				hudHideMode();
+				if(pSelection->eMode == MODE_TNT) {
+					s_pBombCount[ubPlayer] = 0;
+					s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
+				}
+			}
 		}
-		else {
-			pSelection->isSelecting = 0;
-			hudHideMode();
-			if(pSelection->eMode == MODE_TNT) {
-				s_pBombCount[ubPlayer] = 0;
-				s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
-			}
+		else if(inboxIsUrgent() && vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+			statePush(g_pGameStateManager, &g_sStateShop);
+			return 1;
 		}
 	}
+
 	if(pSelection->isSelecting) {
 		if(steerUse(pSelection->eSteerLeft)) {
 			if(pSelection->eMode > 0) {
@@ -303,10 +335,12 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	}
 	else {
 		BYTE bDirX = 0, bDirY = 0;
-		if(steerGet(pSelection->eSteerRight)) { bDirX += 1; }
-		if(steerGet(pSelection->eSteerLeft)) { bDirX -= 1; }
-		if(steerGet(pSelection->eSteerDown)) { bDirY += 1; }
-		if(steerGet(pSelection->eSteerUp)) { bDirY -= 1; }
+		if(!g_pVehicles[ubPlayer].isChallengeEnded) {
+			if(steerGet(pSelection->eSteerRight)) { bDirX += 1; }
+			if(steerGet(pSelection->eSteerLeft)) { bDirX -= 1; }
+			if(steerGet(pSelection->eSteerDown)) { bDirY += 1; }
+			if(steerGet(pSelection->eSteerUp)) { bDirY -= 1; }
+		}
 		vehicleMove(&g_pVehicles[ubPlayer], bDirX, bDirY);
 	}
 	return 0;
@@ -402,15 +436,29 @@ static void gameCameraProcess(void) {
 	}
 }
 
-void gameAddAccolade(void) {
+void gameAdvanceAccolade(void) {
 	if(++s_ubAccoladesFract >= g_ubPlansPerAccolade) {
 		s_ubAccoladesFract = 0;
 		++s_ubAccolades;
+
+		if(s_ubAccolades >= g_ubAccoladesInMainStory) {
+			inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES, 0);
+		}
 	}
 }
 
 void gameAddRebuke(void) {
-	++s_ubRebukes;
+	if(s_ubRebukes < g_ubRebukesInMainStory) {
+		++s_ubRebukes;
+	}
+	tCommShopPage ePage = CLAMP(
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1 + s_ubRebukes - 1,
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1,
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3
+	);
+
+	pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, ePage);
+	inboxPushBack(ePage, 1);
 }
 
 UBYTE gameGetAccolades(void) {
@@ -422,10 +470,6 @@ UBYTE gameGetRebukes(void) {
 }
 
 //-------------------------------------------------------------------- CHALLENGE
-
-void gameChallengeEnd(void) {
-	g_isChallengeEnd = 1;
-}
 
 void gameChallengeResult(void) {
 	if(!g_is2pPlaying) {
@@ -452,53 +496,34 @@ void gameChallengeResult(void) {
 		hiScoreSetup(0, pMsg);
 		menuGsEnter(1);
 	}
-
 }
 
-//-------------------------------------------------------------------- GAMESTATE
-
-static void gameGsCreate(void) {
-
-}
-
-static void gameGsLoop(void) {
-	if(!g_isChallenge) {
-		if(tutorialProcess()) {
-			return;
-		}
+static void onSongEnd(void) {
+	if(++s_ubCurrentMod >= GAME_MOD_COUNT) {
+		s_ubCurrentMod = 0;
 	}
+	ptplayerLoadMod(g_pGameMods[s_ubCurrentMod], g_pModSampleData, 0);
+	ptplayerEnableMusic(1);
+}
 
-	debugColor(0x080);
-	gameCameraProcess();
-	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
-	gameProcessHotkeys();
-	UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
-	if(isGameStateChange) {
+static void processPlan(void) {
+	tPlan *pPlan = warehouseGetCurrentPlan();
+	if(!pPlan->isActive) {
 		return;
 	}
-	vehicleProcessText();
 
-	// Process plan being complete
-	const tPlan *pPlan = warehouseGetPlan();
-	WORD wRemainingDays = warehouseGetRemainingDays(pPlan);
+	WORD wRemainingDays = planGetRemainingDays(pPlan);
 	if(wRemainingDays <= 0) {
-		if(warehouseTryFulfillPlan()) {
-			hudShowMessage(0, g_pMsgs[MSG_PLAN_DONE_AFK]);
-			warehouseNewPlan(1, g_is2pPlaying);
-			pageAccountingReduceChanceFail();
+		if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
+			char szBfr[100];
+			sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
+			hudShowMessage(0, szBfr);
+			planStartPenaltyCountdown(pPlan);
 		}
 		else {
-			if(!pPlan->isExtendedTime) {
-				char szBfr[100];
-				sprintf(szBfr, g_pMsgs[MSG_PLAN_EXTENDING], 14);
-				hudShowMessage(0, szBfr);
-				warehouseAddDaysToPlan(14, 0);
-			}
-			else {
-				hudShowMessage(0, g_pMsgs[MSG_PLAN_NOT_DONE]);
-				warehouseNewPlan(0, g_is2pPlaying);
-				gameAddRebuke();
-			}
+			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_REBUKE]);
+			warehouseNextPlan(NEXT_PLAN_REASON_FAILED);
+			gameAddRebuke();
 		}
 	}
 	else if(
@@ -507,15 +532,146 @@ static void gameGsLoop(void) {
 	) {
 		if(!s_isReminderShown) {
 			s_isReminderShown = 1;
-			char szBfr[50];
-			sprintf(szBfr, g_pMsgs[MSG_PLAN_REMAINING], wRemainingDays);
-			hudShowMessage(0, szBfr);
+			char szBuffer[50];
+			sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
+			hudShowMessage(0, szBuffer);
 		}
 	}
 	else {
 		s_isReminderShown = 0;
 	}
+}
 
+void gameElapseTime(UWORD uwTime) {
+	if(ULONG_MAX - s_ulGameTime > uwTime) {
+		s_ulGameTime += uwTime;
+	}
+	else {
+		s_ulGameTime = ULONG_MAX;
+	}
+
+	tPlan *pPlan = warehouseGetCurrentPlan();
+	planElapseTime(pPlan, uwTime);
+	if(!pPlan->isActive && pPlan->wTimeRemaining == 0 && pPlan->uwIndex > 0) {
+		// first plan start (index 0) is handled by tutorial
+		hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_NEW_PLAN]);
+		planStart(pPlan);
+	}
+}
+
+void gameElapseDay(void) {
+	gameElapseTime(GAME_TIME_PER_DAY);
+}
+
+ULONG gameGetTime(void) {
+	return s_ulGameTime;
+}
+
+UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays) {
+	if(s_ulGameTime - ulStart >= ubDays * GAME_TIME_PER_DAY) {
+		return 1;
+	}
+	return 0;
+}
+
+void gameSave(tFile *pFile) {
+	saveWriteHeader(pFile, "GAME");
+	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
+	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
+	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
+	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
+	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
+	// for(UBYTE i = 0; i < 3; ++i) {
+	// 	bobNewSave(pFile, g_pBombMarkers[i]);
+	// }
+
+	fileWrite(pFile, s_pBombCount, sizeof(s_pBombCount));
+	fileWrite(pFile, s_pLastDir, sizeof(s_pLastDir));
+	fileWrite(pFile, &s_eCameraType, sizeof(s_eCameraType));
+	fileWrite(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
+
+	fileWrite(pFile, &s_ubRebukes, sizeof(s_ubRebukes));
+	fileWrite(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
+	fileWrite(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
+	fileWrite(pFile, &s_isReminderShown, sizeof(s_isReminderShown));
+	fileWrite(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
+	fileWrite(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
+
+	dinoSave(pFile);
+	tutorialSave(pFile);
+	pageOfficeSave(pFile);
+	tileSave(pFile);
+	warehouseSave(pFile);
+	inventorySave(pFile);
+	vehicleSave(&g_pVehicles[0], pFile);
+	vehicleSave(&g_pVehicles[1], pFile);
+	hudSave(pFile);
+	groundLayerSave(pFile);
+}
+
+UBYTE gameLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "GAME")) {
+		return 0;
+	}
+
+	fileRead(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
+	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
+	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
+	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
+	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
+	// for(UBYTE i = 0; i < 3; ++i) {
+	// 	bobNewLoad(pFile, g_pBombMarkers[i]);
+	// }
+
+	fileRead(pFile, s_pBombCount, sizeof(s_pBombCount));
+	fileRead(pFile, s_pLastDir, sizeof(s_pLastDir));
+	fileRead(pFile, &s_eCameraType, sizeof(s_eCameraType));
+	fileRead(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
+
+	fileRead(pFile, &s_ubRebukes, sizeof(s_ubRebukes));
+	fileRead(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
+	fileRead(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
+	fileRead(pFile, &s_isReminderShown, sizeof(s_isReminderShown));
+	fileRead(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
+	fileRead(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
+
+	return dinoLoad(pFile) &&
+		tutorialLoad(pFile) &&
+		pageOfficeLoad(pFile) &&
+		tileLoad(pFile) &&
+		warehouseLoad(pFile) &&
+		inventoryLoad(pFile) &&
+		vehicleLoad(&g_pVehicles[0], pFile) &&
+		vehicleLoad(&g_pVehicles[1], pFile) &&
+		hudLoad(pFile) &&
+		groundLayerLoad(pFile);
+}
+
+//-------------------------------------------------------------------- GAMESTATE
+
+static void gameGsCreate(void) {
+	s_ulGameTime = 0;
+	s_ubCurrentMod = GAME_MOD_COUNT;
+	ptplayerConfigureSongRepeat(0, onSongEnd);
+	onSongEnd();
+}
+
+static void gameGsLoop(void) {
+	if(tutorialProcess()) {
+		return;
+	}
+
+	debugColor(0x080);
+	gameCameraProcess();
+	steerUpdateFromInput(g_sSettings.is1pKbd, g_sSettings.is2pKbd);
+	gameProcessHotkeys();
+	UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
+	if(isGameStateChange) {
+		return;
+	}
+	vehicleProcessText();
+
+	processPlan();
 	coreProcessBeforeBobs();
 	debugColor(0x088);
 	vehicleProcess(&g_pVehicles[0]);
@@ -529,15 +685,16 @@ static void gameGsLoop(void) {
 	gameDisplayModeTnt(1);
 	coreProcessAfterBobs();
 
-	if(g_isChallengeEnd && g_pVehicles[0].ubDrillDir == DRILL_DIR_NONE && (
-		!g_is2pPlaying || g_pVehicles[1].ubDrillDir == DRILL_DIR_NONE
-	)) {
+	if(
+		g_pVehicles[0].isChallengeEnded &&
+		(!g_is2pPlaying || g_pVehicles[1].isChallengeEnded)
+	) {
 		gameChallengeResult();
 	}
 }
 
 static void gameGsDestroy(void) {
-
+	ptplayerStop();
 }
 
 tState g_sStateGame = {

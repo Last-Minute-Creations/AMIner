@@ -4,13 +4,14 @@
 #include "core.h"
 #include "menu.h"
 #include "steer.h"
+#include "settings.h"
 
 void pauseGsCreate(void) {
 	hudPause(1);
 }
 
 void pauseGsLoop(void) {
-	steerUpdateFromInput(g_is1pKbd, g_is2pKbd);
+	steerUpdateFromInput(g_sSettings.is1pKbd, g_sSettings.is2pKbd);
 
 	if(steerGet(STEER_P1_LEFT) || steerGet(STEER_P2_LEFT)) {
 		hudSelect(0);
@@ -23,6 +24,7 @@ void pauseGsLoop(void) {
 			stateChange(g_pGameStateManager, &g_sStateGame);
 		}
 		else {
+			gameTriggerSave();
 			menuGsEnter(0);
 		}
 	}

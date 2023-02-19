@@ -6,11 +6,13 @@
 #include "../core.h"
 
 #define LINES_MAX 100
+#define LINES_OCCUPIED_BY_FACE 3
 
 static char *s_pLines[LINES_MAX] = {0};
+static const char *s_szTitle;
 static UWORD s_uwLineCount;
 static UBYTE s_ubCurrPage, s_ubPageCount;
-
+static tFaceId s_eFace;
 static tOnClose s_cbOnClose;
 
 static void freeLines(void) {
@@ -62,6 +64,7 @@ static void readLines(
 
 		szFileContents[uwTextLength++] = ubCharCode;
 	}
+	szFileContents[uwTextLength] = '\0';
 
 	fileClose(pFileLines);
 
@@ -89,18 +92,29 @@ static void readLines(
 
 	memFree(szFileContents, uwFileContentsBufferSize);
 	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / commGetLineHeight() - 1;
-	s_ubPageCount = (s_uwLineCount + (ubLinesPerPage - 1)) / ubLinesPerPage;
+	WORD wLinesInNextPages = s_uwLineCount - LINES_OCCUPIED_BY_FACE;
+	wLinesInNextPages = MAX(0, wLinesInNextPages);
+	s_ubPageCount = 1 + ((UWORD)wLinesInNextPages + ubLinesPerPage - 1) / ubLinesPerPage;
 
 	logBlockEnd("readLines()");
 	systemUnuse();
 }
 
-static void commMsgDrawPage(UBYTE ubPage) {
+static void commMsgDrawCurrentPage(void) {
 	UBYTE ubLineHeight = commGetLineHeight();
 	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight - 1;
-	UWORD uwLineStart = ubPage * ubLinesPerPage;
+	UWORD uwLineStart = MAX(0, s_ubCurrPage * ubLinesPerPage - 3);
 	commEraseAll();
 	UWORD uwLineY = 0;
+
+	if(s_ubCurrPage == 0) {
+		commDrawFaceAt(s_eFace, 0, 0);
+		commDrawTitle(48, 0, g_pMsgs[MSG_PAGE_LIST_MIETEK + s_eFace]);
+		commDrawText(48, ubLineHeight, s_szTitle, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+		uwLineY = LINES_OCCUPIED_BY_FACE * ubLineHeight;
+		ubLinesPerPage -= LINES_OCCUPIED_BY_FACE;
+	}
+
 	for(
 		UWORD i = uwLineStart;
 		i < uwLineStart + ubLinesPerPage && i < s_uwLineCount; ++i
@@ -123,7 +137,7 @@ static void pageMsgProcess(void) {
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(s_ubCurrPage < s_ubPageCount - 1) {
 			++s_ubCurrPage;
-			commMsgDrawPage(s_ubCurrPage);
+			commMsgDrawCurrentPage();
 		}
 		else {
 			if(s_cbOnClose) {
@@ -136,11 +150,11 @@ static void pageMsgProcess(void) {
 
 	if(s_ubCurrPage > 0 && commNavUse(COMM_NAV_UP)) {
 		--s_ubCurrPage;
-		commMsgDrawPage(s_ubCurrPage);
+		commMsgDrawCurrentPage();
 	}
 	else if(s_ubCurrPage < s_ubPageCount - 1 && commNavUse(COMM_NAV_DOWN)) {
 		++s_ubCurrPage;
-		commMsgDrawPage(s_ubCurrPage);
+		commMsgDrawCurrentPage();
 	}
 }
 
@@ -150,9 +164,16 @@ static void pageMsgDestroy(void) {
 	systemUnuse();
 }
 
-void pageMsgCreate(const char *szFile, tOnClose cbOnClose) {
-	logBlockBegin("pageMsgCreate(szfile: '%s', cbOnClose: %p)", szFile, cbOnClose);
+void pageMsgCreate(
+	tFaceId eFace, const char *szTitle, const char *szFile, tOnClose cbOnClose
+) {
+	logBlockBegin(
+		"pageMsgCreate(eFace: %d, szTitle: '%s', szfile: '%s', cbOnClose: %p)",
+		eFace, szTitle, szFile, cbOnClose
+	);
 	commRegisterPage(pageMsgProcess, pageMsgDestroy);
+	s_eFace = eFace;
+	s_szTitle = szTitle;
 	s_cbOnClose = cbOnClose;
 	s_uwLineCount = 0;
 	char szPath[100];
@@ -160,6 +181,6 @@ void pageMsgCreate(const char *szFile, tOnClose cbOnClose) {
 	readLines(g_pRemap, szPath, COMM_DISPLAY_WIDTH);
 
 	s_ubCurrPage = 0;
-	commMsgDrawPage(0);
+	commMsgDrawCurrentPage();
 	logBlockEnd("pageMsgCreate()");
 }

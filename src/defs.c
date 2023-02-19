@@ -5,6 +5,7 @@
 #include "defs.h"
 #include "json/json.h"
 #include <ace/managers/log.h>
+#include <fixmath/fix16.h>
 #include <comm/page_workshop.h>
 #include <comm/page_warehouse.h>
 #include "hi_score.h"
@@ -22,16 +23,15 @@ UBYTE g_ubUpgradeLevels;
 UBYTE g_ubDrillingCost;
 UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 UBYTE g_ubPlansPerAccolade;
+UBYTE g_ubAccoladesInMainStory;
+UBYTE g_ubRebukesInMainStory;
+fix16_t g_fPlanIncreaseRatioSingleplayer;
+fix16_t g_fPlanIncreaseRatioMultiplayer;
 
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[9];
 
 const char * s_pLangDom[] = {
-	// Plan
-	[MSG_PLAN_DONE_AFK] = "planMessages.doneAfk",
-	[MSG_PLAN_NOT_DONE] = "planMessages.notDone",
-	[MSG_PLAN_REMAINING] = "planMessages.remaining",
-	[MSG_PLAN_EXTENDING] = "planMessages.extending",
 	// Hi score
 	[MSG_HI_SCORE_NEW] = "hiScore.new",
 	[MSG_HI_SCORE_PRESS] = "hiScore.press",
@@ -40,11 +40,12 @@ const char * s_pLangDom[] = {
 	[MSG_HI_SCORE_WIN_P2] = "hiScore.winP2",
 	[MSG_HI_SCORE_DRAW] = "hiScore.draw",
 	// Tutorial
-	[MSG_TUTORIAL_GO_DIG] =  "tutorial.start",
+	[MSG_TUTORIAL_GO_MEET_MIETEK] =  "tutorial.start",
 	[MSG_TUTORIAL_ON_DUG] =  "tutorial.onDugOut",
-	[MSG_TUTORIAL_NEAR_SHOP] = "tutorial.nearShop",
 	[MSG_TUTORIAL_IN_SHOP] = "tutorial.inShop",
-	[MSG_TUTORIAL_ON_MOVE_TO_PLAN] = "tutorial.onMoveToPlan",
+	[MSG_TUTORIAL_DESCRIPTION_TAB_OFFICE] = "tutorial.descriptionOffice",
+	[MSG_TUTORIAL_DESCRIPTION_TAB_WORKSHOP] = "tutorial.descriptionWorkshop",
+	[MSG_TUTORIAL_DESCRIPTION_TAB_WAREHOUSE] = "tutorial.descriptionWarehouse",
 	// Shop
 	[MSG_COMM_TIME_REMAINING] = "shop.timeRemaining",
 	[MSG_COMM_ACCOLADES] = "shop.accolades",
@@ -65,7 +66,7 @@ const char * s_pLangDom[] = {
 	[MSG_MISC_CARGO_FULL] = "misc.cargoFull",
 	[MSG_MISC_RESTOCK] = "misc.restock",
 	[MSG_MISC_FOUND_BONE] = "misc.foundBone",
-	// HUD
+	// HUD: UI
 	[MSG_HUD_P1] = "hud.p1",
 	[MSG_HUD_P2] = "hud.p2",
 	[MSG_HUD_DRILL] = "hud.drill",
@@ -75,7 +76,15 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_DEPTH] = "hud.depth",
 	[MSG_HUD_PAUSED] = "hud.paused",
 	[MSG_HUD_RESUME] = "hud.resume",
-	[MSG_HUD_QUIT] = "hud.quit",
+	[MSG_HUD_SAVE_QUIT] = "hud.saveQuit",
+	// HUD: Misc
+	// HUD: Plan
+	[MSG_HUD_NEW_PLAN] = "hudMessages.newPlan",
+	[MSG_HUD_PLAN_REMAINING] = "hudMessages.remaining",
+	[MSG_HUD_PLAN_EXTENDING] = "hudMessages.extending",
+	[MSG_HUD_REBUKE] = "hudMessages.rebuke",
+	[MSG_HUD_GUEST] = "hudMessages.guest",
+	[MSG_HUD_WAITING_URZEDAS] = "hudMessages.waitingUrzedas",
 	// Loading
 	[MSG_LOADING_GEN_TERRAIN] = "loading.genTerrain",
 	[MSG_LOADING_GEN_BASES] = "loading.genBases",
@@ -84,13 +93,23 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_MAIN] = "officePages.main",
 	[MSG_PAGE_LIST_MIETEK] = "officePages.listMietek",
 	[MSG_PAGE_LIST_KRYSTYNA] = "officePages.listKrystyna",
-	[MSG_PAGE_LIST_PUTIN] = "officePages.listPutin",
+	[MSG_PAGE_LIST_KOMISARZ] = "officePages.listPutin",
 	[MSG_PAGE_LIST_URZEDAS] = "officePages.listUrzedas",
-	[MSG_PAGE_DOSSIER_KRYSTYNA] = "officePages.dossierKrystyna",
-	[MSG_PAGE_DOSSIER_URZEDAS] = "officePages.dossierUrzedas",
-	[MSG_PAGE_BRIBE] = "officePages.bribe",
-	[MSG_PAGE_FAVOR] = "officePages.favor",
-	[MSG_PAGE_ACCOUNTING] = "officePages.accounting",
+	[MSG_PAGE_MIETEK_WELCOME] = "officePages.mietekWelcome",
+	[MSG_PAGE_KRYSTYNA_DOSSIER] = "officePages.krystynaDossier",
+	[MSG_PAGE_KRYSTYNA_ACCOUNTING] = "officePages.krystynaAccounting",
+	[MSG_PAGE_URZEDAS_DOSSIER] = "officePages.urzedasDossier",
+	[MSG_PAGE_URZEDAS_WELCOME] = "officePages.urzedasWelcome",
+	[MSG_PAGE_URZEDAS_FIRST_PLAN] = "officePages.urzedasFirstPlan",
+	[MSG_PAGE_URZEDAS_PLAN_COMPLETE] = "officePages.planComplete",
+	[MSG_PAGE_URZEDAS_PLAN_DELAYED] = "officePages.planDelayed",
+	[MSG_PAGE_URZEDAS_BRIBE] = "officePages.urzedasBribe",
+	[MSG_PAGE_URZEDAS_FAVOR] = "officePages.urzedasFavor",
+	[MSG_PAGE_KOMISARZ_DOSSIER] = "officePages.komisarzDossier",
+	[MSG_PAGE_KOMISARZ_WELCOME] = "officePages.komisarzWelcome",
+	[MSG_PAGE_KOMISARZ_REBUKE_1] = "officePages.komisarzRebuke_1",
+	[MSG_PAGE_KOMISARZ_REBUKE_2] = "officePages.komisarzRebuke_2",
+	[MSG_PAGE_KOMISARZ_REBUKE_3] = "officePages.komisarzRebuke_3",
 	// Count
 	[MSG_COUNT] = 0
 };
@@ -124,6 +143,10 @@ void defsInit(void) {
 
 	g_lInitialCash = jsonTokToUlong(pJson, jsonGetDom(pJson, "initialCash"));
 	g_ubPlansPerAccolade = jsonTokToUlong(pJson, jsonGetDom(pJson, "plansPerAccolade"));
+	g_ubAccoladesInMainStory = jsonTokToUlong(pJson, jsonGetDom(pJson, "accoladesInMainStory"));
+	g_ubRebukesInMainStory = jsonTokToUlong(pJson, jsonGetDom(pJson, "rebukesInMainStory"));
+	g_fPlanIncreaseRatioSingleplayer = jsonTokToFix(pJson, jsonGetDom(pJson, "planIncreaseRatioSingleplayer"));
+	g_fPlanIncreaseRatioMultiplayer = jsonTokToFix(pJson, jsonGetDom(pJson, "planIncreaseRatioMultiplayer"));
 
 	// Upgrade costs
 	UWORD uwIdxUpgradeCosts = jsonGetDom(pJson, "upgradeCosts");
@@ -194,7 +217,6 @@ void langCreate(const char *szLangPrefix) {
 	// Shop names
 	g_pShopNames = stringArrayCreateFromDom(pJson, g_pRemap, "shopNames");
 	g_pWarehouseColNames = stringArrayCreateFromDom(pJson, g_pRemap, "warehouseColNames");
-	g_pMenuEnumMode = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumMode");
 	g_pMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumPlayerCount");
 	g_pMenuEnumP1 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP1");
 	g_pMenuEnumP2 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP2");
@@ -212,7 +234,6 @@ void langDestroy(void) {
 	logBlockBegin("langDestroy()");
 	stringArrayDestroy(g_pShopNames);
 	stringArrayDestroy(g_pWarehouseColNames);
-	stringArrayDestroy(g_pMenuEnumMode);
 	stringArrayDestroy(g_pMenuEnumPlayerCount);
 	stringArrayDestroy(g_pMenuEnumP1);
 	stringArrayDestroy(g_pMenuEnumP2);

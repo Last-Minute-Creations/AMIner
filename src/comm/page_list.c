@@ -10,23 +10,33 @@
 #include <comm/page_bribe.h>
 #include <comm/page_favor.h>
 #include <comm/page_accounting.h>
+#include "gs_shop.h"
 #include "../defs.h"
 
+#define PORTRAIT_X 0
+#define PORTRAIT_Y 0
+#define PORTRAIT_HEIGHT 32
+#define LIST_X 40
+#define LIST_Y 40
+#define TITLE_HEIGHT 8
+#define TITLE_X LIST_X
+#define TITLE_Y (PORTRAIT_HEIGHT - TITLE_HEIGHT)
+#define LIST_SPACING_Y 10
+
 static BYTE s_bPosCurr, s_bPosCount;
-static const tOfficePage *s_pCurrentList;
+static const tCommShopPage *s_pCurrentList;
+static tFaceId s_eFace;
 
-static void cbOnMsgClose(void) {
-	pageListCreate(s_pCurrentList);
-}
-
-static void officeDrawListPos(tOfficePage eListPage, UBYTE ubPos) {
+static void officeDrawListPos(tCommShopPage eListPage, UBYTE ubPos) {
 	UBYTE ubColor = (
 		ubPos == s_bPosCurr ?
 		COMM_DISPLAY_COLOR_TEXT :
 		COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	commDrawText(
-		0, 10 * ubPos, g_pMsgs[MSG_PAGE_MAIN + eListPage], FONT_COOKIE, ubColor
+		LIST_X, LIST_Y + LIST_SPACING_Y * ubPos,
+		g_pMsgs[commShopPageToTitle(eListPage)],
+		FONT_COOKIE, ubColor
 	);
 }
 
@@ -48,43 +58,28 @@ static void pageListProcess(void) {
 		officeDrawListPos(s_pCurrentList[s_bPosCurr], s_bPosCurr);
 	}
 	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		switch(s_pCurrentList[s_bPosCurr]) {
-			case OFFICE_PAGE_DOSSIER_KRYSTYNA:
-				pageMsgCreate("dossier_krystyna", cbOnMsgClose);
-				break;
-			case OFFICE_PAGE_DOSSIER_URZEDAS:
-				pageMsgCreate("dossier_urzedas", cbOnMsgClose);
-				break;
-			case OFFICE_PAGE_BRIBE:
-				pageBribeCreate();
-				break;
-			case OFFICE_PAGE_FAVOR:
-				pageFavorCreate();
-				break;
-			case OFFICE_PAGE_ACCOUNTING:
-				pageAccountingCreate();
-				break;
-			case OFFICE_PAGE_LIST_MIETEK:
-			case OFFICE_PAGE_LIST_KRYSTYNA:
-			case OFFICE_PAGE_LIST_PUTIN:
-			case OFFICE_PAGE_LIST_URZEDAS:
-			case OFFICE_PAGE_MAIN:
-			default:
-				pageOfficeCreate();
-				break;
-		}
+		commShopChangePage(
+			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_eFace - FACE_ID_MIETEK,
+			s_pCurrentList[s_bPosCurr]
+		);
 	}
 }
 
-void pageListCreate(const tOfficePage *pPages) {
+void pageListCreate(tFaceId eFace) {
+	const tCommShopPage *pPages = officeGetPagesForFace(eFace);
+	s_eFace = eFace;
 	s_pCurrentList = pPages;
 	commRegisterPage(pageListProcess, 0);
-	tOfficePage eListPage;
 	s_bPosCurr = 0;
+
+	commDrawTitle(TITLE_X, TITLE_Y, g_pMsgs[MSG_PAGE_LIST_MIETEK + s_eFace]);
+	commDrawFaceAt(s_eFace, PORTRAIT_X, PORTRAIT_Y);
+
+	tCommShopPage eListPage;
 	s_bPosCount = 0;
 	do {
 		eListPage = pPages[s_bPosCount];
 		officeDrawListPos(eListPage, s_bPosCount);
 		++s_bPosCount;
-	} while(eListPage != OFFICE_PAGE_MAIN);
+	} while(eListPage != COMM_SHOP_PAGE_OFFICE_MAIN);
 }

@@ -4,6 +4,7 @@
 
 #include "vehicle.h"
 #include <ace/managers/rand.h>
+#include <ace/utils/string.h>
 #include "hud.h"
 #include "core.h"
 #include "game.h"
@@ -15,6 +16,7 @@
 #include "ground_layer.h"
 #include "defs.h"
 #include "inventory.h"
+#include "save.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -31,6 +33,8 @@
 #define VEHICLE_SMOKE_FRAME_HEIGHT 29
 #define VEHICLE_SMOKE_ANIM_HEIGHT 42
 #define VEHICLE_SMOKE_FRAMES 12
+
+#define SFX_CHANNEL_DRILL 3
 
 #define TRACK_OFFSET_TRACK 0
 #define TRACK_OFFSET_JET 28
@@ -111,6 +115,7 @@ void vehicleBitmapsDestroy(void) {
 
 void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubDrillDir = DRILL_DIR_NONE;
+	pVehicle->ubDrillState = DRILL_STATE_OFF;
 	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 
 	pVehicle->ubTrackAnimCnt = 0;
@@ -234,8 +239,109 @@ void vehicleRespawn(tVehicle *pVehicle) {
 
 void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
+	pVehicle->isChallengeEnded = 0;
 	pVehicle->lCash = g_lInitialCash;
 	vehicleRespawn(pVehicle);
+}
+
+void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
+	saveWriteHeader(pFile, "VHCL");
+	fileWrite(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
+	// textBobSave(&pVehicle->sTextBob, pFile);
+	// bobNewSave(&pVehicle->sBobBody, pFile);
+	// bobNewSave(&pVehicle->sBobTrack, pFile);
+	// bobNewSave(&pVehicle->sBobJet, pFile);
+	// bobNewSave(&pVehicle->sBobTool, pFile);
+	// bobNewSave(&pVehicle->sBobWreck, pFile);
+	// bobNewSave(&pVehicle->sBobSmoke, pFile);
+	fileWrite(pFile, &pVehicle->fX, sizeof(pVehicle->fX));
+	fileWrite(pFile, &pVehicle->fY, sizeof(pVehicle->fY));
+	fileWrite(pFile, &pVehicle->fDx, sizeof(pVehicle->fDx));
+	fileWrite(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
+	fileWrite(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
+	fileWrite(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
+	fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
+	fileWrite(pFile, &pVehicle->ubTrackAnimCnt, sizeof(pVehicle->ubTrackAnimCnt));
+	fileWrite(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
+	fileWrite(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
+	fileWrite(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
+	fileWrite(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
+	fileWrite(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
+	fileWrite(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
+	fileWrite(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
+	fileWrite(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
+	fileWrite(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
+	fileWrite(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
+	fileWrite(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
+	fileWrite(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
+	fileWrite(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
+	fileWrite(pFile, &pVehicle->ubTeleportAnimFrame, sizeof(pVehicle->ubTeleportAnimFrame));
+	fileWrite(pFile, &pVehicle->ubTeleportAnimCnt, sizeof(pVehicle->ubTeleportAnimCnt));
+	fileWrite(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
+	fileWrite(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
+	fileWrite(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
+	fileWrite(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
+	fileWrite(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
+	fileWrite(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
+	fileWrite(pFile, &pVehicle->lCash, sizeof(pVehicle->lCash));
+	fileWrite(pFile, &pVehicle->uwDrillCurr, sizeof(pVehicle->uwDrillCurr));
+	fileWrite(pFile, &pVehicle->wHullCurr, sizeof(pVehicle->wHullCurr));
+	fileWrite(pFile, &pVehicle->ubPlayerIdx, sizeof(pVehicle->ubPlayerIdx));
+	fileWrite(pFile, &pVehicle->ubDestructionState, sizeof(pVehicle->ubDestructionState));
+	fileWrite(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
+	fileWrite(pFile, &pVehicle->ubDamageFrames, sizeof(pVehicle->ubDamageFrames));
+}
+
+UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
+	if(!saveReadHeader(pFile, "VHCL")) {
+		return 0;
+	}
+
+	fileRead(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
+	// textBobLoad(&pVehicle->sTextBob, pFile);
+	// bobNewLoad(&pVehicle->sBobBody, pFile);
+	// bobNewLoad(&pVehicle->sBobTrack, pFile);
+	// bobNewLoad(&pVehicle->sBobJet, pFile);
+	// bobNewLoad(&pVehicle->sBobTool, pFile);
+	// bobNewLoad(&pVehicle->sBobWreck, pFile);
+	// bobNewLoad(&pVehicle->sBobSmoke, pFile);
+	fileRead(pFile, &pVehicle->fX, sizeof(pVehicle->fX));
+	fileRead(pFile, &pVehicle->fY, sizeof(pVehicle->fY));
+	fileRead(pFile, &pVehicle->fDx, sizeof(pVehicle->fDx));
+	fileRead(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
+	fileRead(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
+	fileRead(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
+	fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
+	fileRead(pFile, &pVehicle->ubTrackAnimCnt, sizeof(pVehicle->ubTrackAnimCnt));
+	fileRead(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
+	fileRead(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
+	fileRead(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
+	fileRead(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
+	fileRead(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
+	fileRead(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
+	fileRead(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
+	fileRead(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
+	fileRead(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
+	fileRead(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
+	fileRead(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
+	fileRead(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
+	fileRead(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
+	fileRead(pFile, &pVehicle->ubTeleportAnimFrame, sizeof(pVehicle->ubTeleportAnimFrame));
+	fileRead(pFile, &pVehicle->ubTeleportAnimCnt, sizeof(pVehicle->ubTeleportAnimCnt));
+	fileRead(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
+	fileRead(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
+	fileRead(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
+	fileRead(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
+	fileRead(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
+	fileRead(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
+	fileRead(pFile, &pVehicle->lCash, sizeof(pVehicle->lCash));
+	fileRead(pFile, &pVehicle->uwDrillCurr, sizeof(pVehicle->uwDrillCurr));
+	fileRead(pFile, &pVehicle->wHullCurr, sizeof(pVehicle->wHullCurr));
+	fileRead(pFile, &pVehicle->ubPlayerIdx, sizeof(pVehicle->ubPlayerIdx));
+	fileRead(pFile, &pVehicle->ubDestructionState, sizeof(pVehicle->ubDestructionState));
+	fileRead(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
+	fileRead(pFile, &pVehicle->ubDamageFrames, sizeof(pVehicle->ubDamageFrames));
+	return 1;
 }
 
 void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
@@ -374,6 +480,10 @@ static inline void vehicleSetTool(
 static inline UBYTE vehicleStartDrilling(
 	tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY, UBYTE ubDrillDir
 ) {
+	if(pVehicle->isChallengeEnded) {
+		return 0;
+	}
+
 	static UBYTE ubCooldown = 0;
 
 	// Check if other player drills the same tile
@@ -407,7 +517,7 @@ static inline UBYTE vehicleStartDrilling(
 					pVehicle->sBobBody.sPos.uwY,
 					pVehicle->sBobBody.sPos.uwY - 32, 1
 				);
-				ptplayerSfxPlay(g_pSfxPenalty, pVehicle->ubPlayerIdx + 2, 64, 1);
+				ptplayerSfxPlay(g_pSfxPenalty, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 				ubCooldown = 25;
 			}
 			else {
@@ -416,7 +526,7 @@ static inline UBYTE vehicleStartDrilling(
 			return 0;
 		}
 		pVehicle->uwDrillCurr -= ubDrillCost;
-		warehouseElapseTime(ubDrillCost);
+		gameElapseTime(ubDrillCost);
 	}
 
 	pVehicle->ubDrillState = (
@@ -433,7 +543,7 @@ static inline UBYTE vehicleStartDrilling(
 
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
-	ptplayerSfxPlay(g_pSfxDrill, pVehicle->ubPlayerIdx, 64, -1);
+	ptplayerSfxPlayLooped(g_pSfxDrill, SFX_CHANNEL_DRILL, 64);
 
 	return 1;
 }
@@ -473,6 +583,11 @@ static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
 	return -wRestockValue;
 }
 
+static void vehicleEndChallenge(tVehicle *pVehicle) {
+	vehicleRestock(pVehicle, 0);
+	pVehicle->isChallengeEnded = 1;
+}
+
 void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	// Load mineral to vehicle
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwTileX][uwTileY];
@@ -488,7 +603,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			pVehicle->sBobBody.sPos.uwY,
 			pVehicle->sBobBody.sPos.uwY - 32, 1
 		);
-		ptplayerSfxPlay(g_pSfxOre, pVehicle->ubPlayerIdx + 2, 64, 1);
+		ptplayerSfxPlay(g_pSfxOre, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 	}
 	else if(g_pTileDefs[ubTile].ubSlots) {
 		UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
@@ -499,26 +614,26 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		pVehicle->uwCargoScore += pMineral->ubReward * ubSlots;
 		pVehicle->uwCargoCurr += ubSlots;
 		pVehicle->pStock[ubMineralType] += ubSlots;
-		warehousePlanUnlockMineral(ubMineralType);
+		planUnlockMineral(warehouseGetCurrentPlan(), ubMineralType);
 
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->uwCargoCurr, uwCargoMax);
-		char szMsgBuffer[40];
+		char szMsg[40];
 		const char *szMessage;
 		UBYTE ubColor;
 		if(pVehicle->uwCargoCurr == uwCargoMax) {
 			szMessage = g_pMsgs[MSG_MISC_CARGO_FULL];
 			ubColor = COLOR_REDEST;
-			ptplayerSfxPlay(g_pSfxPenalty, pVehicle->ubPlayerIdx + 2, 64, 1);
+			ptplayerSfxPlay(g_pSfxPenalty, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 		}
 		else {
-			sprintf(
-				szMsgBuffer, "%s x%hhu",
-				g_pMineralNames[g_pTileDefs[ubTile].ubMineral],
-				g_pTileDefs[ubTile].ubSlots
-			);
-			szMessage = szMsgBuffer;
+			char *pEnd = szMsg;
+			pEnd = stringCopy(g_pMineralNames[g_pTileDefs[ubTile].ubMineral], pEnd);
+			*(pEnd++) = ' ';
+			*(pEnd++) = 'x';
+			pEnd = stringDecimalFromULong(g_pTileDefs[ubTile].ubSlots, pEnd);
+			szMessage = szMsg;
 			ubColor = pMineral->ubTitleColor;
-			ptplayerSfxPlay(g_pSfxOre, pVehicle->ubPlayerIdx + 2, 64, 1);
+			ptplayerSfxPlay(g_pSfxOre, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 		}
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, ubColor,
@@ -532,8 +647,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_1 + 9) {
 			if(uwTileY == TILE_ROW_CHALLENGE_FINISH) {
 				pVehicle->lCash += pVehicle->uwCargoScore;
-				vehicleRestock(pVehicle, 0);
-				gameChallengeEnd();
+				vehicleEndChallenge(pVehicle);
 			}
 			else {
 				textBobSetText(
@@ -550,7 +664,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				pVehicle->lCash += pVehicle->uwCargoScore;
 				vehicleRestock(pVehicle, 0);
 			}
-			ptplayerSfxPlay(g_pSfxOre, pVehicle->ubPlayerIdx + 2, 64, 1);
+			ptplayerSfxPlay(g_pSfxOre, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 		}
 	}
 
@@ -563,6 +677,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	const fix16_t fAccX = fix16_one / 16;
 	const fix16_t fFrictX = fix16_one / 12;
 
+	// Challenge camera teleport
 	if(
 		g_isChallenge &&
 		fix16_to_int(pVehicle->fY) < g_pMainBuffer->pCamera->uPos.uwY
@@ -578,7 +693,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->fY = fix16_from_int(uwTileY*32);
 		pVehicle->fDy = fix16_from_int(-1); // HACK HACK HACK
 		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
-		ptplayerSfxPlay(g_pSfxPenalty, pVehicle->ubPlayerIdx + 2, 64, 1);
+		ptplayerSfxPlay(g_pSfxPenalty, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 		UWORD uwTeleportPenalty = 50;
 		textBobSetText(
 			&pVehicle->sTextBob, "%s -%hu\x1F",
@@ -592,11 +707,15 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			pVehicle->sBobBody.sPos.uwY - 48, 1
 		);
 		pVehicle->lCash -= uwTeleportPenalty;
+	}
 
+	if(g_isChallenge && !pVehicle->isChallengeEnded) {
+		UWORD uwTileY = fix16_to_int(pVehicle->fY) / 32;
 		if(uwTileY >= TILE_ROW_CHALLENGE_FINISH) {
-			gameChallengeEnd();
+			vehicleEndChallenge(pVehicle);
 		}
 	}
+
 	if(pVehicle->sSteer.bX) {
 		if(pVehicle->sSteer.bX > 0) {
 			pVehicle->fDx = MIN(pVehicle->fDx + fAccX, fMaxDx);
@@ -793,7 +912,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		// If restocked then play audio & display score
 		WORD wDeltaScore = vehicleRestock(pVehicle, 1);
 		if(wDeltaScore) {
-			ptplayerSfxPlay(g_pSfxOre, pVehicle->ubPlayerIdx + 2, 64, 1);
+			ptplayerSfxPlay(g_pSfxOre, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 			textBobSetText(
 				&pVehicle->sTextBob, "%s %hd\x1F",
 				g_pMsgs[MSG_MISC_RESTOCK], wDeltaScore
@@ -883,6 +1002,15 @@ UBYTE transitionVarToBy(fix16_t *pVar, fix16_t fDest, fix16_t fDelta) {
 	return 0;
 }
 
+static void tryStopDrillAudio(void) {
+	if(
+		g_pVehicles[0].ubDrillState != DRILL_STATE_DRILLING &&
+		(!g_is2pPlaying || g_pVehicles[1].ubDrillState != DRILL_STATE_DRILLING)
+	) {
+		ptplayerSfxStopOnChannel(SFX_CHANNEL_DRILL);
+	}
+}
+
 static void vehicleProcessDrilling(tVehicle *pVehicle) {
 	static const UBYTE pTrackAnimOffs[DRILL_V_ANIM_LEN] = {
 		0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0
@@ -906,6 +1034,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			else {
 				if(!--pVehicle->ubDrillVAnimCnt) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
+					pVehicle->ubDrillState = DRILL_STATE_OFF;
 					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 				}
 				else if(pVehicle->ubDrillVAnimCnt == 5) {
@@ -939,8 +1068,9 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				vehicleExcavateTile(pVehicle, pVehicle->sDrillTile.uwX, pVehicle->sDrillTile.uwY);
 				if(pVehicle->ubDrillDir == DRILL_DIR_H) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
+					pVehicle->ubDrillState = DRILL_STATE_OFF;
 					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
-					// audioStop(AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx);
+					tryStopDrillAudio();
 				}
 				else {
 					const UBYTE ubAdd = 4; // No grass past this point
@@ -954,7 +1084,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					}
 					else {
 						pVehicle->ubDrillState = DRILL_STATE_VERT_ANIM_OUT;
-						// audioStop(AUDIO_CHANNEL_0 + pVehicle->ubPlayerIdx);
+						tryStopDrillAudio();
 					}
 				}
 			}
@@ -1033,6 +1163,7 @@ void vehicleProcess(tVehicle *pVehicle) {
 		case VEHICLE_STATE_TELEPORTING_IN:
 			break;
 	}
+
 	UBYTE ubPlayerIdx = pVehicle->ubPlayerIdx;
 	UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
 	hudSetDrill(ubPlayerIdx, pVehicle->uwDrillCurr, uwDrillMax);

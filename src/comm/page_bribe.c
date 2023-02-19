@@ -8,13 +8,14 @@
 #include "../warehouse.h"
 #include "../game.h"
 #include "../core.h"
+#include "../vehicle.h"
+#include "../save.h"
 
 static UBYTE s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
 static BYTE s_bBribeChanceFail;
+static UWORD s_uwBribeCost;
 
 static void pageBribeProcess(void) {
-// #error take cash for a bribe!
-
 	if(buttonGetPreset() == BUTTON_PRESET_ACCEPT_DECLINE) {
 		BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
 		BYTE bButtonCount = buttonGetCount();
@@ -31,9 +32,11 @@ static void pageBribeProcess(void) {
 
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(bButtonCurr == 0) {
+				g_pVehicles[0].lCash -= s_uwBribeCost;
 				if(randUwMinMax(&g_sRand, 1, 100) > s_bBribeChanceFail) {
 					// Success
-					const tPlan *pPlan = warehouseGetPlan();
+					pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
+					tPlan *pPlan = warehouseGetCurrentPlan();
 					if(!pPlan->isPenaltyCountdownStarted) {
 						// accolade bribe
 						++s_ubBribeAccoladeCount;
@@ -44,18 +47,18 @@ static void pageBribeProcess(void) {
 						++s_ubBribeRebukeCount;
 						s_bBribeChanceFail = MIN(s_bBribeChanceFail + 5, 100);
 					}
-					warehouseAddDaysToPlan(14, 1);
+					planAddDays(pPlan, 14, 1);
 				}
 				else {
 					gameAddRebuke();
 				}
 			}
-			pageOfficeCreate();
+			commShopGoBack();
 		}
 	}
 	else {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			pageOfficeCreate();
+			commShopGoBack();
 		}
 	}
 }
@@ -63,12 +66,18 @@ static void pageBribeProcess(void) {
 void pageBribeCreate(void) {
 	commRegisterPage(pageBribeProcess, 0);
 	const UBYTE ubLineHeight = commGetLineHeight();
-	const tPlan *pPlan = warehouseGetPlan();
+	const tPlan *pPlan = warehouseGetCurrentPlan();
 	char szBfr[150];
 	UWORD uwPosY = 0;
 	UWORD uwCost;
 
-	if(!pPlan->isExtendedTime) {
+	if (!pPlan->isActive) {
+		uwPosY += commDrawMultilineText(
+			"You have no active plan! What do you want me to do?", 0, uwPosY
+		) * ubLineHeight;
+		buttonInitOk("Back");
+	}
+	else if(!pPlan->isExtendedTimeByFavor) {
 		if(!pPlan->isPenaltyCountdownStarted) {
 			sprintf(szBfr, "Bribe for extra %hhu days for finishing plan in time.", 14);
 			uwCost = 100;
@@ -91,16 +100,18 @@ void pageBribeCreate(void) {
 			s_bBribeChanceFail
 		);
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
+		s_uwBribeCost = uwCost;
 		sprintf(szBfr, "It will cost you %hu\x1F.", uwCost);
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 		buttonInitAcceptDecline("Accept", "Decline");
-		buttonDrawAll(commGetDisplayBuffer());
 	}
 	else {
 		uwPosY += commDrawMultilineText("Comrade, not now... there's too much heat!", 0, uwPosY) * ubLineHeight;
 		buttonInitOk("Back");
 	}
+
+	buttonDrawAll(commGetDisplayBuffer());
 }
 
 void pageBribeReset(void) {
@@ -108,3 +119,22 @@ void pageBribeReset(void) {
 	s_ubBribeAccoladeCount = 0;
 	s_ubBribeRebukeCount = 0;
 }
+
+void pageBribeSave(tFile *pFile) {
+	saveWriteHeader(pFile, "BRBE");
+	fileWrite(pFile, &s_bBribeChanceFail, sizeof(s_bBribeChanceFail));
+	fileWrite(pFile, &s_ubBribeAccoladeCount, sizeof(s_ubBribeAccoladeCount));
+	fileWrite(pFile, &s_ubBribeRebukeCount, sizeof(s_ubBribeRebukeCount));
+}
+
+UBYTE pageBribeLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "FAVR")) {
+		return 0;
+	}
+
+	fileRead(pFile, &s_bBribeChanceFail, sizeof(s_bBribeChanceFail));
+	fileRead(pFile, &s_ubBribeAccoladeCount, sizeof(s_ubBribeAccoladeCount));
+	fileRead(pFile, &s_ubBribeRebukeCount, sizeof(s_ubBribeRebukeCount));
+	return 1;
+}
+

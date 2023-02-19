@@ -7,15 +7,45 @@
 
 #include "aminer.h"
 #include <string_array.h>
+#include <ace/managers/ptplayer.h>
 
-extern tState g_sStateMenu;
+// must be same order as in strings.json: menu.captions
+typedef enum tMenuCaptionKind {
+	// Main
+	MENU_CAPTION_STORY,
+	MENU_CAPTION_FREE,
+	MENU_CAPTION_CHALLENGE,
+	MENU_CAPTION_SETTINGS,
+	MENU_CAPTION_EXIT,
+	// Story/Free/Challenge
+	MENU_CAPTION_START,
+	MENU_CAPTION_CONTINUE,
+	MENU_CAPTION_PLAYER_COUNT,
+	MENU_CAPTION_BACK,
+	MENU_CAPTION_ATARI_MODE,
+	MENU_CAPTION_HI_SCORES,
+	// Settings
+	MENU_CAPTION_VOLUME_MUSIC,
+	MENU_CAPTION_VOLUME_SOUND,
+	MENU_CAPTION_STEER_P1,
+	MENU_CAPTION_STEER_P2,
+	MENU_CAPTION_CREDITS,
+	MENU_CAPTION_COUNT,
+} tMenuCaptionKind;
 
 void menuPreload(void);
 void menuUnload(void);
 
 void menuGsEnter(UBYTE isScoreShow);
 
-extern char **g_pMenuCaptions, **g_pMenuEnumMode, **g_pMenuEnumP1, **g_pMenuEnumP2,
-	**g_pMenuEnumOnOff, **g_pMenuEnumPlayerCount;
+extern tState g_sStateMenu;
+extern tPtplayerMod *g_pMenuMod;
+
+extern char **g_pMenuCaptions;
+extern char **g_pMenuEnumP1;
+extern char **g_pMenuEnumP2;
+extern char **g_pMenuEnumOnOff;
+extern char **g_pMenuEnumPlayerCount;
+extern char **g_pMenuEnumVolume;
 
 #endif // _MENU_H_

@@ -5,6 +5,7 @@
 #include "dino.h"
 #include "bob_new.h"
 #include "core.h"
+#include "save.h"
 
 #define DINO_BOB_COUNT 9
 
@@ -58,6 +59,22 @@ void dinoReset(void) {
 	for(UBYTE i = 0; i < DINO_BOB_COUNT; ++i) {
 		s_pDinoWereDrawn[i] = 0;
 	}
+}
+
+void dinoSave(tFile *pFile) {
+	saveWriteHeader(pFile, "DINO");
+	fileWrite(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
+	// fileWrite(pFile, s_pDinoWereDrawn, sizeof(DINO_BOB_COUNT * s_pDinoWereDrawn[0]));
+}
+
+UBYTE dinoLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "DINO")) {
+		return 0;
+	}
+
+	fileRead(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
+	// fileRead(pFile, s_pDinoWereDrawn, sizeof(DINO_BOB_COUNT * s_pDinoWereDrawn[0]));
+	return 1;
 }
 
 void dinoProcess(void) {
