@@ -13,6 +13,12 @@
 #include "defs.h"
 #include "save.h"
 
+/**
+ * @brief Determines that the base is a variant of other base and shouldn't
+ * be naturally spawned on any depth.
+ */
+#define BASE_LEVEL_VARIANT 65535
+
 typedef struct _tBase {
 	UBYTE pPattern[10 * 10];
 	UWORD uwLevel;
@@ -20,8 +26,8 @@ typedef struct _tBase {
 
 //----------------------------------------------------------------- PRIVATE VARS
 
-static const tBase s_pBases[] = {
-	{
+static const tBase s_pBases[BASE_ID_COUNT] = {
+	[BASE_ID_GROUND] = {
 		.uwLevel = 0,
 		.pPattern = {
 			 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -36,8 +42,23 @@ static const tBase s_pBases[] = {
 			63, 57, 63, 64, 63, 64, 63, 64, 63, 64,
 		}
 	},
-	{
+	[BASE_ID_DINO_UNPOPULATED] = {
 		.uwLevel = 100,
+		.pPattern = {
+			44, 44, 44, 44, 44, 44, 44, 44, 44, 44,
+			 0, 43, 43, 43, 43,  1, 43,  0, 43, 43,
+			43,  1, 43, 43, 43, 43, 43, 43, 43,  2,
+			43, 43, 43, 43, 43,  3,  1, 43, 43,  1,
+			43, 43, 43, 43,  3, 43, 43, 43,  0, 43,
+			43,  1, 43, 43, 43, 43, 43, 43, 43,  2,
+			13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+			23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+			34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
+			63, 64, 63, 64, 63, 57, 63, 64, 63, 64
+		}
+	},
+	[BASE_ID_DINO_POPULATED] = {
+		.uwLevel = BASE_LEVEL_VARIANT,
 		.pPattern = {
 			44, 44, 44, 44, 44, 44, 44, 44, 44, 44,
 			 0, 43, 43, 43, 43,  1, 43,  0, 43, 43,
@@ -50,10 +71,8 @@ static const tBase s_pBases[] = {
 			34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
 			63, 64, 63, 64, 63, 57, 63, 64, 63, 64
 		}
-	}
+	},
 };
-
-static const UBYTE s_ubBaseCount = sizeof(s_pBases) / sizeof(s_pBases[0]);
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -101,6 +120,15 @@ static UWORD chanceTrapezoid(
 	return uwMin;
 }
 
+static void tileDrawBase(const tBase *pBase, UWORD uwLevel) {
+	UBYTE **pTiles = g_pMainBuffer->pTileData;
+	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
+		for(UWORD x = 1; x < 1 + 10; ++x) {
+			pTiles[x][uwLevel + y] = pBase->pPattern[y * 10 + x - 1];
+		}
+	}
+}
+
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	return (
@@ -130,7 +158,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 	UBYTE **pTiles = g_pMainBuffer->pTileData;
 
 	// Draw terrain
-	UBYTE ubPercentTiles = (100 - 10 * s_ubBaseCount);
+	UBYTE ubPercentTiles = (100 - 10 * BASE_ID_COUNT_UNIQUE);
 	for(UWORD x = 1; x < uwEndX; ++x) {
 		UBYTE ubPercent = (x * ubPercentTiles) / uwEndX;
 		commProgress(ubPercent, g_pMsgs[MSG_LOADING_GEN_TERRAIN]);
@@ -217,14 +245,12 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 	}
 
 	// Draw bases
-	for(UBYTE ubBase = 0; ubBase < s_ubBaseCount; ++ubBase) {
-		UBYTE ubPercent = ((100 - ubPercentTiles) * ubBase / s_ubBaseCount);
-		commProgress(ubPercentTiles + ubPercent, g_pMsgs[MSG_LOADING_GEN_BASES]);
+	for(UBYTE ubBase = 0; ubBase < BASE_ID_COUNT; ++ubBase) {
 		const tBase *pBase = &s_pBases[ubBase];
-		for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
-			for(UWORD x = 1; x < 1 + 10; ++x) {
-				pTiles[x][pBase->uwLevel + y] = pBase->pPattern[y * 10 + x - 1];
-			}
+		if(pBase->uwLevel != BASE_LEVEL_VARIANT) {
+			UBYTE ubPercent = ((100 - ubPercentTiles) * ubBase / BASE_ID_COUNT_UNIQUE);
+			commProgress(ubPercentTiles + ubPercent, g_pMsgs[MSG_LOADING_GEN_BASES]);
+			tileDrawBase(pBase, pBase->uwLevel);
 		}
 	}
 
@@ -333,4 +359,15 @@ void tileExcavate(UWORD uwX, UWORD uwY) {
 	}
 
 	tileBufferSetTile(g_pMainBuffer, uwX, uwY, ubBg);
+}
+
+void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant) {
+	if(s_pBases[eNewVariant].uwLevel != BASE_LEVEL_VARIANT) {
+		logWrite("ERR: eNewVariant %d is not a base variant\n", eNewVariant);
+	}
+	if(s_pBases[eBase].uwLevel == BASE_LEVEL_VARIANT) {
+		logWrite("ERR: eBase %d is not a base non-variant\n", eNewVariant);
+	}
+
+	tileDrawBase(&s_pBases[eNewVariant], s_pBases[eBase].uwLevel);
 }

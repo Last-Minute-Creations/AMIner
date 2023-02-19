@@ -6,6 +6,7 @@
 #include "bob_new.h"
 #include "core.h"
 #include "save.h"
+#include "tile.h"
 
 #define DINO_BOB_COUNT 9
 
@@ -112,4 +113,8 @@ UBYTE dinoGetBoneCount(void) {
 
 void dinoFoundBone(void) {
 	++s_ubDinoBonesFound;
+
+	if(s_ubDinoBonesFound == 1) {
+		tileReplaceBaseWithVariant(BASE_ID_DINO_UNPOPULATED, BASE_ID_DINO_POPULATED);
+	}
 }
