@@ -128,7 +128,7 @@ void pageBribeSave(tFile *pFile) {
 }
 
 UBYTE pageBribeLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "FAVR")) {
+	if(!saveReadHeader(pFile, "BRBE")) {
 		return 0;
 	}
 
