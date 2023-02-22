@@ -2,33 +2,64 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef _STEER_H_
-#define _STEER_H_
+#ifndef INCLUDE_STEER_H
+#define INCLUDE_STEER_H
 
-#include <ace/types.h>
-#include <ace/macros.h>
+#include <ace/managers/joy.h> // for steerInitJoy() param
+#include "direction.h"
 
-typedef enum _tSteer {
-	STEER_P1_UP    = 1 << 0,
-	STEER_P1_DOWN  = 1 << 1,
-	STEER_P1_LEFT  = 1 << 2,
-	STEER_P1_RIGHT = 1 << 3,
-	STEER_P2_UP    = 1 << 4,
-	STEER_P2_DOWN  = 1 << 5,
-	STEER_P2_LEFT  = 1 << 6,
-	STEER_P2_RIGHT = 1 << 7,
-	STEER_P1_FIRE  = 1 << 8,
-	STEER_P2_FIRE  = 1 << 9,
+typedef enum tSteerMode {
+	STEER_MODE_JOY_1,
+	STEER_MODE_JOY_2,
+	STEER_MODE_KEY_WSAD,
+	STEER_MODE_KEY_ARROWS,
+	STEER_MODE_IDLE,
+	STEER_MODE_OFF,
+	STEER_MODE_COUNT,
+} tSteerMode;
+
+struct tSteer;
+
+typedef void (*tCbSteerProcess)(struct tSteer *pSteer);
+
+typedef enum tSteerDirState {
+	STEER_DIR_STATE_INACTIVE,
+	STEER_DIR_STATE_USED,
+	STEER_DIR_STATE_ACTIVE,
+} tSteerDirState;
+
+typedef enum tSteerKeymap {
+	STEER_KEYMAP_WSAD,
+	STEER_KEYMAP_ARROWS
+} tSteerKeymap;
+
+typedef struct tSteer {
+	tCbSteerProcess cbProcess;
+	tSteerDirState pDirectionStates[DIRECTION_COUNT];
+	union {
+		UBYTE ubJoy; ///< for joy steer
+		tSteerKeymap eKeymap; ///< for keyboard steer
+	};
 } tSteer;
 
-extern UWORD g_uwSteer;
+tSteer steerInitFromMode(tSteerMode eMode);
 
-void steerUpdateFromInput(UBYTE is1pKbd, UBYTE is2pKbd);
+tSteer steerInitJoy(UBYTE ubJoy);
 
-static inline UWORD steerGet(UWORD uwInput) {
-	return g_uwSteer & uwInput;
-}
+tSteer steerInitKey(tSteerKeymap eKeymap);
 
-UBYTE steerUse(UWORD uwInput);
+void steerProcess(tSteer *pSteer);
 
-#endif // _STEER_H_
+tSteer steerInitIdle(void);
+
+UBYTE steerIsPlayer(const tSteer *pSteer);
+
+UBYTE steerIsArrows(const tSteer *pSteer);
+
+UBYTE steerDirCheck(const tSteer *pSteer, tDirection eDir);
+
+UBYTE steerDirUse(tSteer *pSteer, tDirection eDir);
+
+tDirection steerGetPressedDir(const tSteer *pSteer);
+
+#endif // INCLUDE_STEER_H

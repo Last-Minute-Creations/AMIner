@@ -11,15 +11,26 @@ void pauseGsCreate(void) {
 }
 
 void pauseGsLoop(void) {
-	steerUpdateFromInput(g_sSettings.is1pKbd, g_sSettings.is2pKbd);
+	tSteer *pSteers = gameGetSteers();
+	steerProcess(&pSteers[0]);
+	steerProcess(&pSteers[1]);
 
-	if(steerGet(STEER_P1_LEFT) || steerGet(STEER_P2_LEFT)) {
+	if(
+		steerDirCheck(&pSteers[0], DIRECTION_LEFT) ||
+		(g_is2pPlaying && steerDirCheck(&pSteers[1], DIRECTION_LEFT))
+	) {
 		hudSelect(0);
 	}
-	else if(steerGet(STEER_P1_RIGHT) || steerGet(STEER_P2_RIGHT)) {
+	else if(
+		steerDirCheck(&pSteers[0], DIRECTION_RIGHT) ||
+		(g_is2pPlaying && steerDirCheck(&pSteers[1], DIRECTION_RIGHT))
+	) {
 		hudSelect(1);
 	}
-	else if(steerGet(STEER_P1_FIRE) || steerGet(STEER_P2_FIRE)) {
+	else if(
+		steerDirCheck(&pSteers[0], DIRECTION_FIRE) ||
+		(g_is2pPlaying && steerDirCheck(&pSteers[1], DIRECTION_FIRE))
+	) {
 		if(hudGetSelection() == 0) {
 			stateChange(g_pGameStateManager, &g_sStateGame);
 		}

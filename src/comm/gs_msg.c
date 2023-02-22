@@ -10,6 +10,7 @@
 #include "core.h"
 #include "color.h"
 #include "defs.h"
+#include "game.h"
 
 static UBYTE s_isMsgShown;
 static const char *s_szMessageFile;
@@ -21,7 +22,7 @@ static void cbOnClose(void) {
 }
 
 static void commGsMsgCreate(void) {
-	s_isMsgShown = commTryShow();
+	s_isMsgShown = commTryShow(gameGetSteers(), 2);
 	if(!s_isMsgShown) {
 		// Camera not placed properly
 		statePop(g_pGameStateManager);

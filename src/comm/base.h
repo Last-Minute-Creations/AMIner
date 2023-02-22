@@ -7,6 +7,8 @@
 
 #include <ace/utils/font.h>
 #include "face_id.h"
+#include "direction.h"
+#include "../steer.h"
 
 #define COMM_WIDTH (320-64)
 #define COMM_HEIGHT (192)
@@ -22,15 +24,6 @@
 typedef void (*tPageProcess)(void);
 
 typedef void (*tPageCleanup)(void);
-
-typedef enum _tCommNav {
-	COMM_NAV_UP,
-	COMM_NAV_DOWN,
-	COMM_NAV_LEFT,
-	COMM_NAV_RIGHT,
-	COMM_NAV_BTN,
-	COMM_NAV_COUNT
-} tCommNav;
 
 typedef enum _tCommNavEx {
 	COMM_NAV_EX_BTN_CLICK,
@@ -62,15 +55,15 @@ void commDestroy(void);
 
 void commProcess(void);
 
-UBYTE commTryShow(void);
+UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount);
 
 void commHide(void);
 
 UBYTE commIsShown(void);
 
-tBtnState commNavCheck(tCommNav eNav);
+tBtnState commNavCheck(tDirection eNav);
 
-UBYTE commNavUse(tCommNav eNav);
+UBYTE commNavUse(tDirection eNav);
 
 UBYTE commNavExUse(tCommNavEx eNavEx);
 

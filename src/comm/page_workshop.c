@@ -79,7 +79,7 @@ static void pageWorkshopProcess(void) {
 			// Exit
 			commRegisterPage(0, 0);
 		}
-		else if(commNavUse(COMM_NAV_UP)) {
+		else if(commNavUse(DIRECTION_UP)) {
 			buttonSelect(0);
 			buttonDrawAll(commGetDisplayBuffer());
 			s_isOnExitBtn = 0;
@@ -117,20 +117,20 @@ static void pageWorkshopProcess(void) {
 				}
 			}
 		}
-		else if(commNavUse(COMM_NAV_DOWN)) {
+		else if(commNavUse(DIRECTION_DOWN)) {
 			buttonSelect(1);
 			buttonDrawAll(commGetDisplayBuffer());
 			s_isOnExitBtn = 1;
 			commShopSelectWorkshopPos(s_ubWorkshopPos, 0);
 		}
-		else if(commNavUse(COMM_NAV_RIGHT)) {
+		else if(commNavUse(DIRECTION_RIGHT)) {
 			BYTE bNewPos = s_ubWorkshopPos + 1;
 			if(bNewPos >= WORKSHOP_ITEM_COUNT) {
 				bNewPos = 0;
 			}
 			commShopSelectWorkshopPos(bNewPos, 1);
 		}
-		else if(commNavUse(COMM_NAV_LEFT)) {
+		else if(commNavUse(DIRECTION_LEFT)) {
 			BYTE bNewPos = s_ubWorkshopPos - 1;
 			if(bNewPos < 0) {
 				bNewPos = WORKSHOP_ITEM_COUNT - 1;

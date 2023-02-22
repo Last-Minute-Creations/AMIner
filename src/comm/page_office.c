@@ -53,16 +53,16 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 static void pageOfficeProcess(void) {
 	BYTE bOldSelection = s_bSelectionCurr;
 
-	if(commNavUse(COMM_NAV_LEFT)) {
+	if(commNavUse(DIRECTION_LEFT)) {
 		--s_bSelectionCurr;
 	}
-	else if(commNavUse(COMM_NAV_RIGHT)) {
+	else if(commNavUse(DIRECTION_RIGHT)) {
 		++s_bSelectionCurr;
 	}
-	else if(commNavUse(COMM_NAV_DOWN)) {
+	else if(commNavUse(DIRECTION_DOWN)) {
 		s_bSelectionCurr += PPL_PER_ROW;
 	}
-	else if(commNavUse(COMM_NAV_UP)){
+	else if(commNavUse(DIRECTION_UP)){
 		s_bSelectionCurr -= PPL_PER_ROW;
 	}
 

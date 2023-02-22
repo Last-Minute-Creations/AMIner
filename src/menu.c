@@ -17,10 +17,12 @@
 #include "core.h"
 #include "settings.h"
 #include "menu_list.h"
+#include "steer.h"
 
 #define SFX_CHANNEL_ATARI 3
 #define MENU_OPTIONS_MAX 10
 #define INDEX_ATARI_INVALID 0xFF
+#define MENU_STEER_COUNT 4
 
 //------------------------------------------------------------------------ TYPES
 
@@ -66,6 +68,7 @@ static tBitMap *s_pLogo;
 static UWORD s_uwOffsY;
 static UBYTE s_isScoreShowAfterRollIn;
 static UBYTE s_ubIndexAtari;
+static tSteer s_pMenuSteers[MENU_STEER_COUNT];
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -87,7 +90,11 @@ static void menuEnableAtari(void) {
 
 static void menuStartGame(UBYTE isChallenge) {
 	commEraseAll();
-	gameStart(isChallenge);
+	gameStart(
+		isChallenge,
+		g_sSettings.is1pKbd ? steerInitKey(STEER_KEYMAP_WSAD) : steerInitJoy(0),
+		g_sSettings.is2pKbd ? steerInitKey(STEER_KEYMAP_ARROWS) : steerInitJoy(1)
+	);
 	commHide();
 	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
 	// copProcessBlocks();
@@ -96,7 +103,11 @@ static void menuStartGame(UBYTE isChallenge) {
 
 static void menuLoadGame(const char *szSavePath) {
 	commEraseAll();
-	gameStart(1); // challenge loading is faster due to less terrain prep
+	gameStart(
+		1, // challenge loading is faster due to less terrain prep
+		g_sSettings.is1pKbd ? steerInitKey(STEER_KEYMAP_WSAD) : steerInitJoy(0),
+		g_sSettings.is2pKbd ? steerInitKey(STEER_KEYMAP_ARROWS) : steerInitJoy(1)
+	);
 
 	systemUse();
 	tFile *pSave = fileOpen(szSavePath, "rb");
@@ -444,6 +455,9 @@ static void menuOnBackToMain(void) {
 }
 
 static void menuOnBackToMainFromSettings(void) {
+	// Update the 2nd port steer to prevent interfering with mouse
+	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitIdle() : steerInitJoy(STEER_MODE_JOY_2);
+
 	tFile *pFileSettings = fileOpen("settings.dat", "wb");
 	if(pFileSettings) {
 		settingsSave(pFileSettings);
@@ -489,19 +503,19 @@ static void menuProcessSelecting(void) {
 	menuListDraw();
 
 	UBYTE ubNewKey = 0;
-	if(commNavUse(COMM_NAV_UP)) {
+	if(commNavUse(DIRECTION_UP)) {
 		ubNewKey = KEY_UP;
 		menuListNavigate(-1);
 	}
-	else if(commNavUse(COMM_NAV_DOWN)) {
+	else if(commNavUse(DIRECTION_DOWN)) {
 		ubNewKey = KEY_DOWN;
 		menuListNavigate(+1);
 	}
-	else if(commNavUse(COMM_NAV_LEFT)) {
+	else if(commNavUse(DIRECTION_LEFT)) {
 		ubNewKey = KEY_LEFT;
 		menuListToggle(-1);
 	}
-	else if(commNavUse(COMM_NAV_RIGHT)) {
+	else if(commNavUse(DIRECTION_RIGHT)) {
 		ubNewKey = KEY_RIGHT;
 		menuListToggle(+1);
 	}
@@ -541,7 +555,7 @@ static void menuProcessRollIn(void) {
 		s_eMenuState = MENU_STATE_SELECTING;
 		s_uwOffsY = 16 + s_pLogo->Rows + 30;
 
-		if(!commTryShow()) {
+		if(!commTryShow(s_pMenuSteers, MENU_STEER_COUNT)) {
 			// TODO do something
 		}
 		if(s_isScoreShowAfterRollIn) {
@@ -629,6 +643,12 @@ void menuPreload(void) {
 
 		fileClose(pFileSettings);
 	}
+
+	// Init all steers except joy2 if not explicitly selected, because mouse may be connected there
+	s_pMenuSteers[0] = steerInitJoy(STEER_MODE_JOY_1);
+	s_pMenuSteers[1] = steerInitKey(STEER_KEYMAP_WSAD);
+	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitIdle() : steerInitJoy(STEER_MODE_JOY_2);
+	s_pMenuSteers[3] = steerInitKey(STEER_KEYMAP_ARROWS);
 }
 
 void menuUnload(void) {

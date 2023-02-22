@@ -176,10 +176,10 @@ static void redraw(void) {
 static void pageWarehouseProcess(void) {
 	UBYTE isButtonRefresh = 0;
 	UBYTE ubPosPrev = s_ubPosCurr;
-	if(commNavUse(COMM_NAV_UP) && s_ubPosCurr) {
+	if(commNavUse(DIRECTION_UP) && s_ubPosCurr) {
 		 s_ubPosCurr = MAX(0, s_ubPosCurr - 1);
 	}
-	else if(commNavUse(COMM_NAV_DOWN) && s_ubPosCurr < s_ubPosCount) {
+	else if(commNavUse(DIRECTION_DOWN) && s_ubPosCurr < s_ubPosCount) {
 		s_ubPosCurr = MIN(s_ubPosCount, s_ubPosCurr + 1);
 	}
 
@@ -204,13 +204,13 @@ static void pageWarehouseProcess(void) {
 	else if(s_ubPosCurr < s_ubPosCount) {
 		UBYTE ubMineral = s_pMineralsOnList[s_ubPosCurr];
 		// Process moving stock
-		if(commNavUse(COMM_NAV_LEFT) && s_pTmpStock[ubMineral]) {
+		if(commNavUse(DIRECTION_LEFT) && s_pTmpStock[ubMineral]) {
 			++s_pTmpSell[ubMineral];
 			--s_pTmpStock[ubMineral];
 			drawRow(ubPosPrev, warehouseGetCurrentPlan());
 		}
 		else if(
-			commNavUse(COMM_NAV_RIGHT) && s_pTmpStock[ubMineral] &&
+			commNavUse(DIRECTION_RIGHT) && s_pTmpStock[ubMineral] &&
 			warehouseGetCurrentPlan()->isActive
 		) {
 			++s_pTmpPlan[ubMineral];
@@ -220,11 +220,11 @@ static void pageWarehouseProcess(void) {
 	}
 	else {
 		// Navigation between buttons
-		if(commNavUse(COMM_NAV_RIGHT)) {
+		if(commNavUse(DIRECTION_RIGHT)) {
 			buttonSelect(1);
 			isButtonRefresh = 1;
 		}
-		else if(commNavUse(COMM_NAV_LEFT)) {
+		else if(commNavUse(DIRECTION_LEFT)) {
 			buttonSelect(0);
 			isButtonRefresh = 1;
 		}
