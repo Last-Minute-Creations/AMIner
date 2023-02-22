@@ -444,7 +444,12 @@ static void menuOnBackToMain(void) {
 }
 
 static void menuOnBackToMainFromSettings(void) {
-	// TODO: save settings
+	tFile *pFileSettings = fileOpen("settings.dat", "wb");
+	if(pFileSettings) {
+		settingsSave(pFileSettings);
+		fileClose(pFileSettings);
+		logWrite("Saved settings\n");
+	}
 	menuOnEnterMain();
 }
 
@@ -612,6 +617,18 @@ static void menuScoreGsDestroy(void) {
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
 	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx");
+
+	tFile *pFileSettings = fileOpen("settings.dat", "rb");
+	if(pFileSettings) {
+		if(settingsLoad(pFileSettings)) {
+			logWrite("Saved settings\n");
+		}
+		else {
+			logWrite("ERR: Can't save settings\n");
+		}
+
+		fileClose(pFileSettings);
+	}
 }
 
 void menuUnload(void) {
