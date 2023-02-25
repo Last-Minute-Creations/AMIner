@@ -149,6 +149,9 @@ static void menuOnExit(void) {
 static void onMenuPosUndraw(
 	UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight
 ) {
+	// Accomodate for text shadow, clear one more line
+	++uwHeight;
+
 	commErase(uwX + (COMM_DISPLAY_WIDTH - uwWidth) / 2, uwY, uwWidth, uwHeight);
 }
 
