@@ -14,7 +14,7 @@ typedef struct tInboxMessage {
 
 void inboxPushBack(tCommShopPage ePage, UBYTE isUrgent);
 
-UBYTE inboxTryPopBack(tCommShopPage *ePage);
+UBYTE inboxTryPopFront(tCommShopPage *ePage);
 
 UBYTE inboxIsUrgent(void);
 

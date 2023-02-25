@@ -42,7 +42,7 @@ static tCommShopPage commShopTabToPage(tCommTab eTab) {
 
 static void onBack(void) {
 	tCommShopPage ePage;
-	if(inboxTryPopBack(&ePage)) {
+	if(inboxTryPopFront(&ePage)) {
 		commShopChangePage(s_eCameFrom, ePage);
 	}
 	else {
@@ -63,7 +63,7 @@ static void commGsShopCreate(void) {
 	}
 
 	tCommShopPage ePage;
-	if(!inboxTryPopBack(&ePage)) {
+	if(!inboxTryPopFront(&ePage)) {
 		ePage = COMM_SHOP_PAGE_OFFICE_MAIN;
 	}
 	commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, ePage);
@@ -88,7 +88,7 @@ static void commGsShopLoop(void) {
 	if(commShopPageToTab(s_eCurrentPage) != COMM_TAB_COUNT) {
 		// Process inbox when on main tab page, e.g. after fulfilling plan
 		tCommShopPage ePage;
-		if(inboxTryPopBack(&ePage)) {
+		if(inboxTryPopFront(&ePage)) {
 			commShopChangePage(s_eCameFrom, ePage);
 			return;
 		}

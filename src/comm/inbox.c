@@ -9,10 +9,12 @@
 
 static tCommShopPage s_pInbox[INBOX_SIZE];
 static UWORD s_uwPendingInboxCount;
+static UWORD s_uwPopPos;
 static UBYTE s_isUrgent;
 
 void inboxCreate(void) {
 	s_uwPendingInboxCount = 0;
+	s_uwPopPos = 0;
 	s_isUrgent = 0;
 }
 
@@ -25,12 +27,14 @@ void inboxPushBack(tCommShopPage ePage, UBYTE isUrgent) {
 	s_pInbox[s_uwPendingInboxCount++] = ePage;
 }
 
-UBYTE inboxTryPopBack(tCommShopPage *ePage) {
-	if(!s_uwPendingInboxCount) {
+UBYTE inboxTryPopFront(tCommShopPage *ePage) {
+	if(s_uwPopPos >= s_uwPendingInboxCount) {
+		s_uwPopPos = 0;
+		s_uwPendingInboxCount = 0;
 		return 0;
 	}
 
-	*ePage = s_pInbox[--s_uwPendingInboxCount];
+	*ePage = s_pInbox[s_uwPopPos++];
 	s_isUrgent = 0;
 	return 1;
 }
