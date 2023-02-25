@@ -26,43 +26,51 @@ typedef struct _tGroundLayer {
 static const tGroundLayer s_pLayers[] = {
 	{
 		// Stock
-		{
+		.pColors = {
 			RGB(51, 0, 0), RGB(102, 34, 0), RGB(153, 68, 17),
 			RGB(204, 102, 34), RGB(255, 136, 51)
 		},
-		0, 2
+		.uwTop = 0, .ubDifficulty = 2
 	},
 	{
 		// A
-		{
+		.pColors = {
 			RGB(51, 34, 0), RGB(102, 68, 0), RGB(153, 102, 17),
 			RGB(204, 136, 34), RGB(255, 170, 51)
 		},
-		2048 + 32, 3
+		.uwTop = 2048 + 32, .ubDifficulty = 3
 	},
 	{
 		// B
-		{
+		.pColors = {
 			RGB(51, 34, 17), RGB(102, 68, 34), RGB(153, 102, 51),
 			RGB(204, 136, 68), RGB(255, 170, 85)
 		},
-		4096 + 32, 4
+		.uwTop = 4096 + 32, .ubDifficulty = 4
 	},
 	{
 		// C
-		{
+		.pColors = {
 			RGB(17, 34, 17), RGB(68, 68, 34), RGB(119, 102, 51),
 			RGB(170, 136, 68), RGB(221, 170, 85)
 		},
-		6144 + 32, 5
+		.uwTop = 6144 + 32, .ubDifficulty = 5
 	},
 	{
 		// D
-		{
+		.pColors = {
 			RGB(17, 34, 34), RGB(68, 68, 51), RGB(119, 102, 68),
 			RGB(170, 136, 85), RGB(221, 170, 102)
 		},
-		8192 + 32, 6
+		.uwTop = 8192 + 32, .ubDifficulty = 6
+	},
+	{
+		// Unreachable
+		.pColors = {
+			RGB(17, 34, 34), RGB(68, 68, 51), RGB(119, 102, 68),
+			RGB(170, 136, 85), RGB(221, 170, 102)
+		},
+		.uwTop = 65535, .ubDifficulty = 0
 	}
 };
 
@@ -84,8 +92,8 @@ void groundLayerCreate(const tVPort *pVp) {
 	s_uwVpStartY = pVp->uwOffsY + SCREEN_PAL_YOFFSET;
 	s_uwVpHeight = pVp->uwHeight;
 	s_isCopperActive = 0;
-	s_pColorsBelow = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);
-	s_pColorsAbove = copBlockCreate(pView->pCopList, s_ubLayerCount, 0, 0);
+	s_pColorsBelow = copBlockCreate(pView->pCopList, LAYER_COLOR_COUNT, 0, 0);
+	s_pColorsAbove = copBlockCreate(pView->pCopList, LAYER_COLOR_COUNT, 0, 0);
 	s_ubPrevLevel = 0xF;
 	groundLayerReset(1);
 	logBlockEnd("groundLayerCreate()");
@@ -112,11 +120,12 @@ UBYTE groundLayerLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_isCopperActive, sizeof(s_isCopperActive));
-	fileRead(pFile, &s_ubPrevLevel, sizeof(s_ubPrevLevel));
-	fileRead(pFile, &s_uwVpHeight, sizeof(s_uwVpHeight));
-	fileRead(pFile, &s_uwVpStartY, sizeof(s_uwVpStartY));
-	fileRead(pFile, &s_ubLowerLayer, sizeof(s_ubLowerLayer));
+	ULONG ulDummy;
+	fileRead(pFile, &ulDummy, sizeof(s_isCopperActive));
+	fileRead(pFile, &ulDummy, sizeof(s_ubPrevLevel));
+	fileRead(pFile, &ulDummy, sizeof(s_uwVpHeight));
+	fileRead(pFile, &ulDummy, sizeof(s_uwVpStartY));
+	fileRead(pFile, &ulDummy, sizeof(s_ubLowerLayer));
 	return 1;
 }
 
@@ -133,7 +142,7 @@ static void layerCopyColorsToBlock(
 	}
 }
 
-void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel) {
+void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorFadeLevel) {
 	if(uwCameraY < s_pLayers[s_ubLowerLayer-1].uwTop) {
 		--s_ubLowerLayer;
 	}
@@ -151,18 +160,18 @@ void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel) {
 	if(uwCameraY < uwSeamPos && uwSeamPos < uwCameraY + s_uwVpHeight) {
 		if(!s_isCopperActive) {
 			copBlockEnable(s_pCopList, s_pColorsBelow);
-			layerCopyColorsToBlock(pLayerLower, s_pColorsBelow, ubColorLevel);
+			layerCopyColorsToBlock(pLayerLower, s_pColorsBelow, ubColorFadeLevel);
 
 			copBlockEnable(s_pCopList, s_pColorsAbove);
-			layerCopyColorsToBlock(pLayerUpper, s_pColorsAbove, ubColorLevel);
+			layerCopyColorsToBlock(pLayerUpper, s_pColorsAbove, ubColorFadeLevel);
 			copBlockWait(
 				s_pCopList, s_pColorsAbove, 0xE2, s_uwVpStartY + s_uwVpHeight - 1
 			);
 			s_isCopperActive = 1;
 		}
-		else if(s_ubPrevLevel != ubColorLevel) {
-			layerCopyColorsToBlock(pLayerLower, s_pColorsBelow, ubColorLevel);
-			layerCopyColorsToBlock(pLayerUpper, s_pColorsAbove, ubColorLevel);
+		else if(s_ubPrevLevel != ubColorFadeLevel) {
+			layerCopyColorsToBlock(pLayerLower, s_pColorsBelow, ubColorFadeLevel);
+			layerCopyColorsToBlock(pLayerUpper, s_pColorsAbove, ubColorFadeLevel);
 		}
 		copBlockWait(
 			s_pCopList, s_pColorsBelow, 0, s_uwVpStartY + uwSeamPos - uwCameraY
@@ -189,11 +198,11 @@ void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel) {
 				}
 			}
 		}
-		else if(s_ubPrevLevel != ubColorLevel) {
-			groundLayerSetColorRegs(pLayerUpper, ubColorLevel);
+		else if(s_ubPrevLevel != ubColorFadeLevel) {
+			groundLayerSetColorRegs(pLayerUpper, ubColorFadeLevel);
 		}
 	}
-	s_ubPrevLevel = ubColorLevel;
+	s_ubPrevLevel = ubColorFadeLevel;
 }
 
 UBYTE groundLayerGetDifficultyAtDepth(UWORD uwDepth) {

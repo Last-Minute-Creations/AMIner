@@ -1,0 +1,18 @@
+General:
+	✔ Loaded game doesn't always show the terrain properly - related to ground layers @done(23-02-25 17:33)
+	☐ Show pending message in order of receiving, (first-in-first-out, not the last-in-first-out)
+	☐ Remove GDLR from saving/loading
+
+Main quest:
+
+Dino:
+	☐ Figure out the flow
+	☐ Implement the flow
+	☐ Swap bases with proper gfx
+	☐ extra accolade for completing the quest
+
+Gate quest:
+	☐ Figure out the flow
+
+Free mode:
+	☐ figure out the rules
