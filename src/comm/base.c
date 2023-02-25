@@ -6,6 +6,7 @@
 #include <ace/managers/ptplayer.h>
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
+#include <ace/managers/key.h>
 #include "../core.h"
 #include "../game.h"
 #include "settings.h"
@@ -138,6 +139,7 @@ void commProcess(void) {
 		pTests[DIRECTION_RIGHT] |= steerDirCheck(pSteer, DIRECTION_RIGHT);
 		pTests[DIRECTION_FIRE] |= steerDirCheck(pSteer, DIRECTION_FIRE);
 	}
+	pTests[DIRECTION_FIRE] |= keyCheck(KEY_SPACE) | keyCheck(KEY_RETURN);
 
 	tUwCoordYX sOrigin = commGetOrigin();
 

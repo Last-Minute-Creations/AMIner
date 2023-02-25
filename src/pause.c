@@ -1,4 +1,5 @@
 #include "pause.h"
+#include <ace/managers/key.h>
 #include "hud.h"
 #include "game.h"
 #include "core.h"
@@ -29,7 +30,8 @@ void pauseGsLoop(void) {
 	}
 	else if(
 		steerDirCheck(&pSteers[0], DIRECTION_FIRE) ||
-		(g_is2pPlaying && steerDirCheck(&pSteers[1], DIRECTION_FIRE))
+		(g_is2pPlaying && steerDirCheck(&pSteers[1], DIRECTION_FIRE)) ||
+		keyCheck(KEY_SPACE) || keyCheck(KEY_RETURN)
 	) {
 		if(hudGetSelection() == 0) {
 			stateChange(g_pGameStateManager, &g_sStateGame);
