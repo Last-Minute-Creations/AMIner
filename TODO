@@ -2,20 +2,24 @@ General:
 	✔ Loaded game doesn't always show the terrain properly - related to ground layers @done(23-02-25 17:33)
 	✔ Show pending message in order of receiving, (first-in-first-out, not the last-in-first-out) @done(23-02-25 18:03)
 	✔ re-enable space and enter as fire button in commrade and pause @done(23-02-25 18:33)
+	✔ prevent flying upwards and disappearing of krtek @done(23-03-07 18:34)
 	☐ Add save for inbox
 	☐ Remove GDLR from saving/loading
-	☐ prevent flying upwards and disappearing of krtek
 
 Main quest:
 
 Dino:
-	☐ Figure out the flow
-	☐ Implement the flow
+	☐ Figure out the final flow
+	☐ Implement the initial flow
+		☐ Intro when digging out the first bone
+		☐ Base gfx swap after reading intro
+		☐ Placeholder outro after digging out the last bone
+		☐ Extra accolade after reading outro
 	☐ Swap bases with proper gfx
-	☐ extra accolade for completing the quest
 
 Gate quest:
 	☐ Figure out the flow
+	☐ Add base into the game
 
 Free mode:
 	☐ figure out the rules

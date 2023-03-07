@@ -179,6 +179,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED:
 			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_delayed", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_URZEDAS_DINO_INTRO:
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_dino_intro", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
 			break;
@@ -199,6 +202,12 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3:
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_3", onBackFromLastRebuke);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_welcome", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_ARCH_ACCOLADE:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_accolade", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:

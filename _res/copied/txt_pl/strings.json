@@ -120,26 +120,23 @@
 		"saveQuit": "Zapisz i wyjdź"
 	},
 	"officePages": {
+		"commonWelcome": "Powitanie",
+		"commonDossier": "Dossier",
 		"main": "Powrót",
 		"listMietek": "Mietek",
 		"listKrystyna": "Krystyna",
 		"listPutin": "Komisarz Putienko",
 		"listUrzedas": "Urzędas",
-		"mietekWelcome": "Powitanie",
-		"krystynaDossier": "Dossier",
 		"krystynaAccounting": "Kreatywna Księgowość",
-		"urzedasDossier": "Dossier",
-		"urzedasWelcome": "Powitanie",
 		"urzedasFirstPlan": "Pierwszy plan",
 		"planComplete": "Wykonanie planu",
 		"planDelayed": "Przedłużony plan",
 		"urzedasBribe": "Łapówka",
 		"urzedasFavor": "Przysługa",
-		"komisarzDossier": "Dossier",
-		"komisarzWelcome": "Powitanie",
 		"komisarzRebuke_1": "Pierwsza nagana",
 		"komisarzRebuke_2": "Druga nagana",
-		"komisarzRebuke_3": "Ostatnia nagana"
+		"komisarzRebuke_3": "Ostatnia nagana",
+		"archAccolade": "Pochwała"
 	},
 	"officePageContents": {
 		"bribeA": [

@@ -38,7 +38,6 @@ target_compile_options(${GAME_EXECUTABLE} PRIVATE -Werror -Wno-error=unused-para
 target_link_libraries(${GAME_EXECUTABLE} ace)
 if(GAME_DEBUG)
   target_compile_definitions(${GAME_EXECUTABLE} PRIVATE GAME_DEBUG)
-	target_compile_definitions(ace PUBLIC ACE_DEBUG_UAE)
 endif()
 
 set(RES_DIR ${CMAKE_CURRENT_LIST_DIR}/_res)
