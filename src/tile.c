@@ -42,7 +42,7 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			63, 57, 63, 64, 63, 64, 63, 64, 63, 64,
 		}
 	},
-	[BASE_ID_DINO_UNPOPULATED] = {
+	[BASE_ID_DINO] = {
 		.uwLevel = 100,
 		.pPattern = {
 			44, 44, 44, 44, 44, 44, 44, 44, 44, 44,

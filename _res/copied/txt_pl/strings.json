@@ -92,7 +92,7 @@
 		"drillDepleted": "Wiertło zużyte",
 		"cargoFull": "Ładownia pełna!",
 		"restock": "Rozładunek!",
-		"foundBone": "Znaleźliście kość nr %hhu!"
+		"foundBone": "Kość #%hhu"
 	},
 	"shop": {
 		"timeRemaining": "Pozostało %d dni",
@@ -127,10 +127,14 @@
 		"listKrystyna": "Krystyna",
 		"listPutin": "Komisarz Putienko",
 		"listUrzedas": "Urzędas",
+		"listArch": "Iwan Jensonow",
+		"listPrisoner": "Prisoner",
+		"listAgent": "Agent",
 		"krystynaAccounting": "Kreatywna Księgowość",
 		"urzedasFirstPlan": "Pierwszy plan",
 		"planComplete": "Wykonanie planu",
 		"planDelayed": "Przedłużony plan",
+		"urzedasDinoIntro": "Archeolodzy",
 		"urzedasBribe": "Łapówka",
 		"urzedasFavor": "Przysługa",
 		"komisarzRebuke_1": "Pierwsza nagana",

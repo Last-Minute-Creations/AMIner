@@ -33,6 +33,8 @@ void gameTryPushBob(tBobNew *pBob);
 
 void gameAdvanceAccolade(void);
 
+void gameAddAccolade(void);
+
 void gameAddRebuke(void);
 
 UBYTE gameGetAccolades(void);

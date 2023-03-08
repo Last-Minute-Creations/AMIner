@@ -20,6 +20,8 @@ UBYTE dinoLoad(tFile *pFile);
 
 void dinoProcess(void);
 
+void dinoProcessDraw(void);
+
 UBYTE dinoGetBoneCount(void);
 
 void dinoFoundBone(void);

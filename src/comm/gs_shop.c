@@ -15,11 +15,12 @@
 #include <comm/page_favor.h>
 #include <comm/page_list.h>
 #include "core.h"
-#include "hud.h"
-#include "tutorial.h"
+#include "dino.h"
 #include "game.h"
+#include "hud.h"
 #include "inbox.h"
 #include "menu.h"
+#include "tutorial.h"
 
 static tCommTab s_eTab;
 static tCommShopPage s_eCurrentPage;
@@ -78,6 +79,7 @@ static void commGsShopCreate(void) {
 static void commGsShopLoop(void) {
 	commProcess();
 	tutorialProcess();
+	dinoProcess();
 
 	hudUpdate();
 	// Process only managers of HUD because we want single buffering on main one
@@ -212,6 +214,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
+		case COMM_SHOP_PAGE_OFFICE_LIST_ARCH:
+		case COMM_SHOP_PAGE_OFFICE_LIST_PRISONER:
+		case COMM_SHOP_PAGE_OFFICE_LIST_AGENT:
 		case COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS: {
 			tFaceId eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + FACE_ID_MIETEK;
 			pageListCreate(eFace);

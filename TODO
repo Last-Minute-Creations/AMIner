@@ -10,11 +10,13 @@ Main quest:
 
 Dino:
 	☐ Figure out the final flow
-	☐ Implement the initial flow
-		☐ Intro when digging out the first bone
-		☐ Base gfx swap after reading intro
-		☐ Placeholder outro after digging out the last bone
-		☐ Extra accolade after reading outro
+	✔ Implement the initial flow @done(23-03-08 17:58)
+		✔ Intro when digging out the first bone @done(23-03-08 17:58)
+		✔ Base gfx swap after reading intro @done(23-03-08 17:58)
+		✔ Placeholder outro after digging out the last bone @done(23-03-08 17:58)
+		✔ Extra accolade after reading outro @done(23-03-08 17:58)
+	☐ Message for call upon finding subsequent bones
+	☐ Message for final call to receive the accolade
 	☐ Swap bases with proper gfx
 
 Gate quest:

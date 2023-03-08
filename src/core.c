@@ -48,7 +48,7 @@ void coreProcessBeforeBobs(void) {
 	tileBufferQueueProcess(g_pMainBuffer);
 
 	// Draw dino bones before anything else
-	dinoProcess();
+	dinoProcessDraw();
 }
 
 void coreProcessAfterBobs(void) {

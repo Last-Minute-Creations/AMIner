@@ -427,11 +427,15 @@ static void gameCameraProcess(void) {
 void gameAdvanceAccolade(void) {
 	if(++s_ubAccoladesFract >= g_ubPlansPerAccolade) {
 		s_ubAccoladesFract = 0;
-		++s_ubAccolades;
+		gameAddAccolade();
+	}
+}
 
-		if(s_ubAccolades >= g_ubAccoladesInMainStory) {
-			inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES, 0);
-		}
+void gameAddAccolade(void) {
+	++s_ubAccolades;
+
+	if(s_ubAccolades >= g_ubAccoladesInMainStory) {
+		inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES, 0);
 	}
 }
 
@@ -652,6 +656,7 @@ static void gameGsLoop(void) {
 	if(tutorialProcess()) {
 		return;
 	}
+	dinoProcess();
 
 	debugColor(0x080);
 	gameCameraProcess();
