@@ -3,8 +3,8 @@ General:
 	✔ Show pending message in order of receiving, (first-in-first-out, not the last-in-first-out) @done(23-02-25 18:03)
 	✔ re-enable space and enter as fire button in commrade and pause @done(23-02-25 18:33)
 	✔ prevent flying upwards and disappearing of krtek @done(23-03-07 18:34)
-	☐ Add save for inbox
-	☐ Remove GDLR from saving/loading
+	✔ Add save for inbox @done(23-03-09 16:37)
+	✔ Remove GDLR from saving/loading @done(23-03-09 16:26)
 
 Main quest:
 

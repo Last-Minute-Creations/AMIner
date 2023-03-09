@@ -4,6 +4,7 @@
 
 #include "inbox.h"
 #include <ace/managers/log.h>
+#include "../save.h"
 
 #define INBOX_SIZE 10
 
@@ -12,11 +13,32 @@ static UWORD s_uwPendingInboxCount;
 static UWORD s_uwPopPos;
 static UBYTE s_isUrgent;
 
-void inboxCreate(void) {
+void inboxReset(void) {
 	s_uwPendingInboxCount = 0;
 	s_uwPopPos = 0;
 	s_isUrgent = 0;
 }
+
+void inboxSave(tFile *pFile) {
+	saveWriteHeader(pFile, "INBX");
+	fileWrite(pFile, s_pInbox, sizeof(s_pInbox));
+	fileWrite(pFile, &s_uwPendingInboxCount, sizeof(s_uwPendingInboxCount));
+	fileWrite(pFile, &s_uwPopPos, sizeof(s_uwPopPos));
+	fileWrite(pFile, &s_isUrgent, sizeof(s_isUrgent));
+}
+
+UBYTE inboxLoad(tFile *pFile) {
+	if(!saveReadHeader(pFile, "INBX")) {
+		return 0;
+	}
+
+	fileRead(pFile, s_pInbox, sizeof(s_pInbox));
+	fileRead(pFile, &s_uwPendingInboxCount, sizeof(s_uwPendingInboxCount));
+	fileRead(pFile, &s_uwPopPos, sizeof(s_uwPopPos));
+	fileRead(pFile, &s_isUrgent, sizeof(s_isUrgent));
+	return 1;
+}
+
 
 void inboxPushBack(tCommShopPage ePage, UBYTE isUrgent) {
 	if(s_uwPendingInboxCount >= INBOX_SIZE) {

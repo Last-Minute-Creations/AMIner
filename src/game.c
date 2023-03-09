@@ -83,6 +83,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	g_isChallenge = isChallenge;
 	s_pPlayerSteers[0] = sSteerP1;
 	s_pPlayerSteers[1] = sSteerP2;
+	inboxReset();
 	dinoReset();
 	tutorialReset();
 	pageOfficeReset();
@@ -593,6 +594,7 @@ void gameSave(tFile *pFile) {
 	fileWrite(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
 	fileWrite(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
 
+	inboxSave(pFile);
 	dinoSave(pFile);
 	tutorialSave(pFile);
 	pageOfficeSave(pFile);
@@ -630,7 +632,8 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
 	fileRead(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
 
-	return dinoLoad(pFile) &&
+	return inboxLoad(pFile) &&
+		dinoLoad(pFile) &&
 		tutorialLoad(pFile) &&
 		pageOfficeLoad(pFile) &&
 		tileLoad(pFile) &&
