@@ -27,8 +27,8 @@
 		"draw": "Remis!"
 	},
 	"menu": {
-		"enumP1": ["Dżoj", "WSAD"],
-		"enumP2": ["Dżoj", "Strzałki"],
+		"enumP1": ["Dżoj", "WSAD + Shift"],
+		"enumP2": ["Dżoj", "Strzałki + Shift"],
 		"enumOnOff": ["WYŁ", "WŁ"],
 		"enumPlayerCount": ["Jeden", "Dwóch"],
 		"captions": [
@@ -92,7 +92,7 @@
 		"drillDepleted": "Wiertło zużyte",
 		"cargoFull": "Ładownia pełna!",
 		"restock": "Rozładunek!",
-		"foundBone": "Znaleźliście kość nr %hhu!"
+		"foundBone": "Kość #%hhu"
 	},
 	"shop": {
 		"timeRemaining": "Pozostało %d dni",
@@ -120,26 +120,27 @@
 		"saveQuit": "Zapisz i wyjdź"
 	},
 	"officePages": {
+		"commonWelcome": "Powitanie",
+		"commonDossier": "Dossier",
 		"main": "Powrót",
 		"listMietek": "Mietek",
 		"listKrystyna": "Krystyna",
 		"listPutin": "Komisarz Putienko",
 		"listUrzedas": "Urzędas",
-		"mietekWelcome": "Powitanie",
-		"krystynaDossier": "Dossier",
+		"listArch": "Iwan Jensonow",
+		"listPrisoner": "Prisoner",
+		"listAgent": "Agent",
 		"krystynaAccounting": "Kreatywna Księgowość",
-		"urzedasDossier": "Dossier",
-		"urzedasWelcome": "Powitanie",
 		"urzedasFirstPlan": "Pierwszy plan",
 		"planComplete": "Wykonanie planu",
 		"planDelayed": "Przedłużony plan",
+		"urzedasDinoIntro": "Archeolodzy",
 		"urzedasBribe": "Łapówka",
 		"urzedasFavor": "Przysługa",
-		"komisarzDossier": "Dossier",
-		"komisarzWelcome": "Powitanie",
 		"komisarzRebuke_1": "Pierwsza nagana",
 		"komisarzRebuke_2": "Druga nagana",
-		"komisarzRebuke_3": "Ostatnia nagana"
+		"komisarzRebuke_3": "Ostatnia nagana",
+		"archAccolade": "Pochwała"
 	},
 	"officePageContents": {
 		"bribeA": [

@@ -21,6 +21,7 @@
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
 #define VEHICLE_TOOL_ANIM_FRAMES 2
+#define VEHICLE_TOOL_OFFSET_Y 3
 #define VEHICLE_TRACK_HEIGHT 7
 #define VEHICLE_TRACK_DRILL_HEIGHT 7
 #define VEHICLE_TRACK_JET_HEIGHT 5
@@ -436,7 +437,7 @@ static inline void vehicleSetTool(
 	tVehicle *pVehicle, tToolState eToolState, UBYTE ubFrame
 ) {
 	pVehicle->sBobTool.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
-	pVehicle->sBobTool.sPos.uwY -= 3;
+	pVehicle->sBobTool.sPos.uwY -= VEHICLE_TOOL_OFFSET_Y;
 	UBYTE ubFrameOffsetY;
 	if(eToolState == TOOL_STATE_IDLE) {
 		ubFrameOffsetY = 0;
@@ -776,8 +777,12 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	if(pVehicle->fDy < 0) {
 		UWORD uwTileTop = (fix16_to_int(pVehicle->fY) - 1) >> 5;
 		// Flying
-		pVehicle->fY = MAX(0, pVehicle->fY + pVehicle->fDy);
-		if(tileIsSolid(uwTileCenter, uwTileTop)) {
+		pVehicle->fY += pVehicle->fDy;
+		if(pVehicle->fY < F16(VEHICLE_TOOL_OFFSET_Y)) {
+			pVehicle->fY = F16(VEHICLE_TOOL_OFFSET_Y);
+			pVehicle->fDy = 0;
+		}
+		else if(tileIsSolid(uwTileCenter, uwTileTop)) {
 			pVehicle->fY = fix16_from_int((uwTileTop+1) << 5);
 			pVehicle->fDy = 0;
 		}

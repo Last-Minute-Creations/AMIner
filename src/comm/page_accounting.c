@@ -19,10 +19,10 @@ static UWORD s_uwAccountingCost;
 static void pageAccountingProcess(void) {
 	BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
 	BYTE bButtonCount = buttonGetCount();
-	if(commNavUse(COMM_NAV_RIGHT)) {
+	if(commNavUse(DIRECTION_RIGHT)) {
 		bButtonCurr = MIN(bButtonCurr + 1, bButtonCount - 1);
 	}
-	else if(commNavUse(COMM_NAV_LEFT)) {
+	else if(commNavUse(DIRECTION_LEFT)) {
 		bButtonCurr = MAX(bButtonCurr - 1, 0);
 	}
 	if(bButtonPrev != bButtonCurr) {

@@ -46,7 +46,7 @@ static void pageNewsFillScrollWithText(void) {
 }
 
 static void pageNewsProcess(void) {
-	UBYTE ubSpeed = commNavCheck(COMM_NAV_BTN) ? SCROLL_SPEED_FAST : SCROLL_SPEED_SLOW;
+	UBYTE ubSpeed = commNavCheck(DIRECTION_FIRE) ? SCROLL_SPEED_FAST : SCROLL_SPEED_SLOW;
 
 	// Shift scroll contents right
 	tBitMap *pBitmap = s_pNewsTextBitmap->pBitMap;

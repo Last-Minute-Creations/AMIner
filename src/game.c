@@ -25,7 +25,6 @@
 #include "core.h"
 #include "dino.h"
 #include "debug.h"
-#include "steer.h"
 #include "inventory.h"
 #include "defs.h"
 #include "save.h"
@@ -41,22 +40,9 @@ typedef enum _tCameraType {
 typedef struct _tModeSelection {
 	tMode eMode;
 	UBYTE isSelecting;
-	tSteer eSteerFire;
-	tSteer eSteerLeft, eSteerRight, eSteerUp, eSteerDown;
 } tModeSelection;
 
-static tModeSelection s_pModeSelection[2] = {
-	{
-		.eSteerFire = STEER_P1_FIRE,
-		.eSteerLeft = STEER_P1_LEFT, .eSteerRight = STEER_P1_RIGHT,
-		.eSteerUp = STEER_P1_UP, .eSteerDown = STEER_P1_DOWN
-	},
-	{
-		.eSteerFire = STEER_P2_FIRE,
-		.eSteerLeft = STEER_P2_LEFT, .eSteerRight = STEER_P2_RIGHT,
-		.eSteerUp = STEER_P2_UP, .eSteerDown = STEER_P2_DOWN
-	},
-};
+static tModeSelection s_pModeSelection[2] = {};
 
 tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
@@ -68,6 +54,7 @@ static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 
 static UBYTE s_pBombCount[2];
 static tBombDir s_pLastDir[2];
+static tSteer s_pPlayerSteers[2];
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
@@ -91,9 +78,12 @@ void modeReset(UBYTE ubPlayer) {
 	hudSetMode(ubPlayer, MODE_DRILL);
 }
 
-void gameStart(UBYTE isChallenge) {
+void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_ubChallengeCamCnt = 0;
 	g_isChallenge = isChallenge;
+	s_pPlayerSteers[0] = sSteerP1;
+	s_pPlayerSteers[1] = sSteerP2;
+	inboxReset();
 	dinoReset();
 	tutorialReset();
 	pageOfficeReset();
@@ -204,20 +194,19 @@ static void addBombInDir(UBYTE ubPlayer, tBombDir eDir, tBombDir eOpposite) {
 }
 
 static void gameProcessModeTnt(UBYTE ubPlayer) {
-	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
-	if(steerUse(pSelection->eSteerLeft)) {
+	if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_LEFT)) {
 		addBombInDir(ubPlayer, BOMB_DIR_LEFT, BOMB_DIR_RIGHT);
 	}
-	else if(steerUse(pSelection->eSteerRight)) {
+	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_RIGHT)) {
 		addBombInDir(ubPlayer, BOMB_DIR_RIGHT, BOMB_DIR_LEFT);
 	}
-	else if(steerUse(pSelection->eSteerUp)) {
+	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_UP)) {
 		addBombInDir(ubPlayer, BOMB_DIR_UP, BOMB_DIR_DOWN);
 	}
-	else if(steerUse(pSelection->eSteerDown)) {
+	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_DOWN)) {
 		addBombInDir(ubPlayer, BOMB_DIR_DOWN, BOMB_DIR_UP);
 	}
-	else if(steerUse(pSelection->eSteerFire)) {
+	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
 		UBYTE ubTntCount = inventoryGetItemDef(INVENTORY_ITEM_TNT)->ubCount;
 		ubTntCount -= dynamiteTrigger(
 			&g_pVehicles[ubPlayer].sDynamite,
@@ -290,7 +279,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
 
 	if(!g_isChallenge) {
-		if(steerUse(pSelection->eSteerFire)) {
+		if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
 			if(!pSelection->isSelecting) {
 				if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
 					statePush(g_pGameStateManager, &g_sStateShop);
@@ -315,7 +304,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	}
 
 	if(pSelection->isSelecting) {
-		if(steerUse(pSelection->eSteerLeft)) {
+		if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_LEFT)) {
 			if(pSelection->eMode > 0) {
 				--pSelection->eMode;
 			}
@@ -323,7 +312,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				pSelection->eMode = MODE_COUNT - 1;
 			}
 		}
-		else if(steerUse(pSelection->eSteerRight)) {
+		else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_RIGHT)) {
 			if(pSelection->eMode < MODE_COUNT - 1) {
 			++pSelection->eMode;
 			}
@@ -336,10 +325,10 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	else {
 		BYTE bDirX = 0, bDirY = 0;
 		if(!g_pVehicles[ubPlayer].isChallengeEnded) {
-			if(steerGet(pSelection->eSteerRight)) { bDirX += 1; }
-			if(steerGet(pSelection->eSteerLeft)) { bDirX -= 1; }
-			if(steerGet(pSelection->eSteerDown)) { bDirY += 1; }
-			if(steerGet(pSelection->eSteerUp)) { bDirY -= 1; }
+			if(steerDirCheck(&s_pPlayerSteers[ubPlayer], DIRECTION_RIGHT)) { bDirX += 1; }
+			if(steerDirCheck(&s_pPlayerSteers[ubPlayer], DIRECTION_LEFT)) { bDirX -= 1; }
+			if(steerDirCheck(&s_pPlayerSteers[ubPlayer], DIRECTION_DOWN)) { bDirY += 1; }
+			if(steerDirCheck(&s_pPlayerSteers[ubPlayer], DIRECTION_UP)) { bDirY -= 1; }
 		}
 		vehicleMove(&g_pVehicles[ubPlayer], bDirX, bDirY);
 	}
@@ -439,11 +428,15 @@ static void gameCameraProcess(void) {
 void gameAdvanceAccolade(void) {
 	if(++s_ubAccoladesFract >= g_ubPlansPerAccolade) {
 		s_ubAccoladesFract = 0;
-		++s_ubAccolades;
+		gameAddAccolade();
+	}
+}
 
-		if(s_ubAccolades >= g_ubAccoladesInMainStory) {
-			inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES, 0);
-		}
+void gameAddAccolade(void) {
+	++s_ubAccolades;
+
+	if(s_ubAccolades >= g_ubAccoladesInMainStory) {
+		inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES, 0);
 	}
 }
 
@@ -574,6 +567,10 @@ UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays) {
 	return 0;
 }
 
+tSteer *gameGetSteers(void) {
+	return s_pPlayerSteers;
+}
+
 void gameSave(tFile *pFile) {
 	saveWriteHeader(pFile, "GAME");
 	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
@@ -597,6 +594,7 @@ void gameSave(tFile *pFile) {
 	fileWrite(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
 	fileWrite(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
 
+	inboxSave(pFile);
 	dinoSave(pFile);
 	tutorialSave(pFile);
 	pageOfficeSave(pFile);
@@ -606,7 +604,6 @@ void gameSave(tFile *pFile) {
 	vehicleSave(&g_pVehicles[0], pFile);
 	vehicleSave(&g_pVehicles[1], pFile);
 	hudSave(pFile);
-	groundLayerSave(pFile);
 }
 
 UBYTE gameLoad(tFile *pFile) {
@@ -635,7 +632,8 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
 	fileRead(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
 
-	return dinoLoad(pFile) &&
+	return inboxLoad(pFile) &&
+		dinoLoad(pFile) &&
 		tutorialLoad(pFile) &&
 		pageOfficeLoad(pFile) &&
 		tileLoad(pFile) &&
@@ -643,8 +641,7 @@ UBYTE gameLoad(tFile *pFile) {
 		inventoryLoad(pFile) &&
 		vehicleLoad(&g_pVehicles[0], pFile) &&
 		vehicleLoad(&g_pVehicles[1], pFile) &&
-		hudLoad(pFile) &&
-		groundLayerLoad(pFile);
+		hudLoad(pFile);
 }
 
 //-------------------------------------------------------------------- GAMESTATE
@@ -660,10 +657,12 @@ static void gameGsLoop(void) {
 	if(tutorialProcess()) {
 		return;
 	}
+	dinoProcess();
 
 	debugColor(0x080);
 	gameCameraProcess();
-	steerUpdateFromInput(g_sSettings.is1pKbd, g_sSettings.is2pKbd);
+	steerProcess(&s_pPlayerSteers[0]);
+	steerProcess(&s_pPlayerSteers[1]);
 	gameProcessHotkeys();
 	UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
 	if(isGameStateChange) {

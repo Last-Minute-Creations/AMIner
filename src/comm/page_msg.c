@@ -148,11 +148,11 @@ static void pageMsgProcess(void) {
 		}
 	}
 
-	if(s_ubCurrPage > 0 && commNavUse(COMM_NAV_UP)) {
+	if(s_ubCurrPage > 0 && commNavUse(DIRECTION_UP)) {
 		--s_ubCurrPage;
 		commMsgDrawCurrentPage();
 	}
-	else if(s_ubCurrPage < s_ubPageCount - 1 && commNavUse(COMM_NAV_DOWN)) {
+	else if(s_ubCurrPage < s_ubPageCount - 1 && commNavUse(DIRECTION_DOWN)) {
 		++s_ubCurrPage;
 		commMsgDrawCurrentPage();
 	}

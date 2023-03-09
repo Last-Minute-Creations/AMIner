@@ -9,6 +9,7 @@
 #include <ace/managers/ptplayer.h>
 #include "bob_new.h"
 #include "string_array.h"
+#include "steer.h"
 
 #define GAME_BPP 5
 #define GAME_MOD_COUNT 10
@@ -18,7 +19,7 @@ UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void gameGsLoopChallengeEnd(void);
 
-void gameStart(UBYTE isChallenge);
+void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2);
 
 void gameTriggerSave(void);
 
@@ -31,6 +32,8 @@ void gameGsLoopEnterScore(void);
 void gameTryPushBob(tBobNew *pBob);
 
 void gameAdvanceAccolade(void);
+
+void gameAddAccolade(void);
 
 void gameAddRebuke(void);
 
@@ -45,6 +48,8 @@ void gameElapseDay(void);
 ULONG gameGetTime(void);
 
 UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays);
+
+tSteer *gameGetSteers(void);
 
 extern tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];

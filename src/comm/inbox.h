@@ -6,15 +6,22 @@
 #define _AMINER_COMM_INBOX_H_
 
 #include "gs_shop.h"
+#include <ace/utils/file.h>
 
 typedef struct tInboxMessage {
 	tCommShopPage ePage;
 	// TODO: something to tell shop which next page to show - for going to default state, triggering rebuke game over
 } tInboxMessage;
 
+void inboxSave(tFile *pFile);
+
+UBYTE inboxLoad(tFile *pFile);
+
+void inboxReset(void);
+
 void inboxPushBack(tCommShopPage ePage, UBYTE isUrgent);
 
-UBYTE inboxTryPopBack(tCommShopPage *ePage);
+UBYTE inboxTryPopFront(tCommShopPage *ePage);
 
 UBYTE inboxIsUrgent(void);
 

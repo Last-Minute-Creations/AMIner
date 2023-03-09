@@ -5,15 +5,31 @@
 #include "dino.h"
 #include "bob_new.h"
 #include "core.h"
+#include "game.h"
+#include "hud.h"
 #include "save.h"
+#include "tile.h"
+#include "comm/gs_shop.h"
+#include "comm/inbox.h"
+#include "comm/page_office.h"
 
 #define DINO_BOB_COUNT 9
+
+typedef enum tDinoState {
+	DINO_STATE_WAITING_FOR_FIRST_BONE,
+	DINO_STATE_INCOMING_BRIEFING,
+	DINO_STATE_WAITING_FOR_READING_BRIEFING,
+	DINO_STATE_WAITING_FOR_LAST_BONE,
+	DINO_STATE_INCOMING_ACCOLADE,
+	DINO_STATE_WAITING_FOR_RECEIVING_ACCOLADE,
+	DINO_STATE_DONE,
+} tDinoState;
 
 static tBobNew s_pDinoBobs[DINO_BOB_COUNT];
 static UBYTE s_pDinoWereDrawn[DINO_BOB_COUNT];
 static UBYTE s_ubDinoBonesFound = 0;
 static tBitMap *s_pBones, *s_pBonesMask;
-
+static tDinoState s_eQuestState;
 
 void dinoCreate(void) {
 	static const tUwCoordYX s_pDinoPos[DINO_BOB_COUNT] = {
@@ -64,7 +80,7 @@ void dinoReset(void) {
 void dinoSave(tFile *pFile) {
 	saveWriteHeader(pFile, "DINO");
 	fileWrite(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
-	// fileWrite(pFile, s_pDinoWereDrawn, sizeof(DINO_BOB_COUNT * s_pDinoWereDrawn[0]));
+	fileWrite(pFile, &s_eQuestState, sizeof(s_eQuestState));
 }
 
 UBYTE dinoLoad(tFile *pFile) {
@@ -73,11 +89,52 @@ UBYTE dinoLoad(tFile *pFile) {
 	}
 
 	fileRead(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
-	// fileRead(pFile, s_pDinoWereDrawn, sizeof(DINO_BOB_COUNT * s_pDinoWereDrawn[0]));
+	fileRead(pFile, &s_eQuestState, sizeof(s_eQuestState));
 	return 1;
 }
 
 void dinoProcess(void) {
+	switch(s_eQuestState) {
+		case DINO_STATE_WAITING_FOR_FIRST_BONE:
+			break;
+		case DINO_STATE_INCOMING_BRIEFING:
+				pageOfficeUnlockPerson(FACE_ID_ARCH);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DINO_INTRO);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_ARCH, COMM_SHOP_PAGE_OFFICE_ARCH_DOSSIER);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_ARCH, COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME);
+
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_DINO_INTRO, 1);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME, 1);
+				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_URZEDAS]);
+				++s_eQuestState;
+			break;
+		case DINO_STATE_WAITING_FOR_READING_BRIEFING:
+			if(commShopIsActive()) {
+				// TODO: check if on surface?
+				tileReplaceBaseWithVariant(BASE_ID_DINO, BASE_ID_DINO_POPULATED);
+			}
+			break;
+		case DINO_STATE_WAITING_FOR_LAST_BONE:
+			break;
+		case DINO_STATE_INCOMING_ACCOLADE:
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_ARCH, COMM_SHOP_PAGE_OFFICE_ARCH_ACCOLADE);
+
+			inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_ACCOLADE, 1);
+			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]); // TODO: better message
+			++s_eQuestState;
+			break;
+		case DINO_STATE_WAITING_FOR_RECEIVING_ACCOLADE:
+			if(commShopIsActive()) {
+				gameAddAccolade();
+				++s_eQuestState;
+			}
+			break;
+		case DINO_STATE_DONE:
+			break;
+	}
+}
+
+void dinoProcessDraw(void) {
 	static UBYTE ubLastDino = 0;
 
 	if(s_ubDinoBonesFound && tileBufferIsTileOnBuffer(
@@ -112,4 +169,11 @@ UBYTE dinoGetBoneCount(void) {
 
 void dinoFoundBone(void) {
 	++s_ubDinoBonesFound;
+
+	if(s_ubDinoBonesFound == 1) {
+		s_eQuestState = DINO_STATE_INCOMING_BRIEFING;
+	}
+	else if(s_ubDinoBonesFound == DINO_BOB_COUNT) {
+		s_eQuestState = DINO_STATE_INCOMING_ACCOLADE;
+	}
 }

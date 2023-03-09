@@ -14,6 +14,15 @@
 #define TILE_ROW_CHALLENGE_CHECKPOINT_3 (TILE_ROW_CHALLENGE_CHECKPOINT_2 + 20)
 #define TILE_ROW_CHALLENGE_FINISH (TILE_ROW_CHALLENGE_CHECKPOINT_3 + 15)
 
+typedef enum tBaseId {
+	BASE_ID_GROUND,
+	BASE_ID_DINO,
+	BASE_ID_COUNT_UNIQUE,
+	// Variants:
+	BASE_ID_DINO_POPULATED = BASE_ID_COUNT_UNIQUE,
+	BASE_ID_COUNT,
+} tBaseId;
+
 typedef enum _tTile {
 	TILE_BASE_BG_FIRST = 0, TILE_BASE_BG_LAST = 32,
 	TILE_BASE_SHAFT,
@@ -52,6 +61,8 @@ void tileSave(tFile *pFile);
 UBYTE tileLoad(tFile *pFile);
 
 void tileExcavate(UWORD uwX, UWORD uwY);
+
+void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant);
 
 extern const tTileDef g_pTileDefs[TILE_COUNT];
 

@@ -49,7 +49,7 @@ static void logoGsCreate(void) {
 	logBlockBegin("logoGsCreate()");
 
 	s_pView = viewCreate(0,
-		TAG_VIEW_GLOBAL_CLUT, 1,
+		TAG_VIEW_GLOBAL_PALETTE, 1,
 	TAG_END);
 
 	s_pVp = vPortCreate(0,

@@ -15,11 +15,12 @@
 #include <comm/page_favor.h>
 #include <comm/page_list.h>
 #include "core.h"
-#include "hud.h"
-#include "tutorial.h"
+#include "dino.h"
 #include "game.h"
+#include "hud.h"
 #include "inbox.h"
 #include "menu.h"
+#include "tutorial.h"
 
 static tCommTab s_eTab;
 static tCommShopPage s_eCurrentPage;
@@ -42,7 +43,7 @@ static tCommShopPage commShopTabToPage(tCommTab eTab) {
 
 static void onBack(void) {
 	tCommShopPage ePage;
-	if(inboxTryPopBack(&ePage)) {
+	if(inboxTryPopFront(&ePage)) {
 		commShopChangePage(s_eCameFrom, ePage);
 	}
 	else {
@@ -55,7 +56,7 @@ static void onBackFromLastRebuke(void) {
 }
 
 static void commGsShopCreate(void) {
-	UBYTE isShopShown = commTryShow();
+	UBYTE isShopShown = commTryShow(gameGetSteers(), 2);
 	if(!isShopShown) {
 		// Camera not placed properly
 		statePop(g_pGameStateManager);
@@ -63,7 +64,7 @@ static void commGsShopCreate(void) {
 	}
 
 	tCommShopPage ePage;
-	if(!inboxTryPopBack(&ePage)) {
+	if(!inboxTryPopFront(&ePage)) {
 		ePage = COMM_SHOP_PAGE_OFFICE_MAIN;
 	}
 	commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, ePage);
@@ -78,6 +79,7 @@ static void commGsShopCreate(void) {
 static void commGsShopLoop(void) {
 	commProcess();
 	tutorialProcess();
+	dinoProcess();
 
 	hudUpdate();
 	// Process only managers of HUD because we want single buffering on main one
@@ -88,7 +90,7 @@ static void commGsShopLoop(void) {
 	if(commShopPageToTab(s_eCurrentPage) != COMM_TAB_COUNT) {
 		// Process inbox when on main tab page, e.g. after fulfilling plan
 		tCommShopPage ePage;
-		if(inboxTryPopBack(&ePage)) {
+		if(inboxTryPopFront(&ePage)) {
 			commShopChangePage(s_eCameFrom, ePage);
 			return;
 		}
@@ -179,6 +181,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED:
 			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_delayed", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_URZEDAS_DINO_INTRO:
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_dino_intro", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
 			break;
@@ -200,9 +205,18 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3:
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_3", onBackFromLastRebuke);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_welcome", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_ARCH_ACCOLADE:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_accolade", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
+		case COMM_SHOP_PAGE_OFFICE_LIST_ARCH:
+		case COMM_SHOP_PAGE_OFFICE_LIST_PRISONER:
+		case COMM_SHOP_PAGE_OFFICE_LIST_AGENT:
 		case COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS: {
 			tFaceId eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + FACE_ID_MIETEK;
 			pageListCreate(eFace);

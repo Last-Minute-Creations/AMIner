@@ -2,62 +2,150 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include <ace/managers/key.h>
-#include <ace/managers/joy.h>
-#include <ace/utils/file.h>
 #include "steer.h"
+#include <ace/managers/joy.h>
+#include <ace/managers/key.h>
 
-static UWORD s_uwSteerUnused = 0xFFFF;
+//------------------------------------------------------------------ PRIVATE FNS
 
-void steerReset(void) {
-	s_uwSteerUnused = 0xFFFF;
+static void onJoy(tSteer *pSteer) {
+	// Joy direction enum is not in same order as steer enum
+	// There is a reason why it's ordered that way in game, so it needs remapping
+	static const UBYTE pDirToJoy[] = {
+		[DIRECTION_UP] = JOY_UP,
+		[DIRECTION_DOWN] = JOY_DOWN,
+		[DIRECTION_LEFT] = JOY_LEFT,
+		[DIRECTION_RIGHT] = JOY_RIGHT,
+		[DIRECTION_FIRE] = JOY_FIRE
+	};
+
+	UBYTE ubJoy = pSteer->ubJoy;
+
+	for(tDirection eDir = 0; eDir < DIRECTION_COUNT; ++eDir) {
+		if(joyCheck(ubJoy + pDirToJoy[eDir])) {
+			if(pSteer->pDirectionStates[eDir] == STEER_DIR_STATE_INACTIVE) {
+				pSteer->pDirectionStates[eDir] = STEER_DIR_STATE_ACTIVE;
+			}
+		}
+		else {
+			pSteer->pDirectionStates[eDir] = STEER_DIR_STATE_INACTIVE;
+		}
+	}
 }
 
-void steerUpdateFromInput(UBYTE is1pKbd, UBYTE is2pKbd) {
-	g_uwSteer = 0;
-	if(is1pKbd) {
-		if(keyCheck(KEY_W)) { g_uwSteer |= STEER_P1_UP; }
-		if(keyCheck(KEY_S)) { g_uwSteer |= STEER_P1_DOWN; }
-		if(keyCheck(KEY_A)) { g_uwSteer |= STEER_P1_LEFT; }
-		if(keyCheck(KEY_D)) { g_uwSteer |= STEER_P1_RIGHT; }
-		if(keyCheck(KEY_SPACE)) { g_uwSteer |= STEER_P1_FIRE; }
-	}
-	else {
-		if(joyCheck(JOY1_UP   )) { g_uwSteer |= STEER_P1_UP; }
-		if(joyCheck(JOY1_DOWN )) { g_uwSteer |= STEER_P1_DOWN; }
-		if(joyCheck(JOY1_LEFT )) { g_uwSteer |= STEER_P1_LEFT; }
-		if(joyCheck(JOY1_RIGHT)) { g_uwSteer |= STEER_P1_RIGHT; }
-		if(joyCheck(JOY1_FIRE)) { g_uwSteer |= STEER_P1_FIRE; }
-	}
+static void onKey(tSteer *pSteer) {
+	static const UBYTE pDirsWsad[] = {
+		[DIRECTION_UP] = KEY_W,
+		[DIRECTION_DOWN] = KEY_S,
+		[DIRECTION_LEFT] = KEY_A,
+		[DIRECTION_RIGHT] = KEY_D,
+		[DIRECTION_FIRE] = KEY_LSHIFT
+	};
+	static const UBYTE pDirsArrows[] = {
+		[DIRECTION_UP] = KEY_UP,
+		[DIRECTION_DOWN] = KEY_DOWN,
+		[DIRECTION_LEFT] = KEY_LEFT,
+		[DIRECTION_RIGHT] = KEY_RIGHT,
+		[DIRECTION_FIRE] = KEY_RSHIFT
+	};
 
-	if(is2pKbd) {
-		if(keyCheck(KEY_UP)) { g_uwSteer |= STEER_P2_UP; }
-		if(keyCheck(KEY_DOWN)) { g_uwSteer |= STEER_P2_DOWN; }
-		if(keyCheck(KEY_LEFT)) { g_uwSteer |= STEER_P2_LEFT; }
-		if(keyCheck(KEY_RIGHT)) { g_uwSteer |= STEER_P2_RIGHT; }
-		if(keyCheck(KEY_RETURN) || keyCheck(KEY_NUMENTER)) { g_uwSteer |= STEER_P2_FIRE; }
+	const UBYTE *pDirToKey = (pSteer->eKeymap == STEER_KEYMAP_WSAD) ? pDirsWsad : pDirsArrows;
+
+	for(tDirection eDir = 0; eDir < DIRECTION_COUNT; ++eDir) {
+		if(keyCheck(pDirToKey[eDir])) {
+			if(pSteer->pDirectionStates[eDir] == STEER_DIR_STATE_INACTIVE) {
+				pSteer->pDirectionStates[eDir] = STEER_DIR_STATE_ACTIVE;
+			}
+		}
+		else {
+			pSteer->pDirectionStates[eDir] = STEER_DIR_STATE_INACTIVE;
+		}
 	}
-	else {
-		if(joyCheck(JOY2_UP)) { g_uwSteer |= STEER_P2_UP; }
-		if(joyCheck(JOY2_DOWN)) { g_uwSteer |= STEER_P2_DOWN; }
-		if(joyCheck(JOY2_LEFT)) { g_uwSteer |= STEER_P2_LEFT; }
-		if(joyCheck(JOY2_RIGHT)) { g_uwSteer |= STEER_P2_RIGHT; }
-		if(joyCheck(JOY2_FIRE)) { g_uwSteer |= STEER_P2_FIRE; }
-	}
-	s_uwSteerUnused |= ~g_uwSteer;
 }
 
-UBYTE steerUpdateFromFile(tFile *pFile) {
-	UBYTE isRead = fileRead(pFile, &g_uwSteer, sizeof(g_uwSteer));
-	return isRead;
+static void onIdle(UNUSED_ARG tSteer *pSteer) {
+	// Do nothing
 }
 
-UBYTE steerUse(UWORD uwInput) {
-	UBYTE isPressed = ((steerGet(uwInput) & s_uwSteerUnused) == uwInput);
-	if(isPressed) {
-		s_uwSteerUnused &= ~uwInput;
+//------------------------------------------------------------------- PUBLIC FNS
+
+tSteer steerInitFromMode(tSteerMode eMode) {
+	switch(eMode) {
+		case STEER_MODE_JOY_1:
+			return steerInitJoy(JOY1);
+		case STEER_MODE_JOY_2:
+			return steerInitJoy(JOY2);
+		case STEER_MODE_KEY_ARROWS:
+			return steerInitKey(STEER_KEYMAP_ARROWS);
+		case STEER_MODE_KEY_WSAD:
+			return steerInitKey(STEER_KEYMAP_WSAD);
+		default:
+			return steerInitIdle();
 	}
-	return isPressed;
 }
 
-UWORD g_uwSteer;
+tSteer steerInitJoy(UBYTE ubJoy) {
+	tSteer sSteer = {
+		.cbProcess = onJoy,
+		.ubJoy = ubJoy
+	};
+	return sSteer;
+}
+
+tSteer steerInitKey(tSteerKeymap eKeymap) {
+	tSteer sSteer = {
+		.cbProcess = onKey,
+		.eKeymap = eKeymap
+	};
+	return sSteer;
+}
+
+tSteer steerInitIdle(void) {
+	tSteer sSteer = {
+		.cbProcess = onIdle
+	};
+	return sSteer;
+}
+
+void steerProcess(tSteer *pSteer) {
+	if(pSteer->cbProcess) {
+		pSteer->cbProcess(pSteer);
+	}
+}
+
+UBYTE steerIsPlayer(const tSteer *pSteer) {
+	return (pSteer->cbProcess == onJoy || pSteer->cbProcess == onKey);
+}
+
+UBYTE steerIsArrows(const tSteer *pSteer) {
+	UBYTE isArrows = (pSteer->cbProcess == onKey && pSteer->eKeymap == STEER_KEYMAP_ARROWS);
+	return isArrows;
+}
+
+UBYTE steerDirCheck(const tSteer *pSteer, tDirection eDir) {
+	return pSteer->pDirectionStates[eDir] != STEER_DIR_STATE_INACTIVE;
+}
+
+UBYTE steerDirUse(tSteer *pSteer, tDirection eDir) {
+	if(pSteer->pDirectionStates[eDir] == STEER_DIR_STATE_ACTIVE) {
+		pSteer->pDirectionStates[eDir] = STEER_DIR_STATE_USED;
+		return 1;
+	}
+	return 0;
+}
+
+tDirection steerGetPressedDir(const tSteer *pSteer) {
+	if(pSteer->pDirectionStates[DIRECTION_UP] != STEER_DIR_STATE_INACTIVE) {
+		return DIRECTION_UP;
+	}
+	if(pSteer->pDirectionStates[DIRECTION_DOWN] != STEER_DIR_STATE_INACTIVE) {
+		return DIRECTION_DOWN;
+	}
+	if(pSteer->pDirectionStates[DIRECTION_LEFT] != STEER_DIR_STATE_INACTIVE) {
+		return DIRECTION_LEFT;
+	}
+	if(pSteer->pDirectionStates[DIRECTION_RIGHT] != STEER_DIR_STATE_INACTIVE) {
+		return DIRECTION_RIGHT;
+	}
+	return DIRECTION_COUNT;
+}

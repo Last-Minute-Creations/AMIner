@@ -6,8 +6,8 @@
 #include <ace/managers/ptplayer.h>
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
+#include <ace/managers/key.h>
 #include "../core.h"
-#include "../steer.h"
 #include "../game.h"
 #include "settings.h"
 
@@ -15,13 +15,16 @@
 
 static tBitMap *s_pBmRestore;
 static tBitMap *s_pBg, *s_pButtons;
-static UBYTE s_pNav[COMM_NAV_COUNT] = {BTN_STATE_NACTIVE};
+static UBYTE s_pNav[DIRECTION_COUNT] = {BTN_STATE_NACTIVE};
 static UBYTE s_pNavEx[COMM_NAV_EX_COUNT] = {BTN_STATE_NACTIVE};
 static tBitMap *s_pBmDraw;
 static tTextBitMap *s_pLineBuffer;
 static UBYTE s_isCommShown = 0;
 static tPtplayerSfx *s_pSfxKeyPress[4];
 static tPtplayerSfx *s_pSfxKeyRelease[4];
+static UBYTE s_ubSteerCount;
+static tSteer *s_pSteers;
+
 tBitMap *g_pCommBmFaces, *g_pCommBmSelection;
 
 void commCreate(void) {
@@ -86,13 +89,15 @@ void commSetActiveLed(tCommTab eLed) {
 	}
 }
 
-UBYTE commTryShow(void) {
+UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount) {
 	tUwCoordYX sOrigin = commGetOrigin();
 	if(g_pMainBuffer->uwMarginedHeight - sOrigin.uwX < COMM_HEIGHT) {
 		// Not positioned evenly
 		return 0;
 	}
 	s_isCommShown = 1;
+	s_pSteers = pSteers;
+	s_ubSteerCount = ubSteerCount;
 
 	s_pBmDraw = g_pMainBuffer->pScroll->pBack;
 
@@ -109,13 +114,13 @@ UBYTE commTryShow(void) {
 	);
 
 	// Skip the initial fire press
-	s_pNav[COMM_NAV_BTN] = BTN_STATE_USED;
+	s_pNav[DIRECTION_FIRE] = BTN_STATE_USED;
 
 	return 1;
 }
 
 void commProcess(void) {
-	static const UWORD pBtnPos[COMM_NAV_COUNT][4] = {
+	static const UWORD pBtnPos[DIRECTION_COUNT][4] = {
 		// dX, dY, sY, h
 		{218, 114, 26, 14},
 		{218, 143, 54, 14},
@@ -124,18 +129,21 @@ void commProcess(void) {
 		{218, 129, 142, 13}
 	};
 
-	steerUpdateFromInput(g_sSettings.is1pKbd, g_sSettings.is2pKbd);
-	UBYTE pTests[COMM_NAV_COUNT] = {
-		steerGet(STEER_P1_UP)  || steerGet(STEER_P2_UP),
-		steerGet(STEER_P1_DOWN) || steerGet(STEER_P2_DOWN),
-		steerGet(STEER_P1_LEFT) || steerGet(STEER_P2_LEFT),
-		steerGet(STEER_P1_RIGHT) || steerGet(STEER_P2_RIGHT),
-		steerGet(STEER_P1_FIRE) || steerGet(STEER_P2_FIRE),
-	};
+	UBYTE pTests[DIRECTION_COUNT] = {0};
+	for(UBYTE i = 0; i < s_ubSteerCount; ++i) {
+		tSteer *pSteer = &s_pSteers[i];
+		steerProcess(pSteer);
+		pTests[DIRECTION_UP] |= steerDirCheck(pSteer, DIRECTION_UP);
+		pTests[DIRECTION_DOWN] |= steerDirCheck(pSteer, DIRECTION_DOWN);
+		pTests[DIRECTION_LEFT] |= steerDirCheck(pSteer, DIRECTION_LEFT);
+		pTests[DIRECTION_RIGHT] |= steerDirCheck(pSteer, DIRECTION_RIGHT);
+		pTests[DIRECTION_FIRE] |= steerDirCheck(pSteer, DIRECTION_FIRE);
+	}
+	pTests[DIRECTION_FIRE] |= keyCheck(KEY_SPACE) | keyCheck(KEY_RETURN);
 
 	tUwCoordYX sOrigin = commGetOrigin();
 
-	for(UBYTE i = 0; i < COMM_NAV_COUNT; ++i) {
+	for(UBYTE i = 0; i < DIRECTION_COUNT; ++i) {
 		if(pTests[i]) {
 			if(s_pNav[i] == BTN_STATE_NACTIVE) {
 				ptplayerSfxPlay(s_pSfxKeyPress[randUw(&g_sRand) & 3], SFX_CHANNEL_KEY, 64, 1);
@@ -163,7 +171,7 @@ void commProcess(void) {
 	// Process ex events
 	static UBYTE isShift = 0;
 	static UBYTE wasShiftAction = 0;
-	if(commNavCheck(COMM_NAV_BTN) == BTN_STATE_ACTIVE) {
+	if(commNavCheck(DIRECTION_FIRE) == BTN_STATE_ACTIVE) {
 		isShift = 1;
 	}
 	else {
@@ -180,11 +188,11 @@ void commProcess(void) {
 
 	// Tab nav using shift+left / shift+right
 	if(isShift) {
-		if(commNavUse(COMM_NAV_LEFT)) {
+		if(commNavUse(DIRECTION_LEFT)) {
 			s_pNavEx[COMM_NAV_EX_SHIFT_LEFT] = BTN_STATE_ACTIVE;
 			wasShiftAction = 1;
 		}
-		else if(commNavUse(COMM_NAV_RIGHT)) {
+		else if(commNavUse(DIRECTION_RIGHT)) {
 			s_pNavEx[COMM_NAV_EX_SHIFT_RIGHT] = BTN_STATE_ACTIVE;
 			wasShiftAction = 1;
 		}
@@ -195,15 +203,15 @@ void commProcess(void) {
 	}
 }
 
-tBtnState commNavCheck(tCommNav eNav) {
-	return s_pNav[eNav];
+tBtnState commNavCheck(tDirection eDir) {
+	return s_pNav[eDir];
 }
 
-UBYTE commNavUse(tCommNav eNav) {
+UBYTE commNavUse(tDirection eDir) {
 	// Relying on btn states from commProcess() makes it independent from state
 	// changes during interrupts and allows hierarchical usage of buttons
-	if(s_pNav[eNav] == BTN_STATE_ACTIVE) {
-		s_pNav[eNav] = BTN_STATE_USED;
+	if(s_pNav[eDir] == BTN_STATE_ACTIVE) {
+		s_pNav[eDir] = BTN_STATE_USED;
 		return 1;
 	}
 	return 0;

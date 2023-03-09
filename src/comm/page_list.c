@@ -42,12 +42,12 @@ static void officeDrawListPos(tCommShopPage eListPage, UBYTE ubPos) {
 
 static void pageListProcess(void) {
 	BYTE bPrevPos = s_bPosCurr;
-	if(commNavUse(COMM_NAV_DOWN)) {
+	if(commNavUse(DIRECTION_DOWN)) {
 		if(++s_bPosCurr >= s_bPosCount) {
 			s_bPosCurr = 0;
 		}
 	}
-	else if(commNavUse(COMM_NAV_UP)) {
+	else if(commNavUse(DIRECTION_UP)) {
 		if(--s_bPosCurr < 0) {
 			s_bPosCurr = s_bPosCount - 1;
 		}
