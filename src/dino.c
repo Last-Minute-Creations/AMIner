@@ -80,7 +80,7 @@ void dinoReset(void) {
 void dinoSave(tFile *pFile) {
 	saveWriteHeader(pFile, "DINO");
 	fileWrite(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
-	// fileWrite(pFile, s_pDinoWereDrawn, sizeof(DINO_BOB_COUNT * s_pDinoWereDrawn[0]));
+	fileWrite(pFile, &s_eQuestState, sizeof(s_eQuestState));
 }
 
 UBYTE dinoLoad(tFile *pFile) {
@@ -89,7 +89,7 @@ UBYTE dinoLoad(tFile *pFile) {
 	}
 
 	fileRead(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
-	// fileRead(pFile, s_pDinoWereDrawn, sizeof(DINO_BOB_COUNT * s_pDinoWereDrawn[0]));
+	fileRead(pFile, &s_eQuestState, sizeof(s_eQuestState));
 	return 1;
 }
 
