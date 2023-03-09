@@ -106,29 +106,6 @@ void groundLayerReset(UBYTE ubLowerLayer) {
 	groundLayerSetColorRegs(pLayerCurrent, s_ubPrevLevel);
 }
 
-void groundLayerSave(tFile *pFile) {
-	saveWriteHeader(pFile, "GDLR");
-	fileWrite(pFile, &s_isCopperActive, sizeof(s_isCopperActive));
-	fileWrite(pFile, &s_ubPrevLevel, sizeof(s_ubPrevLevel));
-	fileWrite(pFile, &s_uwVpHeight, sizeof(s_uwVpHeight));
-	fileWrite(pFile, &s_uwVpStartY, sizeof(s_uwVpStartY));
-	fileWrite(pFile, &s_ubLowerLayer, sizeof(s_ubLowerLayer));
-}
-
-UBYTE groundLayerLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "GDLR")) {
-		return 0;
-	}
-
-	ULONG ulDummy;
-	fileRead(pFile, &ulDummy, sizeof(s_isCopperActive));
-	fileRead(pFile, &ulDummy, sizeof(s_ubPrevLevel));
-	fileRead(pFile, &ulDummy, sizeof(s_uwVpHeight));
-	fileRead(pFile, &ulDummy, sizeof(s_uwVpStartY));
-	fileRead(pFile, &ulDummy, sizeof(s_ubLowerLayer));
-	return 1;
-}
-
 static void layerCopyColorsToBlock(
 	const tGroundLayer *pLayer, tCopBlock *pBlock, UBYTE ubColorLevel
 ) {

@@ -602,7 +602,6 @@ void gameSave(tFile *pFile) {
 	vehicleSave(&g_pVehicles[0], pFile);
 	vehicleSave(&g_pVehicles[1], pFile);
 	hudSave(pFile);
-	groundLayerSave(pFile);
 }
 
 UBYTE gameLoad(tFile *pFile) {
@@ -639,8 +638,7 @@ UBYTE gameLoad(tFile *pFile) {
 		inventoryLoad(pFile) &&
 		vehicleLoad(&g_pVehicles[0], pFile) &&
 		vehicleLoad(&g_pVehicles[1], pFile) &&
-		hudLoad(pFile) &&
-		groundLayerLoad(pFile);
+		hudLoad(pFile);
 }
 
 //-------------------------------------------------------------------- GAMESTATE
