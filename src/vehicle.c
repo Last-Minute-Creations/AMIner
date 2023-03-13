@@ -195,7 +195,7 @@ static void vehicleCrash(tVehicle *pVehicle) {
 
 	explosionAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnExplodePeak, pVehicle->ubPlayerIdx, 0, 0
+		vehicleOnExplodePeak, pVehicle->ubPlayerIdx, 0, EXPLOSION_KIND_BOOM
 	);
 	pVehicle->ubVehicleState = VEHICLE_STATE_EXPLODING;
 
@@ -1210,7 +1210,7 @@ static void vehicleOnTeleportOutPeak(ULONG ulData) {
 	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_IN;
 	explosionAdd(
 		pVehicle->uwTeleportX, pVehicle->uwTeleportY,
-		vehicleOnTeleportInPeak, (ULONG)pVehicle, 0, 1
+		vehicleOnTeleportInPeak, (ULONG)pVehicle, 0, EXPLOSION_KIND_TELEPORT
 	);
 }
 
@@ -1220,7 +1220,7 @@ void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_OUT;
 	explosionAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnTeleportOutPeak, (ULONG)pVehicle, 0, 1
+		vehicleOnTeleportOutPeak, (ULONG)pVehicle, 0, EXPLOSION_KIND_TELEPORT
 	);
 }
 

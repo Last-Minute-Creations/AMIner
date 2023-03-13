@@ -51,6 +51,7 @@ UBYTE g_isChallenge, g_isAtari;
 tBobNew g_pBombMarkers[3];
 
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};
+static tUwCoordYX s_sTeleportReturn;
 
 static UBYTE s_pBombCount[2];
 static tBombDir s_pLastDir[2];
@@ -98,6 +99,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_ubAccolades = 0;
 	s_ubAccoladesFract = 0;
 	s_isReminderShown = 0;
+	s_sTeleportReturn.ulYX = -1;
 	for(tMode eMode = 0; eMode < MODE_COUNT; ++eMode) {
 		hudSetModeCounter(eMode, 0);
 	}
@@ -122,9 +124,6 @@ static void gameProcessHotkeys(void) {
 		stateChange(g_pGameStateManager, &g_sStatePause);
 		return;
   }
-	if(keyUse(KEY_N)) {
-		gameTriggerSave();
-	}
 	if(keyUse(KEY_B)) {
 		debugToggle();
 	}
@@ -132,6 +131,9 @@ static void gameProcessHotkeys(void) {
 		vPortWaitForEnd(s_pVpMain);
 		vPortWaitForEnd(s_pVpMain);
 		vPortWaitForEnd(s_pVpMain);
+	}
+	if(keyUse(KEY_R) && s_sTeleportReturn.ulYX != -1u && g_pVehicles[0].ubVehicleState == VEHICLE_STATE_MOVING) {
+		vehicleTeleport(&g_pVehicles[0], s_sTeleportReturn.uwX, s_sTeleportReturn.uwY);
 	}
 
 	if(keyUse(KEY_F1) && !g_isChallenge) {
@@ -270,6 +272,10 @@ static void gameDisplayModeTnt(UBYTE ubPlayer) {
 
 static void gameProcessModeTeleport(UBYTE ubPlayer) {
 	tModeSelection *pSelection = &s_pModeSelection[ubPlayer];
+	s_sTeleportReturn = (tUwCoordYX) {
+		.uwX = fix16_to_int(g_pVehicles[ubPlayer].fX),
+		.uwY = fix16_to_int(g_pVehicles[ubPlayer].fY)
+	};
 	vehicleTeleport(&g_pVehicles[ubPlayer], 160, s_pBaseTeleportY[0]);
 	pSelection->eMode = MODE_DRILL;
 	hudSetMode(0, pSelection->eMode);
@@ -582,6 +588,7 @@ void gameSave(tFile *pFile) {
 	// 	bobNewSave(pFile, g_pBombMarkers[i]);
 	// }
 
+	fileWrite(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
 	fileWrite(pFile, s_pBombCount, sizeof(s_pBombCount));
 	fileWrite(pFile, s_pLastDir, sizeof(s_pLastDir));
 	fileWrite(pFile, &s_eCameraType, sizeof(s_eCameraType));
@@ -620,6 +627,7 @@ UBYTE gameLoad(tFile *pFile) {
 	// 	bobNewLoad(pFile, g_pBombMarkers[i]);
 	// }
 
+	fileRead(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
 	fileRead(pFile, s_pBombCount, sizeof(s_pBombCount));
 	fileRead(pFile, s_pLastDir, sizeof(s_pLastDir));
 	fileRead(pFile, &s_eCameraType, sizeof(s_eCameraType));

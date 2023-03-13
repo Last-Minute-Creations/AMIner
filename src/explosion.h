@@ -9,13 +9,18 @@
 
 typedef void (*tCbOnPeak)(ULONG ulData);
 
+typedef enum tExplosionKind {
+	EXPLOSION_KIND_BOOM,
+	EXPLOSION_KIND_TELEPORT,
+} tExplosionKind;
+
 void explosionManagerCreate(void);
 
 void explosionManagerDestroy(void);
 
 void explosionAdd(
 	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData,
-	UBYTE isQuick, UBYTE isTeleport
+	UBYTE isQuick, tExplosionKind eKind
 );
 
 void explosionManagerProcess(void);

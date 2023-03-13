@@ -19,11 +19,11 @@
 typedef struct tExplosion {
 	tBobNew sBob;
 	tCbOnPeak cbOnPeak;
+	tExplosionKind eKind;
 	ULONG ulCbData;
 	UBYTE ubFrame;
 	UBYTE ubCnt;
 	UBYTE isQuick;
-	UBYTE isTeleport;
 } tExplosion;
 
 static tExplosion s_pExplosions[EXPLOSION_MAX];
@@ -74,7 +74,7 @@ void explosionManagerDestroy(void) {
 
 void explosionAdd(
 	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData,
-	UBYTE isQuick, UBYTE isTeleport
+	UBYTE isQuick, tExplosionKind eKind
 ) {
 	tExplosion *pStart = s_pExplosionNext;
 	do {
@@ -104,8 +104,8 @@ void explosionAdd(
 	s_pExplosionNext->cbOnPeak = cbOnPeak;
 	s_pExplosionNext->ulCbData = ulCbData;
 	s_pExplosionNext->isQuick = isQuick;
-	s_pExplosionNext->isTeleport = isTeleport;
-	if(isTeleport) {
+	s_pExplosionNext->eKind = eKind;
+	if(eKind == EXPLOSION_KIND_TELEPORT) {
 		bobNewSetFrame(
 			&s_pExplosionNext->sBob,
 			bobNewCalcFrameAddress(s_pTpFrames, 0),
@@ -120,8 +120,9 @@ void explosionAdd(
 		);
 	}
 	ptplayerSfxPlay(
-		isTeleport ? s_pSfxTeleport : s_pSfxBoom, EXPLOSION_AUDIO_CHANNEL,
-		64, 1
+		eKind == EXPLOSION_KIND_TELEPORT ?
+			s_pSfxTeleport : s_pSfxBoom,
+		EXPLOSION_AUDIO_CHANNEL, PTPLAYER_VOLUME_MAX, 1
 	);
 }
 
@@ -129,7 +130,7 @@ void explosionManagerProcess(void) {
 	tExplosion *pExplosion = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i, ++pExplosion) {
 		UBYTE uwCntMax;
-		if(pExplosion->isTeleport) {
+		if(pExplosion->eKind == EXPLOSION_KIND_TELEPORT) {
 			uwCntMax = s_uwTeleportFrameCntMax;
 		}
 		else {
@@ -143,7 +144,7 @@ void explosionManagerProcess(void) {
 					pExplosion->cbOnPeak(pExplosion->ulCbData);
 				}
 				UWORD uwFrameOffsetY = pExplosion->ubFrame * EXPLOSION_FRAME_HEIGHT;
-				if(pExplosion->isTeleport) {
+				if(pExplosion->eKind == EXPLOSION_KIND_TELEPORT) {
 					bobNewSetFrame(
 						&s_pExplosionNext->sBob,
 						bobNewCalcFrameAddress(s_pTpFrames, uwFrameOffsetY),
