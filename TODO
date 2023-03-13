@@ -5,8 +5,13 @@ General:
 	✔ prevent flying upwards and disappearing of krtek @done(23-03-07 18:34)
 	✔ Add save for inbox @done(23-03-09 16:37)
 	✔ Remove GDLR from saving/loading @done(23-03-09 16:26)
+	✔ Add debug means to set teleport source/destination @done(23-03-13 17:37)
 	☐ Localized commrade buttons
 	☐ Animated base elements
+	☐ Figure out the teleport upgrades
+		☐ Remove debug teleport return button
+		☐ Bring back teleport damage on zeroeth upgrade
+	☐ Fix hud disappearing after teleport
 
 Optimizations:
 	☐ Comm message page loading
