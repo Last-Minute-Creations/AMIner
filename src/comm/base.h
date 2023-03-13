@@ -109,5 +109,6 @@ UBYTE commProcessPage(void);
 
 extern tBitMap *g_pCommBmFaces;
 extern tBitMap *g_pCommBmSelection;
+extern char **g_pCommPageNames;
 
 #endif // _AMINER_COMM_BASE_H_

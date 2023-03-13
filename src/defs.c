@@ -6,6 +6,7 @@
 #include "json/json.h"
 #include <ace/managers/log.h>
 #include <fixmath/fix16.h>
+#include <comm/base.h>
 #include <comm/page_workshop.h>
 #include <comm/page_warehouse.h>
 #include "hi_score.h"
@@ -223,6 +224,7 @@ void langCreate(const char *szLangPrefix) {
 
 	// Shop names
 	g_pShopNames = stringArrayCreateFromDom(pJson, g_pRemap, "shopNames");
+	g_pCommPageNames = stringArrayCreateFromDom(pJson, g_pRemap, "commPageNames");
 	g_pWarehouseColNames = stringArrayCreateFromDom(pJson, g_pRemap, "warehouseColNames");
 	g_pMenuEnumPlayerCount = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumPlayerCount");
 	g_pMenuEnumP1 = stringArrayCreateFromDom(pJson, g_pRemap, "menu.enumP1");
@@ -240,6 +242,7 @@ void langCreate(const char *szLangPrefix) {
 void langDestroy(void) {
 	logBlockBegin("langDestroy()");
 	stringArrayDestroy(g_pShopNames);
+	stringArrayDestroy(g_pCommPageNames);
 	stringArrayDestroy(g_pWarehouseColNames);
 	stringArrayDestroy(g_pMenuEnumPlayerCount);
 	stringArrayDestroy(g_pMenuEnumP1);

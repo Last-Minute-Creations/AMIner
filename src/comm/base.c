@@ -7,11 +7,20 @@
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
 #include <ace/managers/key.h>
+#include <ace/utils/chunky.h>
 #include "../core.h"
 #include "../game.h"
 #include "settings.h"
 
 #define SFX_CHANNEL_KEY 3
+#define COMM_BUTTON_LABEL_Y 170
+#define COMM_BUTTON_LABEL_OFFICE_X 39
+#define COMM_BUTTON_LABEL_WORKSHOP_X 115
+#define COMM_BUTTON_LABEL_WAREHOUSE_X 201
+#define COMM_BUTON_LABEL_COLOR_TEXT 9
+#define COMM_BUTON_LABEL_COLOR_SHADOW 6
+#define COMM_BUTON_LABEL_COLOR_BG 5
+#define COMM_BUTON_LABEL_COLOR_CORNER 6
 
 static tBitMap *s_pBmRestore;
 static tBitMap *s_pBg, *s_pButtons;
@@ -25,7 +34,9 @@ static tPtplayerSfx *s_pSfxKeyRelease[4];
 static UBYTE s_ubSteerCount;
 static tSteer *s_pSteers;
 
-tBitMap *g_pCommBmFaces, *g_pCommBmSelection;
+tBitMap *g_pCommBmFaces;
+tBitMap *g_pCommBmSelection;
+char **g_pCommPageNames;
 
 void commCreate(void) {
 	systemUse();
@@ -112,6 +123,53 @@ UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount) {
 		s_pBg, 0, 0, s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
 		COMM_WIDTH, COMM_HEIGHT
 	);
+
+	static const UBYTE s_pLabelOffsetsX[] = {
+		COMM_BUTTON_LABEL_OFFICE_X,
+		COMM_BUTTON_LABEL_WORKSHOP_X,
+		COMM_BUTTON_LABEL_WAREHOUSE_X
+	};
+
+	for(UBYTE i = 0; i < 3; ++i) {
+		fontFillTextBitMap(g_pFont, s_pLineBuffer,  g_pCommPageNames[i]);
+		UWORD uwTextWidth = s_pLineBuffer->uwActualWidth;
+
+		UWORD uwLabelX = sOrigin.uwX + s_pLabelOffsetsX[i] - 2;
+		UWORD uwLabelY = sOrigin.uwY + COMM_BUTTON_LABEL_Y;
+		UWORD uwLabelWidth = uwTextWidth + 3;
+		UWORD uwLabelHeight = g_pFont->uwHeight + 2;
+
+		blitRect(
+			s_pBmDraw, uwLabelX, uwLabelY, uwLabelWidth, uwLabelHeight,
+			COMM_BUTON_LABEL_COLOR_BG
+		);
+
+		// Corners: top-left, top-right, bottom-left, bottom-right
+		UBYTE ubColor = COMM_BUTON_LABEL_COLOR_CORNER;
+		chunkyToPlanar(
+			ubColor, uwLabelX, uwLabelY, s_pBmDraw
+		);
+		chunkyToPlanar(
+			ubColor, uwLabelX + uwLabelWidth - 1, uwLabelY, s_pBmDraw
+		);
+		chunkyToPlanar(
+			ubColor, uwLabelX, uwLabelY + uwLabelHeight - 1, s_pBmDraw
+		);
+		chunkyToPlanar(
+			ubColor, uwLabelX + uwLabelWidth - 1, uwLabelY + uwLabelHeight - 1, s_pBmDraw
+		);
+
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pLineBuffer,
+			sOrigin.uwX + s_pLabelOffsetsX[i],
+			sOrigin.uwY + COMM_BUTTON_LABEL_Y + 1, 6, FONT_COOKIE
+		);
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pLineBuffer,
+			sOrigin.uwX + s_pLabelOffsetsX[i],
+			sOrigin.uwY + COMM_BUTTON_LABEL_Y, 9, FONT_COOKIE
+		);
+	}
 
 	// Skip the initial fire press
 	s_pNav[DIRECTION_FIRE] = BTN_STATE_USED;

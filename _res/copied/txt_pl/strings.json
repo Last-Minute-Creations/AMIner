@@ -1,5 +1,6 @@
 {
 	"shopNames": ["Wiertło", "Ładownia", "Kadłub", "Karbid"],
+	"commPageNames": ["Biuro", "Warsztat", "Magazyn"],
 	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
 	"hudMessages": {
 		"newPlan": "Panie Derektorze, dostaliście nowy plan.",

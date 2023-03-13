@@ -6,7 +6,7 @@ General:
 	✔ Add save for inbox @done(23-03-09 16:37)
 	✔ Remove GDLR from saving/loading @done(23-03-09 16:26)
 	✔ Add debug means to set teleport source/destination @done(23-03-13 17:37)
-	☐ Localized commrade buttons
+	✔ Localized commrade buttons @done(23-03-13 20:15)
 	☐ Animated base elements
 	☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button
