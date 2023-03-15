@@ -8,7 +8,7 @@
 
 static UBYTE s_ubBaseCurrent;
 static UBYTE s_isFinishLoaded;
-static tBitMap *s_pBaseTiles[2];
+static tBitMap *s_pBaseTiles[3];
 static tBitMap *s_pCheckpointTiles;
 tTileBufferManager *s_pManager;
 
@@ -26,6 +26,7 @@ void baseTileCreate(tTileBufferManager *pManager) {
 	s_pManager = pManager;
 	s_pBaseTiles[0] = bitmapCreateFromFile("data/base0.bm", 1);
 	s_pBaseTiles[1] = bitmapCreateFromFile("data/base1.bm", 1);
+	s_pBaseTiles[2] = bitmapCreateFromFile("data/base2.bm", 1);
 	s_pCheckpointTiles = bitmapCreateFromFile("data/checkpoint.bm", 1);
 	baseTileLoad(0);
 	s_isFinishLoaded = 0;
@@ -34,6 +35,7 @@ void baseTileCreate(tTileBufferManager *pManager) {
 void baseTileDestroy(void) {
 	bitmapDestroy(s_pBaseTiles[0]);
 	bitmapDestroy(s_pBaseTiles[1]);
+	bitmapDestroy(s_pBaseTiles[2]);
 	bitmapDestroy(s_pCheckpointTiles);
 }
 
@@ -63,11 +65,20 @@ void baseTileProcess(void) {
 		}
 	}
 	else {
-		if(uwCamY < 20*32 && s_ubBaseCurrent != 0) {
-			baseTileLoad(0);
+		if(uwCamY > 190*32) {
+			if(s_ubBaseCurrent != 2) {
+				baseTileLoad(2);
+			}
 		}
-		else if(uwCamY > 90*32 && s_ubBaseCurrent != 1) {
-			baseTileLoad(1);
+		else if(uwCamY > 90*32) {
+			if(s_ubBaseCurrent != 1) {
+				baseTileLoad(1);
+			}
+		}
+		else if(uwCamY < 20*32) {
+			if(s_ubBaseCurrent != 0) {
+				baseTileLoad(0);
+			}
 		}
 	}
 }

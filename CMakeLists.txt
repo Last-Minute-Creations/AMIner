@@ -235,6 +235,7 @@ extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
 
 include("base0.cmake")
 include("base1.cmake")
+include("base2.cmake")
 include("tiles.cmake")
 include("checkpoint.cmake")
 
