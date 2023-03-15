@@ -12,6 +12,11 @@ General:
 		☐ Remove debug teleport return button
 		☐ Bring back teleport damage on zeroeth upgrade
 	☐ Fix hud disappearing after teleport
+	☐ "Transparency" of comm corners
+	☐ Add magma tiles
+		☐ Hurt while drilling  through
+		☐ Figure out detailed mechanics
+
 
 Optimizations:
 	☐ Comm message page loading
