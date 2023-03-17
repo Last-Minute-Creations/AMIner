@@ -606,6 +606,9 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		);
 		ptplayerSfxPlay(g_pSfxOre, PTPLAYER_SFX_CHANNEL_ANY, 64, 1);
 	}
+	else if(ubTile == TILE_MAGMA_1 || ubTile == TILE_MAGMA_2) {
+		vehicleHullDamage(pVehicle, 5 + (randUw(&g_sRand) & 0x7));
+	}
 	else if(g_pTileDefs[ubTile].ubSlots) {
 		UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
 		UBYTE ubMineralType = g_pTileDefs[ubTile].ubMineral;

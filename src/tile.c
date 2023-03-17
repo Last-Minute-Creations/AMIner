@@ -166,7 +166,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 			// 2000 is max
 			UWORD uwWhat = (randUw(&g_sRand) * 1000) / 65535;
 			UWORD uwChanceAir = 50;
-			UWORD uwChanceRock, uwChanceSilver, uwChanceGold, uwChanceEmerald, uwChanceRuby, uwChanceMoonstone;
+			UWORD uwChanceRock, uwChanceSilver, uwChanceGold, uwChanceEmerald, uwChanceRuby, uwChanceMoonstone, uwChanceMagma;
 			if(g_isChallenge) {
 				uwChanceRock = 75;
 				uwChanceSilver = chanceTrapezoid(
@@ -182,6 +182,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 				uwChanceEmerald = 0;
 				uwChanceRuby = 0;
 				uwChanceMoonstone = 10;
+				uwChanceMagma = 10;
 			}
 			else {
 				uwChanceRock = CLAMP(y * 500 / 2000, 0, 500);
@@ -190,10 +191,14 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 				uwChanceEmerald = y > 200 ? 75 : 0;
 				uwChanceRuby = y  > 400 ? 75 : 0;
 				uwChanceMoonstone = y > 175 ? 75 : 0;
+				uwChanceMagma = chanceTrapezoid(y, 50, 900, 1000, 1100, 0, 75);
 			}
 			UWORD uwChance;
 			if(uwWhat < (uwChance = uwChanceRock)) {
 				pTiles[x][y] = randUwMinMax(&g_sRand, TILE_STONE_1, TILE_STONE_4);
+			}
+			else if(uwWhat < (uwChance += uwChanceMagma)) {
+				pTiles[x][y] = randUwMinMax(&g_sRand, TILE_MAGMA_1, TILE_MAGMA_2);
 			}
 			else if(
 				uwWhat < (uwChance += uwChanceAir) &&
