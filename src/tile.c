@@ -120,11 +120,13 @@ static UWORD chanceTrapezoid(
 	return uwMin;
 }
 
-static void tileDrawBase(const tBase *pBase, UWORD uwLevel) {
+static void tileSetBaseTiles(const tBase *pBase, UWORD uwLevel, UBYTE isReplacing) {
 	UBYTE **pTiles = g_pMainBuffer->pTileData;
 	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
 		for(UWORD x = 1; x < 1 + 10; ++x) {
-			pTiles[x][uwLevel + y] = pBase->pPattern[y * 10 + x - 1];
+			if(!isReplacing || tileIsSolid(x, uwLevel + y)) {
+				pTiles[x][uwLevel + y] = pBase->pPattern[y * 10 + x - 1];
+			}
 		}
 	}
 }
@@ -255,7 +257,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		if(pBase->uwLevel != BASE_LEVEL_VARIANT) {
 			UBYTE ubPercent = ((100 - ubPercentTiles) * ubBase / BASE_ID_COUNT_UNIQUE);
 			commProgress(ubPercentTiles + ubPercent, g_pMsgs[MSG_LOADING_GEN_BASES]);
-			tileDrawBase(pBase, pBase->uwLevel);
+			tileSetBaseTiles(pBase, pBase->uwLevel, 0);
 		}
 	}
 
@@ -374,5 +376,5 @@ void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant) {
 		logWrite("ERR: eBase %d is not a base non-variant\n", eNewVariant);
 	}
 
-	tileDrawBase(&s_pBases[eNewVariant], s_pBases[eBase].uwLevel);
+	tileSetBaseTiles(&s_pBases[eNewVariant], s_pBases[eBase].uwLevel, 1);
 }
