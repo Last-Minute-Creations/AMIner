@@ -69,7 +69,8 @@ function rgbToHex(r, g, b) {
 }
 
 class GroundLayer {
-	constructor(pixelStartY, drillDifficulty, colorHex) {
+	constructor(name, pixelStartY, drillDifficulty, colorHex) {
+		this.name = name;
 		this.pixelStartY = pixelStartY;
 		this.drillDifficulty = drillDifficulty;
 		this.colorHex = colorHex;
@@ -85,12 +86,12 @@ class GroundLayer {
 	}
 
 	static layers = [
-		new GroundLayer(0, 2, rgbToHex(153, 68, 17)),
-		new GroundLayer(2048 + 32, 3, rgbToHex(153, 102, 17)),
-		new GroundLayer(4096 + 32, 4, rgbToHex(153, 102, 51)),
-		new GroundLayer(6144 + 32, 5, rgbToHex(119, 102, 51)),
-		new GroundLayer(8192 + 32, 6, rgbToHex(119, 102, 68)),
-		new GroundLayer(65535, 0, rgbToHex(119, 102, 68)) // unreachable
+		new GroundLayer('A', 0, 2, rgbToHex(153, 68, 17)),
+		new GroundLayer('B', 2048 + 32, 3, rgbToHex(153, 102, 17)),
+		new GroundLayer('C', 4096 + 32, 4, rgbToHex(153, 102, 51)),
+		new GroundLayer('D', 6144 + 32, 5, rgbToHex(119, 102, 51)),
+		new GroundLayer('E', 8192 + 32, 6, rgbToHex(119, 102, 68)),
+		new GroundLayer('X', 65535, 0, rgbToHex(119, 102, 68)) // unreachable
 	]
 }
 
@@ -414,10 +415,17 @@ function drawTiles(tileMap) {
 
 			tr.appendChild(td);
 		}
+
 		let tdRowIndex = document.createElement("td");
 		tdRowIndex.textContent = y;
 		tdRowIndex.classList.add("row_index");
 		tr.appendChild(tdRowIndex);
+
+		let tdLayerName = document.createElement("td");
+		tdLayerName.textContent = GroundLayer.getLayerAt(y).name;
+		tdLayerName.classList.add("row_index");
+		tr.appendChild(tdLayerName);
+
 		table.appendChild(tr);
 	}
 }
