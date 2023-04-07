@@ -19,12 +19,17 @@ General:
 	☐ Implement simulator
 		✔ Basic view of mine @done(23-04-07 13:44)
 		✔ Click to excavate @done(23-04-07 13:44)
-		☐ Click to restock
-		☐ Proper drill costs
-			☐ Minerals
-			☐ Ground layer
+		✔ Click to restock @done(23-04-07 16:09)
+		✔ Proper drill costs @done(23-04-07 16:55)
+			✔ Rocks @done(23-04-07 16:15)
+			✔ Ground layer @done(23-04-07 16:55)
 		☐ Simulate plans
+		☐ Configurable gameplay constants
 		☐ Draw proper bases
+		☐ Dino quest
+			☐ Scatter bones
+			☐ Show collected bones
+			☐ Accolade
 		☐ Ability to buy upgrades
 		☐ Add simulated damage
 		☐ Exactly same RNG as in-game

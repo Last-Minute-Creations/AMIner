@@ -1,6 +1,7 @@
 BODY {
 	margin: 0;
 	padding: 0;
+	font-family: sans-serif;
 }
 
 #panel_left {
@@ -9,16 +10,30 @@ BODY {
 }
 
 #panel_right {
-	width: 45%;
-	float: right;
+	width: 50%;
 	background: green;
+	position: fixed;
+	top: 0; right: 0;
+}
+
+H2 {
+	font-variant: small-caps;
 }
 
 #mine_preview {
 	border-collapse: collapse;
-	font-family: sans-serif;
 	text-align: center;
 }
+
+#btn_vehicle_restock {
+	display: block;
+	width: 95%;
+	height: 3em;
+	margin: 5px auto;
+	font-weight: bold;
+}
+
+/*------------------------------------------------------------------MINE VIEW-*/
 
 #mine_preview TD {
 	font-size: 12px;
@@ -40,31 +55,31 @@ BODY {
 }
 
 .tile_dirt {
-	background: brown !important;
+	/* background: brown !important; */
 }
 
 .tile_silver {
-	background: brown !important;
+	/* background: brown !important; */
 	color: deepskyblue;
 }
 
 .tile_gold {
-	background: brown !important;
+	/* background: brown !important; */
 	color: gold;
 }
 
 .tile_emerald {
-	background: brown !important;
+	/* background: brown !important; */
 	color: greenyellow;
 }
 
 .tile_ruby {
-	background: brown !important;
+	/* background: brown !important; */
 	color: pink;
 }
 
 .tile_moonstone {
-	background: brown !important;
+	/* background: brown !important; */
 	color: turquoise;
 }
 
@@ -73,11 +88,11 @@ BODY {
 }
 
 .tile_magma {
-	background: brown !important;
+	/* background: brown !important; */
 	color: red;
 }
 
 .tile_stone {
-	background: brown !important;
+	/* background: brown !important; */
 	color: grey;
 }

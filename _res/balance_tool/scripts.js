@@ -46,6 +46,52 @@ class MineralType {
 	static MAGMA = 7;
 	static ROCK = 8;
 	static COUNT = 9;
+
+	static defs = [
+		{reward: 5}, // SILVER
+		{reward: 10}, // GOLD
+		{reward: 15}, // EMERALD
+		{reward: 20}, // RUBY
+		{reward: 25}, // MOONSTONE
+		{reward: 0}, // DIRT
+		{reward: 0}, // AIR
+		{reward: 0}, // MAGMA
+		{reward: 0}, // ROCK
+		{reward: 0}, // COUNT
+	]
+}
+
+function rgbToHex(r, g, b) {
+	return '#' +
+		('0' + r.toString(16)).slice(-2) +
+		('0' + g.toString(16)).slice(-2) +
+		('0' + b.toString(16)).slice(-2);
+}
+
+class GroundLayer {
+	constructor(pixelStartY, drillDifficulty, colorHex) {
+		this.pixelStartY = pixelStartY;
+		this.drillDifficulty = drillDifficulty;
+		this.colorHex = colorHex;
+	}
+
+	static getLayerAt(posY) {
+		for(let i = 0; i < this.layers.length - 1; ++i) {
+			if(this.layers[i + 1].pixelStartY / 32 > posY) {
+				return this.layers[i];
+			}
+		}
+		this.layers[this.layers.length - 1];
+	}
+
+	static layers = [
+		new GroundLayer(0, 2, rgbToHex(153, 68, 17)),
+		new GroundLayer(2048 + 32, 3, rgbToHex(153, 102, 17)),
+		new GroundLayer(4096 + 32, 4, rgbToHex(153, 102, 51)),
+		new GroundLayer(6144 + 32, 5, rgbToHex(119, 102, 51)),
+		new GroundLayer(8192 + 32, 6, rgbToHex(119, 102, 68)),
+		new GroundLayer(65535, 0, rgbToHex(119, 102, 68)) // unreachable
+	]
 }
 
 class Tile {
@@ -53,6 +99,10 @@ class Tile {
 		this.index = index;
 		this.mineralType = mineralType;
 		this.mineralAmount = mineralAmount;
+	}
+
+	isHardToDrill() {
+		return this.index >= TileIndex.STONE_1;
 	}
 }
 
@@ -73,26 +123,52 @@ class Vehicle {
 		this.hullMk = 0;
 		this.cargoMk = 0;
 		this.drillMk = 0;
+		this.money = 0;
+		this.cargoMoney = 0;
 
 		this.hullMax = 100;
-		this.cargoMax = 100;
-		this.drillMax = 100;
+		this.cargoMax = 50;
+		this.drillMax = 1000;
 
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
 		this.drillCurr = this.drillMax;
+
+		this.restock();
 	}
 
-	tryExcavate(tile) {
-		let drillCost = 5;
+	tryExcavate(tile, posY) {
+		let drillUnitCost = 15;
+		let drillLevel = this.drillMk;
+		let difficulty = tile.isHardToDrill() ? 10 : GroundLayer.getLayerAt(posY).drillDifficulty;
+		let drillDuration = Math.max(1, difficulty - drillLevel);
+		let drillCost = drillUnitCost * drillDuration;
 
 		if(this.drillCurr < drillCost) {
 			return false;
 		}
 
 		this.drillCurr -= drillCost;
+		this.cargoMoney += tile.mineralAmount * MineralType.defs[tile.mineralType].reward;
 		this.cargoCurr = Math.min(this.cargoCurr + tile.mineralAmount, this.cargoMax);
 		return true;
+	}
+
+	restock() {
+		let hullPrice = 2;
+		let literPrice = 5;
+		let fuelInLiter = 100;
+
+		this.money += this.cargoMoney;
+		this.cargoMoney = 0;
+
+		let liters = Math.floor((this.drillMax - this.drillCurr + 0.5 * fuelInLiter) / fuelInLiter);
+		this.money -= (this.hullMax - this.hullCurr) * hullPrice;
+		this.money -= liters * literPrice;
+
+		this.hullCurr = this.hullMax;
+		this.cargoCurr = 0;
+		this.drillCurr = Math.min(this.drillCurr + liters * fuelInLiter, this.drillMax);
 	}
 }
 
@@ -243,7 +319,7 @@ function onCellTryExcavate(evt) {
 	}
 
 	var tile = g_tileMap.tiles[posX][posY];
-	if(g_vehicle.tryExcavate(tile)) {
+	if(g_vehicle.tryExcavate(tile, posY)) {
 		console.log(`excavated at ${posX},${posY}`);
 
 		// Update data
@@ -265,10 +341,13 @@ function updateVehicleStats() {
 	document.querySelector("#vehicle_cargo_mk").textContent = g_vehicle.cargoMk + 1;
 	document.querySelector("#vehicle_cargo_curr").textContent = g_vehicle.cargoCurr;
 	document.querySelector("#vehicle_cargo_max").textContent = g_vehicle.cargoMax;
+	document.querySelector("#vehicle_cargo_money").textContent = g_vehicle.cargoMoney;
 
 	document.querySelector("#vehicle_drill_mk").textContent = g_vehicle.drillMk + 1;
 	document.querySelector("#vehicle_drill_curr").textContent = g_vehicle.drillCurr;
 	document.querySelector("#vehicle_drill_max").textContent = g_vehicle.drillMax;
+
+	document.querySelector("#vehicle_money").textContent = g_vehicle.money;
 }
 
 function updateCellEvents(cell) {
@@ -324,6 +403,10 @@ function drawTiles(tileMap) {
 			else {
 				td.textContent = tileMap.tiles[x][y].index;
 			}
+			if(tileMap.isSolid(x, y)) {
+				var colorHex = GroundLayer.getLayerAt(y).colorHex;
+				td.style = `background-color: ${colorHex};`;
+			}
 
 			td.dataset.posX = x;
 			td.dataset.posY = y;
@@ -339,7 +422,14 @@ function drawTiles(tileMap) {
 	}
 }
 
+function onRestockClicked(evt) {
+	g_vehicle.restock();
+	updateVehicleStats();
+}
+
 window.addEventListener("load", function() {
+	document.querySelector("#btn_vehicle_restock").addEventListener("click", onRestockClicked);
+
 	g_tileMap = tileGenerate(g_rand);
 	g_vehicle = new Vehicle();
 	drawTiles(g_tileMap);
