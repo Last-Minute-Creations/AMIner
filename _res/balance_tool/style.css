@@ -1,0 +1,83 @@
+BODY {
+	margin: 0;
+	padding: 0;
+}
+
+#panel_left {
+	width: 45%;
+	float: left;
+}
+
+#panel_right {
+	width: 45%;
+	float: right;
+	background: green;
+}
+
+#mine_preview {
+	border-collapse: collapse;
+	font-family: sans-serif;
+	text-align: center;
+}
+
+#mine_preview TD {
+	font-size: 12px;
+	font-weight: bold;
+	width: 20px;
+	line-height: 20px;
+	height: 20px;
+	border: solid 1px black;
+	overflow: hidden;
+	background: white;
+	user-select: none;
+}
+
+.row_index {
+	border: none !important;
+	text-align: left;
+	padding-left: 5px;
+	color: #aaa;
+}
+
+.tile_dirt {
+	background: brown !important;
+}
+
+.tile_silver {
+	background: brown !important;
+	color: deepskyblue;
+}
+
+.tile_gold {
+	background: brown !important;
+	color: gold;
+}
+
+.tile_emerald {
+	background: brown !important;
+	color: greenyellow;
+}
+
+.tile_ruby {
+	background: brown !important;
+	color: pink;
+}
+
+.tile_moonstone {
+	background: brown !important;
+	color: turquoise;
+}
+
+.tile_bg {
+	background: black !important;
+}
+
+.tile_magma {
+	background: brown !important;
+	color: red;
+}
+
+.tile_stone {
+	background: brown !important;
+	color: grey;
+}

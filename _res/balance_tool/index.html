@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+	<head>
+		<script type="text/javascript" src="rand.js"></script>
+		<script type="text/javascript" src="scripts.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+		<h1>Aminer balancing tool</h1>
+		<div id="panel_left">
+			<table id="mine_preview"></table>
+		</div>
+		<div id="panel_right">
+			<h2>Config</h2>
+			<div>
+				<form>
+					<label for="seed1">Seed 1</label>
+					<input type="number" name="seed1" value="2184" min="1" max="65535">
+					<label for="seed2">Seed 2</label>
+					<input type="number" name="seed2" value="1911" min="1" max="65535">
+					<label for="plans_per_accoldade">Plans per accolade</label>
+					<input type="number" name="plans_per_accoldade" value="10" min="1" max="65535">
+					<label for="accolades">Accolades</label>
+					<input type="number" name="accolades" value="5" min="1" max="65535">
+					<label for="plan_value_ratio">Plan value increment ratio</label>
+					<input type="number" name="plan_value_ratio" value="1.1" min="1.0" step="0.05" max="65535.0">
+				</form>
+			</div>
+
+			<h2>Minerals in mine</h2>
+			<div>
+				<ul>
+					<li>Silver: <span id="minerals_silver">0</span>/<span id="minerals_silver_total">0</span></li>
+					<li>Gold: <span id="minerals_gold">0</span>/<span id="minerals_gold_total">0</span></li>
+					<li>Emerald: <span id="minerals_emerald">0</span>/<span id="minerals_emerald_total">0</span></li>
+					<li>Ruby: <span id="minerals_ruby">0</span>/<span id="minerals_ruby_total">0</span></li>
+					<li>Moonstone: <span id="minerals_moonstone">0</span>/<span id="minerals_moonstone_total">0</span></li>
+				</ul>
+			</div>
+
+			<h2>Plans</h2>
+			<div>
+				<ol id="plans">
+
+				</ol>
+			</div>
+
+			<h2>Vehicle</h2>
+			<div>
+				<ul>
+					<li>Hull mk <span id="vehicle_hull_mk">1</span>: <span id="vehicle_hull_curr">0</span>/<span id="vehicle_hull_max">0</span>
+					<li>Drill mk <span id="vehicle_drill_mk">1</span>: <span id="vehicle_drill_curr">0</span>/<span id="vehicle_drill_max">0</span>
+					<li>Cargo mk <span id="vehicle_cargo_mk">1</span>: <span id="vehicle_cargo_curr">0</span>/<span id="vehicle_cargo_max">0</span>
+					<li>Money: <span id="money">0</span></li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>

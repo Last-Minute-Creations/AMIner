@@ -16,6 +16,21 @@ General:
 	✔ Add magma tiles @done(23-03-17 18:03)
 		✔ Hurt while drilling through @done(23-03-17 18:03)
 		☐ Figure out detailed mechanics
+	☐ Implement simulator
+		✔ Basic view of mine @done(23-04-07 13:44)
+		✔ Click to excavate @done(23-04-07 13:44)
+		☐ Click to restock
+		☐ Proper drill costs
+			☐ Minerals
+			☐ Ground layer
+		☐ Simulate plans
+		☐ Draw proper bases
+		☐ Ability to buy upgrades
+		☐ Add simulated damage
+		☐ Exactly same RNG as in-game
+	☐ Variance in mine backgrounds
+		☐ On-the-fly composing background tile with edges
+		☐ Add extra bg variants (stones)
 
 Optimizations:
 	☐ Comm message page loading
