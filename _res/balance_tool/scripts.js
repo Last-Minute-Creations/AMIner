@@ -180,6 +180,17 @@ class Vehicle {
 		this.cargoCurr = 0;
 		this.drillCurr = Math.min(this.drillCurr + liters * fuelInLiter, this.drillMax);
 	}
+
+	trySell(mineralType, amount) {
+		if(g_vehicle.stock[mineralType] == undefined) {
+			return 0;
+		}
+
+		let sellAmount = Math.min(amount, g_vehicle.stock[mineralType]);
+		g_vehicle.money += MineralType.defs[mineralType].reward * sellAmount;
+		g_vehicle.stock[mineralType] -= sellAmount;
+		return sellAmount;
+	}
 }
 
 function clamp(x, min, max) {
@@ -446,6 +457,20 @@ function drawTiles(tileMap) {
 	}
 }
 
+function onSellClicked(mineralType, amount) {
+	g_vehicle.trySell(mineralType, amount);
+	updateVehicleStats();
+	updateWarehouse();
+}
+
+function onSellAllClicked() {
+	for(let mineralType = 0; mineralType < MineralType.COUNT; ++mineralType) {
+		g_vehicle.trySell(mineralType, 1000000);
+	}
+	updateVehicleStats();
+	updateWarehouse();
+}
+
 function onRestockClicked(evt) {
 	g_vehicle.restock();
 	updateVehicleStats();
@@ -454,6 +479,24 @@ function onRestockClicked(evt) {
 
 window.addEventListener('load', function() {
 	document.querySelector('#btn_vehicle_restock').addEventListener('click', onRestockClicked);
+
+	document.querySelector('#btn_silver_sell_1').addEventListener('click', function() {onSellClicked(MineralType.SILVER, 1); });
+	document.querySelector('#btn_silver_sell_10').addEventListener('click', function() {onSellClicked(MineralType.SILVER, 10); });
+	document.querySelector('#btn_gold_sell_1').addEventListener('click', function() {onSellClicked(MineralType.GOLD, 1); });
+	document.querySelector('#btn_gold_sell_10').addEventListener('click', function() {onSellClicked(MineralType.GOLD, 10); });
+	document.querySelector('#btn_emerald_sell_1').addEventListener('click', function() {onSellClicked(MineralType.EMERALD, 1); });
+	document.querySelector('#btn_emerald_sell_10').addEventListener('click', function() {onSellClicked(MineralType.EMERALD, 10); });
+	document.querySelector('#btn_ruby_sell_1').addEventListener('click', function() {onSellClicked(MineralType.RUBY, 1); });
+	document.querySelector('#btn_ruby_sell_10').addEventListener('click', function() {onSellClicked(MineralType.RUBY, 10); });
+	document.querySelector('#btn_moonstone_sell_1').addEventListener('click', function() {onSellClicked(MineralType.MOONSTONE, 1); });
+	document.querySelector('#btn_moonstone_sell_10').addEventListener('click', function() {onSellClicked(MineralType.MOONSTONE, 10); });
+	document.querySelector('#btn_sell_all').addEventListener('click', function() {onSellAllClicked(); });
+
+	document.querySelector('#silver_price').textContent = MineralType.defs[MineralType.SILVER].reward;
+	document.querySelector('#gold_price').textContent = MineralType.defs[MineralType.GOLD].reward;
+	document.querySelector('#emerald_price').textContent = MineralType.defs[MineralType.EMERALD].reward;
+	document.querySelector('#ruby_price').textContent = MineralType.defs[MineralType.RUBY].reward;
+	document.querySelector('#moonstone_price').textContent = MineralType.defs[MineralType.MOONSTONE].reward;
 
 	g_tileMap = tileGenerate(g_rand);
 	g_vehicle = new Vehicle();
