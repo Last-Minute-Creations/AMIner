@@ -220,7 +220,6 @@ function tileGenerate(rand) {
 	let endX = 11;
 	let endY = 1024;
 
-	let mineralCounts = new Array(MineralType.COUNT).fill(0);
 	let tileMap = new TileMap(endX, endY);
 	let tileRowBaseDirt = 8;
 
@@ -253,27 +252,22 @@ function tileGenerate(rand) {
 			}
 			else if(what < (chance += chanceSilver)) {
 				let add = g_rand.next16MinMax(0, 2);
-				mineralCounts[MineralType.SILVER] += 1 + add;
 				tileMap.tiles[x][y] = new Tile(TileIndex.SILVER_1 + add, MineralType.SILVER, 1 + add);
 			}
 			else if(what < (chance += chanceGold)) {
 				let add = g_rand.next16MinMax(0, 2);
-				mineralCounts[MineralType.GOLD] += 1 + add;
 				tileMap.tiles[x][y] = new Tile(TileIndex.GOLD_1 + add, MineralType.GOLD, 1 + add);
 			}
 			else if(what < (chance += chanceEmerald)) {
 				let add = g_rand.next16MinMax(0, 2);
-				mineralCounts[MineralType.EMERALD] += 1 + add;
 				tileMap.tiles[x][y] = new Tile(TileIndex.EMERALD_1 + add, MineralType.EMERALD, 1 + add);
 			}
 			else if(what < (chance += chanceRuby)) {
 				let add = g_rand.next16MinMax(0, 2);
-				mineralCounts[MineralType.RUBY] += 1 + add;
 				tileMap.tiles[x][y] = new Tile(TileIndex.RUBY_1 + add, MineralType.RUBY, 1 + add);
 			}
 			else if(what < (chance += chanceMoonstone)) {
 				let add = g_rand.next16MinMax(0, 2);
-				mineralCounts[MineralType.MOONSTONE] += 1 + add;
 				tileMap.tiles[x][y] = new Tile(TileIndex.MOONSTONE_1 + add, MineralType.MOONSTONE, 1 + add);
 			}
 			else {
@@ -311,6 +305,14 @@ function tileGenerate(rand) {
 	// tileMap.tiles[2][g_dinoDepths[7]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
 	// tileMap.tiles[9][g_dinoDepths[8]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
 
+	tileMap.totalMineralCounts = new Array(MineralType.COUNT).fill(0);
+	for(let x = 1; x < endX; ++x) {
+		for(let y = tileRowBaseDirt + 2; y < endY; ++y) {
+			tileMap.totalMineralCounts[tileMap.tiles[x][y].mineralType] += tileMap.tiles[x][y].mineralAmount;
+		}
+	}
+	tileMap.currentMineralCounts = Array.from(tileMap.totalMineralCounts);
+
 	return tileMap;
 }
 
@@ -345,12 +347,14 @@ function onCellTryExcavate(evt) {
 
 		// Update data
 		g_tileMap.tiles[posX][posY] = new Tile(TileIndex.CAVE_BG_16,  MineralType.AIR, 0);
+		g_tileMap.currentMineralCounts[tile.mineralType] -= tile.mineralAmount;
 		// Update view
 		cell.setAttribute('class', '');
 		cell.classList.add('tile_bg');
 		cell.textContent = '';
 
 		updateVehicleStats();
+		updateMineralStats();
 	}
 }
 
@@ -477,6 +481,20 @@ function onRestockClicked(evt) {
 	updateWarehouse();
 }
 
+function updateMineralStats() {
+	document.querySelector('#minerals_silver_total').textContent = g_tileMap.totalMineralCounts[MineralType.SILVER];
+	document.querySelector('#minerals_gold_total').textContent = g_tileMap.totalMineralCounts[MineralType.GOLD];
+	document.querySelector('#minerals_emerald_total').textContent = g_tileMap.totalMineralCounts[MineralType.EMERALD];
+	document.querySelector('#minerals_ruby_total').textContent = g_tileMap.totalMineralCounts[MineralType.RUBY];
+	document.querySelector('#minerals_moonstone_total').textContent = g_tileMap.totalMineralCounts[MineralType.MOONSTONE];
+
+	document.querySelector('#minerals_silver').textContent = g_tileMap.currentMineralCounts[MineralType.SILVER];
+	document.querySelector('#minerals_gold').textContent = g_tileMap.currentMineralCounts[MineralType.GOLD];
+	document.querySelector('#minerals_emerald').textContent = g_tileMap.currentMineralCounts[MineralType.EMERALD];
+	document.querySelector('#minerals_ruby').textContent = g_tileMap.currentMineralCounts[MineralType.RUBY];
+	document.querySelector('#minerals_moonstone').textContent = g_tileMap.currentMineralCounts[MineralType.MOONSTONE];
+}
+
 window.addEventListener('load', function() {
 	document.querySelector('#btn_vehicle_restock').addEventListener('click', onRestockClicked);
 
@@ -498,8 +516,10 @@ window.addEventListener('load', function() {
 	document.querySelector('#ruby_price').textContent = MineralType.defs[MineralType.RUBY].reward;
 	document.querySelector('#moonstone_price').textContent = MineralType.defs[MineralType.MOONSTONE].reward;
 
+
 	g_tileMap = tileGenerate(g_rand);
 	g_vehicle = new Vehicle();
 	drawTiles(g_tileMap);
 	updateVehicleStats();
+	updateMineralStats();
 });
