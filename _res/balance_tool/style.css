@@ -11,21 +11,18 @@ BODY {
 
 #panel_right {
 	width: 50%;
-	background: green;
+	height: 100%;
+	background: #ccc;
 	position: fixed;
 	top: 0; right: 0;
+	overflow: auto;
 }
 
 H2 {
 	font-variant: small-caps;
 }
 
-#mine_preview {
-	border-collapse: collapse;
-	text-align: center;
-}
-
-#btn_vehicle_restock {
+.btn_large {
 	display: block;
 	width: 95%;
 	height: 3em;
@@ -33,7 +30,25 @@ H2 {
 	font-weight: bold;
 }
 
-/*------------------------------------------------------------------MINE VIEW-*/
+/*-----------------------------------------------------------------WAREHOUSE--*/
+
+#warehouse {
+	border-collapse: collapse;
+	text-align: center;
+	width: 80%;
+	margin: 0 auto;
+}
+
+#warehouse TD, #warehouse TH {
+	border: solid 1px black;
+}
+
+/*-----------------------------------------------------------------MINE VIEW--*/
+
+#mine_preview {
+	border-collapse: collapse;
+	text-align: center;
+}
 
 #mine_preview TD {
 	font-size: 12px;

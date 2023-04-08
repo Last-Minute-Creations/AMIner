@@ -125,7 +125,11 @@ class Vehicle {
 		this.cargoMk = 0;
 		this.drillMk = 0;
 		this.money = 0;
-		this.cargoMoney = 0;
+		this.cargoMinerals = {};
+		this.stock = {};
+		for(let i = 0 ; i < MineralType.COUNT; ++i) {
+			this.stock[i] = 0;
+		}
 
 		this.hullMax = 100;
 		this.cargoMax = 50;
@@ -134,8 +138,6 @@ class Vehicle {
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
 		this.drillCurr = this.drillMax;
-
-		this.restock();
 	}
 
 	tryExcavate(tile, posY) {
@@ -150,7 +152,12 @@ class Vehicle {
 		}
 
 		this.drillCurr -= drillCost;
-		this.cargoMoney += tile.mineralAmount * MineralType.defs[tile.mineralType].reward;
+
+		if(this.cargoMinerals[tile.mineralType] == undefined) {
+			this.cargoMinerals[tile.mineralType] = 0;
+		}
+		this.cargoMinerals[tile.mineralType] += tile.mineralAmount;
+
 		this.cargoCurr = Math.min(this.cargoCurr + tile.mineralAmount, this.cargoMax);
 		return true;
 	}
@@ -160,8 +167,10 @@ class Vehicle {
 		let literPrice = 5;
 		let fuelInLiter = 100;
 
-		this.money += this.cargoMoney;
-		this.cargoMoney = 0;
+		for(let mineralType in this.cargoMinerals) {
+			this.stock[mineralType] += this.cargoMinerals[mineralType];
+			this.cargoMinerals[mineralType] = 0;
+		}
 
 		let liters = Math.floor((this.drillMax - this.drillCurr + 0.5 * fuelInLiter) / fuelInLiter);
 		this.money -= (this.hullMax - this.hullCurr) * hullPrice;
@@ -328,78 +337,85 @@ function onCellTryExcavate(evt) {
 		// Update view
 		cell.setAttribute('class', '');
 		cell.classList.add('tile_bg');
-		cell.textContent = "";
+		cell.textContent = '';
 
 		updateVehicleStats();
 	}
 }
 
 function updateVehicleStats() {
-	document.querySelector("#vehicle_hull_mk").textContent = g_vehicle.hullMk + 1;
-	document.querySelector("#vehicle_hull_curr").textContent = g_vehicle.hullCurr;
-	document.querySelector("#vehicle_hull_max").textContent = g_vehicle.hullMax;
+	document.querySelector('#vehicle_hull_mk').textContent = g_vehicle.hullMk + 1;
+	document.querySelector('#vehicle_hull_curr').textContent = g_vehicle.hullCurr;
+	document.querySelector('#vehicle_hull_max').textContent = g_vehicle.hullMax;
 
-	document.querySelector("#vehicle_cargo_mk").textContent = g_vehicle.cargoMk + 1;
-	document.querySelector("#vehicle_cargo_curr").textContent = g_vehicle.cargoCurr;
-	document.querySelector("#vehicle_cargo_max").textContent = g_vehicle.cargoMax;
-	document.querySelector("#vehicle_cargo_money").textContent = g_vehicle.cargoMoney;
+	document.querySelector('#vehicle_cargo_mk').textContent = g_vehicle.cargoMk + 1;
+	document.querySelector('#vehicle_cargo_curr').textContent = g_vehicle.cargoCurr;
+	document.querySelector('#vehicle_cargo_max').textContent = g_vehicle.cargoMax;
 
-	document.querySelector("#vehicle_drill_mk").textContent = g_vehicle.drillMk + 1;
-	document.querySelector("#vehicle_drill_curr").textContent = g_vehicle.drillCurr;
-	document.querySelector("#vehicle_drill_max").textContent = g_vehicle.drillMax;
+	document.querySelector('#vehicle_drill_mk').textContent = g_vehicle.drillMk + 1;
+	document.querySelector('#vehicle_drill_curr').textContent = g_vehicle.drillCurr;
+	document.querySelector('#vehicle_drill_max').textContent = g_vehicle.drillMax;
 
-	document.querySelector("#vehicle_money").textContent = g_vehicle.money;
+	document.querySelector('#vehicle_money').textContent = g_vehicle.money;
 }
 
-function updateCellEvents(cell) {
+function setMineCellEvents(cell) {
 	cell.addEventListener('mousedown', onCellTryExcavate);
 	cell.addEventListener('mousemove', onCellTryExcavate);
 }
 
+function updateWarehouse() {
+	document.querySelector('#stock_silver').textContent = g_vehicle.stock[MineralType.SILVER];
+	document.querySelector('#stock_gold').textContent = g_vehicle.stock[MineralType.GOLD];
+	document.querySelector('#stock_emerald').textContent = g_vehicle.stock[MineralType.EMERALD];
+	document.querySelector('#stock_ruby').textContent = g_vehicle.stock[MineralType.RUBY];
+	document.querySelector('#stock_moonstone').textContent = g_vehicle.stock[MineralType.MOONSTONE];
+}
+
 function drawTiles(tileMap) {
-	let table = document.querySelector("#mine_preview");
+	let table = document.querySelector('#mine_preview');
 	table.innerHTML = '';
 
 	let sizeX = tileMap.tiles.length - 1; // skip dummy column on the left
 	let sizeY = tileMap.tiles[0].length;
 
 	for(let y = 0; y < sizeY; ++y) {
-		let tr = document.createElement("tr");
+		let tr = document.createElement('tr');
 		for(let x = 1; x < sizeX; ++x) {
-			let td = document.createElement("td");
+			let td = document.createElement('td');
 			if(tileMap.tiles[x][y].mineralType == MineralType.DIRT) {
 				td.classList.add('tile_dirt');
 			}
 			else if(tileMap.tiles[x][y].mineralType == MineralType.SILVER) {
 				td.classList.add('tile_silver');
-				td.textContent = "S" + tileMap.tiles[x][y].mineralAmount;
+				td.textContent = 'S' + tileMap.tiles[x][y].mineralAmount;
 			}
 			else if(tileMap.tiles[x][y].mineralType == MineralType.GOLD) {
 				td.classList.add('tile_gold');
-				td.textContent = "G" + tileMap.tiles[x][y].mineralAmount;
+				td.textContent = 'G' + tileMap.tiles[x][y].mineralAmount;
 			}
 			else if(tileMap.tiles[x][y].mineralType == MineralType.EMERALD) {
 				td.classList.add('tile_emerald');
-				td.textContent = "E" + tileMap.tiles[x][y].mineralAmount;
+				td.textContent = 'E' + tileMap.tiles[x][y].mineralAmount;
 			}
 			else if(tileMap.tiles[x][y].mineralType == MineralType.RUBY) {
 				td.classList.add('tile_ruby');
-				td.textContent = "R" + tileMap.tiles[x][y].mineralAmount;
+				td.textContent = 'R' + tileMap.tiles[x][y].mineralAmount;
 			}
 			else if(tileMap.tiles[x][y].mineralType == MineralType.MOONSTONE) {
 				td.classList.add('tile_moonstone');
-				td.textContent = "M" + tileMap.tiles[x][y].mineralAmount;
+				td.textContent = 'M' + tileMap.tiles[x][y].mineralAmount;
 			}
 			else if(tileMap.tiles[x][y].mineralType == MineralType.AIR) {
 				td.classList.add('tile_bg');
 			}
 			else if(tileMap.tiles[x][y].mineralType == MineralType.MAGMA) {
 				td.classList.add('tile_magma');
-				td.textContent = "🔥";
+				td.textContent = '🔥';
 			}
 			else if(tileMap.tiles[x][y].mineralType == MineralType.ROCK) {
 				td.classList.add('tile_stone');
-				td.textContent = "R";
+				td.textContent = 'R';
 			}
 			else {
 				td.textContent = tileMap.tiles[x][y].index;
@@ -411,19 +427,19 @@ function drawTiles(tileMap) {
 
 			td.dataset.posX = x;
 			td.dataset.posY = y;
-			updateCellEvents(td);
+			setMineCellEvents(td);
 
 			tr.appendChild(td);
 		}
 
-		let tdRowIndex = document.createElement("td");
+		let tdRowIndex = document.createElement('td');
 		tdRowIndex.textContent = y;
-		tdRowIndex.classList.add("row_index");
+		tdRowIndex.classList.add('row_index');
 		tr.appendChild(tdRowIndex);
 
-		let tdLayerName = document.createElement("td");
+		let tdLayerName = document.createElement('td');
 		tdLayerName.textContent = GroundLayer.getLayerAt(y).name;
-		tdLayerName.classList.add("row_index");
+		tdLayerName.classList.add('row_index');
 		tr.appendChild(tdLayerName);
 
 		table.appendChild(tr);
@@ -433,10 +449,11 @@ function drawTiles(tileMap) {
 function onRestockClicked(evt) {
 	g_vehicle.restock();
 	updateVehicleStats();
+	updateWarehouse();
 }
 
-window.addEventListener("load", function() {
-	document.querySelector("#btn_vehicle_restock").addEventListener("click", onRestockClicked);
+window.addEventListener('load', function() {
+	document.querySelector('#btn_vehicle_restock').addEventListener('click', onRestockClicked);
 
 	g_tileMap = tileGenerate(g_rand);
 	g_vehicle = new Vehicle();
