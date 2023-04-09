@@ -161,6 +161,7 @@ class Vehicle {
 		}
 
 		this.drillCurr -= drillCost;
+		g_plan.elapseTime(drillCost);
 		let mineralId = tile.mineralType.id;
 
 		if(this.cargoMinerals[mineralId] == undefined) {
@@ -277,6 +278,14 @@ class Plan {
 	tryProceed() {
 		if(this.isCompleted()) {
 			this.next();
+		}
+	}
+
+	elapseTime(timeDelta) {
+		this.timeRemaining -= timeDelta;
+		if(this.timeRemaining <= 0) {
+			// TODO: rebuke
+			this.reroll();
 		}
 	}
 }
@@ -579,6 +588,7 @@ function onFillAllPlanClicked() {
 	}
 	updateVehicleStats();
 	updateWarehouse();
+	updateOfficeStats();
 }
 
 function onRestockClicked(evt) {
@@ -601,7 +611,7 @@ function updateOfficeStats() {
 	document.querySelector("#plan_started").textContent = g_plan.isStarted ? '✓' : '✗';
 	document.querySelector("#plan_extended").textContent = g_plan.isExtendedByFavor ? '✓' : '✗';
 	document.querySelector("#plan_time_remaining").textContent = g_plan.timeRemaining;
-	document.querySelector("#plan_time_remaining_days").textContent = g_plan.timeRemaining / timeInDay;
+	document.querySelector("#plan_time_remaining_days").textContent = (g_plan.timeRemaining / timeInDay).toFixed(2);
 	document.querySelector("#plan_unlocked_minerals").textContent = g_plan.mineralsUnlocked.map((x) => MineralType.all[x].name).join(', ');
 
 }
