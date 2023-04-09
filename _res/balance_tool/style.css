@@ -4,18 +4,26 @@ BODY {
 	font-family: sans-serif;
 }
 
+#panel_container {
+	display:flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: stretch;
+	height: 100%;
+	position: absolute;
+	top: 0; bottom: 0; left: 0; right: 0;
+}
+
 #panel_left {
-	width: 45%;
-	float: left;
+	overflow: auto;
+	flex-grow: 1;
 }
 
 #panel_right {
 	width: 50%;
-	height: 100%;
 	background: #ccc;
-	position: fixed;
-	top: 0; right: 0;
 	overflow: auto;
+	padding-left: 20px;
 }
 
 H2 {

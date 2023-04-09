@@ -41,6 +41,13 @@ Simulator:
 	☐ Ability to buy upgrades
 	☐ Add simulated damage
 	☐ Exactly same RNG as in-game
+	☐ Sub-mechanics
+		☐ Accounting
+		☐ Bribe
+		☐ Favor
+	☐ Approximate time spent in-game
+		☐ Time spent on drilling
+		☐ Time spent on backtracking to restock
 
 Optimizations:
 	☐ Comm message page loading

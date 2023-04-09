@@ -2,6 +2,19 @@ let g_rand = new rand(2184, 1911);
 let g_tileMap = null;
 let g_vehicle = null;
 
+function rgbToHex(r, g, b) {
+	return '#' +
+		('0' + r.toString(16)).slice(-2) +
+		('0' + g.toString(16)).slice(-2) +
+		('0' + b.toString(16)).slice(-2);
+}
+
+function clamp(x, min, max) {
+	if (x < min) return min;
+	if (x > max) return max;
+	return x;
+}
+
 class TileIndex {
 	static CAVE_BG_1 = 43
 	static CAVE_BG_16 = 58
@@ -36,36 +49,31 @@ class TileIndex {
 }
 
 class MineralType {
-	static SILVER = 0;
-	static GOLD = 1;
-	static EMERALD = 2;
-	static RUBY = 3;
-	static MOONSTONE = 4;
-	static DIRT = 5;
-	static AIR = 6;
-	static MAGMA = 7;
-	static ROCK = 8;
-	static COUNT = 9;
+	static SILVER = {id: 0, name: 'silver', isCollectible: true, reward: 5};
+	static GOLD = {id: 1, name: 'gold', isCollectible: true, reward: 10};
+	static EMERALD = {id: 2, name: 'emerald', isCollectible: true, reward: 15};
+	static RUBY = {id: 3, name: 'ruby', isCollectible: true, reward: 20};
+	static MOONSTONE = {id: 4, name: 'moonstone', isCollectible: true, reward: 25};
+	static DIRT = {id: 5, name: 'dirt', isCollectible: false, reward: 0};
+	static AIR = {id: 6, name: 'air', isCollectible: false, reward: 0};
+	static MAGMA = {id: 7, name: 'magma', isCollectible: false, reward: 0};
+	static ROCK = {id: 8, name: 'rock', isCollectible: false, reward: 0};
+	static UNKNOWN = {id: 9, name: 'unknown', isCollectible: false, reward: 0};
 
-	static defs = [
-		{reward: 5}, // SILVER
-		{reward: 10}, // GOLD
-		{reward: 15}, // EMERALD
-		{reward: 20}, // RUBY
-		{reward: 25}, // MOONSTONE
-		{reward: 0}, // DIRT
-		{reward: 0}, // AIR
-		{reward: 0}, // MAGMA
-		{reward: 0}, // ROCK
-		{reward: 0}, // COUNT
-	]
-}
+	static all = [
+		this.SILVER,
+		this.GOLD,
+		this.EMERALD,
+		this.RUBY,
+		this.MOONSTONE,
+		this.DIRT,
+		this.AIR,
+		this.MAGMA,
+		this.ROCK,
+		this.UNKNOWN,
+	];
 
-function rgbToHex(r, g, b) {
-	return '#' +
-		('0' + r.toString(16)).slice(-2) +
-		('0' + g.toString(16)).slice(-2) +
-		('0' + b.toString(16)).slice(-2);
+	static collectibles = (() => this.all.filter((x) => x.isCollectible))();
 }
 
 class GroundLayer {
@@ -125,10 +133,10 @@ class Vehicle {
 		this.cargoMk = 0;
 		this.drillMk = 0;
 		this.money = 0;
-		this.cargoMinerals = {};
-		this.stock = {};
-		for(let i = 0 ; i < MineralType.COUNT; ++i) {
-			this.stock[i] = 0;
+		this.cargoMinerals = {}; // [mineralId] => count
+		this.stock = {}; // [mineralId] => count
+		for(let mineral of MineralType.all) {
+			this.stock[mineral.id] = 0;
 		}
 
 		this.hullMax = 100;
@@ -153,10 +161,10 @@ class Vehicle {
 
 		this.drillCurr -= drillCost;
 
-		if(this.cargoMinerals[tile.mineralType] == undefined) {
-			this.cargoMinerals[tile.mineralType] = 0;
+		if(this.cargoMinerals[tile.mineralType.id] == undefined) {
+			this.cargoMinerals[tile.mineralType.id] = 0;
 		}
-		this.cargoMinerals[tile.mineralType] += tile.mineralAmount;
+		this.cargoMinerals[tile.mineralType.id] += tile.mineralAmount;
 
 		this.cargoCurr = Math.min(this.cargoCurr + tile.mineralAmount, this.cargoMax);
 		return true;
@@ -167,9 +175,9 @@ class Vehicle {
 		let literPrice = 5;
 		let fuelInLiter = 100;
 
-		for(let mineralType in this.cargoMinerals) {
-			this.stock[mineralType] += this.cargoMinerals[mineralType];
-			this.cargoMinerals[mineralType] = 0;
+		for(let mineralId in this.cargoMinerals) {
+			this.stock[mineralId] += this.cargoMinerals[mineralId];
+			this.cargoMinerals[mineralId] = 0;
 		}
 
 		let liters = Math.floor((this.drillMax - this.drillCurr + 0.5 * fuelInLiter) / fuelInLiter);
@@ -182,21 +190,15 @@ class Vehicle {
 	}
 
 	trySell(mineralType, amount) {
-		if(g_vehicle.stock[mineralType] == undefined) {
+		if(g_vehicle.stock[mineralType.id] == undefined) {
 			return 0;
 		}
 
-		let sellAmount = Math.min(amount, g_vehicle.stock[mineralType]);
-		g_vehicle.money += MineralType.defs[mineralType].reward * sellAmount;
-		g_vehicle.stock[mineralType] -= sellAmount;
+		let sellAmount = Math.min(amount, g_vehicle.stock[mineralType.id]);
+		g_vehicle.money += mineralType.reward * sellAmount;
+		g_vehicle.stock[mineralType.id] -= sellAmount;
 		return sellAmount;
 	}
-}
-
-function clamp(x, min, max) {
-	if (x < min) return min;
-	if (x > max) return max;
-	return x;
 }
 
 function chanceTrapezoid(curr, start, peakStart, peakEnd, end, min, max) {
@@ -305,13 +307,20 @@ function tileGenerate(rand) {
 	// tileMap.tiles[2][g_dinoDepths[7]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
 	// tileMap.tiles[9][g_dinoDepths[8]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
 
-	tileMap.totalMineralCounts = new Array(MineralType.COUNT).fill(0);
+	tileMap.totalMineralCounts = {};
+	for(let mineralType of MineralType.all) {
+		tileMap.totalMineralCounts[mineralType.id] = 0;
+	}
 	for(let x = 1; x < endX; ++x) {
 		for(let y = tileRowBaseDirt + 2; y < endY; ++y) {
-			tileMap.totalMineralCounts[tileMap.tiles[x][y].mineralType] += tileMap.tiles[x][y].mineralAmount;
+			tileMap.totalMineralCounts[tileMap.tiles[x][y].mineralType.id] += tileMap.tiles[x][y].mineralAmount;
 		}
 	}
-	tileMap.currentMineralCounts = Array.from(tileMap.totalMineralCounts);
+
+	tileMap.currentMineralCounts = {};
+	for(let mineralType of MineralType.all) {
+		tileMap.currentMineralCounts[mineralType.id] = tileMap.totalMineralCounts[mineralType.id];
+	}
 
 	return tileMap;
 }
@@ -347,7 +356,7 @@ function onCellTryExcavate(evt) {
 
 		// Update data
 		g_tileMap.tiles[posX][posY] = new Tile(TileIndex.CAVE_BG_16,  MineralType.AIR, 0);
-		g_tileMap.currentMineralCounts[tile.mineralType] -= tile.mineralAmount;
+		g_tileMap.currentMineralCounts[tile.mineralType.id] -= tile.mineralAmount;
 		// Update view
 		cell.setAttribute('class', '');
 		cell.classList.add('tile_bg');
@@ -380,11 +389,9 @@ function setMineCellEvents(cell) {
 }
 
 function updateWarehouse() {
-	document.querySelector('#stock_silver').textContent = g_vehicle.stock[MineralType.SILVER];
-	document.querySelector('#stock_gold').textContent = g_vehicle.stock[MineralType.GOLD];
-	document.querySelector('#stock_emerald').textContent = g_vehicle.stock[MineralType.EMERALD];
-	document.querySelector('#stock_ruby').textContent = g_vehicle.stock[MineralType.RUBY];
-	document.querySelector('#stock_moonstone').textContent = g_vehicle.stock[MineralType.MOONSTONE];
+	for(let mineralType of MineralType.collectibles) {
+		document.querySelector(`#stock_${mineralType.name}`).textContent = g_vehicle.stock[mineralType.id];
+	}
 }
 
 function drawTiles(tileMap) {
@@ -468,7 +475,7 @@ function onSellClicked(mineralType, amount) {
 }
 
 function onSellAllClicked() {
-	for(let mineralType = 0; mineralType < MineralType.COUNT; ++mineralType) {
+	for(let mineralType of MineralType.all) {
 		g_vehicle.trySell(mineralType, 1000000);
 	}
 	updateVehicleStats();
@@ -482,40 +489,23 @@ function onRestockClicked(evt) {
 }
 
 function updateMineralStats() {
-	document.querySelector('#minerals_silver_total').textContent = g_tileMap.totalMineralCounts[MineralType.SILVER];
-	document.querySelector('#minerals_gold_total').textContent = g_tileMap.totalMineralCounts[MineralType.GOLD];
-	document.querySelector('#minerals_emerald_total').textContent = g_tileMap.totalMineralCounts[MineralType.EMERALD];
-	document.querySelector('#minerals_ruby_total').textContent = g_tileMap.totalMineralCounts[MineralType.RUBY];
-	document.querySelector('#minerals_moonstone_total').textContent = g_tileMap.totalMineralCounts[MineralType.MOONSTONE];
-
-	document.querySelector('#minerals_silver').textContent = g_tileMap.currentMineralCounts[MineralType.SILVER];
-	document.querySelector('#minerals_gold').textContent = g_tileMap.currentMineralCounts[MineralType.GOLD];
-	document.querySelector('#minerals_emerald').textContent = g_tileMap.currentMineralCounts[MineralType.EMERALD];
-	document.querySelector('#minerals_ruby').textContent = g_tileMap.currentMineralCounts[MineralType.RUBY];
-	document.querySelector('#minerals_moonstone').textContent = g_tileMap.currentMineralCounts[MineralType.MOONSTONE];
+	for(let mineralType of MineralType.collectibles) {
+		let name = mineralType.name;
+		document.querySelector(`#minerals_${name}_total`).textContent = g_tileMap.totalMineralCounts[mineralType.id];
+		document.querySelector(`#minerals_${name}`).textContent = g_tileMap.currentMineralCounts[mineralType.id];
+	}
 }
 
 window.addEventListener('load', function() {
 	document.querySelector('#btn_vehicle_restock').addEventListener('click', onRestockClicked);
 
-	document.querySelector('#btn_silver_sell_1').addEventListener('click', function() {onSellClicked(MineralType.SILVER, 1); });
-	document.querySelector('#btn_silver_sell_10').addEventListener('click', function() {onSellClicked(MineralType.SILVER, 10); });
-	document.querySelector('#btn_gold_sell_1').addEventListener('click', function() {onSellClicked(MineralType.GOLD, 1); });
-	document.querySelector('#btn_gold_sell_10').addEventListener('click', function() {onSellClicked(MineralType.GOLD, 10); });
-	document.querySelector('#btn_emerald_sell_1').addEventListener('click', function() {onSellClicked(MineralType.EMERALD, 1); });
-	document.querySelector('#btn_emerald_sell_10').addEventListener('click', function() {onSellClicked(MineralType.EMERALD, 10); });
-	document.querySelector('#btn_ruby_sell_1').addEventListener('click', function() {onSellClicked(MineralType.RUBY, 1); });
-	document.querySelector('#btn_ruby_sell_10').addEventListener('click', function() {onSellClicked(MineralType.RUBY, 10); });
-	document.querySelector('#btn_moonstone_sell_1').addEventListener('click', function() {onSellClicked(MineralType.MOONSTONE, 1); });
-	document.querySelector('#btn_moonstone_sell_10').addEventListener('click', function() {onSellClicked(MineralType.MOONSTONE, 10); });
+	for(let mineralType of MineralType.collectibles) {
+		let name = mineralType.name;
+		document.querySelector(`#${name}_price`).textContent = mineralType.reward;
+		document.querySelector(`#btn_${name}_sell_1`).addEventListener('click', function() {onSellClicked(mineralType, 1); });
+		document.querySelector(`#btn_${name}_sell_10`).addEventListener('click', function() {onSellClicked(mineralType, 10); });
+	}
 	document.querySelector('#btn_sell_all').addEventListener('click', function() {onSellAllClicked(); });
-
-	document.querySelector('#silver_price').textContent = MineralType.defs[MineralType.SILVER].reward;
-	document.querySelector('#gold_price').textContent = MineralType.defs[MineralType.GOLD].reward;
-	document.querySelector('#emerald_price').textContent = MineralType.defs[MineralType.EMERALD].reward;
-	document.querySelector('#ruby_price').textContent = MineralType.defs[MineralType.RUBY].reward;
-	document.querySelector('#moonstone_price').textContent = MineralType.defs[MineralType.MOONSTONE].reward;
-
 
 	g_tileMap = tileGenerate(g_rand);
 	g_vehicle = new Vehicle();
