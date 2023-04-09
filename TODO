@@ -27,11 +27,18 @@ Simulator:
 	✔ Proper drill costs @done(23-04-07 16:55)
 		✔ Rocks @done(23-04-07 16:15)
 		✔ Ground layer @done(23-04-07 16:55)
-	☐ Warehouse
+	✔ Warehouse @done(23-04-09 15:40)
 		✔ Add from vehicle to stock @done(23-04-08 11:04)
 		✔ Sell minerals @done(23-04-08 11:26)
-		☐ Fill plans
+		✔ Fill plans @done(23-04-09 15:40)
 	☐ Simulate plans
+		✔ First plan @done(23-04-09 15:41)
+		✔ Next plans @done(23-04-09 15:45)
+		✔ Unlock minerals @done(23-04-09 15:52)
+		☐ Count progress towards accolades
+		☐ Time countdown
+		☐ Receive rebukes
+	☐ Show game win/lose
 	☐ Configurable gameplay constants
 	☐ Draw proper bases
 	☐ Dino quest
