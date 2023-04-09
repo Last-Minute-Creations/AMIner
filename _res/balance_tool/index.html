@@ -34,21 +34,21 @@
 				<h2>Mine contents</h2>
 				<div>
 					<ul>
-						<li>Silver: <span id="minerals_silver">0</span>/<span id="minerals_silver_total">0</span></li>
-						<li>Gold: <span id="minerals_gold">0</span>/<span id="minerals_gold_total">0</span></li>
-						<li>Emerald: <span id="minerals_emerald">0</span>/<span id="minerals_emerald_total">0</span></li>
-						<li>Ruby: <span id="minerals_ruby">0</span>/<span id="minerals_ruby_total">0</span></li>
-						<li>Moonstone: <span id="minerals_moonstone">0</span>/<span id="minerals_moonstone_total">0</span></li>
+						<li>Silver: <span id="minerals_silver">?</span>/<span id="minerals_silver_total">?</span></li>
+						<li>Gold: <span id="minerals_gold">?</span>/<span id="minerals_gold_total">?</span></li>
+						<li>Emerald: <span id="minerals_emerald">?</span>/<span id="minerals_emerald_total">?</span></li>
+						<li>Ruby: <span id="minerals_ruby">?</span>/<span id="minerals_ruby_total">?</span></li>
+						<li>Moonstone: <span id="minerals_moonstone">?</span>/<span id="minerals_moonstone_total">?</span></li>
 					</ul>
 				</div>
 
 				<h2>Vehicle</h2>
 				<div>
 					<ul>
-						<li>Hull mk <span id="vehicle_hull_mk">1</span>: <span id="vehicle_hull_curr">0</span>/<span id="vehicle_hull_max">0</span>
-						<li>Drill mk <span id="vehicle_drill_mk">1</span>: <span id="vehicle_drill_curr">0</span>/<span id="vehicle_drill_max">0</span>
-						<li>Cargo mk <span id="vehicle_cargo_mk">1</span>: <span id="vehicle_cargo_curr">0</span>/<span id="vehicle_cargo_max">0</span>
-						<li>Money: <span id="vehicle_money">0</span></li>
+						<li>Hull mk <span id="vehicle_hull_mk">?</span>: <span id="vehicle_hull_curr">?</span>/<span id="vehicle_hull_max">?</span>
+						<li>Drill mk <span id="vehicle_drill_mk">?</span>: <span id="vehicle_drill_curr">?</span>/<span id="vehicle_drill_max">?</span>
+						<li>Cargo mk <span id="vehicle_cargo_mk">?</span>: <span id="vehicle_cargo_curr">?</span>/<span id="vehicle_cargo_max">?</span>
+						<li>Money: <span id="vehicle_money">?</span></li>
 					</ul>
 					<button id="btn_vehicle_restock" class="btn_large">Restock</button>
 				</div>
@@ -56,15 +56,16 @@
 				<h2>Office</h2>
 				<div>
 					<ul>
+						<li>Ending: <span id="office_ending">?</span>
 						<li>
-							Plan Index: <span id="plan_index">1</span>,
-							started: <span id="plan_started">&check;</span>,
-							extended: <span id="plan_extended">&cross;</span>,
-							time remaining: <span id="plan_time_remaining">0</span> (<span id="plan_time_remaining_days">0</span> days)
+							Plan Index: <span id="plan_index">?</span>,
+							started: <span id="plan_started">?</span>,
+							extended: <span id="plan_extended">?</span>,
+							time remaining: <span id="plan_time_remaining">?</span> (<span id="plan_time_remaining_days">?</span> days)
 						<li>Unlocked minerals: <span id="plan_unlocked_minerals"></span>
-						<li>Accolades: <span id="office_accolades">0</span>, progress: <span id="office_accolades_progress_curr">0</span>/<span id="office_accolades_progress_max">0</span>
-						<li>Rebukes: <span id="office_rebukes">0</span>
-						<li>Heat: <span id="office_heat">5</span>%
+						<li>Accolades: <span id="office_accolades">?</span>, progress: <span id="office_accolades_progress_curr">?</span>/<span id="office_accolades_progress_max">?</span>
+						<li>Rebukes: <span id="office_rebukes">?</span>
+						<li>Heat: <span id="office_heat">?</span>%
 					</ul>
 					<button id="btn_favor" class="btn_large">Favor</buton>
 					<button id="btn_bribe" class="btn_large">Bribe</buton>
@@ -77,50 +78,50 @@
 						<tr><th>Mineral</th><th>Sell</th><th>Stock</th><th>Plan</th></tr>
 						<tr>
 							<td>Silver</td>
-							<td><span id="silver_price">0</span>$/pc <button id="btn_silver_sell_1">Sell 1</button> <button id="btn_silver_sell_10">Sell 10</button></td>
-							<td><span id="stock_silver">0</span></td>
+							<td><span id="silver_price">?</span>$/pc <button id="btn_silver_sell_1">Sell 1</button> <button id="btn_silver_sell_10">Sell 10</button></td>
+							<td><span id="stock_silver">?</span></td>
 							<td>
-								<span id="plan_silver_spent">0</span>/<span id="plan_silver_required">0</span>
+								<span id="plan_silver_spent">?</span>/<span id="plan_silver_required">?</span>
 								<button id="btn_silver_plan_1">Add 1</button>
 								<button id="btn_silver_plan_fill">Fill</button>
 							</td>
 						</tr>
 						<tr>
 							<td>Gold</td>
-							<td><span id="gold_price">0</span>$/pc <button id="btn_gold_sell_1">Sell 1</button> <button id="btn_gold_sell_10">Sell 10</button></td>
-							<td><span id="stock_gold">0</span></td>
+							<td><span id="gold_price">?</span>$/pc <button id="btn_gold_sell_1">Sell 1</button> <button id="btn_gold_sell_10">Sell 10</button></td>
+							<td><span id="stock_gold">?</span></td>
 							<td>
-								<span id="plan_gold_spent">0</span>/<span id="plan_gold_required">0</span>
+								<span id="plan_gold_spent">?</span>/<span id="plan_gold_required">?</span>
 								<button id="btn_gold_plan_1">Add 1</button>
 								<button id="btn_gold_plan_fill">Fill</button>
 							</td>
 						</tr>
 						<tr>
 							<td>Emerald</td>
-							<td><span id="emerald_price">0</span>$/pc <button id="btn_emerald_sell_1">Sell 1</button> <button id="btn_emerald_sell_10">Sell 10</button></td>
-							<td><span id="stock_emerald">0</span></td>
+							<td><span id="emerald_price">?</span>$/pc <button id="btn_emerald_sell_1">Sell 1</button> <button id="btn_emerald_sell_10">Sell 10</button></td>
+							<td><span id="stock_emerald">?</span></td>
 							<td>
-								<span id="plan_emerald_spent">0</span>/<span id="plan_emerald_required">0</span>
+								<span id="plan_emerald_spent">?</span>/<span id="plan_emerald_required">?</span>
 								<button id="btn_emerald_plan_1">Add 1</button>
 								<button id="btn_emerald_plan_fill">Fill</button>
 							</td>
 						</tr>
 						<tr>
 							<td>Ruby</td>
-							<td><span id="ruby_price">0</span>$/pc <button id="btn_ruby_sell_1">Sell 1</button> <button id="btn_ruby_sell_10">Sell 10</button></td>
-							<td><span id="stock_ruby">0</span></td>
+							<td><span id="ruby_price">?</span>$/pc <button id="btn_ruby_sell_1">Sell 1</button> <button id="btn_ruby_sell_10">Sell 10</button></td>
+							<td><span id="stock_ruby">?</span></td>
 							<td>
-								<span id="plan_ruby_spent">0</span>/<span id="plan_ruby_required">0</span>
+								<span id="plan_ruby_spent">?</span>/<span id="plan_ruby_required">?</span>
 								<button id="btn_ruby_plan_1">Add 1</button>
 								<button id="btn_ruby_plan_fill">Fill</button>
 							</td>
 						</tr>
 						<tr>
 							<td>Moonstone</td>
-							<td><span id="moonstone_price">0</span>$/pc <button id="btn_moonstone_sell_1">Sell 1</button> <button id="btn_moonstone_sell_10">Sell 10</button></td>
-							<td><span id="stock_moonstone">0</span></td>
+							<td><span id="moonstone_price">?</span>$/pc <button id="btn_moonstone_sell_1">Sell 1</button> <button id="btn_moonstone_sell_10">Sell 10</button></td>
+							<td><span id="stock_moonstone">?</span></td>
 							<td>
-								<span id="plan_moonstone_spent">0</span>/<span id="plan_moonstone_required">0</span>
+								<span id="plan_moonstone_spent">?</span>/<span id="plan_moonstone_required">?</span>
 								<button id="btn_moonstone_plan_1">Add 1</button>
 								<button id="btn_moonstone_plan_fill">Fill</button>
 							</td>
