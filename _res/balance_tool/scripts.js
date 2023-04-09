@@ -1,6 +1,7 @@
 let g_rand = new rand(2184, 1911);
 let g_tileMap = null;
 let g_vehicle = null;
+let g_plan = null;
 
 function rgbToHex(r, g, b) {
 	return '#' +
@@ -160,13 +161,17 @@ class Vehicle {
 		}
 
 		this.drillCurr -= drillCost;
+		let mineralId = tile.mineralType.id;
 
-		if(this.cargoMinerals[tile.mineralType.id] == undefined) {
-			this.cargoMinerals[tile.mineralType.id] = 0;
+		if(this.cargoMinerals[mineralId] == undefined) {
+			this.cargoMinerals[mineralId] = 0;
 		}
-		this.cargoMinerals[tile.mineralType.id] += tile.mineralAmount;
+		this.cargoMinerals[mineralId] += tile.mineralAmount;
 
 		this.cargoCurr = Math.min(this.cargoCurr + tile.mineralAmount, this.cargoMax);
+		if(tile.mineralType.isCollectible && g_plan.mineralsUnlocked.indexOf(mineralId) == -1) {
+			g_plan.mineralsUnlocked.push(mineralId);
+		}
 		return true;
 	}
 
@@ -198,6 +203,81 @@ class Vehicle {
 		g_vehicle.money += mineralType.reward * sellAmount;
 		g_vehicle.stock[mineralType.id] -= sellAmount;
 		return sellAmount;
+	}
+
+	tryFillPlan(mineralType, amount) {
+		if(g_vehicle.stock[mineralType.id] == undefined) {
+			return 0;
+		}
+
+		let requiredAmount = g_plan.mineralsRequired[mineralType.id] - g_plan.mineralsCollected[mineralType.id];
+		let fillAmount = Math.min(Math.min(amount, g_vehicle.stock[mineralType.id]), requiredAmount);
+		g_plan.mineralsCollected[mineralType.id] +=  fillAmount;
+		g_vehicle.stock[mineralType.id] -= fillAmount;
+
+		g_plan.tryProceed();
+
+		return fillAmount;
+	}
+}
+
+class Plan {
+	constructor() {
+		this.mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+		this.mineralsCollected = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+		this.mineralsUnlocked = [ MineralType.SILVER.id ]; // [mineralId]
+		this.index = 0;
+		this.isStarted = true;
+		this.isExtendedByFavor = false;
+		this.targetSum = 15;
+
+		this.reroll();
+	}
+
+	reroll() {
+		this.mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+		this.mineralsCollected = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+		let costRemaining = this.targetSum;
+		let i = 0;
+		do {
+			let collectibleIndex = g_rand.next16MinMax(0, MineralType.collectibles.length - 1);
+			let mineralId = MineralType.collectibles[collectibleIndex].id;
+			if(this.mineralsUnlocked.indexOf(mineralId) != -1) {
+				let reward = MineralType.all[mineralId].reward;
+				let count = g_rand.next16Max(Math.floor((costRemaining + reward - 1) / reward));
+
+				this.mineralsRequired[mineralId] += count;
+				costRemaining -= count * reward;
+				console.log(`reward ${reward}, count ${count}, remaining: ${costRemaining}`);
+			}
+			if(++i > 100) {
+				break;
+			}
+		} while(costRemaining > 0);
+
+		this.timeRemaining = 2 * 2 * 1000; // two full fuel, per player
+		this.timeRemaining += 200; // Add for nice division into 30 days
+	}
+
+	next() {
+		++this.index;
+		this.targetSum += Math.floor(this.targetSum * 0.1);
+		this.reroll();
+	}
+
+	isCompleted() {
+		for(let i = 0; i < MineralType.all.length; ++i) {
+			if(this.mineralsRequired[i] != this.mineralsCollected[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	tryProceed() {
+		if(this.isCompleted()) {
+			this.next();
+		}
 	}
 }
 
@@ -364,6 +444,7 @@ function onCellTryExcavate(evt) {
 
 		updateVehicleStats();
 		updateMineralStats();
+		updateOfficeStats();
 	}
 }
 
@@ -390,7 +471,10 @@ function setMineCellEvents(cell) {
 
 function updateWarehouse() {
 	for(let mineralType of MineralType.collectibles) {
-		document.querySelector(`#stock_${mineralType.name}`).textContent = g_vehicle.stock[mineralType.id];
+		let name = mineralType.name;
+		document.querySelector(`#stock_${name}`).textContent = g_vehicle.stock[mineralType.id];
+		document.querySelector(`#plan_${name}_spent`).textContent = g_plan.mineralsCollected[mineralType.id];
+		document.querySelector(`#plan_${name}_required`).textContent = g_plan.mineralsRequired[mineralType.id];
 	}
 }
 
@@ -482,6 +566,21 @@ function onSellAllClicked() {
 	updateWarehouse();
 }
 
+function onPlanFillClicked(mineralType, amount) {
+	g_vehicle.tryFillPlan(mineralType, amount);
+	updateVehicleStats();
+	updateWarehouse();
+	updateOfficeStats();
+}
+
+function onFillAllPlanClicked() {
+	for(let mineralType of MineralType.all) {
+		g_vehicle.tryFillPlan(mineralType, 1000000);
+	}
+	updateVehicleStats();
+	updateWarehouse();
+}
+
 function onRestockClicked(evt) {
 	g_vehicle.restock();
 	updateVehicleStats();
@@ -496,6 +595,17 @@ function updateMineralStats() {
 	}
 }
 
+function updateOfficeStats() {
+	let timeInDay = 140;
+	document.querySelector("#plan_index").textContent = g_plan.index + 1;
+	document.querySelector("#plan_started").textContent = g_plan.isStarted ? '✓' : '✗';
+	document.querySelector("#plan_extended").textContent = g_plan.isExtendedByFavor ? '✓' : '✗';
+	document.querySelector("#plan_time_remaining").textContent = g_plan.timeRemaining;
+	document.querySelector("#plan_time_remaining_days").textContent = g_plan.timeRemaining / timeInDay;
+	document.querySelector("#plan_unlocked_minerals").textContent = g_plan.mineralsUnlocked.map((x) => MineralType.all[x].name).join(', ');
+
+}
+
 window.addEventListener('load', function() {
 	document.querySelector('#btn_vehicle_restock').addEventListener('click', onRestockClicked);
 
@@ -504,12 +614,18 @@ window.addEventListener('load', function() {
 		document.querySelector(`#${name}_price`).textContent = mineralType.reward;
 		document.querySelector(`#btn_${name}_sell_1`).addEventListener('click', function() {onSellClicked(mineralType, 1); });
 		document.querySelector(`#btn_${name}_sell_10`).addEventListener('click', function() {onSellClicked(mineralType, 10); });
+		document.querySelector(`#btn_${name}_plan_1`).addEventListener('click', function() {onPlanFillClicked(mineralType, 1); });
+		document.querySelector(`#btn_${name}_plan_fill`).addEventListener('click', function() {onPlanFillClicked(mineralType, 1000000); });
 	}
 	document.querySelector('#btn_sell_all').addEventListener('click', function() {onSellAllClicked(); });
+	document.querySelector('#btn_fill_plan').addEventListener('click', function() {onFillAllPlanClicked(); });
 
 	g_tileMap = tileGenerate(g_rand);
 	g_vehicle = new Vehicle();
+	g_plan = new Plan();
 	drawTiles(g_tileMap);
 	updateVehicleStats();
 	updateMineralStats();
+	updateOfficeStats();
+	updateWarehouse();
 });
