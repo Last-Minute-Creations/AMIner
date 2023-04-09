@@ -1,7 +1,8 @@
-let g_rand = new rand(2184, 1911);
+let g_rand = null;
 let g_tileMap = null;
 let g_vehicle = null;
 let g_plan = null;
+let g_defs = null;
 
 function rgbToHex(r, g, b) {
 	return '#' +
@@ -14,6 +15,21 @@ function clamp(x, min, max) {
 	if (x < min) return min;
 	if (x > max) return max;
 	return x;
+}
+
+class Defs {
+	constructor() {
+		this.timeInDay = 140;
+		this.maxRebukes = 3;
+		this.maxSubAccolades = 10;
+		this.maxAccolades = 5;
+		this.hullPrice = 2;
+		this.literPrice = 5;
+		this.fuelInLiter = 100;
+		this.planCostMultiplier = 0.1;
+		this.seed1 = 2184;
+		this.seed2 = 1911;
+	}
 }
 
 class TileIndex {
@@ -187,22 +203,18 @@ class Vehicle {
 	}
 
 	restock() {
-		let hullPrice = 2;
-		let literPrice = 5;
-		let fuelInLiter = 100;
-
 		for(let mineralId in this.cargoMinerals) {
 			this.stock[mineralId] += this.cargoMinerals[mineralId];
 			this.cargoMinerals[mineralId] = 0;
 		}
 
-		let liters = Math.floor((this.drillMax - this.drillCurr + 0.5 * fuelInLiter) / fuelInLiter);
-		this.money -= (this.hullMax - this.hullCurr) * hullPrice;
-		this.money -= liters * literPrice;
+		let liters = Math.floor((this.drillMax - this.drillCurr + 0.5 * g_defs.fuelInLiter) / g_defs.fuelInLiter);
+		this.money -= (this.hullMax - this.hullCurr) * g_defs.hullPrice;
+		this.money -= liters * g_defs.literPrice;
 
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
-		this.drillCurr = Math.min(this.drillCurr + liters * fuelInLiter, this.drillMax);
+		this.drillCurr = Math.min(this.drillCurr + liters * g_defs.fuelInLiter, this.drillMax);
 	}
 
 	trySell(mineralType, amount) {
@@ -227,9 +239,9 @@ class Vehicle {
 		g_vehicle.stock[mineralType.id] -= fillAmount;
 
 		if(g_plan.tryProceed()) {
-			if(++this.subAccolades == 10) {
+			if(++this.subAccolades == g_defs.maxSubAccolades) {
 				this.subAccolades = 0;
-				if(++this.accolades >= 5) {
+				if(++this.accolades >= g_defs.maxAccolades) {
 					this.ending = Ending.ACCOLADES_WIN;
 				}
 			}
@@ -239,7 +251,7 @@ class Vehicle {
 	}
 
 	addRebuke() {
-		if(++this.rebukes >= 3) {
+		if(++this.rebukes >= g_defs.maxRebukes) {
 			this.ending = Ending.REBUKE_LOST;
 		}
 	}
@@ -289,7 +301,7 @@ class Plan {
 
 	next() {
 		++this.index;
-		this.targetSum += Math.floor(this.targetSum * 0.1);
+		this.targetSum += Math.floor(this.targetSum * g_defs.planCostMultiplier);
 		this.reroll();
 	}
 
@@ -655,8 +667,6 @@ function updateMineralStats() {
 }
 
 function updateOfficeStats() {
-	let timeInDay = 140;
-
 	document.querySelector('#office_ending').textContent = g_vehicle.ending.description;
 	document.querySelector('#office_ending').className = g_vehicle.ending.className;
 
@@ -664,12 +674,14 @@ function updateOfficeStats() {
 	document.querySelector('#plan_started').textContent = g_plan.isStarted ? '✓' : '✗';
 	document.querySelector('#plan_extended').textContent = g_plan.isExtendedByFavor ? '✓' : '✗';
 	document.querySelector('#plan_time_remaining').textContent = g_plan.timeRemaining;
-	document.querySelector('#plan_time_remaining_days').textContent = (g_plan.timeRemaining / timeInDay).toFixed(2);
+	document.querySelector('#plan_time_remaining_days').textContent = (g_plan.timeRemaining / g_defs.timeInDay).toFixed(2);
 	document.querySelector('#plan_unlocked_minerals').textContent = g_plan.mineralsUnlocked.map((x) => MineralType.all[x].name).join(', ');
-	document.querySelector('#office_rebukes').textContent = g_vehicle.rebukes;
-	document.querySelector('#office_accolades').textContent = g_vehicle.accolades;
+	document.querySelector('#office_rebukes_curr').textContent = g_vehicle.rebukes;
+	document.querySelector('#office_rebukes_max').textContent = g_defs.maxRebukes;
+	document.querySelector('#office_accolades_curr').textContent = g_vehicle.accolades;
+	document.querySelector('#office_accolades_max').textContent = g_defs.maxAccolades;
 	document.querySelector('#office_accolades_progress_curr').textContent = g_vehicle.subAccolades;
-	document.querySelector('#office_accolades_progress_max').textContent = 10;
+	document.querySelector('#office_accolades_progress_max').textContent = g_defs.maxSubAccolades;
 }
 
 window.addEventListener('load', function() {
@@ -686,6 +698,8 @@ window.addEventListener('load', function() {
 	document.querySelector('#btn_sell_all').addEventListener('click', function() {onSellAllClicked(); });
 	document.querySelector('#btn_fill_plan').addEventListener('click', function() {onFillAllPlanClicked(); });
 
+	g_defs = new Defs();
+	g_rand = new rand(g_defs.seed1, g_defs.seed2);
 	g_tileMap = tileGenerate(g_rand);
 	g_vehicle = new Vehicle();
 	g_plan = new Plan();
