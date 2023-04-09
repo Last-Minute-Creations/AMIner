@@ -38,7 +38,7 @@ Simulator:
 		✔ Time countdown @done(23-04-09 16:12)
 		✔ Count progress towards accolades @done(23-04-09 16:32)
 		✔ Receive rebukes @done(23-04-09 16:32)
-	☐ Show game win/lose
+	✔ Show game win/lose @done(23-04-09 16:53)
 	☐ Configurable gameplay constants
 	☐ Draw proper bases
 	☐ Dino quest

@@ -128,6 +128,12 @@ class TileMap {
 	}
 }
 
+class Ending {
+	static NONE = {description: 'none - game ongoing', className: ''};
+	static ACCOLADES_WIN = {description: 'won by accolades', className: 'end_good'};
+	static REBUKE_LOST = {description: 'lost by rebukes', className: 'end_bad'};
+}
+
 class Vehicle {
 	constructor() {
 		this.hullMk = 0;
@@ -137,6 +143,7 @@ class Vehicle {
 		this.subAccolades = 0;
 		this.accolades = 0;
 		this.rebukes = 0;
+		this.ending = Ending.NONE;
 		this.cargoMinerals = {}; // [mineralId] => count
 		this.stock = {}; // [mineralId] => count
 		for(let mineral of MineralType.all) {
@@ -222,7 +229,9 @@ class Vehicle {
 		if(g_plan.tryProceed()) {
 			if(++this.subAccolades == 10) {
 				this.subAccolades = 0;
-				++this.accolades;
+				if(++this.accolades >= 5) {
+					this.ending = Ending.ACCOLADES_WIN;
+				}
 			}
 		}
 
@@ -230,8 +239,13 @@ class Vehicle {
 	}
 
 	addRebuke() {
-		++this.rebukes;
-		// TODO: game over
+		if(++this.rebukes >= 3) {
+			this.ending = Ending.REBUKE_LOST;
+		}
+	}
+
+	isGameOver() {
+		return this.ending != Ending.NONE;
 	}
 }
 
@@ -431,7 +445,7 @@ function tileGenerate(rand) {
 
 function onCellTryExcavate(evt) {
 	evt.preventDefault();
-	if(!(evt.buttons & 1)) {
+	if(!(evt.buttons & 1) || g_vehicle.isGameOver()) {
 		return;
 	}
 
@@ -577,12 +591,20 @@ function drawTiles(tileMap) {
 }
 
 function onSellClicked(mineralType, amount) {
+	if(g_vehicle.isGameOver()) {
+		return;
+	}
+
 	g_vehicle.trySell(mineralType, amount);
 	updateVehicleStats();
 	updateWarehouse();
 }
 
 function onSellAllClicked() {
+	if(g_vehicle.isGameOver()) {
+		return;
+	}
+
 	for(let mineralType of MineralType.all) {
 		g_vehicle.trySell(mineralType, 1000000);
 	}
@@ -591,6 +613,10 @@ function onSellAllClicked() {
 }
 
 function onPlanFillClicked(mineralType, amount) {
+	if(g_vehicle.isGameOver()) {
+		return;
+	}
+
 	g_vehicle.tryFillPlan(mineralType, amount);
 	updateVehicleStats();
 	updateWarehouse();
@@ -598,6 +624,10 @@ function onPlanFillClicked(mineralType, amount) {
 }
 
 function onFillAllPlanClicked() {
+	if(g_vehicle.isGameOver()) {
+		return;
+	}
+
 	for(let mineralType of MineralType.all) {
 		g_vehicle.tryFillPlan(mineralType, 1000000);
 	}
@@ -607,6 +637,10 @@ function onFillAllPlanClicked() {
 }
 
 function onRestockClicked(evt) {
+	if(g_vehicle.isGameOver()) {
+		return;
+	}
+
 	g_vehicle.restock();
 	updateVehicleStats();
 	updateWarehouse();
@@ -622,12 +656,16 @@ function updateMineralStats() {
 
 function updateOfficeStats() {
 	let timeInDay = 140;
-	document.querySelector("#plan_index").textContent = g_plan.index + 1;
-	document.querySelector("#plan_started").textContent = g_plan.isStarted ? '✓' : '✗';
-	document.querySelector("#plan_extended").textContent = g_plan.isExtendedByFavor ? '✓' : '✗';
-	document.querySelector("#plan_time_remaining").textContent = g_plan.timeRemaining;
-	document.querySelector("#plan_time_remaining_days").textContent = (g_plan.timeRemaining / timeInDay).toFixed(2);
-	document.querySelector("#plan_unlocked_minerals").textContent = g_plan.mineralsUnlocked.map((x) => MineralType.all[x].name).join(', ');
+
+	document.querySelector('#office_ending').textContent = g_vehicle.ending.description;
+	document.querySelector('#office_ending').className = g_vehicle.ending.className;
+
+	document.querySelector('#plan_index').textContent = g_plan.index + 1;
+	document.querySelector('#plan_started').textContent = g_plan.isStarted ? '✓' : '✗';
+	document.querySelector('#plan_extended').textContent = g_plan.isExtendedByFavor ? '✓' : '✗';
+	document.querySelector('#plan_time_remaining').textContent = g_plan.timeRemaining;
+	document.querySelector('#plan_time_remaining_days').textContent = (g_plan.timeRemaining / timeInDay).toFixed(2);
+	document.querySelector('#plan_unlocked_minerals').textContent = g_plan.mineralsUnlocked.map((x) => MineralType.all[x].name).join(', ');
 	document.querySelector('#office_rebukes').textContent = g_vehicle.rebukes;
 	document.querySelector('#office_accolades').textContent = g_vehicle.accolades;
 	document.querySelector('#office_accolades_progress_curr').textContent = g_vehicle.subAccolades;

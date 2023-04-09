@@ -38,6 +38,16 @@ H2 {
 	font-weight: bold;
 }
 
+.end_good {
+	color: green;
+	font-weight: bold;
+}
+
+.end_bad {
+	color: darkred;
+	font-weight: bold;
+}
+
 /*-----------------------------------------------------------------WAREHOUSE--*/
 
 #warehouse {
