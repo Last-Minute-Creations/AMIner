@@ -134,6 +134,9 @@ class Vehicle {
 		this.cargoMk = 0;
 		this.drillMk = 0;
 		this.money = 0;
+		this.subAccolades = 0;
+		this.accolades = 0;
+		this.rebukes = 0;
 		this.cargoMinerals = {}; // [mineralId] => count
 		this.stock = {}; // [mineralId] => count
 		for(let mineral of MineralType.all) {
@@ -216,9 +219,19 @@ class Vehicle {
 		g_plan.mineralsCollected[mineralType.id] +=  fillAmount;
 		g_vehicle.stock[mineralType.id] -= fillAmount;
 
-		g_plan.tryProceed();
+		if(g_plan.tryProceed()) {
+			if(++this.subAccolades == 10) {
+				this.subAccolades = 0;
+				++this.accolades;
+			}
+		}
 
 		return fillAmount;
+	}
+
+	addRebuke() {
+		++this.rebukes;
+		// TODO: game over
 	}
 }
 
@@ -278,13 +291,15 @@ class Plan {
 	tryProceed() {
 		if(this.isCompleted()) {
 			this.next();
+			return true;
 		}
+		return false;
 	}
 
 	elapseTime(timeDelta) {
 		this.timeRemaining -= timeDelta;
 		if(this.timeRemaining <= 0) {
-			// TODO: rebuke
+			g_vehicle.addRebuke();
 			this.reroll();
 		}
 	}
@@ -613,7 +628,10 @@ function updateOfficeStats() {
 	document.querySelector("#plan_time_remaining").textContent = g_plan.timeRemaining;
 	document.querySelector("#plan_time_remaining_days").textContent = (g_plan.timeRemaining / timeInDay).toFixed(2);
 	document.querySelector("#plan_unlocked_minerals").textContent = g_plan.mineralsUnlocked.map((x) => MineralType.all[x].name).join(', ');
-
+	document.querySelector('#office_rebukes').textContent = g_vehicle.rebukes;
+	document.querySelector('#office_accolades').textContent = g_vehicle.accolades;
+	document.querySelector('#office_accolades_progress_curr').textContent = g_vehicle.subAccolades;
+	document.querySelector('#office_accolades_progress_max').textContent = 10;
 }
 
 window.addEventListener('load', function() {
