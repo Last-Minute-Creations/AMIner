@@ -91,12 +91,14 @@ class TileMap {
 		// this.tiles[9][g_dinoDepths[8]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
 
 		this.totalMineralCounts = {};
+		this.totalMoney = 0;
 		for(let mineralType of MineralType.all) {
 			this.totalMineralCounts[mineralType.id] = 0;
 		}
 		for(let x = 1; x < width; ++x) {
 			for(let y = tileRowBaseDirt + 2; y < height; ++y) {
 				this.totalMineralCounts[this.tiles[x][y].mineralType.id] += this.tiles[x][y].mineralAmount;
+				this.totalMoney += this.tiles[x][y].mineralAmount * this.tiles[x][y].mineralType.reward;
 			}
 		}
 
@@ -104,6 +106,7 @@ class TileMap {
 		for(let mineralType of MineralType.all) {
 			this.currentMineralCounts[mineralType.id] = this.totalMineralCounts[mineralType.id];
 		}
+		this.currentMoney = this.totalMoney;
 	}
 
 

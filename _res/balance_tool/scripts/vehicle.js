@@ -69,6 +69,7 @@ class Vehicle {
 		// Update tile data
 		g_tileMap.tiles[posX][posY] = new Tile(TileIndex.CAVE_BG_16,  MineralType.AIR, 0);
 		g_tileMap.currentMineralCounts[tile.mineralType.id] -= tile.mineralAmount;
+		g_tileMap.currentMoney -= tile.mineralAmount * tile.mineralType.reward;
 
 		return true;
 	}

@@ -215,6 +215,8 @@ function updateMineralStats() {
 		document.querySelector(`#minerals_${name}_total`).textContent = g_tileMap.totalMineralCounts[mineralType.id];
 		document.querySelector(`#minerals_${name}`).textContent = g_tileMap.currentMineralCounts[mineralType.id];
 	}
+	document.querySelector('#minerals_money').textContent = g_tileMap.currentMoney;
+	document.querySelector('#minerals_money_total').textContent = g_tileMap.totalMoney;
 }
 
 function updateOfficeStats() {
