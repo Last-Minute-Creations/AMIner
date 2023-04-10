@@ -10,5 +10,12 @@ class Defs {
 		this.planCostMultiplier = parseFloat(document.querySelector('[name=defs_plan_value_ratio]').value) - 1;
 		this.seed1 = parseInt(document.querySelector('[name=defs_seed1]').value);
 		this.seed2 = parseInt(document.querySelector('[name=defs_seed2]').value);
+		this.upgradeCosts = [100, 300, 600, 1000];
+		this.hullBase = 100;
+		this.hullAddPerLevel = 20;
+		this.drillBase = 1000;
+		this.drillAddPerLevel = 250;
+		this.cargoBase = 50;
+		this.cargoAddPerLevel = 20;
 	}
 }

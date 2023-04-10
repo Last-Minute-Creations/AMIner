@@ -46,14 +46,17 @@ function updateVehicleStats() {
 	document.querySelector('#vehicle_hull_mk').textContent = g_vehicle.hullMk + 1;
 	document.querySelector('#vehicle_hull_curr').textContent = g_vehicle.hullCurr;
 	document.querySelector('#vehicle_hull_max').textContent = g_vehicle.hullMax;
+	document.querySelector('#vehicle_upgrade_hull_cost').textContent = g_vehicle.hullMk < g_defs.upgradeCosts.length ? g_defs.upgradeCosts[g_vehicle.hullMk] : 0;
 
 	document.querySelector('#vehicle_cargo_mk').textContent = g_vehicle.cargoMk + 1;
 	document.querySelector('#vehicle_cargo_curr').textContent = g_vehicle.cargoCurr;
 	document.querySelector('#vehicle_cargo_max').textContent = g_vehicle.cargoMax;
+	document.querySelector('#vehicle_upgrade_cargo_cost').textContent = g_vehicle.cargoMk < g_defs.upgradeCosts.length ? g_defs.upgradeCosts[g_vehicle.cargoMk] : 0;
 
 	document.querySelector('#vehicle_drill_mk').textContent = g_vehicle.drillMk + 1;
 	document.querySelector('#vehicle_drill_curr').textContent = g_vehicle.drillCurr;
 	document.querySelector('#vehicle_drill_max').textContent = g_vehicle.drillMax;
+	document.querySelector('#vehicle_upgrade_drill_cost').textContent = g_vehicle.drillMk < g_defs.upgradeCosts.length ? g_defs.upgradeCosts[g_vehicle.drillMk] : 0;
 
 	document.querySelector('#vehicle_money').textContent = g_vehicle.money;
 }
@@ -232,6 +235,11 @@ function updateOfficeStats() {
 	document.querySelector('#office_accolades_progress_max').textContent = g_defs.maxSubAccolades;
 }
 
+function onUpgradeClicked(part) {
+	g_vehicle.tryUpgradePart(part);
+	updateVehicleStats();
+}
+
 window.addEventListener('load', function() {
 	document.querySelector('#btn_vehicle_restock').addEventListener('click', onRestockClicked);
 
@@ -246,6 +254,9 @@ window.addEventListener('load', function() {
 	document.querySelector('#btn_sell_all').addEventListener('click', function() {onSellAllClicked(); });
 	document.querySelector('#btn_fill_plan').addEventListener('click', function() {onFillAllPlanClicked(); });
 	document.querySelector('#btn_game_reload').addEventListener('click', function() {onGameReloadClicked(); });
+	document.querySelector('#vehicle_upgrade_hull').addEventListener('click', function() { onUpgradeClicked('hull'); })
+	document.querySelector('#vehicle_upgrade_drill').addEventListener('click', function() { onUpgradeClicked('drill'); })
+	document.querySelector('#vehicle_upgrade_cargo').addEventListener('click', function() { onUpgradeClicked('cargo'); })
 
 	reloadGame();
 });

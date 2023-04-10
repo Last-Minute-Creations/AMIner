@@ -31,7 +31,7 @@
 					<label>Seed 2 <input type="number" name="defs_seed2" value="1911" min="1" max="65535"></label>
 					<label>Plans per accolade <input type="number" name="defs_plans_per_accoldade" value="10" min="1" max="65535"></label>
 					<label>Accolades <input type="number" name="defs_accolades" value="5" min="1" max="65535"></label>
-					<label>Rebukes <input type="number" name="defs_rebukes" value="5" min="1" max="65535"></label>
+					<label>Rebukes <input type="number" name="defs_rebukes" value="3" min="1" max="65535"></label>
 					<label>Plan value increment ratio <input type="number" name="defs_plan_value_ratio" value="1.1" min="1.0" step="0.05" max="65535.0"></label>
 					<button id="btn_game_reload" class="btn_large">Reload game</button>
 				</div>
@@ -50,9 +50,15 @@
 				<h2>Vehicle</h2>
 				<div>
 					<ul>
-						<li>Hull mk <span id="vehicle_hull_mk">?</span>: <span id="vehicle_hull_curr">?</span>/<span id="vehicle_hull_max">?</span>
-						<li>Drill mk <span id="vehicle_drill_mk">?</span>: <span id="vehicle_drill_curr">?</span>/<span id="vehicle_drill_max">?</span>
-						<li>Cargo mk <span id="vehicle_cargo_mk">?</span>: <span id="vehicle_cargo_curr">?</span>/<span id="vehicle_cargo_max">?</span>
+						<li>
+							Hull mk <span id="vehicle_hull_mk">?</span>: <span id="vehicle_hull_curr">?</span>/<span id="vehicle_hull_max">?</span>,
+							Upgrade cost: <span id="vehicle_upgrade_hull_cost">?</span>$ <button id="vehicle_upgrade_hull">Upgrade</button>
+						<li>
+							Drill mk <span id="vehicle_drill_mk">?</span>: <span id="vehicle_drill_curr">?</span>/<span id="vehicle_drill_max">?</span>,
+							Upgrade cost: <span id="vehicle_upgrade_drill_cost">?</span>$ <button id="vehicle_upgrade_drill">Upgrade</button>
+						<li>
+							Cargo mk <span id="vehicle_cargo_mk">?</span>: <span id="vehicle_cargo_curr">?</span>/<span id="vehicle_cargo_max">?</span>,
+							Upgrade cost: <span id="vehicle_upgrade_cargo_cost">?</span>$ <button id="vehicle_upgrade_cargo">Upgrade</button>
 						<li>Money: <span id="vehicle_money">?</span></li>
 					</ul>
 					<button id="btn_vehicle_restock" class="btn_large">Restock</button>

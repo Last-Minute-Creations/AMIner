@@ -41,7 +41,7 @@ Simulator:
 	✔ Show game win/lose @done(23-04-09 16:53)
 	✔ Configurable gameplay constants @done(23-04-10 11:02)
 	✔ Draw proper bases @done(23-04-10 11:21)
-	☐ Ability to buy upgrades
+	✔ Ability to buy upgrades @done(23-04-10 18:23)
 	☐ Add simulated damage
 	☐ Dino quest
 		☐ Scatter bones

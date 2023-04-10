@@ -14,9 +14,9 @@ class Vehicle {
 			this.stock[mineral.id] = 0;
 		}
 
-		this.hullMax = 100;
-		this.cargoMax = 50;
-		this.drillMax = 1000;
+		this.hullMax = g_defs.hullBase;
+		this.cargoMax = g_defs.cargoBase;
+		this.drillMax = g_defs.drillBase;
 
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
@@ -119,6 +119,36 @@ class Vehicle {
 		}
 
 		return fillAmount;
+	}
+
+	tryUpgradePart(part) {
+		if(part == 'hull') {
+			if(this.hullMk < g_defs.upgradeCosts.length) {
+				if(this.money >= g_defs.upgradeCosts[this.hullMk]) {
+					this.money -= g_defs.upgradeCosts[this.hullMk];
+					++this.hullMk;
+					this.hullMax += g_defs.hullAddPerLevel;
+				}
+			}
+		}
+		if(part == 'drill') {
+			if(this.drillMk < g_defs.upgradeCosts.length) {
+				if(this.money >= g_defs.upgradeCosts[this.drillMk]) {
+					this.money -= g_defs.upgradeCosts[this.drillMk];
+					++this.drillMk;
+					this.drillMax += g_defs.drillAddPerLevel;
+				}
+			}
+		}
+		if(part == 'cargo') {
+			if(this.cargoMk < g_defs.upgradeCosts.length) {
+				if(this.money >= g_defs.upgradeCosts[this.cargoMk]) {
+					this.money -= g_defs.upgradeCosts[this.cargoMk];
+					++this.cargoMk;
+					this.cargoMax += g_defs.cargoAddPerLevel;
+				}
+			}
+		}
 	}
 
 	addRebuke() {
