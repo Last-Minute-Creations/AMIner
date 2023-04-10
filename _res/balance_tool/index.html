@@ -25,20 +25,15 @@
 				<table id="mine_preview"></table>
 			</div>
 			<div id="panel_right">
-				<h2>Config</h2>
+				<h2>Defs</h2>
 				<div>
-					<form>
-						<label for="seed1">Seed 1</label>
-						<input type="number" name="seed1" value="2184" min="1" max="65535">
-						<label for="seed2">Seed 2</label>
-						<input type="number" name="seed2" value="1911" min="1" max="65535">
-						<label for="plans_per_accoldade">Plans per accolade</label>
-						<input type="number" name="plans_per_accoldade" value="10" min="1" max="65535">
-						<label for="accolades">Accolades</label>
-						<input type="number" name="accolades" value="5" min="1" max="65535">
-						<label for="plan_value_ratio">Plan value increment ratio</label>
-						<input type="number" name="plan_value_ratio" value="1.1" min="1.0" step="0.05" max="65535.0">
-					</form>
+					<label>Seed 1 <input type="number" name="defs_seed1" value="2184" min="1" max="65535"></label>
+					<label>Seed 2 <input type="number" name="defs_seed2" value="1911" min="1" max="65535"></label>
+					<label>Plans per accolade <input type="number" name="defs_plans_per_accoldade" value="10" min="1" max="65535"></label>
+					<label>Accolades <input type="number" name="defs_accolades" value="5" min="1" max="65535"></label>
+					<label>Rebukes <input type="number" name="defs_rebukes" value="5" min="1" max="65535"></label>
+					<label>Plan value increment ratio <input type="number" name="defs_plan_value_ratio" value="1.1" min="1.0" step="0.05" max="65535.0"></label>
+					<button id="btn_game_reload" class="btn_large">Reload game</button>
 				</div>
 
 				<h2>Mine contents</h2>

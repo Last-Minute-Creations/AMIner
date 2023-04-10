@@ -1,8 +1,22 @@
+let g_defs = null;
 let g_rand = null;
 let g_tileMap = null;
 let g_vehicle = null;
 let g_plan = null;
-let g_defs = null;
+
+function reloadGame() {
+	g_defs = new Defs();
+	g_rand = new rand(g_defs.seed1, g_defs.seed2);
+	g_tileMap = new TileMap(11, 1024);
+	g_vehicle = new Vehicle();
+	g_plan = new Plan();
+
+	drawTiles(g_tileMap);
+	updateVehicleStats();
+	updateMineralStats();
+	updateOfficeStats();
+	updateWarehouse();
+}
 
 function onCellTryExcavate(evt) {
 	evt.preventDefault();
@@ -132,6 +146,10 @@ function drawTiles(tileMap) {
 	}
 }
 
+function onGameReloadClicked() {
+	reloadGame();
+}
+
 function onSellClicked(mineralType, amount) {
 	if(g_vehicle.isGameOver()) {
 		return;
@@ -227,15 +245,7 @@ window.addEventListener('load', function() {
 	}
 	document.querySelector('#btn_sell_all').addEventListener('click', function() {onSellAllClicked(); });
 	document.querySelector('#btn_fill_plan').addEventListener('click', function() {onFillAllPlanClicked(); });
+	document.querySelector('#btn_game_reload').addEventListener('click', function() {onGameReloadClicked(); });
 
-	g_defs = new Defs();
-	g_rand = new rand(g_defs.seed1, g_defs.seed2);
-	g_tileMap = new TileMap(11, 1024);
-	g_vehicle = new Vehicle();
-	g_plan = new Plan();
-	drawTiles(g_tileMap);
-	updateVehicleStats();
-	updateMineralStats();
-	updateOfficeStats();
-	updateWarehouse();
+	reloadGame();
 });

@@ -48,6 +48,20 @@ H2 {
 	font-weight: bold;
 }
 
+/*----------------------------------------------------------------------DEFS--*/
+
+LABEL {
+	width: 40%;
+	display: inline-block;
+	overflow: auto;
+	margin: 3px;
+}
+
+LABEL * {
+	display: inline-block;
+	float: right;
+}
+
 /*-----------------------------------------------------------------WAREHOUSE--*/
 
 #warehouse {

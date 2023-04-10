@@ -39,7 +39,7 @@ Simulator:
 		✔ Count progress towards accolades @done(23-04-09 16:32)
 		✔ Receive rebukes @done(23-04-09 16:32)
 	✔ Show game win/lose @done(23-04-09 16:53)
-	☐ Configurable gameplay constants
+	✔ Configurable gameplay constants @done(23-04-10 11:02)
 	☐ Draw proper bases
 	☐ Dino quest
 		☐ Scatter bones
