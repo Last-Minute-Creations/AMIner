@@ -22,50 +22,52 @@ class TileMap {
 
 				let chance;
 				if(what < (chance = chanceRock)) {
-					this.tiles[x][y] = new Tile(g_rand.next16MinMax(TileIndex.STONE_1, TileIndex.STONE_4), MineralType.ROCK, 0);
+					this.tiles[x][y] = new Tile(g_rand.next16MinMax(TileIndex.STONE_1, TileIndex.STONE_4));
 				}
 				else if(what < (chance += chanceMagma)) {
-					this.tiles[x][y] = new Tile(g_rand.next16MinMax(TileIndex.MAGMA_1, TileIndex.MAGMA_2), MineralType.MAGMA, 0);
+					this.tiles[x][y] = new Tile(g_rand.next16MinMax(TileIndex.MAGMA_1, TileIndex.MAGMA_2));
 				}
 				else if(
 					what < (chance += chanceAir) &&
 					this.isSolid(x - 1, y) && this.isSolid(x, y - 1)
 				) {
-					this.tiles[x][y] = new Tile(TileIndex.CAVE_BG_1+15, MineralType.AIR, 0);
+					this.tiles[x][y] = new Tile(TileIndex.CAVE_BG_1+15);
 				}
 				else if(what < (chance += chanceSilver)) {
 					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.SILVER_1 + add, MineralType.SILVER, 1 + add);
+					this.tiles[x][y] = new Tile(TileIndex.SILVER_1 + add);
 				}
 				else if(what < (chance += chanceGold)) {
 					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.GOLD_1 + add, MineralType.GOLD, 1 + add);
+					this.tiles[x][y] = new Tile(TileIndex.GOLD_1 + add);
 				}
 				else if(what < (chance += chanceEmerald)) {
 					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.EMERALD_1 + add, MineralType.EMERALD, 1 + add);
+					this.tiles[x][y] = new Tile(TileIndex.EMERALD_1 + add);
 				}
 				else if(what < (chance += chanceRuby)) {
 					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.RUBY_1 + add, MineralType.RUBY, 1 + add);
+					this.tiles[x][y] = new Tile(TileIndex.RUBY_1 + add);
 				}
 				else if(what < (chance += chanceMoonstone)) {
 					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.MOONSTONE_1 + add, MineralType.MOONSTONE, 1 + add);
+					this.tiles[x][y] = new Tile(TileIndex.MOONSTONE_1 + add);
 				}
 				else {
-					this.tiles[x][y] = new Tile(TileIndex.DIRT_1 + ((x & 1) ^ (y & 1)), MineralType.DIRT, 0);
+					this.tiles[x][y] = new Tile(TileIndex.DIRT_1 + ((x & 1) ^ (y & 1)));
 				}
 			}
 		}
 
 		// Draw bases
-		// for(let ubBase = 0; ubBase < BASE_ID_COUNT; ++ubBase) {
-		// 	let base = s_bases[ubBase];
-		// 	if(base.level != BASE_LEVEL_letIANT) {
-		// 		tileDrawBase(base, base.level);
-		// 	}
-		// }
+		for(let baseIndex = 0; baseIndex < TileMap.bases.length; ++baseIndex) {
+			let base = TileMap.bases[baseIndex];
+			for(let y = 0; y < base.pattern.length; ++y) {
+				for(let x = 0; x < width - 1; ++x) {
+					this.tiles[x][base.level + y] = new Tile(base.pattern[y][x]);
+				}
+			}
+		}
 
 		// Fill left invisible col with rocks
 		for(let y = 0; y < height; ++y) {
@@ -108,4 +110,38 @@ class TileMap {
 	isSolid(x, y) {
 		return this.tiles[x][y].index >= TileIndex.DIRT_1;
 	}
+
+	static bases = [
+		{
+			level: 0,
+			pattern: [
+				[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+				[ 1,  1,  1,  1,  1,  1,  1,  1,  1,  1],
+				[ 2,  2,  2,  2,  2,  2,  2,  2,  2,  2],
+				[ 3,  3,  3,  3,  3,  3,  3,  3,  3,  3],
+				[ 4,  4,  4,  4,  4,  4,  4,  4,  4,  5],
+				[ 6,  6,  7,  6,  6,  8,  9, 10, 11, 12],
+				[13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+				[23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+				[34, 33, 35, 36, 37, 38, 39, 40, 41, 42],
+				[63, 57, 63, 64, 63, 64, 63, 64, 63, 64],
+			]
+		},
+		{
+			level: 100,
+			pattern: [
+				[44, 44, 44, 44, 44, 44, 44, 44, 44, 44],
+				[ 0, 43, 43, 43, 43,  1, 43,  0, 43, 43],
+				[43,  1, 43, 43, 43, 43, 43, 43, 43,  2],
+				[43, 43, 43, 43, 43,  3,  1, 43, 43,  1],
+				[43, 43, 43, 43,  3, 43, 43, 43,  0, 43],
+				[43,  1, 43, 43, 43, 43, 43, 43, 43,  2],
+				[13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+				[23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+				[34, 35, 36, 37, 38, 33, 39, 40, 41, 42],
+				[63, 64, 63, 64, 63, 57, 63, 64, 63, 64]
+			]
+		},
+	];
+
 }

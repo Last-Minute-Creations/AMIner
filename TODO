@@ -40,13 +40,13 @@ Simulator:
 		✔ Receive rebukes @done(23-04-09 16:32)
 	✔ Show game win/lose @done(23-04-09 16:53)
 	✔ Configurable gameplay constants @done(23-04-10 11:02)
-	☐ Draw proper bases
+	✔ Draw proper bases @done(23-04-10 11:21)
+	☐ Ability to buy upgrades
+	☐ Add simulated damage
 	☐ Dino quest
 		☐ Scatter bones
 		☐ Show collected bones
 		☐ Accolade
-	☐ Ability to buy upgrades
-	☐ Add simulated damage
 	☐ Exactly same RNG as in-game
 	☐ Sub-mechanics
 		☐ Accounting
