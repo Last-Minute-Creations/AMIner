@@ -76,7 +76,7 @@ class TileMap {
 
 		// Rock bottom
 		for(let x = 1; x < width; ++x) {
-			this.tiles[x][height - 1] = new Tile(TileIndex.STONE_1 + (x & 3), MineralType.ROCK, 0);
+			this.tiles[x][height - 1] = new Tile(TileIndex.BASE_GROUND_1, MineralType.ROCK, 0);
 		}
 
 		// Dino bones

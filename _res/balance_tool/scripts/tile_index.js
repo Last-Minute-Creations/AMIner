@@ -1,9 +1,9 @@
 class TileIndex {
-	static TILE_BASE_BG_FIRST = 0;
-	static TILE_BASE_BG_LAST = 32;
-	static TILE_BASE_SHAFT = 33;
-	static TILE_BASE_GROUND_1 = 34;
-	static TILE_BASE_GROUND_9 = 42;
+	static BASE_BG_FIRST = 0;
+	static BASE_BG_LAST = 32;
+	static BASE_SHAFT = 33;
+	static BASE_GROUND_1 = 34;
+	static BASE_GROUND_9 = 42;
 	static CAVE_BG_1 = 43;
 	static CAVE_BG_16 = 58;
 	static DIRT_1 = 59;

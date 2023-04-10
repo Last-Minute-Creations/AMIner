@@ -4,7 +4,7 @@ class Tile {
 
 		if(
 			TileIndex.CAVE_BG_1 <= tileIndex && tileIndex <= TileIndex.CAVE_BG_16 ||
-			TileIndex.TILE_BASE_BG_FIRST <= tileIndex  && tileIndex <= TileIndex.TILE_BASE_SHAFT
+			TileIndex.BASE_BG_FIRST <= tileIndex  && tileIndex <= TileIndex.BASE_SHAFT
 		) {
 			this.mineralType = MineralType.AIR;
 			this.mineralAmount = 0
@@ -37,7 +37,7 @@ class Tile {
 			this.mineralType = MineralType.ROCK;
 			this.mineralAmount = 0;
 		}
-		else if(TileIndex.TILE_BASE_GROUND_1 <= tileIndex && tileIndex <= TileIndex.TILE_BASE_GROUND_9) {
+		else if(TileIndex.BASE_GROUND_1 <= tileIndex && tileIndex <= TileIndex.BASE_GROUND_9) {
 			// TODO: unbreakable
 			this.mineralType = MineralType.ROCK;
 			this.mineralAmount = 0;
