@@ -16,7 +16,30 @@ BODY {
 
 #panel_left {
 	overflow: auto;
+}
+
+#panel_messages {
+	overflow: auto;
+	padding-left: 20px;
+	padding-right: 20px;
+	background: #eee;
 	flex-grow: 1;
+}
+
+#panel_messages .message {
+	border: solid 1px #333;
+	margin: 5px 0;
+	padding: 20px 20px 0 20px;
+}
+
+#panel_messages .message.warning {
+	background-color: darksalmon;
+}
+#panel_messages .message.error {
+	background-color:indianred;
+}
+#panel_messages .message.success {
+	background-color:darkseagreen;
 }
 
 #panel_right {

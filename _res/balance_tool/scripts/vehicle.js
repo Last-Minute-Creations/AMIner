@@ -115,6 +115,10 @@ class Vehicle {
 				this.subAccolades = 0;
 				if(++this.accolades >= g_defs.maxAccolades) {
 					this.ending = Ending.ACCOLADES_WIN;
+					addMessage('Game won', 'success');
+				}
+				else {
+					addMessage('New accolade', 'success');
 				}
 			}
 		}
@@ -155,6 +159,10 @@ class Vehicle {
 	addRebuke() {
 		if(++this.rebukes >= g_defs.maxRebukes) {
 			this.ending = Ending.REBUKE_LOST;
+			addMessage('Game lost', 'error');
+		}
+		else {
+			addMessage('New rebuke', 'error');
 		}
 	}
 

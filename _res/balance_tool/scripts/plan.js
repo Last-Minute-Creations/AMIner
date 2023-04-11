@@ -34,6 +34,7 @@ class Plan {
 
 		this.timeRemaining = 2 * 2 * 1000; // two full fuel, per player
 		this.timeRemaining += 200; // Add for nice division into 30 days
+		this.wasWarning = false;
 	}
 
 	next() {
@@ -64,6 +65,10 @@ class Plan {
 		if(this.timeRemaining <= 0) {
 			g_vehicle.addRebuke();
 			this.reroll();
+		}
+		else if(this.timeRemaining <= 3 * g_defs.timeInDay && !this.wasWarning) {
+			addMessage('Plan due soon', 'warning');
+			this.wasWarning = true;
 		}
 	}
 }

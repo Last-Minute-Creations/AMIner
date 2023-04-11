@@ -16,6 +16,9 @@ function reloadGame() {
 	updateMineralStats();
 	updateOfficeStats();
 	updateWarehouse();
+
+	clearMessages();
+	addMessage('Started new game', 'success');
 }
 
 function onCellTryExcavate(evt) {
@@ -240,6 +243,29 @@ function updateOfficeStats() {
 function onUpgradeClicked(part) {
 	g_vehicle.tryUpgradePart(part);
 	updateVehicleStats();
+}
+
+function clearMessages() {
+	document.querySelector('#messages_container').innerHTML = '';
+}
+
+function onMessageCloseClicked() {
+	let msgDiv = this.parentNode;
+	let container = msgDiv.parentNode;
+	container.removeChild(msgDiv);
+}
+
+function addMessage(text, className) {
+	let msgDiv = document.createElement('div');
+	msgDiv.classList.add('message');
+	msgDiv.classList.add(className);
+	msgDiv.textContent = 'Incoming message: ' + text;
+	let msgBtn = document.createElement('button');
+	msgBtn.textContent = 'Dismiss';
+	msgBtn.className = 'btn_large';
+	msgBtn.addEventListener('click', onMessageCloseClicked);
+	msgDiv.appendChild(msgBtn);
+	document.querySelector('#messages_container').appendChild(msgDiv);
 }
 
 window.addEventListener('load', function() {
