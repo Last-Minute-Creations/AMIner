@@ -93,6 +93,9 @@ class Vehicle {
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
 		this.drillCurr = Math.min(this.drillCurr + liters * g_defs.fuelInLiter, this.drillMax);
+
+		// Simulated damage
+		this.hullCurr -= g_defs.damageAfterRestock;
 	}
 
 	trySell(mineralType, amount) {

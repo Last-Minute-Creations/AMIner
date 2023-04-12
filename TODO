@@ -43,6 +43,9 @@ Simulator:
 	✔ Draw proper bases @done(23-04-10 11:21)
 	✔ Ability to buy upgrades @done(23-04-10 18:23)
 	☐ Add simulated damage
+		✔ Damage from magma @done(23-04-12 17:21)
+		✔ Small damage after restock @done(23-04-12 18:00)
+		☐ Rebuke after destruction
 	☐ Dino quest
 		☐ Scatter bones
 		☐ Show collected bones

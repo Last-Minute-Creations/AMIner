@@ -17,5 +17,6 @@ class Defs {
 		this.drillAddPerLevel = 250;
 		this.cargoBase = 50;
 		this.cargoAddPerLevel = 20;
+		this.damageAfterRestock = 10;
 	}
 }
