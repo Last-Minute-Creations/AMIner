@@ -56,6 +56,12 @@ class Vehicle {
 		g_plan.elapseTime(drillCost);
 		let mineralId = tile.mineralType.id;
 
+		// Damage vehicle
+		if(tile.mineralType.isDamaging) {
+			this.hullCurr -= 5 + (g_rand.next16() & 0x7);
+		}
+
+		// Add to cargo
 		if(this.cargoMinerals[mineralId] == undefined) {
 			this.cargoMinerals[mineralId] = 0;
 		}
