@@ -220,6 +220,8 @@ function updateMineralStats() {
 	}
 	document.querySelector('#minerals_money').textContent = g_tileMap.currentMoney;
 	document.querySelector('#minerals_money_total').textContent = g_tileMap.totalMoney;
+	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value) * 3;
+
 }
 
 function updateOfficeStats() {
