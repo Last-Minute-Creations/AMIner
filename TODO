@@ -42,10 +42,11 @@ Simulator:
 	✔ Configurable gameplay constants @done(23-04-10 11:02)
 	✔ Draw proper bases @done(23-04-10 11:21)
 	✔ Ability to buy upgrades @done(23-04-10 18:23)
-	☐ Add simulated damage
+	✔ Add simulated damage @done(23-04-14 15:10)
 		✔ Damage from magma @done(23-04-12 17:21)
 		✔ Small damage after restock @done(23-04-12 18:00)
-		☐ Rebuke after destruction
+		✔ Rebuke after destruction @done(23-04-14 15:10)
+	☐ Cash stats for plans
 	☐ Dino quest
 		☐ Scatter bones
 		☐ Show collected bones

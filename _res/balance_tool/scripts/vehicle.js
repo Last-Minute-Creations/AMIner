@@ -8,8 +8,8 @@ class Vehicle {
 		this.accolades = 0;
 		this.rebukes = 0;
 		this.ending = Ending.NONE;
-		this.cargoMinerals = {}; // [mineralId] => count
 		this.stock = {}; // [mineralId] => count
+
 		for(let mineral of MineralType.all) {
 			this.stock[mineral.id] = 0;
 		}
@@ -18,6 +18,11 @@ class Vehicle {
 		this.cargoMax = g_defs.cargoBase;
 		this.drillMax = g_defs.drillBase;
 
+		this.respawn();
+	}
+
+	respawn() {
+		this.cargoMinerals = {}; // [mineralId] => count
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
 		this.drillCurr = this.drillMax;
@@ -56,11 +61,6 @@ class Vehicle {
 		g_plan.elapseTime(drillCost);
 		let mineralId = tile.mineralType.id;
 
-		// Damage vehicle
-		if(tile.mineralType.isDamaging) {
-			this.hullCurr -= 5 + (g_rand.next16() & 0x7);
-		}
-
 		// Add to cargo
 		if(this.cargoMinerals[mineralId] == undefined) {
 			this.cargoMinerals[mineralId] = 0;
@@ -76,6 +76,11 @@ class Vehicle {
 		g_tileMap.tiles[posX][posY] = new Tile(TileIndex.CAVE_BG_16,  MineralType.AIR, 0);
 		g_tileMap.currentMineralCounts[tile.mineralType.id] -= tile.mineralAmount;
 		g_tileMap.currentMoney -= tile.mineralAmount * tile.mineralType.reward;
+
+		// Damage vehicle
+		if(tile.mineralType.isDamaging) {
+			this.damage(5 + (g_rand.next16() & 0x7));
+		}
 
 		return true;
 	}
@@ -95,7 +100,7 @@ class Vehicle {
 		this.drillCurr = Math.min(this.drillCurr + liters * g_defs.fuelInLiter, this.drillMax);
 
 		// Simulated damage
-		this.hullCurr -= g_defs.damageAfterRestock;
+		this.damage(g_defs.damageAfterRestock)
 	}
 
 	trySell(mineralType, amount) {
@@ -165,13 +170,21 @@ class Vehicle {
 		}
 	}
 
-	addRebuke() {
+	damage(amount) {
+		this.hullCurr -= amount;
+		if(this.hullCurr <= 0) {
+				this.respawn();
+				this.addRebuke('Vehicle destroyed');
+		}
+	}
+
+	addRebuke(reason = null) {
 		if(++this.rebukes >= g_defs.maxRebukes) {
 			this.ending = Ending.REBUKE_LOST;
 			addMessage('Game lost', 'error');
 		}
 		else {
-			addMessage('New rebuke', 'error');
+			addMessage(`New rebuke${reason == null ? '' : " - " + reason}`, 'error');
 		}
 	}
 
