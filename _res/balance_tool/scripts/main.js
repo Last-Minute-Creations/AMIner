@@ -14,6 +14,7 @@ function reloadGame() {
 	drawTiles(g_tileMap);
 	updateVehicleStats();
 	updateMineralStats();
+	updateTotalMoneyStats();
 	updateOfficeStats();
 	updateWarehouse();
 
@@ -212,6 +213,20 @@ function onRestockClicked(evt) {
 	updateWarehouse();
 }
 
+function updateTotalMoneyStats() {
+	let plan = new Plan(false);
+	let totalPlanCost = 0;
+	for(let accolade = 0; accolade < g_defs.maxAccolades; ++accolade) {
+		for(let subAccolade = 0; subAccolade < g_defs.maxSubAccolades; ++subAccolade) {
+			plan.next(false);
+			totalPlanCost += plan.targetSum;
+		}
+	}
+
+	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value) * 3;
+	document.querySelector('#plan_cost_total').textContent = totalPlanCost;
+}
+
 function updateMineralStats() {
 	for(let mineralType of MineralType.collectibles) {
 		let name = mineralType.name;
@@ -220,8 +235,6 @@ function updateMineralStats() {
 	}
 	document.querySelector('#minerals_money').textContent = g_tileMap.currentMoney;
 	document.querySelector('#minerals_money_total').textContent = g_tileMap.totalMoney;
-	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value) * 3;
-
 }
 
 function updateOfficeStats() {

@@ -1,5 +1,5 @@
 class Plan {
-	constructor() {
+	constructor(roll = true) {
 		this.mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
 		this.mineralsCollected = new Array(MineralType.all.length).fill(0); // [mineralId] => count
 		this.mineralsUnlocked = [ MineralType.SILVER.id ]; // [mineralId]
@@ -8,7 +8,9 @@ class Plan {
 		this.isExtendedByFavor = false;
 		this.targetSum = 15;
 
-		this.reroll();
+		if(roll) {
+			this.reroll();
+		}
 	}
 
 	reroll() {
@@ -37,10 +39,12 @@ class Plan {
 		this.wasWarning = false;
 	}
 
-	next() {
+	next(roll = true) {
 		++this.index;
 		this.targetSum += Math.floor(this.targetSum * g_defs.planCostMultiplier);
-		this.reroll();
+		if(roll) {
+			this.reroll();
+		}
 	}
 
 	isCompleted() {
