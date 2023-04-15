@@ -18,5 +18,11 @@ class Defs {
 		this.cargoBase = 50;
 		this.cargoAddPerLevel = 20;
 		this.damageAfterRestock = 10;
+
+		this.depthSilver = 0;
+		this.depthGold = 60;
+		this.depthEmerald = 200;
+		this.depthRuby = 400;
+		this.depthMoonstone = 175;
 	}
 }

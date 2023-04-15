@@ -11,14 +11,18 @@ class TileMap {
 				// 2000 is max
 				let what = Math.floor((g_rand.next16() * 1000) / 65535);
 				let chanceAir = 50;
-				let chanceRock, chanceSilver, chanceGold, chanceEmerald, chanceRuby, chanceMoonstone, chanceMagma;
+				let chanceRock, chanceMagma;
 				chanceRock = Utils.clamp(y * 500 / 2000, 0, 500);
-				chanceSilver = 75;
-				chanceGold = y > 60 ? 75 : 0;
-				chanceEmerald = y > 200 ? 75 : 0;
-				chanceRuby = y  > 400 ? 75 : 0;
-				chanceMoonstone = y > 175 ? 75 : 0;
 				chanceMagma = Utils.chanceTrapezoid(y, 50, 900, 1000, 1100, 0, 75);
+
+				////////////////////////////////////////////////////////////////////////
+				let chanceSilver, chanceGold, chanceEmerald, chanceRuby, chanceMoonstone;
+				chanceSilver = y > g_defs.depthSilver ? 75 : 0;
+				chanceGold = y > g_defs.depthGold ? 75 : 0;
+				chanceEmerald = y > g_defs.depthEmerald ? 75 : 0;
+				chanceRuby = y  > g_defs.depthRuby ? 75 : 0;
+				chanceMoonstone = y > g_defs.depthMoonstone ? 75 : 0;
+				////////////////////////////////////////////////////////////////////////
 
 				let chance;
 				if(what < (chance = chanceRock)) {
@@ -33,6 +37,7 @@ class TileMap {
 				) {
 					this.tiles[x][y] = new Tile(TileIndex.CAVE_BG_1+15);
 				}
+				////////////////////////////////////////////////////////////////////////
 				else if(what < (chance += chanceSilver)) {
 					let add = g_rand.next16MinMax(0, 2);
 					this.tiles[x][y] = new Tile(TileIndex.SILVER_1 + add);
@@ -53,6 +58,7 @@ class TileMap {
 					let add = g_rand.next16MinMax(0, 2);
 					this.tiles[x][y] = new Tile(TileIndex.MOONSTONE_1 + add);
 				}
+				////////////////////////////////////////////////////////////////////////
 				else {
 					this.tiles[x][y] = new Tile(TileIndex.DIRT_1 + ((x & 1) ^ (y & 1)));
 				}
