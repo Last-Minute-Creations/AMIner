@@ -17,10 +17,10 @@ class GroundLayer {
 
 	static layers = [
 		new GroundLayer('A', 0, 2, Utils.rgbToHex(153, 68, 17)),
-		new GroundLayer('B', 2048 + 32, 3, Utils.rgbToHex(153, 102, 17)),
-		new GroundLayer('C', 4096 + 32, 4, Utils.rgbToHex(153, 102, 51)),
-		new GroundLayer('D', 6144 + 32, 5, Utils.rgbToHex(119, 102, 51)),
-		new GroundLayer('E', 8192 + 32, 6, Utils.rgbToHex(119, 102, 68)),
+		new GroundLayer('B', (64 + 1) * 32, 3, Utils.rgbToHex(153, 102, 17)),
+		new GroundLayer('C', (64 + 128 + 1) * 32, 4, Utils.rgbToHex(153, 102, 51)),
+		new GroundLayer('D', (64 + 128 + 256 + 1) * 32, 5, Utils.rgbToHex(119, 102, 51)),
+		new GroundLayer('E', (64 + 128 + 256 + 256 + 1) * 32, 6, Utils.rgbToHex(119, 102, 68)),
 		new GroundLayer('X', 65535, 0, Utils.rgbToHex(119, 102, 68)) // unreachable
 	]
 }
