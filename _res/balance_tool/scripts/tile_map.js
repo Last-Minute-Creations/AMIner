@@ -69,7 +69,7 @@ class TileMap {
 		for(let baseIndex = 0; baseIndex < TileMap.bases.length; ++baseIndex) {
 			let base = TileMap.bases[baseIndex];
 			for(let y = 0; y < base.pattern.length; ++y) {
-				for(let x = 0; x < width - 1; ++x) {
+				for(let x = 0; x < width; ++x) {
 					this.tiles[x][base.level + y] = new Tile(base.pattern[y][x]);
 				}
 			}
@@ -102,7 +102,7 @@ class TileMap {
 			this.totalMineralCounts[mineralType.id] = 0;
 		}
 		for(let x = 1; x < width; ++x) {
-			for(let y = tileRowBaseDirt + 2; y < height; ++y) {
+			for(let y = 0; y < height; ++y) {
 				this.totalMineralCounts[this.tiles[x][y].mineralType.id] += this.tiles[x][y].mineralAmount;
 				this.totalMoney += this.tiles[x][y].mineralAmount * this.tiles[x][y].mineralType.reward;
 			}
