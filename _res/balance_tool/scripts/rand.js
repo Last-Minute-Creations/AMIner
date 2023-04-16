@@ -9,7 +9,7 @@ class rand {
 	}
 
 	next16() {
-		var t = (this.state1 ^ (this.state1 << this.COEFF_A)) & 0xFFFF;
+		let t = (this.state1 ^ (this.state1 << this.COEFF_A)) & 0xFFFF;
 		this.state1 = this.state2;
 		this.state2 = ((this.state2 ^ (this.state2 >> this.COEFF_C)) ^ (t ^ (t >> this.COEFF_B))) & 0xFFFF;
 		return this.state2;
@@ -24,8 +24,8 @@ class rand {
 	}
 
 	next32() {
-		var upper = this.next16();
-		var lower = this.next16();
+		let upper = this.next16();
+		let lower = this.next16();
 		return (upper << 16) | (lower);
 	}
 

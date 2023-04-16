@@ -16,15 +16,15 @@ class TileMap {
 				chanceMagma = Utils.chanceTrapezoid(y, 50, 900, 1000, 1100, 0, 75);
 
 				////////////////////////////////////////////////////////////////////////
-				let chanceSilver, chanceGold, chanceEmerald, chanceRuby, chanceMoonstone;
-				chanceSilver = y > g_defs.depthSilver ? 75 : 0;
-				chanceGold = y > g_defs.depthGold ? 75 : 0;
-				chanceEmerald = y > g_defs.depthEmerald ? 75 : 0;
-				chanceRuby = y  > g_defs.depthRuby ? 75 : 0;
-				chanceMoonstone = y > g_defs.depthMoonstone ? 75 : 0;
+				// let chanceSilver, chanceGold, chanceEmerald, chanceRuby, chanceMoonstone;
+				// chanceSilver = y > g_defs.depthSilver ? 75 : 0;
+				// chanceGold = y > g_defs.depthGold ? 75 : 0;
+				// chanceEmerald = y > g_defs.depthEmerald ? 75 : 0;
+				// chanceRuby = y  > g_defs.depthRuby ? 75 : 0;
+				// chanceMoonstone = y > g_defs.depthMoonstone ? 75 : 0;
 				////////////////////////////////////////////////////////////////////////
 
-				let chance;
+				let chance = 0;
 				if(what < (chance = chanceRock)) {
 					this.tiles[x][y] = new Tile(g_rand.next16MinMax(TileIndex.STONE_1, TileIndex.STONE_4));
 				}
@@ -38,26 +38,26 @@ class TileMap {
 					this.tiles[x][y] = new Tile(TileIndex.CAVE_BG_1+15);
 				}
 				////////////////////////////////////////////////////////////////////////
-				else if(what < (chance += chanceSilver)) {
-					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.SILVER_1 + add);
-				}
-				else if(what < (chance += chanceGold)) {
-					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.GOLD_1 + add);
-				}
-				else if(what < (chance += chanceEmerald)) {
-					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.EMERALD_1 + add);
-				}
-				else if(what < (chance += chanceRuby)) {
-					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.RUBY_1 + add);
-				}
-				else if(what < (chance += chanceMoonstone)) {
-					let add = g_rand.next16MinMax(0, 2);
-					this.tiles[x][y] = new Tile(TileIndex.MOONSTONE_1 + add);
-				}
+				// else if(what < (chance += chanceSilver)) {
+				// 	let add = g_rand.next16MinMax(0, 2);
+				// 	this.tiles[x][y] = new Tile(TileIndex.SILVER_1 + add);
+				// }
+				// else if(what < (chance += chanceGold)) {
+				// 	let add = g_rand.next16MinMax(0, 2);
+				// 	this.tiles[x][y] = new Tile(TileIndex.GOLD_1 + add);
+				// }
+				// else if(what < (chance += chanceEmerald)) {
+				// 	let add = g_rand.next16MinMax(0, 2);
+				// 	this.tiles[x][y] = new Tile(TileIndex.EMERALD_1 + add);
+				// }
+				// else if(what < (chance += chanceRuby)) {
+				// 	let add = g_rand.next16MinMax(0, 2);
+				// 	this.tiles[x][y] = new Tile(TileIndex.RUBY_1 + add);
+				// }
+				// else if(what < (chance += chanceMoonstone)) {
+				// 	let add = g_rand.next16MinMax(0, 2);
+				// 	this.tiles[x][y] = new Tile(TileIndex.MOONSTONE_1 + add);
+				// }
 				////////////////////////////////////////////////////////////////////////
 				else {
 					this.tiles[x][y] = new Tile(TileIndex.DIRT_1 + ((x & 1) ^ (y & 1)));
@@ -96,6 +96,120 @@ class TileMap {
 		// this.tiles[2][g_dinoDepths[7]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
 		// this.tiles[9][g_dinoDepths[8]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
 
+		// Rows per plan
+		let plannableRows = 0;
+		let baseIndex = 0;
+		for(let y = 0; y < height - 1; ++y) {
+			if(baseIndex >= TileMap.bases.length || y < TileMap.bases[baseIndex].level) {
+				++plannableRows;
+			}
+			else if(y >= TileMap.bases[baseIndex].level + TileMap.bases[baseIndex].pattern.length - 1) {
+				++baseIndex;
+			}
+		}
+		let planCount = g_defs.maxAccolades * g_defs.maxSubAccolades;
+		console.log(`plannable rows: ${plannableRows}, rows per plan: ${plannableRows / planCount}`);
+		let rowsPerPlan = Math.floor(plannableRows / planCount);
+
+		// Pattern for filling minerals
+		let fillPosPattern = []; // [idx] => {x,y}, unordered
+		for(let x = 1; x < width; ++x) {
+			for(let y = 0; y < rowsPerPlan; ++y) {
+				fillPosPattern.push({x: x, y: y});
+			}
+		}
+		Utils.shuffleArray(fillPosPattern, g_rand);
+
+		baseIndex = 0;
+		let planDefs = [];
+		let targetSum = 15;
+		let currentRow = 0;
+		let nextPatternPos = 0;
+		let currentPlannableRow = 0;
+		for(let planIndex = 0; planIndex < planCount; ++planIndex) {
+			let planLastPlannableRow  = Math.floor((plannableRows * (planIndex + 1)) / planCount);
+			let planSegmentRows = [];
+			while(currentPlannableRow <= planLastPlannableRow) {
+				if(baseIndex < TileMap.bases.length && currentRow >= TileMap.bases[baseIndex].level) {
+					currentRow = TileMap.bases[baseIndex].level + TileMap.bases[baseIndex].pattern.length;
+					++baseIndex;
+				}
+				planSegmentRows.push(currentRow++);
+				++currentPlannableRow;
+			}
+			let lastPlanRow = currentRow - 1;
+			console.log(`plan ${planIndex} ends at ${lastPlanRow}`);
+
+			// Get allowed minerals at given segments - use maximum set between rows
+			let mineralsAllowed = []; // [i] => MineralType.Id
+			if(lastPlanRow >= g_defs.depthSilver) {
+				mineralsAllowed.push(MineralType.SILVER.id);
+			}
+			if(lastPlanRow >= g_defs.depthGold) {
+				mineralsAllowed.push(MineralType.GOLD.id);
+			}
+			if(lastPlanRow >= g_defs.depthEmerald) {
+				mineralsAllowed.push(MineralType.EMERALD.id);
+			}
+			if(lastPlanRow >= g_defs.depthRuby) {
+				mineralsAllowed.push(MineralType.RUBY.id);
+			}
+			if(lastPlanRow >= g_defs.depthMoonstone) {
+				mineralsAllowed.push(MineralType.MOONSTONE.id);
+			}
+
+			// Generate plan based on allowed minerals and target money - no more than dirt tiles in segment
+			let costRemaining = targetSum;
+			let totalMinerals = 0;
+			let mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+			while(mineralsAllowed.some((mineralId) => MineralType.all[mineralId].reward <= costRemaining)) {
+				let mineralId = mineralsAllowed[g_rand.next16MinMax(0, mineralsAllowed.length - 1)];
+				let reward = MineralType.all[mineralId].reward;
+				let count = g_rand.next16Max(Math.floor((costRemaining + reward - 1) / reward));
+				if(count > 0) {
+					console.log(`adding ${count} of mineral ${MineralType.all[mineralId].name}`)
+
+					mineralsRequired[mineralId] += count;
+					totalMinerals += count;
+					costRemaining -= count * reward;
+				}
+			}
+			// planDefs.push(null); // TODO
+			targetSum += targetSum * g_defs.planCostMultiplier;
+			console.log(`plan ${planIndex} rows ${planSegmentRows[0]}..${planSegmentRows[planSegmentRows.length - 1]} minerals required: ${mineralsRequired}`);
+
+			// Fill mine segment with minerals required for plan, merging some in the process
+			while(totalMinerals > 0) {
+				// pick mineral and count
+				let placedMineralId = mineralsAllowed[g_rand.next16MinMax(0, mineralsAllowed.length - 1)];
+				if(mineralsRequired[placedMineralId] > 0) {
+					let startPatternPos = nextPatternPos;
+					let isPlaced = false;
+					do {
+						// pick next position from pattern
+						let placePosition = fillPosPattern[nextPatternPos];
+						nextPatternPos = (nextPatternPos + 1) % fillPosPattern.length;
+
+						// fill position with mineral
+						if(this.tiles[placePosition.x][planSegmentRows[placePosition.y]].mineralType == MineralType.DIRT) {
+							console.log(`rand pos ${placePosition.x},${placePosition.y} => ${placePosition.x},${planSegmentRows[placePosition.y]}`);
+							let placedAmount = g_rand.next16MinMax(1, Math.min(mineralsRequired[placedMineralId], 3));
+							let mineralTileIndex = MineralType.all[placedMineralId].tileIndex;
+							this.tiles[placePosition.x][planSegmentRows[placePosition.y]] = new Tile(mineralTileIndex + placedAmount - 1);
+							totalMinerals -= placedAmount;
+							isPlaced = true;
+							break;
+						}
+					} while(nextPatternPos != startPatternPos);
+					if(!isPlaced) {
+						addMessage(`Can't place all minerals on plan ${planIndex}`, 'error');
+					}
+				}
+			}
+		}
+
+		// Count minerals
+		// TODO: move to separate fn?
 		this.totalMineralCounts = {};
 		this.totalMoney = 0;
 		for(let mineralType of MineralType.all) {

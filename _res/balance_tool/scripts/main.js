@@ -128,7 +128,7 @@ function drawTiles(tileMap) {
 				td.textContent = tileMap.tiles[x][y].index;
 			}
 			if(tileMap.isSolid(x, y)) {
-				var colorHex = GroundLayer.getLayerAt(y).colorHex;
+				let colorHex = GroundLayer.getLayerAt(y).colorHex;
 				td.style = `background-color: ${colorHex};`;
 			}
 
