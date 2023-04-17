@@ -19,6 +19,13 @@ class Defs {
 		this.cargoAddPerLevel = 20;
 		this.damageAfterRestock = 10;
 
+		this.planSilver = 0;
+		this.planGold = 10;
+		this.planEmerald = 30;
+		this.planRuby = 40;
+		this.planMoonstone = 20;
+
+		// TODO: remove? leave for free resource pool?
 		this.depthSilver = 0;
 		this.depthGold = 60;
 		this.depthEmerald = 200;

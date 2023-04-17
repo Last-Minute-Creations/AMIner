@@ -2,14 +2,14 @@ let g_defs = null;
 let g_rand = null;
 let g_tileMap = null;
 let g_vehicle = null;
-let g_plan = null;
+let g_plans = null;
 
 function reloadGame() {
 	g_defs = new Defs();
 	g_rand = new rand(g_defs.seed1, g_defs.seed2);
+	g_plans = new Plans();
 	g_tileMap = new TileMap(11, 1024);
 	g_vehicle = new Vehicle();
-	g_plan = new Plan();
 
 	drawTiles(g_tileMap);
 	updateVehicleStats();
@@ -63,6 +63,7 @@ function updateVehicleStats() {
 	document.querySelector('#vehicle_upgrade_drill_cost').textContent = g_vehicle.drillMk < g_defs.upgradeCosts.length ? g_defs.upgradeCosts[g_vehicle.drillMk] : 0;
 
 	document.querySelector('#vehicle_money').textContent = g_vehicle.money;
+	document.querySelector('#vehicle_money_spent_on_restock').textContent = g_vehicle.moneySpentOnRestock;
 }
 
 function setMineCellEvents(cell) {
@@ -74,8 +75,8 @@ function updateWarehouse() {
 	for(let mineralType of MineralType.collectibles) {
 		let name = mineralType.name;
 		document.querySelector(`#stock_${name}`).textContent = g_vehicle.stock[mineralType.id];
-		document.querySelector(`#plan_${name}_spent`).textContent = g_plan.mineralsCollected[mineralType.id];
-		document.querySelector(`#plan_${name}_required`).textContent = g_plan.mineralsRequired[mineralType.id];
+		document.querySelector(`#plan_${name}_spent`).textContent = g_plans.mineralsCollected[mineralType.id];
+		document.querySelector(`#plan_${name}_required`).textContent = g_plans.getCurrentPlanInfo().mineralsRequired[mineralType.id];
 	}
 }
 
@@ -214,16 +215,8 @@ function onRestockClicked(evt) {
 }
 
 function updateTotalMoneyStats() {
-	let plan = new Plan(false);
-	let totalPlanCost = 0;
-	let planCosts = [plan.targetSum];
-	for(let accolade = 0; accolade < g_defs.maxAccolades; ++accolade) {
-		for(let subAccolade = 0; subAccolade < g_defs.maxSubAccolades; ++subAccolade) {
-			plan.next(false);
-			planCosts.push(plan.targetSum);
-			totalPlanCost += plan.targetSum;
-		}
-	}
+	let planCosts = g_plans.sequence.map((planInfo) => planInfo.targetSum);
+	let totalPlanCost = planCosts.reduce((sum, planCost) => sum + planCost);
 
 	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value) * 3;
 	document.querySelector('#plan_cost_total').textContent = totalPlanCost;
@@ -244,12 +237,12 @@ function updateOfficeStats() {
 	document.querySelector('#office_ending').textContent = g_vehicle.ending.description;
 	document.querySelector('#office_ending').className = g_vehicle.ending.className;
 
-	document.querySelector('#plan_index').textContent = g_plan.index + 1;
-	document.querySelector('#plan_started').textContent = g_plan.isStarted ? '✓' : '✗';
-	document.querySelector('#plan_extended').textContent = g_plan.isExtendedByFavor ? '✓' : '✗';
-	document.querySelector('#plan_time_remaining').textContent = g_plan.timeRemaining;
-	document.querySelector('#plan_time_remaining_days').textContent = (g_plan.timeRemaining / g_defs.timeInDay).toFixed(2);
-	document.querySelector('#plan_unlocked_minerals').textContent = g_plan.mineralsUnlocked.map((x) => MineralType.all[x].name).join(', ');
+	document.querySelector('#plan_index').textContent = g_plans.index + 1;
+	document.querySelector('#plan_started').textContent = g_plans.isStarted ? '✓' : '✗';
+	document.querySelector('#plan_extended').textContent = g_plans.isExtendedByFavor ? '✓' : '✗';
+	document.querySelector('#plan_time_remaining').textContent = g_plans.timeRemaining;
+	document.querySelector('#plan_time_remaining_days').textContent = (g_plans.timeRemaining / g_defs.timeInDay).toFixed(2);
+	document.querySelector('#plan_unlocked_minerals').textContent = g_plans.mineralsUnlocked.map((x) => MineralType.all[x].name).join(', ');
 	document.querySelector('#office_rebukes_curr').textContent = g_vehicle.rebukes;
 	document.querySelector('#office_rebukes_max').textContent = g_defs.maxRebukes;
 	document.querySelector('#office_accolades_curr').textContent = g_vehicle.accolades;

@@ -4,6 +4,7 @@ class Vehicle {
 		this.cargoMk = 0;
 		this.drillMk = 0;
 		this.money = 0;
+		this.moneySpentOnRestock = 0;
 		this.subAccolades = 0;
 		this.accolades = 0;
 		this.rebukes = 0;
@@ -58,7 +59,7 @@ class Vehicle {
 		}
 
 		this.drillCurr -= drillCost;
-		g_plan.elapseTime(drillCost);
+		g_plans.elapseTime(drillCost);
 		let mineralId = tile.mineralType.id;
 
 		// Add to cargo
@@ -68,8 +69,8 @@ class Vehicle {
 		this.cargoMinerals[mineralId] += tile.mineralAmount;
 
 		this.cargoCurr = Math.min(this.cargoCurr + tile.mineralAmount, this.cargoMax);
-		if(tile.mineralType.isCollectible && g_plan.mineralsUnlocked.indexOf(mineralId) == -1) {
-			g_plan.mineralsUnlocked.push(mineralId);
+		if(tile.mineralType.isCollectible && g_plans.mineralsUnlocked.indexOf(mineralId) == -1) {
+			g_plans.mineralsUnlocked.push(mineralId);
 		}
 
 		// Update tile data
@@ -92,8 +93,11 @@ class Vehicle {
 		}
 
 		let liters = Math.floor((this.drillMax - this.drillCurr + 0.5 * g_defs.fuelInLiter) / g_defs.fuelInLiter);
-		this.money -= (this.hullMax - this.hullCurr) * g_defs.hullPrice;
-		this.money -= liters * g_defs.literPrice;
+		let restockCost = 0;
+		restockCost -= (this.hullMax - this.hullCurr) * g_defs.hullPrice;
+		restockCost -= liters * g_defs.literPrice;
+		this.moneySpentOnRestock += restockCost;
+		this.money -= restockCost;
 
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
@@ -119,12 +123,12 @@ class Vehicle {
 			return 0;
 		}
 
-		let requiredAmount = g_plan.mineralsRequired[mineralType.id] - g_plan.mineralsCollected[mineralType.id];
+		let requiredAmount = g_plans.getCurrentPlanInfo().mineralsRequired[mineralType.id] - g_plans.mineralsCollected[mineralType.id];
 		let fillAmount = Math.min(Math.min(amount, g_vehicle.stock[mineralType.id]), requiredAmount);
-		g_plan.mineralsCollected[mineralType.id] +=  fillAmount;
+		g_plans.mineralsCollected[mineralType.id] +=  fillAmount;
 		g_vehicle.stock[mineralType.id] -= fillAmount;
 
-		if(g_plan.tryProceed()) {
+		if(g_plans.tryProceed()) {
 			if(++this.subAccolades == g_defs.maxSubAccolades) {
 				this.subAccolades = 0;
 				if(++this.accolades >= g_defs.maxAccolades) {

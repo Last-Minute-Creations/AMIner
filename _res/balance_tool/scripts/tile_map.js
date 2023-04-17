@@ -121,12 +121,11 @@ class TileMap {
 		Utils.shuffleArray(fillPosPattern, g_rand);
 
 		baseIndex = 0;
-		let planDefs = [];
-		let targetSum = 15;
 		let currentRow = 0;
 		let nextPatternPos = 0;
 		let currentPlannableRow = 0;
 		for(let planIndex = 0; planIndex < planCount; ++planIndex) {
+			// Get mine rows for plan
 			let planLastPlannableRow  = Math.floor((plannableRows * (planIndex + 1)) / planCount);
 			let planSegmentRows = [];
 			while(currentPlannableRow <= planLastPlannableRow) {
@@ -138,7 +137,6 @@ class TileMap {
 				++currentPlannableRow;
 			}
 			let lastPlanRow = currentRow - 1;
-			console.log(`plan ${planIndex} ends at ${lastPlanRow}`);
 
 			// Get allowed minerals at given segments - use maximum set between rows
 			let mineralsAllowed = []; // [i] => MineralType.Id
@@ -158,31 +156,15 @@ class TileMap {
 				mineralsAllowed.push(MineralType.MOONSTONE.id);
 			}
 
-			// Generate plan based on allowed minerals and target money - no more than dirt tiles in segment
-			let costRemaining = targetSum;
-			let totalMinerals = 0;
-			let mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
-			while(mineralsAllowed.some((mineralId) => MineralType.all[mineralId].reward <= costRemaining)) {
-				let mineralId = mineralsAllowed[g_rand.next16MinMax(0, mineralsAllowed.length - 1)];
-				let reward = MineralType.all[mineralId].reward;
-				let count = g_rand.next16Max(Math.floor((costRemaining + reward - 1) / reward));
-				if(count > 0) {
-					console.log(`adding ${count} of mineral ${MineralType.all[mineralId].name}`)
-
-					mineralsRequired[mineralId] += count;
-					totalMinerals += count;
-					costRemaining -= count * reward;
-				}
-			}
-			// planDefs.push(null); // TODO
-			targetSum += targetSum * g_defs.planCostMultiplier;
-			console.log(`plan ${planIndex} rows ${planSegmentRows[0]}..${planSegmentRows[planSegmentRows.length - 1]} minerals required: ${mineralsRequired}`);
+			let planInfo = g_plans.sequence[planIndex];
+			console.log(`plan ${planIndex} rows ${planSegmentRows[0]}..${planSegmentRows[planSegmentRows.length - 1]} minerals required: ${planInfo.mineralsRequired}`);
 
 			// Fill mine segment with minerals required for plan, merging some in the process
+			let totalMinerals = planInfo.mineralsRequired.reduce((sum, value) => sum + value);
 			while(totalMinerals > 0) {
 				// pick mineral and count
 				let placedMineralId = mineralsAllowed[g_rand.next16MinMax(0, mineralsAllowed.length - 1)];
-				if(mineralsRequired[placedMineralId] > 0) {
+				if(planInfo.mineralsRequired[placedMineralId] > 0) {
 					let startPatternPos = nextPatternPos;
 					let isPlaced = false;
 					do {
@@ -193,7 +175,7 @@ class TileMap {
 						// fill position with mineral
 						if(this.tiles[placePosition.x][planSegmentRows[placePosition.y]].mineralType == MineralType.DIRT) {
 							console.log(`rand pos ${placePosition.x},${placePosition.y} => ${placePosition.x},${planSegmentRows[placePosition.y]}`);
-							let placedAmount = g_rand.next16MinMax(1, Math.min(mineralsRequired[placedMineralId], 3));
+							let placedAmount = g_rand.next16MinMax(1, Math.min(planInfo.mineralsRequired[placedMineralId], 3));
 							let mineralTileIndex = MineralType.all[placedMineralId].tileIndex;
 							this.tiles[placePosition.x][planSegmentRows[placePosition.y]] = new Tile(mineralTileIndex + placedAmount - 1);
 							totalMinerals -= placedAmount;
@@ -209,7 +191,6 @@ class TileMap {
 		}
 
 		// Count minerals
-		// TODO: move to separate fn?
 		this.totalMineralCounts = {};
 		this.totalMoney = 0;
 		for(let mineralType of MineralType.all) {
