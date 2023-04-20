@@ -5,6 +5,7 @@ let g_vehicle = null;
 let g_plans = null;
 
 function reloadGame() {
+	clearMessages();
 	g_defs = new Defs();
 	g_rand = new rand(g_defs.seed1, g_defs.seed2);
 	g_plans = new Plans();
@@ -18,7 +19,6 @@ function reloadGame() {
 	updateOfficeStats();
 	updateWarehouse();
 
-	clearMessages();
 	addMessage('Started new game', 'success');
 }
 
