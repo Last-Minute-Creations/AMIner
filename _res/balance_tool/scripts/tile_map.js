@@ -109,7 +109,7 @@ class TileMap {
 		}
 		let planCount = g_defs.maxAccolades * g_defs.maxSubAccolades;
 		console.log(`plannable rows: ${plannableRows}, rows per plan: ${plannableRows / planCount}`);
-		let rowsPerPlan = Math.floor(plannableRows / planCount);
+		let rowsPerPlan = Math.ceil(plannableRows / planCount);
 
 		// Pattern for filling minerals
 		let fillPosPattern = []; // [idx] => {x,y}, unordered
@@ -136,58 +136,51 @@ class TileMap {
 				planSegmentRows.push(currentRow++);
 				++currentPlannableRow;
 			}
-			let lastPlanRow = currentRow - 1;
-
-			// Get allowed minerals at given segments - use maximum set between rows
-			let mineralsAllowed = []; // [i] => MineralType.Id
-			if(lastPlanRow >= g_defs.depthSilver) {
-				mineralsAllowed.push(MineralType.SILVER.id);
-			}
-			if(lastPlanRow >= g_defs.depthGold) {
-				mineralsAllowed.push(MineralType.GOLD.id);
-			}
-			if(lastPlanRow >= g_defs.depthEmerald) {
-				mineralsAllowed.push(MineralType.EMERALD.id);
-			}
-			if(lastPlanRow >= g_defs.depthRuby) {
-				mineralsAllowed.push(MineralType.RUBY.id);
-			}
-			if(lastPlanRow >= g_defs.depthMoonstone) {
-				mineralsAllowed.push(MineralType.MOONSTONE.id);
-			}
 
 			let planInfo = g_plans.sequence[planIndex];
 			console.log(`plan ${planIndex} rows ${planSegmentRows[0]}..${planSegmentRows[planSegmentRows.length - 1]} minerals required: ${planInfo.mineralsRequired}`);
 
 			// Fill mine segment with minerals required for plan, merging some in the process
+			let placedMoney = 0;
 			let totalMinerals = planInfo.mineralsRequired.reduce((sum, value) => sum + value);
+			let mineralsRemaining = planInfo.mineralsRequired.map((x) => x);
+			let allowedMineralIds = g_plans.getAllowedMineralIdsForPlan(planIndex);
+			let placedStacks = 0;
 			while(totalMinerals > 0) {
 				// pick mineral and count
-				let placedMineralId = mineralsAllowed[g_rand.next16MinMax(0, mineralsAllowed.length - 1)];
-				if(planInfo.mineralsRequired[placedMineralId] > 0) {
+				let placedMineralId = allowedMineralIds[g_rand.next16MinMax(0, allowedMineralIds.length - 1)];
+				if(mineralsRemaining[placedMineralId] > 0) {
 					let startPatternPos = nextPatternPos;
 					let isPlaced = false;
 					do {
 						// pick next position from pattern
 						let placePosition = fillPosPattern[nextPatternPos];
 						nextPatternPos = (nextPatternPos + 1) % fillPosPattern.length;
+						if(placePosition.y >= planSegmentRows.length) {
+							continue;
+						}
 
 						// fill position with mineral
-						if(this.tiles[placePosition.x][planSegmentRows[placePosition.y]].mineralType == MineralType.DIRT) {
-							console.log(`rand pos ${placePosition.x},${placePosition.y} => ${placePosition.x},${planSegmentRows[placePosition.y]}`);
+						let existingTile = this.tiles[placePosition.x][planSegmentRows[placePosition.y]];
+						if(existingTile.mineralType == MineralType.DIRT) {
 							let placedAmount = g_rand.next16MinMax(1, Math.min(planInfo.mineralsRequired[placedMineralId], 3));
 							let mineralTileIndex = MineralType.all[placedMineralId].tileIndex;
 							this.tiles[placePosition.x][planSegmentRows[placePosition.y]] = new Tile(mineralTileIndex + placedAmount - 1);
 							totalMinerals -= placedAmount;
+							mineralsRemaining[placedMineralId] -= placedAmount;
 							isPlaced = true;
+							++placedStacks;
+							placedMoney += MineralType.all[placedMineralId].reward * placedAmount;
 							break;
 						}
 					} while(nextPatternPos != startPatternPos);
 					if(!isPlaced) {
 						addMessage(`Can't place all minerals on plan ${planIndex}`, 'error');
+						break;
 					}
 				}
 			}
+			console.log(`placed money: ${placedMoney}/${planInfo.targetSum}, stacks: ${placedStacks}`);
 		}
 
 		// Count minerals

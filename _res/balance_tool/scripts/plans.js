@@ -15,44 +15,51 @@ class Plans {
 
 		this.sequence = []; // [planIndex] => [planInfo]
 
-		// Generate plan based on allowed minerals and target money - no more than dirt tiles in segment
-		let targetSum = 15;
-		let planCount = g_defs.maxAccolades * g_defs.maxSubAccolades;
-		for(let planIndex = 0; planIndex < planCount; ++planIndex) {
-			let mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
-			let costRemaining = targetSum;
-			let mineralsAllowed = [];
-			if(planIndex >= g_defs.planSilver) {
-				mineralsAllowed.push(MineralType.SILVER.id);
-			}
-			if(planIndex >= g_defs.planGold) {
-				mineralsAllowed.push(MineralType.GOLD.id);
-			}
-			if(planIndex >= g_defs.planEmerald) {
-				mineralsAllowed.push(MineralType.EMERALD.id);
-			}
-			if(planIndex >= g_defs.planRuby) {
-				mineralsAllowed.push(MineralType.RUBY.id);
-			}
-			if(planIndex >= g_defs.planMoonstone) {
-				mineralsAllowed.push(MineralType.MOONSTONE.id);
-			}
+		// First plan
+		let mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+		mineralsRequired[MineralType.SILVER.id] = 3;
+		let targetSum = mineralsRequired.reduce((sum, amount, id) => sum + MineralType.all[id].reward * amount);
+		this.sequence.push(new PlanInfo(targetSum, mineralsRequired));
 
-			while(mineralsAllowed.some((mineralId) => MineralType.all[mineralId].reward <= costRemaining)) {
+		// Generate plan based on allowed minerals and target money - no more than dirt tiles in segment
+		let planCount = g_defs.maxAccolades * g_defs.maxSubAccolades;
+		for(let planIndex = 1; planIndex < planCount; ++planIndex) {
+			let remainingStacks = Math.min(planIndex * 5, 40);
+			let mineralsAllowed = this.getAllowedMineralIdsForPlan(planIndex); // [index] => mineralId
+			mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+
+			while(remainingStacks > 0) {
 				let mineralId = mineralsAllowed[g_rand.next16MinMax(0, mineralsAllowed.length - 1)];
-				let reward = MineralType.all[mineralId].reward;
-				let count = g_rand.next16Max(Math.floor((costRemaining + reward - 1) / reward));
-				if(count > 0) {
-					console.log(`adding ${count} of mineral ${MineralType.all[mineralId].name}`)
-					mineralsRequired[mineralId] += count;
-					costRemaining -= count * reward;
-				}
+				let count = g_rand.next16MinMax(1, 3);
+				// console.log(`adding ${count} of mineral ${MineralType.all[mineralId].name}`)
+				mineralsRequired[mineralId] += count;
+				--remainingStacks;
 			}
+			targetSum = mineralsRequired.reduce((sum, amount, id) => sum + MineralType.all[id].reward * amount);
 			this.sequence.push(new PlanInfo(targetSum, mineralsRequired));
-			targetSum += Math.floor(targetSum * g_defs.planCostMultiplier);
 		}
 
 		this.start();
+	}
+
+	getAllowedMineralIdsForPlan(planIndex) {
+		let mineralsAllowed = [];
+		if(planIndex >= g_defs.planSilver) {
+			mineralsAllowed.push(MineralType.SILVER.id);
+		}
+		if(planIndex >= g_defs.planGold) {
+			mineralsAllowed.push(MineralType.GOLD.id);
+		}
+		if(planIndex >= g_defs.planEmerald) {
+			mineralsAllowed.push(MineralType.EMERALD.id);
+		}
+		if(planIndex >= g_defs.planRuby) {
+			mineralsAllowed.push(MineralType.RUBY.id);
+		}
+		if(planIndex >= g_defs.planMoonstone) {
+			mineralsAllowed.push(MineralType.MOONSTONE.id);
+		}
+		return mineralsAllowed;
 	}
 
 	// todo: refactor for new procgen
