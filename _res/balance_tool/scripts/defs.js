@@ -4,6 +4,7 @@ class Defs {
 		this.maxRebukes = parseInt(document.querySelector('[name=defs_rebukes]').value);
 		this.maxSubAccolades = parseInt(document.querySelector('[name=defs_plans_per_accoldade]').value);
 		this.maxAccolades = parseInt(document.querySelector('[name=defs_accolades]').value);
+		this.extraPlanMoney = parseInt(document.querySelector('[name=extra_plan_money]').value);
 		this.hullPrice = 2;
 		this.literPrice = 5;
 		this.fuelInLiter = 100;

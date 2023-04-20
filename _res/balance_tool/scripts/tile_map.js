@@ -181,6 +181,38 @@ class TileMap {
 				}
 			}
 			console.log(`placed money: ${placedMoney}/${planInfo.targetSum}, stacks: ${placedStacks}`);
+
+			let extraMineralMoney = g_defs.extraPlanMoney;
+			while(extraMineralMoney > 0) {
+				// pick mineral and count
+				let placedMineralId = allowedMineralIds[g_rand.next16MinMax(0, allowedMineralIds.length - 1)];
+				let startPatternPos = nextPatternPos;
+				let isPlaced = false;
+				do {
+					// pick next position from pattern
+					let placePosition = fillPosPattern[nextPatternPos];
+					nextPatternPos = (nextPatternPos + 1) % fillPosPattern.length;
+					if(placePosition.y >= planSegmentRows.length) {
+						continue;
+					}
+
+					// fill position with mineral
+					if(this.tiles[placePosition.x][planSegmentRows[placePosition.y]].mineralType == MineralType.DIRT) {
+						let mineralReward = MineralType.all[placedMineralId].reward;
+						let maxAmount = Math.min(Math.floor((extraMineralMoney + mineralReward - 1) / mineralReward), 3);
+						let placedAmount = g_rand.next16MinMax(1, maxAmount);
+						extraMineralMoney -= placedAmount * mineralReward;
+						let mineralTileIndex = MineralType.all[placedMineralId].tileIndex;
+						this.tiles[placePosition.x][planSegmentRows[placePosition.y]] = new Tile(mineralTileIndex + placedAmount - 1);
+						isPlaced = true;
+						break;
+					}
+				} while(nextPatternPos != startPatternPos);
+				if(!isPlaced) {
+					addMessage(`Couldn't place all extra minerals on plan ${planIndex}`, 'error');
+					break;
+				}
+			}
 		}
 
 		// Count minerals
