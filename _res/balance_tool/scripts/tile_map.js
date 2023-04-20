@@ -173,6 +173,18 @@ class TileMap {
 							placedMoney += MineralType.all[placedMineralId].reward * placedAmount;
 							break;
 						}
+						else if (
+							mineralsRemaining[existingTile.mineralType.id] > 0 &&
+							existingTile.mineralAmount < 3
+						) {
+							let delta = Math.min(3 - existingTile.mineralAmount, mineralsRemaining[existingTile.mineralType.id]);
+							existingTile.mineralAmount += delta;
+							mineralsRemaining[existingTile.mineralType.id] -= delta;
+							totalMinerals -= delta;
+							isPlaced = true;
+							placedMoney += existingTile.mineralType.reward * delta;
+							break;
+						}
 					} while(nextPatternPos != startPatternPos);
 					if(!isPlaced) {
 						addMessage(`Can't place all minerals on plan ${planIndex}`, 'error');
