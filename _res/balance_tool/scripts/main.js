@@ -216,9 +216,9 @@ function onRestockClicked(evt) {
 
 function updateTotalMoneyStats() {
 	let planCosts = g_plans.sequence.map((planInfo) => planInfo.targetSum);
-	let totalPlanCost = planCosts.reduce((sum, planCost) => sum + planCost);
+	let totalPlanCost = planCosts.reduce((sum, planCost) => sum + planCost, 0);
 
-	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value) * 3;
+	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value, 0) * 3;
 	document.querySelector('#plan_cost_total').textContent = totalPlanCost;
 	document.querySelector('#separate_plan_costs').textContent = planCosts.join(', ');
 }

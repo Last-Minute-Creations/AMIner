@@ -18,7 +18,7 @@ class Plans {
 		// First plan
 		let mineralsRequired = new Array(MineralType.all.length).fill(0); // [mineralId] => count
 		mineralsRequired[MineralType.SILVER.id] = 3;
-		let targetSum = mineralsRequired.reduce((sum, amount, id) => sum + MineralType.all[id].reward * amount);
+		let targetSum = mineralsRequired.reduce((sum, amount, id) => sum + MineralType.all[id].reward * amount, 0);
 		this.sequence.push(new PlanInfo(targetSum, mineralsRequired));
 
 		// Generate plan based on allowed minerals and target money - no more than dirt tiles in segment
@@ -35,7 +35,7 @@ class Plans {
 				mineralsRequired[mineralId] += count;
 				--remainingStacks;
 			}
-			targetSum = mineralsRequired.reduce((sum, amount, id) => sum + MineralType.all[id].reward * amount);
+			targetSum = mineralsRequired.reduce((sum, amount, id) => sum + MineralType.all[id].reward * amount, 0);
 			this.sequence.push(new PlanInfo(targetSum, mineralsRequired));
 		}
 

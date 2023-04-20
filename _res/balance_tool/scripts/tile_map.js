@@ -142,7 +142,7 @@ class TileMap {
 
 			// Fill mine segment with minerals required for plan, merging some in the process
 			let placedMoney = 0;
-			let totalMinerals = planInfo.mineralsRequired.reduce((sum, value) => sum + value);
+			let totalMinerals = planInfo.mineralsRequired.reduce((sum, value) => sum + value, 0);
 			let mineralsRemaining = planInfo.mineralsRequired.map((x) => x);
 			let allowedMineralIds = g_plans.getAllowedMineralIdsForPlan(planIndex);
 			let placedStacks = 0;
