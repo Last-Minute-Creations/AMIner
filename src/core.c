@@ -5,6 +5,7 @@
 #include "core.h"
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
+#include <ace/managers/key.h>
 #include <ace/utils/palette.h>
 #include "menu.h"
 #include "dino.h"
@@ -21,6 +22,7 @@
 #include <comm/base.h>
 #include "defs.h"
 #include "settings.h"
+#include "mixer/ace_mixer.h"
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
@@ -122,6 +124,22 @@ static void coreGsCreate(void) {
 	}
 	g_pMenuMod = ptplayerModCreate("data/music/menu.mod");
 	g_pModSampleData = ptplayerSampleDataCreate("data/music/samples.samplepack");
+
+	systemUnuse();
+	audioMixerCreate();
+	MixerPlaySample(g_pSfxDrill->pData, DMAF_AUD3, g_pSfxDrill->uwWordLength, 1, MIX_FX_LOOP);
+	// MixerPlaySample(sample2,DMAF_AUD3,sample2_size,1,MIX_FX_LOOP);
+
+	while(1) {
+		g_pCustom->color[0] = 0x200;
+		if(keyUse(KEY_SPACE)) {
+			MixerPlaySample(g_pSfxOre->pData, DMAF_AUD3, g_pSfxOre->uwWordLength, 1, MIX_FX_ONCE);
+		}
+		g_pCustom->color[0] = 0x000;
+	}
+
+	audioMixerDestroy();
+	systemUse();
 
 #ifdef GAME_DEBUG
 	randInit(&g_sRand, 2184, 1911);

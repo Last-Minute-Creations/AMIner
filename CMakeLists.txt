@@ -9,6 +9,7 @@ set(CMAKE_C_STANDARD 11)
 
 # ACE
 add_subdirectory(deps/ace ace)
+add_subdirectory(deps/audio_mixer ace_audio_mixer)
 file(GLOB_RECURSE GAME_src src/*.c src/*.h)
 
 set(GAME_EXECUTABLE_STEM Aminer)
@@ -36,6 +37,7 @@ target_include_directories(${GAME_EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_options(${GAME_EXECUTABLE} PUBLIC -Wall -Wextra -Wimplicit-fallthrough=2)
 target_compile_options(${GAME_EXECUTABLE} PRIVATE -Werror -Wno-error=unused-parameter -Wimplicit-fallthrough=2)
 target_link_libraries(${GAME_EXECUTABLE} ace)
+target_link_libraries(${GAME_EXECUTABLE} ace_audio_mixer)
 if(GAME_DEBUG)
   target_compile_definitions(${GAME_EXECUTABLE} PRIVATE GAME_DEBUG)
 endif()
