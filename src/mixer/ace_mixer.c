@@ -67,3 +67,12 @@ void audioMixerDestroy(void) {
 
 	memFree(s_pBuffer, s_ulBufferSize);
 }
+
+void audioMixerPlaySfx(
+	const tPtplayerSfx *pSfx, UBYTE ubChannel, WORD wPriority, UBYTE isLoop
+) {
+	MixerPlaySample(
+		pSfx->pData, DMAF_AUD0 << ubChannel, pSfx->uwWordLength, wPriority,
+		isLoop ? MIX_FX_LOOP : MIX_FX_ONCE
+	);
+}

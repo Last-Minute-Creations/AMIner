@@ -127,12 +127,12 @@ static void coreGsCreate(void) {
 
 	audioMixerCreate();
 	systemUnuse();
-	MixerPlaySample(g_pSfxDrill->pData, DMAF_AUD3, g_pSfxDrill->uwWordLength, 1, MIX_FX_LOOP);
+	audioMixerPlaySfx(g_pSfxDrill, 3, 1, 1);
 
 	while(1) {
 		g_pCustom->color[0] = 0x200;
 		if(keyCheck(KEY_A)) {
-			MixerPlaySample(g_pSfxOre->pData, DMAF_AUD3, g_pSfxOre->uwWordLength, 1, MIX_FX_ONCE);
+			audioMixerPlaySfx(g_pSfxOre, 3, 1, 0);
 		}
 		g_pCustom->color[0] = 0x000;
 	}
