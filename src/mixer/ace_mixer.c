@@ -6,6 +6,7 @@
 #include <ace/managers/memory.h>
 #include <ace/managers/system.h>
 #include <hardware/intbits.h>
+#include <hardware/dmabits.h>
 #include <audio_mixer/mixer_control.h>
 
 extern MXMixer mixer;
@@ -19,18 +20,38 @@ static void onChannelInterrupt(
 	MixerIRQHandler();
 }
 
+//---------------------------------------------------------------- ASM CALLBACKS
+
+__attribute__((used))
+void mixerEnableAudioDma(void) {
+	systemSetDmaMask(DMAF_AUD3, 1);
+}
+
+__attribute__((used))
+void mixerDisableAudioDma(void) {
+	systemSetDmaMask(DMAF_AUD3, 0);
+}
+
+__attribute__((used))
+void mixerEnableAudioInterrupts(void) {
+	systemSetInt(INTB_AUD3, onChannelInterrupt, 0);
+}
+
+__attribute__((used))
+void mixerDisableAudioInterrupts(void) {
+	systemSetInt(INTB_AUD3, 0, 0);
+}
+
+//------------------------------------------------------------------- PUBLIC FNS
+
 void audioMixerCreate(void) {
 	s_ulBufferSize = MixerGetBufferSize();
 	s_pBuffer = memAllocChip(s_ulBufferSize);
 
 	MixerSetup(s_pBuffer, MIX_PAL);
-	// MixerInstallHandler(0, 0); // todo: remove
 
-	// Install interrupt handlers
-	// systemSetInt(INTB_AUD0, onChannelInterrupt, 0);
-	// systemSetInt(INTB_AUD1, onChannelInterrupt, 0);
-	// systemSetInt(INTB_AUD2, onChannelInterrupt, 0);
-	systemSetInt(INTB_AUD3, onChannelInterrupt, 0);
+	// Install interrupt handlers - equivalent of MixerInstallHandler()
+	mixerEnableAudioInterrupts();
 	mixer.mx_status = MIXER_RUNNING;
 	mixer.mx_irq_bits = INTF_AUD3; // TODO: sync with config.mixer_output_channels
 
@@ -40,7 +61,7 @@ void audioMixerCreate(void) {
 void audioMixerDestroy(void) {
 	MixerStop();
 
-	// Uninstall interrupt handlers
+	// Uninstall interrupt handlers - equivalent of MixerRemoveHandler()
 	mixer.mx_status = MIXER_STOPPED;
 	systemSetInt(INTB_AUD3, 0, 0);
 

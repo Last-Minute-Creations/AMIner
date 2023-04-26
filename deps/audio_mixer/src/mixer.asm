@@ -566,11 +566,11 @@ MixerStart
 		lea.l	mxcustombase,a6
 
 		; Enable audio interrupts for all valid channels
-		lea.l	mixer(pc),a0
-		move.w	mx_irq_bits(a0),d0			; Fetch IRQ bits
-		or.w	#$c000,d0					; Prep INTENA setup
-		move.w	d0,intena(a6)				; Set INTENA value
-		tst.w	dmaconr(a6)					; Delay for A4000
+		; lea.l	mixer(pc),a0
+		; move.w	mx_irq_bits(a0),d0			; Fetch IRQ bits
+		; or.w	#$c000,d0					; Prep INTENA setup
+		; move.w	d0,intena(a6)				; Set INTENA value
+		; tst.w	dmaconr(a6)					; Delay for A4000
 
 		IF MIXER_SINGLE=1
 			move.w	#mxsinglechan,d1
@@ -616,9 +616,9 @@ MixerStop
 		move.w	mx_hw_channels(a0),d6
 
 		; Disable audio interrupt(s)
-		move.w	d7,intena(a6)					; Disable audio interrupts
-		move.w	d7,intreq(a6)					; Clear any pending interrupts
-		move.w	d7,intreq(a6)					; Twice for A4000
+		; move.w	d7,intena(a6)					; Disable audio interrupts
+		; move.w	d7,intreq(a6)					; Clear any pending interrupts
+		; move.w	d7,intreq(a6)					; Twice for A4000
 
 
 		IF MIXER_SINGLE=1
@@ -647,7 +647,10 @@ MixerStop
 		ENDIF
 
 		; Disable audio DMA for the mixing channel(s)
-		move.w	d6,dmacon(a6)
+		; move.w	d6,dmacon(a6)
+		movem.l	d0/d1/a0/a1,-(sp)			; Stack
+		jsr mixerDisableAudioDma
+		movem.l	(sp)+,d0/d1/a0/a1			; Stack
 
 		; Fetch mixer entries
 		lea.l	mx_mixer_entries(a0),a0
@@ -898,11 +901,14 @@ MixPlaySam		MACRO
 		beq.s	.irq_disabled
 
 		; Disable audio interrupts
-		lea.l	mxcustombase,a6
-		move.w	mixer+mx_irq_bits(pc),d7		; Fetch audio bits
-		and.w	#$7fff,d7						; Mask out SET/CLR bit
-		move.w	d7,intena(a6)					; Disable audio interrupts
-		tst.w	dmaconr(a6)						; Wait for A4000
+		; lea.l	mxcustombase,a6
+		; move.w	mixer+mx_irq_bits(pc),d7		; Fetch audio bits
+		; and.w	#$7fff,d7						; Mask out SET/CLR bit
+		; move.w	d7,intena(a6)					; Disable audio interrupts
+		; tst.w	dmaconr(a6)						; Wait for A4000
+		movem.l	d0/d1/a0/a1,-(sp)			; Stack
+		jsr mixerEnableAudioDma
+		movem.l	(sp)+,d0/d1/a0/a1			; Stack
 .irq_disabled
 
 		; Start of atomic part
@@ -950,9 +956,12 @@ MixPlaySam		MACRO
 		beq.s	.irq_enabled
 
 		; Re-enable audio interrupts
-		move.w	mixer+mx_irq_bits(pc),d7
-		or.w	#$8000,d7					; Set the SET/CLR bit
-		move.w	d7,intena(a6)				; Enable audio interrupts
+		; move.w	mixer+mx_irq_bits(pc),d7
+		; or.w	#$8000,d7					; Set the SET/CLR bit
+		; move.w	d7,intena(a6)				; Enable audio interrupts
+		movem.l	d0/d1/a0/a1,-(sp)			; Stack
+		jsr mixerEnableAudioInterrupts
+		movem.l	(sp)+,d0/d1/a0/a1			; Stack
 .irq_enabled
 
 		; End of atomic part
@@ -1051,11 +1060,15 @@ MixPlayChSam	MACRO
 		beq.s	.irq_disabled
 
 		; Disable audio interrupts
-		lea.l	mxcustombase,a6
-		move.w	mixer+mx_irq_bits(pc),d4		; Fetch audio bits
-		and.w	#$7fff,d4						; Mask out SET/CLR bit
-		move.w	d4,intena(a6)					; Disable audio interrupts
-		tst.w	dmaconr(a6)						; Wait for A4000
+		; lea.l	mxcustombase,a6
+		; move.w	mixer+mx_irq_bits(pc),d4		; Fetch audio bits
+		; and.w	#$7fff,d4						; Mask out SET/CLR bit
+		; move.w	d4,intena(a6)					; Disable audio interrupts
+		; tst.w	dmaconr(a6)						; Wait for A4000
+		movem.l	d0/d1/a0/a1,-(sp)			; Stack
+		jsr mixerDisableAudioInterrupts
+		movem.l	(sp)+,d0/d1/a0/a1			; Stack
+
 .irq_disabled
 
 		; Start of atomic part
@@ -1103,9 +1116,13 @@ MixPlayChSam	MACRO
 		beq.s	.irq_enabled
 
 		; Re-enable audio interrupts
-		move.w	mixer+mx_irq_bits(pc),d4
-		or.w	#$8000,d4					; Set the SET/CLR bit
-		move.w	d4,intena(a6)				; Enable audio interrupts
+		; move.w	mixer+mx_irq_bits(pc),d4
+		; or.w	#$8000,d4					; Set the SET/CLR bit
+		; move.w	d4,intena(a6)				; Enable audio interrupts
+		movem.l	d0/d1/a0/a1,-(sp)			; Stack
+		jsr mixerEnableAudioInterrupts
+		movem.l	(sp)+,d0/d1/a0/a1			; Stack
+
 .irq_enabled
 
 		; End of atomic part
@@ -2502,13 +2519,16 @@ MixerPlaySilence
 		move.w	mx_volume(a0),ac_vol(a6,d1.w)
 
 		; Calculate audio bit to set
-		sub.w	#aud,d1
-		asr.w	#4,d1
-		move.w	#DMAF_SETCLR,d0
-		bset	d1,d0
+		; sub.w	#aud,d1
+		; asr.w	#4,d1
+		; move.w	#DMAF_SETCLR,d0
+		; bset	d1,d0
 
 		; Activate audio DMA
-		move.w	d0,dmacon(a6)
+		; move.w	d0,dmacon(a6)
+		movem.l	d0/d1/a0/a1,-(sp)			; Stack
+		jsr mixerEnableAudioDma
+		movem.l	(sp)+,d0/d1/a0/a1			; Stack
 
 		movem.l	(sp)+,d0/d1/a0/a6			; Stack
 		rts

@@ -125,21 +125,20 @@ static void coreGsCreate(void) {
 	g_pMenuMod = ptplayerModCreate("data/music/menu.mod");
 	g_pModSampleData = ptplayerSampleDataCreate("data/music/samples.samplepack");
 
-	systemUnuse();
 	audioMixerCreate();
+	systemUnuse();
 	MixerPlaySample(g_pSfxDrill->pData, DMAF_AUD3, g_pSfxDrill->uwWordLength, 1, MIX_FX_LOOP);
-	// MixerPlaySample(sample2,DMAF_AUD3,sample2_size,1,MIX_FX_LOOP);
 
 	while(1) {
 		g_pCustom->color[0] = 0x200;
-		if(keyUse(KEY_SPACE)) {
+		if(keyCheck(KEY_A)) {
 			MixerPlaySample(g_pSfxOre->pData, DMAF_AUD3, g_pSfxOre->uwWordLength, 1, MIX_FX_ONCE);
 		}
 		g_pCustom->color[0] = 0x000;
 	}
 
-	audioMixerDestroy();
 	systemUse();
+	audioMixerDestroy();
 
 #ifdef GAME_DEBUG
 	randInit(&g_sRand, 2184, 1911);
