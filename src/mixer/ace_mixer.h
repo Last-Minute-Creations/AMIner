@@ -5,7 +5,6 @@
 #ifndef ACE_MIXER_H
 #define ACE_MIXER_H
 
-#include <audio_mixer/mixer.h>
 #include <ace/managers/ptplayer.h>
 
 void audioMixerCreate(void);

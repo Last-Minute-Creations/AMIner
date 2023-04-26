@@ -47,18 +47,23 @@ typedef struct MXEffectStructure
 	UWORD mfx_priority;		/* Priority indicator (higher is better) */
 } MXEffectStructure;
 
-#ifndef BARTMAN_GCC
 
 /* REGARG define to call assembly routines */
-#if defined(__VBCC__)
+#if defined(BARTMAN_GCC) || defined(__INTELLISENSE__)
+// Exploit the fact that Bartman's compiler doesn't add underscore to its C symbols and use them to call underscored mixer function from asm side
+#define MIX_API __attribute__((always_inline)) static inline
+#define MIX_REGARG(arg, reg) arg
+#elif defined(__VBCC__)
+#define MIX_API
 #define MIX_REGARG(arg, reg) __reg(reg) arg
 #elif defined(__GNUC__) // Bebbo
+#define MIX_API
 #define MIX_REGARG(arg, reg) arg asm(reg)
 #endif
 
 /* Prototypes */
 
-void MixerIRQHandler();
+MIX_API void MixerIRQHandler();
 
 /*
 ULONG MixerGetBufferSize()
@@ -68,7 +73,7 @@ ULONG MixerGetBufferSize()
 	this routine is to offer a method for C programs to gain access to this
 	value without needing access to mixer.i.
 */
-ULONG MixerGetBufferSize();
+MIX_API ULONG MixerGetBufferSize();
 
 /*
 ULONG MixerGetSampleMultiplier()
@@ -86,7 +91,7 @@ ULONG MixerGetSampleMultiplier()
 	      the video system selected when calling MixerSetup (PAL or NTSC).
 	Note: MixerSetup() must have been called prior to calling this function.
 */
-ULONG MixerGetSampleMinSize();
+MIX_API ULONG MixerGetSampleMinSize();
 
 /*
 void MixerSetup(void *buffer,UWORD video_system)
@@ -104,7 +109,7 @@ void MixerSetup(void *buffer,UWORD video_system)
 	Note: on 68020+ systems, it is advisable to align the Chip RAM buffer to a
 	      4 byte boundary for optimal performance.
 */
-void MixerSetup (MIX_REGARG(void *buffer, "a0"),
+MIX_API void MixerSetup (MIX_REGARG(void *buffer, "a0"),
                  MIX_REGARG(UWORD vidsys,"d0"));
 
 /*
@@ -116,7 +121,7 @@ void MixerInstallHandler(void *VBR,UWORD save_vector)
 	  saved. Set it to 0 to save the vector for future restoring and to 1 to skip
 	  saving the vector.
    */
-void MixerInstallHandler(MIX_REGARG(void *VBR,"a0"),
+MIX_API void MixerInstallHandler(MIX_REGARG(void *VBR,"a0"),
                          MIX_REGARG(UWORD save_vector,"d0"));
 
 /*
@@ -124,7 +129,7 @@ void MixerRemoveHandler()
 	Removes the mixer interrupt handler. MixerStop() should be called prior to
 	calling this routine to make sure audio DMA is stopped.
 */
-void MixerRemoveHandler();
+MIX_API void MixerRemoveHandler();
 
 /*
 void MixerStart()
@@ -132,21 +137,21 @@ void MixerStart()
 	MixerInstallHandler() must have been called prior to calling this
 	function.
 */
-void MixerStart();
+MIX_API void MixerStart();
 
 /*
 void MixerStop()
 	Stops mixer playback. MixerSetup() and MixerInstallHandler() must have
 	been called prior to calling this function.
 */
-void MixerStop();
+MIX_API void MixerStop();
 
 /*
 void MixerVolume(UWORD volume)
 	Set the desired hardware output volume used by the mixer (valid values are
 	0 to 64).
 */
-void MixerVolume(MIX_REGARG(UWORD volume,"d0"));
+MIX_API void MixerVolume(MIX_REGARG(UWORD volume,"d0"));
 
 /*
 ULONG MixerPlayFX(MXEffectStructure *effect_structure,
@@ -164,7 +169,7 @@ ULONG MixerPlayFX(MXEffectStructure *effect_structure,
 	Note: the MXEffectStructure definition can be found at the top of this
 		  file.
 */
-ULONG MixerPlayFX(MIX_REGARG(MXEffectStructure *effect_structure,"a0"),
+MIX_API ULONG MixerPlayFX(MIX_REGARG(MXEffectStructure *effect_structure,"a0"),
                   MIX_REGARG(ULONG hardware_channel,"d0"));
 
 /*
@@ -192,7 +197,7 @@ ULONG MixerPlayChannelFX(MXEffectStructure *effect_structure,
 	      maximum number of software channels available as defined in
 	      mixer_config.i.
 */
-ULONG MixerChannelPlayFX(MIX_REGARG(MXEffectStructure *effect_structure,"a0"),
+MIX_API ULONG MixerChannelPlayFX(MIX_REGARG(MXEffectStructure *effect_structure,"a0"),
                          MIX_REGARG(ULONG mixer_channel,"d0"));
 
 /*
@@ -207,7 +212,7 @@ void MixerStopFX(ULONG mixer_channel_mask)
 
 	Note: see MixerPlayChannelFX() for an explanation of mixer channels.
 */
-void MixerStopFX(MIX_REGARG(UWORD mixer_channel_mask,"d0"));
+MIX_API void MixerStopFX(MIX_REGARG(UWORD mixer_channel_mask,"d0"));
 
 /*
 ULONG MixerPlaySample(void *sample,ULONG hardware_channel,LONG length,
@@ -232,7 +237,7 @@ ULONG MixerPlaySample(void *sample,ULONG hardware_channel,LONG length,
 	Returns the hardware & mixer channel the sample will play on, or -1 if no
 	free channel could be found.
 */
-ULONG MixerPlaySample(MIX_REGARG(void *sample,"a0"),
+MIX_API ULONG MixerPlaySample(MIX_REGARG(void *sample,"a0"),
                       MIX_REGARG(ULONG hardware_channel,"d0"),
 					  MIX_REGARG(LONG length,"d1"),
 					  MIX_REGARG(WORD signed_priority,"d2"),
@@ -263,7 +268,7 @@ ULONG MixerPlayChannelSample(void *sample,ULONG mixer_channel,LONG length,
 
 	Note: see MixerPlayChannelFX() for an explanation of mixer channels.
 */
-ULONG MixerPlayChannelSample(MIX_REGARG(void *sample,"a0"),
+MIX_API ULONG MixerPlayChannelSample(MIX_REGARG(void *sample,"a0"),
                              MIX_REGARG(ULONG hardware_channel,"d0"),
 					         MIX_REGARG(LONG length,"d1"),
 					         MIX_REGARG(WORD signed_priority,"d2"),
@@ -271,10 +276,9 @@ ULONG MixerPlayChannelSample(MIX_REGARG(void *sample,"a0"),
 
 #undef MIX_REGARG
 
-#else // BARTMAN_GCC
+#if defined(BARTMAN_GCC)
 
-__attribute__((always_inline))
-static inline ULONG Call_MixerGetBufferSize(void) {
+MIX_API ULONG MixerGetBufferSize(void) {
 	register volatile ULONG reg_result __asm("d0");
 	__asm__ volatile (
 		"jsr _MixerGetBufferSize"
@@ -289,8 +293,7 @@ static inline ULONG Call_MixerGetBufferSize(void) {
 	return reg_result;
 }
 
-__attribute__((always_inline))
-static inline ULONG Call_MixerGetSampleMinSize(void) {
+MIX_API ULONG MixerGetSampleMinSize(void) {
 	register volatile ULONG reg_result __asm("d0");
 
 	__asm__ volatile (
@@ -306,8 +309,7 @@ static inline ULONG Call_MixerGetSampleMinSize(void) {
 	return reg_result;
 }
 
-__attribute__((always_inline))
-static inline void Call_MixerSetup(void *buffer, UWORD vidsys) {
+MIX_API void MixerSetup(void *buffer, UWORD vidsys) {
 	register volatile void *reg_buffer __asm("a0") = buffer;
 	register volatile UWORD reg_vidsys __asm("d0") = vidsys;
 
@@ -322,8 +324,7 @@ static inline void Call_MixerSetup(void *buffer, UWORD vidsys) {
 	);
 }
 
-__attribute__((always_inline))
-static inline void Call_MixerIRQHandler(void) {
+MIX_API void MixerIRQHandler(void) {
 	__asm__ volatile (
 		"jsr _MixerIRQHandler"
 		// OutputOperands
@@ -335,8 +336,7 @@ static inline void Call_MixerIRQHandler(void) {
 	);
 }
 
-__attribute__((always_inline))
-static inline void Call_MixerStart(void) {
+MIX_API void MixerStart(void) {
 	__asm__ volatile (
 		"jsr _MixerStart"
 		// OutputOperands
@@ -348,8 +348,7 @@ static inline void Call_MixerStart(void) {
 	);
 }
 
-__attribute__((always_inline))
-static inline void Call_MixerStop(void) {
+MIX_API void MixerStop(void) {
 	__asm__ volatile (
 		"jsr _MixerStop"
 		// OutputOperands
@@ -361,8 +360,7 @@ static inline void Call_MixerStop(void) {
 	);
 }
 
-__attribute__((always_inline))
-static inline void Call_MixerVolume(UWORD volume) {
+MIX_API void MixerVolume(UWORD volume) {
 	register volatile UWORD reg_volume __asm("d0") = volume;
 
 	__asm__ volatile (
@@ -376,8 +374,7 @@ static inline void Call_MixerVolume(UWORD volume) {
 	);
 }
 
-__attribute__((always_inline))
-static inline ULONG Call_MixerPlayFX(
+MIX_API ULONG MixerPlayFX(
 	MXEffectStructure *effect_structure, ULONG hardware_channel
 ) {
 	register volatile MXEffectStructure *reg_effect_structure __asm("a0") = effect_structure;
@@ -397,8 +394,7 @@ static inline ULONG Call_MixerPlayFX(
 	return reg_result;
 }
 
-__attribute__((always_inline))
-static inline ULONG Call_MixerChannelPlayFX(
+MIX_API ULONG MixerChannelPlayFX(
 	MXEffectStructure *effect_structure, ULONG mixer_channel
 ) {
 	register volatile MXEffectStructure *reg_effect_structure __asm("a0") = effect_structure;
@@ -418,8 +414,7 @@ static inline ULONG Call_MixerChannelPlayFX(
 	return reg_result;
 }
 
-__attribute__((always_inline))
-static inline void Call_MixerStopFX(UWORD mixer_channel_mask) {
+MIX_API void MixerStopFX(UWORD mixer_channel_mask) {
 	register volatile UWORD reg_mixer_channel_mask __asm("d0") = mixer_channel_mask;
 
 	__asm__ volatile (
@@ -433,8 +428,7 @@ static inline void Call_MixerStopFX(UWORD mixer_channel_mask) {
 	);
 }
 
-__attribute__((always_inline))
-static inline ULONG Call_MixerPlaySample(
+MIX_API ULONG MixerPlaySample(
 	void *sample, ULONG hardware_channel, LONG length, WORD signed_priority,
 	UWORD loop_indicator
 ) {
@@ -459,8 +453,7 @@ static inline ULONG Call_MixerPlaySample(
 	return reg_result;
 }
 
-__attribute__((always_inline))
-static inline ULONG Call_MixerPlayChannelSample(
+MIX_API ULONG MixerPlayChannelSample(
 	void *sample, ULONG hardware_channel, LONG length, WORD signed_priority,
 	UWORD loop_indicator
 ) {
@@ -484,19 +477,6 @@ static inline ULONG Call_MixerPlayChannelSample(
 
 	return reg_result;
 }
-
-#define MixerGetBufferSize Call_MixerGetBufferSize
-#define MixerGetSampleMinSize Call_MixerGetSampleMinSize
-#define MixerSetup Call_MixerSetup
-#define MixerIRQHandler Call_MixerIRQHandler
-#define MixerStart Call_MixerStart
-#define MixerStop Call_MixerStop
-#define MixerVolume Call_MixerVolume
-#define MixerPlayFX Call_MixerPlayFX
-#define MixerChannelPlayFX Call_MixerChannelPlayFX
-#define MixerStopFX Call_MixerStopFX
-#define MixerPlaySample Call_MixerPlaySample
-#define MixerPlayChannelSample Call_MixerPlayChannelSample
 
 #endif // BARTMAN_GCC
 
