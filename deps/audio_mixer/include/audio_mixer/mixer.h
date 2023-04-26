@@ -269,7 +269,7 @@ ULONG MixerPlayChannelSample(void *sample,ULONG mixer_channel,LONG length,
 	Note: see MixerPlayChannelFX() for an explanation of mixer channels.
 */
 MIX_API ULONG MixerPlayChannelSample(MIX_REGARG(void *sample,"a0"),
-                             MIX_REGARG(ULONG hardware_channel,"d0"),
+                             MIX_REGARG(ULONG mixer_channel,"d0"),
 					         MIX_REGARG(LONG length,"d1"),
 					         MIX_REGARG(WORD signed_priority,"d2"),
 					         MIX_REGARG(UWORD loop_indicator,"d3"));
@@ -481,11 +481,11 @@ MIX_API ULONG MixerPlaySample(
 }
 
 MIX_API ULONG MixerPlayChannelSample(
-	void *sample, ULONG hardware_channel, LONG length, WORD signed_priority,
+	void *sample, ULONG mixer_channel, LONG length, WORD signed_priority,
 	UWORD loop_indicator
 ) {
 	register volatile void *reg_sample __asm("a0") = sample;
-	register volatile ULONG reg_hardware_channel __asm("d0") = hardware_channel;
+	register volatile ULONG reg_mixer_channel __asm("d0") = mixer_channel;
 	register volatile LONG reg_length __asm("d1") = length;
 	register volatile WORD reg_signed_priority __asm("d2") = signed_priority;
 	register volatile UWORD reg_loop_indicator __asm("d3") = loop_indicator;
@@ -496,7 +496,7 @@ MIX_API ULONG MixerPlayChannelSample(
 		// OutputOperands
 		: "=r" (reg_result)
 		// InputOperands
-		: "r" (reg_sample), "r" (reg_hardware_channel), "r" (reg_length),
+		: "r" (reg_sample), "r" (reg_mixer_channel), "r" (reg_length),
 			"r" (reg_signed_priority), "r" (reg_loop_indicator)
 		// Clobbers
 		: "cc"

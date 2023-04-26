@@ -127,12 +127,22 @@ static void coreGsCreate(void) {
 
 	audioMixerCreate();
 	systemUnuse();
-	audioMixerPlaySfx(g_pSfxDrill, 3, 1, 1);
+	UBYTE isPlayingDrill = 0;
 
 	while(1) {
 		g_pCustom->color[0] = 0x200;
 		if(keyCheck(KEY_A)) {
-			audioMixerPlaySfx(g_pSfxOre, 3, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, 1, 1, 0);
+		}
+		if(keyUse(KEY_D)) {
+			if(!isPlayingDrill) {
+				isPlayingDrill = 1;
+				audioMixerPlaySfx(g_pSfxDrill, 0, 1, 1);
+			}
+			else {
+				isPlayingDrill = 0;
+				audioMixerStopSfxOnChannel(0);
+			}
 		}
 		g_pCustom->color[0] = 0x000;
 	}

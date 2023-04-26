@@ -12,15 +12,22 @@ void audioMixerCreate(void);
 void audioMixerDestroy(void);
 
 /**
- * @brief Plays given sound effect on selected mixer-enabled audio channel.
+ * @brief Plays given sound effect on selected mixer's software channel.
  *
  * @param pSfx Sound effect to play.
- * @param ubChannel Hardware audio channel to use.
+ * @param ubChannel Mixer's software audio channel to use.
  * @param wPriority Playback priority. Bigger is more important.
  * @param isLoop Set to 1 to play sound effect in a loop, zero for one-shot.
  */
 void audioMixerPlaySfx(
 	const tPtplayerSfx *pSfx, UBYTE ubChannel, WORD wPriority, UBYTE isLoop
 );
+
+/**
+ * @brief Stops playback of sound effect on selected mixer's software channel.
+ *
+ * @param ubChannel Mixer's software audio channel to mute.
+ */
+void audioMixerStopSfxOnChannel(UBYTE ubChannel);
 
 #endif // ACE_MIXER_H

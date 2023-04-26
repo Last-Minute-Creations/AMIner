@@ -69,10 +69,14 @@ void audioMixerDestroy(void) {
 }
 
 void audioMixerPlaySfx(
-	const tPtplayerSfx *pSfx, UBYTE ubChannel, WORD wPriority, UBYTE isLoop
+	const tPtplayerSfx *pSfx, UBYTE ubMixerChannel, WORD wPriority, UBYTE isLoop
 ) {
-	MixerPlaySample(
-		pSfx->pData, DMAF_AUD0 << ubChannel, pSfx->uwWordLength, wPriority,
+	MixerPlayChannelSample(
+		pSfx->pData, DMAF_AUD3 | (MIX_CH0 << ubMixerChannel), pSfx->uwWordLength, wPriority,
 		isLoop ? MIX_FX_LOOP : MIX_FX_ONCE
 	);
+}
+
+void audioMixerStopSfxOnChannel(UBYTE ubMixerChannel) {
+	MixerStopFX(DMAF_AUD3 | (MIX_CH0 << ubMixerChannel));
 }
