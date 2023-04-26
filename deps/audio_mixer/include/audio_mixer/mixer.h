@@ -324,9 +324,36 @@ MIX_API void MixerSetup(void *buffer, UWORD vidsys) {
 	);
 }
 
+MIX_API void MixerInstallHandler(void *VBR, UWORD save_vector) {
+	register volatile void *reg_VBR __asm("a0") = VBR;
+	register volatile UWORD reg_save_vector __asm("d0") = save_vector;
+
+	__asm__ volatile (
+		"jsr _MixerInstallHandler\n"
+		// OutputOperands
+		:
+		// InputOperands
+		: "r" (reg_VBR), "r" (reg_save_vector)
+		// Clobbers
+		: "cc"
+	);
+}
+
 MIX_API void MixerIRQHandler(void) {
 	__asm__ volatile (
 		"jsr _MixerIRQHandler"
+		// OutputOperands
+		:
+		// InputOperands
+		:
+		// Clobbers
+		: "cc"
+	);
+}
+
+MIX_API void MixerRemoveHandler(void) {
+	__asm__ volatile (
+		"jsr _MixerRemoveHandler"
 		// OutputOperands
 		:
 		// InputOperands
