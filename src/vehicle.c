@@ -5,7 +5,7 @@
 #include "vehicle.h"
 #include <ace/managers/rand.h>
 #include <ace/utils/string.h>
-#include "mixer/ace_mixer.h"
+#include <ace/contrib/managers/audio_mixer.h>
 #include "hud.h"
 #include "core.h"
 #include "game.h"

@@ -7,6 +7,7 @@
 #include <ace/managers/system.h>
 #include <ace/managers/key.h>
 #include <ace/utils/palette.h>
+#include <ace/contrib/managers/audio_mixer.h>
 #include "menu.h"
 #include "dino.h"
 #include "game.h"
@@ -22,7 +23,6 @@
 #include <comm/base.h>
 #include "defs.h"
 #include "settings.h"
-#include "mixer/ace_mixer.h"
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];

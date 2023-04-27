@@ -4,7 +4,7 @@
 typedef enum MixerState {
 	MIXER_STOPPED = 0,
 	MIXER_RUNNING = 1,
-};
+} MixerState;
 
 typedef struct MXChannel {
 #if !defined(MIXER_68020) && defined(MIXER_WORDSIZED)

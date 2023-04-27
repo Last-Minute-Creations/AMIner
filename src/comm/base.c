@@ -8,9 +8,9 @@
 #include <ace/managers/system.h>
 #include <ace/managers/key.h>
 #include <ace/utils/chunky.h>
+#include <ace/contrib/managers/audio_mixer.h>
 #include "../core.h"
 #include "../game.h"
-#include "../mixer/ace_mixer.h"
 #include "settings.h"
 
 #define SFX_CHANNEL_KEY 0

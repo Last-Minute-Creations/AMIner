@@ -2,12 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "ace_mixer.h"
+#include <ace/contrib/managers/audio_mixer.h>
 #include <ace/managers/memory.h>
 #include <ace/managers/system.h>
 #include <hardware/intbits.h>
 #include <hardware/dmabits.h>
-#include <audio_mixer/mixer_control.h>
+#include "mixer_control.h"
 
 extern MXMixer mixer;
 static ULONG s_ulBufferSize;

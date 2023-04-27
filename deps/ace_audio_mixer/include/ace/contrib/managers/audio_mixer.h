@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef ACE_MIXER_H
-#define ACE_MIXER_H
+#ifndef ACE_MIXER_AUDIO_MIXER_H
+#define ACE_MIXER_AUDIO_MIXER_H
 
 #include <ace/managers/ptplayer.h>
 
@@ -30,4 +30,4 @@ void audioMixerPlaySfx(
  */
 void audioMixerStopSfxOnChannel(UBYTE ubChannel);
 
-#endif // ACE_MIXER_H
+#endif // ACE_MIXER_AUDIO_MIXER_H

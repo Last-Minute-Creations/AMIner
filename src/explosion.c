@@ -5,9 +5,8 @@
 #include "explosion.h"
 #include "bob_new.h"
 #include "game.h"
-#include "mixer/ace_mixer.h"
-
 #include <ace/managers/ptplayer.h>
+#include <ace/contrib/managers/audio_mixer.h>
 
 #define EXPLOSION_MAX 6
 #define EXPLOSION_COUNTER_MAX 4

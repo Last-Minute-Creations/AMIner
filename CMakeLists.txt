@@ -9,7 +9,7 @@ set(CMAKE_C_STANDARD 11)
 
 # ACE
 add_subdirectory(deps/ace ace)
-add_subdirectory(deps/audio_mixer ace_audio_mixer)
+add_subdirectory(deps/ace_audio_mixer ace_audio_mixer)
 file(GLOB_RECURSE GAME_src src/*.c src/*.h)
 
 set(GAME_EXECUTABLE_STEM Aminer)

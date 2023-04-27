@@ -6,6 +6,7 @@
 #include <ace/managers/system.h>
 #include <ace/managers/joy.h>
 #include <ace/managers/key.h>
+#include <ace/contrib/managers/audio_mixer.h>
 #include <comm/base.h>
 #include "game.h"
 #include "bob_new.h"
@@ -18,7 +19,6 @@
 #include "settings.h"
 #include "menu_list.h"
 #include "steer.h"
-#include "mixer/ace_mixer.h"
 
 #define SFX_CHANNEL_ATARI 1
 #define MENU_OPTIONS_MAX 10
