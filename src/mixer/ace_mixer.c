@@ -72,7 +72,8 @@ void audioMixerPlaySfx(
 	const tPtplayerSfx *pSfx, UBYTE ubMixerChannel, WORD wPriority, UBYTE isLoop
 ) {
 	MixerPlayChannelSample(
-		pSfx->pData, DMAF_AUD3 | (MIX_CH0 << ubMixerChannel), pSfx->uwWordLength, wPriority,
+		pSfx->pData, DMAF_AUD3 | (MIX_CH0 << ubMixerChannel),
+		pSfx->uwWordLength * sizeof(UWORD), wPriority,
 		isLoop ? MIX_FX_LOOP : MIX_FX_ONCE
 	);
 }
