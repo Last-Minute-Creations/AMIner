@@ -5,6 +5,7 @@
 #include "explosion.h"
 #include "bob_new.h"
 #include "game.h"
+#include "mixer/ace_mixer.h"
 
 #include <ace/managers/ptplayer.h>
 
@@ -14,7 +15,8 @@
 #define EXPLOSION_FRAME_PEAK 5
 #define EXPLOSION_FRAME_COUNT 10
 
-#define EXPLOSION_AUDIO_CHANNEL PTPLAYER_SFX_CHANNEL_ANY
+#define SFX_CHANNEL_BOOM 1
+#define SFX_PRIORITY_BOOM 5
 
 typedef struct tExplosion {
 	tBobNew sBob;
@@ -119,10 +121,10 @@ void explosionAdd(
 			bobNewCalcFrameAddress(s_pBoomFramesMask, 0)
 		);
 	}
-	ptplayerSfxPlay(
+	audioMixerPlaySfx(
 		eKind == EXPLOSION_KIND_TELEPORT ?
 			s_pSfxTeleport : s_pSfxBoom,
-		EXPLOSION_AUDIO_CHANNEL, PTPLAYER_VOLUME_MAX, 1
+		SFX_CHANNEL_BOOM, SFX_PRIORITY_BOOM, 0
 	);
 }
 

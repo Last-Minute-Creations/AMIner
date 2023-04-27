@@ -10,9 +10,10 @@
 #include <ace/utils/chunky.h>
 #include "../core.h"
 #include "../game.h"
+#include "../mixer/ace_mixer.h"
 #include "settings.h"
 
-#define SFX_CHANNEL_KEY 3
+#define SFX_CHANNEL_KEY 0
 #define COMM_BUTTON_LABEL_Y 170
 #define COMM_BUTTON_LABEL_OFFICE_X 39
 #define COMM_BUTTON_LABEL_WORKSHOP_X 115
@@ -204,7 +205,7 @@ void commProcess(void) {
 	for(UBYTE i = 0; i < DIRECTION_COUNT; ++i) {
 		if(pTests[i]) {
 			if(s_pNav[i] == BTN_STATE_NACTIVE) {
-				ptplayerSfxPlay(s_pSfxKeyPress[randUw(&g_sRand) & 3], SFX_CHANNEL_KEY, 64, 1);
+				audioMixerPlaySfx(s_pSfxKeyPress[randUw(&g_sRand) & 3], SFX_CHANNEL_KEY, 1, 0);
 				s_pNav[i] = BTN_STATE_ACTIVE;
 				blitCopy(
 					s_pButtons, 0, pBtnPos[i][2], s_pBmDraw,
@@ -215,7 +216,7 @@ void commProcess(void) {
 			}
 		}
 		else if(s_pNav[i] != BTN_STATE_NACTIVE) {
-			ptplayerSfxPlay(s_pSfxKeyRelease[randUw(&g_sRand) & 3], SFX_CHANNEL_KEY, 64, 1);
+			audioMixerPlaySfx(s_pSfxKeyRelease[randUw(&g_sRand) & 3], SFX_CHANNEL_KEY, 1, 0);
 			s_pNav[i] = BTN_STATE_NACTIVE;
 			blitCopy(
 				s_pButtons, 0, pBtnPos[i][2] + pBtnPos[i][3], s_pBmDraw,

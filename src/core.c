@@ -113,7 +113,9 @@ static void coreGsCreate(void) {
 
 	baseTileCreate(g_pMainBuffer);
 	ptplayerCreate(1);
+	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
+	audioMixerCreate();
 	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx");
 	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx");
 	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx");
@@ -124,31 +126,6 @@ static void coreGsCreate(void) {
 	}
 	g_pMenuMod = ptplayerModCreate("data/music/menu.mod");
 	g_pModSampleData = ptplayerSampleDataCreate("data/music/samples.samplepack");
-
-	audioMixerCreate();
-	systemUnuse();
-	UBYTE isPlayingDrill = 0;
-
-	while(1) {
-		g_pCustom->color[0] = 0x200;
-		if(keyCheck(KEY_A)) {
-			audioMixerPlaySfx(g_pSfxOre, 1, 1, 0);
-		}
-		if(keyUse(KEY_D)) {
-			if(!isPlayingDrill) {
-				isPlayingDrill = 1;
-				audioMixerPlaySfx(g_pSfxDrill, 0, 1, 1);
-			}
-			else {
-				isPlayingDrill = 0;
-				audioMixerStopSfxOnChannel(0);
-			}
-		}
-		g_pCustom->color[0] = 0x000;
-	}
-
-	systemUse();
-	audioMixerDestroy();
 
 #ifdef GAME_DEBUG
 	randInit(&g_sRand, 2184, 1911);
@@ -221,6 +198,7 @@ static void coreGsDestroy(void) {
 	commDestroy();
 	bobNewManagerDestroy();
 
+	audioMixerDestroy();
 	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
 		ptplayerModDestroy(g_pGameMods[i]);
 	}
