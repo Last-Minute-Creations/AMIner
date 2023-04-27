@@ -634,7 +634,7 @@ static void menuScoreGsDestroy(void) {
 
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
-	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx");
+	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx", 1);
 
 	tFile *pFileSettings = fileOpen("settings.dat", "rb");
 	if(pFileSettings) {

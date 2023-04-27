@@ -54,9 +54,9 @@ void commCreate(void) {
 	for(UBYTE i = 0; i < 4; ++i) {
 		char szPath[40];
 		sprintf(szPath, "data/sfx/key_press_%hhu.sfx", i);
-		s_pSfxKeyPress[i] = ptplayerSfxCreateFromFile(szPath);
+		s_pSfxKeyPress[i] = ptplayerSfxCreateFromFile(szPath, 1);
 		sprintf(szPath, "data/sfx/key_release_%hhu.sfx", i);
-		s_pSfxKeyRelease[i] = ptplayerSfxCreateFromFile(szPath);
+		s_pSfxKeyRelease[i] = ptplayerSfxCreateFromFile(szPath, 1);
 	}
 	systemUnuse();
 

@@ -116,9 +116,9 @@ static void coreGsCreate(void) {
 	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
 	audioMixerCreate();
-	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx");
-	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx");
-	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx");
+	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx", 1);
+	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx", 1);
+	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx", 1);
 	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
 		char szModPath[30];
 		sprintf(szModPath, "data/music/game%hhu.mod", i);

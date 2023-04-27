@@ -43,8 +43,8 @@ void explosionManagerCreate(void) {
 	s_pTpFrames = bitmapCreateFromFile("data/teleport.bm", 0);
 	s_pTpFramesMask = bitmapCreateFromFile("data/teleport_mask.bm", 0);
 
-	s_pSfxBoom = ptplayerSfxCreateFromFile("data/sfx/explosion.sfx");
-	s_pSfxTeleport = ptplayerSfxCreateFromFile("data/sfx/teleport.sfx");
+	s_pSfxBoom = ptplayerSfxCreateFromFile("data/sfx/explosion.sfx", 1);
+	s_pSfxTeleport = ptplayerSfxCreateFromFile("data/sfx/teleport.sfx", 1);
 
 	s_pExplosionNext = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i) {
