@@ -94,8 +94,8 @@ class Vehicle {
 
 		let liters = Math.floor((this.drillMax - this.drillCurr + 0.5 * g_defs.fuelInLiter) / g_defs.fuelInLiter);
 		let restockCost = 0;
-		restockCost -= (this.hullMax - this.hullCurr) * g_defs.hullPrice;
-		restockCost -= liters * g_defs.literPrice;
+		restockCost += (this.hullMax - this.hullCurr) * g_defs.hullPrice;
+		restockCost += liters * g_defs.literPrice;
 		this.moneySpentOnRestock += restockCost;
 		this.money -= restockCost;
 
