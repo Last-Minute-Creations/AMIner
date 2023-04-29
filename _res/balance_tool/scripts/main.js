@@ -197,7 +197,10 @@ function onFillAllPlanClicked() {
 	}
 
 	for(let mineralType of MineralType.all) {
-		g_vehicle.tryFillPlan(mineralType, 1000000);
+		let isPlanCompleted = g_vehicle.tryFillPlan(mineralType, 1000000);
+		if(isPlanCompleted) {
+			break;
+		}
 	}
 	updateVehicleStats();
 	updateWarehouse();

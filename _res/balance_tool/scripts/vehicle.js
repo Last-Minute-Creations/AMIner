@@ -123,8 +123,8 @@ class Vehicle {
 			return 0;
 		}
 
-		let requiredAmount = g_plans.getCurrentPlanInfo().mineralsRequired[mineralType.id] - g_plans.mineralsCollected[mineralType.id];
-		let fillAmount = Math.min(Math.min(amount, g_vehicle.stock[mineralType.id]), requiredAmount);
+		let amountRemaining = g_plans.getCurrentPlanInfo().mineralsRequired[mineralType.id] - g_plans.mineralsCollected[mineralType.id];
+		let fillAmount = Math.min(Math.min(amount, g_vehicle.stock[mineralType.id]), amountRemaining);
 		g_plans.mineralsCollected[mineralType.id] +=  fillAmount;
 		g_vehicle.stock[mineralType.id] -= fillAmount;
 
@@ -138,10 +138,11 @@ class Vehicle {
 				else {
 					addMessage('New accolade', 'success');
 				}
+				return true;
 			}
 		}
 
-		return fillAmount;
+		return false;
 	}
 
 	tryUpgradePart(part) {
