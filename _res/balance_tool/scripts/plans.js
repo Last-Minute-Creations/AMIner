@@ -102,7 +102,7 @@ class Plans {
 
 	isCompleted() {
 		for(let i = 0; i < MineralType.all.length; ++i) {
-			if(this.mineralsRequired[i] != this.mineralsCollected[i]) {
+			if(this.getCurrentPlanInfo().mineralsRequired[i] != this.mineralsCollected[i]) {
 				return false;
 			}
 		}
