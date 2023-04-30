@@ -84,12 +84,12 @@ function drawTiles(tileMap) {
 	let table = document.querySelector('#mine_preview');
 	table.innerHTML = '';
 
-	let sizeX = tileMap.tiles.length - 1; // skip dummy column on the left
+	let sizeX = tileMap.tiles.length;
 	let sizeY = tileMap.tiles[0].length;
 
 	for(let y = 0; y < sizeY; ++y) {
 		let tr = document.createElement('tr');
-		for(let x = 1; x < sizeX; ++x) {
+		for(let x = 1; x < sizeX; ++x) { // skip dummy column on the left
 			let td = document.createElement('td');
 			if(tileMap.tiles[x][y].mineralType == MineralType.DIRT) {
 				td.classList.add('tile_dirt');

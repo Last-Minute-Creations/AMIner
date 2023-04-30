@@ -69,8 +69,8 @@ class TileMap {
 		for(let baseIndex = 0; baseIndex < TileMap.bases.length; ++baseIndex) {
 			let base = TileMap.bases[baseIndex];
 			for(let y = 0; y < base.pattern.length; ++y) {
-				for(let x = 0; x < width; ++x) {
-					this.tiles[x][base.level + y] = new Tile(base.pattern[y][x]);
+				for(let x = 1; x < width; ++x) {
+					this.tiles[x][base.level + y] = new Tile(base.pattern[y][x - 1]);
 				}
 			}
 		}
