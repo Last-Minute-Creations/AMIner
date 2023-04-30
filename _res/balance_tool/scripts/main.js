@@ -239,6 +239,7 @@ function updateTotalMoneyStats() {
 	document.querySelector('#separate_plan_costs').textContent = planCosts.join(', ');
 	for (const mineralType of MineralType.collectibles) {
 		document.querySelector(`#plan_total_${mineralType.name}`).textContent = totalMineralsInPlans[mineralType.id];
+		document.querySelector(`#plan_margin_${mineralType.name}`).textContent = g_tileMap.totalMineralCounts[mineralType.id] - totalMineralsInPlans[mineralType.id];
 	}
 }
 
