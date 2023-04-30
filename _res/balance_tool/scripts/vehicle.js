@@ -10,6 +10,7 @@ class Vehicle {
 		this.rebukes = 0;
 		this.ending = Ending.NONE;
 		this.stock = {}; // [mineralId] => count
+		this.sold = new Array(MineralType.all.length).fill(0); // [mineralId] => count
 
 		for(let mineral of MineralType.all) {
 			this.stock[mineral.id] = 0;
@@ -108,13 +109,14 @@ class Vehicle {
 	}
 
 	trySell(mineralType, amount) {
-		if(g_vehicle.stock[mineralType.id] == undefined) {
+		if(this.stock[mineralType.id] == undefined) {
 			return 0;
 		}
 
-		let sellAmount = Math.min(amount, g_vehicle.stock[mineralType.id]);
-		g_vehicle.money += mineralType.reward * sellAmount;
-		g_vehicle.stock[mineralType.id] -= sellAmount;
+		let sellAmount = Math.min(amount, this.stock[mineralType.id]);
+		this.money += mineralType.reward * sellAmount;
+		this.stock[mineralType.id] -= sellAmount;
+		this.sold[mineralType.id] += sellAmount;
 		return sellAmount;
 	}
 

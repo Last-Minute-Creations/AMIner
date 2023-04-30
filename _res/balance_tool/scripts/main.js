@@ -75,6 +75,7 @@ function updateWarehouse() {
 	for(let mineralType of MineralType.collectibles) {
 		let name = mineralType.name;
 		document.querySelector(`#stock_${name}`).textContent = g_vehicle.stock[mineralType.id];
+		document.querySelector(`#sold_${name}`).textContent = g_vehicle.sold[mineralType.id];
 		document.querySelector(`#plan_${name}_spent`).textContent = g_plans.mineralsCollected[mineralType.id];
 		document.querySelector(`#plan_${name}_required`).textContent = g_plans.getCurrentPlanInfo().mineralsRequired[mineralType.id];
 	}
@@ -231,8 +232,6 @@ function updateTotalMoneyStats() {
 			totalMineralsInPlans[mineralId] += mineralCount;
 		});
 	});
-
-
 
 	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value, 0) * 3;
 	document.querySelector('#plan_cost_total').textContent = totalPlanCost;
