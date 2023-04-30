@@ -168,6 +168,11 @@ function onSellClicked(mineralType, amount) {
 	updateWarehouse();
 }
 
+function onResetEndingClicked() {
+	g_vehicle.ending = Ending.NONE;
+	updateOfficeStats();
+}
+
 function onSellAllClicked() {
 	if(g_vehicle.isGameOver()) {
 		return;
@@ -310,6 +315,7 @@ window.addEventListener('load', function() {
 	document.querySelector('#vehicle_upgrade_hull').addEventListener('click', function() { onUpgradeClicked('hull'); })
 	document.querySelector('#vehicle_upgrade_drill').addEventListener('click', function() { onUpgradeClicked('drill'); })
 	document.querySelector('#vehicle_upgrade_cargo').addEventListener('click', function() { onUpgradeClicked('cargo'); })
+	document.querySelector('#ending_reset').addEventListener('click', function() { onResetEndingClicked(); })
 
 	reloadGame();
 });
