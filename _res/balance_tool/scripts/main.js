@@ -220,10 +220,21 @@ function onRestockClicked(evt) {
 function updateTotalMoneyStats() {
 	let planCosts = g_plans.sequence.map((planInfo) => planInfo.targetSum);
 	let totalPlanCost = planCosts.reduce((sum, planCost) => sum + planCost, 0);
+	let totalMineralsInPlans = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+	g_plans.sequence.forEach(planInfo => {
+		planInfo.mineralsRequired.forEach((mineralCount, mineralId) => {
+			totalMineralsInPlans[mineralId] += mineralCount;
+		});
+	});
+
+
 
 	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value, 0) * 3;
 	document.querySelector('#plan_cost_total').textContent = totalPlanCost;
 	document.querySelector('#separate_plan_costs').textContent = planCosts.join(', ');
+	for (const mineralType of MineralType.collectibles) {
+		document.querySelector(`#plan_total_${mineralType.name}`).textContent = totalMineralsInPlans[mineralType.id];
+	}
 }
 
 function updateMineralStats() {
