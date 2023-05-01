@@ -223,6 +223,17 @@ function onRestockClicked(evt) {
 	updateWarehouse();
 }
 
+function onAccountingClicked() {
+	if(g_vehicle.isGameOver()) {
+		return;
+	}
+
+	g_vehicle.doAccounting();
+	updateVehicleStats();
+	updateWarehouse();
+	updateOfficeStats();
+}
+
 function updateTotalMoneyStats() {
 	let planCosts = g_plans.sequence.map((planInfo) => planInfo.targetSum);
 	let totalPlanCost = planCosts.reduce((sum, planCost) => sum + planCost, 0);
@@ -268,6 +279,8 @@ function updateOfficeStats() {
 	document.querySelector('#office_accolades_max').textContent = g_defs.maxAccolades;
 	document.querySelector('#office_accolades_progress_curr').textContent = g_vehicle.subAccolades;
 	document.querySelector('#office_accolades_progress_max').textContent = g_defs.maxSubAccolades;
+	document.querySelector('#office_heat').textContent = g_vehicle.heat;
+	document.querySelector('#office_accounting_cost').textContent = g_vehicle.getAccountingCost();
 }
 
 function onUpgradeClicked(part) {
@@ -301,6 +314,7 @@ function addMessage(text, className) {
 window.addEventListener('load', function() {
 	document.querySelector('#btn_vehicle_restock').addEventListener('click', onRestockClicked);
 
+	document.querySelector('#btn_accounting').addEventListener('click', function() {onAccountingClicked(); });
 	for(let mineralType of MineralType.collectibles) {
 		let name = mineralType.name;
 		document.querySelector(`#${name}_price`).textContent = mineralType.reward;

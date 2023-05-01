@@ -8,13 +8,10 @@ class Vehicle {
 		this.subAccolades = 0;
 		this.accolades = 0;
 		this.rebukes = 0;
+		this.heat = 5;
 		this.ending = Ending.NONE;
-		this.stock = {}; // [mineralId] => count
+		this.stock = new Array(MineralType.all.length).fill(0); // [mineralId] => count
 		this.sold = new Array(MineralType.all.length).fill(0); // [mineralId] => count
-
-		for(let mineral of MineralType.all) {
-			this.stock[mineral.id] = 0;
-		}
 
 		this.hullMax = g_defs.hullBase;
 		this.cargoMax = g_defs.cargoBase;
@@ -109,10 +106,6 @@ class Vehicle {
 	}
 
 	trySell(mineralType, amount) {
-		if(this.stock[mineralType.id] == undefined) {
-			return 0;
-		}
-
 		let sellAmount = Math.min(amount, this.stock[mineralType.id]);
 		this.money += mineralType.reward * sellAmount;
 		this.stock[mineralType.id] -= sellAmount;
@@ -131,20 +124,25 @@ class Vehicle {
 		g_vehicle.stock[mineralType.id] -= fillAmount;
 
 		if(g_plans.tryProceed()) {
-			if(++this.subAccolades == g_defs.maxSubAccolades) {
-				this.subAccolades = 0;
-				if(++this.accolades >= g_defs.maxAccolades) {
-					this.ending = Ending.ACCOLADES_WIN;
-					addMessage('Game won', 'success');
-				}
-				else {
-					addMessage('New accolade', 'success');
-				}
-				return true;
-			}
+			this.heat = Math.max(0, this.heat - g_defs.heatRemovedByPlan);
+			this.advanceAccolade();
+			return true;
 		}
 
 		return false;
+	}
+
+	advanceAccolade() {
+		if(++this.subAccolades == g_defs.maxSubAccolades) {
+			this.subAccolades = 0;
+			if(++this.accolades >= g_defs.maxAccolades) {
+				this.ending = Ending.ACCOLADES_WIN;
+				addMessage('Game won', 'success');
+			}
+			else {
+				addMessage('New accolade', 'success');
+			}
+		}
 	}
 
 	tryUpgradePart(part) {
@@ -175,6 +173,35 @@ class Vehicle {
 				}
 			}
 		}
+	}
+
+	getAccountingCost() {
+		return Math.floor(g_plans.getCurrentPlanInfo().targetSum * g_defs.accountingCostMultiplier);
+	}
+
+	doAccounting() {
+		let accountingCost = this.getAccountingCost();
+		if(this.money < accountingCost) {
+			return;
+		}
+
+		this.money -= accountingCost;
+		let pick = g_rand.next16MinMax(1, 100);
+		if(pick > this.heat) {
+			// Bring back stuff already spent on plan
+			for(let mineralType of MineralType.collectibles) {
+				this.stock[mineralType.id] += g_plans.mineralsCollected[mineralType.id];
+				g_plans.mineralsCollected[mineralType.id] = 0;
+			}
+
+			// Force next plan
+			g_plans.next();
+			this.advanceAccolade();
+		}
+		else {
+			this.addRebuke('Accounting failed');
+		}
+		this.heat = Math.min(this.heat + g_defs.heatAddPerAccounting, 99);
 	}
 
 	damage(amount) {

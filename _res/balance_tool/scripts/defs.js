@@ -19,6 +19,10 @@ class Defs {
 		this.cargoAddPerLevel = 20;
 		this.damageAfterRestock = 10;
 
+		this.accountingCostMultiplier = parseFloat(document.querySelector('[name=defs_accounting_cost_multiplier]').value);
+		this.heatAddPerAccounting = parseInt(document.querySelector('[name=defs_heat_add_accounting]').value);
+		this.heatRemovedByPlan = parseInt(document.querySelector('[name=defs_heat_remove_plan]').value);
+
 		this.planSilver = 0;
 		this.planGold = 10;
 		this.planEmerald = 30;
