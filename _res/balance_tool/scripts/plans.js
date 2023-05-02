@@ -128,4 +128,11 @@ class Plans {
 			this.wasWarning = true;
 		}
 	}
+
+	extendTime(timeDelta) {
+		this.timeRemaining += timeDelta;
+		if(this.timeRemaining > 3 * g_defs.timeInDay) {
+			this.wasWarning = false;
+		}
+	}
 }

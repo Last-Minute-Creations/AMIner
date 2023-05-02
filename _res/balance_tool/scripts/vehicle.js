@@ -9,6 +9,7 @@ class Vehicle {
 		this.accolades = 0;
 		this.rebukes = 0;
 		this.heat = 5;
+		this.bribeCount = 0;
 		this.ending = Ending.NONE;
 		this.stock = new Array(MineralType.all.length).fill(0); // [mineralId] => count
 		this.sold = new Array(MineralType.all.length).fill(0); // [mineralId] => count
@@ -202,6 +203,33 @@ class Vehicle {
 			this.addRebuke('Accounting failed');
 		}
 		this.heat = Math.min(this.heat + g_defs.heatAddPerAccounting, 99);
+	}
+
+	getBribeCost() {
+		let bribeCost = g_defs.bribeBaseCost;
+		for(let i = 0; i < this.bribeCount; ++i) {
+			bribeCost += Math.floor(bribeCost * g_defs.bribeCostMultiplier);
+		}
+		return bribeCost;
+	}
+
+	doBribe() {
+		let bribeCost = this.getBribeCost();
+		if(this.money < bribeCost) {
+			return;
+		}
+
+		this.money -= bribeCost;
+		let pick = g_rand.next16MinMax(1, 100);
+		if(pick > this.heat) {
+			g_plans.extendTime(14 * g_defs.timeInDay);
+		}
+		else {
+			this.addRebuke('Bribe failed');
+		}
+
+		this.heat = Math.min(this.heat + g_defs.heatAddPerAccounting, 99);
+		++this.bribeCount;
 	}
 
 	damage(amount) {

@@ -19,6 +19,8 @@ class Defs {
 		this.cargoAddPerLevel = 20;
 		this.damageAfterRestock = 10;
 
+		this.bribeBaseCost = parseInt(document.querySelector('[name=defs_bribe_base_cost]').value);
+		this.bribeCostMultiplier = parseFloat(document.querySelector('[name=defs_bribe_cost_multiplier]').value);
 		this.accountingCostMultiplier = parseFloat(document.querySelector('[name=defs_accounting_cost_multiplier]').value);
 		this.heatAddPerAccounting = parseInt(document.querySelector('[name=defs_heat_add_accounting]').value);
 		this.heatRemovedByPlan = parseInt(document.querySelector('[name=defs_heat_remove_plan]').value);
