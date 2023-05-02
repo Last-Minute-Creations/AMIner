@@ -6,6 +6,7 @@
 #include <ace/managers/system.h>
 #include <ace/managers/joy.h>
 #include <ace/managers/key.h>
+#include <ace/contrib/managers/audio_mixer.h>
 #include <comm/base.h>
 #include "game.h"
 #include "bob_new.h"
@@ -19,7 +20,7 @@
 #include "menu_list.h"
 #include "steer.h"
 
-#define SFX_CHANNEL_ATARI 3
+#define SFX_CHANNEL_ATARI 1
 #define MENU_OPTIONS_MAX 10
 #define INDEX_ATARI_INVALID 0xFF
 #define MENU_STEER_COUNT 4
@@ -84,7 +85,7 @@ static void menuEnableAtari(void) {
 	if(s_ubIndexAtari != INDEX_ATARI_INVALID && g_sSettings.isAtariHidden) {
 		g_sSettings.isAtariHidden = 0;
 		menuListSetPosHidden(s_ubIndexAtari, 0); // TODO: find option
-		ptplayerSfxPlay(s_pSfxAtari, SFX_CHANNEL_ATARI, 64, 1);
+		audioMixerPlaySfx(s_pSfxAtari, SFX_CHANNEL_ATARI, 1, 0);
 	}
 }
 
@@ -633,7 +634,7 @@ static void menuScoreGsDestroy(void) {
 
 void menuPreload(void) {
 	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
-	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx");
+	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx", 1);
 
 	tFile *pFileSettings = fileOpen("settings.dat", "rb");
 	if(pFileSettings) {

@@ -5,7 +5,9 @@
 #include "core.h"
 #include <ace/managers/rand.h>
 #include <ace/managers/system.h>
+#include <ace/managers/key.h>
 #include <ace/utils/palette.h>
+#include <ace/contrib/managers/audio_mixer.h>
 #include "menu.h"
 #include "dino.h"
 #include "game.h"
@@ -111,10 +113,12 @@ static void coreGsCreate(void) {
 
 	baseTileCreate(g_pMainBuffer);
 	ptplayerCreate(1);
+	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
-	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx");
-	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx");
-	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx");
+	audioMixerCreate();
+	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx", 1);
+	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx", 1);
+	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx", 1);
 	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
 		char szModPath[30];
 		sprintf(szModPath, "data/music/game%hhu.mod", i);
@@ -194,6 +198,7 @@ static void coreGsDestroy(void) {
 	commDestroy();
 	bobNewManagerDestroy();
 
+	audioMixerDestroy();
 	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
 		ptplayerModDestroy(g_pGameMods[i]);
 	}

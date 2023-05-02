@@ -5,8 +5,8 @@
 #include "explosion.h"
 #include "bob_new.h"
 #include "game.h"
-
 #include <ace/managers/ptplayer.h>
+#include <ace/contrib/managers/audio_mixer.h>
 
 #define EXPLOSION_MAX 6
 #define EXPLOSION_COUNTER_MAX 4
@@ -14,7 +14,8 @@
 #define EXPLOSION_FRAME_PEAK 5
 #define EXPLOSION_FRAME_COUNT 10
 
-#define EXPLOSION_AUDIO_CHANNEL PTPLAYER_SFX_CHANNEL_ANY
+#define SFX_CHANNEL_BOOM 1
+#define SFX_PRIORITY_BOOM 5
 
 typedef struct tExplosion {
 	tBobNew sBob;
@@ -41,8 +42,8 @@ void explosionManagerCreate(void) {
 	s_pTpFrames = bitmapCreateFromFile("data/teleport.bm", 0);
 	s_pTpFramesMask = bitmapCreateFromFile("data/teleport_mask.bm", 0);
 
-	s_pSfxBoom = ptplayerSfxCreateFromFile("data/sfx/explosion.sfx");
-	s_pSfxTeleport = ptplayerSfxCreateFromFile("data/sfx/teleport.sfx");
+	s_pSfxBoom = ptplayerSfxCreateFromFile("data/sfx/explosion.sfx", 1);
+	s_pSfxTeleport = ptplayerSfxCreateFromFile("data/sfx/teleport.sfx", 1);
 
 	s_pExplosionNext = &s_pExplosions[0];
 	for(UBYTE i = 0; i < EXPLOSION_MAX; ++i) {
@@ -119,10 +120,10 @@ void explosionAdd(
 			bobNewCalcFrameAddress(s_pBoomFramesMask, 0)
 		);
 	}
-	ptplayerSfxPlay(
+	audioMixerPlaySfx(
 		eKind == EXPLOSION_KIND_TELEPORT ?
 			s_pSfxTeleport : s_pSfxBoom,
-		EXPLOSION_AUDIO_CHANNEL, PTPLAYER_VOLUME_MAX, 1
+		SFX_CHANNEL_BOOM, SFX_PRIORITY_BOOM, 0
 	);
 }
 
