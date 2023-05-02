@@ -48,20 +48,20 @@ Simulator:
 		✔ Small damage after restock @done(23-04-12 18:00)
 		✔ Rebuke after destruction @done(23-04-14 15:10)
 	✔ Cash stats for plans @done(23-04-14 17:35)
-	☐ Generate mine based on plans
+	✔ Generate mine based on plans @done(23-05-02 14:43)
 		✔ Divide mine by plans @done(23-04-17 17:37)
 		✔ Fill mine with plan-required minerals @done(23-04-17 17:37)
 		✔ Extra minerals for restock/upgrades @done(23-04-20 13:46)
 		✔ Limit plans based on max stack count @done(23-04-20 13:47)
-		☐ Better mineral restrictions for plans?
+		✔ Better mineral restrictions for plans? @done(23-05-02 14:43)
 	☐ Dino quest
 		☐ Scatter bones
 		☐ Show collected bones
 		☐ Accolade
 	☐ Exactly same RNG as in-game
 	☐ Sub-mechanics
-		☐ Accounting
-		☐ Bribe
+		✔ Accounting @done(23-05-02 14:43)
+		✔ Bribe @done(23-05-02 14:43)
 		☐ Favor
 	☐ Approximate time spent in-game
 		☐ Time spent on drilling
