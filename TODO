@@ -37,6 +37,9 @@ Dino:
 Gate quest:
 	☐ Figure out the flow
 	✔ Add base into the game @done(23-03-15 17:54)
+	☐ Picking up the pieces
+		☐ Scatter parts in mine
+		☐ Display reconstructed gate
 
 Free mode:
 	☐ figure out the rules
