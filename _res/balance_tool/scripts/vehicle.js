@@ -176,17 +176,7 @@ class Vehicle {
 		}
 	}
 
-	getAccountingCost() {
-		return Math.floor(g_plans.getCurrentPlanInfo().targetSum * g_defs.accountingCostMultiplier);
-	}
-
 	doAccounting() {
-		let accountingCost = this.getAccountingCost();
-		if(this.money < accountingCost) {
-			return;
-		}
-
-		this.money -= accountingCost;
 		let pick = g_rand.next16MinMax(1, 100);
 		if(pick > this.heat) {
 			// Bring back stuff already spent on plan

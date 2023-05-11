@@ -291,7 +291,6 @@ function updateOfficeStats() {
 	document.querySelector('#office_accolades_progress_curr').textContent = g_vehicle.subAccolades;
 	document.querySelector('#office_accolades_progress_max').textContent = g_defs.maxSubAccolades;
 	document.querySelector('#office_heat').textContent = g_vehicle.heat;
-	document.querySelector('#office_accounting_cost').textContent = g_vehicle.getAccountingCost();
 	document.querySelector('#office_bribe_cost').textContent = g_vehicle.getBribeCost();
 }
 
