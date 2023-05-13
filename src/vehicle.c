@@ -121,7 +121,7 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubDrillState = DRILL_STATE_OFF;
 	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 
-	pVehicle->ubTrackAnimCnt = 0;
+	pVehicle->fTrackAnimCnt = 0;
 	pVehicle->ubTrackFrame = 0;
 	pVehicle->ubBodyShakeCnt = 0;
 	pVehicle->ubJetShowFrame = 0;
@@ -264,7 +264,7 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	fileWrite(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
 	fileWrite(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
 	fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
-	fileWrite(pFile, &pVehicle->ubTrackAnimCnt, sizeof(pVehicle->ubTrackAnimCnt));
+	fileWrite(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
 	fileWrite(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
 	fileWrite(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
 	fileWrite(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
@@ -315,7 +315,7 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
 	fileRead(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
 	fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
-	fileRead(pFile, &pVehicle->ubTrackAnimCnt, sizeof(pVehicle->ubTrackAnimCnt));
+	fileRead(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
 	fileRead(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
 	fileRead(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
 	fileRead(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
@@ -827,8 +827,8 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		// Jet hidden
 		if(pVehicle->fDx) {
 			// Animate wheel rotation
-			pVehicle->ubTrackAnimCnt += fix16_abs(pVehicle->fDx);
-			if(fix16_to_int(pVehicle->ubTrackAnimCnt) >= 5) {
+			pVehicle->fTrackAnimCnt += fix16_abs(pVehicle->fDx);
+			if(fix16_to_int(pVehicle->fTrackAnimCnt) >= 5) {
 				if(pVehicle->fDx > 0) {
 					if(pVehicle->ubTrackFrame >= 3) {
 						pVehicle->ubTrackFrame = 0;
@@ -851,7 +851,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 					bobNewCalcFrameAddress(s_pTrackFrames, uwOffsY),
 					bobNewCalcFrameAddress(s_pTrackMask, uwOffsY)
 				);
-				pVehicle->ubTrackAnimCnt = 0;
+				pVehicle->fTrackAnimCnt = 0;
 			}
 		}
 
