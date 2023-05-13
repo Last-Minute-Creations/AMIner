@@ -174,7 +174,7 @@ void vehicleUpdateBodyBob(tVehicle *pVehicle) {
 		pFrame = &s_pBodyFrames[pVehicle->ubPlayerIdx]->Planes[0][uwByteOffset];
 	}
 
-	bobNewSetFrame(
+	bobSetFrame(
 		&pVehicle->sBobBody,
 		pFrame,
 		&s_pBodyMask->Planes[0][uwByteOffset]
@@ -251,12 +251,12 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	saveWriteHeader(pFile, "VHCL");
 	fileWrite(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
 	// textBobSave(&pVehicle->sTextBob, pFile);
-	// bobNewSave(&pVehicle->sBobBody, pFile);
-	// bobNewSave(&pVehicle->sBobTrack, pFile);
-	// bobNewSave(&pVehicle->sBobJet, pFile);
-	// bobNewSave(&pVehicle->sBobTool, pFile);
-	// bobNewSave(&pVehicle->sBobWreck, pFile);
-	// bobNewSave(&pVehicle->sBobSmoke, pFile);
+	// bobSave(&pVehicle->sBobBody, pFile);
+	// bobSave(&pVehicle->sBobTrack, pFile);
+	// bobSave(&pVehicle->sBobJet, pFile);
+	// bobSave(&pVehicle->sBobTool, pFile);
+	// bobSave(&pVehicle->sBobWreck, pFile);
+	// bobSave(&pVehicle->sBobSmoke, pFile);
 	fileWrite(pFile, &pVehicle->fX, sizeof(pVehicle->fX));
 	fileWrite(pFile, &pVehicle->fY, sizeof(pVehicle->fY));
 	fileWrite(pFile, &pVehicle->fDx, sizeof(pVehicle->fDx));
@@ -302,12 +302,12 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 
 	fileRead(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
 	// textBobLoad(&pVehicle->sTextBob, pFile);
-	// bobNewLoad(&pVehicle->sBobBody, pFile);
-	// bobNewLoad(&pVehicle->sBobTrack, pFile);
-	// bobNewLoad(&pVehicle->sBobJet, pFile);
-	// bobNewLoad(&pVehicle->sBobTool, pFile);
-	// bobNewLoad(&pVehicle->sBobWreck, pFile);
-	// bobNewLoad(&pVehicle->sBobSmoke, pFile);
+	// bobLoad(&pVehicle->sBobBody, pFile);
+	// bobLoad(&pVehicle->sBobTrack, pFile);
+	// bobLoad(&pVehicle->sBobJet, pFile);
+	// bobLoad(&pVehicle->sBobTool, pFile);
+	// bobLoad(&pVehicle->sBobWreck, pFile);
+	// bobLoad(&pVehicle->sBobSmoke, pFile);
 	fileRead(pFile, &pVehicle->fX, sizeof(pVehicle->fX));
 	fileRead(pFile, &pVehicle->fY, sizeof(pVehicle->fY));
 	fileRead(pFile, &pVehicle->fDx, sizeof(pVehicle->fDx));
@@ -351,40 +351,40 @@ void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 	logBlockBegin("vehicleCreate(pVehicle: %p, ubIdx: %hhu)", pVehicle, ubIdx);
 
 	// Setup bobs
-  bobNewInit(
+  bobInit(
 		&pVehicle->sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
-		bobNewCalcFrameAddress(s_pBodyFrames[ubIdx], 0),
-		bobNewCalcFrameAddress(s_pBodyMask, 0),
+		bobCalcFrameAddress(s_pBodyFrames[ubIdx], 0),
+		bobCalcFrameAddress(s_pBodyMask, 0),
 		0, 0
 	);
-	bobNewInit(
+	bobInit(
 		&pVehicle->sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
-		bobNewCalcFrameAddress(s_pTrackFrames, 0),
-		bobNewCalcFrameAddress(s_pTrackMask, 0),
+		bobCalcFrameAddress(s_pTrackFrames, 0),
+		bobCalcFrameAddress(s_pTrackMask, 0),
 		0, 0
 	);
-	bobNewInit(
+	bobInit(
 		&pVehicle->sBobJet, VEHICLE_WIDTH, VEHICLE_FLAME_HEIGHT, 1,
-		bobNewCalcFrameAddress(s_pJetFrames, 0),
-		bobNewCalcFrameAddress(s_pJetMask, 0),
+		bobCalcFrameAddress(s_pJetFrames, 0),
+		bobCalcFrameAddress(s_pJetMask, 0),
 		0, 0
 	);
-	bobNewInit(
+	bobInit(
 		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
-		bobNewCalcFrameAddress(s_pToolFrames[ubIdx], 0),
-		bobNewCalcFrameAddress(s_pToolMask, 0),
+		bobCalcFrameAddress(s_pToolFrames[ubIdx], 0),
+		bobCalcFrameAddress(s_pToolMask, 0),
 		0, 0
 	);
-	bobNewInit(
+	bobInit(
 		&pVehicle->sBobWreck, VEHICLE_WRECK_WIDTH, VEHICLE_WRECK_HEIGHT, 1,
-		bobNewCalcFrameAddress(s_pWreckFrames[ubIdx], 0),
-		bobNewCalcFrameAddress(s_pWreckMask, 0),
+		bobCalcFrameAddress(s_pWreckFrames[ubIdx], 0),
+		bobCalcFrameAddress(s_pWreckMask, 0),
 		0, 0
 	);
-	bobNewInit(
+	bobInit(
 		&pVehicle->sBobSmoke, VEHICLE_SMOKE_WIDTH, VEHICLE_SMOKE_FRAME_HEIGHT, 1,
-		bobNewCalcFrameAddress(s_pSmokeFrames, 0),
-		bobNewCalcFrameAddress(s_pSmokeMask, 0),
+		bobCalcFrameAddress(s_pSmokeFrames, 0),
+		bobCalcFrameAddress(s_pSmokeMask, 0),
 		0, 0
 	);
 	pVehicle->ubPlayerIdx = ubIdx;
@@ -471,12 +471,12 @@ static inline void vehicleSetTool(
 		pFrame = s_pWhiteTool->Planes[0];
 	}
 	else {
-		pFrame = bobNewCalcFrameAddress(s_pToolFrames[pVehicle->ubPlayerIdx], ubFrameOffsetY);
+		pFrame = bobCalcFrameAddress(s_pToolFrames[pVehicle->ubPlayerIdx], ubFrameOffsetY);
 	}
-	bobNewSetFrame(
+	bobSetFrame(
 		&pVehicle->sBobTool,
 		pFrame,
-		bobNewCalcFrameAddress(s_pToolMask, ubFrameOffsetY)
+		bobCalcFrameAddress(s_pToolMask, ubFrameOffsetY)
 	);
 }
 
@@ -846,10 +846,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 					}
 				}
 				UWORD uwOffsY = pVehicle->ubTrackFrame * VEHICLE_TRACK_HEIGHT;
-				bobNewSetFrame(
+				bobSetFrame(
 					&pVehicle->sBobTrack,
-					bobNewCalcFrameAddress(s_pTrackFrames, uwOffsY),
-					bobNewCalcFrameAddress(s_pTrackMask, uwOffsY)
+					bobCalcFrameAddress(s_pTrackFrames, uwOffsY),
+					bobCalcFrameAddress(s_pTrackMask, uwOffsY)
 				);
 				pVehicle->fTrackAnimCnt = 0;
 			}
@@ -868,20 +868,20 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->sBobBody.sPos.uwY += s_pJetAnimOffsets[pVehicle->ubJetShowFrame];
 		if(pVehicle->ubJetShowFrame == 5) {
 			UWORD uwOffsetY = (pVehicle->sSteer.bY ? TRACK_OFFSET_JET : 0);
-			bobNewSetFrame(
+			bobSetFrame(
 				&pVehicle->sBobTrack,
-				bobNewCalcFrameAddress(s_pTrackFrames, uwOffsetY),
-				bobNewCalcFrameAddress(s_pTrackMask, uwOffsetY)
+				bobCalcFrameAddress(s_pTrackFrames, uwOffsetY),
+				bobCalcFrameAddress(s_pTrackMask, uwOffsetY)
 			);
 		}
 		else if(pVehicle->ubJetShowFrame == 10) {
 			// Update jet pos
 			pVehicle->ubJetAnimCnt = (pVehicle->ubJetAnimCnt + 1) & 63;
 			UWORD uwOffsetY = VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 4);
-			bobNewSetFrame(
+			bobSetFrame(
 				&pVehicle->sBobJet,
-				bobNewCalcFrameAddress(s_pJetFrames, uwOffsetY),
-				bobNewCalcFrameAddress(s_pJetMask, uwOffsetY)
+				bobCalcFrameAddress(s_pJetFrames, uwOffsetY),
+				bobCalcFrameAddress(s_pJetMask, uwOffsetY)
 			);
 			pVehicle->sBobJet.sPos.ulYX = pVehicle->sBobTrack.sPos.ulYX;
 			pVehicle->sBobJet.sPos.uwY += VEHICLE_TRACK_JET_HEIGHT;
@@ -976,10 +976,10 @@ static void vehicleProcessSmoking(tVehicle *pVehicle) {
 			pVehicle->ubSmokeAnimFrame = 0;
 		}
 		UWORD uwOffsY = VEHICLE_SMOKE_FRAME_HEIGHT * pVehicle->ubSmokeAnimFrame;
-		bobNewSetFrame(
+		bobSetFrame(
 			&pVehicle->sBobSmoke,
-			bobNewCalcFrameAddress(s_pSmokeFrames, uwOffsY),
-			bobNewCalcFrameAddress(s_pSmokeMask, uwOffsY)
+			bobCalcFrameAddress(s_pSmokeFrames, uwOffsY),
+			bobCalcFrameAddress(s_pSmokeMask, uwOffsY)
 		);
 	}
 	else {
@@ -1034,10 +1034,10 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					pVehicle->ubDrillState = DRILL_STATE_DRILLING;
 				}
 				else if(pVehicle->ubDrillVAnimCnt == 5) {
-					bobNewSetFrame(
+					bobSetFrame(
 						&pVehicle->sBobTrack,
-						bobNewCalcFrameAddress(s_pTrackFrames, TRACK_OFFSET_DRILL),
-						bobNewCalcFrameAddress(s_pTrackMask, TRACK_OFFSET_DRILL)
+						bobCalcFrameAddress(s_pTrackFrames, TRACK_OFFSET_DRILL),
+						bobCalcFrameAddress(s_pTrackMask, TRACK_OFFSET_DRILL)
 					);
 				}
 			}
@@ -1048,10 +1048,10 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 				}
 				else if(pVehicle->ubDrillVAnimCnt == 5) {
-					bobNewSetFrame(
+					bobSetFrame(
 						&pVehicle->sBobTrack,
-						bobNewCalcFrameAddress(s_pTrackFrames, TRACK_OFFSET_TRACK),
-						bobNewCalcFrameAddress(s_pTrackMask, TRACK_OFFSET_TRACK)
+						bobCalcFrameAddress(s_pTrackFrames, TRACK_OFFSET_TRACK),
+						bobCalcFrameAddress(s_pTrackMask, TRACK_OFFSET_TRACK)
 					);
 				}
 			}
@@ -1120,10 +1120,10 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				else {
 					vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 					UWORD uwOffsY = TRACK_OFFSET_DRILL + (ubAnim ?  VEHICLE_TRACK_HEIGHT : 0);
-					bobNewSetFrame(
+					bobSetFrame(
 						&pVehicle->sBobTrack,
-						bobNewCalcFrameAddress(s_pTrackFrames, uwOffsY),
-						bobNewCalcFrameAddress(s_pTrackMask, uwOffsY)
+						bobCalcFrameAddress(s_pTrackFrames, uwOffsY),
+						bobCalcFrameAddress(s_pTrackMask, uwOffsY)
 					);
 				}
 			}

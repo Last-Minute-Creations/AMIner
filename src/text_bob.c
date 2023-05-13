@@ -32,10 +32,10 @@ void textBobCreate(
 	pTextBob->pTextMask = bitmapCreate(
 		pTextBob->uwWidth, uwHeight, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);
-	bobNewInit(
+	bobInit(
 		&pTextBob->sBob, pTextBob->uwWidth, uwHeight, 1,
-		bobNewCalcFrameAddress(pTextBob->pTextBm, 0),
-		bobNewCalcFrameAddress(pTextBob->pTextMask, 0),
+		bobCalcFrameAddress(pTextBob->pTextBm, 0),
+		bobCalcFrameAddress(pTextBob->pTextMask, 0),
 		0, 0
 	);
 	pTextBob->isUpdateRequired = 0;

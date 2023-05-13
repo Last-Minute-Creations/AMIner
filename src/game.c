@@ -48,7 +48,7 @@ tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
 tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 UBYTE g_is2pPlaying;
 UBYTE g_isChallenge, g_isAtari;
-tBobNew g_pBombMarkers[3];
+tBob g_pBombMarkers[3];
 
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 static tUwCoordYX s_sTeleportReturn;
@@ -64,12 +64,12 @@ static UBYTE s_isReminderShown;
 static UBYTE s_ubCurrentMod;
 static ULONG s_ulGameTime;
 
-void gameTryPushBob(tBobNew *pBob) {
+void gameTryPushBob(tBob *pBob) {
 	if(
 		pBob->sPos.uwY + pBob->uwHeight >= g_pMainBuffer->pCamera->uPos.uwY &&
 		pBob->sPos.uwY < g_pMainBuffer->pCamera->uPos.uwY +  s_pVpMain->uwHeight
 	) {
-		bobNewPush(pBob);
+		bobPush(pBob);
 	}
 }
 
@@ -424,7 +424,7 @@ static void gameCameraProcess(void) {
 			baseTileProcess();
 			groundLayerReset(groundLayerGetLowerAtDepth(g_pMainBuffer->pCamera->uPos.uwY));
 			tileBufferRedrawAll(g_pMainBuffer);
-			bobNewDiscardUndraw();
+			bobDiscardUndraw();
 			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
 			fadeMorphTo(FADE_STATE_IN);
 		}
@@ -585,7 +585,7 @@ void gameSave(tFile *pFile) {
 	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
 	// for(UBYTE i = 0; i < 3; ++i) {
-	// 	bobNewSave(pFile, g_pBombMarkers[i]);
+	// 	bobSave(pFile, g_pBombMarkers[i]);
 	// }
 
 	fileWrite(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
@@ -624,7 +624,7 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
 	// for(UBYTE i = 0; i < 3; ++i) {
-	// 	bobNewLoad(pFile, g_pBombMarkers[i]);
+	// 	bobLoad(pFile, g_pBombMarkers[i]);
 	// }
 
 	fileRead(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));

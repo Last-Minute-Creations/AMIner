@@ -7,7 +7,7 @@
 
 #include "aminer.h"
 #include <ace/managers/ptplayer.h>
-#include "bob_new.h"
+#include <ace/managers/bob.h>
 #include "string_array.h"
 #include "steer.h"
 
@@ -29,7 +29,7 @@ UBYTE gameLoad(tFile *pFile);
 
 void gameGsLoopEnterScore(void);
 
-void gameTryPushBob(tBobNew *pBob);
+void gameTryPushBob(tBob *pBob);
 
 void gameAdvanceAccolade(void);
 
@@ -58,7 +58,7 @@ extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 extern UBYTE g_is2pPlaying;
 extern UBYTE g_isChallenge;
 extern UBYTE g_isAtari;
-extern tBobNew g_pBombMarkers[3];
+extern tBob g_pBombMarkers[3];
 extern tState g_sStateGame;
 
 #endif // _GAME_H_

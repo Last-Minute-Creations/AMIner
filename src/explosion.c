@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "explosion.h"
-#include "bob_new.h"
+#include <ace/managers/bob.h>
 #include "game.h"
 #include <ace/managers/ptplayer.h>
 #include <ace/contrib/managers/audio_mixer.h>
@@ -18,7 +18,7 @@
 #define SFX_PRIORITY_BOOM 5
 
 typedef struct tExplosion {
-	tBobNew sBob;
+	tBob sBob;
 	tCbOnPeak cbOnPeak;
 	tExplosionKind eKind;
 	ULONG ulCbData;
@@ -50,10 +50,10 @@ void explosionManagerCreate(void) {
 		s_pExplosions[i].ubFrame = EXPLOSION_FRAME_COUNT;
 		s_pExplosions[i].ubCnt = 0;
 
-		bobNewInit(
+		bobInit(
 			&s_pExplosions[i].sBob, EXPLOSION_FRAME_HEIGHT, EXPLOSION_FRAME_HEIGHT, 1,
-			bobNewCalcFrameAddress(s_pBoomFrames, 0),
-			bobNewCalcFrameAddress(s_pBoomFramesMask, 0),
+			bobCalcFrameAddress(s_pBoomFrames, 0),
+			bobCalcFrameAddress(s_pBoomFramesMask, 0),
 			0, 0
 		);
 	}
@@ -107,17 +107,17 @@ void explosionAdd(
 	s_pExplosionNext->isQuick = isQuick;
 	s_pExplosionNext->eKind = eKind;
 	if(eKind == EXPLOSION_KIND_TELEPORT) {
-		bobNewSetFrame(
+		bobSetFrame(
 			&s_pExplosionNext->sBob,
-			bobNewCalcFrameAddress(s_pTpFrames, 0),
-			bobNewCalcFrameAddress(s_pTpFramesMask, 0)
+			bobCalcFrameAddress(s_pTpFrames, 0),
+			bobCalcFrameAddress(s_pTpFramesMask, 0)
 		);
 	}
 	else {
-		bobNewSetFrame(
+		bobSetFrame(
 			&s_pExplosionNext->sBob,
-			bobNewCalcFrameAddress(s_pBoomFrames, 0),
-			bobNewCalcFrameAddress(s_pBoomFramesMask, 0)
+			bobCalcFrameAddress(s_pBoomFrames, 0),
+			bobCalcFrameAddress(s_pBoomFramesMask, 0)
 		);
 	}
 	audioMixerPlaySfx(
@@ -146,17 +146,17 @@ void explosionManagerProcess(void) {
 				}
 				UWORD uwFrameOffsetY = pExplosion->ubFrame * EXPLOSION_FRAME_HEIGHT;
 				if(pExplosion->eKind == EXPLOSION_KIND_TELEPORT) {
-					bobNewSetFrame(
+					bobSetFrame(
 						&s_pExplosionNext->sBob,
-						bobNewCalcFrameAddress(s_pTpFrames, uwFrameOffsetY),
-						bobNewCalcFrameAddress(s_pTpFramesMask, uwFrameOffsetY)
+						bobCalcFrameAddress(s_pTpFrames, uwFrameOffsetY),
+						bobCalcFrameAddress(s_pTpFramesMask, uwFrameOffsetY)
 					);
 				}
 				else {
-					bobNewSetFrame(
+					bobSetFrame(
 						&s_pExplosionNext->sBob,
-						bobNewCalcFrameAddress(s_pBoomFrames, uwFrameOffsetY),
-						bobNewCalcFrameAddress(s_pBoomFramesMask, uwFrameOffsetY)
+						bobCalcFrameAddress(s_pBoomFrames, uwFrameOffsetY),
+						bobCalcFrameAddress(s_pBoomFramesMask, uwFrameOffsetY)
 					);
 				}
 			}

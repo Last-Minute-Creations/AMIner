@@ -44,7 +44,7 @@ static void mainPaletteProcess(UBYTE ubFadeLevel) {
 void coreProcessBeforeBobs(void) {
 	// Undraw all bobs
 	debugColor(0x008);
-	bobNewBegin(g_pMainBuffer->pScroll->pBack);
+	bobBegin(g_pMainBuffer->pScroll->pBack);
 
 	// Draw pending tiles
 	tileBufferQueueProcess(g_pMainBuffer);
@@ -56,8 +56,8 @@ void coreProcessBeforeBobs(void) {
 void coreProcessAfterBobs(void) {
 
 	// Finish bob drawing
-	bobNewPushingDone();
-	bobNewEnd();
+	bobPushingDone();
+	bobEnd();
 
 	// Update HUD state machine and draw stuff
 	hudUpdate();
@@ -75,7 +75,9 @@ void coreProcessAfterBobs(void) {
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
 	debugColor(*s_pColorBg);
+	systemIdleBegin();
 	vPortWaitForEnd(s_pVpMain);
+	systemIdleEnd();
 }
 
 static void coreGsCreate(void) {
@@ -137,7 +139,7 @@ static void coreGsCreate(void) {
 
 	tileReset(0, 1);
 
-	bobNewManagerCreate(
+	bobManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
@@ -152,16 +154,16 @@ static void coreGsCreate(void) {
 	s_pBombMarkerMask = bitmapCreateFromFile("data/bomb_marker_mask.bm", 0);
 
 	for(UBYTE i = 0; i < 3; ++i) {
-		bobNewInit(
+		bobInit(
 			&g_pBombMarkers[i], 16, 10, 1,
-			bobNewCalcFrameAddress(s_pBombMarker, 0),
-			bobNewCalcFrameAddress(s_pBombMarkerMask, 0),
+			bobCalcFrameAddress(s_pBombMarker, 0),
+			bobCalcFrameAddress(s_pBombMarkerMask, 0),
 			0, 0
 		);
 	}
 
 	menuPreload();
-	bobNewReallocateBgBuffers();
+	bobReallocateBgBuffers();
 	systemUnuse();
 
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
@@ -196,7 +198,7 @@ static void coreGsDestroy(void) {
 	vehicleDestroy(&g_pVehicles[1]);
 	vehicleBitmapsDestroy();
 	commDestroy();
-	bobNewManagerDestroy();
+	bobManagerDestroy();
 
 	audioMixerDestroy();
 	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {

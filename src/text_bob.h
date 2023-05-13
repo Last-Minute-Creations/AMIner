@@ -5,7 +5,7 @@
 #ifndef _TEXT_BOB_H_
 #define _TEXT_BOB_H_
 
-#include "bob_new.h"
+#include <ace/managers/bob.h>
 #include <ace/utils/font.h>
 
 typedef struct _tTextBob {
@@ -13,7 +13,7 @@ typedef struct _tTextBob {
 	char szText[100];
 	tBitMap *pTextBm;
 	tBitMap *pTextMask;
-	tBobNew sBob;
+	tBob sBob;
 	UWORD uwWidth;
 	UWORD uwDestPosY;
 	UBYTE isUpdateRequired;

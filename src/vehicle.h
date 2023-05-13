@@ -7,7 +7,7 @@
 
 #include <ace/types.h>
 #include <fixmath/fix16.h>
-#include "bob_new.h"
+#include <ace/managers/bob.h>
 #include "text_bob.h"
 #include "mineral.h"
 #include "dynamite.h"
@@ -47,12 +47,12 @@ typedef enum _tVehicleState {
 typedef struct _tVehicle {
 	tBCoordYX sSteer;
 	tTextBob sTextBob;
-	tBobNew sBobBody;
-	tBobNew sBobTrack;
-	tBobNew sBobJet;
-	tBobNew sBobTool;
-	tBobNew sBobWreck;
-	tBobNew sBobSmoke;
+	tBob sBobBody;
+	tBob sBobTrack;
+	tBob sBobJet;
+	tBob sBobTool;
+	tBob sBobWreck;
+	tBob sBobSmoke;
 	fix16_t fX;
 	fix16_t fY;
 	fix16_t fDx;

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "dino.h"
-#include "bob_new.h"
+#include <ace/managers/bob.h>
 #include "core.h"
 #include "game.h"
 #include "hud.h"
@@ -25,7 +25,7 @@ typedef enum tDinoState {
 	DINO_STATE_DONE,
 } tDinoState;
 
-static tBobNew s_pDinoBobs[DINO_BOB_COUNT];
+static tBob s_pDinoBobs[DINO_BOB_COUNT];
 static UBYTE s_pDinoWereDrawn[DINO_BOB_COUNT];
 static UBYTE s_ubDinoBonesFound = 0;
 static tBitMap *s_pBones, *s_pBonesMask;
@@ -55,10 +55,10 @@ void dinoCreate(void) {
 	s_pBonesMask = bitmapCreateFromFile("data/bones_mask.bm", 0);
 
 	for(UBYTE i = 0; i < DINO_BOB_COUNT; ++i) {
-		bobNewInit(
+		bobInit(
 			&s_pDinoBobs[i], 80, pDinoHeights[i], 0,
-			bobNewCalcFrameAddress(s_pBones, pDinoFrameOffs[i]),
-			bobNewCalcFrameAddress(s_pBonesMask, pDinoFrameOffs[i]),
+			bobCalcFrameAddress(s_pBones, pDinoFrameOffs[i]),
+			bobCalcFrameAddress(s_pBonesMask, pDinoFrameOffs[i]),
 			s_pDinoPos[i].uwX, s_pDinoPos[i].uwY
 		);
 	}
@@ -149,7 +149,7 @@ void dinoProcessDraw(void) {
 			}
 		}
 		else {
-			bobNewPush(&s_pDinoBobs[ubLastDino]);
+			bobPush(&s_pDinoBobs[ubLastDino]);
 			++s_pDinoWereDrawn[ubLastDino];
 		}
 	}

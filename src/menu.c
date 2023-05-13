@@ -6,10 +6,10 @@
 #include <ace/managers/system.h>
 #include <ace/managers/joy.h>
 #include <ace/managers/key.h>
+#include <ace/managers/bob.h>
 #include <ace/contrib/managers/audio_mixer.h>
 #include <comm/base.h>
 #include "game.h"
-#include "bob_new.h"
 #include "text_bob.h"
 #include "ground_layer.h"
 #include "base_tile.h"
@@ -538,7 +538,7 @@ static void menuProcessSelecting(void) {
 }
 
 static void menuProcessRollIn(void) {
-	bobNewDiscardUndraw();
+	bobDiscardUndraw();
 	coreProcessBeforeBobs();
 
 	UWORD *pCamY = &g_pMainBuffer->pCamera->uPos.uwY;
