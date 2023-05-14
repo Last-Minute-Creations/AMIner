@@ -91,7 +91,8 @@ static void readLines(
 	}
 
 	memFree(szFileContents, uwFileContentsBufferSize);
-	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / commGetLineHeight() - 1; // skip 1 for  page count
+	UBYTE ubLineHeight = commGetLineHeight() - 1;
+	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight - 1; // skip 1 for  page count
 	WORD wLinesInNextPages = s_uwLineCount - (ubLinesPerPage - LINES_OCCUPIED_BY_FACE);
 	wLinesInNextPages = MAX(0, wLinesInNextPages);
 	s_ubPageCount = 1 + ((UWORD)wLinesInNextPages + ubLinesPerPage - 1) / ubLinesPerPage; // always add first smaller page
@@ -101,7 +102,7 @@ static void readLines(
 }
 
 static void commMsgDrawCurrentPage(void) {
-	UBYTE ubLineHeight = commGetLineHeight();
+	UBYTE ubLineHeight = commGetLineHeight() - 1; // keep it more concise here
 	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / ubLineHeight - 1;
 	UWORD uwLineStart = MAX(0, s_ubCurrPage * ubLinesPerPage - 3);
 	commEraseAll();
