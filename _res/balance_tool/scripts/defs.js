@@ -7,9 +7,9 @@ class Defs {
 		this.maxSubAccolades = parseInt(document.querySelector('[name=defs_plans_per_accoldade]').value);
 		this.maxAccolades = parseInt(document.querySelector('[name=defs_accolades]').value);
 		this.extraPlanMoney = parseInt(document.querySelector('[name=extra_plan_money]').value);
-		this.hullPrice = 2;
-		this.literPrice = 5;
-		this.fuelInLiter = 100;
+		this.hullPrice = parseInt(document.querySelector('[name=defs_hull_price]').value);
+		this.drillUnitPrice = parseInt(document.querySelector('[name=defs_drill_unit_price]').value);
+		this.dillInUnit = parseInt(document.querySelector('[name=defs_drill_amount_in_unit]').value);
 		this.seed1 = parseInt(document.querySelector('[name=defs_seed1]').value);
 		this.seed2 = parseInt(document.querySelector('[name=defs_seed2]').value);
 		this.upgradeCosts = document.querySelector('[name=defs_upgrade_costs]').value.split(',').map((x) => parseInt(x));

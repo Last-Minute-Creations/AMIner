@@ -91,16 +91,16 @@ class Vehicle {
 			this.cargoMinerals[mineralId] = 0;
 		}
 
-		let liters = Math.floor((this.drillMax - this.drillCurr + 0.5 * g_defs.fuelInLiter) / g_defs.fuelInLiter);
+		let drillUnits = Math.floor((this.drillMax - this.drillCurr + 0.5 * g_defs.dillInUnit) / g_defs.dillInUnit);
 		let restockCost = 0;
 		restockCost += (this.hullMax - this.hullCurr) * g_defs.hullPrice;
-		restockCost += liters * g_defs.literPrice;
+		restockCost += drillUnits * g_defs.drillUnitPrice;
 		this.moneySpentOnRestock += restockCost;
 		this.money -= restockCost;
 
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
-		this.drillCurr = Math.min(this.drillCurr + liters * g_defs.fuelInLiter, this.drillMax);
+		this.drillCurr = Math.min(this.drillCurr + drillUnits * g_defs.dillInUnit, this.drillMax);
 
 		// Simulated damage
 		this.damage(g_defs.damageAfterRestock)
