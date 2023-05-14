@@ -1,6 +1,7 @@
 class Defs {
 	constructor() {
 		this.timeInDay = 140;
+		this.daysPerPlan = parseInt(document.querySelector('[name=defs_days_per_plan]').value);
 		this.maxRebukes = parseInt(document.querySelector('[name=defs_rebukes]').value);
 		this.maxSubAccolades = parseInt(document.querySelector('[name=defs_plans_per_accoldade]').value);
 		this.maxAccolades = parseInt(document.querySelector('[name=defs_accolades]').value);

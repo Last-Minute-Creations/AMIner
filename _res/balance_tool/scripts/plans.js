@@ -91,8 +91,7 @@ class Plans {
 
 	start() {
 		this.mineralsCollected = new Array(MineralType.all.length).fill(0); // [mineralId] => count
-		this.timeRemaining = 2 * 2 * 1000; // two full fuel, per player
-		this.timeRemaining += 200; // Add for nice division into 30 days
+		this.timeRemaining = g_defs.timeInDay * g_defs.daysPerPlan; // Add for nice division into 30 days
 		this.wasWarning = false;
 	}
 
