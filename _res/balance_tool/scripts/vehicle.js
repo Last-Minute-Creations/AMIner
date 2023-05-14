@@ -114,6 +114,16 @@ class Vehicle {
 		return sellAmount;
 	}
 
+	tryBlackMarketExchange(mineralSellType, sellAmount, mineralBuyType, buyAmount){
+		if(this.stock[mineralSellType.id] < sellAmount) {
+			return false;
+		}
+
+		this.stock[mineralSellType.id] -= sellAmount;
+		this.stock[mineralBuyType.id] += buyAmount;
+		return true;
+	}
+
 	tryFillPlan(mineralType, amount) {
 		if(g_vehicle.stock[mineralType.id] == undefined) {
 			return 0;

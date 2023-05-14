@@ -18,6 +18,7 @@ function reloadGame() {
 	updateTotalMoneyStats();
 	updateOfficeStats();
 	updateWarehouse();
+	generateBlackMarketTable();
 
 	addMessage('Started new game', 'success');
 }
@@ -78,6 +79,56 @@ function updateWarehouse() {
 		document.querySelector(`#sold_${name}`).textContent = g_vehicle.sold[mineralType.id];
 		document.querySelector(`#plan_${name}_spent`).textContent = g_plans.mineralsCollected[mineralType.id];
 		document.querySelector(`#plan_${name}_required`).textContent = g_plans.getCurrentPlanInfo().mineralsRequired[mineralType.id];
+	}
+}
+
+function generateBlackMarketTable() {
+	let table = document.querySelector('#black_market_goods');
+	table.innerHTML = '';
+
+	let tr = document.createElement('tr');
+	let cell = document.createElement('th');
+	cell.textContent = 'buy\\sell';
+	tr.appendChild(cell);
+	for(let mineralType of MineralType.collectibles) {
+		cell = document.createElement('th');
+		cell.textContent = mineralType.name;
+		tr.appendChild(cell);
+	}
+	table.appendChild(tr);
+
+	let mineralBuyIndex = 0;
+	for(let mineralTypeBuy of MineralType.collectibles) {
+		tr = document.createElement('tr');
+		cell = document.createElement('th');
+		cell.textContent = mineralTypeBuy.name;
+		tr.appendChild(cell);
+
+		let mineralSellIndex = 0;
+		for(let mineralTypeSell of MineralType.collectibles) {
+			cell = document.createElement('td');
+			if(mineralSellIndex == mineralBuyIndex) {
+				cell.innerHTML = '-';
+			}
+			else {
+				let button = document.createElement('button');
+				let delta = mineralBuyIndex - mineralSellIndex;
+				let sellAmount = delta > 0 ? 4 * (delta) : 1;
+				let buyAmount = 1;
+				button.innerHTML = `${buyAmount} for ${sellAmount}`;
+				button.dataset.mineralSellId = mineralTypeSell.id;
+				button.dataset.mineralBuyId = mineralTypeBuy.id;
+				button.dataset.sellAmount = sellAmount;
+				button.dataset.buyAmount = buyAmount;
+				button.addEventListener('click', onBlackMarketBuyClicked);
+				cell.appendChild(button);
+			}
+			tr.appendChild(cell);
+			++mineralSellIndex;
+		}
+
+		table.appendChild(tr);
+		++mineralBuyIndex;
 	}
 }
 
@@ -157,6 +208,20 @@ function drawTiles(tileMap) {
 
 function onGameReloadClicked() {
 	reloadGame();
+}
+
+function onBlackMarketBuyClicked(evt) {
+	let button = evt.target;
+	let mineralSellId = parseInt(button.dataset.mineralSellId);
+	let mineralBuyId = parseInt(button.dataset.mineralBuyId);
+	let sellAmount = parseInt(button.dataset.sellAmount);
+	let buyAmount = parseInt(button.dataset.buyAmount);
+
+	let mineralSellType = MineralType.all[mineralSellId];
+	let mineralBuyType = MineralType.all[mineralBuyId];
+
+	g_vehicle.tryBlackMarketExchange(mineralSellType, sellAmount, mineralBuyType, buyAmount);
+	updateWarehouse();
 }
 
 function onSellClicked(mineralType, amount) {

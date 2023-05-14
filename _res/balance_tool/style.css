@@ -103,14 +103,14 @@ LABEL * {
 
 /*-----------------------------------------------------------------WAREHOUSE--*/
 
-#warehouse {
+.comm_table {
 	border-collapse: collapse;
 	text-align: center;
 	width: 80%;
 	margin: 0 auto;
 }
 
-#warehouse TD, #warehouse TH {
+.comm_table TD, .comm_table TH {
 	border: solid 1px black;
 }
 
