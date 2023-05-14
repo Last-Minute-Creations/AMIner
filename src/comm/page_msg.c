@@ -91,10 +91,10 @@ static void readLines(
 	}
 
 	memFree(szFileContents, uwFileContentsBufferSize);
-	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / commGetLineHeight() - 1;
-	WORD wLinesInNextPages = s_uwLineCount - LINES_OCCUPIED_BY_FACE;
+	UBYTE ubLinesPerPage = COMM_DISPLAY_HEIGHT / commGetLineHeight() - 1; // skip 1 for  page count
+	WORD wLinesInNextPages = s_uwLineCount - (ubLinesPerPage - LINES_OCCUPIED_BY_FACE);
 	wLinesInNextPages = MAX(0, wLinesInNextPages);
-	s_ubPageCount = 1 + ((UWORD)wLinesInNextPages + ubLinesPerPage - 1) / ubLinesPerPage;
+	s_ubPageCount = 1 + ((UWORD)wLinesInNextPages + ubLinesPerPage - 1) / ubLinesPerPage; // always add first smaller page
 
 	logBlockEnd("readLines()");
 	systemUnuse();
