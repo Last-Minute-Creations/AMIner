@@ -6,7 +6,7 @@
 #include "json/json.h"
 #include <ace/managers/log.h>
 #include <fixmath/fix16.h>
-#include <comm/base.h>
+#include <comm/comm.h>
 #include <comm/page_workshop.h>
 #include <comm/page_warehouse.h>
 #include "hi_score.h"

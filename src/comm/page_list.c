@@ -4,7 +4,7 @@
 
 #include "page_list.h"
 #include "page_office.h"
-#include <comm/base.h>
+#include <comm/comm.h>
 #include <comm/page_office.h>
 #include <comm/page_msg.h>
 #include <comm/page_bribe.h>

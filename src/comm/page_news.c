@@ -1,6 +1,6 @@
 #include "page_news.h"
 #include <ace/managers/system.h>
-#include <comm/base.h>
+#include <comm/comm.h>
 #include <json/utf8.h>
 #include "../defs.h"
 #include "../core.h"

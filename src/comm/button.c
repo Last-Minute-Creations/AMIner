@@ -1,7 +1,7 @@
 #include "button.h"
 #include <string.h>
 #include <ace/utils/font.h>
-#include <comm/base.h>
+#include <comm/comm.h>
 #include "core.h"
 
 #define BUTTON_COUNT_MAX 5

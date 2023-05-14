@@ -1,6 +1,6 @@
 #include "page_warehouse.h"
 #include <ace/utils/string.h>
-#include <comm/base.h>
+#include <comm/comm.h>
 #include <comm/button.h>
 #include <comm/page_accounting.h>
 #include <comm/page_news.h>

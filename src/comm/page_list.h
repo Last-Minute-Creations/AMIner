@@ -7,7 +7,7 @@
 
 #include <ace/types.h>
 #include "comm/page_office.h"
-#include "comm/base.h"
+#include "comm/comm.h"
 
 void pageListCreate(tFaceId eFace);
 

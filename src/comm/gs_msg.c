@@ -5,7 +5,7 @@
 #include "gs_msg.h"
 #include <ace/managers/system.h>
 #include <ace/utils/font.h>
-#include <comm/base.h>
+#include <comm/comm.h>
 #include <comm/page_msg.h>
 #include "core.h"
 #include "color.h"

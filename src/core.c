@@ -20,7 +20,7 @@
 #include "hi_score.h"
 #include "tile.h"
 #include "explosion.h"
-#include <comm/base.h>
+#include <comm/comm.h>
 #include "defs.h"
 #include "settings.h"
 

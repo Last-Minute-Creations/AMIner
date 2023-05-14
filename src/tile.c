@@ -5,7 +5,7 @@
 #include "tile.h"
 #include <ace/managers/viewport/tilebuffer.h>
 #include <ace/managers/rand.h>
-#include <comm/base.h>
+#include <comm/comm.h>
 #include "game.h"
 #include "core.h"
 #include "hud.h"

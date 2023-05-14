@@ -8,7 +8,7 @@
 #include <ace/managers/key.h>
 #include <ace/managers/bob.h>
 #include <ace/contrib/managers/audio_mixer.h>
-#include <comm/base.h>
+#include <comm/comm.h>
 #include "game.h"
 #include "text_bob.h"
 #include "ground_layer.h"

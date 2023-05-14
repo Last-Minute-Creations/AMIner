@@ -7,7 +7,7 @@
 #include <ace/managers/system.h>
 #include <ace/managers/timer.h>
 #include <ace/utils/bitmap.h>
-#include <comm/base.h>
+#include <comm/comm.h>
 #include "defs.h"
 #include "core.h"
 #include "game.h"

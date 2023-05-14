@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "page_accounting.h"
-#include <comm/base.h>
+#include <comm/comm.h>
 #include <comm/page_office.h>
 #include <comm/button.h>
 #include <comm/gs_shop.h>

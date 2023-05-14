@@ -5,7 +5,7 @@
 #ifndef _COMM_PAGE_OFFICE_H_
 #define _COMM_PAGE_OFFICE_H_
 
-#include <comm/base.h>
+#include <comm/comm.h>
 #include <comm/gs_shop.h>
 
 void pageOfficeReset(void);

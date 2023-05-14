@@ -6,7 +6,7 @@
 #define _COMM_SHOP_H_
 
 #include "aminer.h"
-#include <comm/base.h>
+#include <comm/comm.h>
 #include "defs.h"
 
 typedef enum _tCommShopPage {
