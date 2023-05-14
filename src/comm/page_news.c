@@ -84,6 +84,7 @@ static void pageNewsProcess(void) {
 		);
 	}
 	else {
+		commRegisterPage(0, 0);
 		menuGsEnter(0);
 	}
 }
