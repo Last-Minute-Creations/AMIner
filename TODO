@@ -13,7 +13,7 @@ General:
 		☐ Bring back teleport damage on zeroeth upgrade
 	☐ Fix hud disappearing after teleport
 	☐ Extra background tiles in mine - compositioning of dug-out tiles
-	☐ "Transparency" of comm corners
+	✔ "Transparency" of comm corners @done(23-05-14 09:38)
 	✔ Add magma tiles @done(23-03-17 18:03)
 		✔ Hurt while drilling through @done(23-03-17 18:03)
 		☐ Figure out detailed mechanics

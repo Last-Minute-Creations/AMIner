@@ -23,6 +23,7 @@
 #define COMM_BUTON_LABEL_COLOR_BG 5
 #define COMM_BUTON_LABEL_COLOR_CORNER 6
 
+static tBitMap *s_pBmEdgesMask;
 static tBitMap *s_pBmRestore;
 static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[DIRECTION_COUNT] = {BTN_STATE_NACTIVE};
@@ -39,6 +40,100 @@ tBitMap *g_pCommBmFaces;
 tBitMap *g_pCommBmSelection;
 char **g_pCommPageNames;
 
+//------------------------------------------------------------ PRIVATE FUNCTIONS
+
+static void drawButtonLabels(void) {
+	static const UBYTE s_pLabelOffsetsX[] = {
+		COMM_BUTTON_LABEL_OFFICE_X,
+		COMM_BUTTON_LABEL_WORKSHOP_X,
+		COMM_BUTTON_LABEL_WAREHOUSE_X
+	};
+
+	tUwCoordYX sOrigin = commGetOrigin();
+	for(UBYTE i = 0; i < 3; ++i) {
+		fontFillTextBitMap(g_pFont, s_pLineBuffer,  g_pCommPageNames[i]);
+		UWORD uwTextWidth = s_pLineBuffer->uwActualWidth;
+
+		UWORD uwLabelX = sOrigin.uwX + s_pLabelOffsetsX[i] - 2;
+		UWORD uwLabelY = sOrigin.uwY + COMM_BUTTON_LABEL_Y;
+		UWORD uwLabelWidth = uwTextWidth + 3;
+		UWORD uwLabelHeight = g_pFont->uwHeight + 2;
+
+		blitRect(
+			s_pBmDraw, uwLabelX, uwLabelY, uwLabelWidth, uwLabelHeight,
+			COMM_BUTON_LABEL_COLOR_BG
+		);
+
+		// Corners: top-left, top-right, bottom-left, bottom-right
+		UBYTE ubColor = COMM_BUTON_LABEL_COLOR_CORNER;
+		chunkyToPlanar(
+			ubColor, uwLabelX, uwLabelY, s_pBmDraw
+		);
+		chunkyToPlanar(
+			ubColor, uwLabelX + uwLabelWidth - 1, uwLabelY, s_pBmDraw
+		);
+		chunkyToPlanar(
+			ubColor, uwLabelX, uwLabelY + uwLabelHeight - 1, s_pBmDraw
+		);
+		chunkyToPlanar(
+			ubColor, uwLabelX + uwLabelWidth - 1, uwLabelY + uwLabelHeight - 1, s_pBmDraw
+		);
+
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pLineBuffer,
+			sOrigin.uwX + s_pLabelOffsetsX[i],
+			sOrigin.uwY + COMM_BUTTON_LABEL_Y + 1, 6, FONT_COOKIE
+		);
+		fontDrawTextBitMap(
+			s_pBmDraw, s_pLineBuffer,
+			sOrigin.uwX + s_pLabelOffsetsX[i],
+			sOrigin.uwY + COMM_BUTTON_LABEL_Y, 9, FONT_COOKIE
+		);
+	}
+}
+
+static void fixNextBackgroundEdge(UWORD uwX, UWORD uwY, UWORD uwHeight) {
+	tUwCoordYX sOrigin = commGetOrigin();
+	UWORD uwBlitWidthInWords = 1;
+	ULONG ulOffsB = s_pBmRestore->BytesPerRow * uwY + (uwX / 8);
+	ULONG ulOffsCD = s_pBmDraw->BytesPerRow * (uwY + sOrigin.uwY) + ((uwX + sOrigin.uwX) / 8);
+	blitWait();
+	g_pCustom->bltbpt = (UBYTE*)((ULONG)s_pBmRestore->Planes[0] + ulOffsB);
+	g_pCustom->bltcpt = (UBYTE*)((ULONG)s_pBmDraw->Planes[0] + ulOffsCD);
+	g_pCustom->bltdpt = (UBYTE*)((ULONG)s_pBmDraw->Planes[0] + ulOffsCD);
+	g_pCustom->bltsize = ((uwHeight * GAME_BPP) << HSIZEBITS) | (uwBlitWidthInWords);
+}
+
+static void fixBackgroundEdges(void) {
+
+	// A: edge mask, B: restore buffer, C/D: display buffer
+	// Use C channel instead of A - same speed, less regs to set up
+	UWORD uwBltCon0 = USEA|USEB|USEC|USED | MINTERM_COOKIE;
+	UWORD uwBlitWidthInWords = 1;
+	WORD wModuloB = bitmapGetByteWidth(s_pBmRestore) - (uwBlitWidthInWords << 1);
+	WORD wModuloCD = bitmapGetByteWidth(s_pBmDraw) - (uwBlitWidthInWords << 1);
+
+	blitWait();
+	g_pCustom->bltafwm = 0xFFFF;
+	g_pCustom->bltalwm = 0xFFFF;
+	g_pCustom->bltcon0 = uwBltCon0;
+	g_pCustom->bltcon1 = 0;
+
+	g_pCustom->bltapt = (UBYTE*)((ULONG)s_pBmEdgesMask->Planes[0]);
+	g_pCustom->bltamod = 0;
+	g_pCustom->bltbmod = wModuloB;
+	g_pCustom->bltcmod = wModuloCD;
+	g_pCustom->bltdmod = wModuloCD;
+
+	// First edge
+	fixNextBackgroundEdge(0, 0, 5);
+	fixNextBackgroundEdge(COMM_WIDTH - 16, 0, 4);
+	fixNextBackgroundEdge(0, COMM_HEIGHT - 4, 4);
+	fixNextBackgroundEdge(COMM_WIDTH - 16, COMM_HEIGHT - 5, 5);
+}
+
+//------------------------------------------------------------- PUBLIC FUNCTIONS
+
 void commCreate(void) {
 	systemUse();
 	s_pBmRestore = bitmapCreate(
@@ -50,6 +145,7 @@ void commCreate(void) {
 	s_pLineBuffer = fontCreateTextBitMap(
 		CEIL_TO_FACTOR(COMM_DISPLAY_WIDTH, 16), g_pFont->uwHeight
 	);
+	s_pBmEdgesMask = bitmapCreateFromFile("data/comm_edges_mask.bm", 0);
 
 	for(UBYTE i = 0; i < 4; ++i) {
 		char szPath[40];
@@ -76,6 +172,7 @@ void commDestroy(void) {
 	bitmapDestroy(s_pBmRestore);
 	bitmapDestroy(s_pBg);
 	bitmapDestroy(s_pButtons);
+	bitmapDestroy(s_pBmEdgesMask);
 	fontDestroyTextBitMap(s_pLineBuffer);
 
 	bitmapDestroy(g_pCommBmFaces);
@@ -125,52 +222,8 @@ UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount) {
 		COMM_WIDTH, COMM_HEIGHT
 	);
 
-	static const UBYTE s_pLabelOffsetsX[] = {
-		COMM_BUTTON_LABEL_OFFICE_X,
-		COMM_BUTTON_LABEL_WORKSHOP_X,
-		COMM_BUTTON_LABEL_WAREHOUSE_X
-	};
-
-	for(UBYTE i = 0; i < 3; ++i) {
-		fontFillTextBitMap(g_pFont, s_pLineBuffer,  g_pCommPageNames[i]);
-		UWORD uwTextWidth = s_pLineBuffer->uwActualWidth;
-
-		UWORD uwLabelX = sOrigin.uwX + s_pLabelOffsetsX[i] - 2;
-		UWORD uwLabelY = sOrigin.uwY + COMM_BUTTON_LABEL_Y;
-		UWORD uwLabelWidth = uwTextWidth + 3;
-		UWORD uwLabelHeight = g_pFont->uwHeight + 2;
-
-		blitRect(
-			s_pBmDraw, uwLabelX, uwLabelY, uwLabelWidth, uwLabelHeight,
-			COMM_BUTON_LABEL_COLOR_BG
-		);
-
-		// Corners: top-left, top-right, bottom-left, bottom-right
-		UBYTE ubColor = COMM_BUTON_LABEL_COLOR_CORNER;
-		chunkyToPlanar(
-			ubColor, uwLabelX, uwLabelY, s_pBmDraw
-		);
-		chunkyToPlanar(
-			ubColor, uwLabelX + uwLabelWidth - 1, uwLabelY, s_pBmDraw
-		);
-		chunkyToPlanar(
-			ubColor, uwLabelX, uwLabelY + uwLabelHeight - 1, s_pBmDraw
-		);
-		chunkyToPlanar(
-			ubColor, uwLabelX + uwLabelWidth - 1, uwLabelY + uwLabelHeight - 1, s_pBmDraw
-		);
-
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pLineBuffer,
-			sOrigin.uwX + s_pLabelOffsetsX[i],
-			sOrigin.uwY + COMM_BUTTON_LABEL_Y + 1, 6, FONT_COOKIE
-		);
-		fontDrawTextBitMap(
-			s_pBmDraw, s_pLineBuffer,
-			sOrigin.uwX + s_pLabelOffsetsX[i],
-			sOrigin.uwY + COMM_BUTTON_LABEL_Y, 9, FONT_COOKIE
-		);
-	}
+	drawButtonLabels();
+	fixBackgroundEdges();
 
 	// Skip the initial fire press
 	s_pNav[DIRECTION_FIRE] = BTN_STATE_USED;
