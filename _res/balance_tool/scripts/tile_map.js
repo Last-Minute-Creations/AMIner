@@ -108,6 +108,7 @@ class TileMap {
 			}
 		}
 		let planCount = g_defs.maxAccolades * g_defs.maxSubAccolades;
+		plannableRows *= g_defs.minePercentForPlans;
 		console.log(`plannable rows: ${plannableRows}, rows per plan: ${plannableRows / planCount}`);
 		let rowsPerPlan = Math.ceil(plannableRows / planCount);
 
