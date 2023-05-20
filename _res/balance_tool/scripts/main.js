@@ -202,6 +202,11 @@ function drawTiles(tileMap) {
 		tdLayerName.classList.add('row_index');
 		tr.appendChild(tdLayerName);
 
+		let tdPlanIndex = document.createElement('td');
+		tdPlanIndex.textContent = tileMap.rowPlans[y];
+		tdPlanIndex.classList.add('row_index');
+		tr.appendChild(tdPlanIndex);
+
 		table.appendChild(tr);
 	}
 }

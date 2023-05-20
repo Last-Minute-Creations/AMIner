@@ -3,6 +3,7 @@ class TileMap {
 		this.tiles = new Array(width).fill(0).map(() => new Array(height).fill(0));
 		this.width = width;
 		this.height = height;
+		this.rowPlans = new Array(height).fill('');
 
 		let tileRowBaseDirt = 8;
 
@@ -108,9 +109,9 @@ class TileMap {
 			}
 		}
 		let planCount = g_defs.maxAccolades * g_defs.maxSubAccolades;
-		plannableRows *= g_defs.minePercentForPlans;
-		console.log(`plannable rows: ${plannableRows}, rows per plan: ${plannableRows / planCount}`);
-		let rowsPerPlan = Math.ceil(plannableRows / planCount);
+		let plannedRows = plannableRows * g_defs.minePercentForPlans;
+		console.log(`plannable rows: ${plannableRows}, planned: ${plannedRows}, rows per plan: ${plannedRows / planCount}`);
+		let rowsPerPlan = Math.ceil(plannedRows / planCount);
 
 		// Pattern for filling minerals
 		let fillPosPattern = []; // [idx] => {x,y}, unordered
@@ -127,13 +128,14 @@ class TileMap {
 		let currentPlannableRow = 0;
 		for(let planIndex = 0; planIndex < planCount; ++planIndex) {
 			// Get mine rows for plan
-			let planLastPlannableRow  = Math.floor((plannableRows * (planIndex + 1)) / planCount);
+			let planLastPlannableRow  = Math.floor((plannedRows * (planIndex + 1)) / planCount);
 			let planSegmentRows = [];
 			while(currentPlannableRow <= planLastPlannableRow) {
 				if(baseIndex < TileMap.bases.length && currentRow >= TileMap.bases[baseIndex].level) {
 					currentRow = TileMap.bases[baseIndex].level + TileMap.bases[baseIndex].pattern.length;
 					++baseIndex;
 				}
+				this.rowPlans[currentRow] = `P${planIndex + 1}`;
 				planSegmentRows.push(currentRow++);
 				++currentPlannableRow;
 			}
@@ -164,7 +166,7 @@ class TileMap {
 						// fill position with mineral
 						let existingTile = this.tiles[placePosition.x][planSegmentRows[placePosition.y]];
 						if(existingTile.mineralType == MineralType.DIRT) {
-							let placedAmount = g_rand.next16MinMax(1, Math.min(planInfo.mineralsRequired[placedMineralId], 3));
+							let placedAmount = g_rand.next16MinMax(1, Math.min(mineralsRemaining[placedMineralId], 3));
 							let mineralTileIndex = MineralType.all[placedMineralId].tileIndex;
 							this.tiles[placePosition.x][planSegmentRows[placePosition.y]] = new Tile(mineralTileIndex + placedAmount - 1);
 							totalMinerals -= placedAmount;
@@ -197,7 +199,7 @@ class TileMap {
 
 			let extraMineralMoney = g_defs.extraPlanMoney;
 			while(extraMineralMoney > 0) {
-				// pick mineral and count
+				// pick mineral
 				let placedMineralId = allowedMineralIds[g_rand.next16MinMax(0, allowedMineralIds.length - 1)];
 				let startPatternPos = nextPatternPos;
 				let isPlaced = false;
@@ -224,6 +226,82 @@ class TileMap {
 				if(!isPlaced) {
 					addMessage(`Couldn't place all extra minerals on plan ${planIndex}`, 'error');
 					break;
+				}
+			}
+		}
+
+		// Extra minerals after all plans
+		let totalMineralsInPlans = new Array(MineralType.all.length).fill(0); // [mineralId] => count
+		g_plans.sequence.forEach(planInfo => {
+			planInfo.mineralsRequired.forEach((mineralCount, mineralId) => {
+				totalMineralsInPlans[mineralId] += mineralCount;
+			});
+		});
+
+		let unplannedRows = plannableRows - plannedRows;
+		let fauxPlanCount = Math.floor(unplannedRows / rowsPerPlan);
+		let fauxPlanMinerals = totalMineralsInPlans.map((x) => Math.ceil(x / fauxPlanCount));
+		for(let fauxPlanIndex = 0; fauxPlanIndex < fauxPlanCount; ++fauxPlanIndex) {
+			// Get mine rows for plan
+			let planLastFauxPlanRow  = Math.floor(plannedRows + (unplannedRows * (fauxPlanIndex + 1)) / fauxPlanCount);
+			let planSegmentRows = [];
+			while(currentPlannableRow <= planLastFauxPlanRow) {
+				if(baseIndex < TileMap.bases.length && currentRow >= TileMap.bases[baseIndex].level) {
+					currentRow = TileMap.bases[baseIndex].level + TileMap.bases[baseIndex].pattern.length;
+					++baseIndex;
+				}
+				this.rowPlans[currentRow] = `F${fauxPlanIndex + 1}`;
+				planSegmentRows.push(currentRow++);
+				++currentPlannableRow;
+			}
+
+			console.log(`faux plan ${fauxPlanIndex} rows ${planSegmentRows[0]}..${planSegmentRows[planSegmentRows.length - 1]} minerals required: ${fauxPlanMinerals}`);
+
+			// Fill mine segment with minerals required for plan, merging some in the process
+			let totalMinerals = fauxPlanMinerals.reduce((sum, value) => sum + value, 0);
+			let mineralsRemaining = fauxPlanMinerals.map((x) => x);
+			let allowedMineralIds = MineralType.collectibles.map((mineralType) => mineralType.id);
+			while(totalMinerals > 0) {
+				// pick mineral and count
+				let placedMineralId = allowedMineralIds[g_rand.next16MinMax(0, allowedMineralIds.length - 1)];
+				if(mineralsRemaining[placedMineralId] > 0) {
+					let startPatternPos = nextPatternPos;
+					let isPlaced = false;
+					do {
+						// pick next position from pattern
+						let placePosition = fillPosPattern[nextPatternPos];
+						nextPatternPos = (nextPatternPos + 1) % fillPosPattern.length;
+						if(placePosition.y >= planSegmentRows.length) {
+							continue;
+						}
+
+						// fill position with mineral
+						let existingTile = this.tiles[placePosition.x][planSegmentRows[placePosition.y]];
+						if(existingTile.mineralType == MineralType.DIRT) {
+							let placedAmount = g_rand.next16MinMax(1, Math.min(mineralsRemaining[placedMineralId], 3));
+							let mineralTileIndex = MineralType.all[placedMineralId].tileIndex;
+							this.tiles[placePosition.x][planSegmentRows[placePosition.y]] = new Tile(mineralTileIndex + placedAmount - 1);
+							totalMinerals -= placedAmount;
+							mineralsRemaining[placedMineralId] -= placedAmount;
+							isPlaced = true;
+							break;
+						}
+						else if (
+							mineralsRemaining[existingTile.mineralType.id] > 0 &&
+							existingTile.mineralAmount < 3
+						) {
+							let delta = Math.min(3 - existingTile.mineralAmount, mineralsRemaining[existingTile.mineralType.id]);
+							existingTile.mineralAmount += delta;
+							mineralsRemaining[existingTile.mineralType.id] -= delta;
+							totalMinerals -= delta;
+							isPlaced = true;
+							break;
+						}
+					} while(nextPatternPos != startPatternPos);
+					if(!isPlaced) {
+						addMessage(`Can't place all minerals on faux plan ${fauxPlanIndex}`, 'warning');
+						break;
+					}
 				}
 			}
 		}
