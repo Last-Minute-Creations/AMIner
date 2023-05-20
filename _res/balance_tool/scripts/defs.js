@@ -10,6 +10,7 @@ class Defs {
 		this.hullPrice = parseInt(document.querySelector('[name=defs_hull_price]').value);
 		this.drillUnitPrice = parseInt(document.querySelector('[name=defs_drill_unit_price]').value);
 		this.dillInUnit = parseInt(document.querySelector('[name=defs_drill_amount_in_unit]').value);
+		this.trailingMineralCountMultiplier = parseFloat(document.querySelector('[name=trailing_mineral_count_multiplier]').value);
 		this.seed1 = parseInt(document.querySelector('[name=defs_seed1]').value);
 		this.seed2 = parseInt(document.querySelector('[name=defs_seed2]').value);
 		this.upgradeCosts = document.querySelector('[name=defs_upgrade_costs]').value.split(',').map((x) => parseInt(x));
