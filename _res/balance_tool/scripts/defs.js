@@ -14,12 +14,12 @@ class Defs {
 		this.seed1 = parseInt(document.querySelector('[name=defs_seed1]').value);
 		this.seed2 = parseInt(document.querySelector('[name=defs_seed2]').value);
 		this.upgradeCosts = document.querySelector('[name=defs_upgrade_costs]').value.split(',').map((x) => parseInt(x));
-		this.hullBase = 100;
+		this.hullBase = 50;
 		this.hullAddPerLevel = 20;
 		this.drillBase = 1000;
 		this.drillAddPerLevel = 250;
-		this.cargoBase = 50;
-		this.cargoAddPerLevel = 20;
+		this.cargoBase = 20;
+		this.cargoAddPerLevel = 10;
 		this.damageAfterRestock = 10;
 
 		this.bribeBaseCost = parseInt(document.querySelector('[name=defs_bribe_base_cost]').value);
