@@ -22,7 +22,7 @@ class Vehicle {
 	}
 
 	respawn() {
-		this.cargoMinerals = {}; // [mineralId] => count
+		this.cargoMinerals = new Array(MineralType.all.length).fill(0); // [mineralId] => count
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
 		this.drillCurr = this.drillMax;
@@ -62,12 +62,12 @@ class Vehicle {
 		let mineralId = tile.mineralType.id;
 
 		// Add to cargo
-		if(this.cargoMinerals[mineralId] == undefined) {
-			this.cargoMinerals[mineralId] = 0;
+		let cargoDelta = Math.min(tile.mineralAmount, this.cargoMax - this.cargoCurr);
+		this.cargoMinerals[mineralId] += cargoDelta;
+		this.cargoCurr += cargoDelta;
+		if(this.cargoCurr == this.cargoMax) {
+			addMessage('Cargo full', 'warning');
 		}
-		this.cargoMinerals[mineralId] += tile.mineralAmount;
-
-		this.cargoCurr = Math.min(this.cargoCurr + tile.mineralAmount, this.cargoMax);
 		if(tile.mineralType.isCollectible && g_plans.mineralsUnlocked.indexOf(mineralId) == -1) {
 			g_plans.mineralsUnlocked.push(mineralId);
 		}
