@@ -14,6 +14,8 @@
 		<script type="text/javascript" src="scripts/tile.js"></script>
 		<script type="text/javascript" src="scripts/tile_map.js"></script>
 		<script type="text/javascript" src="scripts/ending.js"></script>
+		<script type="text/javascript" src="scripts/dino_quest_state.js"></script>
+		<script type="text/javascript" src="scripts/gate_quest_state.js"></script>
 		<script type="text/javascript" src="scripts/vehicle.js"></script>
 		<script type="text/javascript" src="scripts/plans.js"></script>
 		<script type="text/javascript" src="scripts/main.js"></script>
@@ -48,6 +50,7 @@
 					<label>Bribe cost multiplier <input type="number" name="defs_bribe_cost_multiplier" min="0.1" max="1.0" step="0.1" value=".5"></label>
 					<label>Heat % add per accounting <input type="number" name="defs_heat_add_accounting" value="5"></label>
 					<label>Heat % decrement per plan <input type="number" name="defs_heat_remove_plan" value="3"></label>
+					<label>Heat from gate <input type="number" name="defs_heat_from_gate" value="10"></label>
 					<label>Dino depths <input name="defs_dino_depths" value="80, 200, 240, 310, 350, 410, 510, 610, 710"></label>
 					<label>Gate depths <input name="defs_gate_depths" value="220, 250, 300, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000"></label>
 					<button id="btn_game_reload" class="btn_large">Reload game</button>
@@ -100,10 +103,6 @@
 							Upgrade cost: <span id="vehicle_upgrade_cargo_cost">?</span>$ <button id="vehicle_upgrade_cargo">Upgrade</button>
 						<li>Money: <span id="vehicle_money">?</span>$</li>
 						<li>Money spent on restock: <span id="vehicle_money_spent_on_restock">?</span>$</li>
-						<li>Found bones: <span id="vehicle_dino_found_bones">?</span></li>
-						<li>Dino quest state: <span id="vehicle_dino_quest_state">?</span></li>
-						<li>Found gates: <span id="vehicle_gate_found_gates">?</span></li>
-						<li>Gate quest state: <span id="vehicle_gate_quest_state">?</span></li>
 					</ul>
 					<button id="btn_vehicle_restock" class="btn_large">Restock</button>
 				</div>
@@ -112,6 +111,8 @@
 				<div>
 					<ul>
 						<li>Ending: <span id="office_ending">?</span> <button id="ending_reset">Reset</button>
+						<li>Dino quest state: <span id="office_dino_quest_state">?</span>, found bones: <span id="office_dino_found_bones">?</span></li>
+						<li>Gate quest state: <span id="office_gate_quest_state">?</span>, is reported: <span id="office_gate_reported">?</span>, found gates: <span id="office_gate_found_gates">?</span></li>
 						<li>
 							Plan Index: <span id="plan_index">?</span>,
 							started: <span id="plan_started">?</span>,

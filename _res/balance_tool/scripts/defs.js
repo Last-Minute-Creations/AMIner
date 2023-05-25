@@ -42,5 +42,6 @@ class Defs {
 
 		this.dinoDepths = document.querySelector('[name=defs_dino_depths]').value.split(',').map((x) => parseInt(x));
 		this.gateDepths = document.querySelector('[name=defs_gate_depths]').value.split(',').map((x) => parseInt(x));
+		this.heatFromGate = parseInt(document.querySelector('[name=defs_heat_from_gate]').value);
 	}
 }

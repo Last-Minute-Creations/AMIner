@@ -20,6 +20,10 @@ class Vehicle {
 
 		this.foundBones = 0;
 		this.foundGates = 0;
+		this.gateQuestState = GateQuestState.NOT_STARTED;
+		this.dinoQuestState = DinoQuestState.NOT_STARTED;
+		this.isGateQuestioningPending = false;
+		this.isGateReported = false;
 
 		this.respawn();
 	}
@@ -29,6 +33,68 @@ class Vehicle {
 		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
 		this.drillCurr = this.drillMax;
+	}
+
+	advanceDinoQuest() {
+		++this.foundBones;
+		if(this.foundBones == 1) {
+			this.dinoQuestState = DinoQuestState.IN_PROGRESS;
+			addMessage('Dino quest started', 'success');
+		}
+		if(this.foundBones >= g_defs.dinoDepths.length) {
+			addMessage('Dino quest completed', 'success');
+			this.dinoQuestState = DinoQuestState.COMPLETED;
+			this.addAccolade('dino');
+		}
+	}
+
+	advanceGateQuest() {
+		++this.foundGates;
+
+		if(this.foundGates == 1) {
+			this.gateQuestState = GateQuestState.IN_PROGRESS;
+			addMessage('Gate quest started', 'success');
+		}
+		if(this.foundGates >= g_defs.gateDepths.length) {
+			this.gateQuestState = GateQuestState.COMPLETED;
+			if(this.isGateReported) {
+				this.ending = Ending.GATE_REPORTED_END;
+			}
+			else {
+				this.ending = ((g_rand.next16() & 1) == 0) ? Ending.GATE_SECRET_BAD : Ending.GATE_SECRET_GOOD;
+			}
+			addMessage('Game ended with gate quest', 'success');
+		}
+		else {
+			if(!this.isGateReported) {
+				this.heat += g_defs.heatFromGate;
+				this.isGateQuestioningPending = true;
+				addMessage('Commissar will interrogate you on restock', 'warning')
+			}
+		}
+
+	}
+
+	answerQuestioning(isReporting) {
+		if(isReporting) {
+			this.heat = Math.max(0, this.heat - g_defs.heatFromGate);
+		}
+		else {
+			let pick = g_rand.next16MinMax(1, 100);
+			if(pick > this.heat) {
+				addMessage('Lie succeeded', 'success');
+			}
+			else {
+				isReporting = true;
+				this.addRebuke('tried to lie to Commissar');
+			}
+		}
+
+		if(isReporting) {
+			this.isGateReported = true;
+		}
+
+		this.isGateQuestioningPending = false;
 	}
 
 	tryExcavate(posX, posY) {
@@ -79,11 +145,11 @@ class Vehicle {
 		g_tileMap.tiles[posX][posY] = new Tile(TileIndex.CAVE_BG_16,  MineralType.AIR, 0);
 		if(tile.mineralType.isDino) {
 			--g_tileMap.currentMineralCounts[tile.mineralType.id];
-			++this.foundBones;
+			this.advanceDinoQuest();
 		}
 		else if(tile.mineralType.isGate) {
 			--g_tileMap.currentMineralCounts[tile.mineralType.id];
-			++this.foundGates;
+			this.advanceGateQuest();
 		}
 		else {
 			g_tileMap.currentMineralCounts[tile.mineralType.id] -= tile.mineralAmount;
@@ -159,13 +225,15 @@ class Vehicle {
 	advanceAccolade() {
 		if(++this.subAccolades == g_defs.maxSubAccolades) {
 			this.subAccolades = 0;
-			if(++this.accolades >= g_defs.maxAccolades) {
-				this.ending = Ending.ACCOLADES_WIN;
-				addMessage('Game won', 'success');
-			}
-			else {
-				addMessage('New accolade', 'success');
-			}
+			this.addAccolade('plans');
+		}
+	}
+
+	addAccolade(reason) {
+		addMessage(`New accolade from ${reason}`, 'success');
+		if(++this.accolades >= g_defs.maxAccolades) {
+			this.ending = Ending.ACCOLADES_WIN;
+			addMessage('Game won', 'success');
 		}
 	}
 

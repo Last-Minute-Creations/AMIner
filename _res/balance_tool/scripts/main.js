@@ -65,8 +65,6 @@ function updateVehicleStats() {
 
 	document.querySelector('#vehicle_money').textContent = g_vehicle.money;
 	document.querySelector('#vehicle_money_spent_on_restock').textContent = g_vehicle.moneySpentOnRestock;
-	document.querySelector('#vehicle_dino_found_bones').textContent = g_vehicle.foundBones;
-	document.querySelector('#vehicle_gate_found_gates').textContent = g_vehicle.foundGates;
 }
 
 function setMineCellEvents(cell) {
@@ -299,7 +297,14 @@ function onRestockClicked(evt) {
 	}
 
 	g_vehicle.restock();
+
+	if(g_vehicle.isGateQuestioningPending) {
+		let isReporting = confirm(`Report found gate elements?\nIf yes, reduces heat by ${g_defs.heatFromGate}.\nIf not and caught on lie, commissar will know + rebuke`);
+		g_vehicle.answerQuestioning(isReporting);
+	}
+
 	updateVehicleStats();
+	updateOfficeStats();
 	updateWarehouse();
 }
 
@@ -357,6 +362,15 @@ function updateMineralStats() {
 function updateOfficeStats() {
 	document.querySelector('#office_ending').textContent = g_vehicle.ending.description;
 	document.querySelector('#office_ending').className = g_vehicle.ending.className;
+
+	document.querySelector('#office_dino_quest_state').textContent = g_vehicle.dinoQuestState.description;
+	document.querySelector('#office_dino_quest_state').className = g_vehicle.dinoQuestState.className;
+	document.querySelector('#office_dino_found_bones').textContent = g_vehicle.foundBones;
+
+	document.querySelector('#office_gate_quest_state').textContent = g_vehicle.gateQuestState.description;
+	document.querySelector('#office_gate_quest_state').className = g_vehicle.gateQuestState.className;
+	document.querySelector('#office_gate_reported').textContent = g_vehicle.isGateReported ? '✓' : '✗';
+	document.querySelector('#office_gate_found_gates').textContent = g_vehicle.foundGates;
 
 	document.querySelector('#plan_index').textContent = g_plans.index + 1;
 	document.querySelector('#plan_started').textContent = g_plans.isStarted ? '✓' : '✗';
