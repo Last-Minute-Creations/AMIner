@@ -12,6 +12,7 @@ class Plans {
 		this.index = 0;
 		this.isStarted = true;
 		this.isExtendedByFavor = false;
+		this.isAllFinished = false;
 
 		this.sequence = []; // [planIndex] => [planInfo]
 
@@ -85,8 +86,13 @@ class Plans {
 	}
 
 	next() {
-		++this.index;
-		this.start();
+		if(this.index < this.sequence.length - 1) {
+			++this.index;
+			this.start();
+		}
+		else {
+			this.isAllFinished = true;
+		}
 	}
 
 	start() {
@@ -109,7 +115,7 @@ class Plans {
 	}
 
 	tryProceed() {
-		if(this.isCompleted()) {
+		if(this.isCompleted() && !this.isAllFinished) {
 			this.next();
 			return true;
 		}
@@ -117,6 +123,10 @@ class Plans {
 	}
 
 	elapseTime(timeDelta) {
+		if(this.isAllFinished) {
+			return;
+		}
+
 		this.timeRemaining -= timeDelta;
 		if(this.timeRemaining <= 0) {
 			g_vehicle.addRebuke();
