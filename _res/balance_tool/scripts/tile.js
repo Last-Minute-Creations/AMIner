@@ -42,6 +42,14 @@ class Tile {
 			this.mineralType = MineralType.ROCK;
 			this.mineralAmount = 0;
 		}
+		else if(TileIndex.BONE_HEAD <= tileIndex && tileIndex <= TileIndex.BONE_1) {
+			this.mineralType = MineralType.BONE;
+			this.mineralAmount = 0;
+		}
+		else if(TileIndex.GATE_1 <= tileIndex && tileIndex <= TileIndex.GATE_1) {
+			this.mineralType = MineralType.GATE;
+			this.mineralAmount = 0;
+		}
 		else {
 			this.mineralType = MineralType.DIRT;
 			this.mineralAmount = 0;

@@ -184,3 +184,8 @@ LABEL * {
 	/* background: brown !important; */
 	color: #ccc;
 }
+
+.tile_bone, .tile_gate {
+	/* background: brown !important; */
+	color: darkorchid;
+}

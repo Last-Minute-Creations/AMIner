@@ -18,6 +18,9 @@ class Vehicle {
 		this.cargoMax = g_defs.cargoBase;
 		this.drillMax = g_defs.drillBase;
 
+		this.foundBones = 0;
+		this.foundGates = 0;
+
 		this.respawn();
 	}
 
@@ -74,7 +77,17 @@ class Vehicle {
 
 		// Update tile data
 		g_tileMap.tiles[posX][posY] = new Tile(TileIndex.CAVE_BG_16,  MineralType.AIR, 0);
-		g_tileMap.currentMineralCounts[tile.mineralType.id] -= tile.mineralAmount;
+		if(tile.mineralType.isDino) {
+			--g_tileMap.currentMineralCounts[tile.mineralType.id];
+			++this.foundBones;
+		}
+		else if(tile.mineralType.isGate) {
+			--g_tileMap.currentMineralCounts[tile.mineralType.id];
+			++this.foundGates;
+		}
+		else {
+			g_tileMap.currentMineralCounts[tile.mineralType.id] -= tile.mineralAmount;
+		}
 		g_tileMap.currentMoney -= tile.mineralAmount * tile.mineralType.reward;
 
 		// Damage vehicle

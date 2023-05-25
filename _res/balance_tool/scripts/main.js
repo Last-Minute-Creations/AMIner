@@ -65,6 +65,8 @@ function updateVehicleStats() {
 
 	document.querySelector('#vehicle_money').textContent = g_vehicle.money;
 	document.querySelector('#vehicle_money_spent_on_restock').textContent = g_vehicle.moneySpentOnRestock;
+	document.querySelector('#vehicle_dino_found_bones').textContent = g_vehicle.foundBones;
+	document.querySelector('#vehicle_gate_found_gates').textContent = g_vehicle.foundGates;
 }
 
 function setMineCellEvents(cell) {
@@ -176,6 +178,14 @@ function drawTiles(tileMap) {
 			else if(tileMap.tiles[x][y].mineralType == MineralType.ROCK) {
 				td.classList.add('tile_stone');
 				td.textContent = 'R';
+			}
+			else if(tileMap.tiles[x][y].mineralType == MineralType.BONE) {
+				td.classList.add('tile_bone');
+				td.textContent = 'B';
+			}
+			else if(tileMap.tiles[x][y].mineralType == MineralType.GATE) {
+				td.classList.add('tile_gate');
+				td.textContent = 'G';
 			}
 			else {
 				td.textContent = tileMap.tiles[x][y].index;
@@ -335,7 +345,7 @@ function updateTotalMoneyStats() {
 }
 
 function updateMineralStats() {
-	for(let mineralType of MineralType.collectibles) {
+	for(let mineralType of MineralType.statables) {
 		let name = mineralType.name;
 		document.querySelector(`#minerals_${name}_total`).textContent = g_tileMap.totalMineralCounts[mineralType.id];
 		document.querySelector(`#minerals_${name}`).textContent = g_tileMap.currentMineralCounts[mineralType.id];

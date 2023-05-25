@@ -16,15 +16,6 @@ class TileMap {
 				chanceRock = Utils.clamp(y * 500 / 2000, 0, 500);
 				chanceMagma = Utils.chanceTrapezoid(y, 50, 900, 1000, 1100, 0, 75);
 
-				////////////////////////////////////////////////////////////////////////
-				// let chanceSilver, chanceGold, chanceEmerald, chanceRuby, chanceMoonstone;
-				// chanceSilver = y > g_defs.depthSilver ? 75 : 0;
-				// chanceGold = y > g_defs.depthGold ? 75 : 0;
-				// chanceEmerald = y > g_defs.depthEmerald ? 75 : 0;
-				// chanceRuby = y  > g_defs.depthRuby ? 75 : 0;
-				// chanceMoonstone = y > g_defs.depthMoonstone ? 75 : 0;
-				////////////////////////////////////////////////////////////////////////
-
 				let chance = 0;
 				if(what < (chance = chanceRock)) {
 					this.tiles[x][y] = new Tile(g_rand.next16MinMax(TileIndex.STONE_1, TileIndex.STONE_4));
@@ -38,28 +29,6 @@ class TileMap {
 				) {
 					this.tiles[x][y] = new Tile(TileIndex.CAVE_BG_1+15);
 				}
-				////////////////////////////////////////////////////////////////////////
-				// else if(what < (chance += chanceSilver)) {
-				// 	let add = g_rand.next16MinMax(0, 2);
-				// 	this.tiles[x][y] = new Tile(TileIndex.SILVER_1 + add);
-				// }
-				// else if(what < (chance += chanceGold)) {
-				// 	let add = g_rand.next16MinMax(0, 2);
-				// 	this.tiles[x][y] = new Tile(TileIndex.GOLD_1 + add);
-				// }
-				// else if(what < (chance += chanceEmerald)) {
-				// 	let add = g_rand.next16MinMax(0, 2);
-				// 	this.tiles[x][y] = new Tile(TileIndex.EMERALD_1 + add);
-				// }
-				// else if(what < (chance += chanceRuby)) {
-				// 	let add = g_rand.next16MinMax(0, 2);
-				// 	this.tiles[x][y] = new Tile(TileIndex.RUBY_1 + add);
-				// }
-				// else if(what < (chance += chanceMoonstone)) {
-				// 	let add = g_rand.next16MinMax(0, 2);
-				// 	this.tiles[x][y] = new Tile(TileIndex.MOONSTONE_1 + add);
-				// }
-				////////////////////////////////////////////////////////////////////////
 				else {
 					this.tiles[x][y] = new Tile(TileIndex.DIRT_1 + ((x & 1) ^ (y & 1)));
 				}
@@ -78,24 +47,21 @@ class TileMap {
 
 		// Fill left invisible col with rocks
 		for(let y = 0; y < height; ++y) {
-			this.tiles[0][y] = new Tile(TileIndex.STONE_1, MineralType.ROCK, 0);
+			this.tiles[0][y] = new Tile(TileIndex.STONE_1);
 		}
 
 		// Rock bottom
 		for(let x = 1; x < width; ++x) {
-			this.tiles[x][height - 1] = new Tile(TileIndex.BASE_GROUND_1, MineralType.ROCK, 0);
+			this.tiles[x][height - 1] = new Tile(TileIndex.BASE_GROUND_1);
 		}
 
 		// Dino bones
-		// this.tiles[5][g_dinoDepths[0]] = new Tile(TileIndex.BONE_HEAD, MineralType.COUNT, 0);
-		// this.tiles[3][g_dinoDepths[1]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
-		// this.tiles[7][g_dinoDepths[2]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
-		// this.tiles[1][g_dinoDepths[3]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
-		// this.tiles[4][g_dinoDepths[4]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
-		// this.tiles[6][g_dinoDepths[5]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
-		// this.tiles[8][g_dinoDepths[6]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
-		// this.tiles[2][g_dinoDepths[7]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
-		// this.tiles[9][g_dinoDepths[8]] = new Tile(TileIndex.BONE_1, MineralType.COUNT, 0);
+		for(let depth of g_defs.dinoDepths) {
+			this.tiles[g_rand.next16MinMax(1, width - 1)][depth] = new Tile(TileIndex.BONE_1);
+		}
+		for(let depth of g_defs.gateDepths) {
+			this.tiles[g_rand.next16MinMax(1, width - 1)][depth] = new Tile(TileIndex.GATE_1);
+		}
 
 		// Rows per plan
 		let plannableRows = 0;
@@ -317,8 +283,14 @@ class TileMap {
 		}
 		for(let x = 1; x < width; ++x) {
 			for(let y = 0; y < height; ++y) {
-				this.totalMineralCounts[this.tiles[x][y].mineralType.id] += this.tiles[x][y].mineralAmount;
-				this.totalMoney += this.tiles[x][y].mineralAmount * this.tiles[x][y].mineralType.reward;
+				let tile = this.tiles[x][y];
+				if(tile.mineralType.isGate || tile.mineralType.isDino) {
+					this.totalMineralCounts[tile.mineralType.id] += 1;
+				}
+				else {
+					this.totalMineralCounts[tile.mineralType.id] += tile.mineralAmount;
+				}
+				this.totalMoney += tile.mineralAmount * tile.mineralType.reward;
 			}
 		}
 

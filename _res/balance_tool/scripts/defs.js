@@ -39,5 +39,8 @@ class Defs {
 		this.depthEmerald = 200;
 		this.depthRuby = 400;
 		this.depthMoonstone = 175;
+
+		this.dinoDepths = document.querySelector('[name=defs_dino_depths]').value.split(',').map((x) => parseInt(x));
+		this.gateDepths = document.querySelector('[name=defs_gate_depths]').value.split(',').map((x) => parseInt(x));
 	}
 }

@@ -34,4 +34,5 @@ class TileIndex {
 	static MOONSTONE_3 = 84;
 	static BONE_HEAD = 85;
 	static BONE_1 = 86;
+	static GATE_1 = 87;
 }

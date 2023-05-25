@@ -48,6 +48,8 @@
 					<label>Bribe cost multiplier <input type="number" name="defs_bribe_cost_multiplier" min="0.1" max="1.0" step="0.1" value=".5"></label>
 					<label>Heat % add per accounting <input type="number" name="defs_heat_add_accounting" value="5"></label>
 					<label>Heat % decrement per plan <input type="number" name="defs_heat_remove_plan" value="3"></label>
+					<label>Dino depths <input name="defs_dino_depths" value="80, 200, 240, 310, 350, 410, 510, 610, 710"></label>
+					<label>Gate depths <input name="defs_gate_depths" value="220, 250, 300, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000"></label>
 					<button id="btn_game_reload" class="btn_large">Reload game</button>
 				</div>
 
@@ -74,6 +76,10 @@
 							Moonstone: <span id="minerals_moonstone">?</span>/<span id="minerals_moonstone_total">?</span>,
 							in plans: <span id="plan_total_moonstone">?</span>,
 							margin: <span id="plan_margin_moonstone">?</span>
+						<li>
+							Bones: <span id="minerals_bone">?</span>/<span id="minerals_bone_total">?</span>,
+						<li>
+							Gates: <span id="minerals_gate">?</span>/<span id="minerals_gate_total">?</span>,
 						<li>Money worth: <span id="minerals_money">?</span>/<span id="minerals_money_total">?</span>
 						<li>Total cost of upgrades: <span id="upgrade_cost_total">?</span>
 						<li>Total cost of plans: <span id="plan_cost_total">?</span>, costs: <span id="separate_plan_costs"></span>
@@ -94,6 +100,10 @@
 							Upgrade cost: <span id="vehicle_upgrade_cargo_cost">?</span>$ <button id="vehicle_upgrade_cargo">Upgrade</button>
 						<li>Money: <span id="vehicle_money">?</span>$</li>
 						<li>Money spent on restock: <span id="vehicle_money_spent_on_restock">?</span>$</li>
+						<li>Found bones: <span id="vehicle_dino_found_bones">?</span></li>
+						<li>Dino quest state: <span id="vehicle_dino_quest_state">?</span></li>
+						<li>Found gates: <span id="vehicle_gate_found_gates">?</span></li>
+						<li>Gate quest state: <span id="vehicle_gate_quest_state">?</span></li>
 					</ul>
 					<button id="btn_vehicle_restock" class="btn_large">Restock</button>
 				</div>
