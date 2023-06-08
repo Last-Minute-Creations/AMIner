@@ -55,13 +55,17 @@ class TileMap {
 			this.tiles[x][height - 1] = new Tile(TileIndex.BASE_GROUND_1);
 		}
 
-		// Dino bones
+		// Quest items
 		for(let depth of g_defs.dinoDepths) {
 			this.tiles[g_rand.next16MinMax(1, width - 1)][depth] = new Tile(TileIndex.BONE_1);
 		}
 		for(let depth of g_defs.gateDepths) {
 			this.tiles[g_rand.next16MinMax(1, width - 1)][depth] = new Tile(TileIndex.GATE_1);
 		}
+		for(let depth of g_defs.crateDepths) {
+			this.tiles[g_rand.next16MinMax(1, width - 1)][depth] = new Tile(TileIndex.CRATE_1);
+		}
+		this.tiles[g_rand.next16MinMax(1, width - 1)][g_defs.crateCapsuleDepth] = new Tile(TileIndex.CAPSULE_1);
 
 		// Rows per plan
 		let plannableRows = 0;
@@ -284,7 +288,7 @@ class TileMap {
 		for(let x = 1; x < width; ++x) {
 			for(let y = 0; y < height; ++y) {
 				let tile = this.tiles[x][y];
-				if(tile.mineralType.isGate || tile.mineralType.isDino) {
+				if(tile.mineralType.isGate || tile.mineralType.isDino || tile.mineralType.isCrate) {
 					this.totalMineralCounts[tile.mineralType.id] += 1;
 				}
 				else {
@@ -338,7 +342,22 @@ class TileMap {
 			]
 		},
 		{
-			level: 209,
+			level: 209, // teleport
+			pattern: [
+				[44, 44, 44, 44, 44, 44, 44, 44, 44, 44],
+				[ 0, 43, 43, 43, 43,  1, 43,  0, 43, 43],
+				[43,  1, 43, 43, 43, 43, 43, 43, 43,  2],
+				[43, 43, 43, 43, 43,  3,  1, 43, 43,  1],
+				[ 4,  5, 43, 43,  6,  5, 43, 43,  0, 43],
+				[ 7,  8,  1, 43,  9, 10,  2, 11, 43, 43],
+				[12, 13, 43, 43, 14, 15, 16, 17, 18, 19],
+				[20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+				[34, 35, 36, 37, 38, 33, 39, 40, 41, 42],
+				[63, 64, 63, 64, 63, 57, 63, 64, 63, 64],
+			]
+		},
+		{
+			level: 500, // gate
 			pattern: [
 				[44, 44, 44, 44, 44, 44, 44, 44, 44, 44],
 				[ 0, 43, 43, 43, 43,  1, 43,  0, 43, 43],

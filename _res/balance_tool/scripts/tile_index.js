@@ -35,4 +35,6 @@ class TileIndex {
 	static BONE_HEAD = 85;
 	static BONE_1 = 86;
 	static GATE_1 = 87;
+	static CRATE_1 = 88;
+	static CAPSULE_1 = 89;
 }

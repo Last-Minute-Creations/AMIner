@@ -19,11 +19,19 @@ class Vehicle {
 		this.drillMax = g_defs.drillBase;
 
 		this.foundBones = 0;
+		this.dinoQuestState = QuestState.NOT_STARTED;
+
 		this.foundGates = 0;
-		this.gateQuestState = GateQuestState.NOT_STARTED;
-		this.dinoQuestState = DinoQuestState.NOT_STARTED;
+		this.gateQuestState = QuestState.NOT_STARTED;
 		this.isGateQuestioningPending = false;
 		this.isGateReported = false;
+
+		this.minerHeldCrates = 0;
+		this.minerSoldCrates = 0;
+		this.minerSpentCrates = 0;
+		this.minerIsBaseReported = false;
+		this.minerIsAgentReported = false;
+		this.minerIsJayFound = false;
 
 		this.respawn();
 	}
@@ -38,12 +46,12 @@ class Vehicle {
 	advanceDinoQuest() {
 		++this.foundBones;
 		if(this.foundBones == 1) {
-			this.dinoQuestState = DinoQuestState.IN_PROGRESS;
+			this.dinoQuestState = QuestState.IN_PROGRESS;
 			addMessage('Dino quest started', 'success');
 		}
 		if(this.foundBones >= g_defs.dinoDepths.length) {
 			addMessage('Dino quest completed', 'success');
-			this.dinoQuestState = DinoQuestState.COMPLETED;
+			this.dinoQuestState = QuestState.COMPLETED;
 			this.addAccolade('dino');
 		}
 	}
@@ -52,16 +60,19 @@ class Vehicle {
 		++this.foundGates;
 
 		if(this.foundGates == 1) {
-			this.gateQuestState = GateQuestState.IN_PROGRESS;
+			this.gateQuestState = QuestState.IN_PROGRESS;
 			addMessage('Gate quest started', 'success');
 		}
 		if(this.foundGates >= g_defs.gateDepths.length) {
-			this.gateQuestState = GateQuestState.COMPLETED;
+			this.gateQuestState = QuestState.COMPLETED;
 			if(this.isGateReported) {
 				this.ending = Ending.GATE_REPORTED_END;
 			}
 			else {
 				this.ending = ((g_rand.next16() & 1) == 0) ? Ending.GATE_SECRET_BAD : Ending.GATE_SECRET_GOOD;
+				if(this.ending == Ending.GATE_SECRET_BAD && this.canTeleportToWest()) {
+					this.ending = Ending.GATE_BAD_TELEPORTED_TO_WEST;
+				}
 			}
 			addMessage('Game ended with gate quest', 'success');
 		}
@@ -72,7 +83,6 @@ class Vehicle {
 				addMessage('Commissar will interrogate you on restock', 'warning')
 			}
 		}
-
 	}
 
 	answerQuestioning(isReporting) {
@@ -95,6 +105,82 @@ class Vehicle {
 		}
 
 		this.isGateQuestioningPending = false;
+	}
+
+	markCapsuleFound() {
+		this.minerIsJayFound = true;
+	}
+
+	advanceCrateQuest() {
+		++this.minerHeldCrates;
+	}
+
+	tryReportAgent() {
+		if(!this.minerIsAgentReported) {
+			this.minerIsAgentReported = true;
+			this.addAccolade('agent reporting');
+		}
+	}
+
+	trySellCrate() {
+		if(this.minerHeldCrates <= 0) {
+			return;
+		}
+		--this.minerHeldCrates;
+		++this.minerSoldCrates;
+		this.money += g_defs.crateSellReward;
+	}
+
+	tryOpenCapsule() {
+		if(
+			this.minerIsCapsuleOpened ||
+			this.minerIsBaseReported ||
+			!this.minerIsJayFound ||
+			this.minerHeldCrates < g_defs.crateCapsuleCost
+		) {
+			return;
+		}
+		this.minerHeldCrates -= g_defs.crateCapsuleCost;
+		this.minerSpentCrates += g_defs.crateCapsuleCost;
+		addMessage('Opened capsule', 'success');
+	}
+
+	canTeleportToWest() {
+		return (
+			!this.minerIsBaseReported &&
+			this.minerHeldCrates >= g_defs.crateTeleportCost
+		);
+	}
+
+	tryTeleportWest() {
+		if(this.ending != Ending.NONE || !this.canTeleportToWest()) {
+			return;
+		}
+		this.minerHeldCrates -= g_defs.crateTeleportCost;
+		this.minerSpentCrates += g_defs.crateTeleportCost;
+		this.ending = Ending.TELEPORTED_TO_WEST;
+		addMessage('Game ended with teleport quest', 'success');
+	}
+
+	tryEscapeWest() {
+		if(
+			this.ending != Ending.NONE ||
+			this.minerIsAgentReported ||
+			this.minerSoldCrates < g_defs.crateSellBeforeEscape
+		) {
+			return;
+		}
+
+		this.heat = Math.min(this.heat + g_defs.escapeHeat, 99);
+		let pick = g_rand.next16MinMax(1, 100);
+		if(pick > this.heat) {
+			this.ending = Ending.CAUGHT_ESCAPING_TO_WEST;
+			addMessage('You\'ve been caught during escape', 'error');
+		}
+		else {
+			this.ending = Ending.ESCAPED_TO_WEST;
+			addMessage('Game ended with agent quest', 'success');
+		}
 	}
 
 	tryExcavate(posX, posY) {
@@ -150,6 +236,14 @@ class Vehicle {
 		else if(tile.mineralType.isGate) {
 			--g_tileMap.currentMineralCounts[tile.mineralType.id];
 			this.advanceGateQuest();
+		}
+		else if(tile.mineralType.isCrate) {
+			--g_tileMap.currentMineralCounts[tile.mineralType.id];
+			this.advanceCrateQuest();
+		}
+		else if(tile.mineralType.isCapsule) {
+			--g_tileMap.currentMineralCounts[tile.mineralType.id];
+			this.markCapsuleFound();
 		}
 		else {
 			g_tileMap.currentMineralCounts[tile.mineralType.id] -= tile.mineralAmount;

@@ -87,6 +87,10 @@ H2 {
 	font-size: small;
 }
 
+.stat_value {
+	font-weight: bold;
+}
+
 /*----------------------------------------------------------------------DEFS--*/
 
 LABEL {
@@ -143,31 +147,25 @@ LABEL * {
 }
 
 .tile_dirt {
-	/* background: brown !important; */
 }
 
 .tile_silver {
-	/* background: brown !important; */
 	color: deepskyblue;
 }
 
 .tile_gold {
-	/* background: brown !important; */
 	color: gold;
 }
 
 .tile_emerald {
-	/* background: brown !important; */
 	color: greenyellow;
 }
 
 .tile_ruby {
-	/* background: brown !important; */
 	color: pink;
 }
 
 .tile_moonstone {
-	/* background: brown !important; */
 	color: turquoise;
 }
 
@@ -176,16 +174,13 @@ LABEL * {
 }
 
 .tile_magma {
-	/* background: brown !important; */
 	color: red;
 }
 
 .tile_stone {
-	/* background: brown !important; */
 	color: #ccc;
 }
 
-.tile_bone, .tile_gate {
-	/* background: brown !important; */
-	color: darkorchid;
+.tile_bone, .tile_gate, .tile_crate, .tile_capsule {
+	color: orchid;
 }

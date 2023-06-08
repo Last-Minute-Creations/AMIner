@@ -41,7 +41,16 @@ class Defs {
 		this.depthMoonstone = 175;
 
 		this.dinoDepths = document.querySelector('[name=defs_dino_depths]').value.split(',').map((x) => parseInt(x));
+
 		this.gateDepths = document.querySelector('[name=defs_gate_depths]').value.split(',').map((x) => parseInt(x));
 		this.heatFromGate = parseInt(document.querySelector('[name=defs_heat_from_gate]').value);
+
+		this.crateDepths = document.querySelector('[name=defs_crate_depths]').value.split(',').map((x) => parseInt(x));
+		this.crateCapsuleDepth = parseInt(document.querySelector('[name=defs_crate_capsule_depth]').value);
+		this.crateTeleportCost = parseInt(document.querySelector('[name=defs_crate_teleport_cost]').value);
+		this.crateCapsuleCost = parseInt(document.querySelector('[name=defs_crate_capsule_cost]').value);
+		this.crateSellReward = parseInt(document.querySelector('[name=defs_crate_sell_reward]').value);
+		this.crateSellBeforeEscape = parseInt(document.querySelector('[name=defs_crate_sell_before_escape]').value);
+		this.escapeHeat = parseInt(document.querySelector('[name=defs_escape_heat]').value);
 	}
 }

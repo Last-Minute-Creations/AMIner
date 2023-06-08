@@ -50,6 +50,14 @@ class Tile {
 			this.mineralType = MineralType.GATE;
 			this.mineralAmount = 0;
 		}
+		else if(TileIndex.CRATE_1 <= tileIndex && tileIndex <= TileIndex.CRATE_1) {
+			this.mineralType = MineralType.CRATE;
+			this.mineralAmount = 0;
+		}
+		else if(TileIndex.CAPSULE_1 <= tileIndex && tileIndex <= TileIndex.CAPSULE_1) {
+			this.mineralType = MineralType.CAPSULE;
+			this.mineralAmount = 0;
+		}
 		else {
 			this.mineralType = MineralType.DIRT;
 			this.mineralAmount = 0;

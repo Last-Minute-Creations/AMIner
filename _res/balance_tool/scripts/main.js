@@ -185,6 +185,14 @@ function drawTiles(tileMap) {
 				td.classList.add('tile_gate');
 				td.textContent = 'G';
 			}
+			else if(tileMap.tiles[x][y].mineralType == MineralType.CRATE) {
+				td.classList.add('tile_crate');
+				td.textContent = 'C';
+			}
+			else if(tileMap.tiles[x][y].mineralType == MineralType.CAPSULE) {
+				td.classList.add('tile_capsule');
+				td.textContent = 'J';
+			}
 			else {
 				td.textContent = tileMap.tiles[x][y].index;
 			}
@@ -330,6 +338,32 @@ function onBribeClicked() {
 	updateOfficeStats();
 }
 
+function onReportAgentClicked() {
+	g_vehicle.tryReportAgent();
+	updateOfficeStats();
+}
+
+function onSellCrateClicked() {
+	g_vehicle.trySellCrate();
+	updateOfficeStats();
+	updateVehicleStats();
+}
+
+function onEscapeWestClicked() {
+	g_vehicle.tryEscapeWest();
+	updateOfficeStats();
+}
+
+function onOpenCapsuleClicked() {
+	g_vehicle.tryOpenCapsule();
+	updateOfficeStats();
+}
+
+function onTeleportWestClicked() {
+	g_vehicle.tryTeleportWest();
+	updateOfficeStats();
+}
+
 function updateTotalMoneyStats() {
 	let planCosts = g_plans.sequence.map((planInfo) => planInfo.targetSum);
 	let totalPlanCost = planCosts.reduce((sum, planCost) => sum + planCost, 0);
@@ -371,6 +405,13 @@ function updateOfficeStats() {
 	document.querySelector('#office_gate_quest_state').className = g_vehicle.gateQuestState.className;
 	document.querySelector('#office_gate_reported').textContent = g_vehicle.isGateReported ? '✓' : '✗';
 	document.querySelector('#office_gate_found_gates').textContent = g_vehicle.foundGates;
+
+	document.querySelector('#office_miner_held_crates').textContent = g_vehicle.minerHeldCrates;
+	document.querySelector('#office_miner_spent_crates').textContent = g_vehicle.minerSpentCrates;
+	document.querySelector('#office_miner_sold_crates').textContent = g_vehicle.minerSoldCrates;
+	document.querySelector('#office_miner_is_base_reported').textContent = g_vehicle.minerIsBaseReported ? '✓' : '✗';
+	document.querySelector('#office_miner_is_agent_reported').textContent = g_vehicle.minerIsAgentReported ? '✓' : '✗';
+	document.querySelector('#office_miner_is_jay_found').textContent = g_vehicle.minerIsJayFound ? '✓' : '✗';
 
 	document.querySelector('#plan_index').textContent = g_plans.index + 1;
 	document.querySelector('#plan_started').textContent = g_plans.isStarted ? '✓' : '✗';
@@ -436,6 +477,12 @@ window.addEventListener('load', function() {
 	document.querySelector('#vehicle_upgrade_drill').addEventListener('click', function() { onUpgradeClicked('drill'); })
 	document.querySelector('#vehicle_upgrade_cargo').addEventListener('click', function() { onUpgradeClicked('cargo'); })
 	document.querySelector('#ending_reset').addEventListener('click', function() { onResetEndingClicked(); })
+
+	document.querySelector('#btn_sell_crate').addEventListener('click', function() { onSellCrateClicked(); })
+	document.querySelector('#btn_escape_west').addEventListener('click', function() { onEscapeWestClicked(); })
+	document.querySelector('#btn_report_agent').addEventListener('click', function() { onReportAgentClicked(); })
+	document.querySelector('#btn_open_capsule').addEventListener('click', function() { onOpenCapsuleClicked(); })
+	document.querySelector('#btn_teleport_west').addEventListener('click', function() { onTeleportWestClicked(); })
 
 	reloadGame();
 });
