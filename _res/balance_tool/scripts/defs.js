@@ -52,5 +52,7 @@ class Defs {
 		this.crateSellReward = parseInt(document.querySelector('[name=defs_crate_sell_reward]').value);
 		this.crateSellBeforeEscape = parseInt(document.querySelector('[name=defs_crate_sell_before_escape]').value);
 		this.escapeHeat = parseInt(document.querySelector('[name=defs_escape_heat]').value);
+		this.crateCountForInterrogation = parseInt(document.querySelector('[name=defs_crate_count_for_interrogation]').value);
+		this.heatFromCrateQuestioning = parseInt(document.querySelector('[name=defs_heat_from_crate_questioning]').value);
 	}
 }

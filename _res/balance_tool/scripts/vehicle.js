@@ -26,6 +26,7 @@ class Vehicle {
 		this.isGateQuestioningPending = false;
 		this.isGateReported = false;
 
+		this.minerIsCrateQuestioningPending = false;
 		this.minerHeldCrates = 0;
 		this.minerSoldCrates = 0;
 		this.minerSpentCrates = 0;
@@ -69,7 +70,7 @@ class Vehicle {
 				this.ending = Ending.GATE_REPORTED_END;
 			}
 			else {
-				this.ending = ((g_rand.next16() & 1) == 0) ? Ending.GATE_SECRET_BAD : Ending.GATE_SECRET_GOOD;
+				this.ending = (this.dinoQuestState == QuestState.COMPLETED) ? Ending.GATE_SECRET_BAD : Ending.GATE_SECRET_GOOD;
 				if(this.ending == Ending.GATE_SECRET_BAD && this.canTeleportToWest()) {
 					this.ending = Ending.GATE_BAD_TELEPORTED_TO_WEST;
 				}
@@ -78,25 +79,25 @@ class Vehicle {
 		}
 		else {
 			if(!this.isGateReported) {
-				this.heat += g_defs.heatFromGate;
+				this.heat = Math.min(this.heat + g_defs.heatFromGate, 99);
 				this.isGateQuestioningPending = true;
-				addMessage('Commissar will interrogate you on restock', 'warning')
+				addMessage('Commissar will interrogate you about gate on restock', 'warning')
 			}
 		}
 	}
 
-	answerQuestioning(isReporting) {
+	answerGateQuestioning(isReporting) {
 		if(isReporting) {
 			this.heat = Math.max(0, this.heat - g_defs.heatFromGate);
 		}
 		else {
 			let pick = g_rand.next16MinMax(1, 100);
 			if(pick > this.heat) {
-				addMessage('Lie succeeded', 'success');
+				addMessage('Lie about gate esucceeded', 'success');
 			}
 			else {
 				isReporting = true;
-				this.addRebuke('tried to lie to Commissar');
+				this.addRebuke('tried to lie to Commissar about gate');
 			}
 		}
 
@@ -107,12 +108,39 @@ class Vehicle {
 		this.isGateQuestioningPending = false;
 	}
 
+	answerCrateQuestioning(isReporting) {
+		if(isReporting) {
+			this.heat = Math.max(0, this.heat - g_defs.heatFromCrateQuestioning);
+		}
+		else {
+			let pick = g_rand.next16MinMax(1, 100);
+			if(pick > this.heat) {
+				addMessage('Lie about crates succeeded', 'success');
+			}
+			else {
+				isReporting = true;
+				this.addRebuke('tried to lie to Commissar about crates');
+			}
+		}
+
+		if(isReporting) {
+			this.minerHeldCrates = 0;
+		}
+
+		this.minerIsCrateQuestioningPending = false;
+	}
+
 	markCapsuleFound() {
 		this.minerIsJayFound = true;
 	}
 
 	advanceCrateQuest() {
 		++this.minerHeldCrates;
+		if(this.minerHeldCrates % g_defs.crateCountForInterrogation == 0) {
+			this.heat = Math.min(this.heat + g_defs.heatFromCrateQuestioning, 99);
+			this.minerIsCrateQuestioningPending = true;
+			addMessage('Commissar will interrogate you about crates on restock', 'warning')
+		}
 	}
 
 	tryReportAgent() {

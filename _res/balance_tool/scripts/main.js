@@ -308,7 +308,11 @@ function onRestockClicked(evt) {
 
 	if(g_vehicle.isGateQuestioningPending) {
 		let isReporting = confirm(`Report found gate elements?\nIf yes, reduces heat by ${g_defs.heatFromGate}.\nIf not and caught on lie, commissar will know + rebuke`);
-		g_vehicle.answerQuestioning(isReporting);
+		g_vehicle.answerGateQuestioning(isReporting);
+	}
+	if(g_vehicle.minerIsCrateQuestioningPending) {
+		let isReporting = confirm(`Report found crates?\nIf yes, reduces heat by ${g_defs.heatFromCrateQuestioning} and commissar confiscates crates.\nIf not and caught on lie, commissar will confiscate crates`);
+		g_vehicle.answerCrateQuestioning(isReporting);
 	}
 
 	updateVehicleStats();
