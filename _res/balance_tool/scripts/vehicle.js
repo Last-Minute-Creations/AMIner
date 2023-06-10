@@ -33,7 +33,6 @@ class Vehicle {
 		this.minerIsBaseReported = false;
 		this.minerIsAgentReported = false;
 		this.minerIsJayFound = false;
-		this.minerIsAccoladeFromReportingEarned = false;
 
 		this.respawn();
 	}
@@ -147,26 +146,14 @@ class Vehicle {
 	tryReportAgent() {
 		if(!this.minerIsAgentReported) {
 			this.minerIsAgentReported = true;
-			if(!this.minerIsAccoladeFromReportingEarned) {
-				this.addAccolade('teleport quest reporting (agent)');
-				this.minerIsAccoladeFromReportingEarned = true;
-			}
-			else {
-				addMessage('no extra accolade from reporting agent', 'warning');
-			}
+			this.addAccolade('reported agent');
 		}
 	}
 
 	tryReportBase() {
 		if(!this.minerIsBaseReported) {
 			this.minerIsBaseReported = true;
-			if(!this.minerIsAccoladeFromReportingEarned) {
-				this.addAccolade('teleport quest reporting (base)');
-				this.minerIsAccoladeFromReportingEarned = true;
-			}
-			else {
-				addMessage('no extra accolade from reporting base', 'warning');
-			}
+			this.addAccolade('reported teleport base');
 		}
 	}
 
