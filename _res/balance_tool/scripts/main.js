@@ -368,6 +368,11 @@ function onTeleportWestClicked() {
 	updateOfficeStats();
 }
 
+function onReportBaseClicked() {
+	g_vehicle.tryReportBase();
+	updateOfficeStats();
+}
+
 function updateTotalMoneyStats() {
 	let planCosts = g_plans.sequence.map((planInfo) => planInfo.targetSum);
 	let totalPlanCost = planCosts.reduce((sum, planCost) => sum + planCost, 0);
@@ -487,6 +492,7 @@ window.addEventListener('load', function() {
 	document.querySelector('#btn_report_agent').addEventListener('click', function() { onReportAgentClicked(); })
 	document.querySelector('#btn_open_capsule').addEventListener('click', function() { onOpenCapsuleClicked(); })
 	document.querySelector('#btn_teleport_west').addEventListener('click', function() { onTeleportWestClicked(); })
+	document.querySelector('#btn_report_base').addEventListener('click', function() { onReportBaseClicked(); })
 
 	reloadGame();
 });
