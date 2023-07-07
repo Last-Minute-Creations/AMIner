@@ -225,10 +225,26 @@ convertTileset(
 )
 
 #------------------------------------------------------------------------- BONES
+file(MAKE_DIRECTORY ${GEN_DIR}/bones)
 
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
+	GENERATED_FILE_LIST "BONE_TILES"
 	DESTINATIONS
-		${GEN_DIR}/bones.png 0 384 80 265
+		${GEN_DIR}/bones/0.png 0 384 80 22 # true width: 32
+		${GEN_DIR}/bones/1.png 0 408 80 10 # true width: 32
+		${GEN_DIR}/bones/2.png 0 419 80 15 # true width: 32
+		${GEN_DIR}/bones/3.png 0 435 80 24 # true width: 32
+		${GEN_DIR}/bones/4.png 0 460 80 44 # true width: 48
+		${GEN_DIR}/bones/5.png 0 505 80 29 # true width: 48
+		${GEN_DIR}/bones/6.png 0 535 80 45 # true width: 16
+		${GEN_DIR}/bones/7.png 0 581 80 45 # true width: 32
+		${GEN_DIR}/bones/8.png 0 627 80 22 # true width: 80
+)
+
+convertTileset(
+	TARGET ${GAME_EXECUTABLE} SIZE 80 VARIABLE_HEIGHT PALETTE ${palette_aminer_unique}
+	INTERLEAVED SOURCE ${GEN_DIR}/bones DESTINATION ${DATA_DIR}/bones.png
+	TILE_PATHS ${BONE_TILES}
 )
 
 #---------------------------------------------------------------------- TILESETS

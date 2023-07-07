@@ -595,11 +595,10 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	// Load mineral to vehicle
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwTileX][uwTileY];
 	if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
+		// TODO: other message when redundant bone found?
 		char szMessage[50];
-		if(dinoGetBoneCount() < 9) {
-			dinoFoundBone();
-		}
-		sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_BONE], dinoGetBoneCount());
+		UBYTE ubBoneIndex = dinoAddBone();
+		sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_BONE], ubBoneIndex);
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
 			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,

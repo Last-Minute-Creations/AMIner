@@ -23,6 +23,7 @@
 #include <comm/comm.h>
 #include "defs.h"
 #include "settings.h"
+#include "collectibles.h"
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
@@ -50,7 +51,7 @@ void coreProcessBeforeBobs(void) {
 	tileBufferQueueProcess(g_pMainBuffer);
 
 	// Draw dino bones before anything else
-	dinoProcessDraw();
+	collectiblesProcess();
 }
 
 void coreProcessAfterBobs(void) {
@@ -90,7 +91,8 @@ static void coreGsCreate(void) {
 
 	textBobManagerCreate(g_pFont);
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
-	dinoCreate();
+	dinoReset();
+	collectiblesCreate();
 
 	hudCreate(s_pView, g_pFont);
 
@@ -190,7 +192,7 @@ static void coreGsDestroy(void) {
 
 	menuUnload();
 	bitmapDestroy(s_pTiles);
-	dinoDestroy();
+	collectiblesDestroy();
 	baseTileDestroy();
 	textBobManagerDestroy();
 	fontDestroy(g_pFont);

@@ -29,6 +29,7 @@
 #include "defs.h"
 #include "save.h"
 #include "settings.h"
+#include "collectibles.h"
 
 #define CAMERA_SPEED 4
 
@@ -86,6 +87,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_pPlayerSteers[1] = sSteerP2;
 	inboxReset();
 	dinoReset();
+	collectiblesReset();
 	tutorialReset();
 	pageOfficeReset();
 	tileReset(g_isAtari, g_isChallenge);
