@@ -78,6 +78,9 @@ extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/dirt.png
 		${GEN_DIR}/tiles/94.png   1 265 32 32 # TILE_MOONSTONE_3
 		${GEN_DIR}/tiles/95.png  34 331 32 32 # TILE_BONE_HEAD
 		${GEN_DIR}/tiles/96.png   1 331 32 32 # TILE_BONE_1
+		${GEN_DIR}/tiles/97.png 133   1 32 32 # TILE_CRATE_1
+		${GEN_DIR}/tiles/98.png 133  67 32 32 # TILE_GATE_1
+		${GEN_DIR}/tiles/99.png 133 100 32 32 # TILE_GATE_2
 )
 
 convertTileset(
