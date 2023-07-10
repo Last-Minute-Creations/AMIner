@@ -134,6 +134,7 @@ static void advanceBob(void) {
 }
 
 static void collectibleDrawNext(void) {
+	UBYTE ubFoundCount = s_pZoneDatas[s_ubCurrentZone].ubFoundCount;
 	for(UBYTE i = s_pZones[s_ubCurrentZone].ubCount; i--;) {
 		tBob *pBob = &s_pBobs[s_ubCurrentBob];
 
@@ -141,7 +142,7 @@ static void collectibleDrawNext(void) {
 			g_pMainBuffer, pBob->sPos.uwX, pBob->sPos.uwY, pBob->uwWidth, pBob->uwHeight
 		);
 		if(isOnBuffer) {
-			if(s_pBobsDrawCounts[s_ubCurrentBob] < 2) {
+			if(s_ubCurrentBob < ubFoundCount && s_pBobsDrawCounts[s_ubCurrentBob] < 2) {
 				bobPush(pBob);
 				++s_pBobsDrawCounts[s_ubCurrentBob];
 				break;
