@@ -131,13 +131,19 @@ static void gameProcessHotkeys(void) {
 	if(keyUse(KEY_B)) {
 		debugToggle();
 	}
-	if(keyCheck(KEY_M)) {
+	if(keyCheck(KEY_SLASH)) {
 		vPortWaitForEnd(s_pVpMain);
 		vPortWaitForEnd(s_pVpMain);
 		vPortWaitForEnd(s_pVpMain);
 	}
 	if(keyUse(KEY_R) && s_sTeleportReturn.ulYX != -1u && g_pVehicles[0].ubVehicleState == VEHICLE_STATE_MOVING) {
 		vehicleTeleport(&g_pVehicles[0], s_sTeleportReturn.uwX, s_sTeleportReturn.uwY);
+	}
+	if(keyUse(KEY_N)) {
+		vehicleTeleport(&g_pVehicles[0], 4 * 32, 212 * 32);
+	}
+	if(keyUse(KEY_M)) {
+		vehicleTeleport(&g_pVehicles[0], 4 * 32, 4 * 32);
 	}
 
 	if(keyUse(KEY_F1) && !g_isChallenge) {
