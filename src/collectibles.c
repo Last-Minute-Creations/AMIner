@@ -5,6 +5,7 @@
 #include "collectibles.h"
 #include <ace/managers/bob.h>
 #include "core.h"
+#include "tile.h"
 
 #define COLLECTIBLES_BOB_MAX 16
 
@@ -30,19 +31,19 @@ typedef struct tCollectiblesZoneData {
 
 static const tCollectiblesZoneDef s_pZones[COLLECTIBLE_KIND_COUNT] = {
 	[COLLECTIBLE_KIND_DINO] = {
-		.uwDepthTop = 80 * 32,
-		.uwDepthBottom = 120 * 32,
+		.uwDepthTop = 80 * TILE_SIZE,
+		.uwDepthBottom = 120 * TILE_SIZE,
 		.ubCount = 9,
 		.pBobCoords = {
-			{.uwX = 32 + 92, .uwY = 100 * 32 + 170},
-			{.uwX = 32 + 116, .uwY = 100 * 32 + 179},
-			{.uwX = 32 + 147, .uwY = 100 * 32 + 172},
-			{.uwX = 32 + 159, .uwY = 100 * 32 + 189},
-			{.uwX = 32 + 178, .uwY = 100 * 32 + 170},
-			{.uwX = 32 + 215, .uwY = 100 * 32 + 192},
-			{.uwX = 32 + 209, .uwY = 100 * 32 + 201},
-			{.uwX = 32 + 220, .uwY = 100 * 32 + 205},
-			{.uwX = 32 + 250, .uwY = 100 * 32 + 218},
+			{.uwX = 32 + 92, .uwY = 100 * TILE_SIZE + 170},
+			{.uwX = 32 + 116, .uwY = 100 * TILE_SIZE + 179},
+			{.uwX = 32 + 147, .uwY = 100 * TILE_SIZE + 172},
+			{.uwX = 32 + 159, .uwY = 100 * TILE_SIZE + 189},
+			{.uwX = 32 + 178, .uwY = 100 * TILE_SIZE + 170},
+			{.uwX = 32 + 215, .uwY = 100 * TILE_SIZE + 192},
+			{.uwX = 32 + 209, .uwY = 100 * TILE_SIZE + 201},
+			{.uwX = 32 + 220, .uwY = 100 * TILE_SIZE + 205},
+			{.uwX = 32 + 250, .uwY = 100 * TILE_SIZE + 218},
 		},
 		.pBobSizes = {
 			{.uwX = 80, .uwY = 22},
@@ -59,27 +60,27 @@ static const tCollectiblesZoneDef s_pZones[COLLECTIBLE_KIND_COUNT] = {
 		.szMasksFile = "data/bones_mask.bm",
 	},
 	[COLLECTIBLE_KIND_GATE] = {
-		.uwDepthTop = 180 * 32,
-		.uwDepthBottom = 230 * 32,
+		.uwDepthTop = 180 * TILE_SIZE,
+		.uwDepthBottom = 230 * TILE_SIZE,
 		// TODO: Proper values
 		.ubCount = 16,
 		.pBobCoords = {
-			{.uwX = 32 +  78, .uwY = 209 * 32 + 217},
-			{.uwX = 32 +  95, .uwY = 209 * 32 + 210},
-			{.uwX = 32 + 102, .uwY = 209 * 32 + 198},
-			{.uwX = 32 + 109, .uwY = 209 * 32 + 186},
-			{.uwX = 32 + 108, .uwY = 209 * 32 + 168},
-			{.uwX = 32 + 102, .uwY = 209 * 32 + 154},
-			{.uwX = 32 +  92, .uwY = 209 * 32 + 144},
-			{.uwX = 32 +  77, .uwY = 209 * 32 + 141},
-			{.uwX = 32 +  61, .uwY = 209 * 32 + 141},
-			{.uwX = 32 +  47, .uwY = 209 * 32 + 144},
-			{.uwX = 32 +  37, .uwY = 209 * 32 + 153},
-			{.uwX = 32 +  32, .uwY = 209 * 32 + 167},
-			{.uwX = 32 +  32, .uwY = 209 * 32 + 185},
-			{.uwX = 32 +  36, .uwY = 209 * 32 + 198},
-			{.uwX = 32 +  45, .uwY = 209 * 32 + 210},
-			{.uwX = 32 +  62, .uwY = 209 * 32 + 216},
+			{.uwX = 32 +  78, .uwY = 209 * TILE_SIZE + 217},
+			{.uwX = 32 +  95, .uwY = 209 * TILE_SIZE + 210},
+			{.uwX = 32 + 102, .uwY = 209 * TILE_SIZE + 198},
+			{.uwX = 32 + 109, .uwY = 209 * TILE_SIZE + 186},
+			{.uwX = 32 + 108, .uwY = 209 * TILE_SIZE + 168},
+			{.uwX = 32 + 102, .uwY = 209 * TILE_SIZE + 154},
+			{.uwX = 32 +  92, .uwY = 209 * TILE_SIZE + 144},
+			{.uwX = 32 +  77, .uwY = 209 * TILE_SIZE + 141},
+			{.uwX = 32 +  61, .uwY = 209 * TILE_SIZE + 141},
+			{.uwX = 32 +  47, .uwY = 209 * TILE_SIZE + 144},
+			{.uwX = 32 +  37, .uwY = 209 * TILE_SIZE + 153},
+			{.uwX = 32 +  32, .uwY = 209 * TILE_SIZE + 167},
+			{.uwX = 32 +  32, .uwY = 209 * TILE_SIZE + 185},
+			{.uwX = 32 +  36, .uwY = 209 * TILE_SIZE + 198},
+			{.uwX = 32 +  45, .uwY = 209 * TILE_SIZE + 210},
+			{.uwX = 32 +  62, .uwY = 209 * TILE_SIZE + 216},
 		},
 		.pBobSizes = {
 			{.uwX = 32, .uwY = 10},

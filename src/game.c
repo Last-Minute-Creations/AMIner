@@ -16,7 +16,7 @@
 #include "menu.h"
 #include "hi_score.h"
 #include "ground_layer.h"
-#include "base_tile.h"
+#include "base.h"
 #include "warehouse.h"
 #include "tutorial.h"
 #include "explosion.h"
@@ -140,10 +140,13 @@ static void gameProcessHotkeys(void) {
 		vehicleTeleport(&g_pVehicles[0], s_sTeleportReturn.uwX, s_sTeleportReturn.uwY);
 	}
 	if(keyUse(KEY_N)) {
-		vehicleTeleport(&g_pVehicles[0], 4 * 32, 212 * 32);
+		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 212 * TILE_SIZE);
 	}
 	if(keyUse(KEY_M)) {
-		vehicleTeleport(&g_pVehicles[0], 4 * 32, 4 * 32);
+		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 4 * TILE_SIZE);
+	}
+	if(keyUse(KEY_COMMA)) {
+		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 104 * TILE_SIZE);
 	}
 
 	if(keyUse(KEY_F1) && !g_isChallenge) {
@@ -381,7 +384,7 @@ static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 
 static void gameCameraProcess(void) {
 	if(g_isChallenge) {
-		const UWORD uwBottomPos = g_pMainBuffer->pCamera->uPos.uwY + g_pMainBuffer->sCommon.pVPort->uwHeight - 2 * 32;
+		const UWORD uwBottomPos = g_pMainBuffer->pCamera->uPos.uwY + g_pMainBuffer->sCommon.pVPort->uwHeight - 2 * TILE_SIZE;
 		if(
 			g_pVehicles[0].sBobBody.sPos.uwY >  uwBottomPos ||
 			(g_is2pPlaying && g_pVehicles[1].sBobBody.sPos.uwY > uwBottomPos)
@@ -431,7 +434,7 @@ static void gameCameraProcess(void) {
 		if(fadeGetState() == FADE_STATE_OUT) {
 			cameraCenterAt(g_pMainBuffer->pCamera, uwCamDestX, uwCamDestY);
 			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
-			baseTileProcess();
+			baseProcess();
 			groundLayerReset(groundLayerGetLowerAtDepth(g_pMainBuffer->pCamera->uPos.uwY));
 			tileBufferRedrawAll(g_pMainBuffer);
 			bobDiscardUndraw();

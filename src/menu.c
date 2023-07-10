@@ -12,7 +12,7 @@
 #include "game.h"
 #include "text_bob.h"
 #include "ground_layer.h"
-#include "base_tile.h"
+#include "base.h"
 #include "hi_score.h"
 #include "hud.h"
 #include "core.h"

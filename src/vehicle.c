@@ -155,7 +155,7 @@ void vehicleResetPos(tVehicle *pVehicle) {
 	else {
 		uwX = g_isChallenge ? 96 : 320-64;
 	}
-	UWORD uwY = (TILE_ROW_BASE_DIRT - 1) * 32;
+	UWORD uwY = (TILE_ROW_BASE_DIRT - 1) * TILE_SIZE;
 	vehicleSetPos(pVehicle, uwX, uwY);
 }
 
@@ -402,19 +402,16 @@ void vehicleDestroy(tVehicle *pVehicle) {
 }
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
+	const tBase *pBase = baseGetCurrent();
+
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2;
 	UWORD uwY = pVehicle->sBobBody.sPos.uwY;
-	UBYTE isNearInBase0 = (
-		7*32 <= uwCenterX && uwCenterX <= 9*32 &&
-		(TILE_ROW_BASE_DIRT - 2) * 32 <= uwY && uwY <= (TILE_ROW_BASE_DIRT + 1) * 32
+	UBYTE isNearInBase = (
+		pBase->sRectRestock.uwX1 <= uwCenterX && uwCenterX <= pBase->sRectRestock.uwX2 &&
+		pBase->sRectRestock.uwY1 <= uwY && uwY <= pBase->sRectRestock.uwY2
 	);
 
-	UBYTE isNearInBase1 = (
-		1*32 <= uwCenterX && uwCenterX <= 3*32 &&
-		(100 + 6) * 32 <= uwY && uwY <= (100 + 8) * 32
-	);
-
-	return isNearInBase0 || isNearInBase1;
+	return isNearInBase;
 }
 
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
@@ -708,7 +705,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		if(tileIsSolid(uwTileX, uwTileY)) {
 			tileExcavate(uwTileX, uwTileY);
 		}
-		pVehicle->fY = fix16_from_int(uwTileY*32);
+		pVehicle->fY = fix16_from_int(uwTileY * TILE_SIZE);
 		pVehicle->fDy = fix16_from_int(-1); // HACK HACK HACK
 		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 		audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, 1, 0);
@@ -752,10 +749,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 
 	// Limit X movement
-	const fix16_t fMaxPosX = fix16_one * (11*32 - VEHICLE_WIDTH);
+	const fix16_t fMaxPosX = fix16_one * (11 * TILE_SIZE - VEHICLE_WIDTH);
 	pVehicle->fX = CLAMP(pVehicle->fX + pVehicle->fDx, fix16_from_int(32), fMaxPosX);
 	pVehicle->sBobBody.sPos.uwX = fix16_to_int(pVehicle->fX);
-	UBYTE ubAdd = (pVehicle->sBobBody.sPos.uwY > (1 + TILE_ROW_BASE_DIRT) * 32) ? 4 : 2;
+	UBYTE ubAdd = (pVehicle->sBobBody.sPos.uwY > (1 + TILE_ROW_BASE_DIRT) * TILE_SIZE) ? 4 : 2;
 	UBYTE ubHalfWidth = 12;
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
@@ -952,7 +949,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 
 static void vehicleProcessDeadGravity(tVehicle *pVehicle) {
 	UWORD uwY = fix16_to_int(pVehicle->fY);
-	UBYTE ubAdd = (uwY > (1 + TILE_ROW_BASE_DIRT) * 32) ? 4 : 2;
+	UBYTE ubAdd = (uwY > (1 + TILE_ROW_BASE_DIRT) * TILE_SIZE) ? 4 : 2;
 	UWORD uwTileBottom = (uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
 	UWORD uwTileCenter = uwCenterX >> 5;
@@ -1191,7 +1188,7 @@ void vehicleProcess(tVehicle *pVehicle) {
 	hudSetDrill(ubPlayerIdx, pVehicle->uwDrillCurr, uwDrillMax);
 	textBobAnimate(&pVehicle->sTextBob);
 	hudSetDepth(ubPlayerIdx, MAX(
-		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_BASE_DIRT)*32
+		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_BASE_DIRT) * TILE_SIZE
 	));
 	hudSetCash(ubPlayerIdx, pVehicle->lCash);
 }

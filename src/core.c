@@ -16,7 +16,7 @@
 #include "vehicle.h"
 #include "fade.h"
 #include "debug.h"
-#include "base_tile.h"
+#include "base.h"
 #include "ground_layer.h"
 #include "hi_score.h"
 #include "tile.h"
@@ -65,7 +65,7 @@ void coreProcessAfterBobs(void) {
 	hudUpdate();
 
 	// Load next base tiles, if needed
-	baseTileProcess();
+	baseProcess();
 
 	// Update palette for new ground layers, also take into account fade level
 	fadeProcess();
@@ -117,7 +117,7 @@ static void coreGsCreate(void) {
 	memset(s_pVpMain->pPalette, 0, sizeof(s_pVpMain->pPalette));
 	s_pColorBg = &s_pVpMain->pPalette[0];
 
-	baseTileCreate(g_pMainBuffer);
+	baseCreate(g_pMainBuffer);
 	ptplayerCreate(1);
 	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
@@ -195,7 +195,7 @@ static void coreGsDestroy(void) {
 	menuUnload();
 	bitmapDestroy(s_pTiles);
 	collectiblesDestroy();
-	baseTileDestroy();
+	baseDestroy();
 	textBobManagerDestroy();
 	fontDestroy(g_pFont);
 	vehicleDestroy(&g_pVehicles[0]);
