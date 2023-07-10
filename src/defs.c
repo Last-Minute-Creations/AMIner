@@ -67,6 +67,7 @@ const char * s_pLangDom[] = {
 	[MSG_MISC_CARGO_FULL] = "misc.cargoFull",
 	[MSG_MISC_RESTOCK] = "misc.restock",
 	[MSG_MISC_FOUND_BONE] = "misc.foundBone",
+	[MSG_MISC_FOUND_GATE] = "misc.foundGate",
 	// HUD: UI
 	[MSG_HUD_P1] = "hud.p1",
 	[MSG_HUD_P2] = "hud.p2",

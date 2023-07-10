@@ -23,4 +23,6 @@ void collectiblesDestroy(void);
 
 void collectibleSetFoundCount(tCollectibleKind eKind, UBYTE ubCount);
 
+UBYTE collectibleGetMaxCount(tCollectibleKind eKind);
+
 #endif // _AMINER_COLLECTIBLES_H_

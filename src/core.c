@@ -10,6 +10,7 @@
 #include <ace/contrib/managers/audio_mixer.h>
 #include "menu.h"
 #include "dino.h"
+#include "quest_gate.h"
 #include "game.h"
 #include "hud.h"
 #include "vehicle.h"
@@ -50,7 +51,7 @@ void coreProcessBeforeBobs(void) {
 	// Draw pending tiles
 	tileBufferQueueProcess(g_pMainBuffer);
 
-	// Draw dino bones before anything else
+	// Draw collectibles before anything else
 	collectiblesProcess();
 }
 
@@ -92,6 +93,7 @@ static void coreGsCreate(void) {
 	textBobManagerCreate(g_pFont);
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
 	dinoReset();
+	questGateReset();
 	collectiblesCreate();
 
 	hudCreate(s_pView, g_pFont);

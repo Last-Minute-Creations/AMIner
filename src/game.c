@@ -24,6 +24,7 @@
 #include "pause.h"
 #include "core.h"
 #include "dino.h"
+#include "quest_gate.h"
 #include "debug.h"
 #include "inventory.h"
 #include "defs.h"
@@ -87,6 +88,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_pPlayerSteers[1] = sSteerP2;
 	inboxReset();
 	dinoReset();
+	questGateReset();
 	collectiblesReset();
 	tutorialReset();
 	pageOfficeReset();
@@ -605,6 +607,7 @@ void gameSave(tFile *pFile) {
 
 	inboxSave(pFile);
 	dinoSave(pFile);
+	questGateSave(pFile);
 	tutorialSave(pFile);
 	pageOfficeSave(pFile);
 	tileSave(pFile);
@@ -644,6 +647,7 @@ UBYTE gameLoad(tFile *pFile) {
 
 	return inboxLoad(pFile) &&
 		dinoLoad(pFile) &&
+		questGateLoad(pFile) &&
 		tutorialLoad(pFile) &&
 		pageOfficeLoad(pFile) &&
 		tileLoad(pFile) &&
@@ -668,6 +672,7 @@ static void gameGsLoop(void) {
 		return;
 	}
 	dinoProcess();
+	questGateProcess();
 
 	debugColor(0x080);
 	gameCameraProcess();

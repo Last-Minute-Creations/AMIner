@@ -307,6 +307,24 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		pTiles[8][g_pDinoDepths[6]] = TILE_BONE_1;
 		pTiles[2][g_pDinoDepths[7]] = TILE_BONE_1;
 		pTiles[9][g_pDinoDepths[8]] = TILE_BONE_1;
+
+		// Gate fragments
+		pTiles[1][219] = TILE_GATE_1;
+		pTiles[2][219] = TILE_GATE_2;
+		pTiles[3][219] = TILE_GATE_1;
+		pTiles[4][219] = TILE_GATE_2;
+		pTiles[5][219] = TILE_GATE_1;
+		pTiles[6][219] = TILE_GATE_2;
+		pTiles[7][219] = TILE_GATE_1;
+		pTiles[8][219] = TILE_GATE_2;
+		pTiles[9][219] = TILE_GATE_1;
+		pTiles[1][220] = TILE_GATE_2;
+		pTiles[2][220] = TILE_GATE_1;
+		pTiles[3][220] = TILE_GATE_2;
+		pTiles[4][220] = TILE_GATE_1;
+		pTiles[5][220] = TILE_GATE_2;
+		pTiles[6][220] = TILE_GATE_1;
+		pTiles[7][220] = TILE_GATE_2;
 	}
 
 	logBlockEnd("tileReset()");

@@ -66,11 +66,11 @@ static const tCollectiblesZoneDef s_pZones[COLLECTIBLE_KIND_COUNT] = {
 		.pBobCoords = {
 			{.uwX = 32 +  78, .uwY = 209 * 32 + 217},
 			{.uwX = 32 +  95, .uwY = 209 * 32 + 210},
-			{.uwX = 32 + 103, .uwY = 209 * 32 + 198},
-			{.uwX = 32 + 110, .uwY = 209 * 32 + 186},
+			{.uwX = 32 + 102, .uwY = 209 * 32 + 198},
+			{.uwX = 32 + 109, .uwY = 209 * 32 + 186},
 			{.uwX = 32 + 108, .uwY = 209 * 32 + 168},
 			{.uwX = 32 + 102, .uwY = 209 * 32 + 154},
-			{.uwX = 32 +  93, .uwY = 209 * 32 + 144},
+			{.uwX = 32 +  92, .uwY = 209 * 32 + 144},
 			{.uwX = 32 +  77, .uwY = 209 * 32 + 141},
 			{.uwX = 32 +  61, .uwY = 209 * 32 + 141},
 			{.uwX = 32 +  47, .uwY = 209 * 32 + 144},
@@ -126,6 +126,37 @@ static void configureBobsForCurrentZone(void) {
 	}
 }
 
+static void advanceBob(void) {
+	++s_ubCurrentBob;
+	if(s_ubCurrentBob >= s_pZones[s_ubCurrentZone].ubCount) {
+		s_ubCurrentBob = 0;
+	}
+}
+
+static void collectibleDrawNext(void) {
+	for(UBYTE i = s_pZones[s_ubCurrentZone].ubCount; i--;) {
+		tBob *pBob = &s_pBobs[s_ubCurrentBob];
+
+		UBYTE isOnBuffer = tileBufferIsRectFullyOnBuffer(
+			g_pMainBuffer, pBob->sPos.uwX, pBob->sPos.uwY, pBob->uwWidth, pBob->uwHeight
+		);
+		if(isOnBuffer) {
+			if(s_pBobsDrawCounts[s_ubCurrentBob] < 2) {
+				bobPush(pBob);
+				++s_pBobsDrawCounts[s_ubCurrentBob];
+				break;
+			}
+			else {
+				advanceBob();
+			}
+		}
+		else {
+			s_pBobsDrawCounts[s_ubCurrentBob] = 0;
+			advanceBob();
+		}
+	}
+}
+
 //------------------------------------------------------------------- PUBLIC FNS
 
 void collectiblesCreate(void) {
@@ -158,6 +189,7 @@ void collectiblesProcess(void) {
 		if(s_ubCurrentZone) {
 			--s_ubCurrentZone;
 			s_ubCurrentBob = 0;
+			s_isBobsConfigured = 0;
 		}
 		return;
 	}
@@ -165,6 +197,7 @@ void collectiblesProcess(void) {
 		if(s_ubCurrentZone < COLLECTIBLE_KIND_COUNT - 1) {
 			++s_ubCurrentZone;
 			s_ubCurrentBob = 0;
+			s_isBobsConfigured = 0;
 		}
 		return;
 	}
@@ -175,28 +208,7 @@ void collectiblesProcess(void) {
 		return;
 	}
 
-	if(s_pZoneDatas[s_ubCurrentZone].ubFoundCount && tileBufferIsTileOnBuffer(
-		g_pMainBuffer,
-		s_pBobs[s_ubCurrentBob].sPos.uwX / 32, s_pBobs[s_ubCurrentBob].sPos.uwY / 32
-	) && s_pBobsDrawCounts[s_ubCurrentBob] < 2) {
-		if(s_pBobsDrawCounts[s_ubCurrentBob] >= 2) {
-			++s_ubCurrentBob;
-			if(s_ubCurrentBob >= s_pZoneDatas[s_ubCurrentZone].ubFoundCount) {
-				s_ubCurrentBob = 0;
-			}
-		}
-		else {
-			bobPush(&s_pBobs[s_ubCurrentBob]);
-			++s_pBobsDrawCounts[s_ubCurrentBob];
-		}
-	}
-	else {
-		s_pBobsDrawCounts[s_ubCurrentBob] = 0;
-		++s_ubCurrentBob;
-		if(s_ubCurrentBob >= s_pZoneDatas[s_ubCurrentZone].ubFoundCount) {
-			s_ubCurrentBob = 0;
-		}
-	}
+	collectibleDrawNext();
 }
 
 void collectiblesDestroy(void) {
@@ -214,4 +226,8 @@ void collectiblesReset(void) {
 
 void collectibleSetFoundCount(tCollectibleKind eKind, UBYTE ubCount) {
 	s_pZoneDatas[eKind].ubFoundCount = ubCount;
+}
+
+UBYTE collectibleGetMaxCount(tCollectibleKind eKind) {
+	return s_pZones[eKind].ubCount;
 }

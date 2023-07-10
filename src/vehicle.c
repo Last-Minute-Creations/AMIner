@@ -18,6 +18,7 @@
 #include "defs.h"
 #include "inventory.h"
 #include "save.h"
+#include "quest_gate.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -599,6 +600,18 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		char szMessage[50];
 		UBYTE ubBoneIndex = dinoAddBone();
 		sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_BONE], ubBoneIndex);
+		textBobSet(
+			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
+			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+			pVehicle->sBobBody.sPos.uwY,
+			pVehicle->sBobBody.sPos.uwY - 32, 1
+		);
+		audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+	}
+	else if(ubTile == TILE_GATE_1 || ubTile == TILE_GATE_2) {
+		char szMessage[50];
+		UBYTE ubFragmentIndex = questGateAddFragment();
+		sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_GATE], ubFragmentIndex);
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
 			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,

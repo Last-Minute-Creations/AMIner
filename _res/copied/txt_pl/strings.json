@@ -93,7 +93,8 @@
 		"drillDepleted": "Wiertło zużyte",
 		"cargoFull": "Ładownia pełna!",
 		"restock": "Rozładunek!",
-		"foundBone": "Kość #%hhu"
+		"foundBone": "Kość #%hhu",
+		"foundGate": "Fragment bramy #%hhu"
 	},
 	"shop": {
 		"timeRemaining": "Pozostało %d dni",

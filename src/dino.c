@@ -14,8 +14,6 @@
 #include "comm/inbox.h"
 #include "comm/page_office.h"
 
-#define DINO_BONE_COUNT 9
-
 typedef enum tDinoState {
 	DINO_STATE_WAITING_FOR_FIRST_BONE,
 	DINO_STATE_INCOMING_BRIEFING,
@@ -94,7 +92,8 @@ void dinoProcess(void) {
 }
 
 UBYTE dinoAddBone(void) {
-	if(s_ubDinoBonesFound < DINO_BONE_COUNT) {
+	const UBYTE ubMaxFragmentCount = collectibleGetMaxCount(COLLECTIBLE_KIND_DINO);
+	if(s_ubDinoBonesFound < ubMaxFragmentCount) {
 		++s_ubDinoBonesFound;
 		collectibleSetFoundCount(COLLECTIBLE_KIND_DINO, s_ubDinoBonesFound);
 	}
@@ -102,7 +101,7 @@ UBYTE dinoAddBone(void) {
 	if(s_ubDinoBonesFound == 1) {
 		s_eQuestState = DINO_STATE_INCOMING_BRIEFING;
 	}
-	else if(s_ubDinoBonesFound == DINO_BONE_COUNT) {
+	else if(s_ubDinoBonesFound == ubMaxFragmentCount) {
 		s_eQuestState = DINO_STATE_INCOMING_ACCOLADE;
 	}
 
