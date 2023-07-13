@@ -15,7 +15,7 @@ typedef enum _tButtonPreset {
 
 typedef struct _tButton {
 	char szName[BUTTON_NAME_MAX];
-	tUwCoordYX sPos;
+	tUwCoordYX sPos; ///< Relative to middle-top position of the button
 } tButton;
 
 void buttonRmAll(void);
