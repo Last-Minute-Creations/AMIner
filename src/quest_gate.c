@@ -4,6 +4,7 @@
 
 #include "quest_gate.h"
 #include "collectibles.h"
+#include <comm/page_questioning.h>
 
 typedef enum tQuestGateState {
 	QUEST_GATE_STATE_WAITING_FOR_START
@@ -34,6 +35,7 @@ UBYTE questGateAddFragment(void) {
 	if(s_ubFoundFragments < ubMaxFragmentCount) {
 		++s_ubFoundFragments;
 		collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, s_ubFoundFragments);
+		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_GATE);
 	}
 
 	return s_ubFoundFragments;

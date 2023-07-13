@@ -116,6 +116,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_KOMISARZ_REBUKE_1] = "officePages.komisarzRebuke_1",
 	[MSG_PAGE_KOMISARZ_REBUKE_2] = "officePages.komisarzRebuke_2",
 	[MSG_PAGE_KOMISARZ_REBUKE_3] = "officePages.komisarzRebuke_3",
+	[MSG_PAGE_KOMISARZ_QUESTIONING] = "officePages.komisarzQuestioning",
 	[MSG_PAGE_ARCH_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_ARCH_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_ARCH_ACCOLADE] = "officePages.archAccolade",
