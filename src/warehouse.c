@@ -12,6 +12,7 @@
 #include "defs.h"
 #include "comm/page_accounting.h"
 #include "save.h"
+#include "heat.h"
 
 // Not spent on plan, not sold
 static UWORD s_pStock[MINERAL_TYPE_COUNT] = {0};
@@ -62,7 +63,7 @@ void warehouseNextPlan(tNextPlanReason eReason) {
 		}
 
 		if(eReason == NEXT_PLAN_REASON_FULFILLED_ACCOUNTING) {
-			pageAccountingReduceChanceFail();
+			heatTryReduce(2);
 		}
 	}
 

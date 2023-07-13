@@ -12,8 +12,8 @@
 #include "../warehouse.h"
 #include "../vehicle.h"
 #include "../save.h"
+#include "../heat.h"
 
-static BYTE s_bAccountingChanceFail;
 static UWORD s_uwAccountingCost;
 
 static void pageAccountingProcess(void) {
@@ -33,14 +33,14 @@ static void pageAccountingProcess(void) {
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(bButtonCurr == 0) {
 			g_pVehicles[0].lCash -= s_uwAccountingCost;
-			if(randUwMinMax(&g_sRand, 1, 100) > s_bAccountingChanceFail) {
+			if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
 				warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED_ACCOUNTING);
 			}
 			else {
 				gameAddRebuke();
 			}
 
-			s_bAccountingChanceFail = MIN(s_bAccountingChanceFail + 6, 100);
+			heatTryIncrease(6);
 		}
 		commShopGoBack();
 	}
@@ -68,7 +68,7 @@ void pageAccountingCreate(void) {
 		uwPosY += ubLineHeight / 2;
 		sprintf(
 			szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
-			s_bAccountingChanceFail
+			heatGetPercent()
 		);
 		uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
 		sprintf(szBfr, "It will cost you %hu\x1F.", s_uwAccountingCost);
@@ -80,23 +80,16 @@ void pageAccountingCreate(void) {
 	buttonDrawAll(commGetDisplayBuffer());
 }
 
-void pageAccountingReduceChanceFail(void) {
-	s_bAccountingChanceFail = MAX(0, s_bAccountingChanceFail - 2);
-}
-
 void pageAccountingReset(void) {
-	s_bAccountingChanceFail = 5;
 }
 
 void pageAccountingSave(tFile *pFile) {
 	saveWriteHeader(pFile, "ACTG");
-	fileWrite(pFile, &s_bAccountingChanceFail, sizeof(s_bAccountingChanceFail));
 }
 
 UBYTE pageAccountingLoad(tFile *pFile) {
 	if(!saveReadHeader(pFile, "ACTG")) {
 		return 0;
 	}
-	fileRead(pFile, &s_bAccountingChanceFail, sizeof(s_bAccountingChanceFail));
 	return 1;
 }

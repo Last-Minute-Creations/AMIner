@@ -6,8 +6,11 @@
 #include <comm/page_favor.h>
 #include <comm/page_bribe.h>
 #include <comm/page_accounting.h>
+#include <comm/page_questioning.h>
 #include <comm/gs_shop.h>
-#include "save.h"
+#include <comm/inbox.h>
+#include "../save.h"
+#include "../heat.h"
 
 #define PPL_PER_ROW 4
 #define SUBPAGES_PER_PERSON 8
@@ -120,6 +123,7 @@ void pageOfficeReset(void) {
 	pageFavorReset();
 	pageBribeReset();
 	pageAccountingReset();
+	pageQuestioningReset();
 }
 
 void pageOfficeSave(tFile *pFile) {
@@ -131,6 +135,7 @@ void pageOfficeSave(tFile *pFile) {
 	pageFavorSave(pFile);
 	pageBribeSave(pFile);
 	pageAccountingSave(pFile);
+	pageQuestioningSave(pFile);
 }
 
 UBYTE pageOfficeLoad(tFile *pFile) {
@@ -144,7 +149,8 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 	fileRead(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
 	return pageFavorLoad(pFile) &&
 		pageBribeLoad(pFile) &&
-		pageAccountingLoad(pFile);
+		pageAccountingLoad(pFile) &&
+		pageQuestioningLoad(pFile);
 }
 
 void pageOfficeUnlockPerson(tFaceId ePerson) {

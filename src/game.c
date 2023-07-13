@@ -31,6 +31,7 @@
 #include "save.h"
 #include "settings.h"
 #include "collectibles.h"
+#include "heat.h"
 
 #define CAMERA_SPEED 4
 
@@ -108,6 +109,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 		hudSetModeCounter(eMode, 0);
 	}
 	hudReset(g_isChallenge, g_is2pPlaying);
+	heatReset();
 	groundLayerReset(1);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
 }
@@ -625,6 +627,7 @@ void gameSave(tFile *pFile) {
 	vehicleSave(&g_pVehicles[0], pFile);
 	vehicleSave(&g_pVehicles[1], pFile);
 	hudSave(pFile);
+	heatSave(pFile);
 }
 
 UBYTE gameLoad(tFile *pFile) {
@@ -664,7 +667,8 @@ UBYTE gameLoad(tFile *pFile) {
 		inventoryLoad(pFile) &&
 		vehicleLoad(&g_pVehicles[0], pFile) &&
 		vehicleLoad(&g_pVehicles[1], pFile) &&
-		hudLoad(pFile);
+		hudLoad(pFile) &&
+		heatLoad(pFile);
 }
 
 //-------------------------------------------------------------------- GAMESTATE

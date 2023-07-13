@@ -9,8 +9,6 @@
 
 void pageAccountingCreate(void);
 
-void pageAccountingReduceChanceFail(void);
-
 void pageAccountingReset(void);
 
 void pageAccountingSave(tFile *pFile);
