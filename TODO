@@ -17,6 +17,56 @@ General:
 	✔ Add magma tiles @done(23-03-17 18:03)
 		✔ Hurt while drilling through @done(23-03-17 18:03)
 		☐ Figure out detailed mechanics
+	☐ Variance in mine backgrounds
+		☐ On-the-fly composing background tile with edges
+		☐ Add extra bg variants (stones)
+	☐ Proper restock zones - currently can restock beneath first base's building
+
+Simulator:
+	✔ Basic view of mine @done(23-04-07 13:44)
+	✔ Click to excavate @done(23-04-07 13:44)
+	✔ Click to restock @done(23-04-07 16:09)
+	✔ Proper drill costs @done(23-04-07 16:55)
+		✔ Rocks @done(23-04-07 16:15)
+		✔ Ground layer @done(23-04-07 16:55)
+	✔ Warehouse @done(23-04-09 15:40)
+		✔ Add from vehicle to stock @done(23-04-08 11:04)
+		✔ Sell minerals @done(23-04-08 11:26)
+		✔ Fill plans @done(23-04-09 15:40)
+	✔ Simulate plans @done(23-04-09 16:32)
+		✔ First plan @done(23-04-09 15:41)
+		✔ Next plans @done(23-04-09 15:45)
+		✔ Unlock minerals @done(23-04-09 15:52)
+		✔ Time countdown @done(23-04-09 16:12)
+		✔ Count progress towards accolades @done(23-04-09 16:32)
+		✔ Receive rebukes @done(23-04-09 16:32)
+	✔ Show game win/lose @done(23-04-09 16:53)
+	✔ Configurable gameplay constants @done(23-04-10 11:02)
+	✔ Draw proper bases @done(23-04-10 11:21)
+	✔ Ability to buy upgrades @done(23-04-10 18:23)
+	✔ Add simulated damage @done(23-04-14 15:10)
+		✔ Damage from magma @done(23-04-12 17:21)
+		✔ Small damage after restock @done(23-04-12 18:00)
+		✔ Rebuke after destruction @done(23-04-14 15:10)
+	✔ Cash stats for plans @done(23-04-14 17:35)
+	✔ Generate mine based on plans @done(23-05-02 14:43)
+		✔ Divide mine by plans @done(23-04-17 17:37)
+		✔ Fill mine with plan-required minerals @done(23-04-17 17:37)
+		✔ Extra minerals for restock/upgrades @done(23-04-20 13:46)
+		✔ Limit plans based on max stack count @done(23-04-20 13:47)
+		✔ Better mineral restrictions for plans? @done(23-05-02 14:43)
+	☐ Dino quest
+		☐ Scatter bones
+		☐ Show collected bones
+		☐ Accolade
+	☐ Exactly same RNG as in-game
+	☐ Sub-mechanics
+		✔ Accounting @done(23-05-02 14:43)
+		✔ Bribe @done(23-05-02 14:43)
+		☐ Favor
+	☐ Approximate time spent in-game
+		☐ Time spent on drilling
+		☐ Time spent on backtracking to restock
 
 Optimizations:
 	☐ Comm message page loading
