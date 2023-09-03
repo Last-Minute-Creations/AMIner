@@ -33,13 +33,6 @@ class Defs {
 		this.planRuby = 40;
 		this.planMoonstone = 20;
 
-		// TODO: remove? leave for free resource pool?
-		this.depthSilver = 0;
-		this.depthGold = 60;
-		this.depthEmerald = 200;
-		this.depthRuby = 400;
-		this.depthMoonstone = 175;
-
 		this.dinoDepths = document.querySelector('[name=defs_dino_depths]').value.split(',').map((x) => parseInt(x));
 
 		this.gateDepths = document.querySelector('[name=defs_gate_depths]').value.split(',').map((x) => parseInt(x));

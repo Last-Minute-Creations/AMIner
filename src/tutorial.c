@@ -124,19 +124,18 @@ static UBYTE tutorialProcessStory(void) {
 			break;
 		case TUTORIAL_GO_READ_PLAN:
 			if(tutorialIsInMainOffice()) { // Message read
-				planStart(warehouseGetCurrentPlan());
+				planStart();
 				++s_eTutorialState;
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_DIG: {
-			const tPlan *pPlan = warehouseGetCurrentPlan();
 			UWORD uwTotal = (
 				g_pVehicles[0].pStock[MINERAL_TYPE_SILVER] +
 				(g_is2pPlaying ? g_pVehicles[1].pStock[MINERAL_TYPE_SILVER] : 0) +
 				warehouseGetStock(MINERAL_TYPE_SILVER) +
-				pPlan->pMinerals[MINERAL_TYPE_SILVER].uwCurrentCount
+				planManagerGet()->pMineralsSpent[MINERAL_TYPE_SILVER]
 			);
-			if(uwTotal >= pPlan->pMinerals[MINERAL_TYPE_SILVER].uwTargetCount) {
+			if(uwTotal >= planGetCurrent()->pMineralsRequired[MINERAL_TYPE_SILVER]) {
 				if(!commShopIsActive()) {
 					hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_ON_DUG]);
 					++s_eTutorialState;
@@ -162,7 +161,7 @@ static UBYTE tutorialProcessStory(void) {
 			}
 			break;
 		case TUTORIAL_WAITING_FOR_PLAN_DONE:
-			if(warehouseGetCurrentPlan()->uwIndex > 0) {
+			if(planManagerGet()->ubCurrentPlanIndex > 0) {
 				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE, 0);
 				++s_eTutorialState;

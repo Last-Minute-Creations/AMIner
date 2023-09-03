@@ -5,43 +5,68 @@
 #ifndef _PLAN_H_
 #define _PLAN_H_
 
+#include <ace/utils/file.h>
 #include "mineral.h"
 
-typedef struct _tPlanMineral {
-	UWORD uwTargetCount;
-	UWORD uwCurrentCount;
-} tPlanMineral;
+#define PLAN_COUNT_MAX 50
 
 typedef struct _tPlan {
-	tPlanMineral pMinerals[MINERAL_TYPE_COUNT];
-	ULONG ulMineralsUnlocked; ///< Acts as bitfield
+	UWORD pMineralsRequired[MINERAL_TYPE_COUNT];
 	ULONG ulTargetSum;
-	WORD wTimeMax;
-	WORD wTimeRemaining;
-	UWORD uwIndex;
-	UBYTE isExtendedTimeByFavor;
-	UBYTE isPenaltyCountdownStarted;
-	UBYTE isActive;
+	UWORD uwTotalMineralsRequired;
 } tPlan;
 
-UBYTE planIsFulfilled(const tPlan *pPlan);
+typedef struct tPlanManager {
+	tPlan pPlanSequence[PLAN_COUNT_MAX];
+	ULONG ulMineralsUnlocked; ///< Acts as bitfield with BV(MINERAL_TYPE_*)
+	UWORD pMineralsSpent[MINERAL_TYPE_COUNT];
+	WORD wTimeMax;
+	WORD wTimeRemaining;
+	UBYTE ubCurrentPlanIndex;
+	UBYTE isExtendedTimeByFavor;
+	UBYTE isPenaltyCountdownStarted;
+	UBYTE isPlanActive;
+	UBYTE ubPlanCount;
+} tPlanManager;
 
-void planElapseTime(tPlan *pPlan, UWORD uwTime);
+//------------------------------------------------------------------ MANAGER FNS
 
-void planStart(tPlan *pPlan);
+void planManagerInit(void);
 
-void planUnlockMineral(tPlan *pPlan, tMineralType eMineral);
+void planManagerSave(tFile *pFile);
 
-WORD planGetRemainingDays(const tPlan *pPlan);
+UBYTE planManagerLoad(tFile *pFile);
 
-void planAddDays(tPlan *pPlan, UBYTE ubDays, UBYTE isFavor);
+const tPlanManager *planManagerGet(void);
 
-void planStartPenaltyCountdown(tPlan *pPlan);
+//------------------------------------------------------------------- PLAN MANIP
 
-void planFail(tPlan *pPlan);
+UBYTE planGetAllowedMineralsForIndex(UBYTE ubPlanIndex, tMineralType *pAllowedMinerals);
 
-UWORD planGetRemainingCost(const tPlan *pPlan);
+tPlan *planGetCurrent(void);
 
-void planReset(tPlan *pPlan, UBYTE isActive, UBYTE isNext);
+UBYTE planIsCurrentFulfilled(void);
+
+void planElapseTime(UWORD uwTime);
+
+void planStart(void);
+
+void planUnlockMineral(tMineralType eMineral);
+
+WORD planGetRemainingDays(void);
+
+void planAddDays(UBYTE ubDays, UBYTE isFavor);
+
+void planSpendMinerals(UBYTE ubMineralType, UBYTE ubCount);
+
+void planStartPenaltyCountdown(void);
+
+UWORD planGetRemainingCost(void);
+
+void planAdvance(void);
+
+void planFailDeadline(void);
+
+void planReroll(void);
 
 #endif // _PLAN_H_

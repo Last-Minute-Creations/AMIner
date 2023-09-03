@@ -14,26 +14,16 @@ typedef enum tNextPlanReason {
 	NEXT_PLAN_REASON_FAILED,
 } tNextPlanReason;
 
-void warehouseReserveMineralsForPlan(UBYTE ubMineralType, UBYTE ubCount);
-
-UWORD warehouseGetStock(UBYTE ubMineralType);
-
-void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount);
-
 void warehouseReset(void);
 
 void warehouseSave(tFile *pFile);
 
 UBYTE warehouseLoad(tFile *pFile);
 
-//------------------------------------------------------------------------- PLAN
+UWORD warehouseGetStock(UBYTE ubMineralType);
 
-tPlan *warehouseGetCurrentPlan(void);
+void warehouseSetStock(UBYTE ubMineralType, UWORD uwCount);
 
 void warehouseNextPlan(tNextPlanReason eReason);
-
-void warehouseRerollPlan(void);
-
-UWORD planGetRemainingCost(const tPlan *pPlan);
 
 #endif // _WAREHOUSE_H_

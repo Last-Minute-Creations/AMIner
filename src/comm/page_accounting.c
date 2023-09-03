@@ -50,15 +50,14 @@ void pageAccountingCreate(void) {
 	commRegisterPage(pageAccountingProcess, 0);
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
-	tPlan *pPlan = warehouseGetCurrentPlan();
-	if (!pPlan->isActive) {
+	if (!planManagerGet()->isPlanActive) {
 		uwPosY += commDrawMultilineText(
 			"You have no active plan! What do you want me to do?", 0, uwPosY
 		) * ubLineHeight;
 		buttonInitOk("Back");
 	}
 	else {
-		s_uwAccountingCost = planGetRemainingCost(warehouseGetCurrentPlan()) / 2;
+		s_uwAccountingCost = planGetRemainingCost() / 2;
 
 		uwPosY += commDrawMultilineText(
 			"I can do some Creative Acccounting for you and fulfill your plan instantly."

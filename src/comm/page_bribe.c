@@ -36,8 +36,7 @@ static void pageBribeProcess(void) {
 				if(randUwMinMax(&g_sRand, 1, 100) > s_bBribeChanceFail) {
 					// Success
 					pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
-					tPlan *pPlan = warehouseGetCurrentPlan();
-					if(!pPlan->isPenaltyCountdownStarted) {
+					if(!planManagerGet()->isPenaltyCountdownStarted) {
 						// accolade bribe
 						++s_ubBribeAccoladeCount;
 						s_bBribeChanceFail = MIN(s_bBribeChanceFail + 2, 100);
@@ -47,7 +46,7 @@ static void pageBribeProcess(void) {
 						++s_ubBribeRebukeCount;
 						s_bBribeChanceFail = MIN(s_bBribeChanceFail + 5, 100);
 					}
-					planAddDays(pPlan, 14, 1);
+					planAddDays(14, 1);
 				}
 				else {
 					gameAddRebuke();
@@ -66,19 +65,18 @@ static void pageBribeProcess(void) {
 void pageBribeCreate(void) {
 	commRegisterPage(pageBribeProcess, 0);
 	const UBYTE ubLineHeight = commGetLineHeight();
-	const tPlan *pPlan = warehouseGetCurrentPlan();
 	char szBfr[150];
 	UWORD uwPosY = 0;
 	UWORD uwCost;
 
-	if (!pPlan->isActive) {
+	if (!planManagerGet()->isPlanActive) {
 		uwPosY += commDrawMultilineText(
 			"You have no active plan! What do you want me to do?", 0, uwPosY
 		) * ubLineHeight;
 		buttonInitOk("Back");
 	}
-	else if(!pPlan->isExtendedTimeByFavor) {
-		if(!pPlan->isPenaltyCountdownStarted) {
+	else if(!planManagerGet()->isExtendedTimeByFavor) {
+		if(!planManagerGet()->isPenaltyCountdownStarted) {
 			sprintf(szBfr, "Bribe for extra %hhu days for finishing plan in time.", 14);
 			uwCost = 100;
 			for(UBYTE i = s_ubBribeAccoladeCount; i--;) {

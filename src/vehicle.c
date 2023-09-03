@@ -620,7 +620,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		pVehicle->uwCargoScore += pMineral->ubReward * ubSlots;
 		pVehicle->uwCargoCurr += ubSlots;
 		pVehicle->pStock[ubMineralType] += ubSlots;
-		planUnlockMineral(warehouseGetCurrentPlan(), ubMineralType);
+		planUnlockMineral(ubMineralType);
 
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->uwCargoCurr, uwCargoMax);
 		char szMsg[40];

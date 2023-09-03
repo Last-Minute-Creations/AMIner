@@ -88,8 +88,8 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	dinoReset();
 	tutorialReset();
 	pageOfficeReset();
-	tileReset(g_isAtari, g_isChallenge);
 	warehouseReset();
+	tileReset(g_isAtari, g_isChallenge);
 	inventoryReset();
 	modeReset(0);
 	modeReset(1);
@@ -172,8 +172,7 @@ static void gameProcessHotkeys(void) {
 		warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 	}
 	else if(keyUse(KEY_0)) {
-		tPlan *pPlan = warehouseGetCurrentPlan();
-		gameElapseTime(pPlan->wTimeRemaining);
+		gameElapseTime(planManagerGet()->wTimeRemaining);
 	}
 }
 
@@ -506,18 +505,17 @@ static void onSongEnd(void) {
 }
 
 static void processPlan(void) {
-	tPlan *pPlan = warehouseGetCurrentPlan();
-	if(!pPlan->isActive) {
+	if(!planManagerGet()->isPlanActive) {
 		return;
 	}
 
-	WORD wRemainingDays = planGetRemainingDays(pPlan);
+	WORD wRemainingDays = planGetRemainingDays();
 	if(wRemainingDays <= 0) {
-		if(!pPlan->isPenaltyCountdownStarted && !pPlan->isExtendedTimeByFavor) {
+		if(!planManagerGet()->isPenaltyCountdownStarted && !planManagerGet()->isExtendedTimeByFavor) {
 			char szBfr[100];
 			sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
 			hudShowMessage(0, szBfr);
-			planStartPenaltyCountdown(pPlan);
+			planStartPenaltyCountdown();
 		}
 		else {
 			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_REBUKE]);
@@ -549,12 +547,11 @@ void gameElapseTime(UWORD uwTime) {
 		s_ulGameTime = ULONG_MAX;
 	}
 
-	tPlan *pPlan = warehouseGetCurrentPlan();
-	planElapseTime(pPlan, uwTime);
-	if(!pPlan->isActive && pPlan->wTimeRemaining == 0 && pPlan->uwIndex > 0) {
+	planElapseTime(uwTime);
+	if(!planManagerGet()->isPlanActive && planManagerGet()->wTimeRemaining == 0 && planManagerGet()->ubCurrentPlanIndex > 0) {
 		// first plan start (index 0) is handled by tutorial
 		hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_NEW_PLAN]);
-		planStart(pPlan);
+		planStart();
 	}
 }
 
@@ -605,8 +602,8 @@ void gameSave(tFile *pFile) {
 	dinoSave(pFile);
 	tutorialSave(pFile);
 	pageOfficeSave(pFile);
-	tileSave(pFile);
 	warehouseSave(pFile);
+	tileSave(pFile);
 	inventorySave(pFile);
 	vehicleSave(&g_pVehicles[0], pFile);
 	vehicleSave(&g_pVehicles[1], pFile);
@@ -644,8 +641,8 @@ UBYTE gameLoad(tFile *pFile) {
 		dinoLoad(pFile) &&
 		tutorialLoad(pFile) &&
 		pageOfficeLoad(pFile) &&
-		tileLoad(pFile) &&
 		warehouseLoad(pFile) &&
+		tileLoad(pFile) &&
 		inventoryLoad(pFile) &&
 		vehicleLoad(&g_pVehicles[0], pFile) &&
 		vehicleLoad(&g_pVehicles[1], pFile) &&

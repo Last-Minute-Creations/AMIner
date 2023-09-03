@@ -65,5 +65,6 @@ void tileExcavate(UWORD uwX, UWORD uwY);
 void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant);
 
 extern const tTileDef g_pTileDefs[TILE_COUNT];
+extern const tTile g_pMineralToFirstTile[MINERAL_TYPE_COUNT];
 
 #endif // _TILE_H_

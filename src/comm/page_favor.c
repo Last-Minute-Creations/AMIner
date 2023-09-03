@@ -8,7 +8,7 @@
 #include <comm/page_office.h>
 #include <comm/gs_shop.h>
 #include "../game.h"
-#include "../warehouse.h"
+#include "../plan.h"
 #include "../save.h"
 
 static UBYTE s_ubFavorsLeft;
@@ -32,7 +32,7 @@ static void pageFavorProcess(void) {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(bButtonCurr == 0) {
 				--s_ubFavorsLeft;
-				warehouseRerollPlan();
+				planReroll();
 			}
 			commShopGoBack();
 		}
@@ -48,9 +48,8 @@ void pageFavorCreate(void) {
 	commRegisterPage(pageFavorProcess, 0);
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
-	tPlan *pPlan = warehouseGetCurrentPlan();
-	WORD wDays = planGetRemainingDays(pPlan);
-	if (!pPlan->isActive) {
+	WORD wDays = planGetRemainingDays();
+	if (!planManagerGet()->isPlanActive) {
 		uwPosY += commDrawMultilineText(
 			"You have no active plan! What do you want me to do?", 0, uwPosY
 		) * ubLineHeight;

@@ -11,6 +11,7 @@
 #include "hud.h"
 #include "mineral.h"
 #include "defs.h"
+#include "plan.h"
 #include "save.h"
 
 /**
@@ -18,13 +19,18 @@
  * be naturally spawned on any depth.
  */
 #define BASE_LEVEL_VARIANT 65535
+#define BASE_PATTERN_HEIGHT 10
+#define MINE_DIGGABLE_WIDTH 10
+#define ROWS_PER_PLAN_MAX 20
 
 typedef struct _tBase {
-	UBYTE pPattern[10 * 10];
+	UBYTE pPattern[MINE_DIGGABLE_WIDTH * BASE_PATTERN_HEIGHT];
 	UWORD uwLevel;
 } tBase;
 
 //----------------------------------------------------------------- PRIVATE VARS
+
+static const UBYTE s_pRowSpawnPattern[] = {5, 3, 7, 1, 4, 6, 8, 2, 9, 10};
 
 static const tBase s_pBases[BASE_ID_COUNT] = {
 	[BASE_ID_GROUND] = {
@@ -74,6 +80,10 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 	},
 };
 
+static UBYTE s_ubNextRowPatternPos;
+static UWORD s_uwPlanFillPatternLength;
+static tUbCoordYX s_pPlanFillPattern[MINE_DIGGABLE_WIDTH * ROWS_PER_PLAN_MAX];
+
 //------------------------------------------------------------------ PUBLIC VARS
 
 const tTileDef g_pTileDefs[TILE_COUNT] = {
@@ -96,6 +106,15 @@ const tTileDef g_pTileDefs[TILE_COUNT] = {
 	[TILE_COAL_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_COAL},
 	[TILE_COAL_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_COAL},
 	[TILE_COAL_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_COAL}
+};
+
+const tTile g_pMineralToFirstTile[MINERAL_TYPE_COUNT] = {
+	[MINERAL_TYPE_SILVER] = TILE_SILVER_1,
+	[MINERAL_TYPE_GOLD] = TILE_GOLD_1,
+	[MINERAL_TYPE_EMERALD] = TILE_EMERALD_1,
+	[MINERAL_TYPE_RUBY] = TILE_RUBY_1,
+	[MINERAL_TYPE_MOONSTONE] = TILE_MOONSTONE_1,
+	[MINERAL_TYPE_COAL] = TILE_COAL_1,
 };
 
 //------------------------------------------------------------------ PRIVATE FNS
@@ -131,6 +150,159 @@ static void tileSetBaseTiles(const tBase *pBase, UWORD uwLevel, UBYTE isReplacin
 	}
 }
 
+static UBYTE tileProgress(
+	UBYTE ubProgressStart, UBYTE ubProgressEnd,
+	UWORD uwElementCurr, UWORD uwElementCount
+) {
+	 UBYTE ubProgress = (
+		ubProgressStart +
+		((ubProgressEnd - ubProgressStart) * uwElementCurr) / uwElementCount
+	);
+	return ubProgress;
+}
+
+static void tileGenerateTerrain(
+	UBYTE isCoalOnly, UBYTE isChallenge, UBYTE ubProgressMin, UBYTE ubProgressMax
+) {
+	UWORD uwEndX = g_pMainBuffer->uTileBounds.uwX;
+	UWORD uwEndY = g_pMainBuffer->uTileBounds.uwY;
+	if(isChallenge) {
+		uwEndY = TILE_ROW_CHALLENGE_FINISH + 20; // generate a bit more to accomodate scroll
+	}
+
+	UBYTE **pTiles = g_pMainBuffer->pTileData;
+
+	for(UWORD uwX = 1; uwX < uwEndX; ++uwX) {
+		UBYTE ubProgress = tileProgress(ubProgressMin, ubProgressMax, uwX, uwEndX);
+		commProgress(ubProgress, g_pMsgs[MSG_LOADING_GEN_TERRAIN]);
+		for(UWORD uwY = TILE_ROW_BASE_DIRT + 2; uwY < uwEndY; ++uwY) {
+			// 2000 is max
+			UWORD uwWhat = (randUw(&g_sRand) * 1000) / 65535;
+			UWORD uwChanceAir = 50;
+			UWORD uwChanceRock, uwChanceSilver, uwChanceGold, uwChanceEmerald, uwChanceRuby, uwChanceMoonstone, uwChanceMagma;
+			if(isChallenge) {
+				uwChanceRock = 75;
+				uwChanceSilver = chanceTrapezoid(
+					uwY, TILE_ROW_BASE_DIRT, TILE_ROW_BASE_DIRT+5,
+					TILE_ROW_CHALLENGE_CHECKPOINT_2, TILE_ROW_CHALLENGE_CHECKPOINT_2 + 5,
+					5, 200
+				);
+				uwChanceGold = chanceTrapezoid(
+					uwY, TILE_ROW_CHALLENGE_CHECKPOINT_2 - 5, TILE_ROW_CHALLENGE_CHECKPOINT_2 + 5,
+					TILE_ROW_CHALLENGE_FINISH - 5, TILE_ROW_CHALLENGE_FINISH + 5,
+					2, 200
+				);
+				uwChanceEmerald = 0;
+				uwChanceRuby = 0;
+				uwChanceMoonstone = 10;
+				uwChanceMagma = 10;
+			}
+			else {
+				uwChanceGold = 0;
+				uwChanceEmerald = 0;
+				uwChanceRuby = 0;
+				uwChanceMoonstone = 0;
+				uwChanceSilver = 0;
+				uwChanceRock = CLAMP(uwY * 500 / 2000, 0, 500);
+				uwChanceMagma = chanceTrapezoid(uwY, 50, 900, 1000, 1100, 0, 75);
+			}
+
+			UWORD uwChance;
+			if(uwWhat < (uwChance = uwChanceRock)) {
+				pTiles[uwX][uwY] = randUwMinMax(&g_sRand, TILE_STONE_1, TILE_STONE_4);
+			}
+			else if(uwWhat < (uwChance += uwChanceMagma)) {
+				pTiles[uwX][uwY] = randUwMinMax(&g_sRand, TILE_MAGMA_1, TILE_MAGMA_2);
+			}
+			else if(
+				uwWhat < (uwChance += uwChanceAir) &&
+				tileIsSolid(uwX - 1, uwY) && tileIsSolid(uwX, uwY - 1)
+			) {
+				pTiles[uwX][uwY] = TILE_CAVE_BG_1+15;
+			}
+			else if(uwWhat < (uwChance += uwChanceSilver)) {
+				pTiles[uwX][uwY] = (
+					isCoalOnly
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_SILVER_1, TILE_SILVER_3)
+				);
+			}
+			else if(uwWhat < (uwChance += uwChanceGold)) {
+				pTiles[uwX][uwY] = (
+					isCoalOnly
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_GOLD_1, TILE_GOLD_3)
+				);
+			}
+			else if(uwWhat < (uwChance += uwChanceEmerald)) {
+				pTiles[uwX][uwY] = (
+					isCoalOnly
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_EMERALD_1, TILE_EMERALD_3)
+				);
+			}
+			else if(uwWhat < (uwChance += uwChanceRuby)) {
+				pTiles[uwX][uwY] = (
+					isCoalOnly
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_RUBY_1, TILE_RUBY_3)
+				);
+			}
+			else if(uwWhat < (uwChance += uwChanceMoonstone)) {
+				pTiles[uwX][uwY] = (
+					isCoalOnly
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						: randUwMinMax(&g_sRand, TILE_MOONSTONE_1, TILE_MOONSTONE_3)
+				);
+			}
+			else {
+				pTiles[uwX][uwY] = TILE_DIRT_1 + ((uwX & 1) ^ (uwY & 1));
+			}
+			// For quick tests
+			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG_1 + 12;
+		}
+	}
+}
+
+static UBYTE tileTryPlaceQuestItemInRow(UBYTE **pTiles, UWORD uwY, tTile eTile) {
+	for(UBYTE i = 0; i < ARRAY_SIZE(s_pRowSpawnPattern); ++i) {
+		UBYTE ubX = s_pRowSpawnPattern[s_ubNextRowPatternPos++];
+		if(pTiles[ubX][uwY] == TILE_DIRT_1 || pTiles[ubX][uwY] == TILE_DIRT_2) {
+			pTiles[ubX][uwY] = eTile;
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+static void tileGeneratePlanFillPattern(UWORD ubRowsPerPlan) {
+	if(ubRowsPerPlan > ROWS_PER_PLAN_MAX) {
+		logWrite(
+			"ERR: too many rows per plan: %hu, expected max %hu",
+			ubRowsPerPlan, ROWS_PER_PLAN_MAX
+		);
+	}
+
+	UWORD uwPatternPos = 0;
+	for(UBYTE ubX = 1; ubX < MINE_DIGGABLE_WIDTH; ++ubX) {
+		for(UBYTE ubY = 0; ubY < ubRowsPerPlan; ++ubY) {
+			s_pPlanFillPattern[uwPatternPos++] = (tUbCoordYX){.ubX = ubX, .ubY = ubY};
+		}
+	}
+	s_uwPlanFillPatternLength = uwPatternPos;
+
+	// Shuffle pattern
+	while (uwPatternPos--) {
+		UWORD uwOtherPos = randUwMax(&g_sRand, uwPatternPos - 1);
+		tUbCoordYX sTmp = {.uwYX = s_pPlanFillPattern[uwPatternPos].uwYX};
+		s_pPlanFillPattern[uwPatternPos].uwYX = s_pPlanFillPattern[uwOtherPos].uwYX;
+		s_pPlanFillPattern[uwOtherPos].uwYX = sTmp.uwYX;
+	}
+}
+
+//------------------------------------------------------------------- PUBLIC FNS
+
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
 	return (
@@ -159,113 +331,27 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 
 	UBYTE **pTiles = g_pMainBuffer->pTileData;
 
-	// Draw terrain
-	UBYTE ubPercentTiles = (100 - 10 * BASE_ID_COUNT_UNIQUE);
-	for(UWORD x = 1; x < uwEndX; ++x) {
-		UBYTE ubPercent = (x * ubPercentTiles) / uwEndX;
-		commProgress(ubPercent, g_pMsgs[MSG_LOADING_GEN_TERRAIN]);
-		for(UWORD y = TILE_ROW_BASE_DIRT + 2; y < uwEndY; ++y) {
-			// 2000 is max
-			UWORD uwWhat = (randUw(&g_sRand) * 1000) / 65535;
-			UWORD uwChanceAir = 50;
-			UWORD uwChanceRock, uwChanceSilver, uwChanceGold, uwChanceEmerald, uwChanceRuby, uwChanceMoonstone, uwChanceMagma;
-			if(g_isChallenge) {
-				uwChanceRock = 75;
-				uwChanceSilver = chanceTrapezoid(
-					y, TILE_ROW_BASE_DIRT, TILE_ROW_BASE_DIRT+5,
-					TILE_ROW_CHALLENGE_CHECKPOINT_2, TILE_ROW_CHALLENGE_CHECKPOINT_2 + 5,
-					5, 200
-				);
-				uwChanceGold = chanceTrapezoid(
-					y, TILE_ROW_CHALLENGE_CHECKPOINT_2 - 5, TILE_ROW_CHALLENGE_CHECKPOINT_2 + 5,
-					TILE_ROW_CHALLENGE_FINISH - 5, TILE_ROW_CHALLENGE_FINISH + 5,
-					2, 200
-				);
-				uwChanceEmerald = 0;
-				uwChanceRuby = 0;
-				uwChanceMoonstone = 10;
-				uwChanceMagma = 10;
-			}
-			else {
-				uwChanceRock = CLAMP(y * 500 / 2000, 0, 500);
-				uwChanceSilver = 75;
-				uwChanceGold = y > 60 ? 75 : 0;
-				uwChanceEmerald = y > 200 ? 75 : 0;
-				uwChanceRuby = y  > 400 ? 75 : 0;
-				uwChanceMoonstone = y > 175 ? 75 : 0;
-				uwChanceMagma = chanceTrapezoid(y, 50, 900, 1000, 1100, 0, 75);
-			}
-			UWORD uwChance;
-			if(uwWhat < (uwChance = uwChanceRock)) {
-				pTiles[x][y] = randUwMinMax(&g_sRand, TILE_STONE_1, TILE_STONE_4);
-			}
-			else if(uwWhat < (uwChance += uwChanceMagma)) {
-				pTiles[x][y] = randUwMinMax(&g_sRand, TILE_MAGMA_1, TILE_MAGMA_2);
-			}
-			else if(
-				uwWhat < (uwChance += uwChanceAir) &&
-				tileIsSolid(x - 1, y) && tileIsSolid(x, y - 1)
-			) {
-				pTiles[x][y] = TILE_CAVE_BG_1+15;
-			}
-			else if(uwWhat < (uwChance += uwChanceSilver)) {
-				pTiles[x][y] = (
-					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
-						: randUwMinMax(&g_sRand, TILE_SILVER_1, TILE_SILVER_3)
-				);
-			}
-			else if(uwWhat < (uwChance += uwChanceGold)) {
-				pTiles[x][y] = (
-					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
-						: randUwMinMax(&g_sRand, TILE_GOLD_1, TILE_GOLD_3)
-				);
-			}
-			else if(uwWhat < (uwChance += uwChanceEmerald)) {
-				pTiles[x][y] = (
-					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
-						: randUwMinMax(&g_sRand, TILE_EMERALD_1, TILE_EMERALD_3)
-				);
-			}
-			else if(uwWhat < (uwChance += uwChanceRuby)) {
-				pTiles[x][y] = (
-					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
-						: randUwMinMax(&g_sRand, TILE_RUBY_1, TILE_RUBY_3)
-				);
-			}
-			else if(uwWhat < (uwChance += uwChanceMoonstone)) {
-				pTiles[x][y] = (
-					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
-						: randUwMinMax(&g_sRand, TILE_MOONSTONE_1, TILE_MOONSTONE_3)
-				);
-			}
-			else {
-				pTiles[x][y] = TILE_DIRT_1 + ((x & 1) ^ (y & 1));
-			}
-			// For quick tests
-			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG_1 + 12;
-		}
-	}
+	// Generate terrain
+	UBYTE ubProgressTerrainEnd = 30;
+	tileGenerateTerrain(isCoalOnly, isChallenge, 0, ubProgressTerrainEnd);
 
-	// Draw bases
+	// Generate bases
+	UBYTE ubProgressBaseStart = ubProgressTerrainEnd;
+	UBYTE ubProgressBaseEnd = 40;
 	for(UBYTE ubBase = 0; ubBase < BASE_ID_COUNT; ++ubBase) {
 		const tBase *pBase = &s_pBases[ubBase];
 		if(pBase->uwLevel != BASE_LEVEL_VARIANT) {
-			UBYTE ubPercent = ((100 - ubPercentTiles) * ubBase / BASE_ID_COUNT_UNIQUE);
-			commProgress(ubPercentTiles + ubPercent, g_pMsgs[MSG_LOADING_GEN_BASES]);
+			UBYTE ubProgress = tileProgress(ubProgressBaseStart, ubProgressBaseEnd, ubBase, BASE_ID_COUNT_UNIQUE);
+			commProgress(ubProgressTerrainEnd + ubProgress, g_pMsgs[MSG_LOADING_GEN_BASES]);
 			tileSetBaseTiles(pBase, pBase->uwLevel, 0);
 		}
 	}
 
 	// Fill left invisible col with rocks
-	commProgress(100, g_pMsgs[MSG_LOADING_FINISHING]);
 	for(UWORD y = 0; y < uwEndY; ++y) {
 		pTiles[0][y] = TILE_DIRT_1;
 	}
+	commProgress(50, g_pMsgs[MSG_LOADING_FINISHING]);
 
 	if(isChallenge) {
 		for(UWORD x = 1; x < uwEndX; ++x) {
@@ -275,6 +361,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 			pTiles[x][TILE_ROW_CHALLENGE_FINISH] = TILE_CHECKPOINT_1 + x - 1;
 			pTiles[x][TILE_ROW_CHALLENGE_FINISH+1] = TILE_STONE_1 + (x & 1);
 		}
+		commProgress(90, g_pMsgs[MSG_LOADING_FINISHING]);
 	}
 	else {
 		// Rock bottom
@@ -282,17 +369,310 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 			pTiles[x][uwEndY - 1] = TILE_STONE_1 + (x & 3);
 		}
 
-		// Dino bones
-		pTiles[5][g_pDinoDepths[0]] = TILE_BONE_HEAD;
-		pTiles[3][g_pDinoDepths[1]] = TILE_BONE_1;
-		pTiles[7][g_pDinoDepths[2]] = TILE_BONE_1;
-		pTiles[1][g_pDinoDepths[3]] = TILE_BONE_1;
-		pTiles[4][g_pDinoDepths[4]] = TILE_BONE_1;
-		pTiles[6][g_pDinoDepths[5]] = TILE_BONE_1;
-		pTiles[8][g_pDinoDepths[6]] = TILE_BONE_1;
-		pTiles[2][g_pDinoDepths[7]] = TILE_BONE_1;
-		pTiles[9][g_pDinoDepths[8]] = TILE_BONE_1;
+		// Quest items
+		s_ubNextRowPatternPos = 0;
+		for(UBYTE i = 0; i < QUEST_DINO_BONE_COUNT; ++i) {
+			tTile eTile = (i == 0) ? TILE_BONE_HEAD : TILE_BONE_1;
+			if(!tileTryPlaceQuestItemInRow(pTiles, g_pDinoDepths[i], eTile)) {
+				logWrite("ERR: Can't find place for dino bone #%hhu at row %hu\n", i + 1, g_pDinoDepths[i]);
+				pTiles[5][g_pDinoDepths[i]] = eTile;
+			}
+		}
+		commProgress(55, g_pMsgs[MSG_LOADING_FINISHING]);
+
+		// Rows per plan
+		UWORD uwPlannableRows = uwEndY - 2;
+		uwPlannableRows -= BASE_ID_COUNT_UNIQUE * BASE_PATTERN_HEIGHT;
+		UBYTE ubPlanCount = g_ubPlansPerAccolade * g_ubAccoladesInMainStory;
+		UWORD uwPlannedRows = (uwPlannableRows * g_ubMinePercentForPlans) / 100;
+		UBYTE ubRowsPerPlan = uwPlannedRows / ubPlanCount;
+		logWrite("plannable rows: %hu, planned: %hu, rows per plan: %hhu\n", uwPlannableRows, uwPlannedRows, ubRowsPerPlan);
+
+		tileGeneratePlanFillPattern(ubRowsPerPlan);
+		commProgress(60, g_pMsgs[MSG_LOADING_FINISHING]);
+
+		UBYTE ubBaseIndex = 0;
+		UWORD uwCurrentRow = 0;
+		UWORD uwNextPatternPos = 0;
+		UWORD uwCurrentPlannableRow = 0;
+		UWORD pPlanSegmentRows[ROWS_PER_PLAN_MAX];
+		UBYTE ubProgressPlanBegin = 60;
+		UBYTE ubProgressPlanEnd = 80;
+		for(UBYTE ubPlanIndex = 0; ubPlanIndex < ubPlanCount; ++ubPlanIndex) {
+			UBYTE ubProgress = tileProgress(ubProgressPlanBegin, ubProgressPlanEnd, ubPlanIndex, ubPlanCount);
+			commProgress(ubProgress, g_pMsgs[MSG_LOADING_FINISHING]);
+			// Get mine rows for plan
+			UWORD planLastPlannableRow  = (uwPlannedRows * (ubPlanIndex + 1)) / ubPlanCount;
+			UBYTE ubPlanRowCount = 0;
+			while(uwCurrentPlannableRow <= planLastPlannableRow) {
+				if(ubBaseIndex < BASE_ID_COUNT_UNIQUE && uwCurrentRow >= s_pBases[ubBaseIndex].uwLevel) {
+					uwCurrentRow = s_pBases[ubBaseIndex].uwLevel + BASE_PATTERN_HEIGHT;
+					++ubBaseIndex;
+				}
+				pPlanSegmentRows[ubPlanRowCount++] = uwCurrentRow++;
+				++uwCurrentPlannableRow;
+			}
+
+			const tPlan *pPlan = &planManagerGet()->pPlanSequence[ubPlanIndex];
+			logWrite(
+				"plan %hhu rows %hu..%hu minerals required: %hu\n",
+				ubPlanIndex, pPlanSegmentRows[0], pPlanSegmentRows[ubPlanRowCount - 1],
+				pPlan->uwTotalMineralsRequired
+			);
+
+			// Fill mine segment with minerals required for plan, merging some in the process
+			ULONG ulPlacedMoney = 0;
+			UWORD uwTotalMineralsRemaining = pPlan->uwTotalMineralsRequired;
+
+			UWORD pMineralsRemaining[MINERAL_TYPE_COUNT];
+			memcpy(pMineralsRemaining, pPlan->pMineralsRequired, sizeof(pMineralsRemaining));
+
+			tMineralType pMineralsAllowed[MINERAL_TYPE_COUNT];
+			UBYTE ubMineralsAllowedCount = planGetAllowedMineralsForIndex(ubPlanIndex, pMineralsAllowed);
+			UBYTE ubPlacedStacks = 0;
+			while(uwTotalMineralsRemaining > 0) {
+				// pick mineral
+				tMineralType ePlacedMineral = pMineralsAllowed[randUwMax(&g_sRand, ubMineralsAllowedCount - 1)];
+				if(pMineralsRemaining[ePlacedMineral] > 0) {
+					UWORD uwStartPatternPos = uwNextPatternPos;
+					UBYTE isPlaced = 0;
+					do {
+						// pick next position from pattern
+						tUbCoordYX sPlacePosition = s_pPlanFillPattern[uwNextPatternPos];
+						if(++uwNextPatternPos >= s_uwPlanFillPatternLength) {
+							uwNextPatternPos = 0;
+						}
+
+						if(sPlacePosition.ubY >= ubPlanRowCount) {
+							continue;
+						}
+
+						// fill position with mineral
+						tTile eExistingTile = pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]];
+						if(eExistingTile == TILE_DIRT_1 || eExistingTile == TILE_DIRT_2) {
+							UBYTE ubPlacedAmount = randUwMinMax(&g_sRand, 1, MIN(pMineralsRemaining[ePlacedMineral], 3));
+							tTile eNewTile = g_pMineralToFirstTile[ePlacedMineral] + ubPlacedAmount - 1;
+							pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
+							uwTotalMineralsRemaining -= ubPlacedAmount;
+							pMineralsRemaining[ePlacedMineral] -= ubPlacedAmount;
+							isPlaced = 1;
+							++ubPlacedStacks;
+							ulPlacedMoney += g_pMinerals[ePlacedMineral].ubReward * ubPlacedAmount;
+							break;
+						}
+						else if (
+							pMineralsRemaining[eExistingTile] > 0 &&
+							g_pTileDefs[eExistingTile].ubSlots < 3
+						) {
+							UBYTE ubDelta = MIN(3 - g_pTileDefs[eExistingTile].ubSlots, pMineralsRemaining[g_pTileDefs[eExistingTile].ubMineral]);
+							tTile eNewTile = eExistingTile + ubDelta - 1;
+							pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
+							pMineralsRemaining[g_pTileDefs[eExistingTile].ubMineral] -= ubDelta;
+							uwTotalMineralsRemaining -= ubDelta;
+							isPlaced = 1;
+							ulPlacedMoney += g_pMinerals[g_pTileDefs[eExistingTile].ubMineral].ubReward * ubDelta;
+							break;
+						}
+					} while(uwNextPatternPos != uwStartPatternPos);
+					if(!isPlaced) {
+						logWrite("ERR: Can't place all minerals on plan %hhu\n", ubPlanIndex);
+						break;
+					}
+				}
+			}
+			logWrite("placed money: %lu/%lu, stacks: %hhu\n", ulPlacedMoney, pPlan->ulTargetSum, ubPlacedStacks);
+
+			LONG lExtraMineralMoney = g_ulExtraPlanMoney;
+			while(lExtraMineralMoney > 0) {
+				// pick mineral
+				UBYTE ePlacedMineral = pMineralsAllowed[randUwMax(&g_sRand, ubMineralsAllowedCount - 1)];
+				UWORD uwStartPatternPos = uwNextPatternPos;
+				UBYTE isPlaced = 0;
+				do {
+					// pick next position from pattern
+					tUbCoordYX sPlacePosition = s_pPlanFillPattern[uwNextPatternPos];
+					if(++uwNextPatternPos >= s_uwPlanFillPatternLength) {
+						uwNextPatternPos = 0;
+					}
+
+					if(sPlacePosition.ubY >= ubPlanRowCount) {
+						continue;
+					}
+
+					// fill position with mineral
+					tTile eExistingTile = pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]];
+					if(eExistingTile == TILE_DIRT_1 || eExistingTile == TILE_DIRT_2) {
+						UBYTE ubMineralReward = g_pMinerals[ePlacedMineral].ubReward;
+						UBYTE ubMaxAmount = MIN(((lExtraMineralMoney + ubMineralReward - 1) / ubMineralReward), 3);
+						UBYTE ubPlacedAmount = randUwMinMax(&g_sRand, 1, ubMaxAmount);
+						lExtraMineralMoney -= ubPlacedAmount * ubMineralReward;
+						tTile eNewTile = g_pMineralToFirstTile[ePlacedMineral] + ubPlacedAmount - 1;
+						pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
+						isPlaced = 1;
+						break;
+					}
+				} while(uwNextPatternPos != uwStartPatternPos);
+				if(!isPlaced) {
+					logWrite("ERR: Couldn't place all extra minerals on plan %hhu, remaining money to place: %ld/%lu\n", ubPlanIndex, lExtraMineralMoney, g_ulExtraPlanMoney);
+					break;
+				}
+			}
+		}
+
+
+		// Extra minerals after all plans
+		UWORD pMineralsInFauxPlan[MINERAL_TYPE_COUNT] = {0};
+		for(UBYTE ubPlanIndex = 0; ubPlanIndex < ubPlanCount; ++ubPlanIndex) {
+			for(tMineralType eMineral = 0; eMineral < MINERAL_TYPE_COUNT; ++eMineral) {
+				pMineralsInFauxPlan[eMineral] += planManagerGet()->pPlanSequence[ubPlanIndex].pMineralsRequired[eMineral];
+			}
+		}
+
+		UWORD uwUnplannedRows = uwPlannableRows - uwPlannedRows;
+		UBYTE ubProgressFauxPlanBegin = 80;
+		UBYTE ubProgressFauxPlanEnd = 100;
+		if(uwUnplannedRows > 0) {
+			UBYTE ubFauxPlanCount = uwUnplannedRows / ubRowsPerPlan;
+			UWORD uwTotalMineralsPerFauxPlan = 0;
+			for(tMineralType eMineral = 0; eMineral < MINERAL_TYPE_COUNT; ++eMineral) {
+				pMineralsInFauxPlan[eMineral] = ((pMineralsInFauxPlan[eMineral] * g_ubTrailingMineralCountPercent) / 100) / ubFauxPlanCount;
+				uwTotalMineralsPerFauxPlan += pMineralsInFauxPlan[eMineral];
+				logWrite("Mineral %d per faux plan: %hu\n", eMineral, pMineralsInFauxPlan[eMineral]);
+			}
+			tMineralType pMineralsAllowed[MINERAL_TYPE_COUNT];
+			UBYTE ubMineralsAllowedCount = planGetAllowedMineralsForIndex(PLAN_COUNT_MAX, pMineralsAllowed);
+			for(UBYTE ubFauxPlanIndex = 0; ubFauxPlanIndex < ubFauxPlanCount; ++ubFauxPlanIndex) {
+				UBYTE ubProgress = tileProgress(ubProgressFauxPlanBegin, ubProgressFauxPlanEnd, ubFauxPlanIndex, ubFauxPlanCount);
+				commProgress(ubProgress, g_pMsgs[MSG_LOADING_FINISHING]);
+				// Get mine rows for faux-plan
+				UWORD uwPlanLastFauxPlanRow = MIN(uwPlannedRows + (uwUnplannedRows * (ubFauxPlanIndex + 1)) / ubFauxPlanCount, uwEndY - 1);
+				UBYTE ubPlanRowCount = 0;
+				while(uwCurrentPlannableRow <= uwPlanLastFauxPlanRow) {
+					if(ubBaseIndex < BASE_ID_COUNT_UNIQUE && uwCurrentRow >= s_pBases[ubBaseIndex].uwLevel) {
+						uwCurrentRow = s_pBases[ubBaseIndex].uwLevel + BASE_PATTERN_HEIGHT;
+						++ubBaseIndex;
+					}
+					pPlanSegmentRows[ubPlanRowCount++] = uwCurrentRow++;
+					++uwCurrentPlannableRow;
+				}
+
+				logWrite(
+					"Faux plan %hhu rows %hu..%hu (%hhu) minerals required: %hu\n",
+					ubFauxPlanIndex, pPlanSegmentRows[0],
+					pPlanSegmentRows[ubPlanRowCount - 1], ubPlanRowCount,
+					uwTotalMineralsPerFauxPlan
+				);
+
+				// Fill mine segment with minerals required for faux-plan, merging some in the process
+				UWORD uwTotalMineralsRemaining = uwTotalMineralsPerFauxPlan;
+				UWORD pMineralsRemaining[MINERAL_TYPE_COUNT];
+				memcpy(pMineralsRemaining, pMineralsInFauxPlan, sizeof(pMineralsRemaining));
+				while(uwTotalMineralsRemaining > 0) {
+					// pick mineral and count
+					tMineralType ePlacedMineral = pMineralsAllowed[randUwMax(&g_sRand, ubMineralsAllowedCount - 1)];
+					if(pMineralsRemaining[ePlacedMineral] > 0) {
+						UWORD uwStartPatternPos = uwNextPatternPos;
+						UBYTE isPlaced = 0;
+						do {
+							// pick next position from pattern
+							tUbCoordYX sPlacePosition = s_pPlanFillPattern[uwNextPatternPos];
+							if(++uwNextPatternPos >= s_uwPlanFillPatternLength) {
+								uwNextPatternPos = 0;
+							}
+
+							if(sPlacePosition.ubY >= ubPlanRowCount) {
+								continue;
+							}
+
+							// fill position with mineral
+							tTile eExistingTile = pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]];
+							if(eExistingTile == TILE_DIRT_1 || eExistingTile == TILE_DIRT_2) {
+								UBYTE ubPlacedAmount = randUwMinMax(&g_sRand, 1, MIN(pMineralsRemaining[ePlacedMineral], 3));
+								tTile eNewTile = g_pMineralToFirstTile[ePlacedMineral] + ubPlacedAmount - 1;
+								pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
+								uwTotalMineralsRemaining -= ubPlacedAmount;
+								pMineralsRemaining[ePlacedMineral] -= ubPlacedAmount;
+								isPlaced = 1;
+								break;
+							}
+							else if (
+								pMineralsRemaining[eExistingTile] > 0 &&
+								g_pTileDefs[eExistingTile].ubSlots < 3
+							) {
+								UBYTE ubDelta = MIN(3 - g_pTileDefs[eExistingTile].ubSlots, pMineralsRemaining[g_pTileDefs[eExistingTile].ubMineral]);
+								tTile eNewTile = eExistingTile + ubDelta - 1;
+								pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
+								pMineralsRemaining[g_pTileDefs[eExistingTile].ubMineral] -= ubDelta;
+								uwTotalMineralsRemaining -= ubDelta;
+								isPlaced = 1;
+								break;
+							}
+						} while(uwNextPatternPos != uwStartPatternPos);
+						if(!isPlaced) {
+							logWrite("WARN: Can't place all minerals on faux plan %hhu", ubFauxPlanIndex);
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
+
+#if defined(GAME_DEBUG)
+	// Log mine contents
+	char szMineRow[50];
+	for(UWORD uwY = 0; uwY < uwEndY; ++uwY) {
+		char *pEnd = &szMineRow[0];
+		pEnd += sprintf(pEnd, "%4hu: ", uwY);
+		for(UWORD uwX = 1; uwX < uwEndX; ++uwX) {
+			if(!tileIsSolid(uwX, uwY)) {
+				pEnd += sprintf(pEnd, "   ");
+			}
+			else {
+				char cKind = '?';
+				char cCount = ' ';
+				if(g_pTileDefs[pTiles[uwX][uwY]].ubSlots) {
+					static const char pMineralToChar[MINERAL_TYPE_COUNT] = {
+						[MINERAL_TYPE_SILVER] = 'S',
+						[MINERAL_TYPE_GOLD] = 'G',
+						[MINERAL_TYPE_EMERALD] = 'E',
+						[MINERAL_TYPE_RUBY] = 'R',
+						[MINERAL_TYPE_MOONSTONE] = 'M',
+						[MINERAL_TYPE_COAL] = 'C',
+					};
+					cKind = pMineralToChar[g_pTileDefs[pTiles[uwX][uwY]].ubMineral];
+					cCount = '0' + g_pTileDefs[pTiles[uwX][uwY]].ubSlots;
+				}
+				else if(TILE_STONE_1 <= pTiles[uwX][uwY] && pTiles[uwX][uwY] <= TILE_STONE_4) {
+					cKind = 's';
+					cCount = 's';
+				}
+				else if(TILE_MAGMA_1 <= pTiles[uwX][uwY] && pTiles[uwX][uwY] <= TILE_MAGMA_2) {
+					cKind = 'm';
+					cCount = 'm';
+				}
+				else if(TILE_BONE_HEAD <= pTiles[uwX][uwY] && pTiles[uwX][uwY] <= TILE_BONE_1) {
+					cKind = 'd';
+					cCount = 'd';
+				}
+				else if(pTiles[uwX][uwY] <= TILE_BASE_SHAFT) {
+					cKind = ' ';
+					cCount = ' ';
+				}
+				else if(TILE_BASE_GROUND_1 <= pTiles[uwX][uwY] && pTiles[uwX][uwY] <= TILE_BASE_GROUND_1) {
+					cKind = 'X';
+					cCount = 'X';
+				}
+				else if(TILE_DIRT_1 <= pTiles[uwX][uwY] && pTiles[uwX][uwY] <= TILE_DIRT_2) {
+					cKind = '.';
+					cCount = '.';
+				}
+				pEnd += sprintf(pEnd, "%c%c ", cKind, cCount);
+			}
+		}
+		logWrite(szMineRow);
+	}
+#endif
 
 	logBlockEnd("tileReset()");
 }

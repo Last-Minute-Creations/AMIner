@@ -238,14 +238,14 @@ static void hudDrawModeIcon(tMode eMode) {
 		blitCopyMask(
 			s_pModeCursor, 0, 0,
 			s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1,
-			16, 15, (UWORD*)s_pModeCursorMask->Planes[0]
+			16, 15, s_pModeCursorMask->Planes[0]
 		);
 	}
 	if(s_is2pPlaying && s_pPlayerData[PLAYER_2].eMode == eMode) {
 		blitCopyMask(
 			s_pModeCursor, 0, 15,
 			s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1,
-			16, 15, (UWORD*)s_pModeCursorMask->Planes[0]
+			16, 15, s_pModeCursorMask->Planes[0]
 		);
 	}
 

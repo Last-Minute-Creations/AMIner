@@ -7,7 +7,10 @@
 
 #include <ace/types.h>
 #include "string_array.h"
+#include "mineral.h"
 #include <json/utf8_remap.h>
+
+#define QUEST_DINO_BONE_COUNT 9
 
 typedef enum _tMsg {
 	// Plan
@@ -99,16 +102,21 @@ typedef enum _tMsg {
 } tMsg;
 
 extern LONG g_lInitialCash;
-extern UBYTE g_ubUpgradeLevels, g_ubPlansPerAccolade;
+extern UBYTE g_ubUpgradeLevels;
+extern UBYTE g_ubPlansPerAccolade;
 extern UBYTE g_ubAccoladesInMainStory;
 extern UBYTE g_ubRebukesInMainStory;
 extern UBYTE g_ubDrillingCost;
 extern UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 extern fix16_t g_fPlanIncreaseRatioSingleplayer;
 extern fix16_t g_fPlanIncreaseRatioMultiplayer;
+extern UBYTE g_ubMinePercentForPlans;
+extern UBYTE g_ubTrailingMineralCountPercent;
+extern ULONG g_ulExtraPlanMoney;
 
 extern LONG g_pUpgradeCosts[10];
-extern UWORD g_pDinoDepths[9];
+extern UWORD g_pDinoDepths[QUEST_DINO_BONE_COUNT];
+extern UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
 
 extern char **g_pMsgs;
 

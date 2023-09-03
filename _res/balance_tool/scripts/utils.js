@@ -31,7 +31,7 @@ class Utils {
 
 	static shuffleArray(array, rand) {
 		for (let i = array.length - 1; i > 0; i--) {
-			const j = rand.next16Max(i + 1);
+			const j = rand.next16Max(i - 1);
 			[array[i], array[j]] = [array[j], array[i]];
 		}
 	}

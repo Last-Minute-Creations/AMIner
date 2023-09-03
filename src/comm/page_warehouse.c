@@ -25,14 +25,15 @@ static UWORD s_pTmpSell[MINERAL_TYPE_COUNT];
 static UWORD s_pTmpPlan[MINERAL_TYPE_COUNT];
 static UWORD s_pTmpStock[MINERAL_TYPE_COUNT];
 
-static UBYTE getMineralsOnList(const tPlan *pPlan, UBYTE *pMineralsOnList) {
+static UBYTE getMineralsOnList(UBYTE *pMineralsOnList) {
 	UBYTE ubCount = 0;
+	tPlan *pPlan = planGetCurrent();
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		// Omit minerals not in plan
-		if(pPlan->pMinerals[i].uwTargetCount || warehouseGetStock(i)) {
+		if(pPlan->pMineralsRequired[i] || warehouseGetStock(i)) {
 			pMineralsOnList[ubCount] = i;
 			s_pTmpStock[i] = warehouseGetStock(i);
-			s_pTmpPlan[i] = pPlan->pMinerals[i].uwCurrentCount;
+			s_pTmpPlan[i] = planManagerGet()->pMineralsSpent[i];
 			s_pTmpSell[i] = 0;
 			++ubCount;
 		}
@@ -40,7 +41,7 @@ static UBYTE getMineralsOnList(const tPlan *pPlan, UBYTE *pMineralsOnList) {
 	return ubCount;
 }
 
-static void drawRow(UBYTE ubPos, const tPlan *pPlan) {
+static void drawRow(UBYTE ubPos) {
 	UBYTE ubMineral = s_pMineralsOnList[ubPos];
 	UBYTE ubColor = (
 		ubPos == s_ubPosCurr ?
@@ -95,10 +96,10 @@ static void drawRow(UBYTE ubPos, const tPlan *pPlan) {
 	);
 
 	// Plan
-	if(pPlan->isActive) {
+	if(planManagerGet()->isPlanActive) {
 		sprintf(
 			szBfr, "%hu/%hu",
-			s_pTmpPlan[ubMineral], pPlan->pMinerals[ubMineral].uwTargetCount
+			s_pTmpPlan[ubMineral], planGetCurrent()->pMineralsRequired[ubMineral]
 		);
 	}
 	else {
@@ -123,11 +124,10 @@ static void redraw(void) {
 		COMM_DISPLAY_WIDTH, 1, COMM_DISPLAY_COLOR_TEXT
 	);
 
-	const tPlan *pPlan = warehouseGetCurrentPlan();
-	s_ubPosCount = getMineralsOnList(pPlan, s_pMineralsOnList);
+	s_ubPosCount = getMineralsOnList(s_pMineralsOnList);
 	s_ubPosCurr = s_ubPosCount; // move to buttons on start
 	for(UBYTE i = 0; i < s_ubPosCount; ++i) {
-		drawRow(i, pPlan);
+		drawRow(i);
 	}
 
 	// Buttons
@@ -142,10 +142,10 @@ static void redraw(void) {
 	char szBfr[40];
 
 	// Time remaining
-	if(pPlan->isActive) {
+	if(planManagerGet()->isPlanActive) {
 		sprintf(
 			szBfr, g_pMsgs[MSG_COMM_TIME_REMAINING],
-			planGetRemainingDays(pPlan)
+			planGetRemainingDays()
 		);
 		commDrawText(
 			COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,
@@ -186,11 +186,11 @@ static void pageWarehouseProcess(void) {
 	if(s_ubPosCurr != ubPosPrev) {
 		// Deselect previous pos
 		if(ubPosPrev < s_ubPosCount) {
-			drawRow(ubPosPrev, warehouseGetCurrentPlan());
+			drawRow(ubPosPrev);
 		}
 		// Select new pos
 		if(s_ubPosCurr < s_ubPosCount) {
-			drawRow(s_ubPosCurr, warehouseGetCurrentPlan());
+			drawRow(s_ubPosCurr);
 			if(ubPosPrev >= s_ubPosCount) {
 				buttonSelect(BUTTON_INVALID);
 				isButtonRefresh = 1;
@@ -207,15 +207,15 @@ static void pageWarehouseProcess(void) {
 		if(commNavUse(DIRECTION_LEFT) && s_pTmpStock[ubMineral]) {
 			++s_pTmpSell[ubMineral];
 			--s_pTmpStock[ubMineral];
-			drawRow(ubPosPrev, warehouseGetCurrentPlan());
+			drawRow(ubPosPrev);
 		}
 		else if(
 			commNavUse(DIRECTION_RIGHT) && s_pTmpStock[ubMineral] &&
-			warehouseGetCurrentPlan()->isActive
+			planManagerGet()->isPlanActive
 		) {
 			++s_pTmpPlan[ubMineral];
 			--s_pTmpStock[ubMineral];
-			drawRow(ubPosPrev, warehouseGetCurrentPlan());
+			drawRow(ubPosPrev);
 		}
 	}
 	else {
@@ -245,7 +245,7 @@ static void pageWarehouseProcess(void) {
 				for(UBYTE i = 0; i < s_ubPosCount; ++i) {
 					UBYTE ubMineral = s_pMineralsOnList[i];
 					warehouseSetStock(ubMineral, s_pTmpStock[ubMineral]);
-					warehouseReserveMineralsForPlan(ubMineral, s_pTmpPlan[ubMineral]);
+					planSpendMinerals(ubMineral, s_pTmpPlan[ubMineral]);
 					g_pVehicles[0].lCash += g_pMinerals[ubMineral].ubReward * s_pTmpSell[ubMineral];
 					s_pTmpSell[ubMineral] = 0;
 					s_pTmpPlan[ubMineral] = 0;
@@ -253,10 +253,8 @@ static void pageWarehouseProcess(void) {
 					hudSetCash(0, g_pVehicles[0].lCash);
 				}
 
-				tPlan *pPlan = warehouseGetCurrentPlan();
-
-				if(planIsFulfilled(pPlan)) {
-					UBYTE wasDelayed = (pPlan->uwIndex > 0 && pPlan->isPenaltyCountdownStarted);
+				if(planIsCurrentFulfilled()) {
+					UBYTE wasDelayed = (planManagerGet()->ubCurrentPlanIndex > 0 && planManagerGet()->isPenaltyCountdownStarted);
 					warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 
 					if(wasDelayed) {

@@ -12,7 +12,6 @@
 #include "hi_score.h"
 #include "menu.h"
 #include "game.h"
-#include "mineral.h"
 #include "tutorial.h"
 #include "vehicle.h"
 #include "tile.h"
@@ -30,7 +29,11 @@ fix16_t g_fPlanIncreaseRatioSingleplayer;
 fix16_t g_fPlanIncreaseRatioMultiplayer;
 
 LONG g_pUpgradeCosts[10];
-UWORD g_pDinoDepths[9];
+UWORD g_pDinoDepths[QUEST_DINO_BONE_COUNT];
+UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
+UBYTE g_ubMinePercentForPlans;
+UBYTE g_ubTrailingMineralCountPercent;
+ULONG g_ulExtraPlanMoney;
 
 const char * s_pLangDom[] = {
 	// Hi score
@@ -179,9 +182,20 @@ void defsInit(void) {
 		logWrite("Dino part count mismatch: got %d, expected 9\n", ubDepthCount);
 	}
 	for(UBYTE i = 0; i < ubDepthCount; ++i) {
-		UWORD uwIdxCost = jsonGetElementInArray(pJson, uwIdxDinoDepths, i);
-		g_pDinoDepths[i] = jsonTokToUlong(pJson, uwIdxCost);
+		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxDinoDepths, i);
+		g_pDinoDepths[i] = jsonTokToUlong(pJson, uwIdx);
 	}
+
+	// Minerals
+	UWORD uwIdxMineralPlans = jsonGetDom(pJson, "mineralPlans");
+	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
+		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxMineralPlans, i);
+		g_pMineralPlans[i] = jsonTokToUlong(pJson, uwIdx);
+	}
+
+	g_ubMinePercentForPlans = jsonTokToUlong(pJson, jsonGetDom(pJson, "minePercentForPlans"));
+	g_ubTrailingMineralCountPercent = jsonTokToUlong(pJson, jsonGetDom(pJson, "trailingMineralCountPercent"));
+	g_ulExtraPlanMoney = jsonTokToUlong(pJson, jsonGetDom(pJson, "extraPlanMoney"));
 
 	UWORD pPartsBase[INVENTORY_PART_COUNT] = {
 		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.drill.base")),
