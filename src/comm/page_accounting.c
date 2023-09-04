@@ -14,8 +14,6 @@
 #include "../save.h"
 #include "../heat.h"
 
-static UWORD s_uwAccountingCost;
-
 static void pageAccountingProcess(void) {
 	BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
 	BYTE bButtonCount = buttonGetCount();
@@ -32,7 +30,6 @@ static void pageAccountingProcess(void) {
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(bButtonCurr == 0) {
-			g_pVehicles[0].lCash -= s_uwAccountingCost;
 			if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
 				warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED_ACCOUNTING);
 			}
@@ -40,7 +37,7 @@ static void pageAccountingProcess(void) {
 				gameAddRebuke();
 			}
 
-			heatTryIncrease(6);
+			heatTryIncrease(5);
 		}
 		commShopGoBack();
 	}
@@ -57,11 +54,9 @@ void pageAccountingCreate(void) {
 		buttonInitOk("Back");
 	}
 	else {
-		s_uwAccountingCost = planGetRemainingCost() / 2;
-
 		uwPosY += commDrawMultilineText(
-			"I can do some Creative Acccounting for you and fulfill your plan instantly."
-			" For a price, of course.", 0, uwPosY
+			"I can do some Creative Acccounting for you and fulfill your plan instantly.",
+			0, uwPosY
 		) * ubLineHeight;
 		char szBfr[150];
 		uwPosY += ubLineHeight / 2;
@@ -70,8 +65,6 @@ void pageAccountingCreate(void) {
 			heatGetPercent()
 		);
 		uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
-		sprintf(szBfr, "It will cost you %hu\x1F.", s_uwAccountingCost);
-		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 		buttonInitAcceptDecline("Accept", "Decline");
 	}

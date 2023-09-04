@@ -174,7 +174,7 @@ void planAdvance(void) {
 }
 
 void planFailDeadline(void) {
-	s_sPlanManager.wTimeRemaining = 5 * GAME_TIME_PER_DAY;
+	s_sPlanManager.wTimeRemaining += 14 * GAME_TIME_PER_DAY;
 }
 
 void planReroll(void) {

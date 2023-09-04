@@ -38,18 +38,12 @@ UBYTE warehouseLoad(tFile *pFile) {
 }
 
 void warehouseNextPlan(tNextPlanReason eReason) {
-	if(eReason != NEXT_PLAN_REASON_FAILED) {
-		if(!planManagerGet()->isPenaltyCountdownStarted) {
-			gameAdvanceAccolade();
-		}
-
-		if(eReason == NEXT_PLAN_REASON_FULFILLED_ACCOUNTING) {
-			heatTryReduce(2);
-		}
-	}
-
-	// Increase the plan target sum by relevant ratio
+	gameAdvanceAccolade();
 	planAdvance();
+
+	if(eReason != NEXT_PLAN_REASON_FULFILLED_ACCOUNTING) {
+		heatTryReduce(3);
+	}
 }
 
 UWORD warehouseGetStock(UBYTE ubMineralType) {

@@ -11,7 +11,6 @@
 typedef enum tNextPlanReason {
 	NEXT_PLAN_REASON_FULFILLED,
 	NEXT_PLAN_REASON_FULFILLED_ACCOUNTING,
-	NEXT_PLAN_REASON_FAILED,
 } tNextPlanReason;
 
 void warehouseReset(void);

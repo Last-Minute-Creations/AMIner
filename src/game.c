@@ -534,8 +534,8 @@ static void processPlan(void) {
 		}
 		else {
 			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_REBUKE]);
-			warehouseNextPlan(NEXT_PLAN_REASON_FAILED);
 			gameAddRebuke();
+			planFailDeadline();
 		}
 	}
 	else if(
