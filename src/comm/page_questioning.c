@@ -63,7 +63,7 @@ void pageQuestioningCreate(void) {
 		s_eCurrentQuestioningBit <<= 1;
 	}
 
-	const char *szMsg;
+	const char *szMsg = "???";
 	switch (s_eCurrentQuestioningBit)
 	{
 		case QUESTIONING_BIT_GATE:
