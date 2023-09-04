@@ -12,7 +12,7 @@
 #include "../save.h"
 #include "../heat.h"
 
-static UBYTE s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
+static UWORD s_uwBribeCount;
 static UWORD s_uwBribeCost;
 
 static void pageBribeProcess(void) {
@@ -36,15 +36,8 @@ static void pageBribeProcess(void) {
 				if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
 					// Success
 					pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
-					if(!planManagerGet()->isPenaltyCountdownStarted) {
-						// accolade bribe
-						++s_ubBribeAccoladeCount;
-						heatTryIncrease(2);
-					}
-					else {
-						// rebuke bribe
-						++s_ubBribeRebukeCount;
-					}
+					heatTryIncrease(5);
+					++s_uwBribeCount;
 					planAddDays(14, 1);
 				}
 				else {
@@ -66,7 +59,11 @@ void pageBribeCreate(void) {
 	const UBYTE ubLineHeight = commGetLineHeight();
 	char szBfr[150];
 	UWORD uwPosY = 0;
-	UWORD uwCost;
+
+	s_uwBribeCost = 100;
+	for(UBYTE i = s_uwBribeCount; i--;) {
+		s_uwBribeCost = (s_uwBribeCost * 150 / 100);
+	}
 
 	if (!planManagerGet()->isPlanActive) {
 		uwPosY += commDrawMultilineText(
@@ -75,36 +72,21 @@ void pageBribeCreate(void) {
 		buttonInitOk("Back");
 	}
 	else if(!planManagerGet()->isExtendedTimeByFavor) {
-		if(!planManagerGet()->isPenaltyCountdownStarted) {
-			sprintf(szBfr, "Bribe for extra %hhu days for finishing plan in time.", 14);
-			uwCost = 100;
-			for(UBYTE i = s_ubBribeAccoladeCount; i--;) {
-				uwCost = (uwCost * 120 / 100);
-			}
-		}
-		else {
-			sprintf(szBfr, "Bribe for extra %hhu days before getting a penalty.", 14);
-			uwCost = 200;
-			for(UBYTE i = s_ubBribeRebukeCount; i--;) {
-				uwCost = (uwCost * 120 / 100);
-			}
-		}
+		sprintf(szBfr, "Bribe for extra %hhu days for plan.", 14);
 		uwPosY += commDrawMultilineText(szBfr,0, uwPosY) * ubLineHeight;
-
 		uwPosY += ubLineHeight / 2;
 		sprintf(
 			szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
 			heatGetPercent()
 		);
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
-		s_uwBribeCost = uwCost;
-		sprintf(szBfr, "It will cost you %hu\x1F.", uwCost);
+		sprintf(szBfr, "It will cost you %hu\x1F.", s_uwBribeCost);
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
 		buttonInitAcceptDecline("Accept", "Decline");
 	}
 	else {
-		uwPosY += commDrawMultilineText("Comrade, not now... there's too much heat!", 0, uwPosY) * ubLineHeight;
+		uwPosY += commDrawMultilineText("Comrade, not now... I've already helped you with current plan!", 0, uwPosY) * ubLineHeight;
 		buttonInitOk("Back");
 	}
 
@@ -112,14 +94,12 @@ void pageBribeCreate(void) {
 }
 
 void pageBribeReset(void) {
-	s_ubBribeAccoladeCount = 0;
-	s_ubBribeRebukeCount = 0;
+	s_uwBribeCount = 0;
 }
 
 void pageBribeSave(tFile *pFile) {
 	saveWriteHeader(pFile, "BRBE");
-	fileWrite(pFile, &s_ubBribeAccoladeCount, sizeof(s_ubBribeAccoladeCount));
-	fileWrite(pFile, &s_ubBribeRebukeCount, sizeof(s_ubBribeRebukeCount));
+	fileWrite(pFile, &s_uwBribeCount, sizeof(s_uwBribeCount));
 }
 
 UBYTE pageBribeLoad(tFile *pFile) {
@@ -127,8 +107,7 @@ UBYTE pageBribeLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_ubBribeAccoladeCount, sizeof(s_ubBribeAccoladeCount));
-	fileRead(pFile, &s_ubBribeRebukeCount, sizeof(s_ubBribeRebukeCount));
+	fileRead(pFile, &s_uwBribeCount, sizeof(s_uwBribeCount));
 	return 1;
 }
 
