@@ -254,7 +254,7 @@ static void pageWarehouseProcess(void) {
 				}
 
 				if(planIsCurrentFulfilled()) {
-					UBYTE wasDelayed = (planManagerGet()->ubCurrentPlanIndex > 0 && planManagerGet()->isPenaltyCountdownStarted);
+					UBYTE wasDelayed = (planManagerGet()->eProlongState == PLAN_PROLONG_CURRENT);
 					warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 
 					if(wasDelayed) {

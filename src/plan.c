@@ -24,7 +24,7 @@ static void planReset(UBYTE isPlanActive) {
 
 	s_sPlanManager.wTimeRemaining = isPlanActive ? s_sPlanManager.wTimeMax : (GAME_TIME_PER_DAY * 5);
 	s_sPlanManager.isExtendedTimeByFavor = 0;
-	s_sPlanManager.isPenaltyCountdownStarted = 0;
+	s_sPlanManager.eProlongState = PLAN_PROLONG_NONE;
 	s_sPlanManager.isPlanActive = isPlanActive;
 	logBlockEnd("planReset()");
 }
@@ -147,9 +147,13 @@ void planSpendMinerals(UBYTE ubMineralType, UBYTE ubCount) {
 	s_sPlanManager.pMineralsSpent[ubMineralType] += ubCount;
 }
 
-void planStartPenaltyCountdown(void) {
-	planAddDays(14, 0);
-	s_sPlanManager.isPenaltyCountdownStarted = 1;
+UBYTE planTryProlong(void) {
+	if(s_sPlanManager.eProlongState == PLAN_PROLONG_NONE) {
+		planAddDays(14, 0);
+		s_sPlanManager.eProlongState = PLAN_PROLONG_CURRENT;
+		return 1;
+	}
+	return 0;
 }
 
 UWORD planGetRemainingCost(void) {
@@ -170,6 +174,9 @@ tPlan *planGetCurrent(void) {
 
 void planAdvance(void) {
 	++s_sPlanManager.ubCurrentPlanIndex;
+	if(s_sPlanManager.eProlongState == PLAN_PROLONG_CURRENT) {
+		s_sPlanManager.eProlongState = PLAN_PROLONG_PAST;
+	}
 	planReset(0);
 }
 

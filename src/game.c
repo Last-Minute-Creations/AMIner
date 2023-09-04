@@ -63,7 +63,7 @@ static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
 static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
-static UBYTE s_isReminderShown;
+static WORD s_wLastReminder;
 static UBYTE s_ubCurrentMod;
 static ULONG s_ulGameTime;
 
@@ -100,10 +100,12 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	modeReset(1);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
+	s_ulGameTime = 0;
+	s_ubCurrentMod = GAME_MOD_COUNT;
 	s_ubRebukes = 0;
 	s_ubAccolades = 0;
 	s_ubAccoladesFract = 0;
-	s_isReminderShown = 0;
+	s_wLastReminder = 0;
 	s_sTeleportReturn.ulYX = -1;
 	for(tMode eMode = 0; eMode < MODE_COUNT; ++eMode) {
 		hudSetModeCounter(eMode, 0);
@@ -526,11 +528,10 @@ static void processPlan(void) {
 
 	WORD wRemainingDays = planGetRemainingDays();
 	if(wRemainingDays <= 0) {
-		if(!planManagerGet()->isPenaltyCountdownStarted && !planManagerGet()->isExtendedTimeByFavor) {
+		if(!planManagerGet()->isExtendedTimeByFavor && planTryProlong()) {
 			char szBfr[100];
 			sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
 			hudShowMessage(0, szBfr);
-			planStartPenaltyCountdown();
 		}
 		else {
 			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_REBUKE]);
@@ -539,18 +540,18 @@ static void processPlan(void) {
 		}
 	}
 	else if(
-		wRemainingDays == 15 || wRemainingDays == 5 || wRemainingDays == 3 ||
+		wRemainingDays == 10 || wRemainingDays == 5 || wRemainingDays == 3 ||
 		wRemainingDays == 2 || wRemainingDays == 1
 	) {
-		if(!s_isReminderShown) {
-			s_isReminderShown = 1;
+		if(wRemainingDays != s_wLastReminder) {
+			s_wLastReminder = wRemainingDays;
 			char szBuffer[50];
 			sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
 			hudShowMessage(0, szBuffer);
 		}
 	}
 	else {
-		s_isReminderShown = 0;
+		s_wLastReminder = 0;
 	}
 }
 
@@ -609,7 +610,7 @@ void gameSave(tFile *pFile) {
 	fileWrite(pFile, &s_ubRebukes, sizeof(s_ubRebukes));
 	fileWrite(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
 	fileWrite(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
-	fileWrite(pFile, &s_isReminderShown, sizeof(s_isReminderShown));
+	fileWrite(pFile, &s_wLastReminder, sizeof(s_wLastReminder));
 	fileWrite(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
 	fileWrite(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
 
@@ -650,7 +651,7 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &s_ubRebukes, sizeof(s_ubRebukes));
 	fileRead(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
 	fileRead(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
-	fileRead(pFile, &s_isReminderShown, sizeof(s_isReminderShown));
+	fileRead(pFile, &s_wLastReminder, sizeof(s_wLastReminder));
 	fileRead(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
 	fileRead(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
 
@@ -671,8 +672,6 @@ UBYTE gameLoad(tFile *pFile) {
 //-------------------------------------------------------------------- GAMESTATE
 
 static void gameGsCreate(void) {
-	s_ulGameTime = 0;
-	s_ubCurrentMod = GAME_MOD_COUNT;
 	ptplayerConfigureSongRepeat(0, onSongEnd);
 	onSongEnd();
 }

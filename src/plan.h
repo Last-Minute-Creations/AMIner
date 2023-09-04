@@ -16,6 +16,12 @@ typedef struct _tPlan {
 	UWORD uwTotalMineralsRequired;
 } tPlan;
 
+typedef enum tPlanProlongState {
+	PLAN_PROLONG_NONE,
+	PLAN_PROLONG_CURRENT,
+	PLAN_PROLONG_PAST,
+} tPlanProlongState;
+
 typedef struct tPlanManager {
 	tPlan pPlanSequence[PLAN_COUNT_MAX];
 	ULONG ulMineralsUnlocked; ///< Acts as bitfield with BV(MINERAL_TYPE_*)
@@ -24,7 +30,7 @@ typedef struct tPlanManager {
 	WORD wTimeRemaining;
 	UBYTE ubCurrentPlanIndex;
 	UBYTE isExtendedTimeByFavor;
-	UBYTE isPenaltyCountdownStarted;
+	tPlanProlongState eProlongState;
 	UBYTE isPlanActive;
 	UBYTE ubPlanCount;
 } tPlanManager;
@@ -59,7 +65,7 @@ void planAddDays(UBYTE ubDays, UBYTE isFavor);
 
 void planSpendMinerals(UBYTE ubMineralType, UBYTE ubCount);
 
-void planStartPenaltyCountdown(void);
+UBYTE planTryProlong(void);
 
 UWORD planGetRemainingCost(void);
 
