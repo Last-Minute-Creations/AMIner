@@ -13,76 +13,17 @@
 #include "defs.h"
 #include "plan.h"
 #include "save.h"
+#include "base.h"
 
-/**
- * @brief Determines that the base is a variant of other base and shouldn't
- * be naturally spawned on any depth.
- */
-#define BASE_LEVEL_VARIANT 65535
-#define BASE_PATTERN_HEIGHT 10
-#define MINE_DIGGABLE_WIDTH 10
 #define ROWS_PER_PLAN_MAX 20
-
-typedef struct _tBase {
-	UBYTE pPattern[MINE_DIGGABLE_WIDTH * BASE_PATTERN_HEIGHT];
-	UWORD uwLevel;
-} tBase;
 
 //----------------------------------------------------------------- PRIVATE VARS
 
 static const UBYTE s_pRowSpawnPattern[] = {5, 3, 7, 1, 4, 6, 8, 2, 9, 10};
 
-static const tBase s_pBases[BASE_ID_COUNT] = {
-	[BASE_ID_GROUND] = {
-		.uwLevel = 0,
-		.pPattern = {
-			 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-			 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-			 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,
-			 3,  3,  3,  3,  3,  3,  3,  3,  3,  3,
-			 4,  4,  4,  4,  4,  4,  4,  4,  4,  5,
-			 6,  6,  7,  6,  6,  8,  9, 10, 11, 12,
-			13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-			23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-			34, 33, 35, 36, 37, 38, 39, 40, 41, 42,
-			63, 57, 63, 64, 63, 64, 63, 64, 63, 64,
-		}
-	},
-	[BASE_ID_DINO] = {
-		.uwLevel = 100,
-		.pPattern = {
-			44, 44, 44, 44, 44, 44, 44, 44, 44, 44,
-			 0, 43, 43, 43, 43,  1, 43,  0, 43, 43,
-			43,  1, 43, 43, 43, 43, 43, 43, 43,  2,
-			43, 43, 43, 43, 43,  3,  1, 43, 43,  1,
-			43, 43, 43, 43,  3, 43, 43, 43,  0, 43,
-			43,  1, 43, 43, 43, 43, 43, 43, 43,  2,
-			13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-			23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-			34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
-			63, 64, 63, 64, 63, 57, 63, 64, 63, 64
-		}
-	},
-	[BASE_ID_DINO_POPULATED] = {
-		.uwLevel = BASE_LEVEL_VARIANT,
-		.pPattern = {
-			44, 44, 44, 44, 44, 44, 44, 44, 44, 44,
-			 0, 43, 43, 43, 43,  1, 43,  0, 43, 43,
-			43,  1, 43, 43, 43, 43, 43, 43, 43,  2,
-			43, 43, 43, 43, 43,  3,  1, 43, 43,  1,
-			43, 43, 43, 43,  4, 43, 43, 43,  0, 43,
-			43,  3,  5,  6,  7,  8,  9, 10, 11, 12,
-			13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-			23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-			34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
-			63, 64, 63, 64, 63, 57, 63, 64, 63, 64
-		}
-	},
-};
-
 static UBYTE s_ubNextRowPatternPos;
 static UWORD s_uwPlanFillPatternLength;
-static tUbCoordYX s_pPlanFillPattern[MINE_DIGGABLE_WIDTH * ROWS_PER_PLAN_MAX];
+static tUbCoordYX s_pPlanFillPattern[DEFS_MINE_DIGGABLE_WIDTH * ROWS_PER_PLAN_MAX];
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -144,7 +85,7 @@ static void tileSetBaseTiles(const tBase *pBase, UWORD uwLevel, UBYTE isReplacin
 	for(UWORD y = 0; y <= TILE_ROW_BASE_DIRT+1; ++y) {
 		for(UWORD x = 1; x < 1 + 10; ++x) {
 			if(!isReplacing || tileIsSolid(x, uwLevel + y)) {
-				pTiles[x][uwLevel + y] = pBase->pPattern[y * 10 + x - 1];
+				pTiles[x][uwLevel + y] = pBase->pTilePattern[y * 10 + x - 1];
 			}
 		}
 	}
@@ -285,7 +226,7 @@ static void tileGeneratePlanFillPattern(UWORD ubRowsPerPlan) {
 	}
 
 	UWORD uwPatternPos = 0;
-	for(UBYTE ubX = 1; ubX < MINE_DIGGABLE_WIDTH; ++ubX) {
+	for(UBYTE ubX = 1; ubX < DEFS_MINE_DIGGABLE_WIDTH; ++ubX) {
 		for(UBYTE ubY = 0; ubY < ubRowsPerPlan; ++ubY) {
 			s_pPlanFillPattern[uwPatternPos++] = (tUbCoordYX){.ubX = ubX, .ubY = ubY};
 		}
@@ -338,12 +279,12 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 	// Generate bases
 	UBYTE ubProgressBaseStart = ubProgressTerrainEnd;
 	UBYTE ubProgressBaseEnd = 40;
-	for(UBYTE ubBase = 0; ubBase < BASE_ID_COUNT; ++ubBase) {
-		const tBase *pBase = &s_pBases[ubBase];
-		if(pBase->uwLevel != BASE_LEVEL_VARIANT) {
-			UBYTE ubProgress = tileProgress(ubProgressBaseStart, ubProgressBaseEnd, ubBase, BASE_ID_COUNT_UNIQUE);
+	for(tBaseId eBaseId = 0; eBaseId < BASE_ID_COUNT; ++eBaseId) {
+		const tBase *pBase = baseGetById(eBaseId);
+		if(pBase->uwTileDepth != BASE_TILE_DEPTH_VARIANT) {
+			UBYTE ubProgress = tileProgress(ubProgressBaseStart, ubProgressBaseEnd, eBaseId, BASE_ID_COUNT_UNIQUE);
 			commProgress(ubProgressTerrainEnd + ubProgress, g_pMsgs[MSG_LOADING_GEN_BASES]);
-			tileSetBaseTiles(pBase, pBase->uwLevel, 0);
+			tileSetBaseTiles(pBase, pBase->uwTileDepth, 0);
 		}
 	}
 
@@ -371,13 +312,32 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 
 		// Quest items
 		s_ubNextRowPatternPos = 0;
-		for(UBYTE i = 0; i < QUEST_DINO_BONE_COUNT; ++i) {
+		for(UBYTE i = 0; i < DEFS_QUEST_DINO_BONE_COUNT; ++i) {
 			tTile eTile = (i == 0) ? TILE_BONE_HEAD : TILE_BONE_1;
 			if(!tileTryPlaceQuestItemInRow(pTiles, g_pDinoDepths[i], eTile)) {
 				logWrite("ERR: Can't find place for dino bone #%hhu at row %hu\n", i + 1, g_pDinoDepths[i]);
 				pTiles[5][g_pDinoDepths[i]] = eTile;
 			}
 		}
+
+		// Gate fragments
+		pTiles[1][219] = TILE_GATE_1;
+		pTiles[2][219] = TILE_GATE_2;
+		pTiles[3][219] = TILE_GATE_1;
+		pTiles[4][219] = TILE_GATE_2;
+		pTiles[5][219] = TILE_GATE_1;
+		pTiles[6][219] = TILE_GATE_2;
+		pTiles[7][219] = TILE_GATE_1;
+		pTiles[8][219] = TILE_GATE_2;
+		pTiles[9][219] = TILE_GATE_1;
+		pTiles[1][220] = TILE_GATE_2;
+		pTiles[2][220] = TILE_GATE_1;
+		pTiles[3][220] = TILE_GATE_2;
+		pTiles[4][220] = TILE_GATE_1;
+		pTiles[5][220] = TILE_GATE_2;
+		pTiles[6][220] = TILE_GATE_1;
+		pTiles[7][220] = TILE_GATE_2;
+
 		commProgress(55, g_pMsgs[MSG_LOADING_FINISHING]);
 
 		// Rows per plan
@@ -391,7 +351,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		tileGeneratePlanFillPattern(ubRowsPerPlan);
 		commProgress(60, g_pMsgs[MSG_LOADING_FINISHING]);
 
-		UBYTE ubBaseIndex = 0;
+		tBaseId eBaseId = 0;
 		UWORD uwCurrentRow = 0;
 		UWORD uwNextPatternPos = 0;
 		UWORD uwCurrentPlannableRow = 0;
@@ -405,9 +365,9 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 			UWORD planLastPlannableRow  = (uwPlannedRows * (ubPlanIndex + 1)) / ubPlanCount;
 			UBYTE ubPlanRowCount = 0;
 			while(uwCurrentPlannableRow <= planLastPlannableRow) {
-				if(ubBaseIndex < BASE_ID_COUNT_UNIQUE && uwCurrentRow >= s_pBases[ubBaseIndex].uwLevel) {
-					uwCurrentRow = s_pBases[ubBaseIndex].uwLevel + BASE_PATTERN_HEIGHT;
-					++ubBaseIndex;
+				if(eBaseId < BASE_ID_COUNT_UNIQUE && uwCurrentRow >= baseGetById(eBaseId)->uwTileDepth) {
+					uwCurrentRow = baseGetById(eBaseId)->uwTileDepth + BASE_PATTERN_HEIGHT;
+					++eBaseId;
 				}
 				pPlanSegmentRows[ubPlanRowCount++] = uwCurrentRow++;
 				++uwCurrentPlannableRow;
@@ -548,9 +508,9 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 				UWORD uwPlanLastFauxPlanRow = MIN(uwPlannedRows + (uwUnplannedRows * (ubFauxPlanIndex + 1)) / ubFauxPlanCount, uwEndY - 1);
 				UBYTE ubPlanRowCount = 0;
 				while(uwCurrentPlannableRow <= uwPlanLastFauxPlanRow) {
-					if(ubBaseIndex < BASE_ID_COUNT_UNIQUE && uwCurrentRow >= s_pBases[ubBaseIndex].uwLevel) {
-						uwCurrentRow = s_pBases[ubBaseIndex].uwLevel + BASE_PATTERN_HEIGHT;
-						++ubBaseIndex;
+					if(eBaseId < BASE_ID_COUNT_UNIQUE && uwCurrentRow >= baseGetById(eBaseId)->uwTileDepth) {
+						uwCurrentRow = baseGetById(eBaseId)->uwTileDepth + BASE_PATTERN_HEIGHT;
+						++eBaseId;
 					}
 					pPlanSegmentRows[ubPlanRowCount++] = uwCurrentRow++;
 					++uwCurrentPlannableRow;
@@ -749,12 +709,14 @@ void tileExcavate(UWORD uwX, UWORD uwY) {
 }
 
 void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant) {
-	if(s_pBases[eNewVariant].uwLevel != BASE_LEVEL_VARIANT) {
+	const tBase *pBase = baseGetById(eBase);
+	const tBase *pBaseVariant = baseGetById(eNewVariant);
+	if(pBaseVariant->uwTileDepth != BASE_TILE_DEPTH_VARIANT) {
 		logWrite("ERR: eNewVariant %d is not a base variant\n", eNewVariant);
 	}
-	if(s_pBases[eBase].uwLevel == BASE_LEVEL_VARIANT) {
+	if(pBase->uwTileDepth == BASE_TILE_DEPTH_VARIANT) {
 		logWrite("ERR: eBase %d is not a base non-variant\n", eNewVariant);
 	}
 
-	tileSetBaseTiles(&s_pBases[eNewVariant], s_pBases[eBase].uwLevel, 1);
+	tileSetBaseTiles(pBaseVariant, pBase->uwTileDepth, 1);
 }

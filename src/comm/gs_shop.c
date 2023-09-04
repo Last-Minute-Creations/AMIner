@@ -13,6 +13,7 @@
 #include <comm/page_accounting.h>
 #include <comm/page_bribe.h>
 #include <comm/page_favor.h>
+#include <comm/page_questioning.h>
 #include <comm/page_list.h>
 #include "core.h"
 #include "dino.h"
@@ -204,6 +205,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3:
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_3", onBackFromLastRebuke);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING:
+			pageQuestioningCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_welcome", onBack);

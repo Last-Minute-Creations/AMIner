@@ -4,7 +4,7 @@
 #include <ace/types.h>
 #include <ace/utils/font.h>
 
-#define BUTTON_NAME_MAX 10
+#define BUTTON_NAME_MAX 20
 #define BUTTON_INVALID 0xFF
 
 typedef enum _tButtonPreset {
@@ -15,7 +15,7 @@ typedef enum _tButtonPreset {
 
 typedef struct _tButton {
 	char szName[BUTTON_NAME_MAX];
-	tUwCoordYX sPos;
+	tUwCoordYX sPos; ///< Relative to middle-top position of the button
 } tButton;
 
 void buttonRmAll(void);

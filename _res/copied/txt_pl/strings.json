@@ -93,7 +93,8 @@
 		"drillDepleted": "Wiertło zużyte",
 		"cargoFull": "Ładownia pełna!",
 		"restock": "Rozładunek!",
-		"foundBone": "Kość #%hhu"
+		"foundBone": "Kość #%hhu",
+		"foundGate": "Fragment bramy #%hhu"
 	},
 	"shop": {
 		"timeRemaining": "Pozostało %d dni",
@@ -141,6 +142,7 @@
 		"komisarzRebuke_1": "Pierwsza nagana",
 		"komisarzRebuke_2": "Druga nagana",
 		"komisarzRebuke_3": "Ostatnia nagana",
+		"komisarzQuestioning": "Przesłuchanie",
 		"archAccolade": "Pochwała"
 	},
 	"officePageContents": {

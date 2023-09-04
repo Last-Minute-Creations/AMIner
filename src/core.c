@@ -10,12 +10,13 @@
 #include <ace/contrib/managers/audio_mixer.h>
 #include "menu.h"
 #include "dino.h"
+#include "quest_gate.h"
 #include "game.h"
 #include "hud.h"
 #include "vehicle.h"
 #include "fade.h"
 #include "debug.h"
-#include "base_tile.h"
+#include "base.h"
 #include "ground_layer.h"
 #include "hi_score.h"
 #include "tile.h"
@@ -23,6 +24,7 @@
 #include <comm/comm.h>
 #include "defs.h"
 #include "settings.h"
+#include "collectibles.h"
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
@@ -49,8 +51,8 @@ void coreProcessBeforeBobs(void) {
 	// Draw pending tiles
 	tileBufferQueueProcess(g_pMainBuffer);
 
-	// Draw dino bones before anything else
-	dinoProcessDraw();
+	// Draw collectibles before anything else
+	collectiblesProcess();
 }
 
 void coreProcessAfterBobs(void) {
@@ -63,7 +65,7 @@ void coreProcessAfterBobs(void) {
 	hudUpdate();
 
 	// Load next base tiles, if needed
-	baseTileProcess();
+	baseProcess();
 
 	// Update palette for new ground layers, also take into account fade level
 	fadeProcess();
@@ -90,7 +92,9 @@ static void coreGsCreate(void) {
 
 	textBobManagerCreate(g_pFont);
 	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
-	dinoCreate();
+	dinoReset();
+	questGateReset();
+	collectiblesCreate();
 
 	hudCreate(s_pView, g_pFont);
 
@@ -113,7 +117,7 @@ static void coreGsCreate(void) {
 	memset(s_pVpMain->pPalette, 0, sizeof(s_pVpMain->pPalette));
 	s_pColorBg = &s_pVpMain->pPalette[0];
 
-	baseTileCreate(g_pMainBuffer);
+	baseCreate(g_pMainBuffer);
 	ptplayerCreate(1);
 	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
@@ -190,8 +194,8 @@ static void coreGsDestroy(void) {
 
 	menuUnload();
 	bitmapDestroy(s_pTiles);
-	dinoDestroy();
-	baseTileDestroy();
+	collectiblesDestroy();
+	baseDestroy();
 	textBobManagerDestroy();
 	fontDestroy(g_pFont);
 	vehicleDestroy(&g_pVehicles[0]);

@@ -16,7 +16,7 @@
 #include "menu.h"
 #include "hi_score.h"
 #include "ground_layer.h"
-#include "base_tile.h"
+#include "base.h"
 #include "warehouse.h"
 #include "tutorial.h"
 #include "explosion.h"
@@ -24,11 +24,14 @@
 #include "pause.h"
 #include "core.h"
 #include "dino.h"
+#include "quest_gate.h"
 #include "debug.h"
 #include "inventory.h"
 #include "defs.h"
 #include "save.h"
 #include "settings.h"
+#include "collectibles.h"
+#include "heat.h"
 
 #define CAMERA_SPEED 4
 
@@ -86,6 +89,8 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_pPlayerSteers[1] = sSteerP2;
 	inboxReset();
 	dinoReset();
+	questGateReset();
+	collectiblesReset();
 	tutorialReset();
 	pageOfficeReset();
 	warehouseReset();
@@ -104,6 +109,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 		hudSetModeCounter(eMode, 0);
 	}
 	hudReset(g_isChallenge, g_is2pPlaying);
+	heatReset();
 	groundLayerReset(1);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
 }
@@ -127,13 +133,22 @@ static void gameProcessHotkeys(void) {
 	if(keyUse(KEY_B)) {
 		debugToggle();
 	}
-	if(keyCheck(KEY_M)) {
+	if(keyCheck(KEY_SLASH)) {
 		vPortWaitForEnd(s_pVpMain);
 		vPortWaitForEnd(s_pVpMain);
 		vPortWaitForEnd(s_pVpMain);
 	}
 	if(keyUse(KEY_R) && s_sTeleportReturn.ulYX != -1u && g_pVehicles[0].ubVehicleState == VEHICLE_STATE_MOVING) {
 		vehicleTeleport(&g_pVehicles[0], s_sTeleportReturn.uwX, s_sTeleportReturn.uwY);
+	}
+	if(keyUse(KEY_N)) {
+		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 212 * TILE_SIZE);
+	}
+	if(keyUse(KEY_M)) {
+		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 4 * TILE_SIZE);
+	}
+	if(keyUse(KEY_COMMA)) {
+		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 104 * TILE_SIZE);
 	}
 
 	if(keyUse(KEY_F1) && !g_isChallenge) {
@@ -370,7 +385,7 @@ static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 
 static void gameCameraProcess(void) {
 	if(g_isChallenge) {
-		const UWORD uwBottomPos = g_pMainBuffer->pCamera->uPos.uwY + g_pMainBuffer->sCommon.pVPort->uwHeight - 2 * 32;
+		const UWORD uwBottomPos = g_pMainBuffer->pCamera->uPos.uwY + g_pMainBuffer->sCommon.pVPort->uwHeight - 2 * TILE_SIZE;
 		if(
 			g_pVehicles[0].sBobBody.sPos.uwY >  uwBottomPos ||
 			(g_is2pPlaying && g_pVehicles[1].sBobBody.sPos.uwY > uwBottomPos)
@@ -420,7 +435,7 @@ static void gameCameraProcess(void) {
 		if(fadeGetState() == FADE_STATE_OUT) {
 			cameraCenterAt(g_pMainBuffer->pCamera, uwCamDestX, uwCamDestY);
 			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
-			baseTileProcess();
+			baseProcess();
 			groundLayerReset(groundLayerGetLowerAtDepth(g_pMainBuffer->pCamera->uPos.uwY));
 			tileBufferRedrawAll(g_pMainBuffer);
 			bobDiscardUndraw();
@@ -600,6 +615,7 @@ void gameSave(tFile *pFile) {
 
 	inboxSave(pFile);
 	dinoSave(pFile);
+	questGateSave(pFile);
 	tutorialSave(pFile);
 	pageOfficeSave(pFile);
 	warehouseSave(pFile);
@@ -608,6 +624,7 @@ void gameSave(tFile *pFile) {
 	vehicleSave(&g_pVehicles[0], pFile);
 	vehicleSave(&g_pVehicles[1], pFile);
 	hudSave(pFile);
+	heatSave(pFile);
 }
 
 UBYTE gameLoad(tFile *pFile) {
@@ -639,6 +656,7 @@ UBYTE gameLoad(tFile *pFile) {
 
 	return inboxLoad(pFile) &&
 		dinoLoad(pFile) &&
+		questGateLoad(pFile) &&
 		tutorialLoad(pFile) &&
 		pageOfficeLoad(pFile) &&
 		warehouseLoad(pFile) &&
@@ -646,7 +664,8 @@ UBYTE gameLoad(tFile *pFile) {
 		inventoryLoad(pFile) &&
 		vehicleLoad(&g_pVehicles[0], pFile) &&
 		vehicleLoad(&g_pVehicles[1], pFile) &&
-		hudLoad(pFile);
+		hudLoad(pFile) &&
+		heatLoad(pFile);
 }
 
 //-------------------------------------------------------------------- GAMESTATE
@@ -663,6 +682,7 @@ static void gameGsLoop(void) {
 		return;
 	}
 	dinoProcess();
+	questGateProcess();
 
 	debugColor(0x080);
 	gameCameraProcess();

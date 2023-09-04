@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "dino.h"
+#include "collectibles.h"
 #include <ace/managers/bob.h>
 #include "core.h"
 #include "game.h"
@@ -12,8 +13,6 @@
 #include "comm/gs_shop.h"
 #include "comm/inbox.h"
 #include "comm/page_office.h"
-
-#define DINO_BOB_COUNT 9
 
 typedef enum tDinoState {
 	DINO_STATE_WAITING_FOR_FIRST_BONE,
@@ -25,56 +24,13 @@ typedef enum tDinoState {
 	DINO_STATE_DONE,
 } tDinoState;
 
-static tBob s_pDinoBobs[DINO_BOB_COUNT];
-static UBYTE s_pDinoWereDrawn[DINO_BOB_COUNT];
 static UBYTE s_ubDinoBonesFound = 0;
-static tBitMap *s_pBones, *s_pBonesMask;
 static tDinoState s_eQuestState;
-
-void dinoCreate(void) {
-	static const tUwCoordYX s_pDinoPos[DINO_BOB_COUNT] = {
-		{.uwX = 32 + 92, .uwY = 100 * 32 + 170},
-		{.uwX = 32 + 116, .uwY = 100 * 32 + 179},
-		{.uwX = 32 + 147, .uwY = 100 * 32 + 172},
-		{.uwX = 32 + 159, .uwY = 100 * 32 + 189},
-		{.uwX = 32 + 178, .uwY = 100 * 32 + 170},
-		{.uwX = 32 + 215, .uwY = 100 * 32 + 192},
-		{.uwX = 32 + 209, .uwY = 100 * 32 + 201},
-		{.uwX = 32 + 220, .uwY = 100 * 32 + 205},
-		{.uwX = 32 + 250, .uwY = 100 * 32 + 218},
-	};
-
-	static const UBYTE pDinoHeights[DINO_BOB_COUNT] = {
-		22, 10, 15, 24, 44, 29, 45, 45, 22
-	};
-
-	static const UBYTE pDinoFrameOffs[DINO_BOB_COUNT] = {
-		0, 24, 35, 51, 76, 121, 151, 197, 243
-	};
-	s_pBones = bitmapCreateFromFile("data/bones.bm", 0);
-	s_pBonesMask = bitmapCreateFromFile("data/bones_mask.bm", 0);
-
-	for(UBYTE i = 0; i < DINO_BOB_COUNT; ++i) {
-		bobInit(
-			&s_pDinoBobs[i], 80, pDinoHeights[i], 0,
-			bobCalcFrameAddress(s_pBones, pDinoFrameOffs[i]),
-			bobCalcFrameAddress(s_pBonesMask, pDinoFrameOffs[i]),
-			s_pDinoPos[i].uwX, s_pDinoPos[i].uwY
-		);
-	}
-	dinoReset();
-}
-
-void dinoDestroy(void) {
-	bitmapDestroy(s_pBones);
-	bitmapDestroy(s_pBonesMask);
-}
 
 void dinoReset(void) {
 	s_ubDinoBonesFound = 0;
-	for(UBYTE i = 0; i < DINO_BOB_COUNT; ++i) {
-		s_pDinoWereDrawn[i] = 0;
-	}
+	s_eQuestState = DINO_STATE_WAITING_FOR_FIRST_BONE;
+	collectibleSetFoundCount(COLLECTIBLE_KIND_DINO, 0);
 }
 
 void dinoSave(tFile *pFile) {
@@ -90,6 +46,7 @@ UBYTE dinoLoad(tFile *pFile) {
 
 	fileRead(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
 	fileRead(pFile, &s_eQuestState, sizeof(s_eQuestState));
+	collectibleSetFoundCount(COLLECTIBLE_KIND_DINO, s_ubDinoBonesFound);
 	return 1;
 }
 
@@ -134,46 +91,19 @@ void dinoProcess(void) {
 	}
 }
 
-void dinoProcessDraw(void) {
-	static UBYTE ubLastDino = 0;
-
-	if(s_ubDinoBonesFound && tileBufferIsTileOnBuffer(
-		g_pMainBuffer,
-		s_pDinoBobs[ubLastDino].sPos.uwX / 32,
-		s_pDinoBobs[ubLastDino].sPos.uwY / 32
-	) && s_pDinoWereDrawn[ubLastDino] < 2) {
-		if(s_pDinoWereDrawn[ubLastDino] >= 2) {
-			++ubLastDino;
-			if(ubLastDino >= s_ubDinoBonesFound) {
-				ubLastDino = 0;
-			}
-		}
-		else {
-			bobPush(&s_pDinoBobs[ubLastDino]);
-			++s_pDinoWereDrawn[ubLastDino];
-		}
+UBYTE dinoAddBone(void) {
+	const UBYTE ubMaxFragmentCount = collectibleGetMaxCount(COLLECTIBLE_KIND_DINO);
+	if(s_ubDinoBonesFound < ubMaxFragmentCount) {
+		++s_ubDinoBonesFound;
+		collectibleSetFoundCount(COLLECTIBLE_KIND_DINO, s_ubDinoBonesFound);
 	}
-	else {
-		s_pDinoWereDrawn[ubLastDino] = 0;
-		++ubLastDino;
-		if(ubLastDino >= s_ubDinoBonesFound) {
-			ubLastDino = 0;
-		}
-	}
-
-}
-
-UBYTE dinoGetBoneCount(void) {
-	return s_ubDinoBonesFound;
-}
-
-void dinoFoundBone(void) {
-	++s_ubDinoBonesFound;
 
 	if(s_ubDinoBonesFound == 1) {
 		s_eQuestState = DINO_STATE_INCOMING_BRIEFING;
 	}
-	else if(s_ubDinoBonesFound == DINO_BOB_COUNT) {
+	else if(s_ubDinoBonesFound == ubMaxFragmentCount) {
 		s_eQuestState = DINO_STATE_INCOMING_ACCOLADE;
 	}
+
+	return s_ubDinoBonesFound;
 }

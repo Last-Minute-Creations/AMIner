@@ -10,9 +10,9 @@
 #include "../core.h"
 #include "../vehicle.h"
 #include "../save.h"
+#include "../heat.h"
 
 static UBYTE s_ubBribeAccoladeCount, s_ubBribeRebukeCount;
-static BYTE s_bBribeChanceFail;
 static UWORD s_uwBribeCost;
 
 static void pageBribeProcess(void) {
@@ -33,18 +33,17 @@ static void pageBribeProcess(void) {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(bButtonCurr == 0) {
 				g_pVehicles[0].lCash -= s_uwBribeCost;
-				if(randUwMinMax(&g_sRand, 1, 100) > s_bBribeChanceFail) {
+				if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
 					// Success
 					pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
 					if(!planManagerGet()->isPenaltyCountdownStarted) {
 						// accolade bribe
 						++s_ubBribeAccoladeCount;
-						s_bBribeChanceFail = MIN(s_bBribeChanceFail + 2, 100);
+						heatTryIncrease(2);
 					}
 					else {
 						// rebuke bribe
 						++s_ubBribeRebukeCount;
-						s_bBribeChanceFail = MIN(s_bBribeChanceFail + 5, 100);
 					}
 					planAddDays(14, 1);
 				}
@@ -95,7 +94,7 @@ void pageBribeCreate(void) {
 		uwPosY += ubLineHeight / 2;
 		sprintf(
 			szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
-			s_bBribeChanceFail
+			heatGetPercent()
 		);
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 		s_uwBribeCost = uwCost;
@@ -113,14 +112,12 @@ void pageBribeCreate(void) {
 }
 
 void pageBribeReset(void) {
-	s_bBribeChanceFail = 0;
 	s_ubBribeAccoladeCount = 0;
 	s_ubBribeRebukeCount = 0;
 }
 
 void pageBribeSave(tFile *pFile) {
 	saveWriteHeader(pFile, "BRBE");
-	fileWrite(pFile, &s_bBribeChanceFail, sizeof(s_bBribeChanceFail));
 	fileWrite(pFile, &s_ubBribeAccoladeCount, sizeof(s_ubBribeAccoladeCount));
 	fileWrite(pFile, &s_ubBribeRebukeCount, sizeof(s_ubBribeRebukeCount));
 }
@@ -130,7 +127,6 @@ UBYTE pageBribeLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_bBribeChanceFail, sizeof(s_bBribeChanceFail));
 	fileRead(pFile, &s_ubBribeAccoladeCount, sizeof(s_ubBribeAccoladeCount));
 	fileRead(pFile, &s_ubBribeRebukeCount, sizeof(s_ubBribeRebukeCount));
 	return 1;

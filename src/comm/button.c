@@ -6,8 +6,14 @@
 
 #define BUTTON_COUNT_MAX 5
 
-#define BUTTON_BORDER_WIDTH 1
-#define BUTTON_PADDING 2
+// Chars used in buttons don't take up most of the vertical font space
+#define BORDER_LR_DEPTH 2
+#define TEXT_PADDING_X 1
+#define TEXT_PADDING_Y 1
+#define TEXT_HEIGHT_DECREMENT 3
+#define TEXT_BASELINE_POS 8
+#define TEXT_CAP_POS 3
+#define TEXT_HEIGHT (TEXT_BASELINE_POS - TEXT_CAP_POS)
 
 static tButton s_pButtons[BUTTON_COUNT_MAX];
 static UBYTE s_ubButtonCount;
@@ -42,27 +48,38 @@ void buttonDraw(UBYTE ubIdx, tBitMap *pBfr) {
 		ubIdx == s_ubSelected ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	tUwCoordYX sSize = fontMeasureText(g_pFont, s_pButtons[ubIdx].szName);
-	sSize.uwX += 5;
-	sSize.uwY += 2 * (BUTTON_BORDER_WIDTH + BUTTON_PADDING);
+	sSize.uwX += (BORDER_LR_DEPTH + TEXT_PADDING_X) * 2;
+	sSize.uwY = buttonGetHeight();
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
 	UWORD uwBtnX = s_pButtons[ubIdx].sPos.uwX - sSize.uwX / 2;
-	UWORD uwBtnY = s_pButtons[ubIdx].sPos.uwY;
-	blitRect( // top line
-		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY, sSize.uwX, 1, ubColor
-	);
+	UWORD uwBtnY = s_pButtons[ubIdx].sPos.uwY - TEXT_PADDING_Y;
 	blitRect( // left line
 		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY, 1, sSize.uwY, ubColor
 	);
-	blitRect( // bottom line
+	blitRect( // top-left line
+		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY, BORDER_LR_DEPTH, 1, ubColor
+	);
+	blitRect( // bottom-left line
 		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY + sSize.uwY - 1,
-		sSize.uwX, 1, ubColor
+		BORDER_LR_DEPTH, 1, ubColor
 	);
 	blitRect( // right line
 		pBfr, sOrigin.uwX + uwBtnX + sSize.uwX - 1, sOrigin.uwY + uwBtnY,
 		1, sSize.uwY, ubColor
 	);
+	blitRect( // top-right line
+		pBfr, sOrigin.uwX + uwBtnX + sSize.uwX - BORDER_LR_DEPTH,
+		sOrigin.uwY + uwBtnY,
+		BORDER_LR_DEPTH, 1, ubColor
+	);
+	blitRect( // bottom-right line
+		pBfr, sOrigin.uwX + uwBtnX + sSize.uwX - BORDER_LR_DEPTH,
+		sOrigin.uwY + uwBtnY + sSize.uwY - 1,
+		BORDER_LR_DEPTH, 1, ubColor
+	);
 	commDrawText(
-		uwBtnX + 3, uwBtnY  + 2, s_pButtons[ubIdx].szName, FONT_COOKIE, ubColor
+		uwBtnX + 3, uwBtnY - TEXT_CAP_POS + TEXT_PADDING_Y,
+		s_pButtons[ubIdx].szName, FONT_COOKIE, ubColor
 	);
 }
 
@@ -92,7 +109,7 @@ UBYTE buttonGetSelected(void) {
 }
 
 UBYTE buttonGetHeight(void) {
-	return g_pFont->uwHeight + 2 * (BUTTON_BORDER_WIDTH + BUTTON_PADDING);
+	return TEXT_HEIGHT + 2 * TEXT_PADDING_Y;
 }
 
 tButtonPreset buttonGetPreset(void) {

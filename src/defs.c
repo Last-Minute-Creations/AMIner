@@ -29,7 +29,7 @@ fix16_t g_fPlanIncreaseRatioSingleplayer;
 fix16_t g_fPlanIncreaseRatioMultiplayer;
 
 LONG g_pUpgradeCosts[10];
-UWORD g_pDinoDepths[QUEST_DINO_BONE_COUNT];
+UWORD g_pDinoDepths[DEFS_QUEST_DINO_BONE_COUNT];
 UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
 UBYTE g_ubMinePercentForPlans;
 UBYTE g_ubTrailingMineralCountPercent;
@@ -70,6 +70,7 @@ const char * s_pLangDom[] = {
 	[MSG_MISC_CARGO_FULL] = "misc.cargoFull",
 	[MSG_MISC_RESTOCK] = "misc.restock",
 	[MSG_MISC_FOUND_BONE] = "misc.foundBone",
+	[MSG_MISC_FOUND_GATE] = "misc.foundGate",
 	// HUD: UI
 	[MSG_HUD_P1] = "hud.p1",
 	[MSG_HUD_P2] = "hud.p2",
@@ -118,6 +119,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_KOMISARZ_REBUKE_1] = "officePages.komisarzRebuke_1",
 	[MSG_PAGE_KOMISARZ_REBUKE_2] = "officePages.komisarzRebuke_2",
 	[MSG_PAGE_KOMISARZ_REBUKE_3] = "officePages.komisarzRebuke_3",
+	[MSG_PAGE_KOMISARZ_QUESTIONING] = "officePages.komisarzQuestioning",
 	[MSG_PAGE_ARCH_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_ARCH_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_ARCH_ACCOLADE] = "officePages.archAccolade",

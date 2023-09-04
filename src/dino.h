@@ -8,10 +8,6 @@
 #include <ace/types.h>
 #include <ace/utils/file.h>
 
-void dinoCreate(void);
-
-void dinoDestroy(void);
-
 void dinoReset(void);
 
 void dinoSave(tFile *pFile);
@@ -20,10 +16,6 @@ UBYTE dinoLoad(tFile *pFile);
 
 void dinoProcess(void);
 
-void dinoProcessDraw(void);
-
-UBYTE dinoGetBoneCount(void);
-
-void dinoFoundBone(void);
+UBYTE dinoAddBone(void);
 
 #endif // _DINO_H_

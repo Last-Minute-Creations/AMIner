@@ -225,16 +225,63 @@ convertTileset(
 )
 
 #------------------------------------------------------------------------- BONES
+file(MAKE_DIRECTORY ${GEN_DIR}/bones)
 
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
+	GENERATED_FILE_LIST "DINO_FRAGS"
 	DESTINATIONS
-		${GEN_DIR}/bones.png 0 384 80 265
+		${GEN_DIR}/bones/0.png 0 384 80 22 # true width: 32
+		${GEN_DIR}/bones/1.png 0 408 80 10 # true width: 32
+		${GEN_DIR}/bones/2.png 0 419 80 15 # true width: 32
+		${GEN_DIR}/bones/3.png 0 435 80 24 # true width: 32
+		${GEN_DIR}/bones/4.png 0 460 80 44 # true width: 48
+		${GEN_DIR}/bones/5.png 0 505 80 29 # true width: 48
+		${GEN_DIR}/bones/6.png 0 535 80 45 # true width: 16
+		${GEN_DIR}/bones/7.png 0 581 80 45 # true width: 32
+		${GEN_DIR}/bones/8.png 0 627 80 22 # true width: 80
+)
+
+convertTileset(
+	TARGET ${GAME_EXECUTABLE} SIZE 80 VARIABLE_HEIGHT PALETTE ${palette_aminer_unique}
+	INTERLEAVED SOURCE ${GEN_DIR}/bones DESTINATION ${GEN_DIR}/bones.png
+	TILE_PATHS ${DINO_FRAGS}
+)
+
+#-------------------------------------------------------------------------- GATE
+file(MAKE_DIRECTORY ${GEN_DIR}/gate)
+
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
+	GENERATED_FILE_LIST "GATE_FRAGS"
+	DESTINATIONS
+		${GEN_DIR}/gate/0.png  0  649 32 10
+		${GEN_DIR}/gate/1.png  0  659 32 17
+		${GEN_DIR}/gate/2.png  0  676 32 20
+		${GEN_DIR}/gate/3.png  0  696 32 18
+		${GEN_DIR}/gate/4.png  0  714 32 18
+		${GEN_DIR}/gate/5.png  0  732 32 19
+		${GEN_DIR}/gate/6.png  0  751 32 17
+		${GEN_DIR}/gate/7.png  0  768 32 14
+		${GEN_DIR}/gate/8.png  0  782 32 13
+		${GEN_DIR}/gate/9.png  0  795 32 17
+		${GEN_DIR}/gate/10.png 0  812 32 19
+		${GEN_DIR}/gate/11.png 0  831 32 18
+		${GEN_DIR}/gate/12.png 0  849 32 18
+		${GEN_DIR}/gate/13.png 0  867 32 19
+		${GEN_DIR}/gate/14.png 0  886 32 17
+		${GEN_DIR}/gate/15.png 0  903 32 11
+)
+
+convertTileset(
+	TARGET ${GAME_EXECUTABLE} SIZE 32 VARIABLE_HEIGHT PALETTE ${palette_aminer_unique}
+	INTERLEAVED SOURCE ${GEN_DIR}/gate DESTINATION ${GEN_DIR}/gate.png
+	TILE_PATHS ${GATE_FRAGS}
 )
 
 #---------------------------------------------------------------------- TILESETS
 
 include("base0.cmake")
 include("base1.cmake")
+include("base2.cmake")
 include("tiles.cmake")
 include("checkpoint.cmake")
 
@@ -262,19 +309,22 @@ convertBitmaps(
 	INTERLEAVED SOURCES
 		${GEN_DIR}/drill.png ${GEN_DIR}/tool.png ${GEN_DIR}/wreck.png
 		${GEN_DIR}/drill_2.png ${GEN_DIR}/tool_2.png ${GEN_DIR}/wreck_2.png
-		${GEN_DIR}/track.png ${RES_DIR}/jet.png ${GEN_DIR}/bones.png ${RES_DIR}/smoke.png
+		${GEN_DIR}/track.png ${RES_DIR}/jet.png ${GEN_DIR}/bones.png
+		${GEN_DIR}/gate.png ${RES_DIR}/smoke.png
 		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png ${RES_DIR}/hud/mode_cursor.png
 		${RES_DIR}/bomb_marker.png ${RES_DIR}/commrade/edges.png
 	DESTINATIONS
 		${DATA_DIR}/drill.bm ${DATA_DIR}/tool.bm ${DATA_DIR}/wreck.bm
 		${DATA_DIR}/drill_2.bm ${DATA_DIR}/tool_2.bm ${DATA_DIR}/wreck_2.bm
-		${DATA_DIR}/track.bm ${DATA_DIR}/jet.bm ${DATA_DIR}/bones.bm ${DATA_DIR}/smoke.bm
+		${DATA_DIR}/track.bm ${DATA_DIR}/jet.bm ${DATA_DIR}/bones.bm
+		${DATA_DIR}/gate.bm ${DATA_DIR}/smoke.bm
 		${DATA_DIR}/explosion.bm ${DATA_DIR}/teleport.bm ${DATA_DIR}/mode_cursor.bm
 		${DATA_DIR}/bomb_marker.bm NONE
 	MASKS
 		${DATA_DIR}/drill_mask.bm ${DATA_DIR}/tool_mask.bm ${DATA_DIR}/wreck_mask.bm
 		NONE NONE NONE
-		${DATA_DIR}/track_mask.bm ${DATA_DIR}/jet_mask.bm ${DATA_DIR}/bones_mask.bm ${DATA_DIR}/smoke_mask.bm
+		${DATA_DIR}/track_mask.bm ${DATA_DIR}/jet_mask.bm ${DATA_DIR}/bones_mask.bm
+		${DATA_DIR}/gate_mask.bm ${DATA_DIR}/smoke_mask.bm
 		${DATA_DIR}/explosion_mask.bm ${DATA_DIR}/teleport_mask.bm ${DATA_DIR}/mode_cursor_mask.bm
 		${DATA_DIR}/bomb_marker_mask.bm ${DATA_DIR}/comm_edges_mask.bm
 )

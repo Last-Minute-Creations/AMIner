@@ -86,7 +86,16 @@ Dino:
 
 Gate quest:
 	☐ Figure out the flow
-	☐ Add base into the game
+	✔ Add base into the game @done(23-03-15 17:54)
+	✔ Base restock @done(23-07-10 14:30)
+	✔ Picking up the pieces @done(23-07-10 13:14)
+		☐ Scatter parts in mine
+		✔ Display reconstructed gate @done(23-07-10 13:14)
+	☐ Questioning by commissar
+	☐ Endings
+		☐ Secret dino ending
+		☐ Secret scientist ending
+		☐ Non-secret army ending
 
 Free mode:
 	☐ figure out the rules
