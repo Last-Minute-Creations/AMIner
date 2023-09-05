@@ -122,6 +122,7 @@ static void coreGsCreate(void) {
 	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
 	audioMixerCreate();
+	g_pSfxFlyLoop = ptplayerSfxCreateFromFile("data/sfx/fly_loop.sfx", 1);
 	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx", 1);
 	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx", 1);
 	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx", 1);
@@ -211,6 +212,7 @@ static void coreGsDestroy(void) {
 	ptplayerSamplePackDestroy(g_pModSampleData);
 	ptplayerModDestroy(g_pMenuMod);
 	ptplayerSfxDestroy(g_pSfxDrill);
+	ptplayerSfxDestroy(g_pSfxFlyLoop);
 	ptplayerSfxDestroy(g_pSfxOre);
 	ptplayerSfxDestroy(g_pSfxPenalty);
 	ptplayerDestroy();

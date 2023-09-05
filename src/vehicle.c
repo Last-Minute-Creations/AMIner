@@ -36,6 +36,7 @@
 #define VEHICLE_SMOKE_FRAME_HEIGHT 29
 #define VEHICLE_SMOKE_ANIM_HEIGHT 42
 #define VEHICLE_SMOKE_FRAMES 12
+#define VEHICLE_JET_SHOW_FRAME_COUNT 10
 
 #define SFX_CHANNEL_DRILL 0
 #define SFX_CHANNEL_EFFECT 1
@@ -125,6 +126,7 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->fTrackAnimCnt = 0;
 	pVehicle->ubTrackFrame = 0;
 	pVehicle->ubBodyShakeCnt = 0;
+	pVehicle->isJetting = 0;
 	pVehicle->ubJetShowFrame = 0;
 	pVehicle->ubJetAnimFrame = 0;
 	pVehicle->ubJetAnimCnt = 0;
@@ -267,6 +269,7 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
 	fileWrite(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
 	fileWrite(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
+	fileWrite(pFile, &pVehicle->isJetting, sizeof(pVehicle->isJetting));
 	fileWrite(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
 	fileWrite(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
 	fileWrite(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
@@ -318,6 +321,7 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
 	fileRead(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
 	fileRead(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
+	fileRead(pFile, &pVehicle->isJetting, sizeof(pVehicle->isJetting));
 	fileRead(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
 	fileRead(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
 	fileRead(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
@@ -774,14 +778,22 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	const fix16_t fMaxFlightDy = 3 * fix16_one;
 	const fix16_t fAccFlight = fix16_one / 12;
 	if(pVehicle->sSteer.bY < 0) {
-		if(pVehicle->ubJetShowFrame == 10) {
+		if(pVehicle->ubJetShowFrame == VEHICLE_JET_SHOW_FRAME_COUNT) {
 			pVehicle->fDy = MAX(-fMaxFlightDy, pVehicle->fDy - fAccFlight);
+			if(!pVehicle->isJetting) {
+				audioMixerPlaySfx(g_pSfxFlyLoop, SFX_CHANNEL_DRILL, 1, 1);
+				pVehicle->isJetting = 1;
+			}
 		}
 		else {
 			++pVehicle->ubJetShowFrame;
 		}
 	}
 	else {
+		if(pVehicle->isJetting) {
+			audioMixerStopSfxOnChannel(SFX_CHANNEL_DRILL);
+			pVehicle->isJetting = 0;
+		}
 		if(pVehicle->ubJetShowFrame) {
 			--pVehicle->ubJetShowFrame;
 		}
@@ -875,7 +887,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 	else {
 		pVehicle->sBobBody.sPos.uwY += s_pJetAnimOffsets[pVehicle->ubJetShowFrame];
-		if(pVehicle->ubJetShowFrame == 5) {
+		if(pVehicle->ubJetShowFrame == VEHICLE_JET_SHOW_FRAME_COUNT / 2) {
 			UWORD uwOffsetY = (pVehicle->sSteer.bY ? TRACK_OFFSET_JET : 0);
 			bobSetFrame(
 				&pVehicle->sBobTrack,
@@ -883,7 +895,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 				bobCalcFrameAddress(s_pTrackMask, uwOffsetY)
 			);
 		}
-		else if(pVehicle->ubJetShowFrame == 10) {
+		else if(pVehicle->ubJetShowFrame == VEHICLE_JET_SHOW_FRAME_COUNT) {
 			// Update jet pos
 			pVehicle->ubJetAnimCnt = (pVehicle->ubJetAnimCnt + 1) & 63;
 			UWORD uwOffsetY = VEHICLE_FLAME_HEIGHT * (pVehicle->ubJetAnimCnt / 4);

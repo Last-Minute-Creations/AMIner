@@ -47,7 +47,7 @@ typedef struct _tModeSelection {
 
 static tModeSelection s_pModeSelection[2] = {};
 
-tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
+tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty, *g_pSfxFlyLoop;
 tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 UBYTE g_is2pPlaying;
 UBYTE g_isChallenge, g_isAtari;

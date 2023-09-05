@@ -339,6 +339,12 @@ file(MAKE_DIRECTORY ${DATA_DIR}/sfx)
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
+	STRICT SOURCE ${RES_DIR}/audio/fly_loop.wav
+	DESTINATION ${DATA_DIR}/sfx/fly_loop.sfx
+)
+
+convertAudio(
+	TARGET ${GAME_EXECUTABLE}
 	STRICT SOURCE ${RES_DIR}/audio/atari.wav
 	DESTINATION ${DATA_DIR}/sfx/atari.sfx
 )

@@ -62,6 +62,7 @@ typedef struct _tVehicle {
 	UBYTE ubTrackFrame;
 	fix16_t fTrackAnimCnt;
 	UBYTE ubBodyShakeCnt;
+	UBYTE isJetting;
 	UBYTE ubJetShowFrame;
 	UBYTE ubJetAnimFrame;
 	UBYTE ubJetAnimCnt;

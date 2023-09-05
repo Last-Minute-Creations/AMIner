@@ -51,7 +51,7 @@ UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays);
 
 tSteer *gameGetSteers(void);
 
-extern tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty;
+extern tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty, *g_pSfxFlyLoop;
 extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 
 // Game config
