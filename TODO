@@ -7,6 +7,7 @@ General:
 	✔ Remove GDLR from saving/loading @done(23-03-09 16:26)
 	✔ Add debug means to set teleport source/destination @done(23-03-13 17:37)
 	✔ Localized commrade buttons @done(23-03-13 20:15)
+	✔ Proper restock zones - currently can restock beneath first base's building @done(23-07-10 18:31)
 	☐ Animated base elements
 	☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button
@@ -19,7 +20,6 @@ General:
 	☐ Variance in mine backgrounds
 		☐ On-the-fly composing background tile with edges
 		☐ Add extra bg variants (stones)
-	☐ Proper restock zones - currently can restock beneath first base's building
 
 Simulator:
 	✔ Basic view of mine @done(23-04-07 13:44)
@@ -68,7 +68,8 @@ Simulator:
 		✘ Time spent on backtracking to restock @cancelled(23-09-04 21:54)
 
 Optimizations:
-	☐ Comm message page loading
+	✔ Comm message page loading @done(23-09-07 21:57)
+	☐ Font drawing - quasi-register values inside font file
 
 Main quest:
 
@@ -97,4 +98,4 @@ Gate quest:
 		☐ Non-secret army ending
 
 Free mode:
-	☐ figure out the rules
+	✘ figure out the rules @cancelled(23-09-07 20:11)

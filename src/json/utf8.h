@@ -27,7 +27,7 @@ static const UBYTE utf8d[] = {
   1,3,1,1,1,1,1,3,1,3,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // s7..s8
 };
 
-static inline ULONG decode(ULONG* state, ULONG* codep, ULONG byte) {
+static inline ULONG decode(ULONG* state, ULONG* codep, UBYTE byte) {
   ULONG type = utf8d[byte];
 
   *codep = (*state != UTF8_ACCEPT) ?

@@ -44,13 +44,20 @@ static void readLines(
 		return;
 	}
 
-	UWORD uwTextLength = 0;
-	ULONG ulCodepoint, ulState = 0;
-	UBYTE ubCharCode;
-	UWORD uwFileContentsBufferSize = fileGetSize(szFilePath) + 1;
+	UWORD uwRemainingChars = fileGetSize(szFilePath);
+	UWORD uwFileContentsBufferSize = uwRemainingChars + 1;
 	char *szFileContents = memAllocFast(uwFileContentsBufferSize);
+	fileRead(pFileLines, szFileContents, uwFileContentsBufferSize);
+	fileClose(pFileLines);
 
-	while(fileRead(pFileLines, &ubCharCode, 1)) {
+	// Unicode takes more or same space than ascii - can convert in-place
+	UWORD uwTextLength = 0;
+	ULONG ulCodepoint;
+	ULONG ulState = 0;
+	UWORD uwReadPos = 0;
+	UBYTE ubCharCode;
+	while(uwRemainingChars--) {
+		ubCharCode = szFileContents[uwReadPos++];
 		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
 			continue;
 		}
@@ -65,8 +72,6 @@ static void readLines(
 		szFileContents[uwTextLength++] = ubCharCode;
 	}
 	szFileContents[uwTextLength] = '\0';
-
-	fileClose(pFileLines);
 
 	// Split text into lines
 	UWORD uwPos = 0;
