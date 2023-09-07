@@ -49,15 +49,15 @@ MIXER_CONFIG_I	SET	1
 ;						  The paired channels will always be AUD2 & AUD3.
 ;						  Unpaired channels are either none, AUD0, AUD1 or
 ;						  AUD0 & AUD1.
-MIXER_SINGLE			EQU 1
-MIXER_MULTI				EQU	0
-MIXER_MULTI_PAIRED		EQU 0
+MIXER_SINGLE			EQU @CFG_MIXER_SINGLE@
+MIXER_MULTI				EQU	@CFG_MIXER_MULTI@
+MIXER_MULTI_PAIRED		EQU @CFG_MIXER_MULTI_PAIRED@
 
 
 ;-----------------------------------------------------------------------------
 ; Mixer output configuration
 ;-----------------------------------------------------------------------------
-mixer_output_channels	EQU	DMAF_AUD3
+mixer_output_channels	EQU	@CFG_mixer_output_channels@
 									; valid values are DMAF_AUD0/1/2/3 or
 									; any bitwise combination of these with at
 									; least one channel set.
@@ -72,10 +72,10 @@ mixer_output_channels	EQU	DMAF_AUD3
 									;       * DMAF_AUD2|DMAF_AUD3|DMAF_AUD1
 									;		* all 4 channels
 
-mixer_sw_channels		EQU	2		; Maximum number of software mixed
+mixer_sw_channels		EQU	@CFG_mixer_sw_channels@		; Maximum number of software mixed
 									; channels on a single hardware channel.
 									; Valid values are 1,2,3 and 4
-mixer_period			EQU	161 	; Valid values: 124 and up
+mixer_period			EQU	@CFG_mixer_period@ 	; Valid values: 124 and up
 									; Default value of 322 is about
 									; 11025Hz when using a PAL Amiga
 									;
@@ -91,7 +91,7 @@ mixer_period			EQU	161 	; Valid values: 124 and up
 									;       of the video system of the Amiga
 									;       the mixer is running on.
 
-MIXER_PER_IS_NTSC		EQU	0		; Set to 1 if the mixer period value set
+MIXER_PER_IS_NTSC		EQU	@CFG_MIXER_NTSC@		; Set to 1 if the mixer period value set
 									; above is given for NTSC systems, leave
 									; at 0 if it is given for PAL systems.
 
@@ -106,7 +106,7 @@ MIXER_PER_IS_NTSC		EQU	0		; Set to 1 if the mixer period value set
 ;       setting, the only difference is one of speed - the 68000 code is
 ;       significantly faster on 68000/68010 than the 68020+ code and
 ;       vice versa.
-MIXER_68020				EQU 0
+MIXER_68020				EQU @CFG_MIXER_68020@
 
 ; Optimisations below only apply to the 68000 version, as they will not
 ; improve performance for 68020+ code/machines.
@@ -115,7 +115,7 @@ MIXER_68020				EQU 0
 ; length to 65532 bytes (technically up to 65535, but the mixer always rounds
 ; lengths down to the nearest multiple of 4 bytes). This increases performance
 ; by switching some operations from being longword based to word based.
-MIXER_WORDSIZED			EQU 0
+MIXER_WORDSIZED			EQU @CFG_MIXER_WORDSIZED@
 
 ; Set define below to 1 to optimise the mixer by forcing both the buffer size
 ; and source sample sizes to be multiples of 32 bytes. This improves
@@ -128,7 +128,7 @@ MIXER_WORDSIZED			EQU 0
 ;       non-existent.
 ; Note: irrespective of the calculated buffer size, the possible gain for this
 ;       option is usually limited.
-MIXER_SIZEX32			EQU 0
+MIXER_SIZEX32			EQU @CFG_MIXER_SIZEX32@
 
 ; Set define below to 1 to optimise the mixer by forcing the source sample
 ; size to always be a multiple of the buffer size. This increases performance
@@ -149,14 +149,14 @@ MIXER_SIZEX32			EQU 0
 ;       mostly make MIXER_SIZEX32 irrelevant. However, in some edge cases,
 ;       it can still create a slight increase in performance over just using
 ;       MIXER_SIZEXBUF.
-MIXER_SIZEXBUF			EQU 0
+MIXER_SIZEXBUF			EQU @CFG_MIXER_SIZEXBUF@
 
 
 ;-----------------------------------------------------------------------------
 ; Performance measurement options
 ;-----------------------------------------------------------------------------
 ; Set define below to 1 to enable colour/timing bars
-MIXER_TIMING_BARS		EQU	1
+MIXER_TIMING_BARS		EQU	@CFG_MIXER_TIMING_BARS@
 ; Set to desired background colour to reset to after colour bars end (valid if
 ; mixer timing bars are in use).
 MIXER_DEFAULT_COLOUR	EQU	$000

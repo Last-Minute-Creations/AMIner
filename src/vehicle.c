@@ -38,8 +38,9 @@
 #define VEHICLE_SMOKE_FRAMES 12
 #define VEHICLE_JET_SHOW_FRAME_COUNT 10
 
-#define SFX_CHANNEL_DRILL 0
-#define SFX_CHANNEL_EFFECT 1
+#define SFX_CHANNEL_LOOP_P1 0
+#define SFX_CHANNEL_LOOP_P2 1
+#define SFX_CHANNEL_EFFECT 2
 
 #define TRACK_OFFSET_TRACK 0
 #define TRACK_OFFSET_JET 28
@@ -548,7 +549,7 @@ static inline UBYTE vehicleStartDrilling(
 
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
-	audioMixerPlaySfx(g_pSfxDrill, SFX_CHANNEL_DRILL, 1, 1);
+	audioMixerPlaySfx(g_pSfxDrill, SFX_CHANNEL_LOOP_P1 + pVehicle->ubPlayerIdx, 1, 1);
 
 	return 1;
 }
@@ -690,6 +691,10 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	tileExcavate(uwTileX, uwTileY);
 }
 
+static void stopLoopAudio(UBYTE ubPlayerIdx) {
+	audioMixerStopSfxOnChannel(SFX_CHANNEL_LOOP_P1 + ubPlayerIdx);
+}
+
 static void vehicleProcessMovement(tVehicle *pVehicle) {
 	UBYTE isOnGround = 0;
 	const fix16_t fMaxDx = 2 * fix16_one;
@@ -781,7 +786,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		if(pVehicle->ubJetShowFrame == VEHICLE_JET_SHOW_FRAME_COUNT) {
 			pVehicle->fDy = MAX(-fMaxFlightDy, pVehicle->fDy - fAccFlight);
 			if(!pVehicle->isJetting) {
-				audioMixerPlaySfx(g_pSfxFlyLoop, SFX_CHANNEL_DRILL, 1, 1);
+				audioMixerPlaySfx(g_pSfxFlyLoop, SFX_CHANNEL_LOOP_P1 + pVehicle->ubPlayerIdx, 1, 1);
 				pVehicle->isJetting = 1;
 			}
 		}
@@ -791,7 +796,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 	else {
 		if(pVehicle->isJetting) {
-			audioMixerStopSfxOnChannel(SFX_CHANNEL_DRILL);
+			stopLoopAudio(pVehicle->ubPlayerIdx);
 			pVehicle->isJetting = 0;
 		}
 		if(pVehicle->ubJetShowFrame) {
@@ -1033,15 +1038,6 @@ UBYTE transitionVarToBy(fix16_t *pVar, fix16_t fDest, fix16_t fDelta) {
 	return 0;
 }
 
-static void tryStopDrillAudio(void) {
-	if(
-		g_pVehicles[0].ubDrillState != DRILL_STATE_DRILLING &&
-		(!g_is2pPlaying || g_pVehicles[1].ubDrillState != DRILL_STATE_DRILLING)
-	) {
-		audioMixerStopSfxOnChannel(SFX_CHANNEL_DRILL);
-	}
-}
-
 static void vehicleProcessDrilling(tVehicle *pVehicle) {
 	static const UBYTE pTrackAnimOffs[DRILL_V_ANIM_LEN] = {
 		0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0
@@ -1101,7 +1097,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
 					pVehicle->ubDrillState = DRILL_STATE_OFF;
 					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
-					tryStopDrillAudio();
+					stopLoopAudio(pVehicle->ubPlayerIdx);
 				}
 				else {
 					const UBYTE ubAdd = 4; // No grass past this point
@@ -1115,7 +1111,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					}
 					else {
 						pVehicle->ubDrillState = DRILL_STATE_VERT_ANIM_OUT;
-						tryStopDrillAudio();
+						stopLoopAudio(pVehicle->ubPlayerIdx);
 					}
 				}
 			}

@@ -8,6 +8,13 @@ endif()
 set(CMAKE_C_STANDARD 11)
 
 # ACE
+set(AUDIO_MIXER_HW_CHANNEL_MODE "SINGLE")
+set(AUDIO_MIXER_WORD_SIZED ON)
+set(AUDIO_MIXER_ROUND_TO_32 ON)
+set(AUDIO_MIXER_PROFILER ON)
+set(AUDIO_MIXER_HW_CHANNELS 3)
+set(AUDIO_MIXER_SW_CHANNEL_COUNT 3)
+set(AUDIO_MIXER_PERIOD 161)
 add_subdirectory(deps/ace ace)
 add_subdirectory(deps/ace_audio_mixer ace_audio_mixer)
 file(GLOB_RECURSE GAME_src src/*.c src/*.h)
@@ -339,85 +346,85 @@ file(MAKE_DIRECTORY ${DATA_DIR}/sfx)
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/fly_loop.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/fly_loop.wav
 	DESTINATION ${DATA_DIR}/sfx/fly_loop.sfx
-)
+	)
 
-convertAudio(
+	convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/atari.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/atari.wav
 	DESTINATION ${DATA_DIR}/sfx/atari.sfx
 )
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/drill1.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/drill1.wav
 	DESTINATION ${DATA_DIR}/sfx/drill1.sfx
 )
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/ore2.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/ore2.wav
 	DESTINATION ${DATA_DIR}/sfx/ore2.sfx
 )
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/penalty.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/penalty.wav
 	DESTINATION ${DATA_DIR}/sfx/penalty.sfx
 )
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/explosion.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/explosion.wav
 	DESTINATION ${DATA_DIR}/sfx/explosion.sfx
 )
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/teleport.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/teleport.wav
 	DESTINATION ${DATA_DIR}/sfx/teleport.sfx
 )
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_press_0.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/key_press_0.wav
 	DESTINATION ${DATA_DIR}/sfx/key_press_0.sfx
 )
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_press_1.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/key_press_1.wav
 	DESTINATION ${DATA_DIR}/sfx/key_press_1.sfx
 )
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_press_2.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/key_press_2.wav
 	DESTINATION ${DATA_DIR}/sfx/key_press_2.sfx
 )
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_press_3.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/key_press_3.wav
 	DESTINATION ${DATA_DIR}/sfx/key_press_3.sfx
 )
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_release_0.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/key_release_0.wav
 	DESTINATION ${DATA_DIR}/sfx/key_release_0.sfx
 )
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_release_1.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/key_release_1.wav
 	DESTINATION ${DATA_DIR}/sfx/key_release_1.sfx
 )
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_release_2.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/key_release_2.wav
 	DESTINATION ${DATA_DIR}/sfx/key_release_2.sfx
 )
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT SOURCE ${RES_DIR}/audio/key_release_3.wav
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/key_release_3.wav
 	DESTINATION ${DATA_DIR}/sfx/key_release_3.sfx
 )
 

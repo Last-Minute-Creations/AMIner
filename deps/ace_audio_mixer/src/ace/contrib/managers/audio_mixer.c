@@ -81,3 +81,7 @@ void audioMixerPlaySfx(
 void audioMixerStopSfxOnChannel(UBYTE ubMixerChannel) {
 	MixerStopFX(DMAF_AUD3 | (MIX_CH0 << ubMixerChannel));
 }
+
+UBYTE audioMixerIsPlaybackDone(void) {
+	return mixer.mx_mixer_entries[0].mxe_channels[0].mch_status == 0;
+}
