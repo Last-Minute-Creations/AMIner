@@ -154,10 +154,10 @@ void commCreate(void) {
 		sprintf(szPath, "data/sfx/key_release_%hhu.sfx", i);
 		s_pSfxKeyRelease[i] = ptplayerSfxCreateFromFile(szPath, 1);
 	}
-	systemUnuse();
 
 	g_pCommBmFaces = bitmapCreateFromFile("data/comm_faces_office.bm", 0);
 	g_pCommBmSelection = bitmapCreateFromFile("data/comm_office_selection.bm", 0);
+	systemUnuse();
 
 	s_isCommShown = 0;
 }

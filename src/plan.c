@@ -50,7 +50,7 @@ void planManagerInit(void) {
 		UWORD uwRemainingStacks = MIN(ubPlanIndex * 5, 40);
 		UBYTE ubAllowedMineralsCount = planGetAllowedMineralsForIndex(ubPlanIndex, pAllowedMinerals); // bitfield
 		memset(pPlan->pMineralsRequired, 0, sizeof(pPlan->pMineralsRequired));
-
+		pPlan->uwTotalMineralsRequired = 0;
 		pPlan->ulTargetSum = 0;
 		while(uwRemainingStacks > 0) {
 			tMineralType eMineral = pAllowedMinerals[randUwMax(&g_sRand, ubAllowedMineralsCount - 1)];
