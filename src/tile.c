@@ -274,6 +274,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 
 	// Generate terrain
 	UBYTE ubProgressTerrainEnd = 30;
+	commProgressReset();
 	tileGenerateTerrain(isCoalOnly, isChallenge, 0, ubProgressTerrainEnd);
 
 	// Generate bases
@@ -283,7 +284,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		const tBase *pBase = baseGetById(eBaseId);
 		if(pBase->uwTileDepth != BASE_TILE_DEPTH_VARIANT) {
 			UBYTE ubProgress = tileProgress(ubProgressBaseStart, ubProgressBaseEnd, eBaseId, BASE_ID_COUNT_UNIQUE);
-			commProgress(ubProgressTerrainEnd + ubProgress, g_pMsgs[MSG_LOADING_GEN_BASES]);
+			commProgress(ubProgress, g_pMsgs[MSG_LOADING_GEN_BASES]);
 			tileSetBaseTiles(pBase, pBase->uwTileDepth, 0);
 		}
 	}

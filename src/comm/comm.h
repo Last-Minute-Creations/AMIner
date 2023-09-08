@@ -12,6 +12,7 @@
 
 #define COMM_WIDTH (320-64)
 #define COMM_HEIGHT (192)
+// #define COMM_DEBUG
 
 #define COMM_DISPLAY_X 23
 #define COMM_DISPLAY_Y 29
@@ -96,6 +97,8 @@ void commDrawFaceAt(tFaceId eFace, UWORD uwX, UWORD uwY);
 void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight);
 
 void commEraseAll(void);
+
+void commProgressReset(void);
 
 void commProgress(UBYTE ubPercent, const char *szDescription);
 

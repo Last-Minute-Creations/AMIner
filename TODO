@@ -67,9 +67,20 @@ Simulator:
 		✘ Time spent on drilling @cancelled(23-09-04 21:54)
 		✘ Time spent on backtracking to restock @cancelled(23-09-04 21:54)
 
+Initial loading screen:
+	☐ Progress bar
+	☐ News
+
+Commrade:
+	☐ Mietek black market
+	☐ Redo warehouse/plan management
+	☐ Workshop upgrade icons?
+
 Optimizations:
 	✔ Comm message page loading @done(23-09-07 21:57)
+	✔ Mine generation progress bar @done(23-09-08 15:37)
 	☐ Font drawing - quasi-register values inside font file
+	☐ Gate collectibles draw?
 
 Main quest:
 
@@ -96,6 +107,19 @@ Gate quest:
 		☐ Secret dino ending
 		☐ Secret scientist ending
 		☐ Non-secret army ending
+
+Crate quests:
+	☐ Agent quest flow
+		☐ Agent appears after first crate
+		☐ Ability to sell create
+		☐ Questionings after finding crate
+		☐ Bad questioning removes agent
+	☐ Travelers quest flow
+		☐ Implement base
+		☐ Capsule at the bottom of mine
+		☐ Spend parts to build mega-teleporter
+		☐ Spend parts to open capsule
+		☐ Bad questioning causes them to disappear?
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07 20:11)

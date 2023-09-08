@@ -22,6 +22,9 @@
 #define COMM_BUTON_LABEL_COLOR_SHADOW 6
 #define COMM_BUTON_LABEL_COLOR_BG 5
 #define COMM_BUTON_LABEL_COLOR_CORNER 6
+#define COMM_PROGRESS_BAR_WIDTH (COMM_DISPLAY_WIDTH - 20)
+#define COMM_PROGRESS_BAR_HEIGHT 5
+#define COMM_PROGRESS_BAR_BORDER_DISTANCE 2
 
 static tBitMap *s_pBmEdgesMask;
 static tBitMap *s_pBmRestore;
@@ -35,6 +38,8 @@ static tPtplayerSfx *s_pSfxKeyPress[4];
 static tPtplayerSfx *s_pSfxKeyRelease[4];
 static UBYTE s_ubSteerCount;
 static tSteer *s_pSteers;
+static UBYTE s_ubPrevProgressPercent;
+static const char *s_szPrevProgressText;
 
 tBitMap *g_pCommBmFaces;
 tBitMap *g_pCommBmSelection;
@@ -482,55 +487,91 @@ void commEraseAll(void) {
 	commErase(0, 0, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT);
 }
 
-void commProgress(UBYTE ubPercent, const char *szDescription) {
-	logWrite("Comm Progress: %hhu\n", ubPercent);
-	if(!s_isCommShown) {
+void commProgressReset(void) {
+	if(!commIsShown()) {
 		return;
 	}
 
-	commErase(
-		0, COMM_DISPLAY_HEIGHT / 2 - g_pFont->uwHeight,
-		COMM_DISPLAY_WIDTH, g_pFont->uwHeight * 3
-	);
-	commDrawText(
-		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT / 2, szDescription,
-		FONT_HCENTER | FONT_BOTTOM | FONT_COOKIE | FONT_LAZY,
-		COMM_DISPLAY_COLOR_TEXT
-	);
+	s_ubPrevProgressPercent = 0;
+	s_szPrevProgressText = 0;
 
 	tUwCoordYX sBarPos = commGetOriginDisplay();
-	const UBYTE ubDist = 2;
-	const UBYTE ubBarWidth = 100;
-	const UBYTE ubBarHeight = g_pFont->uwHeight;
-	sBarPos.uwX += (COMM_DISPLAY_WIDTH - 100) / 2;
-	sBarPos.uwY += COMM_DISPLAY_HEIGHT / 2 + 1 + ubDist;
+	sBarPos.uwX += (COMM_DISPLAY_WIDTH - COMM_PROGRESS_BAR_WIDTH) / 2;
+	sBarPos.uwY += (COMM_DISPLAY_HEIGHT + g_pFont->uwHeight) / 2 + 2 * COMM_PROGRESS_BAR_BORDER_DISTANCE;
 
 	// X lines
 	blitRect(
-		s_pBmDraw, sBarPos.uwX - ubDist, sBarPos.uwY - ubDist,
-		ubDist + ubBarWidth + ubDist, 1, COMM_DISPLAY_COLOR_TEXT
+		s_pBmDraw,
+		sBarPos.uwX - COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		sBarPos.uwY - COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		COMM_PROGRESS_BAR_BORDER_DISTANCE + COMM_PROGRESS_BAR_WIDTH + COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		1,
+		COMM_DISPLAY_COLOR_TEXT
 	);
 	blitRect(
-		s_pBmDraw, sBarPos.uwX - ubDist, sBarPos.uwY + ubBarHeight + ubDist - 1,
-		ubDist + ubBarWidth + ubDist, 1, COMM_DISPLAY_COLOR_TEXT
+		s_pBmDraw,
+		sBarPos.uwX - COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		sBarPos.uwY + COMM_PROGRESS_BAR_HEIGHT + COMM_PROGRESS_BAR_BORDER_DISTANCE - 1,
+		COMM_PROGRESS_BAR_BORDER_DISTANCE + COMM_PROGRESS_BAR_WIDTH + COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		1,
+		COMM_DISPLAY_COLOR_TEXT
 	);
 
 	// Y lines
 	blitRect(
-		s_pBmDraw, sBarPos.uwX - ubDist, sBarPos.uwY - ubDist,
-		1, ubDist + ubBarHeight + ubDist, COMM_DISPLAY_COLOR_TEXT
+		s_pBmDraw,
+		sBarPos.uwX - COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		sBarPos.uwY - COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		1,
+		COMM_PROGRESS_BAR_BORDER_DISTANCE + COMM_PROGRESS_BAR_HEIGHT + COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		COMM_DISPLAY_COLOR_TEXT
 	);
 	blitRect(
-		s_pBmDraw, sBarPos.uwX + ubBarWidth + ubDist - 1, sBarPos.uwY - ubDist,
-		1, ubDist + ubBarHeight + ubDist, COMM_DISPLAY_COLOR_TEXT
+		s_pBmDraw,
+		sBarPos.uwX + COMM_PROGRESS_BAR_WIDTH + COMM_PROGRESS_BAR_BORDER_DISTANCE - 1,
+		sBarPos.uwY - COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		1,
+		COMM_PROGRESS_BAR_BORDER_DISTANCE + COMM_PROGRESS_BAR_HEIGHT + COMM_PROGRESS_BAR_BORDER_DISTANCE,
+		COMM_DISPLAY_COLOR_TEXT
 	);
+}
 
-	// Fill
-	blitRect(
-		s_pBmDraw, sBarPos.uwX, sBarPos.uwY,
-		ubBarWidth * ubPercent / 100, ubBarHeight, COMM_DISPLAY_COLOR_TEXT_DARK
-	);
+void commProgress(UBYTE ubPercent, const char *szDescription) {
+	if(!commIsShown()) {
+		return;
+	}
 
+	logWrite("Comm Progress: %hhu (%s)\n", ubPercent, szDescription);
+
+	if(szDescription != s_szPrevProgressText) {
+		UWORD uwFontPosY = (COMM_DISPLAY_HEIGHT - g_pFont->uwHeight) / 2;
+		commErase(0, uwFontPosY, COMM_DISPLAY_WIDTH, g_pFont->uwHeight);
+		commDrawText(
+			COMM_DISPLAY_WIDTH / 2, uwFontPosY, szDescription,
+			FONT_HCENTER | FONT_COOKIE | FONT_LAZY,
+			COMM_DISPLAY_COLOR_TEXT
+		);
+	}
+
+	if(ubPercent < s_ubPrevProgressPercent) {
+		logWrite("ERR: progress goes backwards");
+	}
+	else if(ubPercent != s_ubPrevProgressPercent) {
+		tUwCoordYX sBarPos = commGetOriginDisplay();
+		sBarPos.uwX += (COMM_DISPLAY_WIDTH - COMM_PROGRESS_BAR_WIDTH) / 2;
+		sBarPos.uwY += (COMM_DISPLAY_HEIGHT + g_pFont->uwHeight) / 2 + 2 * COMM_PROGRESS_BAR_BORDER_DISTANCE;
+
+		// Fill
+		UWORD uwPrevPosX = COMM_PROGRESS_BAR_WIDTH * s_ubPrevProgressPercent / 100;
+		UWORD uwNewPosX = COMM_PROGRESS_BAR_WIDTH * ubPercent / 100;
+		blitRect(
+			s_pBmDraw, sBarPos.uwX + uwPrevPosX, sBarPos.uwY,
+			uwNewPosX - uwPrevPosX, COMM_PROGRESS_BAR_HEIGHT, COMM_DISPLAY_COLOR_TEXT_DARK
+		);
+
+		s_ubPrevProgressPercent = ubPercent;
+		s_szPrevProgressText = szDescription;
+	}
 }
 
 UBYTE commBreakTextToWidth(const char *szInput, UWORD uwMaxLineWidth) {
