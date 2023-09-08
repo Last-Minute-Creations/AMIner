@@ -117,7 +117,7 @@ static void logoGsLoop(void) {
 	}
 
 	vPortWaitForEnd(s_pVp);
-	viewUpdateCLUT(s_pView);
+	viewUpdatePalette(s_pView);
 }
 
 static void logoGsDestroy(void) {

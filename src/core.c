@@ -83,25 +83,23 @@ void coreProcessAfterBobs(void) {
 }
 
 static void coreGsCreate(void) {
-	defsInit();
-	langCreate(s_szLangPrefix);
-	hiScoreLoad();
+	// Create bare-minimum display
 	s_pView = viewCreate(0,
 		TAG_VIEW_GLOBAL_PALETTE, 1,
 	TAG_END);
 
-	textBobManagerCreate(g_pFont);
-	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
-	dinoReset();
-	questGateReset();
-	collectiblesCreate();
-
-	hudCreate(s_pView, g_pFont);
+  tVPort *pVpHud = vPortCreate(0,
+    TAG_VPORT_VIEW, s_pView,
+    TAG_VPORT_BPP, GAME_BPP,
+    TAG_VPORT_HEIGHT, 31,
+  TAG_END);
 
 	s_pVpMain = vPortCreate(0,
 		TAG_VPORT_VIEW, s_pView,
 		TAG_VPORT_BPP, GAME_BPP,
 	TAG_END);
+
+	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
 	g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
@@ -113,9 +111,23 @@ static void coreGsCreate(void) {
 		TAG_TILEBUFFER_TILESET, s_pTiles,
 	TAG_END);
 
+	// Load the view and draw the progress bar
 	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
-	memset(s_pVpMain->pPalette, 0, sizeof(s_pVpMain->pPalette));
-	s_pColorBg = &s_pVpMain->pPalette[0];
+	memcpy(pVpHud->pPalette, s_pPaletteRef, sizeof(pVpHud->pPalette));
+	viewLoad(s_pView);
+	blitRect(g_pMainBuffer->pScroll->pFront, 50, 50, 100, 100, 3);
+	blitRect(g_pMainBuffer->pScroll->pBack, 200, 50, 100, 100, 4); // This one gets displayed
+	viewProcessManagers(s_pView);
+	copProcessBlocks();
+
+	defsInit();
+	langCreate(s_szLangPrefix);
+	hiScoreLoad();
+	textBobManagerCreate(g_pFont);
+	dinoReset();
+	questGateReset();
+	collectiblesCreate();
+	hudCreate(pVpHud, g_pFont);
 
 	baseCreate(g_pMainBuffer);
 	ptplayerCreate(1);
@@ -172,11 +184,13 @@ static void coreGsCreate(void) {
 	systemUnuse();
 
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
+
+	memset(pVpHud->pPalette, 0, sizeof(pVpHud->pPalette));
+	s_pColorBg = &pVpHud->pPalette[0];
+	viewUpdatePalette(s_pView);
+
 	// Initial background
 	tileBufferRedrawAll(g_pMainBuffer);
-
-	// Load the view
-	viewLoad(s_pView);
 
 	// Default config
 	g_is2pPlaying = 0;

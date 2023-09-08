@@ -23,7 +23,7 @@ typedef enum _tMode {
 	MODE_COUNT
 } tMode;
 
-void hudCreate(tView *pView, const tFont *pFont);
+void hudCreate(tVPort *pVpHud, const tFont *pFont);
 
 void hudDestroy(void);
 

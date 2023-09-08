@@ -285,12 +285,8 @@ void hudHideMode(void) {
 
 //------------------------------------------------------------------------- MAIN
 
-void hudCreate(tView *pView, const tFont *pFont) {
-  s_pVpHud = vPortCreate(0,
-    TAG_VPORT_VIEW, pView,
-    TAG_VPORT_BPP, 5,
-    TAG_VPORT_HEIGHT, 31,
-  TAG_END);
+void hudCreate(tVPort *pVpHud, const tFont *pFont) {
+  s_pVpHud = pVpHud;
 
   s_pHudBuffer = simpleBufferCreate(0,
     TAG_SIMPLEBUFFER_VPORT, s_pVpHud,
