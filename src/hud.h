@@ -10,6 +10,8 @@
 #include "string_array.h"
 #include "face_id.h"
 
+#define HUD_HEIGHT 31
+
 typedef enum _tHudPlayer {
 	PLAYER_1 = 0,
 	PLAYER_2

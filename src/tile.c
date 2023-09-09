@@ -274,7 +274,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 
 	// Generate terrain
 	UBYTE ubProgressTerrainEnd = 30;
-	commProgressReset();
+	commProgressInit();
 	tileGenerateTerrain(isCoalOnly, isChallenge, 0, ubProgressTerrainEnd);
 
 	// Generate bases

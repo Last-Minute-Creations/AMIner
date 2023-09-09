@@ -14,7 +14,6 @@
 #define HUD_COLOR_BAR_FULL 14
 #define HUD_COLOR_BAR_EMPTY 12
 
-#define HUD_HEIGHT 31
 #define HUD_ORIGIN_X 11
 #define HUD_ORIGIN_Y 9
 #define HUD_FACE_SIZE 16
