@@ -98,7 +98,7 @@ void commErase(UWORD uwX, UWORD uwY, UWORD uwWidth, UWORD uwHeight);
 
 void commEraseAll(void);
 
-void commProgressReset(void);
+void commProgressInit(void);
 
 void commProgress(UBYTE ubPercent, const char *szDescription);
 

@@ -32,6 +32,7 @@
 #include "settings.h"
 #include "collectibles.h"
 #include "heat.h"
+#include "assets.h"
 
 #define CAMERA_SPEED 4
 
@@ -47,11 +48,9 @@ typedef struct _tModeSelection {
 
 static tModeSelection s_pModeSelection[2] = {};
 
-tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty, *g_pSfxFlyLoop;
-tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
 UBYTE g_is2pPlaying;
 UBYTE g_isChallenge, g_isAtari;
-tBob g_pBombMarkers[3];
+static tBob s_pBombMarkers[3];
 
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 static tUwCoordYX s_sTeleportReturn;
@@ -66,6 +65,17 @@ static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
 static WORD s_wLastReminder;
 static UBYTE s_ubCurrentMod;
 static ULONG s_ulGameTime;
+
+void gameInitBombMarkerBobs(void) {
+	for(UBYTE i = 0; i < 3; ++i) {
+		bobInit(
+			&s_pBombMarkers[i], 16, 10, 1,
+			bobCalcFrameAddress(g_pBombMarker, 0),
+			bobCalcFrameAddress(g_pBombMarkerMask, 0),
+			0, 0
+		);
+	}
+}
 
 void gameTryPushBob(tBob *pBob) {
 	if(
@@ -101,7 +111,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	s_ulGameTime = 0;
-	s_ubCurrentMod = GAME_MOD_COUNT;
+	s_ubCurrentMod = ASSETS_GAME_MOD_COUNT;
 	s_ubRebukes = 0;
 	s_ubAccolades = 0;
 	s_ubAccoladesFract = 0;
@@ -276,9 +286,9 @@ static void gameDisplayModeTnt(UBYTE ubPlayer) {
 		uwTileX += bDeltaX;
 		uwTileY += bDeltaY;
 		if(1 <= uwTileX && uwTileX <= 10) {
-			g_pBombMarkers[i].sPos.uwX = (uwTileX << 5) + 8;
-			g_pBombMarkers[i].sPos.uwY = (uwTileY << 5) + 11;
-			gameTryPushBob(&g_pBombMarkers[i]);
+			s_pBombMarkers[i].sPos.uwX = (uwTileX << 5) + 8;
+			s_pBombMarkers[i].sPos.uwY = (uwTileY << 5) + 11;
+			gameTryPushBob(&s_pBombMarkers[i]);
 		}
 		else {
 			break;
@@ -514,7 +524,7 @@ void gameChallengeResult(void) {
 }
 
 static void onSongEnd(void) {
-	if(++s_ubCurrentMod >= GAME_MOD_COUNT) {
+	if(++s_ubCurrentMod >= ASSETS_GAME_MOD_COUNT) {
 		s_ubCurrentMod = 0;
 	}
 	ptplayerLoadMod(g_pGameMods[s_ubCurrentMod], g_pModSampleData, 0);
@@ -598,7 +608,7 @@ void gameSave(tFile *pFile) {
 	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
 	// for(UBYTE i = 0; i < 3; ++i) {
-	// 	bobSave(pFile, g_pBombMarkers[i]);
+	// 	bobSave(pFile, s_pBombMarkers[i]);
 	// }
 
 	fileWrite(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
@@ -639,7 +649,7 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
 	// for(UBYTE i = 0; i < 3; ++i) {
-	// 	bobLoad(pFile, g_pBombMarkers[i]);
+	// 	bobLoad(pFile, s_pBombMarkers[i]);
 	// }
 
 	fileRead(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));

@@ -14,7 +14,6 @@
 #define HUD_COLOR_BAR_FULL 14
 #define HUD_COLOR_BAR_EMPTY 12
 
-#define HUD_HEIGHT 31
 #define HUD_ORIGIN_X 11
 #define HUD_ORIGIN_Y 9
 #define HUD_FACE_SIZE 16
@@ -285,12 +284,8 @@ void hudHideMode(void) {
 
 //------------------------------------------------------------------------- MAIN
 
-void hudCreate(tView *pView, const tFont *pFont) {
-  s_pVpHud = vPortCreate(0,
-    TAG_VPORT_VIEW, pView,
-    TAG_VPORT_BPP, 5,
-    TAG_VPORT_HEIGHT, 31,
-  TAG_END);
+void hudCreate(tVPort *pVpHud, const tFont *pFont) {
+  s_pVpHud = pVpHud;
 
   s_pHudBuffer = simpleBufferCreate(0,
     TAG_SIMPLEBUFFER_VPORT, s_pVpHud,

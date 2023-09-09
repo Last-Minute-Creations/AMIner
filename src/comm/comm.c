@@ -11,6 +11,7 @@
 #include <ace/contrib/managers/audio_mixer.h>
 #include "../core.h"
 #include "../game.h"
+#include "../progress_bar.h"
 #include "settings.h"
 
 #define SFX_CHANNEL_KEY 0
@@ -38,8 +39,16 @@ static tPtplayerSfx *s_pSfxKeyPress[4];
 static tPtplayerSfx *s_pSfxKeyRelease[4];
 static UBYTE s_ubSteerCount;
 static tSteer *s_pSteers;
-static UBYTE s_ubPrevProgressPercent;
 static const char *s_szPrevProgressText;
+
+static tProgressBarConfig s_sProgressBarConfig = {
+	.sBarPos = {.ulYX = 0},
+	.uwWidth =  COMM_PROGRESS_BAR_WIDTH,
+	.uwHeight = COMM_PROGRESS_BAR_HEIGHT,
+	.ubBorderDistance = COMM_PROGRESS_BAR_BORDER_DISTANCE,
+	.ubColorBorder = COMM_DISPLAY_COLOR_TEXT,
+	.ubColorBar = COMM_DISPLAY_COLOR_TEXT_DARK,
+};
 
 tBitMap *g_pCommBmFaces;
 tBitMap *g_pCommBmSelection;
@@ -487,53 +496,18 @@ void commEraseAll(void) {
 	commErase(0, 0, COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT);
 }
 
-void commProgressReset(void) {
+void commProgressInit(void) {
 	if(!commIsShown()) {
 		return;
 	}
 
-	s_ubPrevProgressPercent = 0;
 	s_szPrevProgressText = 0;
 
 	tUwCoordYX sBarPos = commGetOriginDisplay();
 	sBarPos.uwX += (COMM_DISPLAY_WIDTH - COMM_PROGRESS_BAR_WIDTH) / 2;
 	sBarPos.uwY += (COMM_DISPLAY_HEIGHT + g_pFont->uwHeight) / 2 + 2 * COMM_PROGRESS_BAR_BORDER_DISTANCE;
-
-	// X lines
-	blitRect(
-		s_pBmDraw,
-		sBarPos.uwX - COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		sBarPos.uwY - COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		COMM_PROGRESS_BAR_BORDER_DISTANCE + COMM_PROGRESS_BAR_WIDTH + COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		1,
-		COMM_DISPLAY_COLOR_TEXT
-	);
-	blitRect(
-		s_pBmDraw,
-		sBarPos.uwX - COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		sBarPos.uwY + COMM_PROGRESS_BAR_HEIGHT + COMM_PROGRESS_BAR_BORDER_DISTANCE - 1,
-		COMM_PROGRESS_BAR_BORDER_DISTANCE + COMM_PROGRESS_BAR_WIDTH + COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		1,
-		COMM_DISPLAY_COLOR_TEXT
-	);
-
-	// Y lines
-	blitRect(
-		s_pBmDraw,
-		sBarPos.uwX - COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		sBarPos.uwY - COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		1,
-		COMM_PROGRESS_BAR_BORDER_DISTANCE + COMM_PROGRESS_BAR_HEIGHT + COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		COMM_DISPLAY_COLOR_TEXT
-	);
-	blitRect(
-		s_pBmDraw,
-		sBarPos.uwX + COMM_PROGRESS_BAR_WIDTH + COMM_PROGRESS_BAR_BORDER_DISTANCE - 1,
-		sBarPos.uwY - COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		1,
-		COMM_PROGRESS_BAR_BORDER_DISTANCE + COMM_PROGRESS_BAR_HEIGHT + COMM_PROGRESS_BAR_BORDER_DISTANCE,
-		COMM_DISPLAY_COLOR_TEXT
-	);
+	s_sProgressBarConfig.sBarPos = sBarPos;
+	progressBarInit(&s_sProgressBarConfig, s_pBmDraw);
 }
 
 void commProgress(UBYTE ubPercent, const char *szDescription) {
@@ -541,7 +515,7 @@ void commProgress(UBYTE ubPercent, const char *szDescription) {
 		return;
 	}
 
-	logWrite("Comm Progress: %hhu (%s)\n", ubPercent, szDescription);
+	logWrite("Comm Progress: %hhu (%s)\n", ubPercent, szDescription ? szDescription : "???");
 
 	if(szDescription != s_szPrevProgressText) {
 		UWORD uwFontPosY = (COMM_DISPLAY_HEIGHT - g_pFont->uwHeight) / 2;
@@ -551,27 +525,10 @@ void commProgress(UBYTE ubPercent, const char *szDescription) {
 			FONT_HCENTER | FONT_COOKIE | FONT_LAZY,
 			COMM_DISPLAY_COLOR_TEXT
 		);
-	}
-
-	if(ubPercent < s_ubPrevProgressPercent) {
-		logWrite("ERR: progress goes backwards");
-	}
-	else if(ubPercent != s_ubPrevProgressPercent) {
-		tUwCoordYX sBarPos = commGetOriginDisplay();
-		sBarPos.uwX += (COMM_DISPLAY_WIDTH - COMM_PROGRESS_BAR_WIDTH) / 2;
-		sBarPos.uwY += (COMM_DISPLAY_HEIGHT + g_pFont->uwHeight) / 2 + 2 * COMM_PROGRESS_BAR_BORDER_DISTANCE;
-
-		// Fill
-		UWORD uwPrevPosX = COMM_PROGRESS_BAR_WIDTH * s_ubPrevProgressPercent / 100;
-		UWORD uwNewPosX = COMM_PROGRESS_BAR_WIDTH * ubPercent / 100;
-		blitRect(
-			s_pBmDraw, sBarPos.uwX + uwPrevPosX, sBarPos.uwY,
-			uwNewPosX - uwPrevPosX, COMM_PROGRESS_BAR_HEIGHT, COMM_DISPLAY_COLOR_TEXT_DARK
-		);
-
-		s_ubPrevProgressPercent = ubPercent;
 		s_szPrevProgressText = szDescription;
 	}
+
+	progressBarAdvance(&s_sProgressBarConfig, s_pBmDraw, ubPercent);
 }
 
 UBYTE commBreakTextToWidth(const char *szInput, UWORD uwMaxLineWidth) {

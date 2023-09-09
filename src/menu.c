@@ -19,6 +19,7 @@
 #include "settings.h"
 #include "menu_list.h"
 #include "steer.h"
+#include "assets.h"
 
 #define SFX_CHANNEL_ATARI 1
 #define MENU_OPTIONS_MAX 10
@@ -79,7 +80,6 @@ char **g_pMenuEnumP2;
 char **g_pMenuEnumOnOff;
 char **g_pMenuEnumPlayerCount;
 char **	g_pMenuEnumVolume;
-tPtplayerMod *g_pMenuMod;
 
 static void menuEnableAtari(void) {
 	if(s_ubIndexAtari != INDEX_ATARI_INVALID && g_sSettings.isAtariHidden) {

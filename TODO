@@ -8,11 +8,11 @@ General:
 	✔ Add debug means to set teleport source/destination @done(23-03-13 17:37)
 	✔ Localized commrade buttons @done(23-03-13 20:15)
 	✔ Proper restock zones - currently can restock beneath first base's building @done(23-07-10 18:31)
+	✘ Fix hud disappearing after teleport- can't repro @cancelled(23-09-08 18:28)
 	☐ Animated base elements
 	☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button
 		☐ Bring back teleport damage on zeroeth upgrade
-	☐ Fix hud disappearing after teleport
 	✔ "Transparency" of comm corners @done(23-05-14 09:38)
 	✔ Add magma tiles @done(23-03-17 18:03)
 		✔ Hurt while drilling through @done(23-03-17 18:03)
@@ -20,6 +20,9 @@ General:
 	☐ Variance in mine backgrounds
 		☐ On-the-fly composing background tile with edges
 		☐ Add extra bg variants (stones)
+	☐ Initial loading screen
+		✔ Progress bar @done(23-09-09 11:28)
+		☐ News
 
 Simulator:
 	✔ Basic view of mine @done(23-04-07 13:44)
@@ -67,10 +70,6 @@ Simulator:
 		✘ Time spent on drilling @cancelled(23-09-04 21:54)
 		✘ Time spent on backtracking to restock @cancelled(23-09-04 21:54)
 
-Initial loading screen:
-	☐ Progress bar
-	☐ News
-
 Commrade:
 	☐ Mietek black market
 	☐ Redo warehouse/plan management
@@ -113,13 +112,13 @@ Crate quests:
 		☐ Agent appears after first crate
 		☐ Ability to sell create
 		☐ Questionings after finding crate
-		☐ Bad questioning removes agent
+		☐ Bad questioning causes confiscating of all crates
+		☐ Report agent to remove him and get accolade
 	☐ Travelers quest flow
 		☐ Implement base
 		☐ Capsule at the bottom of mine
 		☐ Spend parts to build mega-teleporter
 		☐ Spend parts to open capsule
-		☐ Bad questioning causes them to disappear?
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07 20:11)

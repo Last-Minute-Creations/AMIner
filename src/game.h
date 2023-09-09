@@ -12,7 +12,6 @@
 #include "steer.h"
 
 #define GAME_BPP 5
-#define GAME_MOD_COUNT 10
 #define GAME_TIME_PER_DAY 140
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
@@ -28,6 +27,8 @@ void gameSave(tFile *pFile);
 UBYTE gameLoad(tFile *pFile);
 
 void gameGsLoopEnterScore(void);
+
+void gameInitBombMarkerBobs(void);
 
 void gameTryPushBob(tBob *pBob);
 
@@ -51,14 +52,10 @@ UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays);
 
 tSteer *gameGetSteers(void);
 
-extern tPtplayerSfx *g_pSfxDrill, *g_pSfxOre, *g_pSfxPenalty, *g_pSfxFlyLoop;
-extern tPtplayerMod *g_pGameMods[GAME_MOD_COUNT];
-
 // Game config
 extern UBYTE g_is2pPlaying;
 extern UBYTE g_isChallenge;
 extern UBYTE g_isAtari;
-extern tBob g_pBombMarkers[3];
 extern tState g_sStateGame;
 
 #endif // _GAME_H_

@@ -10,6 +10,8 @@
 #include "string_array.h"
 #include "face_id.h"
 
+#define HUD_HEIGHT 31
+
 typedef enum _tHudPlayer {
 	PLAYER_1 = 0,
 	PLAYER_2
@@ -23,7 +25,7 @@ typedef enum _tMode {
 	MODE_COUNT
 } tMode;
 
-void hudCreate(tView *pView, const tFont *pFont);
+void hudCreate(tVPort *pVpHud, const tFont *pFont);
 
 void hudDestroy(void);
 
