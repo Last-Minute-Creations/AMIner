@@ -27,6 +27,7 @@
 #include "settings.h"
 #include "collectibles.h"
 #include "progress_bar.h"
+#include "assets.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
@@ -39,7 +40,6 @@ static UWORD *s_pColorBg;
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
-static tBitMap *s_pBombMarker, *s_pBombMarkerMask;
 static const char *s_szLangPrefix;
 
 static const tProgressBarConfig s_sProgressBarConfig = {
@@ -134,54 +134,35 @@ static void coreGsCreate(void) {
 	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
 	memcpy(pVpHud->pPalette, s_pPaletteRef, sizeof(pVpHud->pPalette));
 	viewLoad(s_pView);
-	// blitRect(g_pMainBuffer->pScroll->pFront, 50, 50, 100, 100, 3);
-	// blitRect(g_pMainBuffer->pScroll->pBack, 200, 50, 100, 100, 4); // This one gets displayed
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
 	progressBarInit(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront);
 
 	defsInit();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 3);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 5);
 	langCreate(s_szLangPrefix);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 6);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 10);
 	hiScoreLoad();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 9);
-	textBobManagerCreate(g_pFont);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 12);
-	dinoReset();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 15);
+	textBobManagerCreate(g_pFont);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 20);
+	dinoReset();
 	questGateReset();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 18);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 25);
 	collectiblesCreate();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 21);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 30);
 	hudCreate(pVpHud, g_pFont);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 24);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 35);
 
 	baseCreate(g_pMainBuffer);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 27);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 40);
 	ptplayerCreate(1);
 	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
 	audioMixerCreate();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 30);
-	g_pSfxFlyLoop = ptplayerSfxCreateFromFile("data/sfx/fly_loop.sfx", 1);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 33);
-	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx", 1);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 36);
-	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx", 1);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 39);
-	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx", 1);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 42);
-	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
-		char szModPath[30];
-		sprintf(szModPath, "data/music/game%hhu.mod", i);
-		g_pGameMods[i] = ptplayerModCreate(szModPath);
-	}
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 45);
-	g_pMenuMod = ptplayerModCreate("data/music/menu.mod");
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 48);
-	g_pModSampleData = ptplayerSampleDataCreate("data/music/samples.samplepack");
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 51);
+	assetsAudioCreate();
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 50);
 
 #ifdef GAME_DEBUG
 	randInit(&g_sRand, 2184, 1911);
@@ -192,45 +173,34 @@ static void coreGsCreate(void) {
 #endif
 
 	tileReset(0, 1);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 54);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 55);
 
 	bobManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 57);
-	explosionManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 60);
+	explosionManagerCreate();
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 65);
 	groundLayerCreate(s_pVpMain);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 63);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 70);
 	commCreate();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 66);
-	vehicleBitmapsCreate();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 69);
-	vehicleCreate(&g_pVehicles[0], PLAYER_1);
-	vehicleCreate(&g_pVehicles[1], PLAYER_2);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 72);
-
-	s_pBombMarker = bitmapCreateFromFile("data/bomb_marker.bm", 0);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 75);
-	s_pBombMarkerMask = bitmapCreateFromFile("data/bomb_marker_mask.bm", 0);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 78);
+	vehicleManagerCreate();
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 80);
 
-	for(UBYTE i = 0; i < 3; ++i) {
-		bobInit(
-			&g_pBombMarkers[i], 16, 10, 1,
-			bobCalcFrameAddress(s_pBombMarker, 0),
-			bobCalcFrameAddress(s_pBombMarkerMask, 0),
-			0, 0
-		);
-	}
+	assetsBombMarkersCreate();
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 85);
+	gameInitBombMarkerBobs();
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 90);
 
 	menuPreload();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 81);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 95);
 	bobReallocateBgBuffers();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 84);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 100);
 	systemUnuse();
 
+	// Prepare for game display
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
 	memset(pVpHud->pPalette, 0, sizeof(pVpHud->pPalette));
 	s_pColorBg = &pVpHud->pPalette[0];
@@ -260,27 +230,15 @@ static void coreGsDestroy(void) {
 	baseDestroy();
 	textBobManagerDestroy();
 	fontDestroy(g_pFont);
-	vehicleDestroy(&g_pVehicles[0]);
-	vehicleDestroy(&g_pVehicles[1]);
-	vehicleBitmapsDestroy();
+	vehicleManagerDestroy();
 	commDestroy();
 	bobManagerDestroy();
 
 	audioMixerDestroy();
-	for(UBYTE i = 0; i < GAME_MOD_COUNT; ++i) {
-		ptplayerModDestroy(g_pGameMods[i]);
-	}
-	ptplayerSamplePackDestroy(g_pModSampleData);
-	ptplayerModDestroy(g_pMenuMod);
-	ptplayerSfxDestroy(g_pSfxDrill);
-	ptplayerSfxDestroy(g_pSfxFlyLoop);
-	ptplayerSfxDestroy(g_pSfxOre);
-	ptplayerSfxDestroy(g_pSfxPenalty);
+	assetsAudioDestroy();
 	ptplayerDestroy();
 
-	bitmapDestroy(s_pBombMarker);
-	bitmapDestroy(s_pBombMarkerMask);
-
+	assetsBombMarkersDestroy();
 	explosionManagerDestroy();
 	langDestroy();
 
@@ -303,7 +261,6 @@ const char * coreGetLangPrefix(void) {
 tTileBufferManager *g_pMainBuffer;
 tFont *g_pFont;
 tRandManager g_sRand;
-tPtplayerSamplePack *g_pModSampleData;
 
 tState g_sStateCore = {
 	.cbCreate = coreGsCreate, .cbLoop = coreGsLoop, .cbDestroy = coreGsDestroy

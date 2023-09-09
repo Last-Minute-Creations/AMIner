@@ -19,6 +19,7 @@
 #include "inventory.h"
 #include "save.h"
 #include "quest_gate.h"
+#include "assets.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -64,7 +65,64 @@ const UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {
 
 static UBYTE s_ubBebCountdown = 0;
 
-void vehicleBitmapsCreate(void) {
+//------------------------------------------------------------------ PRIVATE FNS
+
+static void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
+	logBlockBegin("vehicleCreate(pVehicle: %p, ubIdx: %hhu)", pVehicle, ubIdx);
+
+	// Setup bobs
+  bobInit(
+		&pVehicle->sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
+		bobCalcFrameAddress(s_pBodyFrames[ubIdx], 0),
+		bobCalcFrameAddress(s_pBodyMask, 0),
+		0, 0
+	);
+	bobInit(
+		&pVehicle->sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
+		bobCalcFrameAddress(s_pTrackFrames, 0),
+		bobCalcFrameAddress(s_pTrackMask, 0),
+		0, 0
+	);
+	bobInit(
+		&pVehicle->sBobJet, VEHICLE_WIDTH, VEHICLE_FLAME_HEIGHT, 1,
+		bobCalcFrameAddress(s_pJetFrames, 0),
+		bobCalcFrameAddress(s_pJetMask, 0),
+		0, 0
+	);
+	bobInit(
+		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
+		bobCalcFrameAddress(s_pToolFrames[ubIdx], 0),
+		bobCalcFrameAddress(s_pToolMask, 0),
+		0, 0
+	);
+	bobInit(
+		&pVehicle->sBobWreck, VEHICLE_WRECK_WIDTH, VEHICLE_WRECK_HEIGHT, 1,
+		bobCalcFrameAddress(s_pWreckFrames[ubIdx], 0),
+		bobCalcFrameAddress(s_pWreckMask, 0),
+		0, 0
+	);
+	bobInit(
+		&pVehicle->sBobSmoke, VEHICLE_SMOKE_WIDTH, VEHICLE_SMOKE_FRAME_HEIGHT, 1,
+		bobCalcFrameAddress(s_pSmokeFrames, 0),
+		bobCalcFrameAddress(s_pSmokeMask, 0),
+		0, 0
+	);
+	pVehicle->ubPlayerIdx = ubIdx;
+	pVehicle->sDynamite.ubPlayer = ubIdx;
+
+	vehicleReset(pVehicle);
+
+	textBobCreate(&pVehicle->sTextBob, g_pFont, "Checkpoint! +1000\x1F");
+	logBlockEnd("vehicleCreate()");
+}
+
+static void vehicleDestroy(tVehicle *pVehicle) {
+	textBobDestroy(&pVehicle->sTextBob);
+}
+
+//------------------------------------------------------------------- PUBLIC FNS
+
+void vehicleManagerCreate(void) {
 	// Load gfx
 	s_pBodyFrames[0] = bitmapCreateFromFile("data/drill.bm", 0);
 	s_pBodyFrames[1] = bitmapCreateFromFile("data/drill_2.bm", 0);
@@ -91,9 +149,12 @@ void vehicleBitmapsCreate(void) {
 	blitRect(s_pWhiteBody, 0, 0, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, COLOR_WHITE);
 	s_pWhiteTool = bitmapCreate(VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, GAME_BPP, BMF_INTERLEAVED);
 	blitRect(s_pWhiteTool, 0, 0, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, COLOR_WHITE);
+
+	vehicleCreate(&g_pVehicles[0], PLAYER_1);
+	vehicleCreate(&g_pVehicles[1], PLAYER_2);
 }
 
-void vehicleBitmapsDestroy(void) {
+void vehicleManagerDestroy(void) {
 	bitmapDestroy(s_pBodyFrames[0]);
 	bitmapDestroy(s_pBodyFrames[1]);
 	bitmapDestroy(s_pBodyMask);
@@ -117,6 +178,9 @@ void vehicleBitmapsDestroy(void) {
 
 	bitmapDestroy(s_pWhiteBody);
 	bitmapDestroy(s_pWhiteTool);
+
+	vehicleDestroy(&g_pVehicles[0]);
+	vehicleDestroy(&g_pVehicles[1]);
 }
 
 void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
@@ -351,59 +415,6 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
 	fileRead(pFile, &pVehicle->ubDamageFrames, sizeof(pVehicle->ubDamageFrames));
 	return 1;
-}
-
-void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
-	logBlockBegin("vehicleCreate(pVehicle: %p, ubIdx: %hhu)", pVehicle, ubIdx);
-
-	// Setup bobs
-  bobInit(
-		&pVehicle->sBobBody, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, 1,
-		bobCalcFrameAddress(s_pBodyFrames[ubIdx], 0),
-		bobCalcFrameAddress(s_pBodyMask, 0),
-		0, 0
-	);
-	bobInit(
-		&pVehicle->sBobTrack, VEHICLE_WIDTH, VEHICLE_TRACK_HEIGHT, 1,
-		bobCalcFrameAddress(s_pTrackFrames, 0),
-		bobCalcFrameAddress(s_pTrackMask, 0),
-		0, 0
-	);
-	bobInit(
-		&pVehicle->sBobJet, VEHICLE_WIDTH, VEHICLE_FLAME_HEIGHT, 1,
-		bobCalcFrameAddress(s_pJetFrames, 0),
-		bobCalcFrameAddress(s_pJetMask, 0),
-		0, 0
-	);
-	bobInit(
-		&pVehicle->sBobTool, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, 1,
-		bobCalcFrameAddress(s_pToolFrames[ubIdx], 0),
-		bobCalcFrameAddress(s_pToolMask, 0),
-		0, 0
-	);
-	bobInit(
-		&pVehicle->sBobWreck, VEHICLE_WRECK_WIDTH, VEHICLE_WRECK_HEIGHT, 1,
-		bobCalcFrameAddress(s_pWreckFrames[ubIdx], 0),
-		bobCalcFrameAddress(s_pWreckMask, 0),
-		0, 0
-	);
-	bobInit(
-		&pVehicle->sBobSmoke, VEHICLE_SMOKE_WIDTH, VEHICLE_SMOKE_FRAME_HEIGHT, 1,
-		bobCalcFrameAddress(s_pSmokeFrames, 0),
-		bobCalcFrameAddress(s_pSmokeMask, 0),
-		0, 0
-	);
-	pVehicle->ubPlayerIdx = ubIdx;
-	pVehicle->sDynamite.ubPlayer = ubIdx;
-
-	vehicleReset(pVehicle);
-
-	textBobCreate(&pVehicle->sTextBob, g_pFont, "Checkpoint! +1000\x1F");
-	logBlockEnd("vehicleCreate()");
-}
-
-void vehicleDestroy(tVehicle *pVehicle) {
-	textBobDestroy(&pVehicle->sTextBob);
 }
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {

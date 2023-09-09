@@ -97,13 +97,9 @@ typedef struct _tVehicle {
 	UBYTE isChallengeEnded;
 } tVehicle;
 
-void vehicleBitmapsCreate(void);
+void vehicleManagerCreate(void);
 
-void vehicleBitmapsDestroy(void);
-
-void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx);
-
-void vehicleDestroy(tVehicle *pVehicle);
+void vehicleManagerDestroy(void);
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle);
 

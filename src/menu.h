@@ -39,7 +39,6 @@ void menuUnload(void);
 void menuGsEnter(UBYTE isScoreShow);
 
 extern tState g_sStateMenu;
-extern tPtplayerMod *g_pMenuMod;
 
 extern char **g_pMenuCaptions;
 extern char **g_pMenuEnumP1;

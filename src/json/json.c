@@ -98,6 +98,7 @@ UWORD jsonGetElementInArray(
 UWORD jsonGetElementInStruct(
 	const tJson *pJson, UWORD uwParentIdx, const char *szElement
 ) {
+	UBYTE ubElementNameLength = strlen(szElement);
 	for(UWORD i = uwParentIdx+1; i < pJson->fwTokenCount; ++i) {
 		if(pJson->pTokens[i].start > pJson->pTokens[uwParentIdx].end) {
 			// We're outside of parent - nothing found
@@ -105,8 +106,8 @@ UWORD jsonGetElementInStruct(
 		}
 		const char *pNextElementName = pJson->szData + pJson->pTokens[i].start;
 		if(
-			!memcmp(pNextElementName, szElement, strlen(szElement)) &&
-			pNextElementName[strlen(szElement)] == '"'
+			!memcmp(pNextElementName, szElement, ubElementNameLength) &&
+			pNextElementName[ubElementNameLength] == '"'
 		) {
 			// Found label - next is content
 			return i+1;

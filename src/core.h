@@ -23,6 +23,5 @@ extern tTileBufferManager *g_pMainBuffer;
 extern tFont *g_pFont;
 extern tRandManager g_sRand;
 extern tState g_sStateCore;
-extern tPtplayerSamplePack *g_pModSampleData;
 
 #endif // _CORE_H_

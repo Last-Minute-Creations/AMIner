@@ -20,6 +20,9 @@ General:
 	☐ Variance in mine backgrounds
 		☐ On-the-fly composing background tile with edges
 		☐ Add extra bg variants (stones)
+	☐ Initial loading screen
+		✔ Progress bar @done(23-09-09 11:28)
+		☐ News
 
 Simulator:
 	✔ Basic view of mine @done(23-04-07 13:44)
@@ -66,10 +69,6 @@ Simulator:
 	✘ Approximate time spent in-game @cancelled(23-09-04 21:54)
 		✘ Time spent on drilling @cancelled(23-09-04 21:54)
 		✘ Time spent on backtracking to restock @cancelled(23-09-04 21:54)
-
-Initial loading screen:
-	☐ Progress bar
-	☐ News
 
 Commrade:
 	☐ Mietek black market
