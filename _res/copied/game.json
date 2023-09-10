@@ -29,6 +29,7 @@
 		"hullPrice": 2
 	},
 	"dinoDepths": [80, 200, 240, 310, 350, 410, 530, 610, 710],
+	"gateDepths": [520, 550, 580, 620, 650, 690, 740, 770, 800, 830, 860, 890, 920, 950, 980, 1000],
 	"mineralPlans": [0, 10, 30, 40, 20, 65535],
 	"minePercentForPlans": 75,
 	"trailingMineralCountPercent": 20,

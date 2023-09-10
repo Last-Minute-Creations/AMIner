@@ -30,6 +30,7 @@ fix16_t g_fPlanIncreaseRatioMultiplayer;
 
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[DEFS_QUEST_DINO_BONE_COUNT];
+UWORD g_pGateDepths[DEFS_QUEST_GATE_PART_COUNT];
 UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
 UBYTE g_ubMinePercentForPlans;
 UBYTE g_ubTrailingMineralCountPercent;
@@ -187,6 +188,18 @@ void defsInit(void) {
 		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxDinoDepths, i);
 		g_pDinoDepths[i] = jsonTokToUlong(pJson, uwIdx);
 	}
+
+	// Gate parts
+	UWORD uwIdxGateDepths = jsonGetDom(pJson, "dinoDepths");
+	ubDepthCount = pJson->pTokens[uwIdxGateDepths].size;
+	if(ubDepthCount != 16) {
+		logWrite("Dino part count mismatch: got %d, expected 16\n", ubDepthCount);
+	}
+	for(UBYTE i = 0; i < ubDepthCount; ++i) {
+		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxGateDepths, i);
+		g_pGateDepths[i] = jsonTokToUlong(pJson, uwIdx);
+	}
+
 
 	// Minerals
 	UWORD uwIdxMineralPlans = jsonGetDom(pJson, "mineralPlans");

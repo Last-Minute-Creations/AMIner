@@ -16,6 +16,7 @@
 #include "base.h"
 
 #define ROWS_PER_PLAN_MAX 20
+// #define TILE_QUEST_DEBUG_PLACEMENT
 
 //----------------------------------------------------------------- PRIVATE VARS
 
@@ -311,7 +312,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 			pTiles[x][uwEndY - 1] = TILE_STONE_1 + (x & 3);
 		}
 
-		// Quest items
+		// Quest items: bones
 		s_ubNextRowPatternPos = 0;
 		for(UBYTE i = 0; i < DEFS_QUEST_DINO_BONE_COUNT; ++i) {
 			tTile eTile = (i == 0) ? TILE_BONE_HEAD : TILE_BONE_1;
@@ -321,7 +322,8 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 			}
 		}
 
-		// Gate fragments
+		// Quest items: gate fragments
+#if defined(TILE_QUEST_DEBUG_PLACEMENT)
 		pTiles[1][219] = TILE_GATE_1;
 		pTiles[2][219] = TILE_GATE_2;
 		pTiles[3][219] = TILE_GATE_1;
@@ -338,6 +340,15 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		pTiles[5][220] = TILE_GATE_2;
 		pTiles[6][220] = TILE_GATE_1;
 		pTiles[7][220] = TILE_GATE_2;
+#else
+		for(UBYTE i = 0; i < DEFS_QUEST_DINO_BONE_COUNT; ++i) {
+			tTile eTile = (i & 1) ? TILE_GATE_2 : TILE_GATE_1;
+			if(!tileTryPlaceQuestItemInRow(pTiles, g_pGateDepths[i], eTile)) {
+				logWrite("ERR: Can't find place for gate part #%hhu at row %hu\n", i + 1, g_pGateDepths[i]);
+				pTiles[5][g_pGateDepths[i]] = eTile;
+			}
+		}
+#endif
 
 		commProgress(55, g_pMsgs[MSG_LOADING_FINISHING]);
 

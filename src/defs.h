@@ -120,6 +120,7 @@ extern ULONG g_ulExtraPlanMoney;
 
 extern LONG g_pUpgradeCosts[10];
 extern UWORD g_pDinoDepths[DEFS_QUEST_DINO_BONE_COUNT];
+extern UWORD g_pGateDepths[DEFS_QUEST_GATE_PART_COUNT];
 extern UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
 
 extern char **g_pMsgs;
