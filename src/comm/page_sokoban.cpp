@@ -523,9 +523,6 @@ void tLevelState::drawTileAt(UBYTE ubX, UBYTE ubY) {
 
 	UBYTE ubTileOffsetY;
 	switch(Tile) {
-		case tLevelData::tTile::WALL:
-			ubTileOffsetY = 0;
-			break;
 		case tLevelData::tTile::FLOOR:
 			ubTileOffsetY = 1 * 16;
 			break;
@@ -539,6 +536,10 @@ void tLevelState::drawTileAt(UBYTE ubX, UBYTE ubY) {
 			break;
 		case tLevelData::tTile::SLOT:
 			ubTileOffsetY = 4 * 16;
+			break;
+		case tLevelData::tTile::WALL:
+		default:
+			ubTileOffsetY = 0;
 			break;
 	}
 
