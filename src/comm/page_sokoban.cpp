@@ -38,15 +38,17 @@ class tLevelState {
 public:
 	constexpr void load(const tLevelData &rLevelData);
 
-	constexpr const tLevelData &getData() const;
+	constexpr const tLevelData &getData(void) const;
 
-	constexpr bool isSolved() const;
+	constexpr bool isSolved(void) const;
 
 	constexpr bool tryMovePlayer(tDirection eDirection);
 
 	void drawAll(void);
 
 	void drawDirty(void);
+
+	void drawStepCount(void);
 
 private:
 	static constexpr UBYTE s_ubMaxBoxes = 5;
@@ -56,10 +58,14 @@ private:
 	tUbCoordYX m_PlayerPos;
 	UBYTE m_ubSlotCount;
 	UBYTE m_ubDirtyCount;
+	UWORD m_uwStepCount;
 	tUbCoordYX m_pSlotPositions[s_ubMaxBoxes];
 	tUbCoordYX m_pDirtyPositions[s_ubMaxDirty];
 
 	void drawTileAt(UBYTE ubX, UBYTE ubY);
+
+	void drawLevelIndex();
+
 	constexpr bool tryMoveBox(tUbCoordYX BoxPos, tDirection eDirection);
 };
 
@@ -67,6 +73,15 @@ private:
 
 // http://sneezingtiger.com/sokoban/levels/yoshioText.html
 const tLevelData s_pLevels[] = {
+	tLevelData(
+		"####### ",
+		"# . . # ",
+		"# $ $ # ",
+		"#  .   # ",
+		"#  $ ## ",
+		"## @ #  ",
+		" #####  "
+	),
 	tLevelData(
 		" ###### ",
 		"##  . # ",
@@ -275,10 +290,13 @@ const tLevelData s_pLevels[] = {
 		" #######"
 	),
 };
+constexpr UBYTE s_ubLevelCount = ARRAY_SIZE(s_pLevels);
 
 constexpr UBYTE s_ubTileSize = 16;
 tLevelState s_CurrentLevel;
 tBitMap *s_pBmTiles;
+UBYTE s_ubCurrentLevelIndex;
+UBYTE s_isSolved;
 
 //------------------------------------------------------------------ PRIVATE FNS
 
@@ -306,35 +324,58 @@ tUbCoordYX positionMoveInDirection(tUbCoordYX Position, tDirection eDirection) {
 void loadLevel(UBYTE ubIndex) {
 	s_CurrentLevel.load(s_pLevels[ubIndex]);
 	s_CurrentLevel.drawAll();
+	s_isSolved = false;
 }
 
 void pageSokobanProcess(void) {
-	tDirection eDirection = DIRECTION_COUNT;
-	if(commNavUse(DIRECTION_UP)) {
-		eDirection = DIRECTION_UP;
-	}
-	else if(commNavUse(DIRECTION_DOWN)) {
-		eDirection = DIRECTION_DOWN;
-	}
-	else if(commNavUse(DIRECTION_LEFT)) {
-		eDirection = DIRECTION_LEFT;
-	}
-	else if(commNavUse(DIRECTION_RIGHT)) {
-		eDirection = DIRECTION_RIGHT;
-	}
-
-	if(eDirection != DIRECTION_COUNT) {
-		bool isMoved = s_CurrentLevel.tryMovePlayer(eDirection);
-		if(isMoved) {
-			s_CurrentLevel.drawDirty();
+	if(s_isSolved) {
+		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+			if(++s_ubCurrentLevelIndex >= s_ubLevelCount) {
+				s_ubCurrentLevelIndex = 0;
+			}
+			loadLevel(s_ubCurrentLevelIndex);
 		}
 	}
-	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		loadLevel(0);
+	else {
+		tDirection eDirection = DIRECTION_COUNT;
+		if(commNavUse(DIRECTION_UP)) {
+			eDirection = DIRECTION_UP;
+		}
+		else if(commNavUse(DIRECTION_DOWN)) {
+			eDirection = DIRECTION_DOWN;
+		}
+		else if(commNavUse(DIRECTION_LEFT)) {
+			eDirection = DIRECTION_LEFT;
+		}
+		else if(commNavUse(DIRECTION_RIGHT)) {
+			eDirection = DIRECTION_RIGHT;
+		}
+
+		if(eDirection != DIRECTION_COUNT) {
+			bool isMoved = s_CurrentLevel.tryMovePlayer(eDirection);
+			if(isMoved) {
+				s_CurrentLevel.drawDirty();
+				s_CurrentLevel.drawStepCount();
+				if(s_CurrentLevel.isSolved()) {
+					s_isSolved = true;
+					UWORD uwY = tLevelData::s_ubHeight * s_ubTileSize;
+					commErase(0, uwY - 10, COMM_DISPLAY_WIDTH, 10);
+					commDrawText(
+						COMM_DISPLAY_WIDTH / 2, uwY,
+						"Level complete! FIRE to continue",
+						FONT_COOKIE | FONT_BOTTOM | FONT_HCENTER,
+						COMM_DISPLAY_COLOR_TEXT
+					);
+				}
+			}
+		}
+		else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+			loadLevel(s_ubCurrentLevelIndex);
+		}
 	}
 }
 
-void pageSokobanDestroy() {
+void pageSokobanDestroy(void) {
 	bitmapDestroy(s_pBmTiles);
 }
 
@@ -359,6 +400,7 @@ constexpr void tLevelState::load(const tLevelData &rLevelData) {
 	// Initialize metadata
 	m_ubSlotCount = 0;
 	m_ubDirtyCount = 0;
+	m_uwStepCount = 0;
 	for(UBYTE ubY = 0; ubY < tLevelData::s_ubHeight; ++ubY) {
 		for(UBYTE ubX = 0; ubX < tLevelData::s_ubWidth; ++ubX) {
 			switch(rLevelData.m_pTiles[ubX][ubY]) {
@@ -385,7 +427,7 @@ constexpr const tLevelData &tLevelState::getData() const {
 	return m_LevelData;
 }
 
-constexpr bool tLevelState::isSolved() const {
+constexpr bool tLevelState::isSolved(void) const {
 	for(UBYTE i = 0; i < m_ubSlotCount; ++i) {
 		const tUbCoordYX &rBoxPos = m_pSlotPositions[i];
 		if(m_LevelData.m_pTiles[rBoxPos.ubX][rBoxPos.ubY] != tLevelData::tTile::BOX_ON_SLOT) {
@@ -469,6 +511,7 @@ constexpr bool tLevelState::tryMovePlayer(tDirection eDirection) {
 		rOldPlayerTile = tTile::SLOT;
 	}
 	m_PlayerPos = NewPlayerPos;
+	++m_uwStepCount;
 	return true;
 }
 
@@ -508,6 +551,19 @@ void tLevelState::drawTileAt(UBYTE ubX, UBYTE ubY) {
 	);
 }
 
+void tLevelState::drawLevelIndex(void) {
+	char szLevelText[sizeof("Level: 23")];
+	sprintf(szLevelText, "Level: %hhu", s_ubCurrentLevelIndex + 1);
+	commDrawText(COMM_DISPLAY_WIDTH - 60, COMM_DISPLAY_HEIGHT - 10, szLevelText, FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
+}
+
+void tLevelState::drawStepCount(void) {
+	char szStepText[sizeof("Steps: 65535")];
+	sprintf(szStepText, "Steps: %hu", m_uwStepCount);
+	commErase(20, COMM_DISPLAY_HEIGHT - 10, 60, 10);
+	commDrawText(20, COMM_DISPLAY_HEIGHT - 10, szStepText, FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
+}
+
 void tLevelState::drawAll(void) {
 	commEraseAll();
 	for(UBYTE ubY = 0; ubY < tLevelData::s_ubHeight; ++ubY) {
@@ -516,6 +572,9 @@ void tLevelState::drawAll(void) {
 		}
 	}
 
+	drawLevelIndex();
+	drawStepCount();
+	m_uwStepCount = 0;
 	m_ubDirtyCount = 0;
 }
 
@@ -533,6 +592,7 @@ void tLevelState::drawDirty(void) {
 
 
 void pageSokobanCreate(void) {
+	s_ubCurrentLevelIndex = 0;
 	s_pBmTiles = bitmapCreateFromFile("data/soko.bm", 0);
 	commRegisterPage(pageSokobanProcess, pageSokobanDestroy);
 	loadLevel(0);
