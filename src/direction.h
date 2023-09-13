@@ -7,6 +7,10 @@
 
 #include <ace/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum tDirection {
 	DIRECTION_UP,
 	DIRECTION_DOWN,
@@ -19,5 +23,9 @@ typedef enum tDirection {
 static inline UBYTE dirIsVertical(tDirection eDir) {
 	return (eDir < DIRECTION_LEFT);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // INCLUDE_DIRECTION_H

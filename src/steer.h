@@ -8,6 +8,10 @@
 #include <ace/managers/joy.h> // for steerInitJoy() param
 #include "direction.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum tSteerMode {
 	STEER_MODE_JOY_1,
 	STEER_MODE_JOY_2,
@@ -61,5 +65,9 @@ UBYTE steerDirCheck(const tSteer *pSteer, tDirection eDir);
 UBYTE steerDirUse(tSteer *pSteer, tDirection eDir);
 
 tDirection steerGetPressedDir(const tSteer *pSteer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // INCLUDE_STEER_H
