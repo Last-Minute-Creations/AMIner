@@ -22,7 +22,7 @@ struct tLevelData {
 	};
 
 	static constexpr UBYTE s_ubWidth = 8;
-	static constexpr UBYTE s_ubHeight = 8;
+	static constexpr UBYTE s_ubHeight = 7;
 
 	tTile m_pTiles[s_ubWidth][s_ubHeight]; ///< [x, y]
 
@@ -30,7 +30,7 @@ struct tLevelData {
 
 	constexpr tLevelData(
 		const char *pRow1, const char *pRow2, const char *pRow3, const char *pRow4,
-		const char *pRow5, const char *pRow6, const char *pRow7, const char *pRow8
+		const char *pRow5, const char *pRow6, const char *pRow7
 	);
 };
 
@@ -74,8 +74,7 @@ const tLevelData s_pLevels[] = {
 		"# .$  # ",
 		"#  #$## ",
 		"## @ #  ",
-		" #####  ",
-		"        "
+		" #####  "
 	),
 	tLevelData(
 		"####### ",
@@ -84,38 +83,7 @@ const tLevelData s_pLevels[] = {
 		"#   $ # ",
 		"#.$$ ## ",
 		"#  ###  ",
-		"####    ",
-		"        "
-	),
-	tLevelData(
-		"   #### ",
-		"#### @# ",
-		"#  *$ # ",
-		"#     # ",
-		"## .### ",
-		" #$ #   ",
-		" # .#   ",
-		" ####   "
-	),
-	tLevelData(
-		"### ### ",
-		"#.###.# ",
-		"# #  .# ",
-		"# $$ @# ",
-		"#  $  # ",
-		"#  #  # ",
-		"#  #### ",
 		"####    "
-	),
-	tLevelData(
-		"   #### ",
-		"   # @##",
-		"####   #",
-		"#. #$$ #",
-		"#     ##",
-		"#.  $## ",
-		"##.  #  ",
-		" #####  "
 	),
 	tLevelData(
 		"        ",
@@ -124,18 +92,7 @@ const tLevelData s_pLevels[] = {
 		"# $    #",
 		"#  #$# #",
 		"# @ .$ #",
-		"########",
-		"        "
-	),
-	tLevelData(
-		"  ##### ",
-		"###  .# ",
-		"# $ # # ",
-		"# *$  # ",
-		"# .#@ # ",
-		"#    ## ",
-		"#   ##  ",
-		"#####   "
+		"########"
 	),
 	tLevelData(
 		"####### ",
@@ -144,8 +101,7 @@ const tLevelData s_pLevels[] = {
 		"# # $. #",
 		"#   $# #",
 		"####   #",
-		"   #####",
-		"        "
+		"   #####"
 	),
 	tLevelData(
 		"#####   ",
@@ -154,18 +110,7 @@ const tLevelData s_pLevels[] = {
 		"#   @ # ",
 		"# $#  # ",
 		"##   ## ",
-		" #####  ",
-		"        "
-	),
-	tLevelData(
-		"#####   ",
-		"#.  ### ",
-		"# #   # ",
-		"# . # # ",
-		"# $*$ # ",
-		"##@ ### ",
-		" #  #   ",
-		" ####   "
+		" #####  "
 	),
 	tLevelData(
 		"########",
@@ -174,18 +119,7 @@ const tLevelData s_pLevels[] = {
 		"#@$  $.#",
 		"##### $#",
 		"    #  #",
-		"    ####",
-		"        "
-	),
-	tLevelData(
-		"####    ",
-		"#  #    ",
-		"#  #####",
-		"# .*   #",
-		"##$    #",
-		" # #$###",
-		" #. @#  ",
-		" #####  "
+		"    ####"
 	),
 	tLevelData(
 		" #####  ",
@@ -194,17 +128,6 @@ const tLevelData s_pLevels[] = {
 		"#. $.$ #",
 		"##$# ###",
 		" #   #  ",
-		" #####  ",
-		"        "
-	),
-	tLevelData(
-		" #####  ",
-		"##   #  ",
-		"# $# #  ",
-		"# . @## ",
-		"# *   # ",
-		"## #$ # ",
-		" #.  ## ",
 		" #####  "
 	),
 	tLevelData(
@@ -214,28 +137,7 @@ const tLevelData s_pLevels[] = {
 		"# #$ $ #",
 		"#@  #  #",
 		"#####  #",
-		"    ####",
-		"        "
-	),
-	tLevelData(
-		" ###### ",
-		" #  .@##",
-		" #   $.#",
-		" ###*# #",
-		"##     #",
-		"#  $  ##",
-		"#   ### ",
-		"#####   "
-	),
-	tLevelData(
-		" ####   ",
-		" #@ #   ",
-		" #  #   ",
-		"##. ####",
-		"# $$. .#",
-		"#  $ ###",
-		"###  #  ",
-		"  ####  "
+		"    ####"
 	),
 	tLevelData(
 		"#####   ",
@@ -244,8 +146,7 @@ const tLevelData s_pLevels[] = {
 		"# *$  # ",
 		"#  $. # ",
 		"#  @### ",
-		"#####   ",
-		"        "
+		"#####   "
 	),
 	tLevelData(
 		"  ##### ",
@@ -254,18 +155,7 @@ const tLevelData s_pLevels[] = {
 		"###  .# ",
 		"#@ $$ # ",
 		"#  .$ # ",
-		"####### ",
-		"        "
-	),
-	tLevelData(
-		"######  ",
-		"#   @#  ",
-		"# $# ###",
-		"# * $  #",
-		"#   ## #",
-		"##.  . #",
-		" ##   ##",
-		"  ##### "
+		"####### "
 	),
 	tLevelData(
 		"######  ",
@@ -274,8 +164,7 @@ const tLevelData s_pLevels[] = {
 		"#.  $ # ",
 		"# $$#.# ",
 		"###  .# ",
-		"  ##### ",
-		"        "
+		"  ##### "
 	),
 	tLevelData(
 		"        ",
@@ -284,48 +173,7 @@ const tLevelData s_pLevels[] = {
 		"# .  ###",
 		"#   $$ #",
 		"## . $@#",
-		" #######",
-		"        "
-	),
-	tLevelData(
-		" ###### ",
-		"##@.  # ",
-		"# $$* # ",
-		"#  #  ##",
-		"#  #  .#",
-		"#### # #",
-		"   #   #",
-		"   #####"
-	),
-	tLevelData(
-		"    ####",
-		"    #  #",
-		"  ###$.#",
-		"  #  . #",
-		"###  #.#",
-		"# $  $ #",
-		"#   #@ #",
-		"########"
-	),
-	tLevelData(
-		"#####   ",
-		"#  .### ",
-		"# $.. # ",
-		"#  ##$##",
-		"##  #  #",
-		" #$   @#",
-		" #  ####",
-		" ####   "
-	),
-	tLevelData(
-		"  ####  ",
-		"  #  #  ",
-		"  #  ###",
-		"### .. #",
-		"#  $#  #",
-		"#  .$$ #",
-		"#### @ #",
-		"   #####"
+		" #######"
 	),
 	tLevelData(
 		"#####   ",
@@ -334,18 +182,7 @@ const tLevelData s_pLevels[] = {
 		"#  *   #",
 		"###$   #",
 		"  #   .#",
-		"  ######",
-		"        "
-	),
-	tLevelData(
-		"  ######",
-		"### .  #",
-		"# $@#. #",
-		"#  $# ##",
-		"#  *  # ",
-		"##  # # ",
-		" ##   # ",
-		"  ##### "
+		"  ######"
 	),
 	tLevelData(
 		"        ",
@@ -354,8 +191,7 @@ const tLevelData s_pLevels[] = {
 		"#     ##",
 		"#  #$$@#",
 		"#  . *.#",
-		"########",
-		"        "
+		"########"
 	),
 	tLevelData(
 		" #######",
@@ -364,48 +200,7 @@ const tLevelData s_pLevels[] = {
 		"# $$$.##",
 		"# .#  # ",
 		"#  #### ",
-		"####    ",
-		"        "
-	),
-	tLevelData(
-		"########",
-		"#      #",
-		"# # ##*#",
-		"# #@ $ #",
-		"#.$ .  #",
-		"#####  #",
-		"    #  #",
-		"    ####"
-	),
-	tLevelData(
-		" ###### ",
-		" #@   ##",
-		" ##$   #",
-		"### .  #",
-		"# $ #$##",
-		"# .  .# ",
-		"####  # ",
-		"   #### "
-	),
-	tLevelData(
-		"#####   ",
-		"#   ### ",
-		"#  $  # ",
-		"##$$ .# ",
-		" #@ . # ",
-		" ## # # ",
-		"  #  .# ",
-		"  ##### "
-	),
-	tLevelData(
-		"#####   ",
-		"#   ####",
-		"# $$   #",
-		"# .#.  #",
-		"#  ## ##",
-		"#  ##$# ",
-		"# @  .# ",
-		"####### "
+		"####    "
 	),
 	tLevelData(
 		"        ",
@@ -414,38 +209,7 @@ const tLevelData s_pLevels[] = {
 		"# .# ###",
 		"# @$$  #",
 		"# $.   #",
-		"########",
-		"        "
-	),
-	tLevelData(
-		"########",
-		"# @.#  #",
-		"# .$ . #",
-		"#  #$  #",
-		"#  $  ##",
-		"###  ## ",
-		"  #  #  ",
-		"  ####  "
-	),
-	tLevelData(
-		" #######",
-		"##   . #",
-		"# $  $@#",
-		"#.$.####",
-		"#  ##   ",
-		"#  #    ",
-		"#  #    ",
-		"####    "
-	),
-	tLevelData(
-		"######  ",
-		"# .  #  ",
-		"#  #@#  ",
-		"#  $ ## ",
-		"##$#  # ",
-		"#   # # ",
-		"#. *  # ",
-		"####### "
+		"########"
 	),
 	tLevelData(
 		"   #####",
@@ -454,8 +218,7 @@ const tLevelData s_pLevels[] = {
 		"# $ #  #",
 		"# #  $ #",
 		"#   ####",
-		"#####   ",
-		"        "
+		"#####   "
 	),
 	tLevelData(
 		"        ",
@@ -464,8 +227,7 @@ const tLevelData s_pLevels[] = {
 		"# .. $.#",
 		"#  $$ @#",
 		"####   #",
-		"   #####",
-		"        "
+		"   #####"
 	),
 	tLevelData(
 		"    ####",
@@ -474,58 +236,7 @@ const tLevelData s_pLevels[] = {
 		"# $ $ $#",
 		"#   .  #",
 		"### .  #",
-		"  ######",
-		"        "
-	),
-	tLevelData(
-		"########",
-		"#   #  #",
-		"# #.$ $#",
-		"#   $  #",
-		"#####. #",
-		"  #   @#",
-		"  #   .#",
 		"  ######"
-	),
-	tLevelData(
-		"   #### ",
-		"  ##@ ##",
-		" ##  ..#",
-		"## $#$##",
-		"#   $. #",
-		"#  #   #",
-		"#    ###",
-		"######  "
-	),
-	tLevelData(
-		"######  ",
-		"#   @#  ",
-		"# $$####",
-		"# $ .  #",
-		"## #.# #",
-		"#.   # #",
-		"#      #",
-		"########"
-	),
-	tLevelData(
-		"   #### ",
-		"   #  # ",
-		"#### $##",
-		"# @$.  #",
-		"# ##   #",
-		"#   ## #",
-		"#   * .#",
-		"########"
-	),
-	tLevelData(
-		"   #####",
-		"   # @ #",
-		" ###   #",
-		" # $ $##",
-		"## $  # ",
-		"#.  # # ",
-		"#..   # ",
-		"####### "
 	),
 	tLevelData(
 		"   #####",
@@ -534,8 +245,7 @@ const tLevelData s_pLevels[] = {
 		"# #  ###",
 		"# $ $ .#",
 		"####   #",
-		"   #####",
-		"        "
+		"   #####"
 	),
 	tLevelData(
 		"########",
@@ -544,8 +254,7 @@ const tLevelData s_pLevels[] = {
 		"# $.#$ #",
 		"## .   #",
 		" #  ####",
-		" ####   ",
-		"        "
+		" ####   "
 	),
 	tLevelData(
 		"#######",
@@ -554,18 +263,7 @@ const tLevelData s_pLevels[] = {
 		"#*  $@#",
 		"#  #$ #",
 		"#  #  #",
-		"#######",
-		"        "
-	),
-	tLevelData(
-		"####    ",
-		"#. #    ",
-		"# $#    ",
-		"#  #####",
-		"# .$ @ #",
-		"# .$ # #",
-		"###    #",
-		"  ######"
+		"#######"
 	),
 	tLevelData(
 		"########",
@@ -574,19 +272,8 @@ const tLevelData s_pLevels[] = {
 		"# $ @#.#",
 		"##$#.  #",
 		" #    .#",
-		" #######",
-		"        "
+		" #######"
 	),
-	tLevelData(
-		"######  ",
-		"#  . #  ",
-		"#    ###",
-		"# #$$. #",
-		"#.  ## #",
-		"#@$ ## #",
-		"###    #",
-		"  ######"
-	)
 };
 
 constexpr UBYTE s_ubTileSize = 16;
@@ -642,6 +329,9 @@ void pageSokobanProcess(void) {
 			s_CurrentLevel.drawDirty();
 		}
 	}
+	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+		loadLevel(0);
+	}
 }
 
 void pageSokobanDestroy() {
@@ -650,7 +340,7 @@ void pageSokobanDestroy() {
 
 constexpr tLevelData::tLevelData(
 	const char *pRow1, const char *pRow2, const char *pRow3, const char *pRow4,
-	const char *pRow5, const char *pRow6, const char *pRow7, const char *pRow8
+	const char *pRow5, const char *pRow6, const char *pRow7
 ) {
 	for(UBYTE ubX = 0; ubX < s_ubWidth; ++ubX) {
 		m_pTiles[ubX][0] = static_cast<tTile>(pRow1[ubX]);
@@ -660,7 +350,6 @@ constexpr tLevelData::tLevelData(
 		m_pTiles[ubX][4] = static_cast<tTile>(pRow5[ubX]);
 		m_pTiles[ubX][5] = static_cast<tTile>(pRow6[ubX]);
 		m_pTiles[ubX][6] = static_cast<tTile>(pRow7[ubX]);
-		m_pTiles[ubX][7] = static_cast<tTile>(pRow8[ubX]);
 	}
 }
 
@@ -787,6 +476,7 @@ void tLevelState::drawTileAt(UBYTE ubX, UBYTE ubY) {
 	tBitMap *pBuffer = commGetDisplayBuffer();
 	tUwCoordYX sOrigin = commGetOriginDisplay();
 	const auto Tile = s_CurrentLevel.getData().m_pTiles[ubX][ubY];
+	constexpr UBYTE ubOffsX = (COMM_DISPLAY_WIDTH - tLevelData::s_ubWidth * s_ubTileSize) / 2;
 
 	UBYTE ubTileOffsetY;
 	switch(Tile) {
@@ -812,7 +502,7 @@ void tLevelState::drawTileAt(UBYTE ubX, UBYTE ubY) {
 	blitCopy(
 		s_pBmTiles, 0, ubTileOffsetY,
 		pBuffer,
-		sOrigin.uwX + ubX * s_ubTileSize,
+		sOrigin.uwX + ubOffsX + ubX * s_ubTileSize,
 		sOrigin.uwY + ubY * s_ubTileSize,
 		s_ubTileSize, s_ubTileSize, MINTERM_COOKIE
 	);
