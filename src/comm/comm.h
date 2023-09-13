@@ -10,6 +10,10 @@
 #include "direction.h"
 #include "../steer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define COMM_WIDTH (320-64)
 #define COMM_HEIGHT (192)
 // #define COMM_DEBUG
@@ -113,5 +117,9 @@ UBYTE commProcessPage(void);
 extern tBitMap *g_pCommBmFaces;
 extern tBitMap *g_pCommBmSelection;
 extern char **g_pCommPageNames;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _AMINER_COMM_COMM_H_

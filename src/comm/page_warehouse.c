@@ -1,5 +1,6 @@
 #include "page_warehouse.h"
 #include <ace/utils/string.h>
+#include <ace/managers/key.h>
 #include <comm/comm.h>
 #include <comm/button.h>
 #include <comm/page_accounting.h>
@@ -174,6 +175,10 @@ static void redraw(void) {
 }
 
 static void pageWarehouseProcess(void) {
+	if(keyUse(KEY_H)) {
+		commShopChangePage(COMM_SHOP_PAGE_WAREHOUSE, COMM_SHOP_PAGE_SOKOBAN);
+	}
+
 	UBYTE isButtonRefresh = 0;
 	UBYTE ubPosPrev = s_ubPosCurr;
 	if(commNavUse(DIRECTION_UP) && s_ubPosCurr) {

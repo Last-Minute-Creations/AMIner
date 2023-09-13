@@ -5,6 +5,10 @@
 #ifndef AMINER_FACE_ID_H
 #define AMINER_FACE_ID_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Face id.
  * Must be same order as in tMsg enum!
@@ -19,5 +23,9 @@ typedef enum _tFaceId {
 	FACE_ID_AGENT,
 	FACE_ID_COUNT,
 } tFaceId;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // AMINER_FACE_ID_H
