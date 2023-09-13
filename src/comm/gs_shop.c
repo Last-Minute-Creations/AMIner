@@ -234,8 +234,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MAIN:
 		default:
-			// pageOfficeShow();
-			pageSokobanCreate();
+			pageOfficeShow();
 			break;
 	}
 }
@@ -253,6 +252,7 @@ tCommTab commShopPageToTab(tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_MAIN:
 			return COMM_TAB_OFFICE;
 		case COMM_SHOP_PAGE_WAREHOUSE:
+		case COMM_SHOP_PAGE_SOKOBAN:
 			return COMM_TAB_WAREHOUSE;
 		case COMM_SHOP_PAGE_WORKSHOP:
 			return COMM_TAB_WORKSHOP;
