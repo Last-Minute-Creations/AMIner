@@ -28,11 +28,8 @@ void pageMarketCreate(void) {
 	UBYTE ubLineHeight = 8;
 
 	// Create buttons
-	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 2;
-	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 2 * ubLineHeight - buttonGetHeight() + 2;
-	buttonRmAll();
-	buttonAdd(g_pMsgs[MSG_COMM_EXIT], uwBtnX, uwBtnY);
-	buttonSelect(0);
+	buttonInitOk(g_pMsgs[MSG_COMM_EXIT]);
+	buttonDrawAll(commGetDisplayBuffer());
 
 	// Draw all
 	commDrawText(0, uwOffsY, "Mineral: < Silver >", FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT);
@@ -62,7 +59,4 @@ void pageMarketCreate(void) {
 	commDrawText(60, uwOffsY, "1 Moonstone", FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
 	commDrawText(COMM_DISPLAY_WIDTH, uwOffsY, "0", FONT_COOKIE | FONT_LAZY | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT_DARK);
 	uwOffsY += ubLineHeight;
-
-	buttonDrawAll(commGetDisplayBuffer());
-
 }

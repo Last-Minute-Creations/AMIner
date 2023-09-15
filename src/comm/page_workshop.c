@@ -145,13 +145,12 @@ void pageWorkshopCreate(void) {
 	commShopSelectWorkshopPos(0, 1);
 
 	// Buttons
-	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 2;
-	UWORD uwBtnY1 = COMM_DISPLAY_HEIGHT - 3 * buttonGetHeight();
-	UWORD uwBtnY2 = COMM_DISPLAY_HEIGHT - 1 * buttonGetHeight();
-	buttonRmAll();
-	buttonAdd(g_pMsgs[MSG_COMM_BUY], uwBtnX, uwBtnY1);
-	buttonAdd(g_pMsgs[MSG_COMM_EXIT], uwBtnX, uwBtnY2);
+	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 1 * buttonGetHeight();
+	buttonReset(uwBtnY);
+	buttonAdd(g_pMsgs[MSG_COMM_BUY]);
+	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);
 	buttonSelect(0);
+	buttonRowApply();
 	buttonDrawAll(commGetDisplayBuffer());
 	s_isOnExitBtn = 0;
 }

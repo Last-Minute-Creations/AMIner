@@ -132,12 +132,13 @@ static void redraw(void) {
 	}
 
 	// Buttons
-	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 3;
 	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 2 * ubLineHeight - buttonGetHeight() + 2;
-	buttonRmAll();
-	buttonAdd(g_pMsgs[MSG_COMM_CONFIRM], uwBtnX, uwBtnY);
-	buttonAdd(g_pMsgs[MSG_COMM_EXIT], uwBtnX * 2, uwBtnY);
+	buttonReset(uwBtnY);
+	buttonAdd(g_pMsgs[MSG_COMM_CONFIRM]);
+	buttonAdd("Rynek");
+	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);
 	buttonSelect(0);
+	buttonRowApply();
 	buttonDrawAll(pBmDraw);
 
 	char szBfr[40];

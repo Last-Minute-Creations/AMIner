@@ -1,6 +1,7 @@
 #include "button.h"
 #include <string.h>
 #include <ace/utils/font.h>
+#include <ace/utils/string.h>
 #include <comm/comm.h>
 #include "core.h"
 
@@ -19,8 +20,11 @@ static tButton s_pButtons[BUTTON_COUNT_MAX];
 static UBYTE s_ubButtonCount;
 static UBYTE s_ubSelected = BUTTON_INVALID;
 static tButtonPreset s_ePreset;
+static UWORD s_uwY;
 
-void buttonRmAll(void) {
+void buttonReset(UWORD uwY) {
+	s_uwY = uwY;
+
 	for(UBYTE i = BUTTON_COUNT_MAX; i--;) {
 		s_pButtons[i].szName[0] = '\0';
 	}
@@ -29,30 +33,29 @@ void buttonRmAll(void) {
 	s_ePreset = BUTTON_PRESET_CUSTOM;
 }
 
-UBYTE buttonAdd(const char *szName, UWORD uwX, UWORD uwY) {
-	for(UBYTE i = 0; i < BUTTON_COUNT_MAX; ++i) {
-		if(s_pButtons[i].szName[0] == '\0') {
-			strcpy(s_pButtons[i].szName, szName);
-			s_pButtons[i].sPos.uwX = uwX;
-			s_pButtons[i].sPos.uwY = uwY;
-			s_ePreset = BUTTON_PRESET_CUSTOM;
-			++s_ubButtonCount;
-			return i;
-		}
+UBYTE buttonAdd(const char *szName) {
+	if(s_ubButtonCount >= BUTTON_COUNT_MAX) {
+		return BUTTON_INVALID;
 	}
-	return BUTTON_INVALID;
+
+	UBYTE ubButtonIndex = s_ubButtonCount++;
+	tButton *pButton = &s_pButtons[ubButtonIndex];
+	strcpy(pButton->szName, szName);
+	pButton->uwWidth = buttonGetWidth(ubButtonIndex);
+	pButton->uwPosX = 0;
+	s_ePreset = BUTTON_PRESET_CUSTOM;
+	return ubButtonIndex;
 }
 
 void buttonDraw(UBYTE ubIdx, tBitMap *pBfr) {
 	UBYTE ubColor = (
 		ubIdx == s_ubSelected ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
-	tUwCoordYX sSize = fontMeasureText(g_pFont, s_pButtons[ubIdx].szName);
-	sSize.uwX += (BORDER_LR_DEPTH + TEXT_PADDING_X) * 2;
-	sSize.uwY = buttonGetHeight();
+	const tButton *pButton = &s_pButtons[ubIdx];
+	tUwCoordYX sSize = {.uwX = pButton->uwWidth, .uwY = buttonGetHeight()};
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
-	UWORD uwBtnX = s_pButtons[ubIdx].sPos.uwX - sSize.uwX / 2;
-	UWORD uwBtnY = s_pButtons[ubIdx].sPos.uwY - TEXT_PADDING_Y;
+	UWORD uwBtnX = pButton->uwPosX;
+	UWORD uwBtnY = s_uwY - TEXT_PADDING_Y;
 	blitRect( // left line
 		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY, 1, sSize.uwY, ubColor
 	);
@@ -79,15 +82,28 @@ void buttonDraw(UBYTE ubIdx, tBitMap *pBfr) {
 	);
 	commDrawText(
 		uwBtnX + 3, uwBtnY - TEXT_CAP_POS + TEXT_PADDING_Y,
-		s_pButtons[ubIdx].szName, FONT_COOKIE, ubColor
+		pButton->szName, FONT_COOKIE, ubColor
 	);
 }
 
+void buttonRowApply(void) {
+	// Get free horizontal space
+	UWORD uwFreeSpace = COMM_DISPLAY_WIDTH;
+	for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
+		uwFreeSpace -= s_pButtons[i].uwWidth;
+	}
+	UBYTE ubPad = uwFreeSpace / (s_ubButtonCount + 1);
+
+	// Spread buttons evenly
+	UWORD uwOffsX = ubPad;
+	for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
+		s_pButtons[i].uwPosX = uwOffsX;
+		uwOffsX += s_pButtons[i].uwWidth + ubPad;
+	}
+}
+
 void buttonDrawAll(tBitMap *pBfr) {
-	for(UBYTE i = 0; i < BUTTON_COUNT_MAX; ++i) {
-		if(!s_pButtons[i].szName[0]) {
-			break;
-		}
+	for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
 		buttonDraw(i, pBfr);
 	}
 }
@@ -108,6 +124,12 @@ UBYTE buttonGetSelected(void) {
 	return s_ubSelected;
 }
 
+UWORD buttonGetWidth(UBYTE ubIndex) {
+	const tButton *pButton = &s_pButtons[ubIndex];
+	UWORD uwWidth = fontMeasureText(g_pFont, pButton->szName).uwX + (BORDER_LR_DEPTH + TEXT_PADDING_X) * 2;
+	return uwWidth;
+}
+
 UBYTE buttonGetHeight(void) {
 	return TEXT_HEIGHT + 2 * TEXT_PADDING_Y;
 }
@@ -119,22 +141,20 @@ tButtonPreset buttonGetPreset(void) {
 void buttonInitAcceptDecline(
 	const char *szTextAccept, const char *szTextDecline
 ) {
-	buttonRmAll();
-	UBYTE ubButtonHeight = buttonGetHeight();
-	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - ubButtonHeight;
-	UWORD uwOffsX = COMM_DISPLAY_WIDTH / 3;
-	buttonAdd(szTextAccept, uwOffsX, uwOffsY);
-
-	uwOffsX *= 2;
-	buttonAdd(szTextDecline, uwOffsX, uwOffsY);
+	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - buttonGetHeight();
+	buttonReset(uwOffsY);
+	buttonAdd(szTextAccept);
+	buttonAdd(szTextDecline);
 	s_ePreset = BUTTON_PRESET_ACCEPT_DECLINE;
 	buttonSelect(0);
+	buttonRowApply();
 }
 
 void buttonInitOk(const char *szText) {
-	buttonRmAll();
 	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - buttonGetHeight();
-	buttonAdd(szText, COMM_DISPLAY_WIDTH / 2, uwOffsY);
+	buttonReset(uwOffsY);
+	buttonAdd(szText);
 	s_ePreset = BUTTON_PRESET_OK;
 	buttonSelect(0);
+	buttonRowApply();
 }

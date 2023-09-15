@@ -15,14 +15,17 @@ typedef enum _tButtonPreset {
 
 typedef struct _tButton {
 	char szName[BUTTON_NAME_MAX];
-	tUwCoordYX sPos; ///< Relative to middle-top position of the button
+	UWORD uwWidth;
+	UWORD uwPosX; ///< Relative to left of button
 } tButton;
 
-void buttonRmAll(void);
+void buttonReset(UWORD uwY);
 
-UBYTE buttonAdd(const char *szName, UWORD uwX, UWORD uwY);
+UBYTE buttonAdd(const char *szName);
 
 void buttonDraw(UBYTE ubIdx, tBitMap *pBfr);
+
+void buttonRowApply(void);
 
 void buttonDrawAll(tBitMap *pBfr);
 
@@ -31,6 +34,8 @@ UBYTE buttonSelect(UBYTE ubIdx);
 UBYTE buttonGetCount(void);
 
 UBYTE buttonGetSelected(void);
+
+UWORD buttonGetWidth(UBYTE ubIndex);
 
 UBYTE buttonGetHeight(void);
 
