@@ -7,6 +7,11 @@
 #define BUTTON_NAME_MAX 20
 #define BUTTON_INVALID 0xFF
 
+typedef enum tButtonLayout {
+	BUTTON_LAYOUT_HORIZONTAL,
+	BUTTON_LAYOUT_VERTICAL,
+} tButtonLayout;
+
 typedef enum _tButtonPreset {
 	BUTTON_PRESET_CUSTOM,
 	BUTTON_PRESET_ACCEPT_DECLINE,
@@ -16,10 +21,10 @@ typedef enum _tButtonPreset {
 typedef struct _tButton {
 	char szName[BUTTON_NAME_MAX];
 	UWORD uwWidth;
-	UWORD uwPosX; ///< Relative to left of button
+	tUwCoordYX sPos; ///< Relative to left of button
 } tButton;
 
-void buttonReset(UWORD uwY);
+void buttonReset(tButtonLayout eLayout, UWORD uwTopY);
 
 UBYTE buttonAdd(const char *szName);
 

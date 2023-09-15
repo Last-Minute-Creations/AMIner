@@ -133,7 +133,7 @@ static void redraw(void) {
 
 	// Buttons
 	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 2 * ubLineHeight - buttonGetHeight() + 2;
-	buttonReset(uwBtnY);
+	buttonReset(BUTTON_LAYOUT_HORIZONTAL, uwBtnY);
 	buttonAdd(g_pMsgs[MSG_COMM_CONFIRM]);
 	buttonAdd("Rynek");
 	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);

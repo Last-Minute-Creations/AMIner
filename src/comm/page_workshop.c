@@ -145,8 +145,8 @@ void pageWorkshopCreate(void) {
 	commShopSelectWorkshopPos(0, 1);
 
 	// Buttons
-	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 1 * buttonGetHeight();
-	buttonReset(uwBtnY);
+	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 2 * (buttonGetHeight() + 2);
+	buttonReset(BUTTON_LAYOUT_VERTICAL, uwBtnY);
 	buttonAdd(g_pMsgs[MSG_COMM_BUY]);
 	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);
 	buttonSelect(0);

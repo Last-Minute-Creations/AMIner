@@ -20,10 +20,12 @@ static tButton s_pButtons[BUTTON_COUNT_MAX];
 static UBYTE s_ubButtonCount;
 static UBYTE s_ubSelected = BUTTON_INVALID;
 static tButtonPreset s_ePreset;
-static UWORD s_uwY;
+static UWORD s_uwTopY;
+static tButtonLayout s_eLayout;
 
-void buttonReset(UWORD uwY) {
-	s_uwY = uwY;
+void buttonReset(tButtonLayout eLayout, UWORD uwTopY) {
+	s_uwTopY = uwTopY;
+	s_eLayout = eLayout;
 
 	for(UBYTE i = BUTTON_COUNT_MAX; i--;) {
 		s_pButtons[i].szName[0] = '\0';
@@ -42,7 +44,7 @@ UBYTE buttonAdd(const char *szName) {
 	tButton *pButton = &s_pButtons[ubButtonIndex];
 	strcpy(pButton->szName, szName);
 	pButton->uwWidth = buttonGetWidth(ubButtonIndex);
-	pButton->uwPosX = 0;
+	pButton->sPos.ulYX = 0;
 	s_ePreset = BUTTON_PRESET_CUSTOM;
 	return ubButtonIndex;
 }
@@ -54,8 +56,8 @@ void buttonDraw(UBYTE ubIdx, tBitMap *pBfr) {
 	const tButton *pButton = &s_pButtons[ubIdx];
 	tUwCoordYX sSize = {.uwX = pButton->uwWidth, .uwY = buttonGetHeight()};
 	const tUwCoordYX sOrigin = commGetOriginDisplay();
-	UWORD uwBtnX = pButton->uwPosX;
-	UWORD uwBtnY = s_uwY - TEXT_PADDING_Y;
+	UWORD uwBtnX = pButton->sPos.uwX;
+	UWORD uwBtnY = pButton->sPos.uwY - TEXT_PADDING_Y;
 	blitRect( // left line
 		pBfr, sOrigin.uwX + uwBtnX, sOrigin.uwY + uwBtnY, 1, sSize.uwY, ubColor
 	);
@@ -87,18 +89,28 @@ void buttonDraw(UBYTE ubIdx, tBitMap *pBfr) {
 }
 
 void buttonRowApply(void) {
-	// Get free horizontal space
-	UWORD uwFreeSpace = COMM_DISPLAY_WIDTH;
-	for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
-		uwFreeSpace -= s_pButtons[i].uwWidth;
-	}
-	UBYTE ubPad = uwFreeSpace / (s_ubButtonCount + 1);
+	if(s_eLayout == BUTTON_LAYOUT_HORIZONTAL) {
+		// Get free horizontal space
+		UWORD uwFreeSpace = COMM_DISPLAY_WIDTH;
+		for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
+			uwFreeSpace -= s_pButtons[i].uwWidth;
+		}
+		UBYTE ubPad = uwFreeSpace / (s_ubButtonCount + 1);
 
-	// Spread buttons evenly
-	UWORD uwOffsX = ubPad;
-	for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
-		s_pButtons[i].uwPosX = uwOffsX;
-		uwOffsX += s_pButtons[i].uwWidth + ubPad;
+		// Spread buttons evenly
+		UWORD uwOffsX = ubPad;
+		for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
+			s_pButtons[i].sPos = (tUwCoordYX){ .uwX = uwOffsX, .uwY = s_uwTopY };
+			uwOffsX += s_pButtons[i].uwWidth + ubPad;
+		}
+	}
+	else {
+		for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
+			s_pButtons[i].sPos = (tUwCoordYX){
+				.uwX = (COMM_DISPLAY_WIDTH - s_pButtons[i].uwWidth) / 2,
+				.uwY = s_uwTopY + i * (buttonGetHeight() + 2)
+			};
+		}
 	}
 }
 
@@ -142,7 +154,7 @@ void buttonInitAcceptDecline(
 	const char *szTextAccept, const char *szTextDecline
 ) {
 	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - buttonGetHeight();
-	buttonReset(uwOffsY);
+	buttonReset(BUTTON_LAYOUT_HORIZONTAL, uwOffsY);
 	buttonAdd(szTextAccept);
 	buttonAdd(szTextDecline);
 	s_ePreset = BUTTON_PRESET_ACCEPT_DECLINE;
@@ -152,7 +164,7 @@ void buttonInitAcceptDecline(
 
 void buttonInitOk(const char *szText) {
 	UWORD uwOffsY = COMM_DISPLAY_HEIGHT - buttonGetHeight();
-	buttonReset(uwOffsY);
+	buttonReset(BUTTON_LAYOUT_HORIZONTAL, uwOffsY);
 	buttonAdd(szText);
 	s_ePreset = BUTTON_PRESET_OK;
 	buttonSelect(0);
