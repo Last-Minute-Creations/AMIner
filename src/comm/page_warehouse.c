@@ -25,6 +25,7 @@ static UBYTE s_pMineralsOnList[MINERAL_TYPE_COUNT];
 static UWORD s_pTmpSell[MINERAL_TYPE_COUNT];
 static UWORD s_pTmpPlan[MINERAL_TYPE_COUNT];
 static UWORD s_pTmpStock[MINERAL_TYPE_COUNT];
+static UBYTE s_ubButtonCurrent;
 
 static UBYTE getMineralsOnList(UBYTE *pMineralsOnList) {
 	UBYTE ubCount = 0;
@@ -132,12 +133,14 @@ static void redraw(void) {
 	}
 
 	// Buttons
-	UWORD uwBtnX = COMM_DISPLAY_WIDTH / 3;
 	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 2 * ubLineHeight - buttonGetHeight() + 2;
-	buttonRmAll();
-	buttonAdd(g_pMsgs[MSG_COMM_CONFIRM], uwBtnX, uwBtnY);
-	buttonAdd(g_pMsgs[MSG_COMM_EXIT], uwBtnX * 2, uwBtnY);
-	buttonSelect(0);
+	s_ubButtonCurrent = 0;
+	buttonReset(BUTTON_LAYOUT_HORIZONTAL, uwBtnY);
+	buttonAdd(g_pMsgs[MSG_COMM_CONFIRM]);
+	buttonAdd(g_pMsgs[MSG_COMM_MARKET]);
+	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);
+	buttonSelect(s_ubButtonCurrent);
+	buttonRowApply();
 	buttonDrawAll(pBmDraw);
 
 	char szBfr[40];
@@ -177,6 +180,7 @@ static void redraw(void) {
 static void pageWarehouseProcess(void) {
 	if(keyUse(KEY_H)) {
 		commShopChangePage(COMM_SHOP_PAGE_WAREHOUSE, COMM_SHOP_PAGE_SOKOBAN);
+		return;
 	}
 
 	UBYTE isButtonRefresh = 0;
@@ -197,12 +201,13 @@ static void pageWarehouseProcess(void) {
 		if(s_ubPosCurr < s_ubPosCount) {
 			drawRow(s_ubPosCurr);
 			if(ubPosPrev >= s_ubPosCount) {
-				buttonSelect(BUTTON_INVALID);
+				buttonDeselectAll();
 				isButtonRefresh = 1;
 			}
 		}
 		else {
-			buttonSelect(0);
+			s_ubButtonCurrent = 0;
+			buttonSelect(s_ubButtonCurrent);
 			isButtonRefresh = 1;
 		}
 	}
@@ -226,15 +231,22 @@ static void pageWarehouseProcess(void) {
 	else {
 		// Navigation between buttons
 		if(commNavUse(DIRECTION_RIGHT)) {
-			buttonSelect(1);
-			isButtonRefresh = 1;
+			if(s_ubButtonCurrent < 2) {
+				++s_ubButtonCurrent;
+				buttonSelect(s_ubButtonCurrent);
+				isButtonRefresh = 1;
+			}
 		}
 		else if(commNavUse(DIRECTION_LEFT)) {
-			buttonSelect(0);
-			isButtonRefresh = 1;
+			if(s_ubButtonCurrent > 0) {
+				--s_ubButtonCurrent;
+				buttonSelect(s_ubButtonCurrent);
+				isButtonRefresh = 1;
+			}
 		}
 		else if(ubPosPrev < s_ubPosCount) {
-			buttonSelect(0);
+			s_ubButtonCurrent = 0;
+			buttonSelect(s_ubButtonCurrent);
 			isButtonRefresh = 1;
 		}
 	}
@@ -271,6 +283,10 @@ static void pageWarehouseProcess(void) {
 				redraw();
 			} break;
 			case 1:
+				// Market
+				commShopChangePage(COMM_SHOP_PAGE_WAREHOUSE, COMM_SHOP_PAGE_MARKET);
+				return;
+			case 2:
 				// Exit
 				commRegisterPage(0, 0);
 				return;

@@ -16,6 +16,7 @@
 #include <comm/page_questioning.h>
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
+#include <comm/page_market.h>
 #include "core.h"
 #include "dino.h"
 #include "game.h"
@@ -231,6 +232,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_SOKOBAN:
 			pageSokobanCreate();
+			break;
+		case COMM_SHOP_PAGE_MARKET:
+			pageMarketCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MAIN:
 		default:

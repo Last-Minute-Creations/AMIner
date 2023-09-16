@@ -91,7 +91,6 @@ void pageQuestioningCreate(void) {
 	uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
 
 	buttonInitAcceptDecline("Tell the truth", "Lie");
-
 	buttonDrawAll(commGetDisplayBuffer());
 }
 
