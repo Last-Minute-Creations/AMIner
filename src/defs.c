@@ -61,8 +61,11 @@ const char * s_pLangDom[] = {
 	[MSG_COMM_BUY] = "shop.buy",
 	[MSG_COMM_EXIT] = "shop.exit",
 	[MSG_COMM_CONFIRM] = "shop.confirm",
+	[MSG_COMM_MARKET] = "shop.market",
 	[MSG_COMM_ALREADY_MAX] = "shop.alreadyMax",
 	[MSG_COMM_ALREADY_FULL] = "shop.alreadyFull",
+	[MSG_COMM_MARKET_TRADE_COL] = "market.tradeCol",
+	[MSG_COMM_MARKET_FOR_COL] = "market.forCol",
 	// Challenge
 	[MSG_CHALLENGE_CHECKPOINT] = "challenge.checkpoint",
 	[MSG_CHALLENGE_TELEPORT] = "challenge.teleport",

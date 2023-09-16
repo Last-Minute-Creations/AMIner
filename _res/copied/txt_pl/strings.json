@@ -106,8 +106,13 @@
 		"buy": "Kup",
 		"exit": "Wyjdź",
 		"confirm": "Zatwierdź",
+		"market": "Giełda",
 		"alreadyMax": "you already have max level!",
 		"alreadyFull": "you're already full!"
+	},
+	"market": {
+		"tradeCol": "Wymień...",
+		"forCol": "Za..."
 	},
 	"hud": {
 		"p1": "Gracz 1",
