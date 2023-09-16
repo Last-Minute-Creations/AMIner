@@ -36,6 +36,8 @@ void buttonDrawAll(tBitMap *pBfr);
 
 UBYTE buttonSelect(UBYTE ubIdx);
 
+void buttonDeselectAll(void);
+
 UBYTE buttonGetCount(void);
 
 UBYTE buttonGetSelected(void);

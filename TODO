@@ -23,7 +23,8 @@ General:
 	☐ Initial loading screen
 		✔ Progress bar @done(23-09-09 11:28)
 		☐ News?
-	☐ Sokoban easter egg
+	✔ Sokoban easter egg code @done(23-09-16 11:27)
+	☐ Figure out where to hide sokoban and how to hint it
 
 Simulator:
 	✔ Basic view of mine @done(23-04-07 13:44)
@@ -79,7 +80,7 @@ Commrade:
 Optimizations:
 	✔ Comm message page loading @done(23-09-07 21:57)
 	✔ Mine generation progress bar @done(23-09-08 15:37)
-	☐ Font drawing - quasi-register values inside font file
+	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 
 Main quest:

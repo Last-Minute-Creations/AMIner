@@ -198,7 +198,7 @@ static void pageWarehouseProcess(void) {
 		if(s_ubPosCurr < s_ubPosCount) {
 			drawRow(s_ubPosCurr);
 			if(ubPosPrev >= s_ubPosCount) {
-				buttonSelect(BUTTON_INVALID);
+				buttonDeselectAll();
 				isButtonRefresh = 1;
 			}
 		}

@@ -31,7 +31,7 @@ void buttonReset(tButtonLayout eLayout, UWORD uwTopY) {
 		s_pButtons[i].szName[0] = '\0';
 	}
 	s_ubButtonCount = 0;
-	s_ubSelected = BUTTON_INVALID;
+	buttonDeselectAll();
 	s_ePreset = BUTTON_PRESET_CUSTOM;
 }
 
@@ -118,6 +118,10 @@ void buttonDrawAll(tBitMap *pBfr) {
 	for(UBYTE i = 0; i < s_ubButtonCount; ++i) {
 		buttonDraw(i, pBfr);
 	}
+}
+
+void buttonDeselectAll(void) {
+	s_ubSelected = BUTTON_INVALID;
 }
 
 UBYTE buttonSelect(UBYTE ubIdx) {
