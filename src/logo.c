@@ -271,6 +271,11 @@ void langWait(void) {
 		}
 		drawLangNames();
 	}
+
+	// HACK: auto-choose language
+	s_eLangCurr = LANGUAGE_PL;
+	s_isAnyPressed = 1;
+
 	if(s_isAnyPressed) {
 		coreSetLangPrefix(s_pLanguagePrefixes[s_eLangCurr]);
 		s_ubState = STATE_FADE_OUT;
