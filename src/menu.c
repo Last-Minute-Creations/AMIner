@@ -525,6 +525,7 @@ static void menuProcessSelecting(void) {
 	}
 	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		menuListEnter();
+		return;
 	}
 
 	if(ubNewKey) {

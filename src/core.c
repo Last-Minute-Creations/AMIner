@@ -28,11 +28,13 @@
 #include "collectibles.h"
 #include "progress_bar.h"
 #include "assets.h"
+#include "bob_sequence.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
 #define CORE_INIT_BAR_HEIGHT 10
 #define CORE_INIT_BAR_BORDER_DISTANCE 2
+#define DRIP_ANIM_LENGTH 11
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
@@ -41,6 +43,9 @@ static UWORD *s_pColorBg;
 static tView *s_pView;
 static tVPort *s_pVpMain;
 static const char *s_szLangPrefix;
+static tBitMap *s_pDripBitmap;
+static tBitMap *s_pDripMask;
+static tBobAnimFrame s_pDripFrames[DRIP_ANIM_LENGTH];
 
 static const tProgressBarConfig s_sProgressBarConfig = {
 	.sBarPos = {
@@ -62,6 +67,24 @@ static void mainPaletteProcess(UBYTE ubFadeLevel) {
 	}
 }
 
+static void coreBobSequencesCreate(void) {
+	s_pDripMask = bitmapCreate(16, 20, GAME_BPP, BMF_INTERLEAVED);
+	blitRect(s_pDripMask, 0, 0, 16, 20, (1 << GAME_BPP) - 1);
+	bobSequenceReset(s_pDripMask->Planes[0]);
+
+	s_pDripBitmap = bitmapCreateFromFile("data/bg_factory_drip.bm", 0);
+	for(UBYTE i = 0; i < DRIP_ANIM_LENGTH; ++i) {
+		s_pDripFrames[i].pAddrFrame = bobCalcFrameAddress(s_pDripBitmap, i * 20);
+	}
+
+	bobSequenceAdd((tUwRect){.uwX = 32 + 247, .uwY = 233, .uwWidth = 16, .uwHeight = 20}, s_pDripFrames, DRIP_ANIM_LENGTH, 5);
+}
+
+static void coreBobSequencesDestroy(void) {
+	bitmapDestroy(s_pDripMask);
+	bitmapDestroy(s_pDripBitmap);
+}
+
 void coreProcessBeforeBobs(void) {
 	// Undraw all bobs
 	debugColor(0x008);
@@ -70,7 +93,8 @@ void coreProcessBeforeBobs(void) {
 	// Draw pending tiles
 	tileBufferQueueProcess(g_pMainBuffer);
 
-	// Draw collectibles before anything else
+	// Draw collectibles and bg anims before anything else
+	bobSequenceProcess(g_pMainBuffer);
 	collectiblesProcess();
 }
 
@@ -183,6 +207,7 @@ static void coreGsCreate(void) {
 	explosionManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 65);
 	groundLayerCreate(s_pVpMain);
+	coreBobSequencesCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 70);
 	commCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 75);
@@ -240,6 +265,7 @@ static void coreGsDestroy(void) {
 
 	assetsBombMarkersDestroy();
 	explosionManagerDestroy();
+	coreBobSequencesDestroy();
 	langDestroy();
 
   hudDestroy();
