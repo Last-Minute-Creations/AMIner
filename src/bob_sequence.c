@@ -1,77 +1,91 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 #include "bob_sequence.h"
-#include <stdarg.h>
+#include <ace/managers/log.h>
 
-tBobSequence *bobSequenceCreate(
-	tBobSequence *pSeq, UBYTE ubMaxBobs
+#define BOB_SEQUENCE_COUNT_MAX 5
+
+static tBobSequence s_pSequences[BOB_SEQUENCE_COUNT_MAX];
+static UBYTE s_ubSequenceCount;
+static UBYTE s_ubDrawCount;
+static UBYTE s_ubCurrentSequence;
+static UBYTE *s_pFrameMask;
+
+void bobSequenceReset(UBYTE *pFrameMask) {
+	s_ubSequenceCount = 0;
+	s_ubDrawCount = 0;
+	s_ubCurrentSequence = 0;
+	s_pFrameMask = pFrameMask;
+}
+
+void bobSequenceAdd(
+	tUwRect sAnimRect, tBobAnimFrame *pAnimFrames, UBYTE ubAnimLength,
+	UBYTE ubSpeed
 ) {
-	pSeq->ubMaxBobs = ubMaxBobs;
-	pSeq->pAnims = memAllocFast(ubMaxBobs * sizeof(tBobAnim));
-	pSeq->ubBobCount = 0;
-	pSeq->ubSequenceLength = 0;
-	pSeq->ubSeqFrame= 0;
-	pSeq->ubLastFrame = 0;
-}
-
-UBYTE bobSequenceAddBob(
-	tBobSequence *pSeq, tBobNew *pBob, UBYTE ubFrameCount
-) {
-	UBYTE ubBobIdx = pSeq->ubBobCount++;
-	pSeq->pAnims[ubBobIdx].pBob = pBob;
-	pSeq->pAnims[ubBobIdx].ubFrameCount = ubFrameCount;
-	return ubBobIdx;
-}
-
-static void bobSequenceAppendVa(tBobSequence *pSeq, UBYTE ubLength, va_list vaArgs) {
-	for(UBYTE i = 0; i < ubLength; ++i) {
-		pSeq->pSequence[i] = va_arg(vaArgs, int);
+	if(s_ubSequenceCount >= BOB_SEQUENCE_COUNT_MAX) {
+		logWrite("ERR: No more room for sequence %hhu\n", s_ubSequenceCount);
+		return;
 	}
-	pSeq->ubSequenceLength += ubLength;
+	tBobSequence *pSequence = &s_pSequences[s_ubSequenceCount];
+	pSequence->sAnimRect = sAnimRect;
+	pSequence->pAnimFrames = pAnimFrames;
+	pSequence->ubAnimLength = ubAnimLength;
+	pSequence->ubCurrentFrame = 0;
+	pSequence->ubSpeed = ubSpeed;
+	pSequence->ubCurrentCooldown = ubSpeed;
+	pSequence->isDrawnOnce = 0;
+	pSequence->ubWasVisible = 0;
+	bobInit(
+		&pSequence->sBob, sAnimRect.uwWidth, sAnimRect.uwHeight, 0,
+		pAnimFrames[0].pAddrFrame, s_pFrameMask,
+		sAnimRect.uwX, sAnimRect.uwY
+	);
+	logWrite("Added bob sequence %hhu\n", s_ubSequenceCount);
+	++s_ubSequenceCount;
 }
 
-void bobSequenceAppend(tBobSequence *pSeq, UBYTE ubLength, ...) {
-	va_list vaArgs;
-	va_start(vaArgs, ubLength);
-	bobSequenceAppendVa(pSeq, ubLength, vaArgs);
-	va_end(vaArgs);
-}
-
-void bobSequenceSetSequence(tBobSequence *pSeq, UBYTE ubLength, ...) {
-	pSeq->ubSequenceLength = 0;
-	va_list vaArgs;
-	va_start(vaArgs, ubLength);
-	bobSequenceAppendVa(pSeq, ubLength, vaArgs);
-	va_end(vaArgs);
-}
-
-void bobSequenceDraw(tBobSequence *pSeq) {
-	UBYTE ubFrame = pSeq->pSequence[pSeq->ubSeqFrame];
-	if(ubFrame == BOB_SEQUENCE_NOP) {
-		ubFrame = pSeq->ubLastFrame;
-	}
-	else {
-		// Increment bob's frame
-		tBobAnim *pAnim = &pSeq->pAnims[ubFrame];
-		bobNewSetBitMapOffset(
-			pAnim->pBob, pAnim->pBob->uwHeight * pAnim->ubFrameIdx
-		);
-		++pAnim->ubFrameIdx;
-		if(pAnim->ubFrameIdx >= pAnim->ubFrameCount) {
-			pAnim->ubFrameIdx = 0;
+void bobSequenceProcess(tTileBufferManager *pBuffer) {
+	UBYTE ubStartSequence = s_ubCurrentSequence;
+	do {
+		tBobSequence *pSequence = &s_pSequences[s_ubCurrentSequence++];
+		if(s_ubCurrentSequence == s_ubSequenceCount) {
+			s_ubCurrentSequence = 0;
 		}
-		pSeq->ubLastFrame = ubFrame;
-	}
 
-	// Push the bob
-	bobNewPush(pSeq->pAnims[ubFrame].pBob);
-
-	// Go to next bob in sequence
-	++pSeq->ubSeqFrame;
-	if(pSeq->ubSeqFrame >= pSeq->ubSequenceLength) {
-		pSeq->ubSeqFrame = 0;
-	}
+		UBYTE isOnBuffer = tileBufferIsRectFullyOnBuffer(
+			pBuffer, pSequence->sAnimRect.uwX, pSequence->sAnimRect.uwY,
+			pSequence->sAnimRect.uwWidth, pSequence->sAnimRect.uwHeight
+		);
+		if(isOnBuffer) {
+			if(!pSequence->ubWasVisible) {
+				pSequence->ubCurrentFrame = 0xFF-1;
+				pSequence->isDrawnOnce = 0;
+				pSequence->ubCurrentCooldown = 1;
+				pSequence->ubWasVisible = 1;
+			}
+			else if(pSequence->isDrawnOnce) {
+				pSequence->isDrawnOnce = 0;
+				bobPush(&pSequence->sBob);
+				break;
+			}
+			else {
+				if(--pSequence->ubCurrentCooldown == 0) {
+					pSequence->ubCurrentCooldown = pSequence->ubSpeed;
+					if(++pSequence->ubCurrentFrame >= pSequence->ubAnimLength) {
+						pSequence->ubCurrentFrame = 0;
+					}
+					const tBobAnimFrame *pAnimFrame = &pSequence->pAnimFrames[pSequence->ubCurrentFrame];
+					bobSetFrame(&pSequence->sBob, pAnimFrame->pAddrFrame, s_pFrameMask);
+					bobPush(&pSequence->sBob);
+					pSequence->isDrawnOnce = 1;
+					break;
+				}
+			}
+		}
+		else {
+			pSequence->ubWasVisible = 0;
+		}
+	} while(s_ubCurrentSequence != ubStartSequence);
 }
-
-void bobSequenceDestroy(tBobSequence *pSeq) {
-	memFree(pSeq->pAnims, pSeq->ubMaxBobs * sizeof(tBobAnim));
-}
-

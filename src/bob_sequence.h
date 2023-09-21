@@ -1,42 +1,38 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 #ifndef _AMINER_BOB_SEQUENCE_H_
 #define _AMINER_BOB_SEQUENCE_H_
 
-#include "bob_new.h"
+#include <ace/managers/bob.h>
+#include <ace/managers/viewport/tilebuffer.h>
 
-#define BOB_SEQUENCE_NOP 0xFF
-#define BOB_SEQUENCE_MAX_LENGTH 200
+#define BOB_SEQUENCE_ANIM_LENGTH_MAX 200
 
-typedef struct _tBobAnim {
-	tBobNew *pBob;
-	UBYTE ubFrameIdx;
-	UBYTE ubFrameCount;
-} tBobAnim;
+typedef struct tBobAnimFrame {
+	UBYTE *pAddrFrame;
+} tBobAnimFrame;
 
 typedef struct _tBobSequence {
-	// Bobs
-	tBobAnim *pAnims;
-	UBYTE ubMaxBobs; ///< Maximum bobs in sequence
-	UBYTE ubBobCount;
-	// The sequence itself
-	UBYTE pSequence[BOB_SEQUENCE_MAX_LENGTH];
-	UBYTE ubSequenceLength; ///< Total sequence length.
-	UBYTE ubSeqFrame; ///< Current sequence frame.
-	UBYTE ubLastFrame; ///< Frame to draw when current frame is NOP
+	tBob sBob;
+	tUwRect sAnimRect;
+	tBobAnimFrame *pAnimFrames;
+	UBYTE ubAnimLength;
+	UBYTE ubCurrentFrame; ///< Current sequence frame.
+	UBYTE ubSpeed; ///< Determines cooldown.
+	UBYTE ubCurrentCooldown;
+	UBYTE ubWasVisible;
+	UBYTE isDrawnOnce;
 } tBobSequence;
 
-tBobSequence *bobSequenceCreate(tBobSequence *pSeq, UBYTE ubMaxBobs);
+void bobSequenceReset(UBYTE *pFrameMask);
 
-void bobSequenceDestroy(tBobSequence *pSeq);
-
-void bobSequenceAppend(tBobSequence *pSeq, UBYTE ubLength, ...);
-
-void bobSequenceSetSequence(tBobSequence *pSeq, UBYTE ubLength, ...);
-
-UBYTE bobSequenceAddBob(
-	tBobSequence *pSeq, tBobNew *pBob, UBYTE ubFrameCount
+void bobSequenceAdd(
+	tUwRect sAnimRect, tBobAnimFrame *pAnimFrames, UBYTE ubAnimLength,
+	UBYTE ubSpeed
 );
 
-void bobSequenceDraw(tBobSequence *pSeq);
-
+void bobSequenceProcess(tTileBufferManager *pBuffer);
 
 #endif // _AMINER_BOB_SEQUENCE_H_
