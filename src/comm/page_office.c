@@ -9,6 +9,7 @@
 #include <comm/page_questioning.h>
 #include <comm/gs_shop.h>
 #include <comm/inbox.h>
+#include <comm/button.h>
 #include "../save.h"
 #include "../heat.h"
 
@@ -53,40 +54,76 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 	commDrawFaceAt(s_pActivePpl[bPos], uwRelativeX, uwRelativeY);
 }
 
+static UBYTE pageOfficeIsSelectionOnButton(UBYTE ubSelection) {
+	return ubSelection == s_ubUnlockedPplCount;
+}
+
 static void pageOfficeProcess(void) {
 	BYTE bOldSelection = s_bSelectionCurr;
 
 	if(commNavUse(DIRECTION_LEFT)) {
-		--s_bSelectionCurr;
+		if(!pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
+			--s_bSelectionCurr;
+		}
 	}
 	else if(commNavUse(DIRECTION_RIGHT)) {
-		++s_bSelectionCurr;
+		if(!pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
+			++s_bSelectionCurr;
+		}
 	}
 	else if(commNavUse(DIRECTION_DOWN)) {
-		s_bSelectionCurr += PPL_PER_ROW;
+		if(pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
+			s_bSelectionCurr = 0;
+		}
+		else {
+			s_bSelectionCurr += PPL_PER_ROW;
+		}
 	}
 	else if(commNavUse(DIRECTION_UP)){
-		s_bSelectionCurr -= PPL_PER_ROW;
+		if(pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
+			--s_bSelectionCurr;
+		}
+		else {
+			s_bSelectionCurr -= PPL_PER_ROW;
+		}
 	}
 
-	while(s_bSelectionCurr < 0) {
-		s_bSelectionCurr += s_ubUnlockedPplCount;
+	if(s_bSelectionCurr < 0) {
+		s_bSelectionCurr = s_ubUnlockedPplCount;
 	}
-
-	while(s_bSelectionCurr >= s_ubUnlockedPplCount) {
-		s_bSelectionCurr -= s_ubUnlockedPplCount;
+	else if(s_bSelectionCurr > s_ubUnlockedPplCount) {
+		s_bSelectionCurr = s_ubUnlockedPplCount;
 	}
 
 	if(s_bSelectionCurr != bOldSelection) {
-		officeDrawFaceAtPos(bOldSelection);
-		officeDrawFaceAtPos(s_bSelectionCurr);
+		if(pageOfficeIsSelectionOnButton(bOldSelection)) {
+			buttonDeselectAll();
+			buttonDrawAll(commGetDisplayBuffer());
+		}
+		else {
+			officeDrawFaceAtPos(bOldSelection);
+		}
+
+		if(pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
+			buttonSelect(0);
+			buttonDrawAll(commGetDisplayBuffer());
+		}
+		else {
+			officeDrawFaceAtPos(s_bSelectionCurr);
+		}
 	}
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		commShopChangePage(
-			COMM_SHOP_PAGE_OFFICE_MAIN,
-			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_pActivePpl[s_bSelectionCurr] - FACE_ID_MIETEK
-		);
+		if(pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
+			commRegisterPage(0, 0);
+			return;
+		}
+		else  {
+			commShopChangePage(
+				COMM_SHOP_PAGE_OFFICE_MAIN,
+				COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_pActivePpl[s_bSelectionCurr] - FACE_ID_MIETEK
+			);
+		}
 	}
 }
 
@@ -97,6 +134,15 @@ void pageOfficeShow(void) {
 	for(tFaceId i = 0; i < s_ubUnlockedPplCount; ++i) {
 		officeDrawFaceAtPos(i);
 	}
+
+	buttonInitOk(g_pMsgs[MSG_COMM_EXIT]);
+	if(pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
+		buttonSelect(0);
+	}
+	else {
+		buttonDeselectAll();
+	}
+	buttonDrawAll(commGetDisplayBuffer());
 }
 
 void pageOfficeReset(void) {
