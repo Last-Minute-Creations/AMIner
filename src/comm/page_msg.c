@@ -140,7 +140,7 @@ static void commMsgDrawCurrentPage(void) {
 }
 
 static void pageMsgProcess(void) {
-	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+	if(commNavExUse(COMM_NAV_EX_BTN_CLICK) || commNavUse(DIRECTION_DOWN)) {
 		if(s_ubCurrPage < s_ubPageCount - 1) {
 			++s_ubCurrPage;
 			commMsgDrawCurrentPage();
@@ -156,10 +156,6 @@ static void pageMsgProcess(void) {
 
 	if(s_ubCurrPage > 0 && commNavUse(DIRECTION_UP)) {
 		--s_ubCurrPage;
-		commMsgDrawCurrentPage();
-	}
-	else if(s_ubCurrPage < s_ubPageCount - 1 && commNavUse(DIRECTION_DOWN)) {
-		++s_ubCurrPage;
 		commMsgDrawCurrentPage();
 	}
 }
