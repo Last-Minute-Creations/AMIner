@@ -7,8 +7,10 @@
 #include <ace/generic/main.h>
 #include <ace/managers/key.h>
 #include <ace/managers/joy.h>
+#include <ace/managers/ptplayer.h>
 #include "logo.h"
 #include "sorry.h"
+#include "assets.h"
 
 tStateManager *g_pGameStateManager;
 
@@ -16,6 +18,13 @@ void genericCreate(void) {
 	keyCreate();
 	joyOpen();
 	g_pGameStateManager = stateManagerCreate();
+
+	// Bare minimum
+	ptplayerCreate(1);
+	ptplayerSetChannelsForPlayer(0b0111);
+	ptplayerSetMasterVolume(8);
+	g_pFont = fontCreate("data/uni54.fnt");
+
 	if(memGetChipSize() < (1024+512) * 1024) {
 		statePush(g_pGameStateManager, &g_sStateSorry);
 	}
@@ -31,6 +40,9 @@ void genericProcess(void) {
 }
 
 void genericDestroy(void) {
+	ptplayerDestroy();
+	fontDestroy(g_pFont);
+
 	stateManagerDestroy(g_pGameStateManager);
 	keyDestroy();
 	joyClose();

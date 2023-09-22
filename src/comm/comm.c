@@ -9,6 +9,7 @@
 #include <ace/managers/key.h>
 #include <ace/utils/chunky.h>
 #include <ace/contrib/managers/audio_mixer.h>
+#include "../assets.h"
 #include "../core.h"
 #include "../game.h"
 #include "../progress_bar.h"

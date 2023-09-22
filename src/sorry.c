@@ -9,13 +9,13 @@
 #include <ace/managers/system.h>
 #include <ace/utils/font.h>
 #include <ace/utils/palette.h>
+#include "assets.h"
 
 #define RGB(r,g,b) ((((r) >> 4) << 8) | (((g) >> 4) << 4) | (((b) >> 4) << 0))
 
 static tView *s_pView;
 static tVPort *s_pVp;
 static tSimpleBufferManager *s_pBfr;
-static tFont *s_pFont;
 
 static void sorryGsCreate(void) {
 logBlockBegin("logoGsCreate()");
@@ -51,20 +51,19 @@ logBlockBegin("logoGsCreate()");
 	);
 	bitmapDestroy(pBitMap);
 
-	s_pFont = fontCreate("data/uni54.fnt");
-	tTextBitMap *pTextBuffer = fontCreateTextBitMap(320, s_pFont->uwHeight);
+	tTextBitMap *pTextBuffer = fontCreateTextBitMap(320, g_pFont->uwHeight);
 	fontDrawStr(
-		s_pFont, s_pBfr->pBack, 160, 128 - 32 - 12,
+		g_pFont, s_pBfr->pBack, 160, 128 - 32 - 12,
 		"Kiedy p\x82""aczesz (bo nie masz ramu), On to widzi",
 		18, FONT_BOTTOM | FONT_HCENTER | FONT_LAZY, pTextBuffer
 	);
 	fontDrawStr(
-		s_pFont, s_pBfr->pBack, 160, 128 + 32 + 12,
+		g_pFont, s_pBfr->pBack, 160, 128 + 32 + 12,
 		"Min. 2MB CHIP RAM, sorry Ci\x84 bardzo!",
 		14, FONT_TOP | FONT_HCENTER | FONT_LAZY, pTextBuffer
 	);
 	fontDrawStr(
-		s_pFont, s_pBfr->pBack, 160, 128 + 32 + 24,
+		g_pFont, s_pBfr->pBack, 160, 128 + 32 + 24,
 		"Press ENTER, SPACE, FIRE or ESCAPE...",
 		14, FONT_TOP | FONT_HCENTER | FONT_LAZY, pTextBuffer
 	);
@@ -88,7 +87,6 @@ static void sorryGsLoop(void) {
 static void sorryGsDestroy(void) {
 	systemUse();
 	viewDestroy(s_pView);
-	fontDestroy(s_pFont);
 }
 
 tState g_sStateSorry = {

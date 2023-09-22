@@ -14,6 +14,7 @@ tPtplayerSamplePack *g_pModSampleData;
 
 tBitMap *g_pBombMarker;
 tBitMap *g_pBombMarkerMask;
+tFont *g_pFont;
 
 void assetsAudioCreate(void) {
 	g_pSfxFlyLoop = ptplayerSfxCreateFromFile("data/sfx/fly_loop.sfx", 1);

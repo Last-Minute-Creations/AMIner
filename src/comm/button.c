@@ -3,7 +3,7 @@
 #include <ace/utils/font.h>
 #include <ace/utils/string.h>
 #include <comm/comm.h>
-#include "core.h"
+#include "assets.h"
 
 #define BUTTON_COUNT_MAX 5
 

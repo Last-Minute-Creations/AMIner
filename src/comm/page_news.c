@@ -3,7 +3,7 @@
 #include <comm/comm.h>
 #include <json/utf8.h>
 #include "../defs.h"
-#include "../core.h"
+#include "../assets.h"
 #include "menu.h"
 
 #define SCROLL_SPEED_SLOW 1

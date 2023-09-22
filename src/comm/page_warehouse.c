@@ -8,7 +8,7 @@
 #include <comm/page_office.h>
 #include <comm/inbox.h>
 #include "../warehouse.h"
-#include "../core.h"
+#include "../assets.h"
 #include "../defs.h"
 #include "../hud.h"
 #include "../game.h"

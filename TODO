@@ -9,6 +9,7 @@ General:
 	✔ Localized commrade buttons @done(23-03-13 20:15)
 	✔ Proper restock zones - currently can restock beneath first base's building @done(23-07-10 18:31)
 	✘ Fix hud disappearing after teleport- can't repro @cancelled(23-09-08 18:28)
+	✔ proper ACE/LMC logo @done(23-09-22 17:50)
 	☐ Animated base elements
 	☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button

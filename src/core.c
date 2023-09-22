@@ -180,9 +180,6 @@ static void coreGsCreate(void) {
 
 	baseCreate(g_pMainBuffer);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 40);
-	ptplayerCreate(1);
-	ptplayerSetChannelsForPlayer(0b0111);
-	ptplayerSetMasterVolume(8);
 	audioMixerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 45);
 	assetsAudioCreate();
@@ -238,6 +235,7 @@ static void coreGsCreate(void) {
 	g_is2pPlaying = 0;
 
 	hudReset(0, 0);
+	fadeMorphTo(FADE_STATE_IN);
 	statePush(g_pGameStateManager, &g_sStateMenu);
 }
 
@@ -254,14 +252,12 @@ static void coreGsDestroy(void) {
 	collectiblesDestroy();
 	baseDestroy();
 	textBobManagerDestroy();
-	fontDestroy(g_pFont);
 	vehicleManagerDestroy();
 	commDestroy();
 	bobManagerDestroy();
 
 	audioMixerDestroy();
 	assetsAudioDestroy();
-	ptplayerDestroy();
 
 	assetsBombMarkersDestroy();
 	explosionManagerDestroy();
@@ -285,7 +281,6 @@ const char * coreGetLangPrefix(void) {
 //---------------------------------------------------------------------- GLOBALS
 
 tTileBufferManager *g_pMainBuffer;
-tFont *g_pFont;
 tRandManager g_sRand;
 
 tState g_sStateCore = {

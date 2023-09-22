@@ -9,7 +9,7 @@
 #include <ace/utils/bitmap.h>
 #include <comm/comm.h>
 #include "defs.h"
-#include "core.h"
+#include "assets.h"
 #include "game.h"
 
 #define SCORE_NAME_LENGTH 20

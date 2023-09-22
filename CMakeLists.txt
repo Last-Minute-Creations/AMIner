@@ -68,11 +68,8 @@ add_custom_command(
 # Palette
 set(palette_aminer_unique "${RES_DIR}/palettes/aminer_editing.gpl")
 file(GLOB palette_aminer_gpl ${RES_DIR}/palettes/aminer.gpl)
-file(GLOB palette_lmc_gpl ${RES_DIR}/palettes/lmc.gpl)
 set(palette_aminer "${DATA_DIR}/aminer.plt")
-set(palette_lmc "${DATA_DIR}/lmc.plt")
 convertPalette(${GAME_EXECUTABLE} ${palette_aminer_gpl} ${palette_aminer})
-convertPalette(${GAME_EXECUTABLE} ${palette_lmc_gpl} ${palette_lmc})
 set(transparency_hex "#993399")
 
 #-------------------------------------------------------------------------- BODY
@@ -311,6 +308,31 @@ convertTileset(
 	${RES_DIR}/bg_anim/factory_drip/10.png
 )
 
+#------------------------------------------------------------------- LOGO ASSETS
+
+# Logo assets
+set(LMC_PLT_PATH ${DATA_DIR}/logo/lmc.plt)
+convertPalette(${GAME_EXECUTABLE} ${RES_DIR}/logo/lmc.gpl ${LMC_PLT_PATH})
+
+convertBitmaps(
+	TARGET ${GAME_EXECUTABLE} PALETTE ${LMC_PLT_PATH}
+	INTERLEAVED SOURCES ${RES_DIR}/logo/lmc.png DESTINATIONS ${DATA_DIR}/logo/lmc.bm
+)
+
+convertBitmaps(
+	TARGET ${GAME_EXECUTABLE} PALETTE ${RES_DIR}/logo/ace.gpl
+	INTERLEAVED SOURCES ${RES_DIR}/logo/ace.png DESTINATIONS ${DATA_DIR}/logo/ace.bm
+)
+
+convertAudio(
+	TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/logo/ace.wav
+	DESTINATION ${DATA_DIR}/logo/ace.sfx
+)
+convertAudio(
+	TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/logo/lmc.wav
+	STRICT DESTINATION ${DATA_DIR}/logo/lmc.sfx
+)
+
 #-------------------------------------------------------- CONVERT TO ACE FORMATS
 
 convertBitmaps(
@@ -325,11 +347,6 @@ convertBitmaps(
 		${DATA_DIR}/hud.bm ${DATA_DIR}/mode_icons.bm ${DATA_DIR}/logo.bm ${DATA_DIR}/lang_select.bm
 		${DATA_DIR}/comm_faces_office.bm ${DATA_DIR}/comm_office_selection.bm ${DATA_DIR}/comm_news.bm
 		${DATA_DIR}/soko.bm ${DATA_DIR}/bg_factory_drip.bm
-)
-
-convertBitmaps(
-	TARGET ${GAME_EXECUTABLE} PALETTE ${palette_lmc}
-	INTERLEAVED SOURCES ${RES_DIR}/lmc.png DESTINATIONS ${DATA_DIR}/lmc.bm
 )
 
 convertBitmaps(
@@ -363,7 +380,7 @@ convertFont(
 )
 
 #--------------------------------------------------------------------------- SFX
-file(MAKE_DIRECTORY ${DATA_DIR}/sfx)
+file(MAKE_DIRECTORY ${DATA_DIR}/sfx ${DATA_DIR}/logo)
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}

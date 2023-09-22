@@ -20,6 +20,7 @@ extern tPtplayerSamplePack *g_pModSampleData;
 
 extern tBitMap *g_pBombMarker;
 extern tBitMap *g_pBombMarkerMask;
+extern tFont *g_pFont;
 
 void assetsAudioCreate(void);
 
