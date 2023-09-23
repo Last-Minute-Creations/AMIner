@@ -184,8 +184,8 @@ void defsInit(void) {
 	// Dino parts
 	UWORD uwIdxDinoDepths = jsonGetDom(pJson, "dinoDepths");
 	UBYTE ubDepthCount = pJson->pTokens[uwIdxDinoDepths].size;
-	if(ubDepthCount != 9) {
-		logWrite("Dino part count mismatch: got %d, expected 9\n", ubDepthCount);
+	if(ubDepthCount != DEFS_QUEST_DINO_BONE_COUNT) {
+		logWrite("ERR: Dino part count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_DINO_BONE_COUNT);
 	}
 	for(UBYTE i = 0; i < ubDepthCount; ++i) {
 		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxDinoDepths, i);
@@ -193,10 +193,10 @@ void defsInit(void) {
 	}
 
 	// Gate parts
-	UWORD uwIdxGateDepths = jsonGetDom(pJson, "dinoDepths");
+	UWORD uwIdxGateDepths = jsonGetDom(pJson, "gateDepths");
 	ubDepthCount = pJson->pTokens[uwIdxGateDepths].size;
-	if(ubDepthCount != 16) {
-		logWrite("Dino part count mismatch: got %d, expected 16\n", ubDepthCount);
+	if(ubDepthCount != DEFS_QUEST_GATE_PART_COUNT) {
+		logWrite("ERR: Gate part count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_GATE_PART_COUNT);
 	}
 	for(UBYTE i = 0; i < ubDepthCount; ++i) {
 		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxGateDepths, i);
