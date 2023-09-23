@@ -28,8 +28,10 @@ static tUbCoordYX s_pPlanFillPattern[DEFS_MINE_DIGGABLE_WIDTH * ROWS_PER_PLAN_MA
 
 //------------------------------------------------------------------ PUBLIC VARS
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverride-init"
 const tTileDef g_pTileDefs[TILE_COUNT] = {
-	{.ubSlots = 0, .ubMineral = MINERAL_TYPE_COUNT},
+	[0 ... TILE_COUNT - 1] = {.ubSlots = 0, .ubMineral = MINERAL_TYPE_COUNT},
 	[TILE_SILVER_1] = {.ubSlots = 1, .ubMineral = MINERAL_TYPE_SILVER},
 	[TILE_SILVER_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_SILVER},
 	[TILE_SILVER_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_SILVER},
@@ -49,6 +51,7 @@ const tTileDef g_pTileDefs[TILE_COUNT] = {
 	[TILE_COAL_2] = {.ubSlots = 2, .ubMineral = MINERAL_TYPE_COAL},
 	[TILE_COAL_3] = {.ubSlots = 3, .ubMineral = MINERAL_TYPE_COAL}
 };
+#pragma GCC diagnostic pop
 
 const tTile g_pMineralToFirstTile[MINERAL_TYPE_COUNT] = {
 	[MINERAL_TYPE_SILVER] = TILE_SILVER_1,
@@ -235,7 +238,7 @@ static void tileGeneratePlanFillPattern(UWORD ubRowsPerPlan) {
 	s_uwPlanFillPatternLength = uwPatternPos;
 
 	// Shuffle pattern
-	while (uwPatternPos--) {
+	while (--uwPatternPos) {
 		UWORD uwOtherPos = randUwMax(&g_sRand, uwPatternPos - 1);
 		tUbCoordYX sTmp = {.uwYX = s_pPlanFillPattern[uwPatternPos].uwYX};
 		s_pPlanFillPattern[uwPatternPos].uwYX = s_pPlanFillPattern[uwOtherPos].uwYX;
@@ -432,18 +435,22 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 							ulPlacedMoney += g_pMinerals[ePlacedMineral].ubReward * ubPlacedAmount;
 							break;
 						}
-						else if (
-							pMineralsRemaining[eExistingTile] > 0 &&
-							g_pTileDefs[eExistingTile].ubSlots < 3
-						) {
-							UBYTE ubDelta = MIN(3 - g_pTileDefs[eExistingTile].ubSlots, pMineralsRemaining[g_pTileDefs[eExistingTile].ubMineral]);
-							tTile eNewTile = eExistingTile + ubDelta - 1;
-							pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
-							pMineralsRemaining[g_pTileDefs[eExistingTile].ubMineral] -= ubDelta;
-							uwTotalMineralsRemaining -= ubDelta;
-							isPlaced = 1;
-							ulPlacedMoney += g_pMinerals[g_pTileDefs[eExistingTile].ubMineral].ubReward * ubDelta;
-							break;
+						else {
+							tMineralType eExistingMineral = g_pTileDefs[eExistingTile].ubMineral;
+							if (
+								eExistingMineral != MINERAL_TYPE_COUNT &&
+								pMineralsRemaining[eExistingMineral] > 0 &&
+								g_pTileDefs[eExistingTile].ubSlots < 3
+							) {
+								UBYTE ubDelta = MIN(3 - g_pTileDefs[eExistingTile].ubSlots, pMineralsRemaining[eExistingMineral]);
+								tTile eNewTile = eExistingTile + ubDelta - 1;
+								pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
+								pMineralsRemaining[eExistingMineral] -= ubDelta;
+								uwTotalMineralsRemaining -= ubDelta;
+								isPlaced = 1;
+								ulPlacedMoney += g_pMinerals[eExistingMineral].ubReward * ubDelta;
+								break;
+							}
 						}
 					} while(uwNextPatternPos != uwStartPatternPos);
 					if(!isPlaced) {
@@ -490,7 +497,6 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 				}
 			}
 		}
-
 
 		// Extra minerals after all plans
 		UWORD pMineralsInFauxPlan[MINERAL_TYPE_COUNT] = {0};
@@ -567,17 +573,21 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 								isPlaced = 1;
 								break;
 							}
-							else if (
-								pMineralsRemaining[eExistingTile] > 0 &&
-								g_pTileDefs[eExistingTile].ubSlots < 3
-							) {
-								UBYTE ubDelta = MIN(3 - g_pTileDefs[eExistingTile].ubSlots, pMineralsRemaining[g_pTileDefs[eExistingTile].ubMineral]);
-								tTile eNewTile = eExistingTile + ubDelta - 1;
-								pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
-								pMineralsRemaining[g_pTileDefs[eExistingTile].ubMineral] -= ubDelta;
-								uwTotalMineralsRemaining -= ubDelta;
-								isPlaced = 1;
-								break;
+							else {
+								tMineralType eExistingMineral = g_pTileDefs[eExistingTile].ubMineral;
+								if (
+									eExistingMineral != MINERAL_TYPE_COUNT &&
+									pMineralsRemaining[eExistingMineral] > 0 &&
+									g_pTileDefs[eExistingTile].ubSlots < 3
+								) {
+									UBYTE ubDelta = MIN(3 - g_pTileDefs[eExistingTile].ubSlots, pMineralsRemaining[eExistingMineral]);
+									tTile eNewTile = eExistingTile + ubDelta - 1;
+									pTiles[sPlacePosition.ubX][pPlanSegmentRows[sPlacePosition.ubY]] = eNewTile;
+									pMineralsRemaining[eExistingMineral] -= ubDelta;
+									uwTotalMineralsRemaining -= ubDelta;
+									isPlaced = 1;
+									break;
+								}
 							}
 						} while(uwNextPatternPos != uwStartPatternPos);
 						if(!isPlaced) {
@@ -638,6 +648,10 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 				else if(TILE_DIRT_1 <= pTiles[uwX][uwY] && pTiles[uwX][uwY] <= TILE_DIRT_2) {
 					cKind = '.';
 					cCount = '.';
+				}
+				else if(TILE_GATE_1 <= pTiles[uwX][uwY] && pTiles[uwX][uwY] <= TILE_GATE_2) {
+					cKind = 'g';
+					cCount = 'g';
 				}
 				pEnd += sprintf(pEnd, "%c%c ", cKind, cCount);
 			}
