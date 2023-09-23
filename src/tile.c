@@ -341,7 +341,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		pTiles[6][220] = TILE_GATE_1;
 		pTiles[7][220] = TILE_GATE_2;
 #else
-		for(UBYTE i = 0; i < DEFS_QUEST_DINO_BONE_COUNT; ++i) {
+		for(UBYTE i = 0; i < DEFS_QUEST_GATE_PART_COUNT; ++i) {
 			tTile eTile = (i & 1) ? TILE_GATE_2 : TILE_GATE_1;
 			if(!tileTryPlaceQuestItemInRow(pTiles, g_pGateDepths[i], eTile)) {
 				logWrite("ERR: Can't find place for gate part #%hhu at row %hu\n", i + 1, g_pGateDepths[i]);

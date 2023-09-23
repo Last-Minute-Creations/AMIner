@@ -29,6 +29,7 @@
 #include "progress_bar.h"
 #include "assets.h"
 #include "bob_sequence.h"
+#include "language.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
@@ -42,7 +43,6 @@ static UWORD *s_pColorBg;
 
 static tView *s_pView;
 static tVPort *s_pVpMain;
-static const char *s_szLangPrefix;
 static tBitMap *s_pDripBitmap;
 static tBitMap *s_pDripMask;
 static tBobAnimFrame s_pDripFrames[DRIP_ANIM_LENGTH];
@@ -164,7 +164,7 @@ static void coreGsCreate(void) {
 
 	defsInit();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 5);
-	langCreate(s_szLangPrefix);
+	langCreate(languageGetPrefix());
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 10);
 	hiScoreLoad();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 15);
@@ -266,16 +266,6 @@ static void coreGsDestroy(void) {
 
   hudDestroy();
   viewDestroy(s_pView);
-}
-
-void coreSetLangPrefix(const char * const szPrefix) {
-	logBlockBegin("coreSetLangPrefix(szPrefix: %s)", szPrefix);
-	s_szLangPrefix = szPrefix;
-	logBlockEnd("coreSetLangPrefix()");
-}
-
-const char * coreGetLangPrefix(void) {
-	return s_szLangPrefix;
 }
 
 //---------------------------------------------------------------------- GLOBALS

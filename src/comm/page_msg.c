@@ -4,6 +4,7 @@
 #include <json/utf8.h>
 #include "../defs.h"
 #include "../core.h"
+#include "../language.h"
 
 #define LINES_MAX 100
 #define LINES_OCCUPIED_BY_FACE 3
@@ -179,7 +180,7 @@ void pageMsgCreate(
 	s_cbOnClose = cbOnClose;
 	s_uwLineCount = 0;
 	char szPath[100];
-	sprintf(szPath, "data/txt_%s/%s.txt", coreGetLangPrefix(), szFile);
+	sprintf(szPath, "data/txt_%s/%s.txt", languageGetPrefix(), szFile);
 	readLines(g_pRemap, szPath, COMM_DISPLAY_WIDTH);
 
 	s_ubCurrPage = 0;

@@ -15,6 +15,7 @@
 #include "fade.h"
 #include "assets.h"
 #include "core.h"
+#include "language.h"
 
 #define FLASH_START_FRAME_A 1
 #define FLASH_START_FRAME_C 10
@@ -27,12 +28,6 @@ typedef enum tStateAce {
 	STATE_ACE_FADE_IN,
 	STATE_ACE_FADE_OUT
 } tStateAce;
-
-typedef enum _tLanguage {
-	LANGUAGE_EN,
-	LANGUAGE_PL,
-	LANGUAGE_COUNT
-} tLanguage;
 
 typedef void (*tCbLogo)(void);
 typedef UBYTE (*tCbFadeOut)(void);
@@ -349,13 +344,8 @@ static void logoAceDestroy(void) {
 //------------------------------------------------------------------------- LANG
 
 static const char *s_pLanguageNames[LANGUAGE_COUNT] = {
-	[LANGUAGE_EN] = "Johnny English",
-	[LANGUAGE_PL] = "Mietek Polisz",
-};
-
-static const char *s_pLanguagePrefixes[LANGUAGE_COUNT] = {
-	[LANGUAGE_EN] = "en",
-	[LANGUAGE_PL] = "pl",
+	[LANGUAGE_ENGLISH] = "Johnny English",
+	[LANGUAGE_POLISH] = "Mietek Polisz",
 };
 
 #define FACE_WIDTH (64)
@@ -443,11 +433,11 @@ void logoLangLoop(void) {
 	}
 
 	// HACK: auto-choose language
-	s_eLangCurr = LANGUAGE_PL;
+	s_eLangCurr = LANGUAGE_POLISH;
 	s_isAnyPressed = 1;
 
 	if(s_isAnyPressed) {
-		coreSetLangPrefix(s_pLanguagePrefixes[s_eLangCurr]);
+		languageSet(s_eLangCurr);
 		fadeMorphTo(FADE_STATE_OUT);
 	}
 }

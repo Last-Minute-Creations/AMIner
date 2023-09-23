@@ -15,10 +15,6 @@ void coreProcessBeforeBobs(void);
 
 void coreProcessAfterBobs(void);
 
-void coreSetLangPrefix(const char * const szPrefix);
-
-const char * coreGetLangPrefix(void);
-
 extern tTileBufferManager *g_pMainBuffer;
 extern tRandManager g_sRand;
 extern tState g_sStateCore;
