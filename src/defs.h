@@ -130,9 +130,9 @@ extern char **g_pMsgs;
 
 void defsInit(void);
 
-void langCreate(const char *szLangPrefix);
+void defsCreateLocale(const char *szLangPrefix);
 
-void langDestroy(void);
+void defsDestroyLocale(void);
 
 extern const tCodeRemap g_pRemap[19];
 

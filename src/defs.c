@@ -244,8 +244,8 @@ void defsInit(void) {
 	jsonDestroy(pJson);
 }
 
-void langCreate(const char *szLangPrefix) {
-	logBlockBegin("langCreate(szLangPrefix: %s)", szLangPrefix);
+void defsCreateLocale(const char *szLangPrefix) {
+	logBlockBegin("defsCreateLocale(szLangPrefix: %s)", szLangPrefix);
 	char szPath[100];
 	sprintf(szPath, "data/txt_%s/strings.json", szLangPrefix);
 	tJson *pJson = jsonCreate(szPath);
@@ -268,11 +268,11 @@ void langCreate(const char *szLangPrefix) {
 	g_pMsgs = stringArrayCreateFromDomElements(pJson, g_pRemap, s_pLangDom);
 
 	jsonDestroy(pJson);
-	logBlockEnd("langCreate()");
+	logBlockEnd("defsCreateLocale()");
 }
 
-void langDestroy(void) {
-	logBlockBegin("langDestroy()");
+void defsDestroyLocale(void) {
+	logBlockBegin("defsDestroyLocale()");
 	stringArrayDestroy(g_pShopNames);
 	stringArrayDestroy(g_pCommPageNames);
 	stringArrayDestroy(g_pWarehouseColNames);
@@ -283,5 +283,5 @@ void langDestroy(void) {
 	stringArrayDestroy(g_pMenuCaptions);
 	stringArrayDestroy(g_pMineralNames);
 	stringArrayDestroy(g_pMsgs);
-	logBlockEnd("langDestroy()");
+	logBlockEnd("defsDestroyLocale()");
 }

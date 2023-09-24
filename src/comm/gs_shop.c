@@ -59,7 +59,7 @@ static void onBackFromLastRebuke(void) {
 }
 
 static void commGsShopCreate(void) {
-	UBYTE isShopShown = commTryShow(gameGetSteers(), 2);
+	UBYTE isShopShown = commTryShow(gameGetSteers(), 2, 0);
 	if(!isShopShown) {
 		// Camera not placed properly
 		statePop(g_pGameStateManager);

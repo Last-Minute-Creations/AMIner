@@ -60,7 +60,7 @@ void commDestroy(void);
 
 void commProcess(void);
 
-UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount);
+UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount, UBYTE isIntro);
 
 void commHide(void);
 

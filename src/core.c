@@ -33,7 +33,7 @@
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
-#define CORE_INIT_BAR_HEIGHT 10
+#define CORE_INIT_BAR_HEIGHT 1
 #define CORE_INIT_BAR_BORDER_DISTANCE 2
 #define DRIP_ANIM_LENGTH 11
 
@@ -125,6 +125,28 @@ void coreProcessAfterBobs(void) {
 	systemIdleEnd();
 }
 
+static void coreVblankHandler(
+	UNUSED_ARG REGARG(volatile tCustom *pCustom, "a0"),
+	UNUSED_ARG REGARG(volatile void *pData, "a1")
+) {
+	if(systemBlitterIsUsed()) {
+		return;
+	}
+
+	static UWORD uwX = 0;
+	static BYTE ubDir = 1;
+
+	blitRect(g_pMainBuffer->pScroll->pFront, uwX, 0, 10, 10, COMM_DISPLAY_COLOR_TEXT_DARK);
+	uwX += 10 * ubDir;
+	if(ubDir == 1 && uwX >= 100) {
+		ubDir = -1;
+	}
+	else if(ubDir == - 1 && uwX <= 0) {
+		ubDir = 1;
+	}
+	blitRect(g_pMainBuffer->pScroll->pFront, uwX, 0, 10, 10, COMM_DISPLAY_COLOR_TEXT);
+}
+
 static void coreGsCreate(void) {
 	// Create bare-minimum display
 	s_pView = viewCreate(0,
@@ -157,14 +179,19 @@ static void coreGsCreate(void) {
 	// Load the view and draw the progress bar
 	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
 	memcpy(pVpHud->pPalette, s_pPaletteRef, sizeof(pVpHud->pPalette));
+	defsCreateLocale(languageGetPrefix());
+	commCreate();
 	viewLoad(s_pView);
+	viewProcessManagers(s_pView);
+	commTryShow(0, 0, 1);
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
 	progressBarInit(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront);
 
+	systemSetInt(INTB_VERTB, &coreVblankHandler, 0);
+
 	defsInit();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 5);
-	langCreate(languageGetPrefix());
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 10);
 	hiScoreLoad();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 15);
@@ -204,9 +231,8 @@ static void coreGsCreate(void) {
 	explosionManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 65);
 	groundLayerCreate(s_pVpMain);
-	coreBobSequencesCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 70);
-	commCreate();
+	coreBobSequencesCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 75);
 	vehicleManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 80);
@@ -221,6 +247,7 @@ static void coreGsCreate(void) {
 	bobReallocateBgBuffers();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 100);
 	systemUnuse();
+	while(1) continue;
 
 	// Prepare for game display
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
@@ -262,7 +289,7 @@ static void coreGsDestroy(void) {
 	assetsBombMarkersDestroy();
 	explosionManagerDestroy();
 	coreBobSequencesDestroy();
-	langDestroy();
+	defsDestroyLocale();
 
   hudDestroy();
   viewDestroy(s_pView);
