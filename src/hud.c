@@ -9,6 +9,7 @@
 #include <ace/utils/string.h>
 #include "defs.h"
 #include "save.h"
+#include "blitter_mutex.h"
 
 #define HUD_COLOR_BG 11
 #define HUD_COLOR_BAR_FULL 14
@@ -303,6 +304,7 @@ void hudCreate(tVPort *pVpHud, const tFont *pFont) {
 	s_ubLineHeight = 7;
 	s_pLineBuffer = fontCreateTextBitMap(s_pHudBuffer->uBfrBounds.uwX, s_pFont->uwHeight);
 
+	blitterMutexLock();
 	fontDrawStr(
 		s_pFont, s_pHudBuffer->pBack, HUD_ORIGIN_X, ROW_1_Y - 3,
 		g_pMsgs[MSG_HUD_P1], HUD_COLOR_BAR_FULL, FONT_LAZY | FONT_COOKIE, s_pLineBuffer
@@ -333,6 +335,7 @@ void hudCreate(tVPort *pVpHud, const tFont *pFont) {
 		FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 	);
 	hudReset(0, 0);
+	blitterMutexUnlock();
 }
 
 UBYTE hudIsShowingMessage(void) {

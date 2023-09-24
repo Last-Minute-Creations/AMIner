@@ -23,6 +23,7 @@
 #include "tile.h"
 #include "explosion.h"
 #include <comm/comm.h>
+#include <comm/page_news.h>
 #include "defs.h"
 #include "settings.h"
 #include "collectibles.h"
@@ -30,6 +31,7 @@
 #include "assets.h"
 #include "bob_sequence.h"
 #include "language.h"
+#include "blitter_mutex.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
@@ -129,22 +131,12 @@ static void coreVblankHandler(
 	UNUSED_ARG REGARG(volatile tCustom *pCustom, "a0"),
 	UNUSED_ARG REGARG(volatile void *pData, "a1")
 ) {
-	if(systemBlitterIsUsed()) {
+	if(systemBlitterIsUsed() || !blitterMutexTryLock()) {
 		return;
 	}
 
-	static UWORD uwX = 0;
-	static BYTE ubDir = 1;
-
-	blitRect(g_pMainBuffer->pScroll->pFront, uwX, 0, 10, 10, COMM_DISPLAY_COLOR_TEXT_DARK);
-	uwX += 10 * ubDir;
-	if(ubDir == 1 && uwX >= 100) {
-		ubDir = -1;
-	}
-	else if(ubDir == - 1 && uwX <= 0) {
-		ubDir = 1;
-	}
-	blitRect(g_pMainBuffer->pScroll->pFront, uwX, 0, 10, 10, COMM_DISPLAY_COLOR_TEXT);
+	commProcessPage();
+	blitterMutexUnlock();
 }
 
 static void coreGsCreate(void) {
@@ -187,6 +179,7 @@ static void coreGsCreate(void) {
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
 	progressBarInit(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront);
+	pageNewsCreate(NEWS_KIND_INTRO_1);
 
 	systemSetInt(INTB_VERTB, &coreVblankHandler, 0);
 
@@ -247,7 +240,33 @@ static void coreGsCreate(void) {
 	bobReallocateBgBuffers();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 100);
 	systemUnuse();
-	while(1) continue;
+
+	blitterMutexLock();
+	blitRect(
+		g_pMainBuffer->pScroll->pFront,
+		s_sProgressBarConfig.sBarPos.uwX - 2, s_sProgressBarConfig.sBarPos.uwY - 2,
+		s_sProgressBarConfig.uwWidth + 4, s_sProgressBarConfig.uwHeight + 4, 0
+	);
+	tTextBitMap *pTextBm = fontCreateTextBitMapFromStr(g_pFont, "Nacisnij przycisk aby pominac");
+	fontDrawTextBitMap(
+		g_pMainBuffer->pScroll->pFront,
+		pTextBm, SCREEN_PAL_WIDTH / 2, s_sProgressBarConfig.sBarPos.uwY,
+		COMM_DISPLAY_COLOR_TEXT, FONT_LAZY | FONT_CENTER
+	);
+	blitterMutexUnlock();
+	fontDestroyTextBitMap(pTextBm);
+
+	while(
+		!keyUse(KEY_RETURN) && !keyUse(KEY_SPACE) &&
+		!keyUse(KEY_LSHIFT) && !keyUse(KEY_RSHIFT) &&
+		!joyUse(JOY1_FIRE) && !joyUse(JOY2_FIRE) && !pageNewsIsDone()
+	) {
+		keyProcess();
+		joyProcess();
+		vPortWaitForEnd(s_pVpMain);
+	}
+	systemSetInt(INTB_VERTB, 0, 0);
+	pageNewsDestroy();
 
 	// Prepare for game display
 	g_pMainBuffer->pCamera->uPos.uwX = 32;

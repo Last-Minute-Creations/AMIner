@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "progress_bar.h"
+#include "blitter_mutex.h"
 #include <ace/managers/blit.h>
 
 static UBYTE s_ubPrevProgressPercent;
@@ -58,10 +59,12 @@ void progressBarAdvance(
 		// Fill
 		UWORD uwPrevPosX = (pConfig->uwWidth * s_ubPrevProgressPercent) / 100;
 		UWORD uwNewPosX = (pConfig->uwWidth * ubProgressPercent) / 100;
+		blitterMutexLock();
 		blitRect(
 			pBuffer, pConfig->sBarPos.uwX + uwPrevPosX, pConfig->sBarPos.uwY,
 			uwNewPosX - uwPrevPosX, pConfig->uwHeight, pConfig->ubColorBar
 		);
+		blitterMutexUnlock();
 
 		s_ubPrevProgressPercent = ubProgressPercent;
 	}
