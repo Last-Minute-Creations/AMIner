@@ -64,6 +64,8 @@ UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount, UBYTE isIntro);
 
 void commHide(void);
 
+UBYTE commIsIntro(void);
+
 UBYTE commIsShown(void);
 
 tBtnState commNavCheck(tDirection eNav);

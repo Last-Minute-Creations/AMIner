@@ -3,6 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "utf8_remap.h"
+#include <json/utf8.h>
+#include <ace/managers/log.h>
+#include <ace/managers/system.h>
+#include <ace/utils/file.h>
 
 char remapChar(const tCodeRemap *pRemap, ULONG ulCodepoint) {
 	if(ulCodepoint < 128) {
@@ -14,4 +18,55 @@ char remapChar(const tCodeRemap *pRemap, ULONG ulCodepoint) {
 		}
 	}
 	return (char)ulCodepoint;
+}
+
+char *remapFile(
+	const char *szFilePath, const tCodeRemap *pRemap,
+	UWORD *pOutAllocSize, UWORD *pOutStringSize
+) {
+	systemUse();
+	// Read whole file to plain buffer
+	tFile *pFilecontents = fileOpen(szFilePath, "r");
+
+	if(!pFilecontents) {
+		logWrite("ERR: Couldn't read contents of '%s'\n", szFilePath);
+		systemUnuse();
+		return 0;
+	}
+
+	UWORD uwRemainingChars = fileGetSize(szFilePath);
+	UWORD uwFileContentsBufferSize = uwRemainingChars + 1;
+	char *szFileContents = memAllocFast(uwFileContentsBufferSize);
+	fileRead(pFilecontents, szFileContents, uwFileContentsBufferSize);
+	fileClose(pFilecontents);
+	systemUnuse();
+
+	// Unicode takes more or same space than ascii - can convert in-place
+	UWORD uwTextLength = 0;
+	ULONG ulCodepoint;
+	ULONG ulState = 0;
+	UWORD uwReadPos = 0;
+	UBYTE ubCharCode;
+	while(uwRemainingChars--) {
+		ubCharCode = szFileContents[uwReadPos++];
+		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
+			continue;
+		}
+
+		if(pRemap) {
+			ubCharCode = remapChar(pRemap, ulCodepoint);
+		}
+		else {
+			ubCharCode = ulCodepoint;
+		}
+
+		szFileContents[uwTextLength++] = ubCharCode;
+	}
+	szFileContents[uwTextLength] = '\0';
+
+	*pOutAllocSize = uwFileContentsBufferSize;
+	if(pOutStringSize) {
+		*pOutStringSize = uwTextLength;
+	}
+	return szFileContents;
 }

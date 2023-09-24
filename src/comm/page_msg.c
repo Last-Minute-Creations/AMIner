@@ -35,44 +35,15 @@ static void readLines(
 	);
 	freeLines();
 
-	// Read whole file to plain buffer
-	tFile *pFileLines = fileOpen(szFilePath, "r");
-
-	if(!pFileLines) {
-		logWrite("ERR: Couldn't read lines from '%s'\n", szFilePath);
-		logBlockEnd("readLines()");
+	UWORD uwFileContentsBufferSize;
+	UWORD uwTextLength;
+	char *szFileContents = remapFile(
+		szFilePath, g_pRemap, &uwFileContentsBufferSize, &uwTextLength
+	);
+	if(!szFileContents) {
 		systemUnuse();
 		return;
 	}
-
-	UWORD uwRemainingChars = fileGetSize(szFilePath);
-	UWORD uwFileContentsBufferSize = uwRemainingChars + 1;
-	char *szFileContents = memAllocFast(uwFileContentsBufferSize);
-	fileRead(pFileLines, szFileContents, uwFileContentsBufferSize);
-	fileClose(pFileLines);
-
-	// Unicode takes more or same space than ascii - can convert in-place
-	UWORD uwTextLength = 0;
-	ULONG ulCodepoint;
-	ULONG ulState = 0;
-	UWORD uwReadPos = 0;
-	UBYTE ubCharCode;
-	while(uwRemainingChars--) {
-		ubCharCode = szFileContents[uwReadPos++];
-		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
-			continue;
-		}
-
-		if(pRemap) {
-			ubCharCode = remapChar(pRemap, ulCodepoint);
-		}
-		else {
-			ubCharCode = ulCodepoint;
-		}
-
-		szFileContents[uwTextLength++] = ubCharCode;
-	}
-	szFileContents[uwTextLength] = '\0';
 
 	// Split text into lines
 	UWORD uwPos = 0;

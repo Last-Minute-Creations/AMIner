@@ -367,6 +367,10 @@ void commHide(void) {
 	);
 }
 
+UBYTE commIsIntro(void) {
+	return s_isIntro;
+}
+
 UBYTE commIsShown(void) {
 	return s_isCommShown;
 }
