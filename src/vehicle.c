@@ -20,6 +20,7 @@
 #include "save.h"
 #include "quest_gate.h"
 #include "assets.h"
+#include "blitter_mutex.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -145,10 +146,12 @@ void vehicleManagerCreate(void) {
 	s_pSmokeFrames = bitmapCreateFromFile("data/smoke.bm", 0);
 	s_pSmokeMask = bitmapCreateFromFile("data/smoke_mask.bm", 0);
 
+	blitterMutexLock();
 	s_pWhiteBody = bitmapCreate(VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, GAME_BPP, BMF_INTERLEAVED);
 	blitRect(s_pWhiteBody, 0, 0, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, COLOR_WHITE);
 	s_pWhiteTool = bitmapCreate(VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, GAME_BPP, BMF_INTERLEAVED);
 	blitRect(s_pWhiteTool, 0, 0, VEHICLE_TOOL_WIDTH, VEHICLE_TOOL_HEIGHT, COLOR_WHITE);
+	blitterMutexUnlock();
 
 	vehicleCreate(&g_pVehicles[0], PLAYER_1);
 	vehicleCreate(&g_pVehicles[1], PLAYER_2);

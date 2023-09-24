@@ -14,4 +14,9 @@ typedef struct tCodeRemap {
 
 char remapChar(const tCodeRemap *pRemapCodes, ULONG ulCodepoint);
 
+char *remapFile(
+	const char *szFilePath, const tCodeRemap *pRemap,
+	UWORD *pOutAllocSize, UWORD *pOutStringSize
+);
+
 #endif // JSON_UTF8_REMAP_H

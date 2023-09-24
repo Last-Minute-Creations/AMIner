@@ -8,9 +8,18 @@
 #include "game.h"
 
 typedef enum tNewsKind {
+	NEWS_KIND_INTRO_1,
+	NEWS_KIND_INTRO_2,
+	NEWS_KIND_INTRO_3,
 	NEWS_KIND_ACCOLADES,
+	NEWS_KIND_COUNT
 } tNewsKind;
 
 void pageNewsCreate(tNewsKind eEnding);
+
+// Use only for initial loading screen!
+void pageNewsDestroy(void);
+
+UBYTE pageNewsIsDone(void);
 
 #endif // _AMINER_COMM_PAGE_NEWS_H_

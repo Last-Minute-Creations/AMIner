@@ -41,6 +41,7 @@ static tPtplayerSfx *s_pSfxKeyRelease[4];
 static UBYTE s_ubSteerCount;
 static tSteer *s_pSteers;
 static const char *s_szPrevProgressText;
+static UBYTE s_isIntro;
 
 static tProgressBarConfig s_sProgressBarConfig = {
 	.sBarPos = {.ulYX = 0},
@@ -213,7 +214,8 @@ void commSetActiveLed(tCommTab eLed) {
 	}
 }
 
-UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount) {
+UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount, UBYTE isIntro) {
+	s_isIntro = isIntro;
 	tUwCoordYX sOrigin = commGetOrigin();
 	if(g_pMainBuffer->uwMarginedHeight - sOrigin.uwX < COMM_HEIGHT) {
 		// Not positioned evenly
@@ -365,6 +367,10 @@ void commHide(void) {
 	);
 }
 
+UBYTE commIsIntro(void) {
+	return s_isIntro;
+}
+
 UBYTE commIsShown(void) {
 	return s_isCommShown;
 }
@@ -383,7 +389,12 @@ tUwCoordYX commGetOrigin(void) {
 
 	tUwCoordYX sOrigin;
 	sOrigin.uwX = uwScrollX + uwCommOffsX;
-	sOrigin.uwY = uwFoldScrollY + uwCommOffsY;
+	if(s_isIntro) {
+		sOrigin.uwY = 0;
+	}
+	else {
+		sOrigin.uwY = uwFoldScrollY + uwCommOffsY;
+	}
 
 	return sOrigin;
 }
@@ -498,7 +509,7 @@ void commEraseAll(void) {
 }
 
 void commProgressInit(void) {
-	if(!commIsShown()) {
+	if(!commIsShown() || s_isIntro) {
 		return;
 	}
 
@@ -512,7 +523,7 @@ void commProgressInit(void) {
 }
 
 void commProgress(UBYTE ubPercent, const char *szDescription) {
-	if(!commIsShown()) {
+	if(!commIsShown() || s_isIntro) {
 		return;
 	}
 

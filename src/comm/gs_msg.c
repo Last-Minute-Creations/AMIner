@@ -22,7 +22,7 @@ static void cbOnClose(void) {
 }
 
 static void commGsMsgCreate(void) {
-	s_isMsgShown = commTryShow(gameGetSteers(), 2);
+	s_isMsgShown = commTryShow(gameGetSteers(), 2, 0);
 	if(!s_isMsgShown) {
 		// Camera not placed properly
 		statePop(g_pGameStateManager);

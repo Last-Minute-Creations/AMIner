@@ -560,7 +560,7 @@ static void menuProcessRollIn(void) {
 		s_eMenuState = MENU_STATE_SELECTING;
 		s_uwOffsY = 16 + s_pLogo->Rows + 30;
 
-		if(!commTryShow(s_pMenuSteers, MENU_STEER_COUNT)) {
+		if(!commTryShow(s_pMenuSteers, MENU_STEER_COUNT, 0)) {
 			// TODO do something
 		}
 		if(s_isScoreShowAfterRollIn) {

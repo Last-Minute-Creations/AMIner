@@ -1,9 +1,11 @@
 #include "page_news.h"
+#include <stdio.h>
 #include <ace/managers/system.h>
 #include <comm/comm.h>
 #include <json/utf8.h>
 #include "../defs.h"
 #include "../assets.h"
+#include "../language.h"
 #include "menu.h"
 
 #define SCROLL_SPEED_SLOW 1
@@ -11,11 +13,20 @@
 #define SCROLL_WIDTH_VISIBLE 160
 #define SCROLL_WIDTH_BUFFER 176
 
-static const char *s_szScroll = "Dzisiaj w godzinach popoludniowych w siedzibie Ministerstwa na uroczystej Gali zostaly wreczone odznaczenia, awanse oraz nominacje na nowe stanowiska w Resorcie. Dyrektorzy kopaln otrzymali odznaki: Zasluzony Przodownik Pracy Socjalistycznej, Zasluzony dla Gornictwa LRD. Wszyscy rowniez otrzymali nowe przydzialy na odcinkach wymagajacych jeszcze wiekszego poswiecenia i zaangazowania. Minister dziekowal zebranym za ofiarna prace i trud w realizacji postawionego celu przekroczenia normy wydobycia o 600%. Celu, ktory udalo sie zrealizowac z nawiazka. Minister wyrazil rowniez nadzieje iz na nowych stanowiskach i w nowych zakladach czlonkowie Resortu stana na wysokosci zadania tak jak robili to dotychczas. Wszystkich nagrodzono gromkimi brawami a nastepnie rozpoczela sie czesc konsumpcyjno - artystyczna. Zabawy i tance w rytm nowoczesnej muzyki granej przez specjalnie w tym celu zaproszone slawy estrady trwaly do bialego rana. Gratulujemy Wam Towarzysze. Jestescie wzorem do nasladowania. Narod jest z Was dumny.";
+static char *s_szScroll;
+static UWORD s_uwScrollBufferLength; ///< Size of allocated buffer with UTF-8 chars
 static tTextBitMap *s_pNewsTextBitmap;
 static const char *s_pCurrentChar;
 static WORD s_wDrawnTextEnd;
 static WORD s_wClearedBgEnd;
+static UBYTE s_isScrollDone;
+
+static const char *s_pNewsFileNames[NEWS_KIND_COUNT] = {
+	[NEWS_KIND_ACCOLADES] = "accolades",
+	[NEWS_KIND_INTRO_1] = "intro_1",
+	[NEWS_KIND_INTRO_2] = "intro_2",
+	[NEWS_KIND_INTRO_3] = "intro_3",
+};
 
 /**
  * @brief Draw characters to fill the void on the right.
@@ -46,7 +57,7 @@ static void pageNewsFillScrollWithText(void) {
 }
 
 static void pageNewsProcess(void) {
-	UBYTE ubSpeed = commNavCheck(DIRECTION_FIRE) ? SCROLL_SPEED_FAST : SCROLL_SPEED_SLOW;
+	UBYTE ubSpeed = SCROLL_SPEED_SLOW; //commNavCheck(DIRECTION_FIRE) ? SCROLL_SPEED_FAST : SCROLL_SPEED_SLOW;
 
 	// Shift scroll contents right
 	tBitMap *pBitmap = s_pNewsTextBitmap->pBitMap;
@@ -84,18 +95,32 @@ static void pageNewsProcess(void) {
 		);
 	}
 	else {
-		commRegisterPage(0, 0);
-		menuGsEnter(0);
+		s_wDrawnTextEnd = 0;
+		s_isScrollDone = 1;
+		if(!commIsIntro()) {
+			commRegisterPage(0, 0);
+			menuGsEnter(0);
+		}
 	}
 }
 
-static void pageNewsDestroy(void) {
+UBYTE pageNewsIsDone(void) {
+	return s_isScrollDone;
+}
+
+void pageNewsDestroy(void) {
 	fontDestroyTextBitMap(s_pNewsTextBitmap);
+	memFree(s_szScroll, s_uwScrollBufferLength);
 }
 
 void pageNewsCreate(tNewsKind eNewsKind) {
 	logBlockBegin("pageNewsCreate(eNewsKind: %d)", eNewsKind);
 	commRegisterPage(pageNewsProcess, pageNewsDestroy);
+
+	char szPath[50];
+	sprintf(szPath, "data/txt_%s/news_%s.txt", languageGetPrefix(), s_pNewsFileNames[eNewsKind]);
+	s_szScroll = remapFile(szPath, g_pRemap, &s_uwScrollBufferLength, 0);
+	s_isScrollDone = 0;
 
 	tUwCoordYX sOrigin = commGetOrigin();
 	tBitMap *pBitmapNews = bitmapCreateFromFile("data/comm_news.bm", 0);
