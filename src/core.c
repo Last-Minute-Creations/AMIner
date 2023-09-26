@@ -139,6 +139,42 @@ static void coreVblankHandler(
 	blitterMutexUnlock();
 }
 
+static void onTileDraw(
+	UNUSED_ARG UWORD uwTileX, UNUSED_ARG UWORD uwTileY,
+	tBitMap *pBitMap, UWORD uwBitMapX, UWORD uwBitMapY
+) {
+	if(!tileIsExcavated(uwTileX, uwTileY)) {
+		return;
+	}
+
+	BYTE bOverlay = -1;
+	if(tileIsSolid(uwTileX, uwTileY - 1)) {
+		bOverlay += 1;
+	}
+
+	if(tileIsSolid(uwTileX, uwTileY + 1)) {
+		bOverlay += 2;
+	}
+
+	if(uwTileX >= 10 || tileIsSolid(uwTileX + 1, uwTileY)) {
+		bOverlay += 4;
+	}
+
+	if(tileIsSolid(uwTileX - 1, uwTileY)) {
+		bOverlay += 8;
+	}
+
+	if(bOverlay >= 0) {
+		// TODO: optimize with custom blitter code
+		blitCopyMask(
+			g_pTileOverlays, 0, (UBYTE)bOverlay * TILE_SIZE,
+			pBitMap, uwBitMapX, uwBitMapY, TILE_SIZE, TILE_SIZE,
+			g_pTileOverlayMasks->Planes[0]
+		);
+		// blitRect(pBitMap, uwBitMapX + 5, uwBitMapY + 5, 20, 20, COMM_DISPLAY_COLOR_TEXT);
+	}
+}
+
 static void coreGsCreate(void) {
 	// Create bare-minimum display
 	s_pView = viewCreate(0,
@@ -165,6 +201,7 @@ static void coreGsCreate(void) {
 		TAG_TILEBUFFER_IS_DBLBUF, 1,
 		TAG_TILEBUFFER_TILE_SHIFT, 5,
 		TAG_TILEBUFFER_REDRAW_QUEUE_LENGTH, 100,
+		TAG_TILEBUFFER_CALLBACK_TILE_DRAW, onTileDraw,
 		TAG_TILEBUFFER_TILESET, s_pTiles,
 	TAG_END);
 
@@ -185,6 +222,7 @@ static void coreGsCreate(void) {
 
 	defsInit();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 5);
+	assetsTileOverlayCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 10);
 	hiScoreLoad();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 15);
@@ -266,7 +304,7 @@ static void coreGsCreate(void) {
 		vPortWaitForEnd(s_pVpMain);
 	}
 	systemSetInt(INTB_VERTB, 0, 0);
-	pageNewsDestroy();
+	commRegisterPage(0, 0);
 
 	// Prepare for game display
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
@@ -306,6 +344,7 @@ static void coreGsDestroy(void) {
 	assetsAudioDestroy();
 
 	assetsBombMarkersDestroy();
+	assetsTileOverlayDestroy();
 	explosionManagerDestroy();
 	coreBobSequencesDestroy();
 	defsDestroyLocale();

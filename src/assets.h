@@ -20,6 +20,8 @@ extern tPtplayerSamplePack *g_pModSampleData;
 
 extern tBitMap *g_pBombMarker;
 extern tBitMap *g_pBombMarkerMask;
+extern tBitMap *g_pTileOverlays;
+extern tBitMap *g_pTileOverlayMasks;
 extern tFont *g_pFont;
 
 void assetsAudioCreate(void);
@@ -29,5 +31,9 @@ void assetsAudioDestroy(void);
 void assetsBombMarkersCreate(void);
 
 void assetsBombMarkersDestroy(void);
+
+void assetsTileOverlayCreate(void);
+
+void assetsTileOverlayDestroy(void);
 
 #endif // ASSETS_H
