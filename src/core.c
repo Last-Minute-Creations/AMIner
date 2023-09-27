@@ -152,16 +152,19 @@ static void onTileDraw(
 		bOverlay += 1;
 	}
 
-	if(tileIsSolid(uwTileX, uwTileY + 1)) {
-		bOverlay += 2;
-	}
+	const tBase *pBase = baseGetCurrent();
+	if(uwTileY < pBase->uwTileDepth || pBase->uwTileDepth + BASE_CAVE_HEIGHT < uwTileY) {
+		if(tileIsSolid(uwTileX, uwTileY + 1)) {
+			bOverlay += 2;
+		}
 
-	if(uwTileX >= 10 || tileIsSolid(uwTileX + 1, uwTileY)) {
-		bOverlay += 4;
-	}
+		if(uwTileX >= 10 || tileIsSolid(uwTileX + 1, uwTileY)) {
+			bOverlay += 4;
+		}
 
-	if(tileIsSolid(uwTileX - 1, uwTileY)) {
-		bOverlay += 8;
+		if(tileIsSolid(uwTileX - 1, uwTileY)) {
+			bOverlay += 8;
+		}
 	}
 
 	if(bOverlay >= 0) {

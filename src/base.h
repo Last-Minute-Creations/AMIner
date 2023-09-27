@@ -14,6 +14,7 @@
  */
 #define BASE_TILE_DEPTH_VARIANT 65535
 #define BASE_PATTERN_HEIGHT 10
+#define BASE_CAVE_HEIGHT 8
 
 typedef enum tBaseId {
 	BASE_ID_GROUND,
