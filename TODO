@@ -15,6 +15,9 @@ General:
 		✔ News? @done(23-09-24 18:06)
 	✔ Sokoban easter egg code @done(23-09-16 11:27)
 	✔ "Transparency" of comm corners @done(23-05-14 09:38)
+	✔ Variance in mine backgrounds @done(23-09-26 18:32)
+		✔ On-the-fly composing background tile with edges @done(23-09-26 18:32)
+		✔ Add extra bg variants (stones) @done(23-09-26 18:32)
 	☐ Animated base elements
 	☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button
@@ -22,9 +25,6 @@ General:
 	✔ Add magma tiles @done(23-03-17 18:03)
 		✔ Hurt while drilling through @done(23-03-17 18:03)
 		☐ Figure out detailed mechanics
-	☐ Variance in mine backgrounds
-		☐ On-the-fly composing background tile with edges
-		☐ Add extra bg variants (stones)
 	☐ Figure out where to hide sokoban and how to hint it
 
 Simulator:
@@ -83,6 +83,7 @@ Optimizations:
 	✔ Mine generation progress bar @done(23-09-08 15:37)
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
+	☐ Excavated ground overlay - custom blitter code
 
 Main quest:
 

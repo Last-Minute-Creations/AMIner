@@ -163,7 +163,7 @@ static void tileGenerateTerrain(
 				uwWhat < (uwChance += uwChanceAir) &&
 				tileIsSolid(uwX - 1, uwY) && tileIsSolid(uwX, uwY - 1)
 			) {
-				pTiles[uwX][uwY] = TILE_CAVE_BG_1+15;
+				pTiles[uwX][uwY] = TILE_CAVE_BG_1;
 			}
 			else if(uwWhat < (uwChance += uwChanceSilver)) {
 				pTiles[uwX][uwY] = (
@@ -204,7 +204,7 @@ static void tileGenerateTerrain(
 				pTiles[uwX][uwY] = TILE_DIRT_1 + ((uwX & 1) ^ (uwY & 1));
 			}
 			// For quick tests
-			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG_1 + 12;
+			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG_1;
 		}
 	}
 }
@@ -247,6 +247,11 @@ static void tileGeneratePlanFillPattern(UWORD ubRowsPerPlan) {
 }
 
 //------------------------------------------------------------------- PUBLIC FNS
+
+UBYTE tileIsExcavated(UWORD uwX, UWORD uwY) {
+	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
+	return TILE_CAVE_BG_1 <= ubTile && ubTile <= TILE_CAVE_BG_STONE_6;
+}
 
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY) {
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwX][uwY];
@@ -693,41 +698,29 @@ UBYTE tileLoad(tFile *pFile) {
 }
 
 void tileExcavate(UWORD uwX, UWORD uwY) {
-	UBYTE ubBg = TILE_CAVE_BG_1;
+	UBYTE ubBg = TILE_CAVE_BG_1 + (randUw(&g_sRand) & 7);
+	if(ubBg >= TILE_CAVE_BG_STONE_6) {
+		// only 0..6 supported right now
+		ubBg = TILE_CAVE_BG_1;
+	};
 
 	// up
-	if(tileIsSolid(uwX, uwY-1)) {
-		ubBg += 1;
-	}
-	else {
-		g_pMainBuffer->pTileData[uwX][uwY-1] -= 2;
+	if(!tileIsSolid(uwX, uwY-1)) {
 		tileBufferInvalidateTile(g_pMainBuffer, uwX, uwY-1);
 	}
 
 	// down
-	if(tileIsSolid(uwX, uwY+1)) {
-		ubBg += 2;
-	}
-	else {
-		g_pMainBuffer->pTileData[uwX][uwY+1] -= 1;
+	if(!tileIsSolid(uwX, uwY+1)) {
 		tileBufferInvalidateTile(g_pMainBuffer, uwX, uwY+1);
 	}
 
 	// right
-	if(uwX >= 10 || tileIsSolid(uwX+1, uwY)) {
-		ubBg += 4;
-	}
-	else if(uwX < 10) {
-		g_pMainBuffer->pTileData[uwX+1][uwY] -= 8;
+	else if(uwX < 10 && !tileIsSolid(uwX+1, uwY)) {
 		tileBufferInvalidateTile(g_pMainBuffer, uwX+1, uwY);
 	}
 
 	// left
-	if(tileIsSolid(uwX-1, uwY)) {
-		ubBg += 8;
-	}
-	else {
-		g_pMainBuffer->pTileData[uwX-1][uwY] -= 4;
+	if(!tileIsSolid(uwX-1, uwY)) {
 		tileBufferInvalidateTile(g_pMainBuffer, uwX-1, uwY);
 	}
 
@@ -745,4 +738,8 @@ void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant) {
 	}
 
 	tileSetBaseTiles(pBaseVariant, pBase->uwTileDepth, 1);
+}
+
+void tileLoadDinoTileset(UBYTE isPopulated) {
+
 }

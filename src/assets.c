@@ -14,6 +14,8 @@ tPtplayerSamplePack *g_pModSampleData;
 
 tBitMap *g_pBombMarker;
 tBitMap *g_pBombMarkerMask;
+tBitMap *g_pTileOverlays;
+tBitMap *g_pTileOverlayMasks;
 tFont *g_pFont;
 
 void assetsAudioCreate(void) {
@@ -52,4 +54,14 @@ void assetsBombMarkersCreate(void) {
 void assetsBombMarkersDestroy(void) {
 	bitmapDestroy(g_pBombMarker);
 	bitmapDestroy(g_pBombMarkerMask);
+}
+
+void assetsTileOverlayCreate(void) {
+	g_pTileOverlays = bitmapCreateFromFile("data/tiles_overlay.bm", 0);
+	g_pTileOverlayMasks = bitmapCreateFromFile("data/tiles_overlay_masks.bm", 0);
+}
+
+void assetsTileOverlayDestroy(void) {
+	bitmapDestroy(g_pTileOverlays);
+	bitmapDestroy(g_pTileOverlayMasks);
 }
