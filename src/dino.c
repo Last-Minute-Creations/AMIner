@@ -30,6 +30,7 @@ static tDinoState s_eQuestState;
 void dinoReset(void) {
 	s_ubDinoBonesFound = 0;
 	s_eQuestState = DINO_STATE_WAITING_FOR_FIRST_BONE;
+	baseUpdateDinoTileset(0);
 	collectibleSetFoundCount(COLLECTIBLE_KIND_DINO, 0);
 }
 
@@ -46,6 +47,8 @@ UBYTE dinoLoad(tFile *pFile) {
 
 	fileRead(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
 	fileRead(pFile, &s_eQuestState, sizeof(s_eQuestState));
+	UBYTE isBasePopulated = s_eQuestState > DINO_STATE_WAITING_FOR_READING_BRIEFING;
+	baseUpdateDinoTileset(isBasePopulated);
 	collectibleSetFoundCount(COLLECTIBLE_KIND_DINO, s_ubDinoBonesFound);
 	return 1;
 }
@@ -69,6 +72,8 @@ void dinoProcess(void) {
 			if(commShopIsActive()) {
 				// TODO: check if on surface?
 				tileReplaceBaseWithVariant(BASE_ID_DINO, BASE_ID_DINO_POPULATED);
+				baseUpdateDinoTileset(1);
+				++s_eQuestState;
 			}
 			break;
 		case DINO_STATE_WAITING_FOR_LAST_BONE:

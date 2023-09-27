@@ -191,6 +191,9 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+	else if(keyUse(KEY_9)) {
+		dinoAddBone();
+	}
 	else if(keyUse(KEY_MINUS)) {
 		gameElapseDay();
 	}
