@@ -33,26 +33,26 @@ static void dynamitePushXY(tDynamite *pDynamite, UWORD uwX, UWORD uwY) {
 
 UBYTE dynamiteTrigger(
 	tDynamite *pDynamite, UWORD uwTileX, UWORD uwTileY, UBYTE ubNewCount,
-	tBombDir eDir
+	tDirection eDir
 ) {
 	if(dynamiteIsActive(pDynamite) || ubNewCount == 0) {
 		return 0;
 	}
 	BYTE bDeltaX = 0, bDeltaY = 0;
 	switch(eDir) {
-		case BOMB_DIR_LEFT:
+		case DIRECTION_LEFT:
 			bDeltaX = -1;
 			break;
-		case BOMB_DIR_RIGHT:
+		case DIRECTION_RIGHT:
 			bDeltaX = 1;
 			break;
-		case BOMB_DIR_UP:
+		case DIRECTION_UP:
 			bDeltaY = -1;
 			break;
-		case BOMB_DIR_DOWN:
+		case DIRECTION_DOWN:
 			bDeltaY = 1;
 			break;
-		case BOMB_DIR_NONE:
+		case DIRECTION_COUNT:
 		default:
 			return 0;
 	}

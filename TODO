@@ -94,9 +94,9 @@ Dino:
 		✔ Base gfx swap after reading intro @done(23-03-08 17:58)
 		✔ Placeholder outro after digging out the last bone @done(23-03-08 17:58)
 		✔ Extra accolade after reading outro @done(23-03-08 17:58)
+	✔ Swap bases with proper gfx @done(23-09-27 16:36)
 	☐ Message for call upon finding subsequent bones
 	☐ Message for final call to receive the accolade
-	☐ Swap bases with proper gfx
 
 Gate quest:
 	☐ Figure out the flow

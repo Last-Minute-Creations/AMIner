@@ -57,10 +57,9 @@ typedef struct _tVehicle {
 	fix16_t fY;
 	fix16_t fDx;
 	fix16_t fDy;
+	UBYTE ubPlayerIdx;
 	UBYTE ubVehicleState;
 	UBYTE isFacingRight;
-	UBYTE ubTrackFrame;
-	fix16_t fTrackAnimCnt;
 	UBYTE ubBodyShakeCnt;
 	UBYTE isJetting;
 	UBYTE ubJetShowFrame;
@@ -74,6 +73,8 @@ typedef struct _tVehicle {
 	fix16_t fDrillDelta;
 	tUwCoordYX sDrillTile;
 	// Anims
+	fix16_t fTrackAnimCnt;
+	UBYTE ubTrackFrame;
 	UBYTE ubSmokeAnimFrame;
 	UBYTE ubSmokeAnimCnt;
 	UBYTE ubTeleportAnimFrame;
@@ -85,15 +86,14 @@ typedef struct _tVehicle {
 	UBYTE uwCargoCurr;
 	UWORD uwCargoScore;
 	UWORD pStock[MINERAL_TYPE_COUNT];
-	// Score, fuel, hull
+	// Cash, drill, hull
 	LONG lCash;
 	UWORD uwDrillCurr;
 	UWORD wHullCurr;
-	UBYTE ubPlayerIdx;
-	UBYTE ubDestructionState;
 	tDynamite sDynamite;
-	// Damage frames
-	UBYTE ubDamageFrames;
+	// Hull damage frames
+	UBYTE ubHullDamageFrame;
+	UBYTE ubDamageBlinkCooldown;
 	UBYTE isChallengeEnded;
 } tVehicle;
 

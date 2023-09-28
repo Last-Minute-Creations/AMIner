@@ -56,7 +56,7 @@ static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 static tUwCoordYX s_sTeleportReturn;
 
 static UBYTE s_pBombCount[2];
-static tBombDir s_pLastDir[2];
+static tDirection s_pLastDir[2];
 static tSteer s_pPlayerSteers[2];
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 static UBYTE s_ubChallengeCamCnt;
@@ -206,7 +206,7 @@ static void gameProcessHotkeys(void) {
 	}
 }
 
-static void addBombInDir(UBYTE ubPlayer, tBombDir eDir, tBombDir eOpposite) {
+static void addBombInDir(UBYTE ubPlayer, tDirection eDir, tDirection eOpposite) {
 	if(s_pLastDir[ubPlayer] == eOpposite && s_pBombCount[ubPlayer]) {
 		// opposite dir
 		--s_pBombCount[ubPlayer];
@@ -226,16 +226,16 @@ static void addBombInDir(UBYTE ubPlayer, tBombDir eDir, tBombDir eOpposite) {
 
 static void gameProcessModeTnt(UBYTE ubPlayer) {
 	if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_LEFT)) {
-		addBombInDir(ubPlayer, BOMB_DIR_LEFT, BOMB_DIR_RIGHT);
+		addBombInDir(ubPlayer, DIRECTION_LEFT, DIRECTION_RIGHT);
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_RIGHT)) {
-		addBombInDir(ubPlayer, BOMB_DIR_RIGHT, BOMB_DIR_LEFT);
+		addBombInDir(ubPlayer, DIRECTION_RIGHT, DIRECTION_LEFT);
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_UP)) {
-		addBombInDir(ubPlayer, BOMB_DIR_UP, BOMB_DIR_DOWN);
+		addBombInDir(ubPlayer, DIRECTION_UP, DIRECTION_DOWN);
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_DOWN)) {
-		addBombInDir(ubPlayer, BOMB_DIR_DOWN, BOMB_DIR_UP);
+		addBombInDir(ubPlayer, DIRECTION_DOWN, DIRECTION_UP);
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
 		UBYTE ubTntCount = inventoryGetItemDef(INVENTORY_ITEM_TNT)->ubCount;
@@ -248,7 +248,7 @@ static void gameProcessModeTnt(UBYTE ubPlayer) {
 		inventorySetItemCount(INVENTORY_ITEM_TNT, ubTntCount);
 		hudSetModeCounter(MODE_TNT, ubTntCount);
 		s_pBombCount[ubPlayer] = 0;
-		s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
+		s_pLastDir[ubPlayer] = DIRECTION_COUNT;
 		s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
 	}
 }
@@ -269,19 +269,19 @@ static void gameDisplayModeTnt(UBYTE ubPlayer) {
 	UWORD uwTileY = (g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5;
 	BYTE bDeltaX = 0, bDeltaY = 0;
 	switch(s_pLastDir[ubPlayer]) {
-		case BOMB_DIR_LEFT:
+		case DIRECTION_LEFT:
 			bDeltaX = -1;
 			break;
-		case BOMB_DIR_RIGHT:
+		case DIRECTION_RIGHT:
 			bDeltaX = 1;
 			break;
-		case BOMB_DIR_UP:
+		case DIRECTION_UP:
 			bDeltaY = -1;
 			break;
-		case BOMB_DIR_DOWN:
+		case DIRECTION_DOWN:
 			bDeltaY = 1;
 			break;
-		case BOMB_DIR_NONE:
+		case DIRECTION_COUNT:
 		default:
 			return;
 	}
@@ -328,7 +328,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				hudHideMode();
 				if(pSelection->eMode == MODE_TNT) {
 					s_pBombCount[ubPlayer] = 0;
-					s_pLastDir[ubPlayer] = BOMB_DIR_NONE;
+					s_pLastDir[ubPlayer] = DIRECTION_COUNT;
 				}
 			}
 		}
