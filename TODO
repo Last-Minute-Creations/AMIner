@@ -26,6 +26,13 @@ General:
 		✔ Hurt while drilling through @done(23-03-17 18:03)
 		☐ Figure out detailed mechanics
 	☐ Figure out where to hide sokoban and how to hint it
+	☐ TNT as a vehicle upgrade
+		☐ Remove consumable amount
+		☐ Can be used since upgrading to lv1
+		☐ Upgrade level determines max charges, up to lv3 inclusive
+		☐ TNT destroys minerals, unless lvl4
+		☐ Breaking rock-like tiles consumes 2 charges
+	☐ Portable teleport as a vehicle upgrade
 
 Simulator:
 	✔ Basic view of mine @done(23-04-07 13:44)
