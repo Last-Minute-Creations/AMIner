@@ -10,7 +10,7 @@
 #include <ace/managers/bob.h>
 #include "text_bob.h"
 #include "mineral.h"
-#include "dynamite.h"
+#include "tnt.h"
 #include "string_array.h"
 
 #define VEHICLE_WIDTH 32
@@ -90,7 +90,7 @@ typedef struct _tVehicle {
 	LONG lCash;
 	UWORD uwDrillCurr;
 	UWORD wHullCurr;
-	tDynamite sDynamite;
+	tTnt sDynamite;
 	// Hull damage frames
 	UBYTE ubHullDamageFrame;
 	UBYTE ubDamageBlinkCooldown;

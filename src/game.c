@@ -55,8 +55,6 @@ static tBob s_pBombMarkers[3];
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 static tUwCoordYX s_sTeleportReturn;
 
-static UBYTE s_pBombCount[2];
-static tDirection s_pLastDir[2];
 static tSteer s_pPlayerSteers[2];
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 static UBYTE s_ubChallengeCamCnt;
@@ -90,6 +88,7 @@ void modeReset(UBYTE ubPlayer) {
 	s_pModeSelection[ubPlayer].isSelecting = 0;
 	s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
 	hudSetMode(ubPlayer, MODE_DRILL);
+	tntReset(&g_pVehicles[ubPlayer].sDynamite, ubPlayer, (tUwCoordYX){.ulYX = 0});
 }
 
 void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
@@ -106,10 +105,10 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	warehouseReset();
 	tileReset(g_isAtari, g_isChallenge);
 	inventoryReset();
-	modeReset(0);
-	modeReset(1);
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
+	modeReset(0);
+	modeReset(1);
 	s_ulGameTime = 0;
 	s_ubCurrentMod = ASSETS_GAME_MOD_COUNT;
 	s_ubRebukes = 0;
@@ -191,6 +190,9 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+	else if(keyUse(KEY_8)) {
+		g_pVehicles[0].lCash += 1000;
+	}
 	else if(keyUse(KEY_9)) {
 		dinoAddBone();
 	}
@@ -206,49 +208,22 @@ static void gameProcessHotkeys(void) {
 	}
 }
 
-static void addBombInDir(UBYTE ubPlayer, tDirection eDir, tDirection eOpposite) {
-	if(s_pLastDir[ubPlayer] == eOpposite && s_pBombCount[ubPlayer]) {
-		// opposite dir
-		--s_pBombCount[ubPlayer];
-	}
-	else if(s_pLastDir[ubPlayer] == eDir) {
-		// same dir
-		if(s_pBombCount[ubPlayer] < 3) {
-			++s_pBombCount[ubPlayer];
-		}
-	}
-	else {
-		// other dir
-		s_pBombCount[ubPlayer] = 1;
-		s_pLastDir[ubPlayer] = eDir;
-	}
-}
-
 static void gameProcessModeTnt(UBYTE ubPlayer) {
+	tTnt *pTnt = &g_pVehicles[ubPlayer].sDynamite;
 	if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_LEFT)) {
-		addBombInDir(ubPlayer, DIRECTION_LEFT, DIRECTION_RIGHT);
+		tntAdd(pTnt, DIRECTION_LEFT);
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_RIGHT)) {
-		addBombInDir(ubPlayer, DIRECTION_RIGHT, DIRECTION_LEFT);
+		tntAdd(pTnt, DIRECTION_RIGHT);
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_UP)) {
-		addBombInDir(ubPlayer, DIRECTION_UP, DIRECTION_DOWN);
+		tntAdd(pTnt, DIRECTION_UP);
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_DOWN)) {
-		addBombInDir(ubPlayer, DIRECTION_DOWN, DIRECTION_UP);
+		tntAdd(pTnt, DIRECTION_DOWN);
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
-		UBYTE ubTntCount = inventoryGetItemDef(INVENTORY_ITEM_TNT)->ubCount;
-		ubTntCount -= dynamiteTrigger(
-			&g_pVehicles[ubPlayer].sDynamite,
-			(g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
-			(g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5,
-			MIN(s_pBombCount[ubPlayer], ubTntCount), s_pLastDir[ubPlayer]
-		);
-		inventorySetItemCount(INVENTORY_ITEM_TNT, ubTntCount);
-		hudSetModeCounter(MODE_TNT, ubTntCount);
-		s_pBombCount[ubPlayer] = 0;
-		s_pLastDir[ubPlayer] = DIRECTION_COUNT;
+		tntDetonate(pTnt);
 		s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
 	}
 }
@@ -265,37 +240,11 @@ static void gameDisplayModeTnt(UBYTE ubPlayer) {
 	) {
 		return;
 	}
-	UWORD uwTileX = (g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5;
-	UWORD uwTileY = (g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5;
-	BYTE bDeltaX = 0, bDeltaY = 0;
-	switch(s_pLastDir[ubPlayer]) {
-		case DIRECTION_LEFT:
-			bDeltaX = -1;
-			break;
-		case DIRECTION_RIGHT:
-			bDeltaX = 1;
-			break;
-		case DIRECTION_UP:
-			bDeltaY = -1;
-			break;
-		case DIRECTION_DOWN:
-			bDeltaY = 1;
-			break;
-		case DIRECTION_COUNT:
-		default:
-			return;
-	}
-	for(UBYTE i = 0; i < s_pBombCount[ubPlayer]; ++i) {
-		uwTileX += bDeltaX;
-		uwTileY += bDeltaY;
-		if(1 <= uwTileX && uwTileX <= 10) {
-			s_pBombMarkers[i].sPos.uwX = (uwTileX << 5) + 8;
-			s_pBombMarkers[i].sPos.uwY = (uwTileY << 5) + 11;
-			gameTryPushBob(&s_pBombMarkers[i]);
-		}
-		else {
-			break;
-		}
+	const tTnt *pTnt = &g_pVehicles[ubPlayer].sDynamite;
+	for(UBYTE i = 0; i < pTnt->ubCoordCount; ++i) {
+		s_pBombMarkers[i].sPos.uwX = (pTnt->pCoords[i].uwX << TILE_SHIFT) + 8;
+		s_pBombMarkers[i].sPos.uwY = (pTnt->pCoords[i].uwY << TILE_SHIFT) + 11;
+		gameTryPushBob(&s_pBombMarkers[i]);
 	}
 }
 
@@ -327,8 +276,11 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				pSelection->isSelecting = 0;
 				hudHideMode();
 				if(pSelection->eMode == MODE_TNT) {
-					s_pBombCount[ubPlayer] = 0;
-					s_pLastDir[ubPlayer] = DIRECTION_COUNT;
+					tUwCoordYX sTilePos = {
+						.uwX = (g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+						.uwY = (g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5
+					};
+					tntReset(&g_pVehicles[ubPlayer].sDynamite, ubPlayer, sTilePos);
 				}
 			}
 		}
@@ -610,13 +562,8 @@ void gameSave(tFile *pFile) {
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
-	// for(UBYTE i = 0; i < 3; ++i) {
-	// 	bobSave(pFile, s_pBombMarkers[i]);
-	// }
 
 	fileWrite(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
-	fileWrite(pFile, s_pBombCount, sizeof(s_pBombCount));
-	fileWrite(pFile, s_pLastDir, sizeof(s_pLastDir));
 	fileWrite(pFile, &s_eCameraType, sizeof(s_eCameraType));
 	fileWrite(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
 
@@ -651,13 +598,8 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
-	// for(UBYTE i = 0; i < 3; ++i) {
-	// 	bobLoad(pFile, s_pBombMarkers[i]);
-	// }
 
 	fileRead(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
-	fileRead(pFile, s_pBombCount, sizeof(s_pBombCount));
-	fileRead(pFile, s_pLastDir, sizeof(s_pLastDir));
 	fileRead(pFile, &s_eCameraType, sizeof(s_eCameraType));
 	fileRead(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
 

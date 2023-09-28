@@ -218,28 +218,20 @@ void defsInit(void) {
 	UWORD pPartsBase[INVENTORY_PART_COUNT] = {
 		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.drill.base")),
 		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.cargo.base")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.hull.base"))
+		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.hull.base")),
+		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.tnt.base")),
+		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.teleport.base")),
 	};
 
 	UWORD pPartsAddPerLevel[INVENTORY_PART_COUNT] = {
 		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.drill.addPerLevel")),
 		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.cargo.addPerLevel")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.hull.addPerLevel"))
+		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.hull.addPerLevel")),
+		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.tnt.addPerLevel")),
+		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.teleport.addPerLevel")),
 	};
 
-	UWORD pItemsPrice[INVENTORY_ITEM_COUNT] = {
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.items.tnt.price")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.items.nuke.price")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.items.teleport.price"))
-	};
-
-	UBYTE pItemsMax[INVENTORY_ITEM_COUNT] = {
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.items.tnt.max")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.items.nuke.max")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.items.teleport.max"))
-	};
-
-	inventoryInit(pPartsBase, pPartsAddPerLevel, pItemsPrice, pItemsMax);
+	inventoryInit(pPartsBase, pPartsAddPerLevel);
 
 	jsonDestroy(pJson);
 }

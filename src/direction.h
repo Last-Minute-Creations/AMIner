@@ -24,6 +24,36 @@ static inline UBYTE dirIsVertical(tDirection eDir) {
 	return (eDir < DIRECTION_LEFT);
 }
 
+static inline tBCoordYX dirToDelta(tDirection eDir) {
+	switch(eDir) {
+		case DIRECTION_LEFT:
+			return (tBCoordYX){.bY = 0, .bX = -1};
+		case DIRECTION_RIGHT:
+			return (tBCoordYX){.bY = 0, .bX = 1};
+		case DIRECTION_UP:
+			return (tBCoordYX){.bY = -1, .bX = 0};
+		case DIRECTION_DOWN:
+			return (tBCoordYX){.bY = 1, .bX = 0};
+		default:
+			return (tBCoordYX){.bY = 0, .bX = 0};
+	}
+}
+
+static inline tDirection dirGetOpposite(tDirection eDir) {
+	switch(eDir) {
+		case DIRECTION_LEFT:
+			return DIRECTION_RIGHT;
+		case DIRECTION_RIGHT:
+			return DIRECTION_LEFT;
+		case DIRECTION_UP:
+			return DIRECTION_DOWN;
+		case DIRECTION_DOWN:
+			return DIRECTION_UP;
+		default:
+			return DIRECTION_COUNT;
+	}
+}
+
 #ifdef __cplusplus
 }
 #endif

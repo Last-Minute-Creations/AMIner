@@ -33,25 +33,17 @@ static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 	commDrawText(0, uwOffs, g_pShopNames[ubPart], ubFontFlags, ubColor);
 	uwOffs += 2 * ubRowSize;
 	char szBfr[50];
-	if(ubPart < INVENTORY_PART_COUNT) {
-		UBYTE ubLevel = inventoryGetPartDef(s_ubWorkshopPos)->ubLevel;
-		sprintf(szBfr, "%s%hhu", g_pMsgs[MSG_COMM_MK], ubLevel + 1);
-		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
-		if(ubLevel < g_ubUpgradeLevels) {
-			uwOffs += ubRowSize;
-			sprintf(szBfr, "%s%hhu: %lu\x1F", g_pMsgs[MSG_COMM_UPGRADE_TO_MK], ubLevel + 2, g_pUpgradeCosts[ubLevel]);
-			commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
-		}
-	}
-	else {
-		const tItem *pItem = inventoryGetItemDef(s_ubWorkshopPos - INVENTORY_PART_COUNT);
-		sprintf(szBfr, "%s: %hu/%hu", g_pMsgs[MSG_COMM_STOCK], pItem->ubCount, pItem->ubMax);
-		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+
+	UBYTE ubLevel = inventoryGetPartDef(s_ubWorkshopPos)->ubLevel;
+	sprintf(szBfr, "%s%hhu", g_pMsgs[MSG_COMM_MK], ubLevel + 1);
+	commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+	if(ubLevel < g_ubUpgradeLevels) {
 		uwOffs += ubRowSize;
-		sprintf(szBfr, "%s: %hu\x1F", g_pMsgs[MSG_COMM_BUY], pItem->uwPrice);
+		sprintf(szBfr, "%s%hhu: %lu\x1F", g_pMsgs[MSG_COMM_UPGRADE_TO_MK], ubLevel + 2, g_pUpgradeCosts[ubLevel]);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 	}
 }
+
 
 static UBYTE commShopWorkshopBuyFor(LONG lCost) {
 	if(g_pVehicles[0].lCash >= lCost) {
@@ -96,24 +88,6 @@ static void pageWorkshopProcess(void) {
 				) && commShopWorkshopBuyFor(g_pUpgradeCosts[ubLevel])) {
 					inventorySetPartLevel(s_ubWorkshopPos, ubLevel+1);
 					commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
-				}
-			}
-			else {
-				tItemName eItemName = s_ubWorkshopPos - INVENTORY_PART_COUNT;
-				const tItem *pItem = inventoryGetItemDef(eItemName);
-				logWrite("try to buy item %p, %hhu/%hhu\n", pItem, pItem->ubCount, pItem->ubMax);
-				// item - TNT, nuke, teleport
-				if(!commShopWorkshopBuyIsFull(
-					pItem->ubCount, pItem->ubMax, g_pMsgs[MSG_COMM_ALREADY_FULL]
-				) && commShopWorkshopBuyFor(pItem->uwPrice)) {
-					inventorySetItemCount(eItemName, pItem->ubCount + 1);
-					commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
-					static const tMode pItemToMode[INVENTORY_ITEM_COUNT] = {
-						[INVENTORY_ITEM_TNT] = MODE_TNT,
-						[INVENTORY_ITEM_NUKE] = MODE_NUKE,
-						[INVENTORY_ITEM_TELEPORT] = MODE_TELEPORT
-					};
-					hudSetModeCounter(pItemToMode[eItemName], pItem->ubCount);
 				}
 			}
 		}

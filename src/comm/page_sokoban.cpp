@@ -301,23 +301,9 @@ UBYTE s_isSolved;
 //------------------------------------------------------------------ PRIVATE FNS
 
 tUbCoordYX positionMoveInDirection(tUbCoordYX Position, tDirection eDirection) {
-	switch(eDirection) {
-		case DIRECTION_UP:
-			--Position.ubY;
-			break;
-		case DIRECTION_DOWN:
-			++Position.ubY;
-			break;
-		case DIRECTION_LEFT:
-			--Position.ubX;
-			break;
-		case DIRECTION_RIGHT:
-			++Position.ubX;
-			break;
-		case DIRECTION_FIRE:
-		case DIRECTION_COUNT:
-			break;
-	}
+	tBCoordYX sDelta = dirToDelta(eDirection);
+	Position.ubX += sDelta.bX;
+	Position.ubY += sDelta.bY;
 	return Position;
 }
 

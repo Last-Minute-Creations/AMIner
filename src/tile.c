@@ -739,7 +739,3 @@ void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant) {
 
 	tileSetBaseTiles(pBaseVariant, pBase->uwTileDepth, 1);
 }
-
-void tileLoadDinoTileset(UBYTE isPopulated) {
-
-}
