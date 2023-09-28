@@ -30,9 +30,10 @@ General:
 		✔ Remove consumable amount @done(23-09-28 21:24)
 		✔ Can be used since upgrading to lv1 @done(23-09-28 21:24)
 		✔ Upgrade level determines max charges, up to lv3 inclusive @done(23-09-28 21:24)
-		☐ TNT destroys minerals, unless lvl4
 		✔ Breaking rock-like tiles consumes 2 charges @done(23-09-28 21:24)
+		☐ TNT destroys minerals, unless lvl4
 		☐ Exit TNT mode on fall (e.g. P2 dug beneath P1)
+		☐ Add workshop descriptions
 	☐ Portable teleport as a vehicle upgrade
 
 Simulator:

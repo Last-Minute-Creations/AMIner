@@ -15,7 +15,12 @@ static void onExplosionPeak(ULONG ulData) {
 
 	// Excavate tile under explosion
 	if(tileIsDrillable(uwX, uwY)) {
-		vehicleExcavateTile(&g_pVehicles[pTnt->ubPlayer], uwX, uwY);
+		if(inventoryGetPartDef(INVENTORY_PART_TNT)->ubLevel >= 4) {
+			vehicleExcavateTile(&g_pVehicles[pTnt->ubPlayer], uwX, uwY);
+		}
+		else {
+			tileExcavate(uwX, uwY);
+		}
 	}
 
 	// Trigger next explosion

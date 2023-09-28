@@ -636,9 +636,6 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		);
 		audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
 	}
-	else if(ubTile == TILE_MAGMA_1 || ubTile == TILE_MAGMA_2) {
-		vehicleHullDamage(pVehicle, 5 + (randUw(&g_sRand) & 0x7));
-	}
 	else if(g_pTileDefs[ubTile].ubSlots) {
 		UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
 		UBYTE ubMineralType = g_pTileDefs[ubTile].ubMineral;
@@ -1106,7 +1103,12 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 
 			if(isDoneX && isDoneY) {
+				tTile eTile = g_pMainBuffer->pTileData[pVehicle->sDrillTile.uwX][pVehicle->sDrillTile.uwY];
 				vehicleExcavateTile(pVehicle, pVehicle->sDrillTile.uwX, pVehicle->sDrillTile.uwY);
+				if(eTile == TILE_MAGMA_1 || eTile == TILE_MAGMA_2) {
+					vehicleHullDamage(pVehicle, 5 + (randUw(&g_sRand) & 0x7));
+				}
+
 				if(pVehicle->ubDrillDir == DRILL_DIR_H) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
 					pVehicle->ubDrillState = DRILL_STATE_OFF;
