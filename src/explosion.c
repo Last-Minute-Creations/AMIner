@@ -147,14 +147,14 @@ void explosionManagerProcess(void) {
 				UWORD uwFrameOffsetY = pExplosion->ubFrame * EXPLOSION_FRAME_HEIGHT;
 				if(pExplosion->eKind == EXPLOSION_KIND_TELEPORT) {
 					bobSetFrame(
-						&s_pExplosionNext->sBob,
+						&pExplosion->sBob,
 						bobCalcFrameAddress(s_pTpFrames, uwFrameOffsetY),
 						bobCalcFrameAddress(s_pTpFramesMask, uwFrameOffsetY)
 					);
 				}
 				else {
 					bobSetFrame(
-						&s_pExplosionNext->sBob,
+						&pExplosion->sBob,
 						bobCalcFrameAddress(s_pBoomFrames, uwFrameOffsetY),
 						bobCalcFrameAddress(s_pBoomFramesMask, uwFrameOffsetY)
 					);
