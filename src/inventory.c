@@ -8,7 +8,7 @@
 tInventory s_sInventory;
 
 void inventoryInit(const UWORD *pPartsBase, const UWORD *pPartsAddPerLevel) {
-	for(tPartName ePart = 0; ePart < INVENTORY_PART_COUNT; ++ePart) {
+	for(tPartKind ePart = 0; ePart < INVENTORY_PART_COUNT; ++ePart) {
 		s_sInventory.pParts[ePart].uwMaxBase = pPartsBase[ePart];
 		s_sInventory.pParts[ePart].uwMaxAddPerLevel = pPartsAddPerLevel[ePart];
 	}
@@ -34,12 +34,12 @@ UBYTE inventoryLoad(tFile *pFile) {
 	return 1;
 }
 
-const tPart *inventoryGetPartDef(tPartName eName) {
+const tPartDef *inventoryGetPartDef(tPartKind eName) {
 	return &s_sInventory.pParts[eName];
 }
 
-void inventorySetPartLevel(tPartName eName, UBYTE ubLevel) {
-	tPart *pPart = &s_sInventory.pParts[eName];
+void inventorySetPartLevel(tPartKind eName, UBYTE ubLevel) {
+	tPartDef *pPart = &s_sInventory.pParts[eName];
 	pPart->ubLevel = ubLevel;
 	pPart->uwMax = pPart->uwMaxBase + ubLevel * pPart->uwMaxAddPerLevel;
 }

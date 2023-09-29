@@ -16,6 +16,13 @@ char **g_pShopNames;
 static UBYTE s_ubWorkshopPos = 0;
 static UBYTE s_isOnExitBtn = 0;
 
+static UBYTE workshopIsPartAcquirable(tPartKind ePart) {
+	UBYTE isAcquirable = (
+		ePart == INVENTORY_PART_TELEPORT || ePart == INVENTORY_PART_TNT
+	);
+	return isAcquirable;
+}
+
 static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 	s_ubWorkshopPos = ubPart;
 	static const char szCaption[] = "KRTEK 2600";
@@ -34,12 +41,16 @@ static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 	uwOffs += 2 * ubRowSize;
 	char szBfr[50];
 
+	UBYTE isAcquirable = workshopIsPartAcquirable(s_ubWorkshopPos);
 	UBYTE ubLevel = inventoryGetPartDef(s_ubWorkshopPos)->ubLevel;
-	sprintf(szBfr, "%s%hhu", g_pMsgs[MSG_COMM_MK], ubLevel + 1);
-	commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
+	if(!isAcquirable || ubLevel > 0) {
+		sprintf(szBfr, "%s%hhu", g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
+		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+	}
 	if(ubLevel < g_ubUpgradeLevels) {
 		uwOffs += ubRowSize;
-		sprintf(szBfr, "%s%hhu: %lu\x1F", g_pMsgs[MSG_COMM_UPGRADE_TO_MK], ubLevel + 2, g_pUpgradeCosts[ubLevel]);
+		sprintf(szBfr, "%s%hhu: %lu\x1F", g_pMsgs[MSG_COMM_UPGRADE_TO_MK], ubDisplayLevel + 1, g_pUpgradeCosts[ubLevel]);
 		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
 	}
 }
@@ -81,7 +92,7 @@ static void pageWorkshopProcess(void) {
 	else {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(s_ubWorkshopPos < INVENTORY_PART_COUNT) {
-				const tPart *pPart = inventoryGetPartDef(s_ubWorkshopPos);
+				const tPartDef *pPart = inventoryGetPartDef(s_ubWorkshopPos);
 				UBYTE ubLevel = pPart->ubLevel;
 				if(!commShopWorkshopBuyIsFull(
 					ubLevel, g_ubUpgradeLevels, g_pMsgs[MSG_COMM_ALREADY_MAX]

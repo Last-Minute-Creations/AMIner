@@ -8,24 +8,24 @@
 #include <ace/types.h>
 #include <ace/utils/file.h>
 
-typedef enum _tPartName {
+typedef enum tPartKind {
 	INVENTORY_PART_DRILL,
 	INVENTORY_PART_CARGO,
 	INVENTORY_PART_HULL,
 	INVENTORY_PART_TNT,
 	INVENTORY_PART_TELEPORT,
 	INVENTORY_PART_COUNT
-} tPartName;
+} tPartKind;
 
-typedef struct _tPart {
+typedef struct tPartDef {
 	UBYTE ubLevel;
 	UWORD uwMaxBase;
 	UWORD uwMaxAddPerLevel;
 	UWORD uwMax;
-} tPart;
+} tPartDef;
 
 typedef struct _tInventory {
-	tPart pParts[INVENTORY_PART_COUNT];
+	tPartDef pParts[INVENTORY_PART_COUNT];
 } tInventory;
 
 void inventoryReset(void);
@@ -34,9 +34,9 @@ void inventorySave(tFile *pFile);
 
 UBYTE inventoryLoad(tFile *pFile);
 
-const tPart *inventoryGetPartDef(tPartName eName);
+const tPartDef *inventoryGetPartDef(tPartKind eName);
 
-void inventorySetPartLevel(tPartName eName, UBYTE ubLevel);
+void inventorySetPartLevel(tPartKind eName, UBYTE ubLevel);
 
 void inventoryInit(const UWORD *pPartsBase, const UWORD *pPartsAddPerLevel);
 
