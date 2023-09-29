@@ -33,12 +33,12 @@ static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
-	commErase(0, 0, COMM_DISPLAY_WIDTH, 5 * ubRowSize);
-	UWORD uwOffs = 0;
-	commDrawText(0, uwOffs, szCaption, ubFontFlags, ubColor);
-	uwOffs += ubRowSize;
-	commDrawText(0, uwOffs, g_pShopNames[ubPart], ubFontFlags, ubColor);
-	uwOffs += 2 * ubRowSize;
+	commEraseAll();
+	UWORD uwOffsY = 0;
+	commDrawText(0, uwOffsY, szCaption, ubFontFlags, ubColor);
+	uwOffsY += ubRowSize;
+	commDrawText(0, uwOffsY, g_pShopNames[ubPart], ubFontFlags, ubColor);
+	uwOffsY += 2 * ubRowSize;
 	char szBfr[50];
 
 	UBYTE isAcquirable = workshopIsPartAcquirable(s_ubWorkshopPos);
@@ -46,13 +46,33 @@ static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
 		sprintf(szBfr, "%s%hhu", g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
-		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+		commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
 	}
+	uwOffsY += ubRowSize;
+
 	if(ubLevel < g_ubUpgradeLevels) {
-		uwOffs += ubRowSize;
 		sprintf(szBfr, "%s%hhu: %lu\x1F", g_pMsgs[MSG_COMM_UPGRADE_TO_MK], ubDisplayLevel + 1, g_pUpgradeCosts[ubLevel]);
-		commDrawText(0, uwOffs, szBfr, ubFontFlags, ubColor);
+		commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
 	}
+	uwOffsY += ubRowSize;
+
+	const char *szDescription = 0;
+	// TODO: load from json
+	if(s_ubWorkshopPos == INVENTORY_PART_TNT && ubLevel < UPGRADE_LEVEL_COUNT) {
+		static const char *pDescriptions[UPGRADE_LEVEL_COUNT] = {
+			"Pojedynczy ladunek pozwalajacy na zniszczenie prostej przeszkody terenowej.\nNiszczy surowce zawarte w terenie.",
+			"Dwa ladunki pozwalajace drazyc dluzszy tunel lub zniszczyc pojedyncza skale.\nNiszczy surowce zawarte w terenie.",
+			"Trzy ladunki jeszcze bardziej zwieksza Twoj zasieg.\nNiszczy surowce zawarte w terenie.",
+			"Ulepszona formula materialu wybuchowego pozwala zachowac surowce w detonowanym terenie."
+		};
+		szDescription = pDescriptions[ubLevel];
+	}
+
+	if(szDescription) {
+		commDrawMultilineText(szDescription, 0, uwOffsY);
+	}
+
+	buttonDrawAll(commGetDisplayBuffer());
 }
 
 
@@ -127,7 +147,6 @@ static void pageWorkshopProcess(void) {
 
 void pageWorkshopCreate(void) {
 	commRegisterPage(pageWorkshopProcess, 0);
-	commShopSelectWorkshopPos(0, 1);
 
 	// Buttons
 	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 2 * (buttonGetHeight() + 2);
@@ -136,6 +155,7 @@ void pageWorkshopCreate(void) {
 	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);
 	buttonSelect(0);
 	buttonRowApply();
-	buttonDrawAll(commGetDisplayBuffer());
+
+	commShopSelectWorkshopPos(0, 1);
 	s_isOnExitBtn = 0;
 }

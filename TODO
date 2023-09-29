@@ -35,7 +35,8 @@ General:
 		✔ Breaking rock-like tiles consumes 2 charges @done(23-09-28 21:24)
 		✔ TNT destroys minerals, unless lvl4 @done(23-09-28 21:49)
 		✔ Exit TNT mode on fall (e.g. P2 dug beneath P1) @done(23-09-29 09:28)
-		☐ Add workshop descriptions
+		✔ Add workshop descriptions @done(23-09-29 10:14)
+		☐ Explosion end visual bugs
 	☐ Portable teleport as a vehicle upgrade
 	☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button

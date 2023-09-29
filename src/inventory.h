@@ -8,6 +8,8 @@
 #include <ace/types.h>
 #include <ace/utils/file.h>
 
+#define UPGRADE_LEVEL_COUNT 4
+
 typedef enum tPartKind {
 	INVENTORY_PART_DRILL,
 	INVENTORY_PART_CARGO,
