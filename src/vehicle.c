@@ -276,6 +276,7 @@ static void vehicleCrash(tVehicle *pVehicle) {
 }
 
 static void vehicleHullDamage(tVehicle *pVehicle, UWORD uwDmg) {
+	gameCancelModeForPlayer(pVehicle->ubPlayerIdx);
 	UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
 	pVehicle->wHullCurr = MAX(0, pVehicle->wHullCurr - uwDmg);
 	pVehicle->ubDamageBlinkCooldown = 5;
@@ -833,6 +834,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		if(!tileIsSolid(uwTileCenter, uwTileBottom)) {
 			// Gravity
 			pVehicle->fY += pVehicle->fDy;
+			gameCancelModeForPlayer(pVehicle->ubPlayerIdx);
 		}
 		else {
 			// Collision with ground

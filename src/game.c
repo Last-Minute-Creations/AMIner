@@ -52,7 +52,7 @@ typedef struct _tModeSelection {
 
 static tModeSelection s_pModeSelection[2] = {};
 
-static tBob s_pBombMarkers[3];
+static tBob s_pBombMarkers[2][3];
 
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 static tUwCoordYX s_sTeleportReturn;
@@ -73,12 +73,12 @@ UBYTE g_isChallenge;
 UBYTE g_isAtari;
 
 //------------------------------------------------------------ PRIVATE FNS: MODE
+// TODO: reformat somehow? Move to separate file?
 
-static void modeReset(UBYTE ubPlayer) {
+static void modeResetForPlayer(UBYTE ubPlayer) {
 	s_pModeSelection[ubPlayer].isSelecting = 0;
 	s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
 	hudSetMode(ubPlayer, MODE_DRILL);
-	tntReset(&g_pVehicles[ubPlayer].sDynamite, ubPlayer, (tUwCoordYX){.ulYX = 0});
 }
 
 static void gameProcessModeTnt(UBYTE ubPlayer) {
@@ -114,10 +114,11 @@ static void gameDisplayModeTnt(UBYTE ubPlayer) {
 		return;
 	}
 	const tTnt *pTnt = &g_pVehicles[ubPlayer].sDynamite;
+	tBob *pPlayerBombMarkers = s_pBombMarkers[ubPlayer];
 	for(UBYTE i = 0; i < pTnt->ubCoordCount; ++i) {
-		s_pBombMarkers[i].sPos.uwX = (pTnt->pCoords[i].uwX << TILE_SHIFT) + 8;
-		s_pBombMarkers[i].sPos.uwY = (pTnt->pCoords[i].uwY << TILE_SHIFT) + 11;
-		gameTryPushBob(&s_pBombMarkers[i]);
+		pPlayerBombMarkers[i].sPos.uwX = (pTnt->pCoords[i].uwX << TILE_SHIFT) + 8;
+		pPlayerBombMarkers[i].sPos.uwY = (pTnt->pCoords[i].uwY << TILE_SHIFT) + 11;
+		gameTryPushBob(&pPlayerBombMarkers[i]);
 	}
 }
 
@@ -255,7 +256,7 @@ static void gameProcessHotkeys(void) {
 		if(!g_is2pPlaying) {
 			g_is2pPlaying = 1;
 			hudSet2pPlaying(1);
-			modeReset(1);
+			modeResetForPlayer(1);
 			vehicleResetPos(&g_pVehicles[1]);
 			g_pVehicles[1].fX = g_pVehicles[0].fX;
 			g_pVehicles[1].fY = g_pVehicles[0].fY;
@@ -463,6 +464,13 @@ static void gameSave(tFile *pFile) {
 
 //------------------------------------------------------------------- PUBLIC FNS
 
+void gameCancelModeForPlayer(UBYTE ubPlayer) {
+	if(!s_pModeSelection[ubPlayer].isSelecting) {
+		s_pModeSelection[ubPlayer].eMode = MODE_DRILL;
+		hudSetMode(ubPlayer, MODE_DRILL);
+	}
+}
+
 void gameAdvanceAccolade(void) {
 	if(++s_ubAccoladesFract >= g_ubPlansPerAccolade) {
 		s_ubAccoladesFract = 0;
@@ -501,13 +509,15 @@ UBYTE gameGetRebukes(void) {
 }
 
 void gameInitBombMarkerBobs(void) {
-	for(UBYTE i = 0; i < 3; ++i) {
-		bobInit(
-			&s_pBombMarkers[i], 16, 10, 1,
-			bobCalcFrameAddress(g_pBombMarker, 0),
-			bobCalcFrameAddress(g_pBombMarkerMask, 0),
-			0, 0
-		);
+	UBYTE *pAddressFrame = bobCalcFrameAddress(g_pBombMarker, 0);
+	UBYTE *pAddressMask = bobCalcFrameAddress(g_pBombMarkerMask, 0);
+	for(UBYTE ubPlayer = 0; ubPlayer < 2; ++ubPlayer) {
+		for(UBYTE i = 0; i < 3; ++i) {
+			bobInit(
+				&s_pBombMarkers[ubPlayer][i], 16, 10, 1,
+				pAddressFrame, pAddressMask, 0, 0
+			);
+		}
 	}
 }
 
@@ -607,8 +617,8 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	inventoryReset();
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
-	modeReset(0);
-	modeReset(1);
+	modeResetForPlayer(0);
+	modeResetForPlayer(1);
 	s_ulGameTime = 0;
 	s_ubCurrentMod = ASSETS_GAME_MOD_COUNT;
 	s_ubRebukes = 0;

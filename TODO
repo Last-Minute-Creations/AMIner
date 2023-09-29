@@ -18,24 +18,29 @@ General:
 	✔ Variance in mine backgrounds @done(23-09-26 18:32)
 		✔ On-the-fly composing background tile with edges @done(23-09-26 18:32)
 		✔ Add extra bg variants (stones) @done(23-09-26 18:32)
-	☐ Animated base elements
-	☐ Figure out the teleport upgrades
-		☐ Remove debug teleport return button
-		☐ Bring back teleport damage on zeroeth upgrade
 	✔ Add magma tiles @done(23-03-17 18:03)
 		✔ Hurt while drilling through @done(23-03-17 18:03)
 		☐ Figure out detailed mechanics
 	☐ Figure out where to hide sokoban and how to hint it
+	☐ Animated base elements
+		✔ Leaking pipe @done(23-09-29 09:28)
+		☐ Workers
+		☐ Smoke
+		☐ Ufo?
+		☐ Clouds?
 	☐ TNT as a vehicle upgrade
 		✔ Remove consumable amount @done(23-09-28 21:24)
 		✔ Can be used since upgrading to lv1 @done(23-09-28 21:24)
 		✔ Upgrade level determines max charges, up to lv3 inclusive @done(23-09-28 21:24)
 		✔ Breaking rock-like tiles consumes 2 charges @done(23-09-28 21:24)
 		✔ TNT destroys minerals, unless lvl4 @done(23-09-28 21:49)
-		☐ Exit TNT mode on fall (e.g. P2 dug beneath P1)
+		✔ Exit TNT mode on fall (e.g. P2 dug beneath P1) @done(23-09-29 09:28)
 		☐ Add workshop descriptions
 	☐ Portable teleport as a vehicle upgrade
-	☐ Save stats preview in main menu
+	☐ Figure out the teleport upgrades
+		☐ Remove debug teleport return button
+		☐ Bring back teleport damage on zeroeth upgrade
+	☐ Show save stats preview in main menu
 
 Simulator:
 	✔ Basic view of mine @done(23-04-07 13:44)
