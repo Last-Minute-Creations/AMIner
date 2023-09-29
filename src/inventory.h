@@ -8,36 +8,26 @@
 #include <ace/types.h>
 #include <ace/utils/file.h>
 
-typedef enum _tPartName {
+#define UPGRADE_LEVEL_COUNT 4
+
+typedef enum tPartKind {
 	INVENTORY_PART_DRILL,
 	INVENTORY_PART_CARGO,
 	INVENTORY_PART_HULL,
+	INVENTORY_PART_TNT,
+	INVENTORY_PART_TELEPORT,
 	INVENTORY_PART_COUNT
-} tPartName;
+} tPartKind;
 
-typedef enum _tItemName {
-	INVENTORY_ITEM_TNT,
-	INVENTORY_ITEM_NUKE,
-	INVENTORY_ITEM_TELEPORT,
-	INVENTORY_ITEM_COUNT
-} tItemName;
-
-typedef struct _tPart {
+typedef struct tPartDef {
 	UBYTE ubLevel;
 	UWORD uwMaxBase;
 	UWORD uwMaxAddPerLevel;
 	UWORD uwMax;
-} tPart;
-
-typedef struct _tItem {
-	UBYTE ubCount;
-	UBYTE ubMax;
-	UWORD uwPrice;
-} tItem;
+} tPartDef;
 
 typedef struct _tInventory {
-	tPart pParts[INVENTORY_PART_COUNT];
-	tItem pItems[INVENTORY_ITEM_COUNT];
+	tPartDef pParts[INVENTORY_PART_COUNT];
 } tInventory;
 
 void inventoryReset(void);
@@ -46,17 +36,10 @@ void inventorySave(tFile *pFile);
 
 UBYTE inventoryLoad(tFile *pFile);
 
-const tItem *inventoryGetItemDef(tItemName eName);
+const tPartDef *inventoryGetPartDef(tPartKind eName);
 
-const tPart *inventoryGetPartDef(tPartName eName);
+void inventorySetPartLevel(tPartKind eName, UBYTE ubLevel);
 
-void inventorySetPartLevel(tPartName eName, UBYTE ubLevel);
-
-void inventorySetItemCount(tItemName eName, UBYTE ubCount);
-
-void inventoryInit(
-	const UWORD *pPartsBase, const UWORD *pPartsAddPerLevel,
-	const UWORD *pItemsPrice, const UBYTE *pItemsMax
-);
+void inventoryInit(const UWORD *pPartsBase, const UWORD *pPartsAddPerLevel);
 
 #endif // _INVENTORY_H_

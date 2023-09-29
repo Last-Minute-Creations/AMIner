@@ -22,8 +22,6 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2);
 
 void gameTriggerSave(void);
 
-void gameSave(tFile *pFile);
-
 UBYTE gameLoad(tFile *pFile);
 
 void gameGsLoopEnterScore(void);
@@ -51,6 +49,8 @@ ULONG gameGetTime(void);
 UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays);
 
 tSteer *gameGetSteers(void);
+
+void gameCancelModeForPlayer(UBYTE ubPlayer);
 
 // Game config
 extern UBYTE g_is2pPlaying;

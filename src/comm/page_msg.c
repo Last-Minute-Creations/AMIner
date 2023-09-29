@@ -38,7 +38,7 @@ static void readLines(
 	UWORD uwFileContentsBufferSize;
 	UWORD uwTextLength;
 	char *szFileContents = remapFile(
-		szFilePath, g_pRemap, &uwFileContentsBufferSize, &uwTextLength
+		szFilePath, pRemap, &uwFileContentsBufferSize, &uwTextLength
 	);
 	if(!szFileContents) {
 		systemUnuse();
