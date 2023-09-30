@@ -30,6 +30,7 @@ General:
 		✔ Exit TNT mode on fall (e.g. P2 dug beneath P1) @done(23-09-29)
 		✔ Add workshop descriptions @done(23-09-29)
 		✔ Explosion end visual bugs @done(23-09-29)
+	✔ Show save stats preview in main menu @done(23-09-30)
 	☐ Figure out where to hide sokoban and how to hint it
 	☐ Animated base elements
 		✔ Leaking pipe @done(23-09-29)
@@ -37,11 +38,12 @@ General:
 		☐ Smoke
 		☐ Ufo?
 		☐ Clouds?
+	☐ Mode management via floating buttons
+	☐ Fast travel between bases
 	☐ Portable teleport as a vehicle upgrade
-	☐ Figure out the teleport upgrades
+		☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button
 		☐ Bring back teleport damage on zeroeth upgrade
-	☐ Show save stats preview in main menu
 
 Simulator:
 	✔ Basic view of mine @done(23-04-07)

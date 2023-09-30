@@ -14,6 +14,16 @@
 #define GAME_BPP 5
 #define GAME_TIME_PER_DAY 140
 
+typedef struct tGameSummary {
+	ULONG ulGameTime;
+	LONG lCash;
+	UWORD uwMaxDepth;
+	UBYTE ubRebukes;
+	UBYTE ubAccolades;
+	UBYTE ubHeatPercent;
+	UBYTE ubPlanIndex;
+} tGameSummary;
+
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void gameGsLoopChallengeEnd(void);
@@ -23,6 +33,8 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2);
 void gameTriggerSave(void);
 
 UBYTE gameLoad(tFile *pFile);
+
+UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary);
 
 void gameGsLoopEnterScore(void);
 
@@ -51,6 +63,8 @@ UBYTE gameIsElapsedDays(ULONG ulStart, UBYTE ubDays);
 tSteer *gameGetSteers(void);
 
 void gameCancelModeForPlayer(UBYTE ubPlayer);
+
+void gameUpdateMaxDepth(UWORD uwTileY);
 
 // Game config
 extern UBYTE g_is2pPlaying;

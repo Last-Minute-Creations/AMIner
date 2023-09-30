@@ -701,6 +701,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	}
 
 	tileExcavate(uwTileX, uwTileY);
+	gameUpdateMaxDepth(uwTileY);
 }
 
 static void stopLoopAudio(UBYTE ubPlayerIdx) {
@@ -1213,9 +1214,11 @@ void vehicleProcess(tVehicle *pVehicle) {
 	UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
 	hudSetDrill(ubPlayerIdx, pVehicle->uwDrillCurr, uwDrillMax);
 	textBobAnimate(&pVehicle->sTextBob);
-	hudSetDepth(ubPlayerIdx, MAX(
+	UWORD uwDepthDm = MAX(
 		0, fix16_to_int(pVehicle->fY) + VEHICLE_HEIGHT - (TILE_ROW_BASE_DIRT) * TILE_SIZE
-	));
+	);
+	gameUpdateMaxDepth(uwDepthDm);
+	hudSetDepth(ubPlayerIdx, uwDepthDm);
 	hudSetCash(ubPlayerIdx, pVehicle->lCash);
 }
 

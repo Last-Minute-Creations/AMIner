@@ -71,6 +71,7 @@ static UWORD s_uwOffsY;
 static UBYTE s_isScoreShowAfterRollIn;
 static UBYTE s_ubIndexAtari;
 static tSteer s_pMenuSteers[MENU_STEER_COUNT];
+static tGameSummary s_sSummary;
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -166,6 +167,46 @@ static void onMenuPosDraw(
 		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	*pUndrawWidth = fontMeasureText(g_pFont, szText).uwX;
+
+	if(szCaption == g_pMenuCaptions[MENU_CAPTION_CONTINUE]) {
+		UBYTE ubLineHeight = commGetLineHeight();
+		UWORD uwY = COMM_DISPLAY_HEIGHT - 4 * ubLineHeight;
+		if(isActive) {
+			char szBfr[50];
+			const UWORD uwColumnWidth = COMM_DISPLAY_WIDTH / 2;
+
+			ULONG ulGameDays = (s_sSummary.ulGameTime + GAME_TIME_PER_DAY - 1) / GAME_TIME_PER_DAY;
+			sprintf(szBfr, "%s %lu", g_pMsgs[MSG_COMM_DAYS], ulGameDays);
+			commDrawText(0, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
+
+			sprintf(szBfr, "%s %ld\x1F", g_pMsgs[MSG_HUD_CASH], s_sSummary.lCash);
+			commDrawText(uwColumnWidth, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
+
+			uwY += ubLineHeight;
+
+			sprintf(szBfr, "%s %hhu", g_pMsgs[MSG_COMM_ACCOLADES], s_sSummary.ubAccolades);
+			commDrawText(0, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
+
+			sprintf(szBfr, "%s %hhu", g_pMsgs[MSG_COMM_REBUKES], s_sSummary.ubRebukes);
+			commDrawText(uwColumnWidth, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
+
+			uwY += ubLineHeight;
+
+			sprintf(szBfr, "%s %hhu%%", g_pMsgs[MSG_COMM_PLANS], (100 * s_sSummary.ubPlanIndex) / 50);
+			commDrawText(0, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
+
+			uwY += ubLineHeight;
+
+			sprintf(szBfr, "%s %hu.%hhum", g_pMsgs[MSG_HUD_DEPTH], s_sSummary.uwMaxDepth / 10, s_sSummary.uwMaxDepth % 10);
+			commDrawText(0, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
+
+			sprintf(szBfr, "%s %hu%%", g_pMsgs[MSG_COMM_HEAT], s_sSummary.ubHeatPercent);
+			commDrawText(uwColumnWidth, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
+		}
+		else {
+			commErase(0, uwY, COMM_DISPLAY_WIDTH, 4 * ubLineHeight);
+		}
+	}
 }
 
 static void menuRedraw(void) {
@@ -186,6 +227,24 @@ static void menuRedraw(void) {
 	);
 }
 
+static UBYTE menuLoadSummaryFromSave(const char *szPath, tGameSummary *pSummary) {
+	systemUse();
+	tFile *pFileSave = fileOpen(szPath, "rb");
+	if(!pFileSave) {
+		logWrite("ERR: Save file not found\n");
+		systemUnuse();
+		return 0;
+	}
+
+	UBYTE isLoaded = gameLoadSummary(pFileSave, pSummary);
+	if(!isLoaded) {
+		logWrite("ERR: Failed to load game summary\n");
+	}
+	fileClose(pFileSave);
+	systemUnuse();
+	return isLoaded;
+}
+
 static void menuOnEnterStory(void) {
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
@@ -197,7 +256,7 @@ static void menuOnEnterStory(void) {
 		.sOptCb = {.cbSelect = menuOnStoryStart}
 	};
 
-	if(fileExists("save_story.dat")) {
+	if(menuLoadSummaryFromSave("save_story.dat", &s_sSummary)) {
 		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
 			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
 			.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,

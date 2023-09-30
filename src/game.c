@@ -65,6 +65,7 @@ static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
 static WORD s_wLastReminder;
 static UBYTE s_ubCurrentMod;
 static ULONG s_ulGameTime;
+static UWORD s_uwMaxTileY;
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -429,7 +430,29 @@ static void gameChallengeResult(void) {
 	}
 }
 
+static void gameSaveSummary(tFile *pFile) {
+	saveWriteHeader(pFile, "SMRY");
+	tGameSummary sSummary = {
+		.lCash = g_pVehicles[0].lCash,
+		.ubAccolades = s_ubAccolades,
+		.ubHeatPercent = heatGetPercent(),
+		.ubPlanIndex = planManagerGet()->ubCurrentPlanIndex,
+		.ubRebukes = s_ubRebukes,
+		.ulGameTime = s_ulGameTime,
+		.uwMaxDepth = s_uwMaxTileY,
+	};
+
+	fileWrite(pFile, &sSummary.ulGameTime, sizeof(sSummary.ulGameTime));
+	fileWrite(pFile, &sSummary.lCash, sizeof(sSummary.lCash));
+	fileWrite(pFile, &sSummary.uwMaxDepth, sizeof(sSummary.uwMaxDepth));
+	fileWrite(pFile, &sSummary.ubRebukes, sizeof(sSummary.ubRebukes));
+	fileWrite(pFile, &sSummary.ubAccolades, sizeof(sSummary.ubAccolades));
+	fileWrite(pFile, &sSummary.ubHeatPercent, sizeof(sSummary.ubHeatPercent));
+	fileWrite(pFile, &sSummary.ubPlanIndex, sizeof(sSummary.ubPlanIndex));
+}
+
 static void gameSave(tFile *pFile) {
+	gameSaveSummary(pFile);
 	saveWriteHeader(pFile, "GAME");
 	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
@@ -447,6 +470,7 @@ static void gameSave(tFile *pFile) {
 	fileWrite(pFile, &s_wLastReminder, sizeof(s_wLastReminder));
 	fileWrite(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
 	fileWrite(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
+	fileWrite(pFile, &s_uwMaxTileY, sizeof(s_uwMaxTileY));
 
 	inboxSave(pFile);
 	dinoSave(pFile);
@@ -566,6 +590,13 @@ tSteer *gameGetSteers(void) {
 }
 
 UBYTE gameLoad(tFile *pFile) {
+	{
+		tGameSummary sSummary; ///< Only for skipping it
+		if(!gameLoadSummary(pFile, &sSummary)) {
+			return 0;
+		}
+	}
+
 	if(!saveReadHeader(pFile, "GAME")) {
 		return 0;
 	}
@@ -586,6 +617,7 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &s_wLastReminder, sizeof(s_wLastReminder));
 	fileRead(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
 	fileRead(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
+	fileRead(pFile, &s_uwMaxTileY, sizeof(s_uwMaxTileY));
 
 	return inboxLoad(pFile) &&
 		dinoLoad(pFile) &&
@@ -599,6 +631,21 @@ UBYTE gameLoad(tFile *pFile) {
 		vehicleLoad(&g_pVehicles[1], pFile) &&
 		hudLoad(pFile) &&
 		heatLoad(pFile);
+}
+
+UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary) {
+	if(!saveReadHeader(pFile, "SMRY")) {
+		return 0;
+	}
+
+	fileRead(pFile, &pSummary->ulGameTime, sizeof(pSummary->ulGameTime));
+	fileRead(pFile, &pSummary->lCash, sizeof(pSummary->lCash));
+	fileRead(pFile, &pSummary->uwMaxDepth, sizeof(pSummary->uwMaxDepth));
+	fileRead(pFile, &pSummary->ubRebukes, sizeof(pSummary->ubRebukes));
+	fileRead(pFile, &pSummary->ubAccolades, sizeof(pSummary->ubAccolades));
+	fileRead(pFile, &pSummary->ubHeatPercent, sizeof(pSummary->ubHeatPercent));
+	fileRead(pFile, &pSummary->ubPlanIndex, sizeof(pSummary->ubPlanIndex));
+	return 1;
 }
 
 void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
@@ -620,6 +667,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	modeResetForPlayer(0);
 	modeResetForPlayer(1);
 	s_ulGameTime = 0;
+	s_uwMaxTileY = 0;
 	s_ubCurrentMod = ASSETS_GAME_MOD_COUNT;
 	s_ubRebukes = 0;
 	s_ubAccolades = 0;
@@ -644,6 +692,10 @@ void gameTriggerSave(void) {
 	fileDelete("save_story.dat");
 	fileMove("save_story.tmp", "save_story.dat");
 	systemUnuse();
+}
+
+void gameUpdateMaxDepth(UWORD uwTileY) {
+	s_uwMaxTileY = MAX(s_uwMaxTileY, uwTileY);
 }
 
 //-------------------------------------------------------------------- GAMESTATE
