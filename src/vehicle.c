@@ -522,7 +522,7 @@ static inline UBYTE vehicleStartDrilling(
 		bDifficulty = 10;
 	}
 	else {
-		bDifficulty = groundLayerGetDifficultyAtDepth(uwTileY << 5);
+		bDifficulty = groundLayerGetDifficultyAtDepth(uwTileY << TILE_SHIFT);
 	}
 	BYTE bDrillLevel = inventoryGetPartDef(INVENTORY_PART_DRILL)->ubLevel;
 	BYTE bDrillDuration = MAX(1, bDifficulty - bDrillLevel);

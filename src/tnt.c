@@ -3,6 +3,8 @@
 #include "tile.h"
 #include "vehicle.h"
 #include "inventory.h"
+#include "game.h"
+#include "ground_layer.h"
 #include <ace/managers/log.h>
 
 #define DETONATION_CURRENT_INVALID 0xFF
@@ -21,6 +23,16 @@ static void onExplosionPeak(ULONG ulData) {
 		else {
 			tileExcavate(uwX, uwY);
 		}
+
+		UBYTE ubDifficulty;
+		if(tileIsHardToDrill(uwX, uwY)) {
+			ubDifficulty = 10;
+		}
+		else {
+			ubDifficulty = groundLayerGetDifficultyAtDepth(uwY << TILE_SHIFT);
+		}
+		UBYTE ubExcavateTime = g_ubDrillingCost * ubDifficulty;
+		gameElapseTime(ubExcavateTime);
 	}
 
 	// Trigger next explosion
