@@ -48,6 +48,7 @@ static void onBack(void) {
 	tCommShopPage ePage;
 	if(inboxTryPopFront(&ePage)) {
 		commShopChangePage(s_eCameFrom, ePage);
+		hudClearInboxNotification();
 	}
 	else {
 		commShopChangePage(COMM_SHOP_PAGE_COUNT, s_eCameFrom);
@@ -69,6 +70,7 @@ static void commGsShopCreate(void) {
 	tCommShopPage ePage;
 	if(!inboxTryPopFront(&ePage)) {
 		ePage = COMM_SHOP_PAGE_OFFICE_MAIN;
+		hudClearInboxNotification();
 	}
 	commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, ePage);
 
@@ -95,6 +97,7 @@ static void commGsShopLoop(void) {
 		tCommShopPage ePage;
 		if(inboxTryPopFront(&ePage)) {
 			commShopChangePage(s_eCameFrom, ePage);
+			hudClearInboxNotification();
 			return;
 		}
 

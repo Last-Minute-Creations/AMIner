@@ -159,7 +159,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				}
 			}
 		}
-		else if(inboxIsUrgent() && vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+		else if(inboxGetState() == INBOX_STATE_URGENT && vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
 			statePush(g_pGameStateManager, &g_sStateShop);
 			return 1;
 		}

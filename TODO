@@ -77,8 +77,8 @@ General:
 		✔ Add workshop descriptions @done(23-09-29)
 		✔ Explosion end visual bugs @done(23-09-29)
 	✔ Show save stats preview in main menu @done(23-09-30)
+	✔ Pending message icon on HUD @done(23-10-01)
 	☐ Figure out where to hide sokoban and how to hint it
-	☐ Pending message icon on HUD
 	☐ Animated base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers

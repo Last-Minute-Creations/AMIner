@@ -13,6 +13,12 @@ typedef struct tInboxMessage {
 	// TODO: something to tell shop which next page to show - for going to default state, triggering rebuke game over
 } tInboxMessage;
 
+typedef enum tInboxState {
+	INBOX_STATE_NONE,
+	INBOX_STATE_PENDING,
+	INBOX_STATE_URGENT
+}  tInboxState;
+
 void inboxSave(tFile *pFile);
 
 UBYTE inboxLoad(tFile *pFile);
@@ -23,6 +29,6 @@ void inboxPushBack(tCommShopPage ePage, UBYTE isUrgent);
 
 UBYTE inboxTryPopFront(tCommShopPage *ePage);
 
-UBYTE inboxIsUrgent(void);
+tInboxState inboxGetState(void);
 
 #endif // _AMINER_COMM_INBOX_H_

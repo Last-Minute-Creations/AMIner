@@ -10,6 +10,7 @@
 #include "defs.h"
 #include "save.h"
 #include "blitter_mutex.h"
+#include "comm/inbox.h"
 
 #define HUD_COLOR_BG 11
 #define HUD_COLOR_BAR_FULL 14
@@ -18,6 +19,11 @@
 #define HUD_ORIGIN_X 11
 #define HUD_ORIGIN_Y 9
 #define HUD_FACE_SIZE 16
+
+#define MSG_ICON_X 300
+#define MSG_ICON_Y 9
+#define MSG_ICON_WIDTH 11
+#define MSG_ICON_HEIGHT 6
 
 #define GAUGE_DRILL_X (HUD_ORIGIN_X + 65)
 #define GAUGE_CARGO_X (HUD_ORIGIN_X + 125)
@@ -343,7 +349,7 @@ UBYTE hudIsShowingMessage(void) {
 }
 
 void hudShowMessage(tFaceId eFace, const char *szMsg) {
-	logWrite("Showing HUD message: '%s'\n", szMsg);
+	logWrite("hudShowMessage(eFace: %d, szMsg: '%s')\n", eFace, szMsg);
 	stringCopyLimited(szMsg, s_szMsg, HUD_MSG_BFR_SIZE);
 	s_eState = STATE_MSG_NOISE_IN;
 	s_uwFrameDelay = 25;
@@ -473,6 +479,13 @@ static void hudDrawStateBarPercent(
 	chunkyToPlanar(ubColor, uwX + 1, ubOffsY + ubBarY, s_pHudBuffer->pBack);
 }
 
+void hudClearInboxNotification(void) {
+	blitRect(
+		s_pHudBuffer->pBack, MSG_ICON_X, MSG_ICON_Y,
+		MSG_ICON_WIDTH, MSG_ICON_HEIGHT, HUD_COLOR_BG
+	);
+}
+
 void hudUpdate(void) {
 	tHudPlayerData * const pData = &s_pPlayerData[s_ePlayer];
 	char szBfr[20];
@@ -566,7 +579,8 @@ void hudUpdate(void) {
 				UBYTE ubY = (s_isChallenge ? s_ubHudOffsY : ROW_1_Y);
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_CASH_X, ubY,
-					320 - (GAUGE_CASH_X + HUD_ORIGIN_X), s_ubLineHeight - 1, HUD_COLOR_BG
+					320 - (GAUGE_CASH_X + HUD_ORIGIN_X + MSG_ICON_WIDTH),
+					s_ubLineHeight - 1, HUD_COLOR_BG
 				);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
@@ -743,6 +757,26 @@ void hudUpdate(void) {
 			}
 			break;
 		case STATE_MSG_END:
+			tInboxState eState = inboxGetState();
+			switch(eState) {
+				case INBOX_STATE_NONE:
+					hudClearInboxNotification();
+					break;
+				case INBOX_STATE_PENDING:
+					blitCopy(
+						s_pFaces, 0, 128, s_pHudBuffer->pBack, MSG_ICON_X + 2, MSG_ICON_Y,
+						MSG_ICON_WIDTH - 2, MSG_ICON_HEIGHT,
+						MINTERM_COOKIE
+					);
+					break;
+				case INBOX_STATE_URGENT:
+					blitCopy(
+						s_pFaces, 0, 128, s_pHudBuffer->pBack, MSG_ICON_X, MSG_ICON_Y,
+						MSG_ICON_WIDTH, MSG_ICON_HEIGHT,
+						MINTERM_COOKIE
+					);
+					break;
+			}
 			hudShowPage(HUD_PAGE_MAIN);
 			hudResetStateMachine();
 			break;

@@ -11,12 +11,12 @@
 static tCommShopPage s_pInbox[INBOX_SIZE];
 static UWORD s_uwPendingInboxCount;
 static UWORD s_uwPopPos;
-static UBYTE s_isUrgent;
+static tInboxState s_eState;
 
 void inboxReset(void) {
 	s_uwPendingInboxCount = 0;
 	s_uwPopPos = 0;
-	s_isUrgent = 0;
+	s_eState = INBOX_STATE_NONE;
 }
 
 void inboxSave(tFile *pFile) {
@@ -24,7 +24,7 @@ void inboxSave(tFile *pFile) {
 	fileWrite(pFile, s_pInbox, sizeof(s_pInbox));
 	fileWrite(pFile, &s_uwPendingInboxCount, sizeof(s_uwPendingInboxCount));
 	fileWrite(pFile, &s_uwPopPos, sizeof(s_uwPopPos));
-	fileWrite(pFile, &s_isUrgent, sizeof(s_isUrgent));
+	fileWrite(pFile, &s_eState, sizeof(s_eState));
 }
 
 UBYTE inboxLoad(tFile *pFile) {
@@ -35,7 +35,7 @@ UBYTE inboxLoad(tFile *pFile) {
 	fileRead(pFile, s_pInbox, sizeof(s_pInbox));
 	fileRead(pFile, &s_uwPendingInboxCount, sizeof(s_uwPendingInboxCount));
 	fileRead(pFile, &s_uwPopPos, sizeof(s_uwPopPos));
-	fileRead(pFile, &s_isUrgent, sizeof(s_isUrgent));
+	fileRead(pFile, &s_eState, sizeof(s_eState));
 	return 1;
 }
 
@@ -45,7 +45,12 @@ void inboxPushBack(tCommShopPage ePage, UBYTE isUrgent) {
 		logWrite("ERR: No more room for message %d in inbox\n", ePage);
 	}
 
-	s_isUrgent |= isUrgent;
+	if(isUrgent) {
+		s_eState = INBOX_STATE_URGENT;
+	}
+	else if(s_eState == INBOX_STATE_NONE) {
+		s_eState = INBOX_STATE_PENDING;
+	}
 	s_pInbox[s_uwPendingInboxCount++] = ePage;
 }
 
@@ -57,10 +62,10 @@ UBYTE inboxTryPopFront(tCommShopPage *ePage) {
 	}
 
 	*ePage = s_pInbox[s_uwPopPos++];
-	s_isUrgent = 0;
+	s_eState = INBOX_STATE_NONE;
 	return 1;
 }
 
-UBYTE inboxIsUrgent(void) {
-	return s_isUrgent;
+tInboxState inboxGetState(void) {
+	return s_eState;
 }

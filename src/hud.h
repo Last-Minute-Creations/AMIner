@@ -47,6 +47,8 @@ void hudSetDrill(UBYTE ubPlayer, UWORD uwDrill, UWORD uwDrillMax);
 
 void hudSetHull(UBYTE ubPlayer, UWORD uwHull, UWORD uwHullMax);
 
+void hudClearInboxNotification(void);
+
 void hudUpdate(void);
 
 UBYTE hudIsShowingMessage(void);
