@@ -36,9 +36,6 @@
 #define HUD_MSG_BFR_SIZE 250
 #define HUD_MSG_WAIT_CNT 150
 
-#define MODE_ICON_HEIGHT 12
-#define MODE_DISABLED_OFFS_Y 3 * MODE_ICON_HEIGHT
-
 typedef enum _tHudPage {
 	HUD_PAGE_MAIN,
 	HUD_PAGE_NOISE_1,
@@ -46,7 +43,6 @@ typedef enum _tHudPage {
 	HUD_PAGE_NOISE_3,
 	HUD_PAGE_MSG,
 	HUD_PAGE_PAUSE,
-	HUD_PAGE_MODE,
 	HUD_PAGE_COUNT,
 } tHudPage;
 
@@ -71,10 +67,6 @@ typedef enum _tHudState {
 	// State machine for pause screen
 	STATE_PAUSE_INITIAL_DRAW,
 	STATE_PAUSE_LOOP,
-	// State machine for drawing aux HUD
-	STATE_MODE_SHOW,
-	STATE_MODE_LOOP,
-	STATE_MODE_HIDE,
 } tHudState;
 
 typedef struct _tHudPlayerData {
@@ -84,7 +76,6 @@ typedef struct _tHudPlayerData {
 	UBYTE ubCargo, ubCargoMax;
 	UWORD uwHull, uwHullMax;
 	UBYTE ubHullDisp, ubCargoDisp, ubDrillDisp;
-	tMode eMode, eModePrev;
 } tHudPlayerData;
 
 static tVPort *s_pVpHud;
@@ -92,7 +83,6 @@ static tSimpleBufferManager *s_pHudBuffer;
 static const tFont *s_pFont;
 static tTextBitMap *s_pLineBuffer;
 static tBitMap *s_pFaces;
-static tBitMap *s_pModeIcons, *s_pModeCursor, *s_pModeCursorMask;
 
 static UBYTE s_ubLineHeight;
 static UBYTE s_isBitmapFilled = 0;
@@ -114,14 +104,6 @@ static tFaceId s_eFaceToDraw;
 
 // Pause vars
 static UBYTE s_ubSelection, s_ubSelectionPrev;
-
-// Mode vars
-static WORD s_pModeCounters[MODE_COUNT] = {-1, 0, 0, 0};
-static WORD s_pModeCountersPrev[MODE_COUNT] = {-1, 0, 0, 0};
-static tMode s_eModeToDraw;
-static UBYTE s_isPendingModeShow;
-static tHudPage s_eModeReturnPage;
-static tHudState s_eModeReturnState;
 static UBYTE s_ubHudShowStack;
 
 //----------------------------------------------------------------------- STATIC
@@ -216,79 +198,6 @@ UBYTE hudGetSelection(void) {
 	return s_ubSelection;
 }
 
-//------------------------------------------------------------------------- MODE
-
-static void hudDrawModeIcon(tMode eMode) {
-	static const UWORD uwModeWidth = 40 - 1;
-	UWORD uwOffsX = HUD_ORIGIN_X + (eMode + 1) * uwModeWidth;
-	UWORD uwOffsY = HUD_ORIGIN_Y + HUD_PAGE_MODE * 31 + 1;
-
-	// Erase selection
-	blitRect(
-		s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1, uwModeWidth, 15, HUD_COLOR_BG
-	);
-
-	// Draw icon
-	UWORD uwIconOffs = eMode * MODE_ICON_HEIGHT;
-	if(eMode != MODE_DRILL && !s_pModeCounters[eMode]) {
-		uwIconOffs += MODE_DISABLED_OFFS_Y;
-	}
-	blitCopy(
-		s_pModeIcons, 0, uwIconOffs,
-		s_pHudBuffer->pBack, uwOffsX + 1, uwOffsY,
-		16, MODE_ICON_HEIGHT, MINTERM_COOKIE
-	);
-
-	// Draw selection
-	if(s_pPlayerData[PLAYER_1].eMode == eMode) {
-		blitCopyMask(
-			s_pModeCursor, 0, 0,
-			s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1,
-			16, 15, s_pModeCursorMask->Planes[0]
-		);
-	}
-	if(s_is2pPlaying && s_pPlayerData[PLAYER_2].eMode == eMode) {
-		blitCopyMask(
-			s_pModeCursor, 0, 15,
-			s_pHudBuffer->pBack, uwOffsX, uwOffsY - 1,
-			16, 15, s_pModeCursorMask->Planes[0]
-		);
-	}
-
-	// Draw count
-	if(eMode != MODE_DRILL) {
-		char szCount[6];
-		stringDecimalFromULong(s_pModeCounters[eMode], szCount);
-		fontFillTextBitMap(s_pFont, s_pLineBuffer, szCount);
-		fontDrawTextBitMap(
-			s_pHudBuffer->pBack, s_pLineBuffer,
-			uwOffsX + 1 + 16, uwOffsY + MODE_ICON_HEIGHT / 2,
-			HUD_COLOR_BAR_FULL, FONT_COOKIE | FONT_VCENTER
-		);
-	}
-}
-
-void hudSetModeCounter(tMode eMode, WORD wCount) {
-	s_pModeCounters[eMode] = wCount;
-}
-
-void hudSetMode(tHudPlayer ePlayer, tMode eMode) {
-	s_pPlayerData[ePlayer].eMode = eMode;
-}
-
-void hudShowMode(void) {
-	if(++s_ubHudShowStack == 1) {
-		s_isPendingModeShow = 1;
-		s_eModeToDraw = MODE_DRILL;
-	}
-}
-
-void hudHideMode(void) {
-	if(--s_ubHudShowStack == 0) {
-		s_eState = STATE_MODE_HIDE;
-	}
-}
-
 //------------------------------------------------------------------------- MAIN
 
 void hudCreate(tVPort *pVpHud, const tFont *pFont) {
@@ -302,9 +211,6 @@ void hudCreate(tVPort *pVpHud, const tFont *pFont) {
 
 	bitmapLoadFromFile(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
 	s_pFaces = bitmapCreateFromFile("data/comm_faces.bm", 0);
-	s_pModeIcons = bitmapCreateFromFile("data/mode_icons.bm", 0);
-	s_pModeCursor = bitmapCreateFromFile("data/mode_cursor.bm", 0);
-	s_pModeCursorMask = bitmapCreateFromFile("data/mode_cursor_mask.bm", 0);
 
 	s_pFont = pFont;
 	s_ubLineHeight = 7;
@@ -400,12 +306,6 @@ void hudSave(tFile *pFile) {
 	fileWrite(pFile, &s_eFaceToDraw, sizeof(s_eFaceToDraw));
 	fileWrite(pFile, &s_ubSelection, sizeof(s_ubSelection));
 	fileWrite(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
-	fileWrite(pFile, s_pModeCounters, sizeof(s_pModeCounters));
-	fileWrite(pFile, s_pModeCountersPrev, sizeof(s_pModeCountersPrev));
-	fileWrite(pFile, &s_eModeToDraw, sizeof(s_eModeToDraw));
-	fileWrite(pFile, &s_isPendingModeShow, sizeof(s_isPendingModeShow));
-	fileWrite(pFile, &s_eModeReturnPage, sizeof(s_eModeReturnPage));
-	fileWrite(pFile, &s_eModeReturnState, sizeof(s_eModeReturnState));
 	fileWrite(pFile, &s_ubHudShowStack, sizeof(s_ubHudShowStack));
 }
 
@@ -433,12 +333,6 @@ UBYTE hudLoad(tFile *pFile) {
 	fileRead(pFile, &s_eFaceToDraw, sizeof(s_eFaceToDraw));
 	fileRead(pFile, &s_ubSelection, sizeof(s_ubSelection));
 	fileRead(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
-	fileRead(pFile, s_pModeCounters, sizeof(s_pModeCounters));
-	fileRead(pFile, s_pModeCountersPrev, sizeof(s_pModeCountersPrev));
-	fileRead(pFile, &s_eModeToDraw, sizeof(s_eModeToDraw));
-	fileRead(pFile, &s_isPendingModeShow, sizeof(s_isPendingModeShow));
-	fileRead(pFile, &s_eModeReturnPage, sizeof(s_eModeReturnPage));
-	fileRead(pFile, &s_eModeReturnState, sizeof(s_eModeReturnState));
 	fileRead(pFile, &s_ubHudShowStack, sizeof(s_ubHudShowStack));
 
 	hudRefresh();
@@ -821,51 +715,12 @@ void hudUpdate(void) {
 				s_ubSelectionPrev = s_ubSelection;
 			}
 			break;
-		case STATE_MODE_SHOW:
-			s_eModeReturnPage = s_ePageCurrent;
-			if(s_eModeToDraw < MODE_COUNT) {
-				hudDrawModeIcon(s_eModeToDraw);
-				++s_eModeToDraw;
-			}
-			else {
-				hudShowPage(HUD_PAGE_MODE);
-				s_eState = STATE_MODE_LOOP;
-			}
-			break;
-		case STATE_MODE_LOOP:
-			if(s_ePlayer == PLAYER_1 || s_is2pPlaying) {
-				tHudPlayerData *pData = &s_pPlayerData[s_ePlayer];
-				if(pData->eModePrev != pData->eMode) {
-					hudDrawModeIcon(pData->eModePrev);
-					hudDrawModeIcon(pData->eMode);
-					pData->eModePrev = pData->eMode;
-				}
-				else if(s_pModeCountersPrev[pData->eMode] != s_pModeCounters[pData->eMode]) {
-					hudDrawModeIcon(pData->eMode);
-					s_pModeCountersPrev[pData->eMode] = s_pModeCounters[pData->eMode];
-				}
-			}
-			// Cycle players and start again
-			s_ePlayer = (s_ePlayer == PLAYER_1) ? PLAYER_2 : PLAYER_1;
-		break;
-		case STATE_MODE_HIDE:
-			hudShowPage(s_eModeReturnPage);
-			s_eState = s_eModeReturnState;
-			break;
-	}
-	if(s_isPendingModeShow && !s_isBitmapFilled) {
-		s_eModeReturnState = s_eState;
-		s_eState = STATE_MODE_SHOW;
-		s_isPendingModeShow = 0;
 	}
 }
 
 void hudDestroy(void) {
 	fontDestroyTextBitMap(s_pLineBuffer);
 	bitmapDestroy(s_pFaces);
-	bitmapDestroy(s_pModeIcons);
-	bitmapDestroy(s_pModeCursor);
-	bitmapDestroy(s_pModeCursorMask);
 }
 
 void hudShowMain(void) {

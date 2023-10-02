@@ -339,14 +339,14 @@ convertBitmaps(
 	TARGET ${GAME_EXECUTABLE} PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCES
 		${RES_DIR}/commrade/bg.png ${RES_DIR}/commrade/buttons.png ${RES_DIR}/commrade/faces_hud.png
-		${RES_DIR}/hud/hud.png ${RES_DIR}/hud/mode_icons.png ${RES_DIR}/logo.png ${RES_DIR}/lang_select.png
+		${RES_DIR}/hud.png ${RES_DIR}/logo.png ${RES_DIR}/lang_select.png
 		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png ${RES_DIR}/commrade/news.png
-		${RES_DIR}/commrade/soko.png ${GEN_DIR}/bg_factory_drip.png
+		${RES_DIR}/commrade/soko.png ${GEN_DIR}/bg_factory_drip.png ${RES_DIR}/mode_icons.png
 	DESTINATIONS
 		${DATA_DIR}/comm_bg.bm ${DATA_DIR}/comm_buttons.bm ${DATA_DIR}/comm_faces.bm
-		${DATA_DIR}/hud.bm ${DATA_DIR}/mode_icons.bm ${DATA_DIR}/logo.bm ${DATA_DIR}/lang_select.bm
+		${DATA_DIR}/hud.bm ${DATA_DIR}/logo.bm ${DATA_DIR}/lang_select.bm
 		${DATA_DIR}/comm_faces_office.bm ${DATA_DIR}/comm_office_selection.bm ${DATA_DIR}/comm_news.bm
-		${DATA_DIR}/soko.bm ${DATA_DIR}/bg_factory_drip.bm
+		${DATA_DIR}/soko.bm ${DATA_DIR}/bg_factory_drip.bm ${DATA_DIR}/mode_icons.bm
 )
 
 convertBitmaps(
@@ -355,22 +355,22 @@ convertBitmaps(
 		${GEN_DIR}/drill.png ${GEN_DIR}/tool.png ${GEN_DIR}/wreck.png
 		${GEN_DIR}/drill_2.png ${GEN_DIR}/tool_2.png ${GEN_DIR}/wreck_2.png
 		${GEN_DIR}/track.png ${RES_DIR}/jet.png ${GEN_DIR}/bones.png
-		${GEN_DIR}/gate.png ${RES_DIR}/smoke.png
-		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png ${RES_DIR}/hud/mode_cursor.png
+		${GEN_DIR}/gate.png ${RES_DIR}/smoke.png ${RES_DIR}/mode_icon_mask.png
+		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png
 		${RES_DIR}/bomb_marker.png ${RES_DIR}/commrade/edges.png
 	DESTINATIONS
 		${DATA_DIR}/drill.bm ${DATA_DIR}/tool.bm ${DATA_DIR}/wreck.bm
 		${DATA_DIR}/drill_2.bm ${DATA_DIR}/tool_2.bm ${DATA_DIR}/wreck_2.bm
 		${DATA_DIR}/track.bm ${DATA_DIR}/jet.bm ${DATA_DIR}/bones.bm
-		${DATA_DIR}/gate.bm ${DATA_DIR}/smoke.bm
-		${DATA_DIR}/explosion.bm ${DATA_DIR}/teleport.bm ${DATA_DIR}/mode_cursor.bm
+		${DATA_DIR}/gate.bm ${DATA_DIR}/smoke.bm NONE
+		${DATA_DIR}/explosion.bm ${DATA_DIR}/teleport.bm
 		${DATA_DIR}/bomb_marker.bm NONE
 	MASKS
 		${DATA_DIR}/drill_mask.bm ${DATA_DIR}/tool_mask.bm ${DATA_DIR}/wreck_mask.bm
 		NONE NONE NONE
 		${DATA_DIR}/track_mask.bm ${DATA_DIR}/jet_mask.bm ${DATA_DIR}/bones_mask.bm
-		${DATA_DIR}/gate_mask.bm ${DATA_DIR}/smoke_mask.bm
-		${DATA_DIR}/explosion_mask.bm ${DATA_DIR}/teleport_mask.bm ${DATA_DIR}/mode_cursor_mask.bm
+		${DATA_DIR}/gate_mask.bm ${DATA_DIR}/smoke_mask.bm ${DATA_DIR}/mode_icon_mask.bm
+		${DATA_DIR}/explosion_mask.bm ${DATA_DIR}/teleport_mask.bm
 		${DATA_DIR}/bomb_marker_mask.bm ${DATA_DIR}/comm_edges_mask.bm
 )
 

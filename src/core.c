@@ -32,6 +32,7 @@
 #include "bob_sequence.h"
 #include "language.h"
 #include "blitter_mutex.h"
+#include "mode_menu.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
@@ -231,15 +232,14 @@ static void coreGsCreate(void) {
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 15);
 	textBobManagerCreate(g_pFont);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 20);
-	dinoReset();
-	questGateReset();
+	baseCreate(g_pMainBuffer);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 25);
 	collectiblesCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 30);
 	hudCreate(pVpHud, g_pFont);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 35);
-
-	baseCreate(g_pMainBuffer);
+	dinoReset();
+	questGateReset();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 40);
 	audioMixerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 45);
@@ -272,6 +272,7 @@ static void coreGsCreate(void) {
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 80);
 
 	assetsBombMarkersCreate();
+	modeMenuManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 85);
 	gameInitBombMarkerBobs();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 90);
@@ -347,6 +348,7 @@ static void coreGsDestroy(void) {
 	assetsAudioDestroy();
 
 	assetsBombMarkersDestroy();
+	modeMenuManagerDestroy();
 	assetsTileOverlayDestroy();
 	explosionManagerDestroy();
 	coreBobSequencesDestroy();
