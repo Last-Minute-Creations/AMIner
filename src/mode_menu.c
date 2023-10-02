@@ -8,14 +8,22 @@
 #include "mode_menu.h"
 #include "game.h"
 
-#define MODE_ICON_SIZE 12
+#define MODE_ICON_WIDTH 16
+#define MODE_ICON_HEIGHT 12
 #define MODE_ICON_MARGIN 4
+
+typedef enum tModeMask {
+	MODE_MASK_MULTI,
+	MODE_MASK_SINGLE,
+	MODE_MASK_COUNT,
+} tModeMask;
 
 //----------------------------------------------------------------- PRIVATE VARS
 
 static tBitMap *s_pModeIcons;
 static tBitMap *s_pModeIconMask;
 static UBYTE *s_pModeIconOffsets[MODE_OPTION_COUNT];
+static UBYTE *s_pModeMaskOffsets[MODE_OPTION_COUNT];
 
 //------------------------------------------------------------------ PRIVATE FNS
 
@@ -26,7 +34,11 @@ void modeMenuManagerCreate(void) {
 	s_pModeIconMask = bitmapCreateFromFile("data/mode_icon_mask.bm", 0);
 
 	for(tModeOption eOption = 0; eOption < MODE_OPTION_COUNT; ++eOption) {
-		s_pModeIconOffsets[eOption] = bobCalcFrameAddress(s_pModeIcons, eOption * MODE_ICON_SIZE);
+		s_pModeIconOffsets[eOption] = bobCalcFrameAddress(s_pModeIcons, eOption * MODE_ICON_HEIGHT);
+	}
+
+	for(tModeMask eMask = 0; eMask < MODE_MASK_COUNT; ++eMask) {
+		s_pModeMaskOffsets[eMask] = bobCalcFrameAddress(s_pModeIconMask, eMask * MODE_ICON_HEIGHT);
 	}
 }
 
@@ -42,23 +54,21 @@ void modeMenuReset(tModeMenu *pModeMenu, UBYTE ubPlayerIndex) {
 	pModeMenu->isActive = 0;
 	pModeMenu->ubPlayerIndex = ubPlayerIndex;
 
-	for(UBYTE ubBobIndex = 0; ubBobIndex < MODE_BOBS_PER_PLAYER; ++ubBobIndex) {
-		bobInit(
-			&pModeMenu->pBobs[ubBobIndex],
-			CEIL_TO_FACTOR(MODE_ICON_SIZE, 16), MODE_ICON_SIZE,
-			1, 0, s_pModeIconMask->Planes[0], 0, 0
-		);
-	}
+	bobInit(
+		&pModeMenu->sBob,
+		MODE_ICON_WIDTH, MODE_ICON_HEIGHT,
+		1, 0, s_pModeIconMask->Planes[0], 0, 0
+	);
 }
 
 void modeMenuClearOptions(tModeMenu *pModeMenu) {
 	pModeMenu->ubCount = 0;
+	pModeMenu->ubCurrent = 0;
 }
 
 void modeMenuAddOption(tModeMenu *pModeMenu, tModeOption eOption) {
 	UBYTE ubIndex = pModeMenu->ubCount;
 	pModeMenu->pModeOptions[ubIndex] = eOption;
-	pModeMenu->pBobs[ubIndex].pFrameData = s_pModeIconOffsets[eOption];
 	pModeMenu->ubCount = ubIndex + 1;
 }
 
@@ -77,10 +87,17 @@ void modeMenuProcess(tModeMenu *pModeMenu, tDirection eDirection) {
 			pModeMenu->ubCurrent = 0;
 		}
 	}
+	else {
+		return;
+	}
+
+	pModeMenu->sBob.pFrameData = s_pModeIconOffsets[modeMenuGetSelected(pModeMenu)];
 }
 
-void modeMenuEnterSelecion(tModeMenu *pModeMenu) {
+void modeMenuEnterSelection(tModeMenu *pModeMenu) {
 	pModeMenu->isActive = 1;
+	pModeMenu->sBob.pFrameData = s_pModeIconOffsets[modeMenuGetSelected(pModeMenu)];
+	pModeMenu->sBob.pMaskData = s_pModeMaskOffsets[pModeMenu->ubCount == 1];
 }
 
 tModeOption modeMenuExitSelection(tModeMenu *pModeMenu) {
@@ -98,13 +115,7 @@ void modeMenuTryDisplay(tModeMenu *pModeMenu) {
 	}
 
 	const tVehicle *pVehicle = &g_pVehicles[pModeMenu->ubPlayerIndex];
-	UWORD uwX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
-	UWORD uwY = pVehicle->sBobBody.sPos.uwY - (MODE_ICON_SIZE + MODE_ICON_MARGIN);
-
-	for(UBYTE ubOptionIndex = 0; ubOptionIndex < pModeMenu->ubCount; ++ubOptionIndex) {
-		pModeMenu->pBobs[ubOptionIndex].sPos.uwX = uwX + ubOptionIndex * (MODE_ICON_SIZE + MODE_ICON_MARGIN);
-		pModeMenu->pBobs[ubOptionIndex].sPos.uwY = uwY;
-		gameTryPushBob(&pModeMenu->pBobs[ubOptionIndex]);
-	}
-
+	pModeMenu->sBob.sPos.uwX = pVehicle->sBobBody.sPos.uwX + (VEHICLE_WIDTH - MODE_ICON_WIDTH) / 2;
+	pModeMenu->sBob.sPos.uwY = pVehicle->sBobBody.sPos.uwY - (MODE_ICON_HEIGHT + MODE_ICON_MARGIN);
+	gameTryPushBob(&pModeMenu->sBob);
 }

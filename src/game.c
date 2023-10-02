@@ -44,9 +44,17 @@ typedef enum _tCameraType {
 	CAMERA_TYPE_P2,
 } tCameraType;
 
+typedef enum tModePreset {
+	MODE_PRESET_DEFAULT,
+	MODE_PRESET_SHOP,
+	MODE_PRESET_FAST_TRAVEL,
+	MODE_PRESET_COUNT,
+} tModePreset;
+
 //----------------------------------------------------------------- PRIVATE VARS
 
-static tBob s_pBombMarkers[2][3];
+static tBob s_pPlayerBombMarkers[2][3];
+static tModePreset s_pPlayerModePreset[2];
 
 static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 static tUwCoordYX s_sTeleportReturn;
@@ -70,6 +78,40 @@ UBYTE g_isAtari;
 
 //------------------------------------------------------------ PRIVATE FNS: MODE
 // TODO: reformat somehow? Move to separate file?
+
+static UBYTE gameChangeModePreset(UBYTE ubPlayerIndex, tModePreset ePreset) {
+	if(s_pPlayerModePreset[ubPlayerIndex] == ePreset) {
+		return 0;
+	}
+
+	s_pPlayerModePreset[ubPlayerIndex] = ePreset;
+	tModeMenu *pModeMenu = &s_pModeMenus[ubPlayerIndex];
+	modeMenuClearOptions(pModeMenu);
+	switch(ePreset) {
+		case MODE_PRESET_SHOP:
+			modeMenuAddOption(pModeMenu, MODE_OPTION_EXCLAMATION);
+			break;
+		case MODE_PRESET_DEFAULT:
+			modeMenuAddOption(pModeMenu, MODE_OPTION_DRILL);
+			// TODO: check conditions for TNT
+			modeMenuAddOption(pModeMenu, MODE_OPTION_TNT);
+			// TODO: check conditions for teleport
+			modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
+			break;
+		case MODE_PRESET_FAST_TRAVEL:
+			break;
+		default:
+			break;
+	}
+	return 1;
+}
+
+static void gameResetModePreset(UBYTE ubPlayerIndex) {
+	// set to  anything else to trigger change
+	s_pPlayerModePreset[ubPlayerIndex] = MODE_PRESET_SHOP;
+
+	gameChangeModePreset(ubPlayerIndex, MODE_PRESET_DEFAULT);
+}
 
 static void gameProcessModeTnt(UBYTE ubPlayer) {
 	tTnt *pTnt = &g_pVehicles[ubPlayer].sDynamite;
@@ -99,7 +141,7 @@ static void gameDisplayModeTnt(UBYTE ubPlayer) {
 		return;
 	}
 	const tTnt *pTnt = &g_pVehicles[ubPlayer].sDynamite;
-	tBob *pPlayerBombMarkers = s_pBombMarkers[ubPlayer];
+	tBob *pPlayerBombMarkers = s_pPlayerBombMarkers[ubPlayer];
 	for(UBYTE i = 0; i < pTnt->ubCoordCount; ++i) {
 		pPlayerBombMarkers[i].sPos.uwX = (pTnt->pCoords[i].uwX << TILE_SHIFT) + 8;
 		pPlayerBombMarkers[i].sPos.uwY = (pTnt->pCoords[i].uwY << TILE_SHIFT) + 11;
@@ -120,28 +162,34 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	tModeMenu *pModeMenu = &s_pModeMenus[ubPlayer];
 
 	if(!g_isChallenge) {
-		if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
-			if(!pModeMenu->isActive) {
-				if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-					statePush(g_pGameStateManager, &g_sStateShop);
-					return 1;
-				}
-				modeMenuEnterSelecion(pModeMenu);
+		if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+			if(gameChangeModePreset(ubPlayer, MODE_PRESET_SHOP)) {
+				modeMenuEnterSelection(&s_pModeMenus[ubPlayer]);
 			}
-			else {
-				tModeOption eSelectedmode = modeMenuExitSelection(pModeMenu);
-				if(eSelectedmode == MODE_OPTION_TNT) {
-					tUwCoordYX sTilePos = {
-						.uwX = (g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
-						.uwY = (g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5
-					};
-					tntReset(&g_pVehicles[ubPlayer].sDynamite, ubPlayer, sTilePos);
-				}
+			if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE) || inboxGetState() == INBOX_STATE_URGENT) {
+				statePush(g_pGameStateManager, &g_sStateShop);
+				return 1;
 			}
 		}
-		else if(inboxGetState() == INBOX_STATE_URGENT && vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-			statePush(g_pGameStateManager, &g_sStateShop);
-			return 1;
+		else {
+			if(gameChangeModePreset(ubPlayer, MODE_PRESET_DEFAULT)) {
+				modeMenuExitSelection(&s_pModeMenus[ubPlayer]);
+			}
+			if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
+				if(!pModeMenu->isActive) {
+					modeMenuEnterSelection(pModeMenu);
+				}
+				else {
+					tModeOption eSelectedmode = modeMenuExitSelection(pModeMenu);
+					if(eSelectedmode == MODE_OPTION_TNT) {
+						tUwCoordYX sTilePos = {
+							.uwX = (g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
+							.uwY = (g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5
+						};
+						tntReset(&g_pVehicles[ubPlayer].sDynamite, ubPlayer, sTilePos);
+					}
+				}
+			}
 		}
 	}
 
@@ -196,15 +244,6 @@ static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 
 //------------------------------------------------------------------ PRIVATE FNS
 
-static void gameSetModeMenuDefault(tModeMenu *pModeMenu) {
-	modeMenuClearOptions(pModeMenu);
-	modeMenuAddOption(pModeMenu, MODE_OPTION_DRILL);
-	// TODO: check conditions for TNT
-	modeMenuAddOption(pModeMenu, MODE_OPTION_TNT);
-	// TODO: check conditions for teleport
-	modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
-}
-
 static void gameProcessHotkeys(void) {
   if(keyUse(KEY_ESCAPE) || keyUse(KEY_P)) {
 		stateChange(g_pGameStateManager, &g_sStatePause);
@@ -236,7 +275,7 @@ static void gameProcessHotkeys(void) {
 			g_is2pPlaying = 1;
 			hudSet2pPlaying(1);
 			modeMenuReset(&s_pModeMenus[1], 1);
-			gameSetModeMenuDefault(&s_pModeMenus[1]);
+			gameResetModePreset(1);
 			vehicleResetPos(&g_pVehicles[1]);
 			g_pVehicles[1].fX = g_pVehicles[0].fX;
 			g_pVehicles[1].fY = g_pVehicles[0].fY;
@@ -516,7 +555,7 @@ void gameInitBombMarkerBobs(void) {
 	for(UBYTE ubPlayer = 0; ubPlayer < 2; ++ubPlayer) {
 		for(UBYTE i = 0; i < 3; ++i) {
 			bobInit(
-				&s_pBombMarkers[ubPlayer][i], 16, 10, 1,
+				&s_pPlayerBombMarkers[ubPlayer][i], 16, 10, 1,
 				pAddressFrame, pAddressMask, 0, 0
 			);
 		}
@@ -643,9 +682,9 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	modeMenuReset(&s_pModeMenus[0], 0);
-	gameSetModeMenuDefault(&s_pModeMenus[0]);
 	modeMenuReset(&s_pModeMenus[1], 1);
-	gameSetModeMenuDefault(&s_pModeMenus[1]);
+	gameResetModePreset(0);
+	gameResetModePreset(1);
 	s_ulGameTime = 0;
 	s_uwMaxTileY = 0;
 	s_ubCurrentMod = ASSETS_GAME_MOD_COUNT;

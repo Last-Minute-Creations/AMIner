@@ -25,7 +25,7 @@ typedef enum tModeOption {
 } tModeOption;
 
 typedef struct tModeMenu {
-	tBob pBobs[MODE_BOBS_PER_PLAYER];
+	tBob sBob;
 	tModeOption pModeOptions[MODE_BOBS_PER_PLAYER];
 	UBYTE ubCount;
 	UBYTE ubCurrent;
@@ -45,7 +45,7 @@ void modeMenuAddOption(tModeMenu *pModeMenu, tModeOption eOption);
 
 void modeMenuProcess(tModeMenu *pModeMenu, tDirection eDirection);
 
-void modeMenuEnterSelecion(tModeMenu *pModeMenu);
+void modeMenuEnterSelection(tModeMenu *pModeMenu);
 
 tModeOption modeMenuExitSelection(tModeMenu *pModeMenu);
 
