@@ -78,6 +78,7 @@ General:
 		✔ Explosion end visual bugs @done(23-09-29)
 	✔ Show save stats preview in main menu @done(23-09-30)
 	✔ Pending message icon on HUD @done(23-10-01)
+	✔ Mode management via floating buttons @done(23-10-02)
 	☐ Figure out where to hide sokoban and how to hint it
 	☐ Animated base elements
 		✔ Leaking pipe @done(23-09-29)
@@ -85,7 +86,6 @@ General:
 		☐ Smoke
 		☐ Ufo?
 		☐ Clouds?
-	☐ Mode management via floating buttons
 	☐ Limit cash to prevent trashing of message icon?
 	☐ Fast travel between bases
 	☐ Portable teleport as a vehicle upgrade

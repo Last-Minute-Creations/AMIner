@@ -93,10 +93,13 @@ static UBYTE gameChangeModePreset(UBYTE ubPlayerIndex, tModePreset ePreset) {
 			break;
 		case MODE_PRESET_DEFAULT:
 			modeMenuAddOption(pModeMenu, MODE_OPTION_DRILL);
-			// TODO: check conditions for TNT
-			modeMenuAddOption(pModeMenu, MODE_OPTION_TNT);
+			if(inventoryGetPartDef(INVENTORY_PART_TNT)->ubLevel) {
+				modeMenuAddOption(pModeMenu, MODE_OPTION_TNT);
+			}
 			// TODO: check conditions for teleport
+			// if(inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel) {
 			modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
+			// }
 			break;
 		case MODE_PRESET_FAST_TRAVEL:
 			break;
@@ -193,7 +196,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 		}
 	}
 
-	if(pModeMenu->isActive) {
+	if(pModeMenu->isActive && s_pPlayerModePreset[ubPlayer] != MODE_PRESET_SHOP) {
 		tDirection eDirection = DIRECTION_COUNT;
 		if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_LEFT)) {
 			eDirection = DIRECTION_LEFT;
