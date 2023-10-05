@@ -403,7 +403,7 @@ static void processPlan(void) {
 			hudShowMessage(0, szBfr);
 		}
 		else {
-			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_REBUKE]);
+			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
 			gameAddRebuke();
 			planFailDeadline();
 		}
@@ -526,6 +526,9 @@ void gameAddAccolade(void) {
 	++s_ubAccolades;
 
 	if(s_ubAccolades >= g_ubAccoladesInMainStory) {
+		if(!dinoIsAllFound()) {
+			inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_PLAN_FAIL, 0);
+		}
 		inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES, 0);
 	}
 }

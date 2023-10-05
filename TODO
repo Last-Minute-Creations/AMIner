@@ -107,16 +107,19 @@ Optimizations:
 
 Main quest:
 
-Dino:
-	☐ Figure out the final flow
+Dino quest:
+	✔ Figure out the final flow @done(23-10-05)
 	✔ Implement the initial flow @done(23-03-08)
 		✔ Intro when digging out the first bone @done(23-03-08)
 		✔ Base gfx swap after reading intro @done(23-03-08)
 		✔ Placeholder outro after digging out the last bone @done(23-03-08)
 		✔ Extra accolade after reading outro @done(23-03-08)
 	✔ Swap bases with proper gfx @done(23-09-27)
-	☐ Message for call upon finding subsequent bones
-	☐ Message for final call to receive the accolade
+	✔ Message on unfinished if receiving plan-based ending @done(23-10-05)
+	✔ HUD Message for call upon finding subsequent bones @done(23-10-05)
+	✔ HUD Message for final call to receive the accolade @done(23-10-05)
+	✔ Message on receiving the accolade @done(23-10-05)
+	✘ Dialogue option to check progress @cancelled(23-10-05)
 
 Gate quest:
 	☐ Figure out the flow
@@ -127,8 +130,9 @@ Gate quest:
 		✔ Display reconstructed gate @done(23-07-10)
 	✔ Questioning by commissar @done(23-07-13)
 	☐ Endings
+		✘ Secret scientist ending @cancelled(23-10-02)
 		☐ Secret dino ending
-		☐ Secret scientist ending
+			☐ Message on unfinished dino-skeleton
 		☐ Non-secret army ending
 
 Crate quests:

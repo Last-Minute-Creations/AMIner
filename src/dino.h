@@ -18,4 +18,6 @@ void dinoProcess(void);
 
 UBYTE dinoAddBone(void);
 
+UBYTE dinoIsAllFound(void);
+
 #endif // _DINO_H_

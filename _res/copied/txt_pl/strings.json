@@ -9,7 +9,7 @@
 			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
 			"niewykonany. Dał nam jeszcze %hhu dni."
 		],
-		"rebuke": [
+		"waitingKomisarz": [
 			"Panie Dyrektorze, Komisarz Putienko wzywa do gabinetu.",
 			"Natychmiast!"
 		],
@@ -17,6 +17,13 @@
 		"waitingUrzedas": [
 			"Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne. Mówiłam,",
 			"że Pan Dyrektor ma naradę ale się uparł i czeka. Zapraszam do gabinetu."
+		],
+		"dinoFoundBone": [
+			"Doskonale! Odnaleźliście kolejny fragment szkieletu!"
+		],
+		"dinoComplete": [
+			"Towarzyszu Dyrektorze, pozwólcie na momencik.",
+			"Mam wspaniałą wiadomość!"
 		]
 	},
 	"hiScore": {
@@ -144,14 +151,17 @@
 		"urzedasFirstPlan": "Pierwszy plan",
 		"planComplete": "Wykonanie planu",
 		"planDelayed": "Przedłużony plan",
-		"urzedasDinoIntro": "Archeolodzy",
 		"urzedasBribe": "Łapówka",
 		"urzedasFavor": "Przysługa",
+		"komisarzDinoIntro": "Archeolodzy",
 		"komisarzRebuke_1": "Pierwsza nagana",
 		"komisarzRebuke_2": "Druga nagana",
 		"komisarzRebuke_3": "Ostatnia nagana",
 		"komisarzQuestioning": "Przesłuchanie",
-		"archAccolade": "Pochwała"
+		"komisarzArchAccolade": "Kompletny dinozaur",
+		"archPlanFail": "Awans",
+		"archGateFail": "Inwazja",
+		"archAccolade": "Kompletny dinozaur"
 	},
 	"officePageContents": {
 		"bribeA": [

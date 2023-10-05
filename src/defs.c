@@ -90,11 +90,13 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_RESUME] = "hud.resume",
 	[MSG_HUD_SAVE_QUIT] = "hud.saveQuit",
 	// HUD: Misc
+	[MSG_HUD_DINO_COMPLETE] = "hudMessages.dinoComplete",
+	[MSG_HUD_DINO_FOUND_BONE] = "hudMessages.dinoFoundBone",
 	// HUD: Plan
 	[MSG_HUD_NEW_PLAN] = "hudMessages.newPlan",
 	[MSG_HUD_PLAN_REMAINING] = "hudMessages.remaining",
 	[MSG_HUD_PLAN_EXTENDING] = "hudMessages.extending",
-	[MSG_HUD_REBUKE] = "hudMessages.rebuke",
+	[MSG_HUD_WAITING_KOMISARZ] = "hudMessages.waitingKomisarz",
 	[MSG_HUD_GUEST] = "hudMessages.guest",
 	[MSG_HUD_WAITING_URZEDAS] = "hudMessages.waitingUrzedas",
 	// Loading
@@ -118,17 +120,20 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_URZEDAS_FIRST_PLAN] = "officePages.urzedasFirstPlan",
 	[MSG_PAGE_URZEDAS_PLAN_COMPLETE] = "officePages.planComplete",
 	[MSG_PAGE_URZEDAS_PLAN_DELAYED] = "officePages.planDelayed",
-	[MSG_PAGE_URZEDAS_DINO_INTRO] = "officePages.urzedasDinoIntro",
 	[MSG_PAGE_URZEDAS_BRIBE] = "officePages.urzedasBribe",
 	[MSG_PAGE_URZEDAS_FAVOR] = "officePages.urzedasFavor",
 	[MSG_PAGE_KOMISARZ_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_KOMISARZ_WELCOME] = "officePages.commonWelcome",
+	[MSG_PAGE_KOMISARZ_DINO_INTRO] = "officePages.komisarzDinoIntro",
 	[MSG_PAGE_KOMISARZ_REBUKE_1] = "officePages.komisarzRebuke_1",
 	[MSG_PAGE_KOMISARZ_REBUKE_2] = "officePages.komisarzRebuke_2",
 	[MSG_PAGE_KOMISARZ_REBUKE_3] = "officePages.komisarzRebuke_3",
 	[MSG_PAGE_KOMISARZ_QUESTIONING] = "officePages.komisarzQuestioning",
+	[MSG_PAGE_KOMISARZ_ARCH_ACCOLADE] = "officePages.komisarzArchAccolade",
 	[MSG_PAGE_ARCH_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_ARCH_WELCOME] = "officePages.commonWelcome",
+	[MSG_PAGE_ARCH_PLAN_FAIL] = "officePages.archPlanFail",
+	[MSG_PAGE_ARCH_GATE_FAIL] = "officePages.archGateFail",
 	[MSG_PAGE_ARCH_ACCOLADE] = "officePages.archAccolade",
 	// Count
 	[MSG_COUNT] = 0

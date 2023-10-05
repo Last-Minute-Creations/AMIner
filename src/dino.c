@@ -59,13 +59,13 @@ void dinoProcess(void) {
 			break;
 		case DINO_STATE_INCOMING_BRIEFING:
 				pageOfficeUnlockPerson(FACE_ID_ARCH);
-				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_DINO_INTRO);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_DINO_INTRO);
 				pageOfficeTryUnlockPersonSubpage(FACE_ID_ARCH, COMM_SHOP_PAGE_OFFICE_ARCH_DOSSIER);
 				pageOfficeTryUnlockPersonSubpage(FACE_ID_ARCH, COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME);
 
-				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_DINO_INTRO, 1);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_DINO_INTRO, 1);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME, 1);
-				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_URZEDAS]);
+				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
 				++s_eQuestState;
 			break;
 		case DINO_STATE_WAITING_FOR_READING_BRIEFING:
@@ -80,9 +80,11 @@ void dinoProcess(void) {
 			break;
 		case DINO_STATE_INCOMING_ACCOLADE:
 			pageOfficeTryUnlockPersonSubpage(FACE_ID_ARCH, COMM_SHOP_PAGE_OFFICE_ARCH_ACCOLADE);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_ARCH_ACCOLADE);
 
 			inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_ACCOLADE, 1);
-			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]); // TODO: better message
+			inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_ARCH_ACCOLADE, 1);
+			hudShowMessage(FACE_ID_ARCH, g_pMsgs[MSG_HUD_DINO_COMPLETE]);
 			++s_eQuestState;
 			break;
 		case DINO_STATE_WAITING_FOR_RECEIVING_ACCOLADE:
@@ -101,6 +103,7 @@ UBYTE dinoAddBone(void) {
 	if(s_ubDinoBonesFound < ubMaxFragmentCount) {
 		++s_ubDinoBonesFound;
 		collectibleSetFoundCount(COLLECTIBLE_KIND_DINO, s_ubDinoBonesFound);
+		hudShowMessage(FACE_ID_ARCH, g_pMsgs[MSG_HUD_DINO_FOUND_BONE]);
 	}
 
 	if(s_ubDinoBonesFound == 1) {
@@ -111,4 +114,8 @@ UBYTE dinoAddBone(void) {
 	}
 
 	return s_ubDinoBonesFound;
+}
+
+UBYTE dinoIsAllFound(void) {
+	return s_eQuestState >= DINO_STATE_INCOMING_ACCOLADE;
 }
