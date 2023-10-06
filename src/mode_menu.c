@@ -48,8 +48,8 @@ void modeMenuManagerDestroy(void) {
 }
 
 void modeMenuReset(tModeMenu *pModeMenu, UBYTE ubPlayerIndex) {
-	modeMenuClearOptions(0);
-	modeMenuAddOption(0, MODE_OPTION_DRILL);
+	modeMenuClearOptions(pModeMenu);
+	modeMenuAddOption(pModeMenu, MODE_OPTION_DRILL);
 	pModeMenu->ubCurrent = 0;
 	pModeMenu->isActive = 0;
 	pModeMenu->ubPlayerIndex = ubPlayerIndex;
