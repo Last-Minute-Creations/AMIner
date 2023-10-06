@@ -765,7 +765,7 @@ static void gameGsLoop(void) {
 	debugColor(0x808);
 	explosionManagerProcess();
 	modeMenuTryDisplay(&s_pModeMenus[0]);
-	modeMenuTryDisplay(&s_pModeMenus[0]);
+	modeMenuTryDisplay(&s_pModeMenus[1]);
 	gameDisplayModeTnt(0);
 	gameDisplayModeTnt(1);
 	coreProcessAfterBobs();
