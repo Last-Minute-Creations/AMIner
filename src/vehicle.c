@@ -59,10 +59,14 @@ tBitMap *s_pToolFrames[2], *s_pToolMask;
 tBitMap *s_pWreckFrames[2], *s_pWreckMask;
 tBitMap *s_pSmokeFrames, *s_pSmokeMask;
 tBitMap *s_pWhiteBody, *s_pWhiteTool;
+tBitMap *s_pPlayerMarkerFrames, *s_pPlayerMarkerMask;
 
 const UBYTE s_pJetAnimOffsets[VEHICLE_TRACK_HEIGHT * 2 + 1] = {
 	0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0
 };
+
+UBYTE *s_pMarkerFrameAddresses[2][2]; // [ubDir][ubPlayer]
+UBYTE *s_pMarkerMaskAddresses[2]; // [ubDir]
 
 static UBYTE s_ubBebCountdown = 0;
 
@@ -108,6 +112,7 @@ static void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 		bobCalcFrameAddress(s_pSmokeMask, 0),
 		0, 0
 	);
+	bobInit(&pVehicle->sBobMarker, 16, 4, 1, 0, 0, 0, 0);
 	pVehicle->ubPlayerIdx = ubIdx;
 	pVehicle->sDynamite.ubPlayer = ubIdx;
 
@@ -146,6 +151,16 @@ void vehicleManagerCreate(void) {
 	s_pSmokeFrames = bitmapCreateFromFile("data/smoke.bm", 0);
 	s_pSmokeMask = bitmapCreateFromFile("data/smoke_mask.bm", 0);
 
+	s_pPlayerMarkerFrames = bitmapCreateFromFile("data/player_markers.bm", 0);
+	s_pPlayerMarkerMask = bitmapCreateFromFile("data/player_marker_mask.bm", 0);
+
+	for(UBYTE ubDir = 0; ubDir < 2; ++ubDir) {
+		for(UBYTE ubPlayerIndex = 0; ubPlayerIndex < 2; ++ubPlayerIndex) {
+			s_pMarkerFrameAddresses[ubDir][ubPlayerIndex] = bobCalcFrameAddress(s_pPlayerMarkerFrames, ubDir * 4 + ubPlayerIndex * 8);
+			s_pMarkerMaskAddresses[ubDir] = bobCalcFrameAddress(s_pPlayerMarkerMask, ubDir * 4);
+		}
+	}
+
 	blitterMutexLock();
 	s_pWhiteBody = bitmapCreate(VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, GAME_BPP, BMF_INTERLEAVED);
 	blitRect(s_pWhiteBody, 0, 0, VEHICLE_WIDTH, VEHICLE_BODY_HEIGHT, COLOR_WHITE);
@@ -181,6 +196,9 @@ void vehicleManagerDestroy(void) {
 
 	bitmapDestroy(s_pWhiteBody);
 	bitmapDestroy(s_pWhiteTool);
+
+	bitmapDestroy(s_pPlayerMarkerFrames);
+	bitmapDestroy(s_pPlayerMarkerMask);
 
 	vehicleDestroy(&g_pVehicles[0]);
 	vehicleDestroy(&g_pVehicles[1]);
@@ -708,6 +726,21 @@ static void stopLoopAudio(UBYTE ubPlayerIdx) {
 	audioMixerStopSfxOnChannel(SFX_CHANNEL_LOOP_P1 + ubPlayerIdx);
 }
 
+static void vehicleDrawMarker(tVehicle *pVehicle) {
+	pVehicle->sBobMarker.sPos.uwX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
+	pVehicle->sBobMarker.sPos.uwY = g_pMainBuffer->pCamera->uPos.uwY;
+	if(pVehicle->sBobBody.sPos.uwY < g_pMainBuffer->pCamera->uPos.uwY) {
+		pVehicle->sBobMarker.pFrameData = s_pMarkerFrameAddresses[1][pVehicle->ubPlayerIdx];
+		pVehicle->sBobMarker.pMaskData = s_pMarkerMaskAddresses[1];
+	}
+	else {
+		pVehicle->sBobMarker.sPos.uwY += g_pMainBuffer->sCommon.pVPort->uwHeight - 4;
+		pVehicle->sBobMarker.pFrameData = s_pMarkerFrameAddresses[0][pVehicle->ubPlayerIdx];
+		pVehicle->sBobMarker.pMaskData = s_pMarkerMaskAddresses[0];
+	}
+	gameTryPushBob(&pVehicle->sBobMarker);
+}
+
 static void vehicleProcessMovement(tVehicle *pVehicle) {
 	UBYTE isOnGround = 0;
 	const fix16_t fMaxDx = 2 * fix16_one;
@@ -951,6 +984,9 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	if(isVehicleVisible) {
 		gameTryPushBob(&pVehicle->sBobBody);
 	}
+	else {
+		vehicleDrawMarker(pVehicle);
+	}
 
 	// Tool
 	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
@@ -1168,9 +1204,14 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			break;
 	}
 
-	gameTryPushBob(&pVehicle->sBobTrack);
-	gameTryPushBob(&pVehicle->sBobBody);
-	gameTryPushBob(&pVehicle->sBobTool);
+	UBYTE isAnyDrawn = (
+		gameTryPushBob(&pVehicle->sBobTrack) |
+		gameTryPushBob(&pVehicle->sBobBody) |
+		gameTryPushBob(&pVehicle->sBobTool)
+	);
+	if(!isAnyDrawn) {
+		vehicleDrawMarker(pVehicle);
+	}
 }
 
 void vehicleProcessText(void) {
@@ -1185,10 +1226,16 @@ void vehicleProcessExploding(tVehicle *pVehicle) {
 	vehicleProcessDeadGravity(pVehicle);
 	pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
 	pVehicle->sBobTrack.sPos.uwY += VEHICLE_BODY_HEIGHT - 1;
-	gameTryPushBob(&pVehicle->sBobTrack);
-	gameTryPushBob(&pVehicle->sBobBody);
 	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
-	gameTryPushBob(&pVehicle->sBobTool);
+
+	UBYTE isAnyDrawn = (
+		gameTryPushBob(&pVehicle->sBobTrack) |
+		gameTryPushBob(&pVehicle->sBobBody) |
+		gameTryPushBob(&pVehicle->sBobTool)
+	);
+	if(!isAnyDrawn) {
+		vehicleDrawMarker(pVehicle);
+	}
 }
 
 void vehicleProcess(tVehicle *pVehicle) {

@@ -568,12 +568,21 @@ void gameInitBombMarkerBobs(void) {
 	}
 }
 
-void gameTryPushBob(tBob *pBob) {
-	if(
+UBYTE gameCanPushBob(const tBob *pBob) {
+	UBYTE isOnCamera = (
 		pBob->sPos.uwY + pBob->uwHeight >= g_pMainBuffer->pCamera->uPos.uwY &&
-		pBob->sPos.uwY < g_pMainBuffer->pCamera->uPos.uwY +  s_pVpMain->uwHeight
-	) {
+		pBob->sPos.uwY < g_pMainBuffer->pCamera->uPos.uwY + s_pVpMain->uwHeight
+	);
+	return isOnCamera;
+}
+
+UBYTE gameTryPushBob(tBob *pBob) {
+	if(gameCanPushBob(pBob)) {
 		bobPush(pBob);
+		return 1;
+	}
+	else {
+		return 0;
 	}
 }
 

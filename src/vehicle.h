@@ -53,6 +53,7 @@ typedef struct _tVehicle {
 	tBob sBobTool;
 	tBob sBobWreck;
 	tBob sBobSmoke;
+	tBob sBobMarker;
 	fix16_t fX;
 	fix16_t fY;
 	fix16_t fDx;

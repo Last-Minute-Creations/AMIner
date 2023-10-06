@@ -46,12 +46,12 @@ void assetsAudioDestroy(void) {
 	ptplayerSamplePackDestroy(g_pModSampleData);
 }
 
-void assetsBombMarkersCreate(void) {
+void assetsMarkersCreate(void) {
 	g_pBombMarker = bitmapCreateFromFile("data/bomb_marker.bm", 0);
 	g_pBombMarkerMask = bitmapCreateFromFile("data/bomb_marker_mask.bm", 0);
 }
 
-void assetsBombMarkersDestroy(void) {
+void assetsMarkersDestroy(void) {
 	bitmapDestroy(g_pBombMarker);
 	bitmapDestroy(g_pBombMarkerMask);
 }

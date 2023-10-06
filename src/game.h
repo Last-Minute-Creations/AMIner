@@ -40,7 +40,9 @@ void gameGsLoopEnterScore(void);
 
 void gameInitBombMarkerBobs(void);
 
-void gameTryPushBob(tBob *pBob);
+UBYTE gameCanPushBob(const tBob *pBob);
+
+UBYTE gameTryPushBob(tBob *pBob);
 
 void gameAdvanceAccolade(void);
 

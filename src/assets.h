@@ -28,9 +28,9 @@ void assetsAudioCreate(void);
 
 void assetsAudioDestroy(void);
 
-void assetsBombMarkersCreate(void);
+void assetsMarkersCreate(void);
 
-void assetsBombMarkersDestroy(void);
+void assetsMarkersDestroy(void);
 
 void assetsTileOverlayCreate(void);
 

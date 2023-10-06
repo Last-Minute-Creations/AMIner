@@ -88,6 +88,8 @@ General:
 		☐ Clouds?
 	☐ Limit cash to prevent trashing of message icon?
 	☐ Fast travel between bases
+	✔ Markers for offscreen players @done(23-10-06)
+	☐ Offscreen players can focus by pressing fire
 	☐ Portable teleport as a vehicle upgrade
 		☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button
@@ -131,9 +133,9 @@ Gate quest:
 	✔ Questioning by commissar @done(23-07-13)
 	☐ Endings
 		✘ Secret scientist ending @cancelled(23-10-02)
-		☐ Secret dino ending
-			☐ Message on unfinished dino-skeleton
-		☐ Non-secret army ending
+		☐ Dino invansion ending
+		☐ Army defensive ending
+		☐ Message on unfinished dino-skeleton
 
 Crate quests:
 	☐ Agent quest flow

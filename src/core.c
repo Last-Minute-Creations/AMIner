@@ -271,7 +271,7 @@ static void coreGsCreate(void) {
 	vehicleManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 80);
 
-	assetsBombMarkersCreate();
+	assetsMarkersCreate();
 	modeMenuManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 85);
 	gameInitBombMarkerBobs();
@@ -347,7 +347,7 @@ static void coreGsDestroy(void) {
 	audioMixerDestroy();
 	assetsAudioDestroy();
 
-	assetsBombMarkersDestroy();
+	assetsMarkersDestroy();
 	modeMenuManagerDestroy();
 	assetsTileOverlayDestroy();
 	explosionManagerDestroy();
