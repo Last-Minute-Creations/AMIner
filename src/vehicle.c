@@ -233,6 +233,8 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	else {
 		vehicleMove(pVehicle, -1, 0);
 	}
+
+	pVehicle->isMarkerShown = 0;
 }
 
 void vehicleResetPos(tVehicle *pVehicle) {
@@ -983,9 +985,11 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 	if(isVehicleVisible) {
 		gameTryPushBob(&pVehicle->sBobBody);
+		pVehicle->isMarkerShown = 0;
 	}
 	else {
 		vehicleDrawMarker(pVehicle);
+		pVehicle->isMarkerShown = 1;
 	}
 
 	// Tool
@@ -1211,6 +1215,10 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 	);
 	if(!isAnyDrawn) {
 		vehicleDrawMarker(pVehicle);
+		pVehicle->isMarkerShown = 1;
+	}
+	else {
+		pVehicle->isMarkerShown = 0;
 	}
 }
 
@@ -1235,6 +1243,10 @@ void vehicleProcessExploding(tVehicle *pVehicle) {
 	);
 	if(!isAnyDrawn) {
 		vehicleDrawMarker(pVehicle);
+		pVehicle->isMarkerShown = 1;
+	}
+	else {
+		pVehicle->isMarkerShown = 0;
 	}
 }
 

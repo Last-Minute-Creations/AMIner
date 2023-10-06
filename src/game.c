@@ -179,7 +179,10 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				modeMenuExitSelection(&s_pModeMenus[ubPlayer]);
 			}
 			if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
-				if(!pModeMenu->isActive) {
+				if(g_pVehicles[ubPlayer].isMarkerShown) {
+					s_eCameraType = (ubPlayer == 0) ? CAMERA_TYPE_P1 : CAMERA_TYPE_P2;
+				}
+				else if(!pModeMenu->isActive) {
 					modeMenuEnterSelection(pModeMenu);
 				}
 				else {

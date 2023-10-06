@@ -96,6 +96,7 @@ typedef struct _tVehicle {
 	UBYTE ubHullDamageFrame;
 	UBYTE ubDamageBlinkCooldown;
 	UBYTE isChallengeEnded;
+	UBYTE isMarkerShown;
 } tVehicle;
 
 void vehicleManagerCreate(void);
