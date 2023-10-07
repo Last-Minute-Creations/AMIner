@@ -14,6 +14,8 @@ void pageOfficeSave(tFile *pFile);
 
 UBYTE pageOfficeLoad(tFile *pFile);
 
+void pageOfficeResetSelection(void);
+
 void pageOfficeShow(void);
 
 void pageOfficeUnlockPerson(tFaceId ePerson);

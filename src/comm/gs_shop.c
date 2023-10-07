@@ -48,9 +48,9 @@ static void onBack(void) {
 	tCommShopPage ePage;
 	if(inboxTryPopFront(&ePage)) {
 		commShopChangePage(s_eCameFrom, ePage);
-		hudClearInboxNotification();
 	}
 	else {
+		hudClearInboxNotification();
 		commShopChangePage(COMM_SHOP_PAGE_COUNT, s_eCameFrom);
 	}
 }
@@ -99,9 +99,9 @@ static void commGsShopLoop(void) {
 		tCommShopPage ePage;
 		if(inboxTryPopFront(&ePage)) {
 			commShopChangePage(s_eCameFrom, ePage);
-			hudClearInboxNotification();
 			return;
 		}
+		hudClearInboxNotification();
 
 		tCommTab eOldTab = s_eTab;
 		// Tab nav using shift+left / shift+right
