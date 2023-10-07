@@ -89,7 +89,7 @@ General:
 	☐ Limit cash to prevent trashing of message icon?
 	☐ Fast travel between bases
 	✔ Markers for offscreen players @done(23-10-06)
-	☐ Offscreen players can focus by pressing fire
+	✔ Offscreen players can focus by pressing fire @done(23-10-06)
 	☐ Portable teleport as a vehicle upgrade
 		☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button

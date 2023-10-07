@@ -72,6 +72,7 @@ typedef struct _tVehicle {
 	UBYTE ubDrillVAnimCnt;
 	fix16_t fDrillDestX, fDrillDestY;
 	fix16_t fDrillDelta;
+	fix16_t fToolOffset;
 	tUwCoordYX sDrillTile;
 	// Anims
 	fix16_t fTrackAnimCnt;

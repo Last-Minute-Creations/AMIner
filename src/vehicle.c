@@ -39,6 +39,7 @@
 #define VEHICLE_SMOKE_ANIM_HEIGHT 42
 #define VEHICLE_SMOKE_FRAMES 12
 #define VEHICLE_JET_SHOW_FRAME_COUNT 10
+#define VEHICLE_TOOL_PATH_LENGTH 8
 
 #define SFX_CHANNEL_LOOP_P1 0
 #define SFX_CHANNEL_LOOP_P2 1
@@ -208,6 +209,7 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubDrillDir = DRILL_DIR_NONE;
 	pVehicle->ubDrillState = DRILL_STATE_OFF;
 	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
+	pVehicle->fToolOffset = 0;
 
 	pVehicle->fTrackAnimCnt = 0;
 	pVehicle->ubTrackFrame = 0;
@@ -481,16 +483,28 @@ static inline void vehicleSetTool(
 	UBYTE ubFrameOffsetY;
 	if(eToolState == TOOL_STATE_IDLE) {
 		ubFrameOffsetY = 0;
+		if(pVehicle->fToolOffset <= 0) {
+			pVehicle->fToolOffset = 0;
+		}
+		else {
+			pVehicle->fToolOffset = fix16_sub(pVehicle->fToolOffset, fix16_one * 2);
+		}
 	}
 	else { // if(eToolState == TOOL_STATE_DRILL)
 		ubFrameOffsetY = ubFrame ? VEHICLE_TOOL_HEIGHT : 0;
+		if(pVehicle->fToolOffset >= fix16_one * VEHICLE_TOOL_PATH_LENGTH) {
+			pVehicle->fToolOffset = fix16_one * VEHICLE_TOOL_PATH_LENGTH;
+		}
+		else {
+			pVehicle->fToolOffset += pVehicle->fDrillDelta;
+		}
 	}
 
 	if(pVehicle->isFacingRight) {
-		pVehicle->sBobTool.sPos.uwX += 24+3;
+		pVehicle->sBobTool.sPos.uwX += 17 + fix16_to_int(pVehicle->fToolOffset);
 	}
 	else {
-		pVehicle->sBobTool.sPos.uwX += -13+3;
+		pVehicle->sBobTool.sPos.uwX += -1 - fix16_to_int(pVehicle->fToolOffset);
 		ubFrameOffsetY += (
 			VEHICLE_TOOL_ANIM_FRAMES * VEHICLE_DESTRUCTION_FRAMES *
 			VEHICLE_TOOL_HEIGHT
@@ -1180,22 +1194,22 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				pVehicle->sBobBody.sPos.uwY += randUw(&g_sRand) & 1;
 
 				// Anim counter for Tool / track drill
-				UBYTE ubAnim = 0;
+				UBYTE ubDrillAnimFrame = 0;
 				++pVehicle->ubToolAnimCnt;
 				if(pVehicle->ubToolAnimCnt >= 4) {
 					pVehicle->ubToolAnimCnt = 0;
 				}
 				else if(pVehicle->ubToolAnimCnt >= 2) {
-					ubAnim = 1;
+					ubDrillAnimFrame = 1;
 				}
 
 				// Anim for Tool / track drill
 				if(pVehicle->ubDrillDir == DRILL_DIR_H) {
-					vehicleSetTool(pVehicle, TOOL_STATE_DRILL, ubAnim);
+					vehicleSetTool(pVehicle, TOOL_STATE_DRILL, ubDrillAnimFrame);
 				}
 				else {
 					vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
-					UWORD uwOffsY = TRACK_OFFSET_DRILL + (ubAnim ?  VEHICLE_TRACK_HEIGHT : 0);
+					UWORD uwOffsY = TRACK_OFFSET_DRILL + (ubDrillAnimFrame ? VEHICLE_TRACK_HEIGHT : 0);
 					bobSetFrame(
 						&pVehicle->sBobTrack,
 						bobCalcFrameAddress(s_pTrackFrames, uwOffsY),
