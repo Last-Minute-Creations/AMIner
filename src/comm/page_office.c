@@ -129,6 +129,10 @@ static void pageOfficeProcess(void) {
 
 //------------------------------------------------------------------- PUBLIC FNS
 
+void pageOfficeResetSelection(void) {
+	s_bSelectionCurr = 0;
+}
+
 void pageOfficeShow(void) {
 	commRegisterPage(pageOfficeProcess, 0);
 	for(tFaceId i = 0; i < s_ubUnlockedPplCount; ++i) {

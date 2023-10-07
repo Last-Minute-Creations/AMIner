@@ -67,6 +67,8 @@ static void commGsShopCreate(void) {
 		return;
 	}
 
+	pageOfficeResetSelection();
+
 	tCommShopPage ePage;
 	if(!inboxTryPopFront(&ePage)) {
 		ePage = COMM_SHOP_PAGE_OFFICE_MAIN;
