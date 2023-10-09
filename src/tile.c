@@ -715,7 +715,7 @@ void tileExcavate(UWORD uwX, UWORD uwY) {
 	}
 
 	// right
-	else if(uwX < 10 && !tileIsSolid(uwX+1, uwY)) {
+	if(uwX < 10 && !tileIsSolid(uwX+1, uwY)) {
 		tileBufferInvalidateTile(g_pMainBuffer, uwX+1, uwY);
 	}
 
