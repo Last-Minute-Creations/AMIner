@@ -116,12 +116,12 @@ void planElapseTime(UWORD uwTime) {
 }
 
 void planStart(void) {
-		if(s_sPlanManager.isPlanActive) {
-			logWrite("ERR: Plan already started\n");
-		}
+	if(s_sPlanManager.isPlanActive) {
+		logWrite("ERR: Plan already started\n");
+	}
 
-		s_sPlanManager.isPlanActive = 1;
-		s_sPlanManager.wTimeRemaining = s_sPlanManager.wTimeMax;
+	s_sPlanManager.isPlanActive = 1;
+	s_sPlanManager.wTimeRemaining = s_sPlanManager.wTimeMax;
 }
 
 void planUnlockMineral(tMineralType eMineral) {

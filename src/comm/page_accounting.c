@@ -29,15 +29,17 @@ static void pageAccountingProcess(void) {
 	}
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		if(bButtonCurr == 0) {
-			if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
-				warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED_ACCOUNTING);
-			}
-			else {
-				gameAddRebuke();
-			}
+		if(planManagerGet()->isPlanActive) {
+			if(bButtonCurr == 0) {
+				if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
+					warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED_ACCOUNTING);
+				}
+				else {
+					gameAddRebuke();
+				}
 
-			heatTryIncrease(5);
+				heatTryIncrease(5);
+			}
 		}
 		commShopGoBack();
 	}

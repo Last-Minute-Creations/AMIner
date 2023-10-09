@@ -31,17 +31,19 @@ static void pageBribeProcess(void) {
 		}
 
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			if(bButtonCurr == 0) {
-				g_pVehicles[0].lCash -= s_uwBribeCost;
-				if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
-					// Success
-					pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
-					heatTryIncrease(5);
-					++s_uwBribeCount;
-					planAddDays(14, 1);
-				}
-				else {
-					gameAddRebuke();
+			if(planManagerGet()->isPlanActive) {
+				if(bButtonCurr == 0) {
+					g_pVehicles[0].lCash -= s_uwBribeCost;
+					if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
+						// Success
+						pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
+						heatTryIncrease(5);
+						++s_uwBribeCount;
+						planAddDays(14, 1);
+					}
+					else {
+						gameAddRebuke();
+					}
 				}
 			}
 			commShopGoBack();
