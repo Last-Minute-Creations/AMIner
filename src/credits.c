@@ -7,80 +7,81 @@
 #include <comm/comm.h>
 #include "aminer.h"
 #include "core.h"
+#include "assets.h"
 
 static const UBYTE s_pE8Sequence[] = {
-	0x81,
-	0x82,
-	0x83,
-	0x84,
-	0x85,
-	0x86,
-	0x87,
-	0x88,
-	0x89,
-	0x8A,
-	0x8B,
-	0x8C,
-	0x8D,
-	0x80,
+	0x0,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
+	0x1, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2,
 };
 
-static const char *s_pLyricsLines[][8] = {
+static const char *s_pVerses[][8] = {
 	// verse 1 pt1
 	{
-		"Comrade, ", "if ", "you ", "don't",
+		"1 Comrade, ", "if ", "you ", "don't",
 		"do ", "what ", "they ", "say"
 	},
 	{
-		"I ", "said, ", "comrade, ", "if",
+		"2 I ", "said, ", "comrade, ", "if",
 		"you ", "do ", "not ", "obey"
 	},
 	{
-		"They ", "will ", "send ", "you",
+		"3 They ", "will ", "send ", "you",
 		"to ", "Kamchatka ", "Resort", 0
 	},
 	{
-		"Where ", "in ", "short ", "time",
+		"4 Where ", "in ", "short ", "time",
 		"you'll ", "be ", "no ", "more"
 	},
 	// verse 1 pt2
 	{
-		"Comrade, ", "if ", "you ", "don't",
+		"5 Comrade, ", "if ", "you ", "don't",
 		"do ", "what ", "they ", "say"
 	},
 	{
-		"I ", "said, ", "comrade, ", "if",
+		"6 I ", "said, ", "comrade, ", "if",
 		"you ", "do ", "not ", "obey"
 	},
 	{
-		"They ", "will ", "send ", "you",
+		"7 They ", "will ", "send ", "you",
 		"to ", "Kamchatka ", "Resort", 0
 	},
 	{
-		"Where ", "in ", "short ", "time",
+		"8 Where ", "in ", "short ", "time",
 		"you'll ", "be ", "no ", "more"
 	},
 
 	// ref pt1
 	{
-		"It's ", "fun ", "to ", "live ",
+		"9 It's ", "fun ", "to ", "live ",
 		"in ", "the ", "Co-mu-nist ", "world"
 	},
 	{
-		"It's ", "fun ", "to ", "live ",
+		"A It's ", "fun ", "to ", "live ",
 		"in ", "the ", "Co-mu-nist ", "world"
 	},
 	// ref pt2
 	{
-		"Commissar ", "is ", "your ", "friend",
+		"B Commissar ", "is ", "your ", "friend",
 		0, 0, 0, 0
 	},
 	{
-		"Can ", "be ", "pain ", "on ",
+		"C Can ", "be ", "pain ", "on ",
 		"rear ", "end", 0, 0
 	},
 	{
-		"Better ", "tell ", "him ", "all ",
+		"D Better ", "tell ", "him ", "all ",
 		"that ", "you ", "know", 0
 	},
 };
@@ -96,23 +97,79 @@ static const char *s_pCreditsLines[] = {
 	"Special thanks to: Rav.En, JakubH",
 	"and two little RKLE18 testers!"
 };
-#define CREDITS_LINE_COUNT (sizeof(s_pCreditsLines) / sizeof(s_pCreditsLines[0]))
 
-static UBYTE s_ubE8;
-static UBYTE s_ubPrevE8;
+static tUbCoordYX s_pWordPositions[ARRAY_SIZE(s_pVerses)][8];
+
 static UBYTE s_ubSeq;
+static UBYTE s_ubVerseCurr;
+static UBYTE s_ubVersePrev;
+static UBYTE s_ubWordCurr;
+static UBYTE s_ubWordPrev;
+
+static void creditsE8Handler(UBYTE ubE8) {
+	switch(ubE8) {
+		case 0x0:
+			s_ubVerseCurr = 0xFF;
+			break;
+		case 0x1:
+			++s_ubVerseCurr;
+			s_ubWordCurr = 0xFF;
+			s_ubWordPrev = 0xFF;
+			break;
+		case 0x2:
+			++s_ubWordCurr;
+			break;
+		default:
+			break;
+	}
+}
 
 static void creditsGsCreate(void) {
 	commEraseAll();
 	UWORD uwOffsY = 0;
 	UBYTE ubLineHeight = commGetLineHeight() - 2;
-	for(UBYTE i = 0; i < CREDITS_LINE_COUNT; ++i) {
+	for(UBYTE i = 0; i < ARRAY_SIZE(s_pCreditsLines); ++i) {
 		commDrawText(0, uwOffsY, s_pCreditsLines[i], FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
 		uwOffsY += ubLineHeight;
 	}
 
-	s_ubE8 = 0;
-	s_ubSeq = 0;
+	s_ubSeq = 0xFF;
+	s_ubVerseCurr = 0xFF;
+	s_ubVersePrev = 0xFF;
+	s_ubWordCurr = 0;
+	s_ubWordPrev = 0;
+
+	for(UBYTE ubVerse = 0; ubVerse < ARRAY_SIZE(s_pVerses); ++ubVerse) {
+		// First row
+		UWORD uwKaraokeY = COMM_DISPLAY_HEIGHT - commGetLineHeight() * 2;
+		UWORD uwLineLength = 0;
+		for(UBYTE i = 0; i < 4; ++i) {
+			if(stringIsEmpty(s_pVerses[ubVerse][i])) {
+				break;
+			}
+			s_pWordPositions[ubVerse][i].ubX = uwLineLength;
+			s_pWordPositions[ubVerse][i].ubY = uwKaraokeY;
+			uwLineLength += fontMeasureText(g_pFont, s_pVerses[ubVerse][i]).uwX;
+		}
+		for(UBYTE i = 0; i < 4; ++i) {
+			s_pWordPositions[ubVerse][i].ubX += (COMM_DISPLAY_WIDTH -  uwLineLength) / 2;
+		}
+
+		// Second row
+		uwKaraokeY += commGetLineHeight();
+		uwLineLength = 0;
+		for(UBYTE i = 4; i < 8; ++i) {
+			if(stringIsEmpty(s_pVerses[ubVerse][i])) {
+				break;
+			}
+			s_pWordPositions[ubVerse][i].ubX = uwLineLength;
+			s_pWordPositions[ubVerse][i].ubY = uwKaraokeY;
+			uwLineLength += fontMeasureText(g_pFont, s_pVerses[ubVerse][i]).uwX;
+		}
+		for(UBYTE i = 4; i < 8; ++i) {
+			s_pWordPositions[ubVerse][i].ubX += (COMM_DISPLAY_WIDTH -  uwLineLength) / 2;
+		}
+	}
 }
 
 static void creditsGsLoop(void) {
@@ -124,52 +181,64 @@ static void creditsGsLoop(void) {
 
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 
-	if(s_ubE8 && s_ubE8 != s_ubPrevE8) {
-		UWORD uwKaraokeY = COMM_DISPLAY_HEIGHT - commGetLineHeight() * 2;
+	UWORD uwKaraokeY = COMM_DISPLAY_HEIGHT - commGetLineHeight() * 2;
+	if(s_ubVersePrev != s_ubVerseCurr) {
+		s_ubVersePrev = s_ubVerseCurr;
 		commErase(0, uwKaraokeY, COMM_DISPLAY_WIDTH, commGetLineHeight() * 2);
-		if(s_ubE8 != 0x80) {
-			UBYTE ubLyricLine = s_ubE8 - 0x81;
-			char szLineBuffer[100];
+		if(s_ubVerseCurr == 0xFF) {
+			return;
+		}
 
-			char *pEnd = &szLineBuffer[0];
-			szLineBuffer[0] = '\0';
-			for(UBYTE i = 0; i < 4; ++i) {
-				if(s_pLyricsLines[ubLyricLine][i]) {
-					pEnd = stringCopy(s_pLyricsLines[ubLyricLine][i], pEnd);
-				}
-			}
-			if(!stringIsEmpty(szLineBuffer)) {
-				commDrawText(
-					COMM_DISPLAY_WIDTH / 2, uwKaraokeY, szLineBuffer,
-					FONT_COOKIE | FONT_HCENTER, COMM_DISPLAY_COLOR_TEXT_DARK
-				);
-			}
-
-			uwKaraokeY += commGetLineHeight();
-			pEnd = &szLineBuffer[0];
-			szLineBuffer[0] = '\0';
-			for(UBYTE i = 0; i < 4; ++i) {
-				if(s_pLyricsLines[ubLyricLine][4 + i]) {
-					pEnd = stringCopy(s_pLyricsLines[ubLyricLine][4 + i], pEnd);
-				}
-			}
-			if(!stringIsEmpty(szLineBuffer)) {
-				commDrawText(
-					COMM_DISPLAY_WIDTH / 2, uwKaraokeY, szLineBuffer,
-					FONT_COOKIE | FONT_HCENTER, COMM_DISPLAY_COLOR_TEXT_DARK
-				);
+		char szLineBuffer[100];
+		char *pEnd = &szLineBuffer[0];
+		szLineBuffer[0] = '\0';
+		for(UBYTE i = 0; i < 4; ++i) {
+			if(s_pVerses[s_ubVerseCurr][i]) {
+				pEnd = stringCopy(s_pVerses[s_ubVerseCurr][i], pEnd);
 			}
 		}
-		s_ubPrevE8 = s_ubE8;
+		if(!stringIsEmpty(szLineBuffer)) {
+			commDrawText(
+				s_pWordPositions[s_ubVerseCurr][0].ubX,
+				s_pWordPositions[s_ubVerseCurr][0].ubY, szLineBuffer,
+				FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK
+			);
+		}
+
+		pEnd = &szLineBuffer[0];
+		szLineBuffer[0] = '\0';
+		for(UBYTE i = 4; i < 8; ++i) {
+			if(s_pVerses[s_ubVerseCurr][i]) {
+				pEnd = stringCopy(s_pVerses[s_ubVerseCurr][i], pEnd);
+			}
+		}
+		if(!stringIsEmpty(szLineBuffer)) {
+			commDrawText(
+				s_pWordPositions[s_ubVerseCurr][4].ubX,
+				s_pWordPositions[s_ubVerseCurr][4].ubY, szLineBuffer,
+				FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK
+			);
+		}
+	}
+	else if(s_ubWordPrev != s_ubWordCurr) {
+		// Allow it catch up word by word if it lags
+		++s_ubWordPrev;
+		if(!stringIsEmpty(s_pVerses[s_ubVerseCurr][s_ubWordPrev])) {
+			tUbCoordYX sPos = s_pWordPositions[s_ubVerseCurr][s_ubWordPrev];
+			commDrawText(
+				sPos.ubX, sPos.ubY, s_pVerses[s_ubVerseCurr][s_ubWordPrev],
+				FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT
+			);
+		}
 	}
 
 	static UBYTE ubCnt = 0;
-	if(++ubCnt >= 40) {
+	if(++ubCnt >= 10) {
 		ubCnt = 0;
-		if(++s_ubSeq >= 14) {
+		if(++s_ubSeq >= ARRAY_SIZE(s_pE8Sequence)) {
 			s_ubSeq = 0;
 		}
-		s_ubE8 = s_pE8Sequence[s_ubSeq];
+		creditsE8Handler(s_pE8Sequence[s_ubSeq]);
 	}
 }
 
