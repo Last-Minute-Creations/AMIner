@@ -7,9 +7,28 @@
 #include "aminer.h"
 #include "core.h"
 
+static const char *s_pCreditsLines[] = {
+	"Aminer by Last Minute Creations",
+	"lastminutecreations.itch.io/aminer",
+	"",
+	"Softiron: graphics, game design",
+	"Luc3k: sounds, music",
+	"KaiN: code",
+	"",
+	"Special thanks to: Rav.En, JakubH",
+	"and two little RKLE18 testers!"
+};
+#define CREDITS_LINE_COUNT (sizeof(s_pCreditsLines) / sizeof(s_pCreditsLines[0]))
+
+
 static void creditsGsCreate(void) {
 	commEraseAll();
-	commDrawText(0, 0, "dupa", FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+	UWORD uwOffsY = 0;
+	UBYTE ubLineHeight = commGetLineHeight() - 2;
+	for(UBYTE i = 0; i < CREDITS_LINE_COUNT; ++i) {
+		commDrawText(0, uwOffsY, s_pCreditsLines[i], FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+		uwOffsY += ubLineHeight;
+	}
 }
 
 static void creditsGsLoop(void) {
