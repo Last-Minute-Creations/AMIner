@@ -20,6 +20,7 @@
 #include "menu_list.h"
 #include "steer.h"
 #include "assets.h"
+#include "credits.h"
 
 #define SFX_CHANNEL_ATARI 1
 #define MENU_OPTIONS_MAX 10
@@ -543,7 +544,9 @@ static void menuOnChallengeStart(void) {
 }
 
 static void menuOnEnterCredits(void) {
-	logWrite("TODO: implement menuOnEnterCredits");
+	commEraseAll();
+	creditsReset(0);
+	statePush(g_pGameStateManager, &g_sStateMenuCredits);
 }
 
 static void menuInitialDraw(void) {
@@ -668,6 +671,10 @@ static void menuGsDestroy(void) {
 
 }
 
+static void menuGsResume(void) {
+	menuInitialDraw(); // g_pMainBuffer->pScroll->pFront
+}
+
 static void menuScoreGsCreate(void) {
 	hiScoreDrawAll();
 }
@@ -684,10 +691,6 @@ static void menuScoreGsLoop(void) {
 		}
 	}
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
-}
-
-static void menuScoreGsDestroy(void) {
-	menuInitialDraw(); // g_pMainBuffer->pScroll->pFront
 }
 
 //------------------------------------------------------------------- PUBLIC FNS
@@ -732,11 +735,11 @@ void menuGsEnter(UBYTE isScoreShow) {
 tState g_sStateMenu = {
 	.cbCreate = menuGsCreate,
 	.cbLoop = menuGsLoop,
-	.cbDestroy = menuGsDestroy
+	.cbDestroy = menuGsDestroy,
+	.cbResume = menuGsResume,
 };
 
 static tState s_sStateMenuScore = {
 	.cbCreate = menuScoreGsCreate,
 	.cbLoop = menuScoreGsLoop,
-	.cbDestroy = menuScoreGsDestroy
 };
