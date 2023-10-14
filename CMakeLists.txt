@@ -476,6 +476,7 @@ mergeMods(
 	TARGET ${GAME_EXECUTABLE}
 	SOURCES
 		${RES_DIR}/music/czolowka.mod
+		${RES_DIR}/music/ymca-cover.mod
 		${RES_DIR}/music/coal-prelude.mod
 		${RES_DIR}/music/dumka.mod
 		${RES_DIR}/music/inzynier.mod
@@ -488,6 +489,7 @@ mergeMods(
 		${RES_DIR}/music/zima.mod
 	DESTINATIONS
 		${DATA_DIR}/music/menu.mod
+		${DATA_DIR}/music/credits.mod
 		${DATA_DIR}/music/game0.mod
 		${DATA_DIR}/music/game1.mod
 		${DATA_DIR}/music/game2.mod

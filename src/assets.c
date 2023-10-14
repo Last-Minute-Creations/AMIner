@@ -10,6 +10,7 @@ tPtplayerSfx *g_pSfxPenalty;
 tPtplayerSfx *g_pSfxFlyLoop;
 tPtplayerMod *g_pGameMods[ASSETS_GAME_MOD_COUNT];
 tPtplayerMod *g_pMenuMod;
+tPtplayerMod *g_pCreditsMod;
 tPtplayerSamplePack *g_pModSampleData;
 
 tBitMap *g_pBombMarker;
@@ -30,6 +31,7 @@ void assetsAudioCreate(void) {
 		g_pGameMods[i] = ptplayerModCreate(szModPath);
 	}
 	g_pMenuMod = ptplayerModCreate("data/music/menu.mod");
+	g_pCreditsMod = ptplayerModCreate("data/music/credits.mod");
 	g_pModSampleData = ptplayerSampleDataCreate("data/music/samples.samplepack");
 }
 
@@ -43,6 +45,7 @@ void assetsAudioDestroy(void) {
 		ptplayerModDestroy(g_pGameMods[i]);
 	}
 	ptplayerModDestroy(g_pMenuMod);
+	ptplayerModDestroy(g_pCreditsMod);
 	ptplayerSamplePackDestroy(g_pModSampleData);
 }
 
