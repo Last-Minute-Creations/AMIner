@@ -704,6 +704,7 @@ static void menuGsDestroy(void) {
 }
 
 static void menuGsResume(void) {
+	commEraseAll();
 	menuInitialDraw(); // g_pMainBuffer->pScroll->pFront
 }
 
