@@ -34,8 +34,10 @@
 #include "heat.h"
 #include "assets.h"
 #include "mode_menu.h"
+#include "twister.h"
 
 #define CAMERA_SPEED 4
+#define CAMERA_SHAKE_AMPLITUDE 2
 
 //------------------------------------------------------------------------ TYPES
 
@@ -50,6 +52,18 @@ typedef enum tModePreset {
 	MODE_PRESET_FAST_TRAVEL,
 	MODE_PRESET_COUNT,
 } tModePreset;
+
+typedef enum tGateCutsceneStep {
+	GATE_CUTSCENE_STEP_OFF,
+	// TODO: wait for camera?
+	GATE_CUTSCENE_STEP_START,
+	GATE_CUTSCENE_STEP_WAIT_FOR_SHAKE,
+	GATE_CUTSCENE_STEP_SHAKE_BEFORE_TWISTER,
+	GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE,
+	GATE_CUTSCENE_STEP_FADE_OUT,
+	GATE_CUTSCENE_STEP_FADE_IN,
+	GATE_CUTSCENE_STEP_END,
+} tGateCutsceneStep;
 
 //----------------------------------------------------------------- PRIVATE VARS
 
@@ -69,6 +83,8 @@ static UBYTE s_ubCurrentMod;
 static ULONG s_ulGameTime;
 static UWORD s_uwMaxTileY;
 static tModeMenu s_pModeMenus[2];
+static tGateCutsceneStep s_eGateCutsceneStep;
+static UBYTE s_isCameraShake;
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -305,11 +321,23 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+	else if(keyUse(KEY_5)) {
+		blitRect(g_pMainBuffer->pScroll->pBack, 32, 64, 100, 5, 17);
+		blitRect(g_pMainBuffer->pScroll->pBack, 32, g_pMainBuffer->pScroll->pBack->Rows - 64, 100, 5, 25);
+	}
+	else if(keyUse(KEY_6)) {
+		// twisterEnable();
+		s_eGateCutsceneStep = GATE_CUTSCENE_STEP_START;
+	}
+	else if(keyUse(KEY_7)) {
+		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
+		inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_PLAN_FAIL, 0);
+	}
 	else if(keyUse(KEY_8)) {
 		g_pVehicles[0].lCash += 1000;
 	}
 	else if(keyUse(KEY_9)) {
-		dinoAddBone();
+		questGateAddFragment();
 	}
 	else if(keyUse(KEY_MINUS)) {
 		gameElapseDay();
@@ -320,6 +348,82 @@ static void gameProcessHotkeys(void) {
 	}
 	else if(keyUse(KEY_0)) {
 		gameElapseTime(planManagerGet()->wTimeRemaining);
+	}
+}
+
+static UWORD gameGetCameraDestinationY(void) {
+	UWORD uwCamDestY;
+	if(g_is2pPlaying && vehiclesAreClose()) {
+		uwCamDestY = (
+			fix16_to_int(g_pVehicles[0].fY) +
+			fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT
+		) / 2;
+	}
+	else if(g_is2pPlaying && s_eCameraType == CAMERA_TYPE_P2) {
+		uwCamDestY = fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT / 2;
+	}
+	else {
+		uwCamDestY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
+	}
+	return uwCamDestY;
+}
+
+static UBYTE s_ubGateCutsceneCooldown;
+
+static void gameProcessGateCutscene(void) {
+	if(s_eGateCutsceneStep == GATE_CUTSCENE_STEP_OFF) {
+		return;
+	}
+
+	switch(s_eGateCutsceneStep) {
+		case GATE_CUTSCENE_STEP_START:
+			++s_eGateCutsceneStep;
+			s_ubGateCutsceneCooldown = 0;
+			// TODO: disable movement
+			// TODO: disable context menu
+			// TODO: disable entering pause
+			ptplayerEnableMusic(0);
+			break;
+		case GATE_CUTSCENE_STEP_WAIT_FOR_SHAKE:
+			if(++s_ubGateCutsceneCooldown > 30) {
+				s_ubGateCutsceneCooldown = 0;
+				++s_eGateCutsceneStep;
+				s_isCameraShake = 1;
+			}
+			break;
+		case GATE_CUTSCENE_STEP_SHAKE_BEFORE_TWISTER:
+			if(++s_ubGateCutsceneCooldown > 80) {
+				s_ubGateCutsceneCooldown = 0;
+				++s_eGateCutsceneStep;
+				twisterEnable();
+			}
+			break;
+		case GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE:
+			if(++s_ubGateCutsceneCooldown > 35) {
+				s_ubGateCutsceneCooldown = 0;
+				fadeMorphTo(FADE_STATE_OUT);
+				++s_eGateCutsceneStep;
+			}
+			break;
+		case GATE_CUTSCENE_STEP_FADE_OUT:
+			if(fadeGetState() == FADE_STATE_OUT) {
+				vehicleSetPos(&g_pVehicles[0], 160, s_pBaseTeleportY[0]);
+				vehicleSetPos(&g_pVehicles[1], 160, s_pBaseTeleportY[0]);
+				s_isCameraShake = 0;
+				twisterDisable();
+				++s_eGateCutsceneStep;
+			}
+			break;
+		case GATE_CUTSCENE_STEP_FADE_IN:
+			if(fadeGetState() == FADE_STATE_IN) {
+				++s_eGateCutsceneStep;
+				// TODO: launch the outro commrade
+			}
+			break;
+		case GATE_CUTSCENE_STEP_END:
+		case GATE_CUTSCENE_STEP_OFF:
+			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
+			break;
 	}
 }
 
@@ -341,19 +445,8 @@ static void gameCameraProcess(void) {
 		}
 	}
 	else {
-		UWORD uwCamDestY, uwCamDestX = 32;
-		if(g_is2pPlaying && vehiclesAreClose()) {
-			uwCamDestY = (
-				fix16_to_int(g_pVehicles[0].fY) +
-				fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT
-			) / 2;
-		}
-		else if(g_is2pPlaying && s_eCameraType == CAMERA_TYPE_P2) {
-			uwCamDestY = fix16_to_int(g_pVehicles[1].fY) + VEHICLE_HEIGHT / 2;
-		}
-		else {
-			uwCamDestY = fix16_to_int(g_pVehicles[0].fY) + VEHICLE_HEIGHT / 2;
-		}
+		UWORD uwCamDestX = 32;
+		UWORD uwCamDestY = gameGetCameraDestinationY();
 		WORD wCameraDistance = (
 			uwCamDestY - g_pMainBuffer->pCamera->sCommon.pVPort->uwHeight / 2
 		) - g_pMainBuffer->pCamera->uPos.uwY;
@@ -368,9 +461,7 @@ static void gameCameraProcess(void) {
 		else {
 			cameraMoveBy(g_pMainBuffer->pCamera, 0, wCameraDistance);
 		}
-		if(g_pMainBuffer->pCamera->uPos.uwX < uwCamDestX) {
-			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
-		}
+		g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
 
 		if(fadeGetState() == FADE_STATE_OUT) {
 			cameraCenterAt(g_pMainBuffer->pCamera, uwCamDestX, uwCamDestY);
@@ -381,6 +472,13 @@ static void gameCameraProcess(void) {
 			bobDiscardUndraw();
 			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
 			fadeMorphTo(FADE_STATE_IN);
+		}
+
+		if(s_isCameraShake) {
+			BYTE bShake = randUwMinMax(
+				&g_sRand, 0, 2 * CAMERA_SHAKE_AMPLITUDE
+			) - CAMERA_SHAKE_AMPLITUDE;
+			cameraMoveBy(g_pMainBuffer->pCamera, 0, bShake);
 		}
 	}
 }
@@ -711,6 +809,8 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_ubAccoladesFract = 0;
 	s_wLastReminder = 0;
 	s_sTeleportReturn.ulYX = -1;
+	s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
+	twisterDisable();
 	hudReset(g_isChallenge, g_is2pPlaying);
 	heatReset();
 	groundLayerReset(1);
@@ -745,6 +845,7 @@ static void gameGsLoop(void) {
 	}
 	dinoProcess();
 	questGateProcess();
+	gameProcessGateCutscene();
 
 	debugColor(0x080);
 	gameCameraProcess();
@@ -759,6 +860,7 @@ static void gameGsLoop(void) {
 
 	processPlan();
 	coreProcessBeforeBobs();
+	twisterProcess();
 	debugColor(0x088);
 	vehicleProcess(&g_pVehicles[0]);
 	if(g_is2pPlaying) {
