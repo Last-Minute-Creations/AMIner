@@ -23,7 +23,7 @@
 #define TWISTER_MIN_BLOCK_X (-(((TWISTER_CAMERA_OFFSET_X + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 2))
 #define TWISTER_MAX_BLOCK_X (+((((SCREEN_PAL_WIDTH - TWISTER_CAMERA_OFFSET_X) + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 0))
 #define TWISTER_MIN_BLOCK_Y (-(((TWISTER_CAMERA_OFFSET_Y + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 2))
-#define TWISTER_MAX_BLOCK_Y (+(((SCREEN_PAL_HEIGHT - TWISTER_CAMERA_OFFSET_Y + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 0))
+#define TWISTER_MAX_BLOCK_Y (+(((224 - TWISTER_CAMERA_OFFSET_Y + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 0))
 // #define TWISTER_MIN_BLOCK_X  (-2)
 // #define TWISTER_MAX_BLOCK_X (+2)
 // #define TWISTER_MIN_BLOCK_Y (-2)
@@ -35,8 +35,85 @@
 #define TWISTER_TOP_BORDER (TWISTER_BITMAP_OFFSET_Y - CLIP_MARGIN_Y)
 #define TWISTER_BOTTOM_BORDER (TWISTER_BITMAP_OFFSET_Y + SCREEN_PAL_HEIGHT + CLIP_MARGIN_Y)
 
-static ULONG s_ps;
+static UBYTE s_ps;
 static UBYTE s_isTwisterEnabled;
+
+static void blitCopyOptimized(
+	const tBitMap *pSrc, WORD wSrcX, WORD wSrcY,
+	tBitMap *pDst, WORD wDstX, WORD wDstY, WORD wWidth, WORD wHeight,
+	UBYTE ubMinterm
+) {
+	// Helper vars
+	UWORD uwBlitWords, uwBlitWidth;
+	ULONG ulSrcOffs, ulDstOffs;
+	UBYTE ubShift, ubSrcDelta, ubDstDelta, ubWidthDelta, ubMaskFShift, ubMaskLShift;
+	// Blitter register values
+	UWORD uwBltCon0, uwBltCon1, uwFirstMask, uwLastMask;
+	WORD wSrcModulo, wDstModulo;
+
+	ubSrcDelta = wSrcX & 0xF;
+	ubDstDelta = wDstX & 0xF;
+	ubWidthDelta = (ubSrcDelta + wWidth) & 0xF;
+
+	if(ubSrcDelta > ubDstDelta || ((wWidth+ubDstDelta+15) & 0xFFF0)-(wWidth+ubSrcDelta) > 16) {
+		uwBlitWidth = (wWidth+(ubSrcDelta>ubDstDelta?ubSrcDelta:ubDstDelta)+15) & 0xFFF0;
+		uwBlitWords = uwBlitWidth >> 4;
+
+		ubMaskFShift = ((ubWidthDelta+15)&0xF0)-ubWidthDelta;
+		ubMaskLShift = uwBlitWidth - (wWidth+ubMaskFShift);
+		uwFirstMask = 0xFFFF << ubMaskFShift;
+		uwLastMask = 0xFFFF >> ubMaskLShift;
+		if(ubMaskLShift > 16) { // Fix for 2-word blits
+			uwFirstMask &= 0xFFFF >> (ubMaskLShift-16);
+		}
+
+		ubShift = uwBlitWidth - (ubDstDelta+wWidth+ubMaskFShift);
+		uwBltCon1 = (ubShift << BSHIFTSHIFT) | BLITREVERSE;
+
+		// Position on the end of last row of the bitmap.
+		// For interleaved, position on the last row of last bitplane.
+		// TODO: fix duplicating bitmapGetByteWidth() check in interleaved branch
+		ulSrcOffs = 280 * (wSrcY + wHeight) - 56 + ((wSrcX + wWidth + ubMaskFShift - 1) / 16) * 2;
+		ulDstOffs = 280 * (wDstY + wHeight) - 56 + ((wDstX + wWidth + ubMaskFShift - 1) / 16) * 2;
+	}
+	else {
+		uwBlitWidth = (wWidth+ubDstDelta+15) & 0xFFF0;
+		uwBlitWords = uwBlitWidth >> 4;
+
+		ubMaskFShift = ubSrcDelta;
+		ubMaskLShift = uwBlitWidth-(wWidth+ubSrcDelta);
+
+		uwFirstMask = 0xFFFF >> ubMaskFShift;
+		uwLastMask = 0xFFFF << ubMaskLShift;
+
+		ubShift = ubDstDelta-ubSrcDelta;
+		uwBltCon1 = ubShift << BSHIFTSHIFT;
+
+		ulSrcOffs = 280 * wSrcY + (wSrcX >> 3);
+		ulDstOffs = 280 * wDstY + (wDstX >> 3);
+	}
+
+	uwBltCon0 = (ubShift << ASHIFTSHIFT) | USEB|USEC|USED | ubMinterm;
+
+	wHeight *= 5;
+	wSrcModulo = 56 - uwBlitWords * 2;
+	wDstModulo = 56 - uwBlitWords * 2;
+
+	blitWait(); // Don't modify registers when other blit is in progress
+	g_pCustom->bltcon0 = uwBltCon0;
+	g_pCustom->bltcon1 = uwBltCon1;
+	g_pCustom->bltafwm = uwFirstMask;
+	g_pCustom->bltalwm = uwLastMask;
+	g_pCustom->bltbmod = wSrcModulo;
+	g_pCustom->bltcmod = wDstModulo;
+	g_pCustom->bltdmod = wDstModulo;
+	g_pCustom->bltadat = 0xFFFF;
+	g_pCustom->bltbpt = &pSrc->Planes[0][ulSrcOffs];
+	g_pCustom->bltcpt = &pDst->Planes[0][ulDstOffs];
+	g_pCustom->bltdpt = &pDst->Planes[0][ulDstOffs];
+
+	g_pCustom->bltsize = (wHeight << HSIZEBITS) | uwBlitWords;
+}
 
 void twisterEnable(void) {
 	s_isTwisterEnabled = 1;
@@ -117,7 +194,7 @@ void twisterProcess(void) {
 				continue;
 			}
 
-			blitCopy(
+			blitCopyOptimized(
 				g_pMainBuffer->pScroll->pFront, wSrcX, wSrcY,
 				g_pMainBuffer->pScroll->pBack, wDstX, wDstY, wWidth, wHeight, MINTERM_COOKIE
 			);
