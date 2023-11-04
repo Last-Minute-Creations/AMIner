@@ -97,8 +97,10 @@ void coreProcessBeforeBobs(void) {
 	tileBufferQueueProcess(g_pMainBuffer);
 
 	// Draw collectibles and bg anims before anything else
-	bobSequenceProcess(g_pMainBuffer);
-	collectiblesProcess();
+	if(!gameIsCutsceneActive()) {
+		bobSequenceProcess(g_pMainBuffer);
+		collectiblesProcess();
+	}
 }
 
 void coreProcessAfterBobs(void) {
@@ -107,8 +109,10 @@ void coreProcessAfterBobs(void) {
 	bobPushingDone();
 	bobEnd();
 
-	// Update HUD state machine and draw stuff
-	hudUpdate();
+	if(!gameIsCutsceneActive()) {
+		// Update HUD state machine and draw stuff
+		hudUpdate();
+	}
 
 	// Load next base tiles, if needed
 	baseProcess();
@@ -124,7 +128,7 @@ void coreProcessAfterBobs(void) {
 	copProcessBlocks();
 	debugColor(*s_pColorBg);
 	systemIdleBegin();
-	vPortWaitForEnd(s_pVpMain);
+	vPortWaitUntilEnd(s_pVpMain);
 	systemIdleEnd();
 }
 

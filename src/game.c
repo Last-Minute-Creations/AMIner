@@ -240,7 +240,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 
 static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 	UBYTE isReturnImmediately = 0;
-	if((ubPlayer == 0 || g_is2pPlaying)) {
+	if(!gameIsCutsceneActive() && (ubPlayer == 0 || g_is2pPlaying)) {
 		if(s_pModeMenus[ubPlayer].isActive) {
 			isReturnImmediately = gameProcessModeDrill(ubPlayer);
 		}
@@ -399,7 +399,7 @@ static void gameProcessGateCutscene(void) {
 			}
 			break;
 		case GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE:
-			if(++s_ubGateCutsceneCooldown > 35) {
+			if(++s_ubGateCutsceneCooldown > 42) {
 				s_ubGateCutsceneCooldown = 0;
 				fadeMorphTo(FADE_STATE_OUT);
 				++s_eGateCutsceneStep;
@@ -475,9 +475,7 @@ static void gameCameraProcess(void) {
 		}
 
 		if(s_isCameraShake) {
-			BYTE bShake = randUwMinMax(
-				&g_sRand, 0, 2 * CAMERA_SHAKE_AMPLITUDE
-			) - CAMERA_SHAKE_AMPLITUDE;
+			BYTE bShake = (randUw(&g_sRand) & 0b11) - 2;
 			cameraMoveBy(g_pMainBuffer->pCamera, 0, bShake);
 		}
 	}
@@ -832,6 +830,10 @@ void gameUpdateMaxDepth(UWORD uwTileY) {
 	s_uwMaxTileY = MAX(s_uwMaxTileY, uwTileY);
 }
 
+UBYTE gameIsCutsceneActive(void) {
+	return s_eGateCutsceneStep != GATE_CUTSCENE_STEP_OFF;
+}
+
 //-------------------------------------------------------------------- GAMESTATE
 
 static void gameGsCreate(void) {
@@ -849,16 +851,18 @@ static void gameGsLoop(void) {
 
 	debugColor(0x080);
 	gameCameraProcess();
-	steerProcess(&s_pPlayerSteers[0]);
-	steerProcess(&s_pPlayerSteers[1]);
-	gameProcessHotkeys();
-	UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
-	if(isGameStateChange) {
-		return;
+	if(!gameIsCutsceneActive()) {
+		steerProcess(&s_pPlayerSteers[0]);
+		steerProcess(&s_pPlayerSteers[1]);
+		gameProcessHotkeys();
+		UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
+		if(isGameStateChange) {
+			return;
+		}
+		vehicleProcessText();
+		processPlan();
 	}
-	vehicleProcessText();
 
-	processPlan();
 	coreProcessBeforeBobs();
 	twisterProcess();
 	debugColor(0x088);
@@ -868,11 +872,13 @@ static void gameGsLoop(void) {
 		vehicleProcess(&g_pVehicles[1]);
 	}
 	debugColor(0x808);
-	explosionManagerProcess();
-	modeMenuTryDisplay(&s_pModeMenus[0]);
-	modeMenuTryDisplay(&s_pModeMenus[1]);
-	gameDisplayModeTnt(0);
-	gameDisplayModeTnt(1);
+	if(!gameIsCutsceneActive()) {
+		explosionManagerProcess();
+		modeMenuTryDisplay(&s_pModeMenus[0]);
+		modeMenuTryDisplay(&s_pModeMenus[1]);
+		gameDisplayModeTnt(0);
+		gameDisplayModeTnt(1);
+	}
 	coreProcessAfterBobs();
 
 	if(

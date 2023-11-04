@@ -106,6 +106,7 @@ Optimizations:
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
+	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
 
 Main quest:
 
