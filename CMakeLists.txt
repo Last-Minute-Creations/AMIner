@@ -358,7 +358,7 @@ convertBitmaps(
 		${GEN_DIR}/gate.png ${RES_DIR}/smoke.png ${RES_DIR}/mode_icon_mask.png
 		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png
 		${RES_DIR}/bomb_marker.png ${RES_DIR}/player_markers.png
-		${RES_DIR}/commrade/edges.png
+		${RES_DIR}/commrade/edges.png ${RES_DIR}/gate_eye_mask.png
 	DESTINATIONS
 		${DATA_DIR}/drill.bm ${DATA_DIR}/tool.bm ${DATA_DIR}/wreck.bm
 		${DATA_DIR}/drill_2.bm ${DATA_DIR}/tool_2.bm ${DATA_DIR}/wreck_2.bm
@@ -366,7 +366,7 @@ convertBitmaps(
 		${DATA_DIR}/gate.bm ${DATA_DIR}/smoke.bm NONE
 		${DATA_DIR}/explosion.bm ${DATA_DIR}/teleport.bm
 		${DATA_DIR}/bomb_marker.bm ${DATA_DIR}/player_markers.bm
-		NONE
+		NONE NONE
 	MASKS
 		${DATA_DIR}/drill_mask.bm ${DATA_DIR}/tool_mask.bm ${DATA_DIR}/wreck_mask.bm
 		NONE NONE NONE
@@ -374,7 +374,7 @@ convertBitmaps(
 		${DATA_DIR}/gate_mask.bm ${DATA_DIR}/smoke_mask.bm ${DATA_DIR}/mode_icon_mask.bm
 		${DATA_DIR}/explosion_mask.bm ${DATA_DIR}/teleport_mask.bm
 		${DATA_DIR}/bomb_marker_mask.bm ${DATA_DIR}/player_marker_mask.bm
-		${DATA_DIR}/comm_edges_mask.bm
+		${DATA_DIR}/comm_edges_mask.bm ${DATA_DIR}/gate_eye_mask.bm
 )
 
 convertFont(

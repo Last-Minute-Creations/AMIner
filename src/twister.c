@@ -8,120 +8,94 @@
 #include <ace/utils/chunky.h>
 #include "core.h"
 
+#define TWISTER_BITMAP_VISIBLE_WIDTH 80
+#define TWISTER_BITMAP_VISIBLE_HEIGHT 67
 #define CLIP_MARGIN_X 32
 #define CLIP_MARGIN_Y 16
-// #define TWISTER_CENTER_X (32 + 86)
-// #define TWISTER_CENTER_Y ((6816 + 66) & (512))
-#define TWISTER_BITMAP_OFFSET_X 32
-#define TWISTER_BITMAP_OFFSET_Y (6816 & (512 - 1))
-#define TWISTER_CAMERA_OFFSET_X 86
-#define TWISTER_CAMERA_OFFSET_Y 60
-#define TWISTER_CENTER_X (TWISTER_BITMAP_OFFSET_X + TWISTER_CAMERA_OFFSET_X)
-#define TWISTER_CENTER_Y ((TWISTER_BITMAP_OFFSET_Y + TWISTER_CAMERA_OFFSET_Y) & (512 - 1))
-#define TWISTER_CENTER_RADIUS 5
+#define TWISTER_BITMAP_WIDTH (2 * CLIP_MARGIN_X + TWISTER_BITMAP_VISIBLE_WIDTH)
+#define TWISTER_BITMAP_HEIGHT (2 * CLIP_MARGIN_Y + TWISTER_BITMAP_VISIBLE_HEIGHT)
+#define TWISTER_CAMERA_OFFSET_X (67 / 2)
+#define TWISTER_CAMERA_OFFSET_Y (67 / 2)
+#define TWISTER_CENTER_X (CLIP_MARGIN_X + TWISTER_CAMERA_OFFSET_X)
+#define TWISTER_CENTER_Y (CLIP_MARGIN_Y + TWISTER_CAMERA_OFFSET_Y)
+#define TWISTER_CENTER_RADIUS 1
 #define TWISTER_BLOCK_SIZE 32
 #define TWISTER_MIN_BLOCK_X (-(((TWISTER_CAMERA_OFFSET_X + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 2))
-#define TWISTER_MAX_BLOCK_X (+((((SCREEN_PAL_WIDTH - TWISTER_CAMERA_OFFSET_X) + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 0))
+#define TWISTER_MAX_BLOCK_X (+((((TWISTER_BITMAP_HEIGHT - TWISTER_CAMERA_OFFSET_X) + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 0))
 #define TWISTER_MIN_BLOCK_Y (-(((TWISTER_CAMERA_OFFSET_Y + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 2))
-#define TWISTER_MAX_BLOCK_Y (+(((224 - TWISTER_CAMERA_OFFSET_Y + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 0))
+#define TWISTER_MAX_BLOCK_Y (+(((TWISTER_BITMAP_WIDTH - TWISTER_CAMERA_OFFSET_Y + TWISTER_BLOCK_SIZE - 1) / TWISTER_BLOCK_SIZE) + 0))
 // #define TWISTER_MIN_BLOCK_X  (-2)
 // #define TWISTER_MAX_BLOCK_X (+2)
 // #define TWISTER_MIN_BLOCK_Y (-2)
 // #define TWISTER_MAX_BLOCK_Y (2)
 #define TWISTER_BLOCKS_X (TWISTER_MAX_BLOCK_X - TWISTER_MIN_BLOCK_X)
 #define TWISTER_BLOCKS_Y (TWISTER_MAX_BLOCK_Y - TWISTER_MIN_BLOCK_Y)
-#define TWISTER_LEFT_BORDER (TWISTER_BITMAP_OFFSET_X - CLIP_MARGIN_X)
-#define TWISTER_RIGHT_BORDER (TWISTER_BITMAP_OFFSET_X + SCREEN_PAL_WIDTH + CLIP_MARGIN_X)
-#define TWISTER_TOP_BORDER (TWISTER_BITMAP_OFFSET_Y - CLIP_MARGIN_Y)
-#define TWISTER_BOTTOM_BORDER (TWISTER_BITMAP_OFFSET_Y + 224 + CLIP_MARGIN_Y)
+#define TWISTER_LEFT_BORDER (0)
+#define TWISTER_RIGHT_BORDER (TWISTER_BITMAP_WIDTH)
+#define TWISTER_TOP_BORDER (0)
+#define TWISTER_BOTTOM_BORDER (TWISTER_BITMAP_HEIGHT)
 
 static UBYTE s_ps;
 static UBYTE s_isTwisterEnabled;
+static tBitMap *s_pBitmaps[2];
+static tBitMap *s_pEyeMask;
+static UBYTE s_ubBackBuffer;
 
-static void blitCopyOptimized(
+static void blitCopyAlignedMasked(
 	const tBitMap *pSrc, WORD wSrcX, WORD wSrcY,
-	tBitMap *pDst, WORD wDstX, WORD wDstY, WORD wWidth, WORD wHeight,
-	UBYTE ubMinterm
+	tBitMap *pDst, WORD wDstX, WORD wDstY, WORD wWidth, WORD wHeight
 ) {
-	// Helper vars
-	UWORD uwBlitWords, uwBlitWidth;
-	ULONG ulSrcOffs, ulDstOffs;
-	UBYTE ubShift, ubSrcDelta, ubDstDelta, ubWidthDelta, ubMaskFShift, ubMaskLShift;
-	// Blitter register values
-	UWORD uwBltCon0, uwBltCon1, uwFirstMask, uwLastMask;
-	WORD wSrcModulo, wDstModulo;
+	UWORD uwBlitWords = wWidth >> 4;
+	ULONG ulSrcOffs = pSrc->BytesPerRow * wSrcY + (wSrcX>>3);
+	ULONG ulDstOffs = pDst->BytesPerRow * wDstY + (wDstX>>3);
 
-	ubSrcDelta = wSrcX & 0xF;
-	ubDstDelta = wDstX & 0xF;
-	ubWidthDelta = (ubSrcDelta + wWidth) & 0xF;
-
-	if(ubSrcDelta > ubDstDelta || ((wWidth+ubDstDelta+15) & 0xFFF0)-(wWidth+ubSrcDelta) > 16) {
-		uwBlitWidth = (wWidth+(ubSrcDelta>ubDstDelta?ubSrcDelta:ubDstDelta)+15) & 0xFFF0;
-		uwBlitWords = uwBlitWidth >> 4;
-
-		ubMaskFShift = ((ubWidthDelta+15)&0xF0)-ubWidthDelta;
-		ubMaskLShift = uwBlitWidth - (wWidth+ubMaskFShift);
-		uwFirstMask = 0xFFFF << ubMaskFShift;
-		uwLastMask = 0xFFFF >> ubMaskLShift;
-		if(ubMaskLShift > 16) { // Fix for 2-word blits
-			uwFirstMask &= 0xFFFF >> (ubMaskLShift-16);
-		}
-
-		ubShift = uwBlitWidth - (ubDstDelta+wWidth+ubMaskFShift);
-		uwBltCon1 = (ubShift << BSHIFTSHIFT) | BLITREVERSE;
-
-		// Position on the end of last row of the bitmap.
-		// For interleaved, position on the last row of last bitplane.
-		// TODO: fix duplicating bitmapGetByteWidth() check in interleaved branch
-		ulSrcOffs = 280 * (wSrcY + wHeight) - 56 + ((wSrcX + wWidth + ubMaskFShift - 1) / 16) * 2;
-		ulDstOffs = 280 * (wDstY + wHeight) - 56 + ((wDstX + wWidth + ubMaskFShift - 1) / 16) * 2;
-	}
-	else {
-		uwBlitWidth = (wWidth+ubDstDelta+15) & 0xFFF0;
-		uwBlitWords = uwBlitWidth >> 4;
-
-		ubMaskFShift = ubSrcDelta;
-		ubMaskLShift = uwBlitWidth-(wWidth+ubSrcDelta);
-
-		uwFirstMask = 0xFFFF >> ubMaskFShift;
-		uwLastMask = 0xFFFF << ubMaskLShift;
-
-		ubShift = ubDstDelta-ubSrcDelta;
-		uwBltCon1 = ubShift << BSHIFTSHIFT;
-
-		ulSrcOffs = 280 * wSrcY + (wSrcX >> 3);
-		ulDstOffs = 280 * wDstY + (wDstX >> 3);
-	}
-
-	uwBltCon0 = (ubShift << ASHIFTSHIFT) | USEB|USEC|USED | ubMinterm;
-
+	WORD wSrcModulo = bitmapGetByteWidth(pSrc) - uwBlitWords * 2;
+	WORD wDstModulo = bitmapGetByteWidth(pDst) - uwBlitWords * 2;
+	WORD wMaskModulo = bitmapGetByteWidth(s_pEyeMask) - uwBlitWords * 2;
 	wHeight *= 5;
-	wSrcModulo = 56 - uwBlitWords * 2;
-	wDstModulo = 56 - uwBlitWords * 2;
 
 	blitWait(); // Don't modify registers when other blit is in progress
-	g_pCustom->bltcon0 = uwBltCon0;
-	g_pCustom->bltcon1 = uwBltCon1;
-	g_pCustom->bltafwm = uwFirstMask;
-	g_pCustom->bltalwm = uwLastMask;
+	g_pCustom->bltcon0 = USEA|USEB|USEC|USED | MINTERM_COOKIE;
+	g_pCustom->bltcon1 = 0;
+	g_pCustom->bltafwm = 0xFFFF;
+	g_pCustom->bltalwm = 0xFFFF;
+	g_pCustom->bltamod = wMaskModulo;
 	g_pCustom->bltbmod = wSrcModulo;
 	g_pCustom->bltcmod = wDstModulo;
 	g_pCustom->bltdmod = wDstModulo;
-	g_pCustom->bltadat = 0xFFFF;
+	g_pCustom->bltapt = &s_pEyeMask->Planes[0][0];
 	g_pCustom->bltbpt = &pSrc->Planes[0][ulSrcOffs];
 	g_pCustom->bltcpt = &pDst->Planes[0][ulDstOffs];
 	g_pCustom->bltdpt = &pDst->Planes[0][ulDstOffs];
-
 	g_pCustom->bltsize = (wHeight << HSIZEBITS) | uwBlitWords;
 }
 
 void twisterEnable(void) {
 	s_isTwisterEnabled = 1;
 	s_ps = 0;
+	s_pBitmaps[0] = bitmapCreate(TWISTER_BITMAP_WIDTH, TWISTER_BITMAP_HEIGHT, 5, BMF_CLEAR | BMF_INTERLEAVED);
+	s_pBitmaps[1] = bitmapCreate(TWISTER_BITMAP_WIDTH, TWISTER_BITMAP_HEIGHT, 5, BMF_CLEAR | BMF_INTERLEAVED);
+	s_pEyeMask = bitmapCreateFromFile("data/gate_eye_mask.bm", 0);
+	s_ubBackBuffer = 0;
+
+	UWORD uwDestY = (6816 & (512 - 1));
+	blitCopyAligned(
+		g_pMainBuffer->pScroll->pBack, 32 + 48, uwDestY + 24,
+		s_pBitmaps[!s_ubBackBuffer], CLIP_MARGIN_X, CLIP_MARGIN_Y,
+		TWISTER_BITMAP_VISIBLE_WIDTH, TWISTER_BITMAP_VISIBLE_HEIGHT
+	);
+	blitCopyAligned(
+		g_pMainBuffer->pScroll->pBack, 32 + 48, uwDestY + 24,
+		s_pBitmaps[s_ubBackBuffer], CLIP_MARGIN_X, CLIP_MARGIN_Y,
+		TWISTER_BITMAP_VISIBLE_WIDTH, TWISTER_BITMAP_VISIBLE_HEIGHT
+	);
 }
 
 void twisterDisable(void) {
 	s_isTwisterEnabled = 0;
+	bitmapDestroy(s_pBitmaps[0]);
+	bitmapDestroy(s_pBitmaps[1]);
+	bitmapDestroy(s_pEyeMask);
 }
 
 void twisterProcess(void) {
@@ -165,10 +139,10 @@ void twisterProcess(void) {
 				wSrcX = TWISTER_LEFT_BORDER;
 			}
 			if(wSrcX + wWidth > TWISTER_RIGHT_BORDER) {
-				wWidth = SCREEN_PAL_WIDTH + CLIP_MARGIN_X - wSrcX;
+				wWidth = TWISTER_RIGHT_BORDER - wSrcX;
 			}
 			if(wDstX + wWidth > TWISTER_RIGHT_BORDER) {
-				wWidth = SCREEN_PAL_WIDTH + CLIP_MARGIN_X - wDstX;
+				wWidth = TWISTER_RIGHT_BORDER - wDstX;
 			}
 
 			if(wDstY < TWISTER_TOP_BORDER) {
@@ -194,24 +168,41 @@ void twisterProcess(void) {
 				continue;
 			}
 
-			blitCopyOptimized(
-				g_pMainBuffer->pScroll->pFront, wSrcX, wSrcY,
-				g_pMainBuffer->pScroll->pBack, wDstX, wDstY, wWidth, wHeight, MINTERM_COOKIE
+			blitCopy(
+				s_pBitmaps[!s_ubBackBuffer], wSrcX, wSrcY,
+				s_pBitmaps[s_ubBackBuffer], wDstX, wDstY, wWidth, wHeight, MINTERM_COOKIE
 			);
+			// blitLine(s_pBitmaps[s_ubBackBuffer], wSrcX, wSrcY, wDstX, wDstY, 2, 0xFFFF, 0);
+			// chunkyToPlanar(1, wSrcX, wSrcY, s_pBitmaps[s_ubBackBuffer]);
+			// chunkyToPlanar(3, wDstX, wDstY, s_pBitmaps[s_ubBackBuffer]);
 		}
 	}
 
-	UBYTE ubColor = 17 + (randUw(&g_sRand) & 3);
-	blitRect(
-		g_pMainBuffer->pScroll->pBack,
-		TWISTER_CENTER_X - 1,
-		TWISTER_CENTER_Y - 35,
-		2, 70, ubColor
+	for(UWORD y = TWISTER_CENTER_Y - TWISTER_CENTER_RADIUS; y <= TWISTER_CENTER_Y + TWISTER_CENTER_RADIUS; ++y) {
+		for(UWORD x = TWISTER_CENTER_X - TWISTER_CENTER_RADIUS; x <= TWISTER_CENTER_X + TWISTER_CENTER_RADIUS; ++x) {
+			UBYTE ubColor = 17 + (randUw(&g_sRand) & 3);
+			chunkyToPlanar(ubColor, x, y, s_pBitmaps[s_ubBackBuffer]);
+		}
+	}
+	// UBYTE ubColor = 17 + (randUw(&g_sRand) & 3);
+	// blitRect(
+	// 	s_pBitmaps[s_ubBackBuffer],
+	// 	TWISTER_CENTER_X - 1,
+	// 	TWISTER_CENTER_Y - 8,
+	// 	2, 16, ubColor
+	// );
+	// blitRect(
+	// 	s_pBitmaps[s_ubBackBuffer],
+	// 	TWISTER_CENTER_X - 8,
+	// 	TWISTER_CENTER_Y - 1,
+	// 	16, 1, ubColor
+	// );
+
+	UWORD uwDestY = (6816 & (512 - 1));
+	blitCopyAlignedMasked(
+		s_pBitmaps[!s_ubBackBuffer], CLIP_MARGIN_X, CLIP_MARGIN_Y,
+		g_pMainBuffer->pScroll->pBack, 32 + 48, uwDestY + 24,
+		TWISTER_BITMAP_VISIBLE_WIDTH, TWISTER_BITMAP_VISIBLE_HEIGHT
 	);
-	blitRect(
-		g_pMainBuffer->pScroll->pBack,
-		TWISTER_CENTER_X - 35,
-		TWISTER_CENTER_Y - 1,
-		70, 1, ubColor
-	);
+	s_ubBackBuffer = !s_ubBackBuffer;
 }

@@ -399,7 +399,7 @@ static void gameProcessGateCutscene(void) {
 			}
 			break;
 		case GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE:
-			if(++s_ubGateCutsceneCooldown > 42) {
+			if(++s_ubGateCutsceneCooldown > 200) {
 				s_ubGateCutsceneCooldown = 0;
 				fadeMorphTo(FADE_STATE_OUT);
 				++s_eGateCutsceneStep;
