@@ -9,13 +9,13 @@
 #include "core.h"
 
 #define TWISTER_BITMAP_VISIBLE_WIDTH 80
-#define TWISTER_BITMAP_VISIBLE_HEIGHT 67
+#define TWISTER_BITMAP_VISIBLE_HEIGHT 65
 #define CLIP_MARGIN_X 32
 #define CLIP_MARGIN_Y 16
 #define TWISTER_BITMAP_WIDTH (2 * CLIP_MARGIN_X + TWISTER_BITMAP_VISIBLE_WIDTH)
 #define TWISTER_BITMAP_HEIGHT (2 * CLIP_MARGIN_Y + TWISTER_BITMAP_VISIBLE_HEIGHT)
-#define TWISTER_CAMERA_OFFSET_X (67 / 2)
-#define TWISTER_CAMERA_OFFSET_Y (67 / 2)
+#define TWISTER_CAMERA_OFFSET_X (65 / 2)
+#define TWISTER_CAMERA_OFFSET_Y (65 / 2)
 #define TWISTER_CENTER_X (CLIP_MARGIN_X + TWISTER_CAMERA_OFFSET_X)
 #define TWISTER_CENTER_Y (CLIP_MARGIN_Y + TWISTER_CAMERA_OFFSET_Y)
 #define TWISTER_CENTER_RADIUS 1
@@ -80,12 +80,12 @@ void twisterEnable(void) {
 
 	UWORD uwDestY = (6816 & (512 - 1));
 	blitCopyAligned(
-		g_pMainBuffer->pScroll->pBack, 32 + 48, uwDestY + 24,
+		g_pMainBuffer->pScroll->pBack, 32 + 64, uwDestY + 29,
 		s_pBitmaps[!s_ubBackBuffer], CLIP_MARGIN_X, CLIP_MARGIN_Y,
 		TWISTER_BITMAP_VISIBLE_WIDTH, TWISTER_BITMAP_VISIBLE_HEIGHT
 	);
 	blitCopyAligned(
-		g_pMainBuffer->pScroll->pBack, 32 + 48, uwDestY + 24,
+		g_pMainBuffer->pScroll->pBack, 32 + 64, uwDestY + 29,
 		s_pBitmaps[s_ubBackBuffer], CLIP_MARGIN_X, CLIP_MARGIN_Y,
 		TWISTER_BITMAP_VISIBLE_WIDTH, TWISTER_BITMAP_VISIBLE_HEIGHT
 	);
@@ -201,7 +201,7 @@ void twisterProcess(void) {
 	UWORD uwDestY = (6816 & (512 - 1));
 	blitCopyAlignedMasked(
 		s_pBitmaps[!s_ubBackBuffer], CLIP_MARGIN_X, CLIP_MARGIN_Y,
-		g_pMainBuffer->pScroll->pBack, 32 + 48, uwDestY + 24,
+		g_pMainBuffer->pScroll->pBack, 32 + 64, uwDestY + 29,
 		TWISTER_BITMAP_VISIBLE_WIDTH, TWISTER_BITMAP_VISIBLE_HEIGHT
 	);
 	s_ubBackBuffer = !s_ubBackBuffer;

@@ -258,22 +258,22 @@ file(MAKE_DIRECTORY ${GEN_DIR}/gate)
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
 	GENERATED_FILE_LIST "GATE_FRAGS"
 	DESTINATIONS
-		${GEN_DIR}/gate/0.png  0  649 32 10
-		${GEN_DIR}/gate/1.png  0  659 32 17
-		${GEN_DIR}/gate/2.png  0  676 32 20
-		${GEN_DIR}/gate/3.png  0  696 32 18
-		${GEN_DIR}/gate/4.png  0  714 32 18
-		${GEN_DIR}/gate/5.png  0  732 32 19
-		${GEN_DIR}/gate/6.png  0  751 32 17
-		${GEN_DIR}/gate/7.png  0  768 32 14
-		${GEN_DIR}/gate/8.png  0  782 32 13
-		${GEN_DIR}/gate/9.png  0  795 32 17
-		${GEN_DIR}/gate/10.png 0  812 32 19
-		${GEN_DIR}/gate/11.png 0  831 32 18
-		${GEN_DIR}/gate/12.png 0  849 32 18
-		${GEN_DIR}/gate/13.png 0  867 32 19
-		${GEN_DIR}/gate/14.png 0  886 32 17
-		${GEN_DIR}/gate/15.png 0  903 32 11
+		${GEN_DIR}/gate/0.png  0  768 32 12
+		${GEN_DIR}/gate/1.png  0  800 32 18
+		${GEN_DIR}/gate/2.png  0  832 32 19
+		${GEN_DIR}/gate/3.png  0  864 32 18
+		${GEN_DIR}/gate/4.png  0  896 32 17
+		${GEN_DIR}/gate/5.png  0  928 32 20
+		${GEN_DIR}/gate/6.png  0  960 32 18
+		${GEN_DIR}/gate/7.png  0  992 32 14
+		${GEN_DIR}/gate/8.png  0 1024 32 14
+		${GEN_DIR}/gate/9.png  0 1056 32 18
+		${GEN_DIR}/gate/10.png 0 1088 32 19
+		${GEN_DIR}/gate/11.png 0 1120 32 18
+		${GEN_DIR}/gate/12.png 0 1152 32 18
+		${GEN_DIR}/gate/13.png 0 1184 32 19
+		${GEN_DIR}/gate/14.png 0 1216 32 18
+		${GEN_DIR}/gate/15.png 0 1248 32 11
 )
 
 convertTileset(
