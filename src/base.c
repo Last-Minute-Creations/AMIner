@@ -12,8 +12,6 @@
 #define BASE_TILE_DEPTH_GATE 209
 #define BASE_TILE_LOADING_MARGIN 10
 
-static void baseProcessGate(void);
-
 //----------------------------------------------------------------- PRIVATE VARS
 
 static tBaseId s_eBaseCurrent;
@@ -87,7 +85,7 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwX2 = 10 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_GATE + 8) * TILE_SIZE
 		},
-		.cbProcess = baseProcessGate,
+		.cbProcess = gameProcessBaseGate,
 	},
 	[BASE_ID_DINO_POPULATED] = {
 		.uwTileDepth = BASE_TILE_DEPTH_VARIANT,
@@ -125,27 +123,6 @@ static void baseTileLoad(tBaseId eBaseId) {
 		pBase->Rows * pBase->BytesPerRow
 	);
 	s_eBaseCurrent = eBaseId;
-}
-
-static UBYTE s_ubRadioMessageCounter = 200;
-
-static void baseProcessGate(void) {
-	if(gameIsCutsceneActive()) {
-		return;
-	}
-
-	if(hudIsShowingMessage()) {
-		s_ubRadioMessageCounter = 200;
-		return;
-	}
-
-	if(s_ubRadioMessageCounter == 0) {
-		hudShowMessage(FACE_ID_KOMISARZ, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
-	}
-	else {
-		--s_ubRadioMessageCounter;
-	}
-
 }
 
 //------------------------------------------------------------------- PUBLIC FNS

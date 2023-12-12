@@ -24,6 +24,45 @@
 		"dinoComplete": [
 			"Towarzyszu Dyrektorze, pozwólcie na momencik.",
 			"Mam wspaniałą wiadomość!"
+		],
+		"radioStart": [
+			[
+				"Pomocy! .... naukowcami ... ...",
+				"eksperymenty ... ... ... Ziemi. ... ..."
+			],
+			[
+				"... ... ... wrócić ... ... ... ... ....",
+				"... ... ... ... - ... ... pomoc"
+			],
+			[
+				"... ... portalu. ... ... ... umieramy."
+			]
+		],
+		"radioHalf": [
+			[
+				"Pomocy! ... naukowcami ... ...",
+				"eksperymenty nazistów ... wnętrzu Ziemi. Bez ..."
+			],
+			[
+				"portalu ... możemy wrócić ... domu ... ... ....",
+				"Ktokolwiek ... ... wiadomość - ... ... pomoc"
+			],
+			[
+				"... uruchomieniu portalu. Pospiesz ... ... umieramy."
+			]
+		],
+		"radioFull": [
+			[
+				"Pomocy! Jesteśmy naukowcami uwięzionymi przez",
+				"eksperymenty nazistów we wnętrzu Ziemi. Bez działającego"
+			],
+			[
+				"portalu nie możemy wrócić do domu i naszych rodzin.",
+				"Ktokolwiek odbierze tę wiadomość - prosimy o pomoc"
+			],
+			[
+				"w uruchomieniu portalu. Pospiesz się, tutaj umieramy."
+			]
 		]
 	},
 	"hiScore": {

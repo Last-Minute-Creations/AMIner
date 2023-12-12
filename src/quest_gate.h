@@ -17,4 +17,8 @@ void questGateProcess(void);
 
 UBYTE questGateAddFragment(void);
 
+UBYTE questGateGetFoundFragmentCount(void);
+
+UBYTE questGateGetMaxFragmentCount(void);
+
 #endif // QUEST_GATE_H

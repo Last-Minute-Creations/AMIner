@@ -31,7 +31,7 @@ void questGateProcess(void) {
 }
 
 UBYTE questGateAddFragment(void) {
-	const UBYTE ubMaxFragmentCount = collectibleGetMaxCount(COLLECTIBLE_KIND_GATE);
+	const UBYTE ubMaxFragmentCount = questGateGetMaxFragmentCount();
 	if(s_ubFoundFragments < ubMaxFragmentCount) {
 		++s_ubFoundFragments;
 		collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, s_ubFoundFragments);
@@ -39,4 +39,12 @@ UBYTE questGateAddFragment(void) {
 	}
 
 	return s_ubFoundFragments;
+}
+
+UBYTE questGateGetFoundFragmentCount(void) {
+	return s_ubFoundFragments;
+}
+
+UBYTE questGateGetMaxFragmentCount(void) {
+	return collectibleGetMaxCount(COLLECTIBLE_KIND_GATE);
 }

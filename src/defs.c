@@ -92,6 +92,15 @@ const char * s_pLangDom[] = {
 	// HUD: Misc
 	[MSG_HUD_DINO_COMPLETE] = "hudMessages.dinoComplete",
 	[MSG_HUD_DINO_FOUND_BONE] = "hudMessages.dinoFoundBone",
+	[MSG_HUD_RADIO_START_0] = "hudMessages.radioStart[0]",
+	[MSG_HUD_RADIO_START_1] = "hudMessages.radioStart[1]",
+	[MSG_HUD_RADIO_START_2] = "hudMessages.radioStart[2]",
+	[MSG_HUD_RADIO_HALF_0] = "hudMessages.radioHalf[0]",
+	[MSG_HUD_RADIO_HALF_1] = "hudMessages.radioHalf[1]",
+	[MSG_HUD_RADIO_HALF_2] = "hudMessages.radioHalf[2]",
+	[MSG_HUD_RADIO_FULL_0] = "hudMessages.radioFull[0]",
+	[MSG_HUD_RADIO_FULL_1] = "hudMessages.radioFull[1]",
+	[MSG_HUD_RADIO_FULL_2] = "hudMessages.radioFull[2]",
 	// HUD: Plan
 	[MSG_HUD_NEW_PLAN] = "hudMessages.newPlan",
 	[MSG_HUD_PLAN_REMAINING] = "hudMessages.remaining",

@@ -608,6 +608,45 @@ static void gameSave(tFile *pFile) {
 
 //------------------------------------------------------------------- PUBLIC FNS
 
+#define RADIO_MESSAGE_COUNT 3
+#define RADIO_MESSAGE_INTERVAL 150
+
+static UBYTE s_ubRadioMessageCounter = RADIO_MESSAGE_INTERVAL;
+static UBYTE s_ubRadioMessageIndex = 0;
+
+void gameProcessBaseGate(void) {
+	if(gameIsCutsceneActive()) {
+		return;
+	}
+
+	// TODO: check if player coords are actually in base
+
+	if(hudIsShowingMessage()) {
+		s_ubRadioMessageCounter = RADIO_MESSAGE_INTERVAL;
+		return;
+	}
+
+	if(s_ubRadioMessageCounter == 0) {
+		UBYTE ubFoundCount = questGateGetFoundFragmentCount();
+		UBYTE ubMaxCount = questGateGetMaxFragmentCount();
+		tMsg eMsgStart = MSG_HUD_RADIO_START_0;
+		if(ubFoundCount >= (ubMaxCount * 2) / 3) {
+			eMsgStart = MSG_HUD_RADIO_FULL_0;
+		}
+		else if(ubFoundCount >= (ubMaxCount * 1) / 3) {
+			eMsgStart = MSG_HUD_RADIO_HALF_0;
+		}
+
+		hudShowMessage(FACE_ID_RADIO, g_pMsgs[eMsgStart + s_ubRadioMessageIndex]);
+		if(++s_ubRadioMessageIndex >= RADIO_MESSAGE_COUNT) {
+			s_ubRadioMessageIndex = 0;
+		}
+	}
+	else {
+		--s_ubRadioMessageCounter;
+	}
+}
+
 void gameCancelModeForPlayer(UBYTE ubPlayer) {
 	if(!s_pModeMenus[ubPlayer].isActive) {
 		s_pModeMenus[ubPlayer].ubCurrent = 0;

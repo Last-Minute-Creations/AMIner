@@ -70,6 +70,8 @@ void gameUpdateMaxDepth(UWORD uwTileY);
 
 UBYTE gameIsCutsceneActive(void);
 
+void gameProcessBaseGate(void);
+
 // Game config
 extern UBYTE g_is2pPlaying;
 extern UBYTE g_isChallenge;
