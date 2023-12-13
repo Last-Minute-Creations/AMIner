@@ -7,6 +7,7 @@
 #include <ace/managers/blit.h>
 #include <ace/managers/system.h>
 #include <ace/utils/custom.h>
+#include <ace/utils/chunky.h>
 #include <comm/gs_shop.h>
 #include <comm/page_office.h>
 #include <comm/inbox.h>
@@ -58,7 +59,8 @@ typedef enum tGateCutsceneStep {
 	// TODO: wait for camera?
 	GATE_CUTSCENE_STEP_START,
 	GATE_CUTSCENE_STEP_WAIT_FOR_SHAKE,
-	GATE_CUTSCENE_STEP_SHAKE_BEFORE_TWISTER,
+	GATE_CUTSCENE_STEP_SHAKE_BEFORE_LIGHTS,
+	GATE_CUTSCENE_STEP_LIGHTS_BEFORE_TWIST,
 	GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE,
 	GATE_CUTSCENE_STEP_FADE_OUT,
 	GATE_CUTSCENE_STEP_FADE_IN,
@@ -369,6 +371,9 @@ static UWORD gameGetCameraDestinationY(void) {
 }
 
 static UBYTE s_ubGateCutsceneCooldown;
+static UBYTE s_ubGateCutsceneColorIndex;
+static UBYTE s_ubGateCutsceneRuneIndex;
+static UBYTE s_ubGateCutsceneUpdateCount;
 
 static void gameProcessGateCutscene(void) {
 	if(s_eGateCutsceneStep == GATE_CUTSCENE_STEP_OFF) {
@@ -391,11 +396,200 @@ static void gameProcessGateCutscene(void) {
 				s_isCameraShake = 1;
 			}
 			break;
-		case GATE_CUTSCENE_STEP_SHAKE_BEFORE_TWISTER:
+		case GATE_CUTSCENE_STEP_SHAKE_BEFORE_LIGHTS:
 			if(++s_ubGateCutsceneCooldown > 80) {
 				s_ubGateCutsceneCooldown = 0;
 				++s_eGateCutsceneStep;
-				twisterEnable();
+				s_ubGateCutsceneUpdateCount = 0;
+				s_ubGateCutsceneColorIndex = 21;
+				s_ubGateCutsceneRuneIndex = 0;
+			}
+			break;
+		case GATE_CUTSCENE_STEP_LIGHTS_BEFORE_TWIST:
+			++s_ubGateCutsceneCooldown;
+			if(s_ubGateCutsceneCooldown == 2) {
+				s_ubGateCutsceneUpdateCount = 2;
+			}
+			else if(s_ubGateCutsceneCooldown > 2) {
+				if(s_ubGateCutsceneUpdateCount-- > 0) {
+					static const tUbCoordYX pPixels[16][20] = {
+						[0] = {
+							{.ubX = 96 + 7, .ubY = 95 + 0}, {.ubX = 96 + 7, .ubY = 95 + 1},
+							{.ubX = 96 + 8, .ubY = 95 + 1}, {.ubX = 96 + 8, .ubY = 95 + 2},
+							{.ubX = 96 + 8, .ubY = 95 + 3}, {.ubX = 96 + 7, .ubY = 95 + 3},
+							{.ubX = 96 + 5, .ubY = 95 + 4}, {.ubX = 96 + 5, .ubY = 95 + 5},
+							{.ubX = 96 + 9, .ubY = 95 + 4}, {.ubX = 96 + 9, .ubY = 95 + 5},
+							{.uwYX = 0}
+						},
+						[1] = {
+							{.ubX = 110 + 8, .ubY = 85 + 5}, {.ubX = 110 + 6, .ubY = 85 + 6},
+							{.ubX = 110 + 8, .ubY = 85 + 6}, {.ubX = 110 + 8, .ubY = 85 + 7},
+							{.ubX = 110 + 8, .ubY = 85 + 8}, {.ubX = 110 + 8, .ubY = 85 + 9},
+							{.ubX = 110 + 8, .ubY = 85 + 10},
+							{.uwYX = 0}
+						},
+						[2] = {
+							{.ubX = 120 + 6, .ubY = 74 + 5}, {.ubX = 120 + 7, .ubY = 74 + 5},
+							{.ubX = 120 + 5, .ubY = 74 + 6}, {.ubX = 120 + 6, .ubY = 74 + 6},
+							{.ubX = 120 + 5, .ubY = 74 + 7}, {.ubX = 120 + 6, .ubY = 74 + 7},
+							{.ubX = 120 + 7, .ubY = 74 + 7}, {.ubX = 120 + 6, .ubY = 74 + 8},
+							{.ubX = 120 + 7, .ubY = 74 + 8}, {.ubX = 120 + 8, .ubY = 74 + 9},
+							{.ubX = 120 + 8, .ubY = 74 + 10}, {.ubX = 120 + 9, .ubY = 74 + 10},
+							{.uwYX = 0}
+						},
+						[3] = {
+							{.ubX = 127 + 6, .ubY = 61 + 5}, {.ubX = 127 + 7, .ubY = 61 + 5},
+							{.ubX = 127 + 4, .ubY = 61 + 6}, {.ubX = 127 + 5, .ubY = 61 + 6},
+							{.ubX = 127 + 4, .ubY = 61 + 7}, {.ubX = 127 + 5, .ubY = 61 + 7},
+							{.ubX = 127 + 7, .ubY = 61 + 7}, {.ubX = 127 + 5, .ubY = 61 + 8},
+							{.ubX = 127 + 6, .ubY = 61 + 8}, {.ubX = 127 + 7, .ubY = 61 + 8},
+							{.ubX = 127 + 6, .ubY = 61 + 9}, {.ubX = 127 + 6, .ubY = 61 + 10},
+							{.uwYX = 0}
+						},
+						[4] = {
+							{.ubX = 127 + 4, .ubY = 44 + 8}, {.ubX = 127 + 5, .ubY = 44 + 8},
+							{.ubX = 127 + 6, .ubY = 44 + 8}, {.ubX = 127 + 7, .ubY = 44 + 8},
+							{.ubX = 127 + 4, .ubY = 44 + 9}, {.ubX = 127 + 3, .ubY = 44 + 10},
+							{.ubX = 127 + 3, .ubY = 44 + 11}, {.ubX = 127 + 6, .ubY = 44 + 11},
+							{.ubX = 127 + 9, .ubY = 44 + 11}, {.ubX = 127 + 9, .ubY = 44 + 12},
+							{.ubX = 127 + 4, .ubY = 44 + 13}, {.ubX = 127 + 5, .ubY = 44 + 13},
+							{.ubX = 127 + 7, .ubY = 44 + 13}, {.ubX = 127 + 8, .ubY = 44 + 13},
+							{.uwYX = 0}
+						},
+						[5] = {
+							{.ubX = 120 + 8, .ubY = 29 + 9}, {.ubX = 120 + 9, .ubY = 29 + 9},
+							{.ubX = 120 + 7, .ubY = 29 + 10}, {.ubX = 120 + 8, .ubY = 29 + 10},
+							{.ubX = 120 + 9, .ubY = 29 + 10}, {.ubX = 120 + 6, .ubY = 29 + 11},
+							{.ubX = 120 + 5, .ubY = 29 + 12}, {.ubX = 120 + 5, .ubY = 29 + 13},
+							{.ubX = 120 + 7, .ubY = 29 + 13}, {.ubX = 120 + 8, .ubY = 29 + 13},
+							{.ubX = 120 + 8, .ubY = 29 + 14},
+							{.uwYX = 0}
+						},
+						[6] = {
+							{.ubX = 113 + 3, .ubY = 20 + 8}, {.ubX = 113 + 4, .ubY = 20 + 8},
+							{.ubX = 113 + 5, .ubY = 20 + 8}, {.ubX = 113 + 6, .ubY = 20 + 8},
+							{.ubX = 113 + 3, .ubY = 20 + 9}, {.ubX = 113 + 2, .ubY = 20 + 10},
+							{.ubX = 113 + 2, .ubY = 20 + 11}, {.ubX = 113 + 5, .ubY = 20 + 11},
+							{.ubX = 113 + 8, .ubY = 20 + 11}, {.ubX = 113 + 8, .ubY = 20 + 12},
+							{.ubX = 113 + 3, .ubY = 20 + 13}, {.ubX = 113 + 4, .ubY = 20 + 13},
+							{.ubX = 113 + 6, .ubY = 20 + 13}, {.ubX = 113 + 7, .ubY = 20 + 13},
+							{.uwYX = 0}
+						},
+						[7] = {
+							{.ubX = 96 + 8, .ubY = 17 + 5}, {.ubX = 96 + 9, .ubY = 17 + 5},
+							{.ubX = 96 + 7, .ubY = 17 + 6}, {.ubX = 96 + 8, .ubY = 17 + 6},
+							{.ubX = 96 + 9, .ubY = 17 + 6}, {.ubX = 96 + 6, .ubY = 17 + 7},
+							{.ubX = 96 + 5, .ubY = 17 + 8}, {.ubX = 96 + 5, .ubY = 17 + 9},
+							{.ubX = 96 + 7, .ubY = 17 + 9}, {.ubX = 96 + 8, .ubY = 17 + 9},
+							{.ubX = 96 + 8, .ubY = 17 + 10},
+							{.uwYX = 0}
+						},
+						[8] = {
+							{.ubX = 78 + 9, .ubY = 17 + 4}, {.ubX = 78 + 10, .ubY = 17 + 4},
+							{.ubX = 78 + 8, .ubY = 17 + 5}, {.ubX = 78 + 9, .ubY = 17 + 5},
+							{.ubX = 78 + 8, .ubY = 17 + 6}, {.ubX = 78 + 9, .ubY = 17 + 6},
+							{.ubX = 78 + 10, .ubY = 17 + 6}, {.ubX = 78 + 9, .ubY = 17 + 7},
+							{.ubX = 78 + 10, .ubY = 17 + 7}, {.ubX = 78 + 11, .ubY = 17 + 8},
+							{.ubX = 78 + 11, .ubY = 17 + 9}, {.ubX = 78 + 12, .ubY = 17 + 9},
+							{.uwYX = 0}
+						},
+						[9] = {
+							{.ubX = 64 + 9, .ubY = 20 + 7}, {.ubX = 64 + 13, .ubY = 20 + 7},
+							{.ubX = 64 + 10, .ubY = 20 + 8}, {.ubX = 64 + 11, .ubY = 20 + 8},
+							{.ubX = 64 + 12, .ubY = 20 + 8}, {.ubX = 64 + 13, .ubY = 20 + 8},
+							{.ubX = 64 + 14, .ubY = 20 + 8}, {.ubX = 64 + 10, .ubY = 20 + 9},
+							{.ubX = 64 + 9, .ubY = 20 + 10}, {.ubX = 64 + 10, .ubY = 20 + 10},
+							{.ubX = 64 + 12, .ubY = 20 + 10}, {.ubX = 64 + 13, .ubY = 20 + 10},
+							{.ubX = 64 + 14, .ubY = 20 + 10}, {.ubX = 64 + 9, .ubY = 20 + 11},
+							{.ubX = 64 + 12, .ubY = 20 + 11}, {.ubX = 64 + 14, .ubY = 20 + 11},
+							{.ubX = 64 + 9, .ubY = 20 + 12}, {.ubX = 64 + 12, .ubY = 20 + 12},
+							{.ubX = 64 + 13, .ubY = 20 + 12},
+							{.uwYX = 0}
+						},
+						[10] = {
+							{.ubX = 55 + 9, .ubY = 30 + 7}, {.ubX = 55 + 9, .ubY = 30 + 8},
+							{.ubX = 55 + 10, .ubY = 30 + 8}, {.ubX = 55 + 10, .ubY = 30 + 9},
+							{.ubX = 55 + 10, .ubY = 30 + 10}, {.ubX = 55 + 9, .ubY = 30 + 10},
+							{.ubX = 55 + 7, .ubY = 30 + 11}, {.ubX = 55 + 7, .ubY = 30 + 12},
+							{.ubX = 55 + 11, .ubY = 30 + 11}, {.ubX = 55 + 11, .ubY = 30 + 12},
+							{.uwYX = 0}
+						},
+						[11] = {
+							{.ubX = 52 + 6, .ubY = 44 + 6}, {.ubX = 52 + 7, .ubY = 44 + 6},
+							{.ubX = 52 + 5, .ubY = 44 + 7}, {.ubX = 52 + 6, .ubY = 44 + 7},
+							{.ubX = 52 + 5, .ubY = 44 + 8}, {.ubX = 52 + 6, .ubY = 44 + 8},
+							{.ubX = 52 + 7, .ubY = 44 + 8}, {.ubX = 52 + 6, .ubY = 44 + 9},
+							{.ubX = 52 + 7, .ubY = 44 + 9}, {.ubX = 52 + 8, .ubY = 44 + 10},
+							{.ubX = 52 + 8, .ubY = 44 + 11}, {.ubX = 52 + 9, .ubY = 44 + 11},
+							{.uwYX = 0}
+						},
+						[12] = {
+							{.ubX = 52 + 4, .ubY = 62 + 4}, {.ubX = 52 + 8, .ubY = 62 + 4},
+							{.ubX = 52 + 5, .ubY = 62 + 5}, {.ubX = 52 + 6, .ubY = 62 + 5},
+							{.ubX = 52 + 7, .ubY = 62 + 5}, {.ubX = 52 + 8, .ubY = 62 + 5},
+							{.ubX = 52 + 9, .ubY = 62 + 5}, {.ubX = 52 + 5, .ubY = 62 + 6},
+							{.ubX = 52 + 4, .ubY = 62 + 7}, {.ubX = 52 + 5, .ubY = 62 + 7},
+							{.ubX = 52 + 7, .ubY = 62 + 7}, {.ubX = 52 + 8, .ubY = 62 + 7},
+							{.ubX = 52 + 9, .ubY = 62 + 7}, {.ubX = 52 + 4, .ubY = 62 + 8},
+							{.ubX = 52 + 7, .ubY = 62 + 8}, {.ubX = 52 + 9, .ubY = 62 + 8},
+							{.ubX = 52 + 4, .ubY = 62 + 9}, {.ubX = 52 + 7, .ubY = 62 + 9},
+							{.ubX = 52 + 8, .ubY = 62 + 9},
+							{.uwYX = 0}
+						},
+						[13] = {
+							{.ubX = 55 + 10, .ubY = 75 + 4}, {.ubX = 55 + 10, .ubY = 75 + 5},
+							{.ubX = 55 + 11, .ubY = 75 + 5}, {.ubX = 55 + 11, .ubY = 75 + 6},
+							{.ubX = 55 + 11, .ubY = 75 + 7}, {.ubX = 55 + 10, .ubY = 75 + 7},
+							{.ubX = 55 + 8, .ubY = 75 + 8}, {.ubX = 55 + 8, .ubY = 75 + 9},
+							{.ubX = 55 + 12, .ubY = 75 + 8}, {.ubX = 55 + 12, .ubY = 75 + 9},
+							{.uwYX = 0}
+						},
+						[14] = {
+							{.ubX = 59 + 14, .ubY = 85 + 4}, {.ubX = 59 + 15, .ubY = 85 + 4},
+							{.ubX = 59 + 16, .ubY = 85 + 5}, {.ubX = 59 + 17, .ubY = 85 + 5},
+							{.ubX = 59 + 14, .ubY = 85 + 6}, {.ubX = 59 + 15, .ubY = 85 + 6},
+							{.ubX = 59 + 16, .ubY = 85 + 6}, {.ubX = 59 + 17, .ubY = 85 + 6},
+							{.ubX = 59 + 17, .ubY = 85 + 7}, {.ubX = 59 + 15, .ubY = 85 + 8},
+							{.ubX = 59 + 16, .ubY = 85 + 8}, {.ubX = 59 + 14, .ubY = 85 + 9},
+							{.ubX = 59 + 15, .ubY = 85 + 9}, {.ubX = 59 + 16, .ubY = 85 + 9},
+							{.uwYX = 0}
+						},
+						[15] = {
+							{.ubX = 79 + 8, .ubY = 92 + 3}, {.ubX = 79 + 9, .ubY = 92 + 3},
+							{.ubX = 79 + 10, .ubY = 92 + 3}, {.ubX = 79 + 11, .ubY = 92 + 3},
+							{.ubX = 79 + 8, .ubY = 92 + 4}, {.ubX = 79 + 7, .ubY = 92 + 5},
+							{.ubX = 79 + 7, .ubY = 92 + 6}, {.ubX = 79 + 10, .ubY = 92 + 6},
+							{.ubX = 79 + 13, .ubY = 92 + 6}, {.ubX = 79 + 13, .ubY = 92 + 7},
+							{.ubX = 79 + 8, .ubY = 92 + 8}, {.ubX = 79 + 9, .ubY = 92 + 8},
+							{.ubX = 79 + 11, .ubY = 92 + 8}, {.ubX = 79 + 12, .ubY = 92 + 8},
+							{.uwYX = 0}
+						},
+					};
+
+					UWORD uwDestY = (6816 & (512 - 1));
+					for(UBYTE i = 0; i < 20; ++i) {
+						if(pPixels[s_ubGateCutsceneRuneIndex][i].uwYX == 0) {
+							break;
+						}
+
+						chunkyToPlanar(
+							s_ubGateCutsceneColorIndex,
+							32 + pPixels[s_ubGateCutsceneRuneIndex][i].ubX,
+							uwDestY + pPixels[s_ubGateCutsceneRuneIndex][i].ubY,
+							g_pMainBuffer->pScroll->pBack
+						);
+					}
+				}
+				else {
+					s_ubGateCutsceneCooldown = 0;
+					if(++s_ubGateCutsceneColorIndex > 25) {
+						if(++s_ubGateCutsceneRuneIndex >= 16) {
+							++s_eGateCutsceneStep;
+							twisterEnable();
+						}
+						s_ubGateCutsceneColorIndex = 21;
+					}
+				}
 			}
 			break;
 		case GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE:
