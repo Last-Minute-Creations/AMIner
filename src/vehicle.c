@@ -448,12 +448,25 @@ UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2;
 	UWORD uwY = pVehicle->sBobBody.sPos.uwY;
-	UBYTE isNearInBase = (
+	UBYTE isNearShop = (
 		pBase->sRectRestock.uwX1 <= uwCenterX && uwCenterX <= pBase->sRectRestock.uwX2 &&
 		pBase->sRectRestock.uwY1 <= uwY && uwY <= pBase->sRectRestock.uwY2
 	);
 
-	return isNearInBase;
+	return isNearShop;
+}
+
+UBYTE vehicleIsInBase(const tVehicle *pVehicle) {
+	const tBase *pBase = baseGetCurrent();
+
+	UWORD uwY = pVehicle->sBobBody.sPos.uwY;
+	UWORD uwBaseStartY = pBase->uwTileDepth * TILE_SIZE;
+	UWORD uwBaseEndY = uwBaseStartY + BASE_PATTERN_HEIGHT * TILE_SIZE;
+	UBYTE isInBase = (
+		uwBaseStartY <= uwY && uwY <= uwBaseEndY
+	);
+
+	return isInBase;
 }
 
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {

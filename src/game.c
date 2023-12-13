@@ -619,7 +619,12 @@ void gameProcessBaseGate(void) {
 		return;
 	}
 
-	// TODO: check if player coords are actually in base
+	if(
+		!vehicleIsInBase(&g_pVehicles[0]) &&
+		(!g_is2pPlaying || vehicleIsInBase(&g_pVehicles[1]))
+	) {
+		return;
+	}
 
 	if(hudIsShowingMessage()) {
 		s_ubRadioMessageCounter = RADIO_MESSAGE_INTERVAL;
