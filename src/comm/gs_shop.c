@@ -244,6 +244,12 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_NEWS_ACCOLADES:
 			pageNewsCreate(NEWS_KIND_ACCOLADES);
 			break;
+		case COMM_SHOP_PAGE_NEWS_GATE_ENEMY:
+			pageNewsCreate(NEWS_KIND_GATE_ENEMY);
+			break;
+		case COMM_SHOP_PAGE_NEWS_GATE_RED:
+			pageNewsCreate(NEWS_KIND_GATE_RED);
+			break;
 		case COMM_SHOP_PAGE_SOKOBAN:
 			pageSokobanCreate();
 			break;

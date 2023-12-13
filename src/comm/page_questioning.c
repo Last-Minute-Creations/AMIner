@@ -16,9 +16,9 @@
 #define QUESTIONING_HEAT_INCREASE 5
 #define QUESTIONING_HEAT_DECREASE_TRUTH 5
 
-static tQuestioningBit s_ePendingQuestioning;
-static tQuestioningBit s_eQuestioningReports;
-static tQuestioningBit s_eCurrentQuestioningBit;
+static tQuestioningBit s_eQuestioningsPending;
+static tQuestioningBit s_eQuestioningsReported;
+static tQuestioningBit s_eQuestioningCurrent;
 
 static void pageQuestioningProcess(void) {
 	BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
@@ -36,11 +36,11 @@ static void pageQuestioningProcess(void) {
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(bButtonCurr == 0) {
-			s_eQuestioningReports |= s_eCurrentQuestioningBit;
+			s_eQuestioningsReported |= s_eQuestioningCurrent;
 		}
 		else {
 			if(heatTryPassCheck()) {
-				s_ePendingQuestioning &= ~(s_eCurrentQuestioningBit);
+				s_eQuestioningsPending &= ~(s_eQuestioningCurrent);
 			}
 			else {
 				gameAddRebuke();
@@ -55,16 +55,16 @@ void pageQuestioningCreate(void) {
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
 
-	s_eCurrentQuestioningBit = QUESTIONING_BIT_GATE;
-	while(s_eCurrentQuestioningBit < QUESTIONING_BIT_END) {
-		if(s_eCurrentQuestioningBit & s_ePendingQuestioning) {
+	s_eQuestioningCurrent = QUESTIONING_BIT_GATE;
+	while(s_eQuestioningCurrent < QUESTIONING_BIT_END) {
+		if(s_eQuestioningCurrent & s_eQuestioningsPending) {
 			break;
 		}
-		s_eCurrentQuestioningBit <<= 1;
+		s_eQuestioningCurrent <<= 1;
 	}
 
 	const char *szMsg = "???";
-	switch (s_eCurrentQuestioningBit)
+	switch (s_eQuestioningCurrent)
 	{
 		case QUESTIONING_BIT_GATE:
 			szMsg = "Have you found some gate parts?";
@@ -73,7 +73,7 @@ void pageQuestioningCreate(void) {
 			szMsg = "Have you found some teleport parts?";
 			break;
 		default:
-			logWrite("ERR: Unhandled questioning value: %d\n", s_eCurrentQuestioningBit);
+			logWrite("ERR: Unhandled questioning value: %d\n", s_eQuestioningCurrent);
 			// TODO: exit earlier?
 	}
 
@@ -95,14 +95,14 @@ void pageQuestioningCreate(void) {
 }
 
 void pageQuestioningReset(void) {
-	s_ePendingQuestioning = 0;
-	s_eQuestioningReports = 0;
+	s_eQuestioningsPending = 0;
+	s_eQuestioningsReported = 0;
 }
 
 void pageQuestioningSave(tFile *pFile) {
 	saveWriteHeader(pFile, "QTNG");
-	fileWrite(pFile, &s_ePendingQuestioning, sizeof(s_ePendingQuestioning));
-	fileWrite(pFile, &s_eQuestioningReports, sizeof(s_eQuestioningReports));
+	fileWrite(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
+	fileWrite(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
 }
 
 UBYTE pageQuestioningLoad(tFile *pFile) {
@@ -110,27 +110,27 @@ UBYTE pageQuestioningLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_ePendingQuestioning, sizeof(s_ePendingQuestioning));
-	fileRead(pFile, &s_eQuestioningReports, sizeof(s_eQuestioningReports));
+	fileRead(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
+	fileRead(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
 	return 1;
 }
 
 void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit) {
-	tQuestioningBit ePendingQuestioningPrev = s_ePendingQuestioning;
+	tQuestioningBit ePendingQuestioningPrev = s_eQuestioningsPending;
 
-	if(!(s_eQuestioningReports & eQuestioningBit)) {
+	if(!(s_eQuestioningsReported & eQuestioningBit)) {
 		// Not reported yet - increase heat and add as pending questioning.
 		// Increases heat each time it's triggered, even when questioning is already pending.
-		s_ePendingQuestioning |= eQuestioningBit;
+		s_eQuestioningsPending |= eQuestioningBit;
 		heatTryIncrease(QUESTIONING_HEAT_INCREASE);
 	}
 
-	if(ePendingQuestioningPrev != s_ePendingQuestioning) {
+	if(ePendingQuestioningPrev != s_eQuestioningsPending) {
 		inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING, 1);
 		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_URZEDAS]);
 	}
 }
 
-tQuestioningBit pageQuestioningGetQuestioningReports(void) {
-	return s_eQuestioningReports;
+UBYTE pageQuestioningIsReported(tQuestioningBit eQuestioning) {
+	return (s_eQuestioningsReported & eQuestioning) != 0;
 }

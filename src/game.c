@@ -9,6 +9,7 @@
 #include <ace/utils/custom.h>
 #include <ace/utils/chunky.h>
 #include <comm/gs_shop.h>
+#include <comm/page_questioning.h>
 #include <comm/page_office.h>
 #include <comm/inbox.h>
 #include "vehicle.h"
@@ -375,9 +376,9 @@ static UBYTE s_ubGateCutsceneColorIndex;
 static UBYTE s_ubGateCutsceneRuneIndex;
 static UBYTE s_ubGateCutsceneUpdateCount;
 
-static void gameProcessGateCutscene(void) {
+static UBYTE gameProcessGateCutscene(void) {
 	if(s_eGateCutsceneStep == GATE_CUTSCENE_STEP_OFF) {
-		return;
+		return 0;
 	}
 
 	switch(s_eGateCutsceneStep) {
@@ -611,7 +612,14 @@ static void gameProcessGateCutscene(void) {
 		case GATE_CUTSCENE_STEP_FADE_IN:
 			if(fadeGetState() == FADE_STATE_IN) {
 				++s_eGateCutsceneStep;
-				// TODO: launch the outro commrade
+				tCommShopPage ePage = (
+					pageQuestioningIsReported(QUESTIONING_BIT_GATE) ?
+					COMM_SHOP_PAGE_NEWS_GATE_RED :
+					COMM_SHOP_PAGE_NEWS_GATE_ENEMY
+				);
+				inboxPushBack(ePage, 0);
+				statePush(g_pGameStateManager, &g_sStateShop);
+				return 1;
 			}
 			break;
 		case GATE_CUTSCENE_STEP_END:
@@ -619,6 +627,7 @@ static void gameProcessGateCutscene(void) {
 			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
 			break;
 	}
+	return 0;
 }
 
 static void gameCameraProcess(void) {
@@ -1085,7 +1094,10 @@ static void gameGsLoop(void) {
 	}
 	dinoProcess();
 	questGateProcess();
-	gameProcessGateCutscene();
+	UBYTE isGameStateChange = gameProcessGateCutscene();
+	if(isGameStateChange) {
+		return;
+	}
 
 	debugColor(0x080);
 	gameCameraProcess();
@@ -1093,7 +1105,7 @@ static void gameGsLoop(void) {
 		steerProcess(&s_pPlayerSteers[0]);
 		steerProcess(&s_pPlayerSteers[1]);
 		gameProcessHotkeys();
-		UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
+		isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
 		if(isGameStateChange) {
 			return;
 		}
