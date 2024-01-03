@@ -36,6 +36,7 @@
 #include "heat.h"
 #include "assets.h"
 #include "mode_menu.h"
+#include "tile_variant.h"
 #include "twister.h"
 
 #define CAMERA_SPEED 4
@@ -1060,6 +1061,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	heatReset();
 	groundLayerReset(1);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
+	tileVariantChangeTo(TILE_VARIANT_PRISONER);
 }
 
 void gameTriggerSave(void) {

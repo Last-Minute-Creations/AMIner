@@ -6,6 +6,7 @@
 #include "game.h"
 #include "tile.h"
 #include "hud.h"
+#include "tile_variant.h"
 
 #define BASE_TILE_DEPTH_GROUND 0
 #define BASE_TILE_DEPTH_DINO 100
@@ -15,9 +16,7 @@
 //----------------------------------------------------------------- PRIVATE VARS
 
 static tBaseId s_eBaseCurrent;
-static UBYTE s_isFinishLineLoaded;
 static tBitMap *s_pBaseTiles[BASE_ID_COUNT_UNIQUE];
-static tBitMap *s_pCheckpointTiles;
 static tTileBufferManager *s_pManager;
 
 static const tBase s_pBases[BASE_ID_COUNT] = {
@@ -132,41 +131,23 @@ void baseCreate(tTileBufferManager *pManager) {
 	s_pBaseTiles[BASE_ID_GROUND] = bitmapCreateFromFile("data/base0.bm", 1);
 	s_pBaseTiles[BASE_ID_DINO] = bitmapCreateFromFile("data/base1.bm", 1);
 	s_pBaseTiles[BASE_ID_GATE] = bitmapCreateFromFile("data/base2.bm", 1);
-	s_pCheckpointTiles = bitmapCreateFromFile("data/checkpoint.bm", 1);
 	baseTileLoad(BASE_ID_GROUND);
-	s_isFinishLineLoaded = 0;
 }
 
 void baseDestroy(void) {
 	bitmapDestroy(s_pBaseTiles[0]);
 	bitmapDestroy(s_pBaseTiles[1]);
 	bitmapDestroy(s_pBaseTiles[2]);
-	bitmapDestroy(s_pCheckpointTiles);
 }
-
-#define TILE_BYTE_COUNT (TILE_SIZE * (TILE_SIZE / 8) * 5)
 
 void baseProcess(void) {
 	UWORD uwCamY = s_pManager->pCamera->uPos.uwY;
 	if(g_isChallenge) {
-		tBitMap *pTiles = s_pManager->pTileSet;
 		if(uwCamY >= TILE_ROW_CHALLENGE_CHECKPOINT_3 * TILE_SIZE) {
-			if(!s_isFinishLineLoaded) {
-				memcpy(
-					&pTiles->Planes[0][TILE_CHECKPOINT_1 * TILE_BYTE_COUNT],
-					&s_pCheckpointTiles->Planes[0][10 * TILE_BYTE_COUNT],
-					10 * TILE_BYTE_COUNT
-				);
-				s_isFinishLineLoaded = 1;
-			}
+			tileVariantChangeTo(TILE_VARIANT_FINISH);
 		}
-		else if(s_isFinishLineLoaded) {
-			memcpy(
-				&pTiles->Planes[0][TILE_CHECKPOINT_1 * TILE_BYTE_COUNT],
-				s_pCheckpointTiles->Planes[0],
-				10 * TILE_BYTE_COUNT
-			);
-			s_isFinishLineLoaded = 0;
+		else {
+			tileVariantChangeTo(TILE_VARIANT_CHECKPOINT);
 		}
 	}
 	else {

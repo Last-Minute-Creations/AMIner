@@ -33,6 +33,7 @@
 #include "language.h"
 #include "blitter_mutex.h"
 #include "mode_menu.h"
+#include "tile_variant.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
@@ -237,6 +238,7 @@ static void coreGsCreate(void) {
 	textBobManagerCreate(g_pFont);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 20);
 	baseCreate(g_pMainBuffer);
+	tileVariantManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 25);
 	collectiblesCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 30);
@@ -343,6 +345,7 @@ static void coreGsDestroy(void) {
 	bitmapDestroy(s_pTiles);
 	collectiblesDestroy();
 	baseDestroy();
+	tileVariantManagerDestroy();
 	textBobManagerDestroy();
 	vehicleManagerDestroy();
 	commDestroy();
