@@ -721,9 +721,8 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			pVehicle->sBobBody.sPos.uwY - 32, 1
 		);
 	}
-
-	if(g_isChallenge) {
-		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_1 + 9) {
+	else if(g_isChallenge) {
+		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_10) {
 			if(uwTileY == TILE_ROW_CHALLENGE_FINISH) {
 				pVehicle->lCash += pVehicle->uwCargoScore;
 				vehicleEndChallenge(pVehicle);
@@ -744,6 +743,18 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				vehicleRestock(pVehicle, 0);
 			}
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+		}
+	}
+	else {
+		if(TILE_PRISONER_1 <= ubTile && ubTile <= TILE_PRISONER_8) {
+			textBobSet(
+				&pVehicle->sTextBob, g_pMsgs[MSG_PAGE_LIST_PRISONER], COLOR_GREEN,
+				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.uwY,
+				pVehicle->sBobBody.sPos.uwY - 32, 1
+			);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			questGateUnlockPrisoner();
 		}
 	}
 

@@ -5,6 +5,9 @@
 #include "quest_gate.h"
 #include "collectibles.h"
 #include <comm/page_questioning.h>
+#include <comm/page_office.h>
+#include <comm/inbox.h>
+#include "hud.h"
 
 typedef enum tQuestGateState {
 	QUEST_GATE_STATE_WAITING_FOR_START
@@ -47,4 +50,15 @@ UBYTE questGateGetFoundFragmentCount(void) {
 
 UBYTE questGateGetMaxFragmentCount(void) {
 	return collectibleGetMaxCount(COLLECTIBLE_KIND_GATE);
+}
+
+void questGateUnlockPrisoner(void) {
+	hudShowMessage(
+		FACE_ID_MIETEK,
+		"Panie derektorze, wyglada na wyglodzonego.\nPrzywiezie go Pan do bazy."
+	);
+	pageOfficeUnlockPerson(FACE_ID_PRISONER);
+	pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_DOSSIER);
+	pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_WELCOME);
+	inboxPushBack(COMM_SHOP_PAGE_OFFICE_PRISONER_WELCOME, 1);
 }

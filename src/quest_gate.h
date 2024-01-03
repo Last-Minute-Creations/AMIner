@@ -21,4 +21,6 @@ UBYTE questGateGetFoundFragmentCount(void);
 
 UBYTE questGateGetMaxFragmentCount(void);
 
+void questGateUnlockPrisoner(void);
+
 #endif // QUEST_GATE_H

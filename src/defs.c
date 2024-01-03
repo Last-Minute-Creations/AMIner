@@ -144,6 +144,8 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_ARCH_PLAN_FAIL] = "officePages.archPlanFail",
 	[MSG_PAGE_ARCH_GATE_FAIL] = "officePages.archGateFail",
 	[MSG_PAGE_ARCH_ACCOLADE] = "officePages.archAccolade",
+	[MSG_PAGE_PRISONER_DOSSIER] = "officePages.commonDossier",
+	[MSG_PAGE_PRISONER_WELCOME] = "officePages.commonWelcome",
 	// Count
 	[MSG_COUNT] = 0
 };

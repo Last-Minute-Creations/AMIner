@@ -358,6 +358,13 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 		}
 #endif
 
+		// Quest tile: prisoner
+		UWORD uwPrisonerDepth = 220;
+		if(!tileTryPlaceQuestItemInRow(pTiles, uwPrisonerDepth, TILE_PRISONER_1)) {
+			logWrite("ERR: Can't find place for prisoner at row %hu\n", uwPrisonerDepth);
+			pTiles[5][uwPrisonerDepth] = TILE_PRISONER_1;
+		}
+
 		commProgress(55, g_pMsgs[MSG_LOADING_FINISHING]);
 
 		// Rows per plan

@@ -231,6 +231,12 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_FAIL:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_fail", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_PRISONER_DOSSIER:
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_dossier", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_PRISONER_WELCOME:
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_welcome", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
