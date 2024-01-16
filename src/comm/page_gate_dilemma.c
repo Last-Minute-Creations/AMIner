@@ -50,5 +50,6 @@ void pageGateDilemmaCreate(void) {
 	// uwPosY += ubLineHeight / 2;
 
 	buttonInitAcceptDecline("Detonate", "Do nothing");
+	buttonSelect(1);
 	buttonDrawAll(commGetDisplayBuffer());
 }

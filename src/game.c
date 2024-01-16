@@ -58,6 +58,7 @@ typedef enum tModePreset {
 
 typedef enum tGateCutsceneStep {
 	GATE_CUTSCENE_STEP_OFF,
+	// gate open steps
 	// TODO: wait for camera?
 	GATE_CUTSCENE_STEP_START,
 	GATE_CUTSCENE_STEP_WAIT_FOR_SHAKE,
@@ -66,7 +67,13 @@ typedef enum tGateCutsceneStep {
 	GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE,
 	GATE_CUTSCENE_STEP_FADE_OUT,
 	GATE_CUTSCENE_STEP_FADE_IN,
-	GATE_CUTSCENE_STEP_END,
+	GATE_CUTSCENE_STEP_OPEN_END,
+	// gate destroy steps
+	GATE_CUTSCENE_STEP_DESTROY_START,
+	GATE_CUTSCENE_STEP_DESTROY_EXPLODING,
+	GATE_CUTSCENE_STEP_DESTROY_FADE_OUT,
+	GATE_CUTSCENE_STEP_DESTROY_FADE_IN,
+	GATE_CUTSCENE_STEP_DESTROY_END,
 } tGateCutsceneStep;
 
 //----------------------------------------------------------------- PRIVATE VARS
@@ -331,7 +338,7 @@ static void gameProcessHotkeys(void) {
 		inboxPushBack(COMM_SHOP_PAGE_GATE_DILEMMA, 1);
 	}
 	else if(keyUse(KEY_6)) {
-		gameTriggerCutscene(GAME_CUTSCENE_GATE_OPEN);
+		gameTriggerCutscene(GAME_CUTSCENE_GATE_EXPLODE);
 	}
 	else if(keyUse(KEY_7)) {
 		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
@@ -568,7 +575,7 @@ static UBYTE gameProcessGateCutscene(void) {
 						},
 					};
 
-					UWORD uwDestY = (6816 & (512 - 1));
+					UWORD uwDestY = (GATE_DEPTH_PX & (512 - 1));
 					for(UBYTE i = 0; i < 20; ++i) {
 						if(pPixels[s_ubGateCutsceneRuneIndex][i].uwYX == 0) {
 							break;
@@ -623,7 +630,32 @@ static UBYTE gameProcessGateCutscene(void) {
 				return 1;
 			}
 			break;
-		case GATE_CUTSCENE_STEP_END:
+
+		case GATE_CUTSCENE_STEP_DESTROY_START:
+			s_ubGateCutsceneCooldown = 0;
+			++s_eGateCutsceneStep;
+			ptplayerEnableMusic(0);
+			break;
+		case GATE_CUTSCENE_STEP_DESTROY_EXPLODING:
+			if(++s_ubGateCutsceneCooldown > 10) {
+				s_ubGateCutsceneCooldown = 0;
+				UWORD uwAddX = randUwMax(&g_sRand, 90);
+				UWORD uwAddY = randUwMax(&g_sRand, 90);
+				explosionAdd(
+					32 + 35 + uwAddX, GATE_DEPTH_PX + uwAddY,
+					0, 0, 1, EXPLOSION_KIND_BOOM
+				);
+			}
+			break;
+		case GATE_CUTSCENE_STEP_DESTROY_FADE_OUT:
+			break;
+		case GATE_CUTSCENE_STEP_DESTROY_FADE_IN:
+			break;
+
+		case GATE_CUTSCENE_STEP_DESTROY_END:
+			ptplayerEnableMusic(1);
+			[[fallthrough]];
+		case GATE_CUTSCENE_STEP_OPEN_END:
 		case GATE_CUTSCENE_STEP_OFF:
 			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
 			break;
@@ -1089,6 +1121,7 @@ void gameTriggerCutscene(tGameCutscene eCutscene) {
 			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_START;
 			break;
 		case GAME_CUTSCENE_GATE_EXPLODE:
+			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_DESTROY_EXPLODING;
 			break;
 	}
 }
@@ -1134,8 +1167,8 @@ static void gameGsLoop(void) {
 		vehicleProcess(&g_pVehicles[1]);
 	}
 	debugColor(0x808);
+	explosionManagerProcess();
 	if(!gameIsCutsceneActive()) {
-		explosionManagerProcess();
 		modeMenuTryDisplay(&s_pModeMenus[0]);
 		modeMenuTryDisplay(&s_pModeMenus[1]);
 		gameDisplayModeTnt(0);

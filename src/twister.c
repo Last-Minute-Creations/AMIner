@@ -7,6 +7,7 @@
 #include <ace/managers/blit.h>
 #include <ace/utils/chunky.h>
 #include "core.h"
+#include "quest_gate.h"
 
 #define TWISTER_BITMAP_VISIBLE_WIDTH 80
 #define TWISTER_BITMAP_VISIBLE_HEIGHT 65
@@ -78,7 +79,7 @@ void twisterEnable(void) {
 	s_pEyeMask = bitmapCreateFromFile("data/gate_eye_mask.bm", 0);
 	s_ubBackBuffer = 0;
 
-	UWORD uwDestY = (6816 & (512 - 1));
+	UWORD uwDestY = (GATE_DEPTH_PX & (512 - 1));
 	blitCopyAligned(
 		g_pMainBuffer->pScroll->pBack, 32 + 64, uwDestY + 29,
 		s_pBitmaps[!s_ubBackBuffer], CLIP_MARGIN_X, CLIP_MARGIN_Y,
@@ -198,7 +199,7 @@ void twisterProcess(void) {
 	// 	16, 1, ubColor
 	// );
 
-	UWORD uwDestY = (6816 & (512 - 1));
+	UWORD uwDestY = (GATE_DEPTH_PX & (512 - 1));
 	blitCopyAlignedMasked(
 		s_pBitmaps[!s_ubBackBuffer], CLIP_MARGIN_X, CLIP_MARGIN_Y,
 		g_pMainBuffer->pScroll->pBack, 32 + 64, uwDestY + 29,
