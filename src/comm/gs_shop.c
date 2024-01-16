@@ -13,6 +13,7 @@
 #include <comm/page_accounting.h>
 #include <comm/page_bribe.h>
 #include <comm/page_favor.h>
+#include <comm/page_gate_dilemma.h>
 #include <comm/page_questioning.h>
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
@@ -261,6 +262,15 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_MARKET:
 			pageMarketCreate();
+			break;
+		case COMM_SHOP_PAGE_ARCH_GATE_PLEA:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_plea", onBack);
+			break;
+		case COMM_SHOP_PAGE_PRISONER_GATE_PLEA:
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_gate_plea", onBack);
+			break;
+		case COMM_SHOP_PAGE_GATE_DILEMMA:
+			pageGateDilemmaCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MAIN:
 		default:

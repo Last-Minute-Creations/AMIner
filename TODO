@@ -142,7 +142,12 @@ Gate quest:
 		✔ Load proper tiles in campaign mode @done(24-01-03)
 		☐ Tile animation
 		☐ Comments regarding transmissions
-	☐ Detonation vs activation dillema
+	✔ Detonation vs activation dillema @done(24-01-16)
+	☐ Detonation cutscene
+		☐ Trigger explosions
+		☐ Undraw the gate
+		☐ Rebuke on detonating without commissar knowing
+		☐ Game over on commissar knowing
 	☐ Endings
 		✘ Secret scientist ending @cancelled(23-10-02)
 		✔ Gate open animation @done(23-11-04)

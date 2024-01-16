@@ -43,7 +43,7 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 		.cbProcess = 0,
 	},
 	[BASE_ID_DINO] = {
-		.uwTileDepth = 100,
+		.uwTileDepth = BASE_TILE_DEPTH_DINO,
 		.pTilePattern = {
 			43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
 			44, 43, 43, 43, 43, 45, 43, 44, 43, 43,
@@ -65,7 +65,7 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 		.cbProcess = 0,
 	},
 	[BASE_ID_GATE] = {
-		.uwTileDepth = 209,
+		.uwTileDepth = BASE_TILE_DEPTH_GATE,
 		.pTilePattern = {
 			43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
 			44, 43, 43, 43, 43, 45, 43, 44, 43, 43,

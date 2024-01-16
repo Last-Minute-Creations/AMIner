@@ -89,7 +89,7 @@ typedef enum _tMsg {
 	MSG_LOADING_GEN_TERRAIN,
 	MSG_LOADING_GEN_BASES,
 	MSG_LOADING_FINISHING,
-	// Office
+	// Office - must be same order as COMM_SHOP_PAGE_OFFICE_* in gs_shop.h
 	MSG_PAGE_MAIN,
 	MSG_PAGE_LIST_MIETEK,
 	MSG_PAGE_LIST_KRYSTYNA,

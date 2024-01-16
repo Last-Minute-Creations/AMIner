@@ -326,12 +326,12 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 	else if(keyUse(KEY_5)) {
-		blitRect(g_pMainBuffer->pScroll->pBack, 32, 64, 100, 5, 17);
-		blitRect(g_pMainBuffer->pScroll->pBack, 32, g_pMainBuffer->pScroll->pBack->Rows - 64, 100, 5, 25);
+		inboxPushBack(COMM_SHOP_PAGE_ARCH_GATE_PLEA, 1);
+		inboxPushBack(COMM_SHOP_PAGE_PRISONER_GATE_PLEA, 1);
+		inboxPushBack(COMM_SHOP_PAGE_GATE_DILEMMA, 1);
 	}
 	else if(keyUse(KEY_6)) {
-		// twisterEnable();
-		s_eGateCutsceneStep = GATE_CUTSCENE_STEP_START;
+		gameTriggerCutscene(GAME_CUTSCENE_GATE_OPEN);
 	}
 	else if(keyUse(KEY_7)) {
 		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
@@ -825,7 +825,7 @@ void gameProcessBaseGate(void) {
 
 	if(
 		!vehicleIsInBase(&g_pVehicles[0]) &&
-		(!g_is2pPlaying || vehicleIsInBase(&g_pVehicles[1]))
+		(!g_is2pPlaying || !vehicleIsInBase(&g_pVehicles[1]))
 	) {
 		return;
 	}
@@ -1081,6 +1081,16 @@ void gameUpdateMaxDepth(UWORD uwTileY) {
 
 UBYTE gameIsCutsceneActive(void) {
 	return s_eGateCutsceneStep != GATE_CUTSCENE_STEP_OFF;
+}
+
+void gameTriggerCutscene(tGameCutscene eCutscene) {
+	switch(eCutscene) {
+		case GAME_CUTSCENE_GATE_OPEN:
+			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_START;
+			break;
+		case GAME_CUTSCENE_GATE_EXPLODE:
+			break;
+	}
 }
 
 //-------------------------------------------------------------------- GAMESTATE

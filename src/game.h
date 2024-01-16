@@ -24,6 +24,11 @@ typedef struct tGameSummary {
 	UBYTE ubPlanIndex;
 } tGameSummary;
 
+typedef enum tGameCutscene {
+	GAME_CUTSCENE_GATE_OPEN,
+	GAME_CUTSCENE_GATE_EXPLODE,
+} tGameCutscene;
+
 UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void gameGsLoopChallengeEnd(void);
@@ -69,6 +74,8 @@ void gameCancelModeForPlayer(UBYTE ubPlayer);
 void gameUpdateMaxDepth(UWORD uwTileY);
 
 UBYTE gameIsCutsceneActive(void);
+
+void gameTriggerCutscene(tGameCutscene eCutscene);
 
 void gameProcessBaseGate(void);
 
