@@ -18,6 +18,10 @@ void questGateProcess(void);
 
 UBYTE questGateAddFragment(void);
 
+void questGateMarkExploded(void);
+
+UBYTE questGateIsExploded(void);
+
 UBYTE questGateGetFoundFragmentCount(void);
 
 UBYTE questGateGetMaxFragmentCount(void);

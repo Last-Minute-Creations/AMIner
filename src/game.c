@@ -381,7 +381,7 @@ static UWORD gameGetCameraDestinationY(void) {
 
 static UBYTE s_ubGateCutsceneCooldown;
 static UBYTE s_ubGateCutsceneColorIndex;
-static UBYTE s_ubGateCutsceneRuneIndex;
+static UBYTE s_ubGateCutsceneItemIndex;
 static UBYTE s_ubGateCutsceneUpdateCount;
 
 static UBYTE gameProcessGateCutscene(void) {
@@ -411,7 +411,7 @@ static UBYTE gameProcessGateCutscene(void) {
 				++s_eGateCutsceneStep;
 				s_ubGateCutsceneUpdateCount = 0;
 				s_ubGateCutsceneColorIndex = 21;
-				s_ubGateCutsceneRuneIndex = 0;
+				s_ubGateCutsceneItemIndex = 0;
 			}
 			break;
 		case GATE_CUTSCENE_STEP_LIGHTS_BEFORE_TWIST:
@@ -577,14 +577,14 @@ static UBYTE gameProcessGateCutscene(void) {
 
 					UWORD uwDestY = (GATE_DEPTH_PX & (512 - 1));
 					for(UBYTE i = 0; i < 20; ++i) {
-						if(pPixels[s_ubGateCutsceneRuneIndex][i].uwYX == 0) {
+						if(pPixels[s_ubGateCutsceneItemIndex][i].uwYX == 0) {
 							break;
 						}
 
 						chunkyToPlanar(
 							s_ubGateCutsceneColorIndex,
-							32 + pPixels[s_ubGateCutsceneRuneIndex][i].ubX,
-							uwDestY + pPixels[s_ubGateCutsceneRuneIndex][i].ubY,
+							32 + pPixels[s_ubGateCutsceneItemIndex][i].ubX,
+							uwDestY + pPixels[s_ubGateCutsceneItemIndex][i].ubY,
 							g_pMainBuffer->pScroll->pBack
 						);
 					}
@@ -592,7 +592,7 @@ static UBYTE gameProcessGateCutscene(void) {
 				else {
 					s_ubGateCutsceneCooldown = 0;
 					if(++s_ubGateCutsceneColorIndex > 25) {
-						if(++s_ubGateCutsceneRuneIndex >= 16) {
+						if(++s_ubGateCutsceneItemIndex >= 16) {
 							++s_eGateCutsceneStep;
 							twisterEnable();
 						}
@@ -604,7 +604,7 @@ static UBYTE gameProcessGateCutscene(void) {
 		case GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE:
 			if(++s_ubGateCutsceneCooldown > 200) {
 				s_ubGateCutsceneCooldown = 0;
-				fadeMorphTo(FADE_STATE_OUT);
+				fadeMorphTo(FADE_STATE_OUT, 0);
 				++s_eGateCutsceneStep;
 			}
 			break;
@@ -632,12 +632,24 @@ static UBYTE gameProcessGateCutscene(void) {
 			break;
 
 		case GATE_CUTSCENE_STEP_DESTROY_START:
+			questGateMarkExploded();
 			s_ubGateCutsceneCooldown = 0;
+			s_ubGateCutsceneItemIndex = 0;
 			++s_eGateCutsceneStep;
 			ptplayerEnableMusic(0);
 			break;
 		case GATE_CUTSCENE_STEP_DESTROY_EXPLODING:
+		case GATE_CUTSCENE_STEP_DESTROY_FADE_OUT:
 			if(++s_ubGateCutsceneCooldown > 10) {
+				if(
+					s_eGateCutsceneStep == GATE_CUTSCENE_STEP_DESTROY_EXPLODING &&
+					++s_ubGateCutsceneItemIndex >= 25
+				) {
+					fadeMorphTo(FADE_STATE_OUT, 0xFFF);
+					++s_eGateCutsceneStep;
+				}
+
+				s_ubGateCutsceneItemIndex = MIN(s_ubGateCutsceneItemIndex + 1, 5 * 5);
 				s_ubGateCutsceneCooldown = 0;
 				UWORD uwAddX = randUwMax(&g_sRand, 90);
 				UWORD uwAddY = randUwMax(&g_sRand, 90);
@@ -646,10 +658,36 @@ static UBYTE gameProcessGateCutscene(void) {
 					0, 0, 1, EXPLOSION_KIND_BOOM
 				);
 			}
-			break;
-		case GATE_CUTSCENE_STEP_DESTROY_FADE_OUT:
+
+			if (s_eGateCutsceneStep == GATE_CUTSCENE_STEP_DESTROY_FADE_OUT) {
+				if(fadeGetState() == FADE_STATE_OUT) {
+					baseProcess();
+					groundLayerReset(groundLayerGetLowerAtDepth(g_pMainBuffer->pCamera->uPos.uwY), fadeGetSecondaryColor());
+					tileBufferRedrawAll(g_pMainBuffer);
+					bobDiscardUndraw();
+					fadeMorphTo(FADE_STATE_IN, 0xFFF);
+
+					++s_eGateCutsceneStep;
+				}
+			}
 			break;
 		case GATE_CUTSCENE_STEP_DESTROY_FADE_IN:
+			if(fadeGetState() == FADE_STATE_IN) {
+				++s_eGateCutsceneStep;
+				// TODO: arch angry telling commissar about situation
+				// TODO: prisoner grateful
+				// TODO: commissar on destroyed ambush?
+				// TODO: news for game over related to destroyed ambush
+
+				// tCommShopPage ePage = (
+				// 	pageQuestioningIsReported(QUESTIONING_BIT_GATE) ?
+				// 	COMM_SHOP_PAGE_NEWS_GATE_RED :
+				// 	COMM_SHOP_PAGE_NEWS_GATE_ENEMY
+				// );
+				// inboxPushBack(ePage, 0);
+				// statePush(g_pGameStateManager, &g_sStateShop);
+				// return 1;
+			}
 			break;
 
 		case GATE_CUTSCENE_STEP_DESTROY_END:
@@ -688,7 +726,7 @@ static void gameCameraProcess(void) {
 		) - g_pMainBuffer->pCamera->uPos.uwY;
 		UWORD uwAbsDistance = ABS(wCameraDistance);
 		if(uwAbsDistance > CAMERA_SPEED * 50 && fadeGetState() == FADE_STATE_IN) {
-			fadeMorphTo(FADE_STATE_OUT);
+			fadeMorphTo(FADE_STATE_OUT, 0);
 		}
 
 		if(uwAbsDistance > CAMERA_SPEED) {
@@ -703,11 +741,11 @@ static void gameCameraProcess(void) {
 			cameraCenterAt(g_pMainBuffer->pCamera, uwCamDestX, uwCamDestY);
 			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
 			baseProcess();
-			groundLayerReset(groundLayerGetLowerAtDepth(g_pMainBuffer->pCamera->uPos.uwY));
+			groundLayerReset(groundLayerGetLowerAtDepth(g_pMainBuffer->pCamera->uPos.uwY), fadeGetSecondaryColor());
 			tileBufferRedrawAll(g_pMainBuffer);
 			bobDiscardUndraw();
 			g_pMainBuffer->pCamera->uPos.uwX = uwCamDestX;
-			fadeMorphTo(FADE_STATE_IN);
+			fadeMorphTo(FADE_STATE_IN, 0);
 		}
 
 		if(s_isCameraShake) {
@@ -852,6 +890,9 @@ static UBYTE s_ubRadioMessageIndex = 0;
 
 void gameProcessBaseGate(void) {
 	if(gameIsCutsceneActive()) {
+		return;
+	}
+	if(questGateIsExploded()) {
 		return;
 	}
 
@@ -1091,7 +1132,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	twisterDisable();
 	hudReset(g_isChallenge, g_is2pPlaying);
 	heatReset();
-	groundLayerReset(1);
+	groundLayerReset(1, 0);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
 	tileVariantChangeTo(TILE_VARIANT_PRISONER);
 }

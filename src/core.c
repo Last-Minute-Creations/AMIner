@@ -66,8 +66,10 @@ static const tProgressBarConfig s_sProgressBarConfig = {
 static void mainPaletteProcess(UBYTE ubFadeLevel) {
 	tFadeState eState = fadeGetState();
 	if(eState == FADE_STATE_IN_MORPHING || eState == FADE_STATE_OUT_MORPHING) {
-		*s_pColorBg = paletteColorDim(s_pPaletteRef[0], ubFadeLevel);
-		paletteDim(s_pPaletteRef, g_pCustom->color, 27, ubFadeLevel);
+		*s_pColorBg = paletteColorMix(s_pPaletteRef[0], fadeGetSecondaryColor(), ubFadeLevel);
+		for(UBYTE i = 0; i < 27; ++i) {
+			g_pCustom->color[i] = paletteColorMix(s_pPaletteRef[i], fadeGetSecondaryColor(), ubFadeLevel);
+		}
 	}
 }
 
@@ -121,7 +123,7 @@ void coreProcessAfterBobs(void) {
 	// Update palette for new ground layers, also take into account fade level
 	fadeProcess();
 	UBYTE ubFadeLevel = fadeGetLevel();
-	groundLayerProcess(g_pMainBuffer->pCamera->uPos.uwY, ubFadeLevel);
+	groundLayerProcess(g_pMainBuffer->pCamera->uPos.uwY, ubFadeLevel, fadeGetSecondaryColor());
 	mainPaletteProcess(ubFadeLevel);
 
 	debugColor(0x800);
@@ -329,7 +331,7 @@ static void coreGsCreate(void) {
 	g_is2pPlaying = 0;
 
 	hudReset(0, 0);
-	fadeMorphTo(FADE_STATE_IN);
+	fadeMorphTo(FADE_STATE_IN, 0);
 	statePush(g_pGameStateManager, &g_sStateMenu);
 }
 
