@@ -1326,7 +1326,7 @@ void vehicleProcess(tVehicle *pVehicle) {
 }
 
 uint8_t vehiclesAreClose(void) {
-	const UWORD uwVpHeight = 256 - 31;
+	const UWORD uwVpHeight = 256 - HUD_HEIGHT;
 	WORD wDelta = ABS(
 		g_pVehicles[0].sBobBody.sPos.uwY - g_pVehicles[1].sBobBody.sPos.uwY
 	);

@@ -119,7 +119,7 @@ static void hudResetStateMachine(void) {
 
 static void hudShowPage(tHudPage eHudPage) {
 	s_ePageCurrent = eHudPage;
-	cameraSetCoord(s_pHudBuffer->pCamera, 0, eHudPage * 31);
+	cameraSetCoord(s_pHudBuffer->pCamera, 0, eHudPage * HUD_HEIGHT);
 }
 
 static void hudRefresh(void) {
@@ -206,7 +206,7 @@ void hudCreate(tVPort *pVpHud, const tFont *pFont) {
   s_pHudBuffer = simpleBufferCreate(0,
     TAG_SIMPLEBUFFER_VPORT, s_pVpHud,
     TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_INTERLEAVED,
-		TAG_SIMPLEBUFFER_BOUND_HEIGHT, 31 * HUD_PAGE_COUNT,
+		TAG_SIMPLEBUFFER_BOUND_HEIGHT, HUD_HEIGHT * HUD_PAGE_COUNT,
   TAG_END);
 
 	bitmapLoadFromFile(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
