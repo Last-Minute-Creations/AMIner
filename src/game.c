@@ -1208,7 +1208,7 @@ void gameTriggerCutscene(tGameCutscene eCutscene) {
 			s_eGateCutsceneStep = GATE_CUTSCENE_OPEN_STEP_START;
 			break;
 		case GAME_CUTSCENE_GATE_EXPLODE:
-			s_eGateCutsceneStep = GATE_CUTSCENE_DESTROY_STEP_EXPLODING;
+			s_eGateCutsceneStep = GATE_CUTSCENE_DESTROY_STEP_START;
 			break;
 	}
 }

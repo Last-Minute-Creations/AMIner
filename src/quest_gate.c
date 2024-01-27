@@ -17,18 +17,18 @@ typedef enum tQuestGateState {
 
 } tQuestGateState;
 
-static tQuestGateState s_eState;
+static tQuestGateState s_eGateQuestState;
 static UBYTE s_ubFoundFragments;
 
 void questGateReset(void) {
-	s_eState = QUEST_GATE_STATE_UNEXPLODED;
+	s_eGateQuestState = QUEST_GATE_STATE_UNEXPLODED;
 	s_ubFoundFragments = 0;
 }
 
 void questGateSave(tFile *pFile) {
 	saveWriteHeader(pFile, "GATE");
 	fileWrite(pFile, &s_ubFoundFragments, sizeof(s_ubFoundFragments));
-	fileWrite(pFile, &s_eState, sizeof(s_eState));
+	fileWrite(pFile, &s_eGateQuestState, sizeof(s_eGateQuestState));
 }
 
 UBYTE questGateLoad(tFile *pFile) {
@@ -37,7 +37,7 @@ UBYTE questGateLoad(tFile *pFile) {
 	}
 
 	fileRead(pFile, &s_ubFoundFragments, sizeof(s_ubFoundFragments));
-	fileRead(pFile, &s_eState, sizeof(s_eState));
+	fileRead(pFile, &s_eGateQuestState, sizeof(s_eGateQuestState));
 	collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, s_ubFoundFragments);
 	return 1;
 }
@@ -61,12 +61,12 @@ UBYTE questGateAddFragment(void) {
 }
 
 void questGateMarkExploded(void) {
-	s_eState = QUEST_GATE_STATE_EXPLODED;
+	s_eGateQuestState = QUEST_GATE_STATE_EXPLODED;
 	collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, 0);
 }
 
 UBYTE questGateIsExploded(void) {
-	return s_eState == QUEST_GATE_STATE_EXPLODED;
+	return s_eGateQuestState == QUEST_GATE_STATE_EXPLODED;
 }
 
 UBYTE questGateGetFoundFragmentCount(void) {
