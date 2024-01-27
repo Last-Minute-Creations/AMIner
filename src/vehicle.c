@@ -229,12 +229,18 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->fY = fix16_from_int(uwY);
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
+
+	// Ugly hack to reset facing
 	if(pVehicle->ubPlayerIdx == PLAYER_1) {
 		vehicleMove(pVehicle, 1, 0);
 	}
 	else {
 		vehicleMove(pVehicle, -1, 0);
 	}
+
+	// Remove side effects of hack above
+	pVehicle->sSteer.bX = 0;
+	pVehicle->fDx = 0;
 
 	pVehicle->isMarkerShown = 0;
 }
@@ -484,7 +490,7 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 		}
 	}
 
-	// Update body roration as well as white frames
+	// Update body rotation as well as white frames
 	vehicleUpdateBodyBob(pVehicle);
 }
 

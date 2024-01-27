@@ -264,10 +264,10 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageMarketCreate();
 			break;
 		case COMM_SHOP_PAGE_ARCH_GATE_PLEA:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_plea", onBack);
+			pageMsgCreate(FACE_ID_ARCH, "", "arch_gate_plea", onBack);
 			break;
 		case COMM_SHOP_PAGE_PRISONER_GATE_PLEA:
-			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_gate_plea", onBack);
+			pageMsgCreate(FACE_ID_PRISONER, "", "prisoner_gate_plea", onBack);
 			break;
 		case COMM_SHOP_PAGE_GATE_DILEMMA:
 			pageGateDilemmaCreate();

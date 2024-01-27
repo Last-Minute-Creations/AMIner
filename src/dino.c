@@ -119,3 +119,7 @@ UBYTE dinoAddBone(void) {
 UBYTE dinoIsAllFound(void) {
 	return s_eQuestState >= DINO_STATE_INCOMING_ACCOLADE;
 }
+
+UBYTE dinoIsQuestStarted(void) {
+	return s_eQuestState >= DINO_STATE_WAITING_FOR_LAST_BONE;
+}

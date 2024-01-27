@@ -125,7 +125,7 @@ Dino quest:
 	✘ Dialogue option to check progress @cancelled(23-10-05)
 
 Gate quest:
-	☐ Figure out the flow
+	✔ Figure out the flow @done(24-01-27)
 	✔ Add base into the game @done(23-03-15)
 	✔ Base restock @done(23-07-10)
 	✔ Picking up the pieces @done(23-07-10)
@@ -133,8 +133,8 @@ Gate quest:
 		✔ Display reconstructed gate @done(23-07-10)
 	✔ Questioning by commissar @done(23-07-13)
 	✔ Background radio transmissions when idling in base @done(23-12-12)
-	☐ Gate open cutscene
-		☐ Teleport player to cutscene with simple fadeout
+	✔ Gate open cutscene @done(24-01-27)
+		✔ Teleport player to cutscene with simple fadeout @done(24-01-27)
 		✔ Light up the runes @done(23-12-13)
 		✔ Twister effect @done(23-11-28)
 	☐ Prisoner of war
@@ -148,6 +148,11 @@ Gate quest:
 		✔ Undraw the gate @done(24-01-16 18:17)
 		☐ Rebuke on detonating without commissar knowing
 		☐ Game over on commissar knowing
+		☐ Stop transmissions
+		☐ Msg: prisoner grateful on destroying
+		☐ Msg: arch angry on destroying
+		☐ Msg: commissar furious on destroing if knowing
+		☐ Outro msg for news on destroying gate?
 	☐ Endings
 		✘ Secret scientist ending @cancelled(23-10-02)
 		✔ Gate open animation @done(23-11-04)

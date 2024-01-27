@@ -58,22 +58,28 @@ typedef enum tModePreset {
 
 typedef enum tGateCutsceneStep {
 	GATE_CUTSCENE_STEP_OFF,
+	// player teleport to gate steps
+	GATE_CUTSCENE_TELEPORT_STEP_START,
+	GATE_CUTSCENE_TELEPORT_STEP_WAIT_FOR_FADE_START,
+	GATE_CUTSCENE_TELEPORT_STEP_FADE_OUT,
+	GATE_CUTSCENE_TELEPORT_STEP_FADE_IN,
+	GATE_CUTSCENE_TELEPORT_STEP_WAIT_FOR_GATE_DRAW,
+	GATE_CUTSCENE_TELEPORT_STEP_END,
 	// gate open steps
-	// TODO: wait for camera?
-	GATE_CUTSCENE_STEP_START,
-	GATE_CUTSCENE_STEP_WAIT_FOR_SHAKE,
-	GATE_CUTSCENE_STEP_SHAKE_BEFORE_LIGHTS,
-	GATE_CUTSCENE_STEP_LIGHTS_BEFORE_TWIST,
-	GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE,
-	GATE_CUTSCENE_STEP_FADE_OUT,
-	GATE_CUTSCENE_STEP_FADE_IN,
-	GATE_CUTSCENE_STEP_OPEN_END,
+	GATE_CUTSCENE_OPEN_STEP_START,
+	GATE_CUTSCENE_OPEN_STEP_WAIT_FOR_SHAKE,
+	GATE_CUTSCENE_OPEN_STEP_SHAKE_BEFORE_LIGHTS,
+	GATE_CUTSCENE_OPEN_STEP_LIGHTS_BEFORE_TWIST,
+	GATE_CUTSCENE_OPEN_STEP_TWIST_BEFORE_FADE,
+	GATE_CUTSCENE_OPEN_STEP_FADE_OUT,
+	GATE_CUTSCENE_OPEN_STEP_FADE_IN,
+	GATE_CUTSCENE_OPEN_STEP_OPEN_END,
 	// gate destroy steps
-	GATE_CUTSCENE_STEP_DESTROY_START,
-	GATE_CUTSCENE_STEP_DESTROY_EXPLODING,
-	GATE_CUTSCENE_STEP_DESTROY_FADE_OUT,
-	GATE_CUTSCENE_STEP_DESTROY_FADE_IN,
-	GATE_CUTSCENE_STEP_DESTROY_END,
+	GATE_CUTSCENE_DESTROY_STEP_START,
+	GATE_CUTSCENE_DESTROY_STEP_EXPLODING,
+	GATE_CUTSCENE_DESTROY_STEP_FADE_OUT,
+	GATE_CUTSCENE_DESTROY_STEP_FADE_IN,
+	GATE_CUTSCENE_DESTROY_STEP_END,
 } tGateCutsceneStep;
 
 //----------------------------------------------------------------- PRIVATE VARS
@@ -333,12 +339,8 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 	else if(keyUse(KEY_5)) {
-		inboxPushBack(COMM_SHOP_PAGE_ARCH_GATE_PLEA, 1);
-		inboxPushBack(COMM_SHOP_PAGE_PRISONER_GATE_PLEA, 1);
-		inboxPushBack(COMM_SHOP_PAGE_GATE_DILEMMA, 1);
 	}
 	else if(keyUse(KEY_6)) {
-		gameTriggerCutscene(GAME_CUTSCENE_GATE_EXPLODE);
 	}
 	else if(keyUse(KEY_7)) {
 		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
@@ -390,7 +392,43 @@ static UBYTE gameProcessGateCutscene(void) {
 	}
 
 	switch(s_eGateCutsceneStep) {
-		case GATE_CUTSCENE_STEP_START:
+		case GATE_CUTSCENE_TELEPORT_STEP_START:
+			s_ubGateCutsceneCooldown = 0;
+			++s_eGateCutsceneStep;
+			break;
+		case GATE_CUTSCENE_TELEPORT_STEP_WAIT_FOR_FADE_START:
+			if(++s_ubGateCutsceneCooldown > 100) {
+				s_ubGateCutsceneCooldown = 0;
+				fadeMorphTo(FADE_STATE_OUT, 0);
+				++s_eGateCutsceneStep;
+			}
+			break;
+		case GATE_CUTSCENE_TELEPORT_STEP_FADE_OUT:
+			if(fadeGetState() == FADE_STATE_OUT) {
+				vehicleSetPos(&g_pVehicles[0], 64, 216 * TILE_SIZE);
+				vehicleSetPos(&g_pVehicles[1], 160, 216 * TILE_SIZE);
+				++s_eGateCutsceneStep;
+				// fadeMorphTo(FADE_STATE_IN, 0);
+			}
+			break;
+		case GATE_CUTSCENE_TELEPORT_STEP_FADE_IN:
+			if(fadeGetState() == FADE_STATE_IN) {
+				++s_eGateCutsceneStep;
+			}
+			break;
+		case GATE_CUTSCENE_TELEPORT_STEP_WAIT_FOR_GATE_DRAW:
+			if(++s_ubGateCutsceneCooldown > 100) {
+				s_ubGateCutsceneCooldown = 0;
+				// TODO: remove pending questioning msgs
+				inboxPushBack(COMM_SHOP_PAGE_ARCH_GATE_PLEA, 1);
+				inboxPushBack(COMM_SHOP_PAGE_PRISONER_GATE_PLEA, 1);
+				inboxPushBack(COMM_SHOP_PAGE_GATE_DILEMMA, 1);
+				statePush(g_pGameStateManager, &g_sStateShop);
+				++s_eGateCutsceneStep;
+				return 1;
+			}
+			break;
+		case GATE_CUTSCENE_OPEN_STEP_START:
 			++s_eGateCutsceneStep;
 			s_ubGateCutsceneCooldown = 0;
 			// TODO: disable movement
@@ -398,14 +436,14 @@ static UBYTE gameProcessGateCutscene(void) {
 			// TODO: disable entering pause
 			ptplayerEnableMusic(0);
 			break;
-		case GATE_CUTSCENE_STEP_WAIT_FOR_SHAKE:
+		case GATE_CUTSCENE_OPEN_STEP_WAIT_FOR_SHAKE:
 			if(++s_ubGateCutsceneCooldown > 30) {
 				s_ubGateCutsceneCooldown = 0;
 				++s_eGateCutsceneStep;
 				s_isCameraShake = 1;
 			}
 			break;
-		case GATE_CUTSCENE_STEP_SHAKE_BEFORE_LIGHTS:
+		case GATE_CUTSCENE_OPEN_STEP_SHAKE_BEFORE_LIGHTS:
 			if(++s_ubGateCutsceneCooldown > 80) {
 				s_ubGateCutsceneCooldown = 0;
 				++s_eGateCutsceneStep;
@@ -414,7 +452,7 @@ static UBYTE gameProcessGateCutscene(void) {
 				s_ubGateCutsceneItemIndex = 0;
 			}
 			break;
-		case GATE_CUTSCENE_STEP_LIGHTS_BEFORE_TWIST:
+		case GATE_CUTSCENE_OPEN_STEP_LIGHTS_BEFORE_TWIST:
 			++s_ubGateCutsceneCooldown;
 			if(s_ubGateCutsceneCooldown == 2) {
 				s_ubGateCutsceneUpdateCount = 2;
@@ -601,14 +639,14 @@ static UBYTE gameProcessGateCutscene(void) {
 				}
 			}
 			break;
-		case GATE_CUTSCENE_STEP_TWIST_BEFORE_FADE:
+		case GATE_CUTSCENE_OPEN_STEP_TWIST_BEFORE_FADE:
 			if(++s_ubGateCutsceneCooldown > 200) {
 				s_ubGateCutsceneCooldown = 0;
 				fadeMorphTo(FADE_STATE_OUT, 0);
 				++s_eGateCutsceneStep;
 			}
 			break;
-		case GATE_CUTSCENE_STEP_FADE_OUT:
+		case GATE_CUTSCENE_OPEN_STEP_FADE_OUT:
 			if(fadeGetState() == FADE_STATE_OUT) {
 				vehicleSetPos(&g_pVehicles[0], 160, s_pBaseTeleportY[0]);
 				vehicleSetPos(&g_pVehicles[1], 160, s_pBaseTeleportY[0]);
@@ -617,7 +655,7 @@ static UBYTE gameProcessGateCutscene(void) {
 				++s_eGateCutsceneStep;
 			}
 			break;
-		case GATE_CUTSCENE_STEP_FADE_IN:
+		case GATE_CUTSCENE_OPEN_STEP_FADE_IN:
 			if(fadeGetState() == FADE_STATE_IN) {
 				++s_eGateCutsceneStep;
 				tCommShopPage ePage = (
@@ -631,18 +669,18 @@ static UBYTE gameProcessGateCutscene(void) {
 			}
 			break;
 
-		case GATE_CUTSCENE_STEP_DESTROY_START:
+		case GATE_CUTSCENE_DESTROY_STEP_START:
 			questGateMarkExploded();
 			s_ubGateCutsceneCooldown = 0;
 			s_ubGateCutsceneItemIndex = 0;
 			++s_eGateCutsceneStep;
 			ptplayerEnableMusic(0);
 			break;
-		case GATE_CUTSCENE_STEP_DESTROY_EXPLODING:
-		case GATE_CUTSCENE_STEP_DESTROY_FADE_OUT:
+		case GATE_CUTSCENE_DESTROY_STEP_EXPLODING:
+		case GATE_CUTSCENE_DESTROY_STEP_FADE_OUT:
 			if(++s_ubGateCutsceneCooldown > 10) {
 				if(
-					s_eGateCutsceneStep == GATE_CUTSCENE_STEP_DESTROY_EXPLODING &&
+					s_eGateCutsceneStep == GATE_CUTSCENE_DESTROY_STEP_EXPLODING &&
 					++s_ubGateCutsceneItemIndex >= 25
 				) {
 					fadeMorphTo(FADE_STATE_OUT, 0xFFF);
@@ -659,7 +697,7 @@ static UBYTE gameProcessGateCutscene(void) {
 				);
 			}
 
-			if (s_eGateCutsceneStep == GATE_CUTSCENE_STEP_DESTROY_FADE_OUT) {
+			if (s_eGateCutsceneStep == GATE_CUTSCENE_DESTROY_STEP_FADE_OUT) {
 				if(fadeGetState() == FADE_STATE_OUT) {
 					baseProcess();
 					groundLayerReset(groundLayerGetLowerAtDepth(g_pMainBuffer->pCamera->uPos.uwY), fadeGetSecondaryColor());
@@ -671,30 +709,35 @@ static UBYTE gameProcessGateCutscene(void) {
 				}
 			}
 			break;
-		case GATE_CUTSCENE_STEP_DESTROY_FADE_IN:
+		case GATE_CUTSCENE_DESTROY_STEP_FADE_IN:
 			if(fadeGetState() == FADE_STATE_IN) {
 				++s_eGateCutsceneStep;
-				// TODO: arch angry telling commissar about situation
-				// TODO: prisoner grateful
-				// TODO: commissar on destroyed ambush?
-				// TODO: news for game over related to destroyed ambush
 
-				// tCommShopPage ePage = (
-				// 	pageQuestioningIsReported(QUESTIONING_BIT_GATE) ?
-				// 	COMM_SHOP_PAGE_NEWS_GATE_RED :
-				// 	COMM_SHOP_PAGE_NEWS_GATE_ENEMY
-				// );
-				// inboxPushBack(ePage, 0);
-				// statePush(g_pGameStateManager, &g_sStateShop);
-				// return 1;
+				if(questGateIsPrisonerFound()) {
+					// TODO: prisoner grateful
+				}
+				if(dinoIsQuestStarted() && !pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
+					// TODO: arch angry telling commissar about situation
+					gameAddRebuke();
+				}
+				if(pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
+					// TODO: commissar on destroyed ambush?
+					// inboxPushBack(COMM_SHOP_PAGE_NEWS_GATE_DESTROYED, 1);
+				}
+
+				if(inboxGetState() == INBOX_STATE_URGENT) {
+					statePush(g_pGameStateManager, &g_sStateShop);
+					return 1;
+				}
 			}
 			break;
 
-		case GATE_CUTSCENE_STEP_DESTROY_END:
+		case GATE_CUTSCENE_DESTROY_STEP_END:
 			ptplayerEnableMusic(1);
 			[[fallthrough]];
-		case GATE_CUTSCENE_STEP_OPEN_END:
+		case GATE_CUTSCENE_OPEN_STEP_OPEN_END:
 		case GATE_CUTSCENE_STEP_OFF:
+		case GATE_CUTSCENE_TELEPORT_STEP_END:
 			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
 			break;
 	}
@@ -1158,11 +1201,14 @@ UBYTE gameIsCutsceneActive(void) {
 
 void gameTriggerCutscene(tGameCutscene eCutscene) {
 	switch(eCutscene) {
+		case GAME_CUTSCENE_TELEPORT:
+			s_eGateCutsceneStep = GATE_CUTSCENE_TELEPORT_STEP_START;
+			break;
 		case GAME_CUTSCENE_GATE_OPEN:
-			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_START;
+			s_eGateCutsceneStep = GATE_CUTSCENE_OPEN_STEP_START;
 			break;
 		case GAME_CUTSCENE_GATE_EXPLODE:
-			s_eGateCutsceneStep = GATE_CUTSCENE_STEP_DESTROY_EXPLODING;
+			s_eGateCutsceneStep = GATE_CUTSCENE_DESTROY_STEP_EXPLODING;
 			break;
 	}
 }

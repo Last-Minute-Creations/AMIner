@@ -1,5 +1,6 @@
 #include "page_msg.h"
 #include <ace/managers/system.h>
+#include <ace/utils/string.h>
 #include <comm/comm.h>
 #include <json/utf8.h>
 #include "../defs.h"
@@ -88,7 +89,9 @@ static void commMsgDrawCurrentPage(void) {
 	if(s_ubCurrPage == 0) {
 		commDrawFaceAt(s_eFace, 0, 0);
 		commDrawTitle(48, 0, g_pMsgs[MSG_PAGE_LIST_MIETEK + s_eFace]);
-		commDrawText(48, ubLineHeight, s_szTitle, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+		if(!stringIsEmpty(s_szTitle)) {
+			commDrawText(48, ubLineHeight, s_szTitle, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+		}
 		uwLineY = LINES_OCCUPIED_BY_FACE * ubLineHeight;
 		ubLinesPerPage -= LINES_OCCUPIED_BY_FACE;
 	}

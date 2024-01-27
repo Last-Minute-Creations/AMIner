@@ -9,6 +9,7 @@
 #include <comm/inbox.h>
 #include "hud.h"
 #include "save.h"
+#include "game.h"
 
 typedef enum tQuestGateState {
 	QUEST_GATE_STATE_UNEXPLODED,
@@ -52,6 +53,9 @@ UBYTE questGateAddFragment(void) {
 		collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, s_ubFoundFragments);
 		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_GATE);
 	}
+	else {
+		gameTriggerCutscene(GAME_CUTSCENE_TELEPORT);
+	}
 
 	return s_ubFoundFragments;
 }
@@ -82,4 +86,8 @@ void questGateUnlockPrisoner(void) {
 	pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_DOSSIER);
 	pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_WELCOME);
 	inboxPushBack(COMM_SHOP_PAGE_OFFICE_PRISONER_WELCOME, 1);
+}
+
+UBYTE questGateIsPrisonerFound(void) {
+	return pageOfficeHasPerson(FACE_ID_PRISONER);
 }

@@ -25,6 +25,7 @@ typedef struct tGameSummary {
 } tGameSummary;
 
 typedef enum tGameCutscene {
+	GAME_CUTSCENE_TELEPORT,
 	GAME_CUTSCENE_GATE_OPEN,
 	GAME_CUTSCENE_GATE_EXPLODE,
 } tGameCutscene;
