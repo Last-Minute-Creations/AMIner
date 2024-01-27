@@ -20,4 +20,6 @@ UBYTE dinoAddBone(void);
 
 UBYTE dinoIsAllFound(void);
 
+UBYTE dinoIsQuestStarted(void);
+
 #endif // _DINO_H_

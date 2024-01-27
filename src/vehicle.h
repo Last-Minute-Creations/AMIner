@@ -106,6 +106,8 @@ void vehicleManagerDestroy(void);
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle);
 
+UBYTE vehicleIsInBase(const tVehicle *pVehicle);
+
 void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
 
 void vehicleResetPos(tVehicle *pVehicle);

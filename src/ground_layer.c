@@ -77,11 +77,11 @@ static const tGroundLayer s_pLayers[] = {
 static const UBYTE s_ubLayerCount = sizeof(s_pLayers) / sizeof(s_pLayers[0]);
 
 static void groundLayerSetColorRegs(
-	const tGroundLayer *pLayer, UBYTE ubColorLevel
+	const tGroundLayer *pLayer, UBYTE ubColorLevel, UWORD uwSecondaryColor
 ) {
 	volatile UWORD *pColorRegs = &g_pCustom->color[LAYER_COLOR_START];
 	for(UBYTE i = 0; i < LAYER_COLOR_COUNT; ++i) {
-		pColorRegs[i] = paletteColorDim(pLayer->pColors[i], ubColorLevel);
+		pColorRegs[i] = paletteColorMix(pLayer->pColors[i], uwSecondaryColor, ubColorLevel);
 	}
 }
 
@@ -95,15 +95,15 @@ void groundLayerCreate(const tVPort *pVp) {
 	s_pColorsBelow = copBlockCreate(pView->pCopList, LAYER_COLOR_COUNT, 0, 0);
 	s_pColorsAbove = copBlockCreate(pView->pCopList, LAYER_COLOR_COUNT, 0, 0);
 	s_ubPrevLevel = 0xF;
-	groundLayerReset(1);
+	groundLayerReset(1, 0);
 	logBlockEnd("groundLayerCreate()");
 }
 
-void groundLayerReset(UBYTE ubLowerLayer) {
+void groundLayerReset(UBYTE ubLowerLayer, UWORD uwSecondaryColor) {
 	s_pColorsBelow->ubDisabled = 1;
 	s_ubLowerLayer = ubLowerLayer;
 	const tGroundLayer *pLayerCurrent = &s_pLayers[ubLowerLayer - 1];
-	groundLayerSetColorRegs(pLayerCurrent, s_ubPrevLevel);
+	groundLayerSetColorRegs(pLayerCurrent, s_ubPrevLevel, uwSecondaryColor);
 }
 
 static void layerCopyColorsToBlock(
@@ -119,7 +119,7 @@ static void layerCopyColorsToBlock(
 	}
 }
 
-void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorFadeLevel) {
+void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorFadeLevel, UWORD uwSecondaryColor) {
 	if(uwCameraY < s_pLayers[s_ubLowerLayer-1].uwTop) {
 		--s_ubLowerLayer;
 	}
@@ -176,7 +176,7 @@ void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorFadeLevel) {
 			}
 		}
 		else if(s_ubPrevLevel != ubColorFadeLevel) {
-			groundLayerSetColorRegs(pLayerUpper, ubColorFadeLevel);
+			groundLayerSetColorRegs(pLayerUpper, ubColorFadeLevel, uwSecondaryColor);
 		}
 	}
 	s_ubPrevLevel = ubColorFadeLevel;

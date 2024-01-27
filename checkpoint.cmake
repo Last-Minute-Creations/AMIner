@@ -32,3 +32,24 @@ convertTileset(
 	INTERLEAVED SOURCE ${GEN_DIR}/checkpoint DESTINATION ${DATA_DIR}/checkpoint.bm
 	TILE_PATHS ${TILES_CHECKPOINT_LIST}
 )
+
+file(MAKE_DIRECTORY ${GEN_DIR}/prisoner)
+
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/prisoner.png
+	GENERATED_FILE_LIST "TILES_CHECKPOINT_LIST"
+	DESTINATIONS
+	${GEN_DIR}/prisoner/0.png 0   0 32 32 # TILE_PRISONER_1,
+	${GEN_DIR}/prisoner/1.png 0  32 32 32 # TILE_PRISONER_2
+	${GEN_DIR}/prisoner/2.png 0  64 32 32 # TILE_PRISONER_3
+	${GEN_DIR}/prisoner/3.png 0  96 32 32 # TILE_PRISONER_4
+	${GEN_DIR}/prisoner/4.png 0 128 32 32 # TILE_PRISONER_5
+	${GEN_DIR}/prisoner/5.png 0 160 32 32 # TILE_PRISONER_6
+	${GEN_DIR}/prisoner/6.png 0 192 32 32 # TILE_PRISONER_7
+	${GEN_DIR}/prisoner/7.png 0 224 32 32 # TILE_PRISONER_8
+)
+
+convertTileset(
+	TARGET ${GAME_EXECUTABLE} SIZE 32 PALETTE ${palette_aminer_unique}
+	INTERLEAVED SOURCE ${GEN_DIR}/prisoner DESTINATION ${DATA_DIR}/prisoner.bm
+	TILE_PATHS ${TILES_CHECKPOINT_LIST}
+)

@@ -207,6 +207,15 @@ void pageOfficeUnlockPerson(tFaceId ePerson) {
 	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
 }
 
+UBYTE pageOfficeHasPerson(tFaceId ePerson) {
+	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
+		if(s_pActivePpl[s_ubUnlockedPplCount] == ePerson) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
 	for(UBYTE i = 0; i < SUBPAGES_PER_PERSON - 1; ++i) {
 		if(s_pOfficePages[ePerson][i] == eSubpage) {

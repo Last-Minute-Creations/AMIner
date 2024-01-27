@@ -97,7 +97,7 @@ static void logoGsCreate(void) {
 
 	s_pStateMachineLogo = stateManagerCreate();
 	stateChange(s_pStateMachineLogo, &s_sStateLogoLmc);
-	fadeMorphTo(FADE_STATE_IN);
+	fadeMorphTo(FADE_STATE_IN, 0);
 	logBlockEnd("logoGsCreate()");
 	systemUnuse();
 	viewLoad(s_pView);
@@ -122,7 +122,7 @@ static void logoGsLoop(void) {
 	else if(eState == FADE_STATE_OUT) {
 		if(s_pNextState) {
 			stateChange(s_pStateMachineLogo, s_pNextState);
-			fadeMorphTo(FADE_STATE_IN);
+			fadeMorphTo(FADE_STATE_IN, 0);
 		}
 		else {
 			stateChange(g_pGameStateManager, &g_sStateCore);
@@ -169,17 +169,17 @@ static void logoLmcLoop(void) {
 	tFadeState eFadeState = fadeGetState();
 
 	if(eFadeState == FADE_STATE_IN && s_isAnyPressed) {
-		fadeMorphTo(FADE_STATE_OUT);
+		fadeMorphTo(FADE_STATE_OUT, 0);
 	}
 	else if(eFadeState == FADE_STATE_IN) {
 		++s_ubWaitFrame;
 
 		if(s_ubWaitFrame >= 100 || s_isAnyPressed) {
-			fadeMorphTo(FADE_STATE_OUT);
+			fadeMorphTo(FADE_STATE_OUT, 0);
 		}
 		else if(s_ubWaitFrame == 1){
 			ptplayerSfxPlay(s_pSfxLmc, 0, PTPLAYER_VOLUME_MAX, 1);
-			// fadeMorphTo(FADE_STATE_OUT); // FOR DEBUGGING SFX GLITCHES
+			// fadeMorphTo(FADE_STATE_OUT, 0); // FOR DEBUGGING SFX GLITCHES
 		}
 	}
 
@@ -438,7 +438,7 @@ void logoLangLoop(void) {
 
 	if(s_isAnyPressed) {
 		languageSet(s_eLangCurr);
-		fadeMorphTo(FADE_STATE_OUT);
+		fadeMorphTo(FADE_STATE_OUT, 0);
 	}
 }
 

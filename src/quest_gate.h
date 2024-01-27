@@ -6,6 +6,7 @@
 #define QUEST_GATE_H
 
 #include <ace/utils/file.h>
+#define GATE_DEPTH_PX 6816
 
 void questGateReset(void);
 
@@ -16,5 +17,17 @@ UBYTE questGateLoad(tFile *pFile);
 void questGateProcess(void);
 
 UBYTE questGateAddFragment(void);
+
+void questGateMarkExploded(void);
+
+UBYTE questGateIsExploded(void);
+
+UBYTE questGateGetFoundFragmentCount(void);
+
+UBYTE questGateGetMaxFragmentCount(void);
+
+void questGateUnlockPrisoner(void);
+
+UBYTE questGateIsPrisonerFound(void);
 
 #endif // QUEST_GATE_H

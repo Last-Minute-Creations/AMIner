@@ -5,9 +5,9 @@
 
 void groundLayerCreate(const tVPort *pVp);
 
-void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel);
+void groundLayerProcess(UWORD uwCameraY, UBYTE ubColorLevel, UWORD uwSecondaryColor);
 
-void groundLayerReset(UBYTE ubLowerLayer);
+void groundLayerReset(UBYTE ubLowerLayer, UWORD uwSecondaryColor);
 
 UWORD groundLayerGetLowerAtDepth(UWORD uwY);
 

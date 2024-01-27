@@ -13,6 +13,7 @@
 #include <comm/page_accounting.h>
 #include <comm/page_bribe.h>
 #include <comm/page_favor.h>
+#include <comm/page_gate_dilemma.h>
 #include <comm/page_questioning.h>
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
@@ -231,6 +232,12 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_FAIL:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_fail", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_PRISONER_DOSSIER:
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_dossier", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_PRISONER_WELCOME:
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_welcome", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
@@ -244,11 +251,26 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_NEWS_ACCOLADES:
 			pageNewsCreate(NEWS_KIND_ACCOLADES);
 			break;
+		case COMM_SHOP_PAGE_NEWS_GATE_ENEMY:
+			pageNewsCreate(NEWS_KIND_GATE_ENEMY);
+			break;
+		case COMM_SHOP_PAGE_NEWS_GATE_RED:
+			pageNewsCreate(NEWS_KIND_GATE_RED);
+			break;
 		case COMM_SHOP_PAGE_SOKOBAN:
 			pageSokobanCreate();
 			break;
 		case COMM_SHOP_PAGE_MARKET:
 			pageMarketCreate();
+			break;
+		case COMM_SHOP_PAGE_ARCH_GATE_PLEA:
+			pageMsgCreate(FACE_ID_ARCH, "", "arch_gate_plea", onBack);
+			break;
+		case COMM_SHOP_PAGE_PRISONER_GATE_PLEA:
+			pageMsgCreate(FACE_ID_PRISONER, "", "prisoner_gate_plea", onBack);
+			break;
+		case COMM_SHOP_PAGE_GATE_DILEMMA:
+			pageGateDilemmaCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MAIN:
 		default:

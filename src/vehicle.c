@@ -229,12 +229,18 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->fY = fix16_from_int(uwY);
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
+
+	// Ugly hack to reset facing
 	if(pVehicle->ubPlayerIdx == PLAYER_1) {
 		vehicleMove(pVehicle, 1, 0);
 	}
 	else {
 		vehicleMove(pVehicle, -1, 0);
 	}
+
+	// Remove side effects of hack above
+	pVehicle->sSteer.bX = 0;
+	pVehicle->fDx = 0;
 
 	pVehicle->isMarkerShown = 0;
 }
@@ -448,12 +454,25 @@ UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2;
 	UWORD uwY = pVehicle->sBobBody.sPos.uwY;
-	UBYTE isNearInBase = (
+	UBYTE isNearShop = (
 		pBase->sRectRestock.uwX1 <= uwCenterX && uwCenterX <= pBase->sRectRestock.uwX2 &&
 		pBase->sRectRestock.uwY1 <= uwY && uwY <= pBase->sRectRestock.uwY2
 	);
 
-	return isNearInBase;
+	return isNearShop;
+}
+
+UBYTE vehicleIsInBase(const tVehicle *pVehicle) {
+	const tBase *pBase = baseGetCurrent();
+
+	UWORD uwY = pVehicle->sBobBody.sPos.uwY;
+	UWORD uwBaseStartY = pBase->uwTileDepth * TILE_SIZE;
+	UWORD uwBaseEndY = uwBaseStartY + BASE_PATTERN_HEIGHT * TILE_SIZE;
+	UBYTE isInBase = (
+		uwBaseStartY <= uwY && uwY <= uwBaseEndY
+	);
+
+	return isInBase;
 }
 
 void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
@@ -471,7 +490,7 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 		}
 	}
 
-	// Update body roration as well as white frames
+	// Update body rotation as well as white frames
 	vehicleUpdateBodyBob(pVehicle);
 }
 
@@ -708,9 +727,8 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			pVehicle->sBobBody.sPos.uwY - 32, 1
 		);
 	}
-
-	if(g_isChallenge) {
-		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_1 + 9) {
+	else if(g_isChallenge) {
+		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_10) {
 			if(uwTileY == TILE_ROW_CHALLENGE_FINISH) {
 				pVehicle->lCash += pVehicle->uwCargoScore;
 				vehicleEndChallenge(pVehicle);
@@ -731,6 +749,18 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				vehicleRestock(pVehicle, 0);
 			}
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+		}
+	}
+	else {
+		if(TILE_PRISONER_1 <= ubTile && ubTile <= TILE_PRISONER_8) {
+			textBobSet(
+				&pVehicle->sTextBob, g_pMsgs[MSG_PAGE_LIST_PRISONER], COLOR_GREEN,
+				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.uwY,
+				pVehicle->sBobBody.sPos.uwY - 32, 1
+			);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			questGateUnlockPrisoner();
 		}
 	}
 

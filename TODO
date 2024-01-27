@@ -106,6 +106,7 @@ Optimizations:
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
+	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
 
 Main quest:
 
@@ -124,18 +125,39 @@ Dino quest:
 	✘ Dialogue option to check progress @cancelled(23-10-05)
 
 Gate quest:
-	☐ Figure out the flow
+	✔ Figure out the flow @done(24-01-27)
 	✔ Add base into the game @done(23-03-15)
 	✔ Base restock @done(23-07-10)
 	✔ Picking up the pieces @done(23-07-10)
 		✔ Scatter parts in mine @done(23-09-10)
 		✔ Display reconstructed gate @done(23-07-10)
 	✔ Questioning by commissar @done(23-07-13)
+	✔ Background radio transmissions when idling in base @done(23-12-12)
+	✔ Gate open cutscene @done(24-01-27)
+		✔ Teleport player to cutscene with simple fadeout @done(24-01-27)
+		✔ Light up the runes @done(23-12-13)
+		✔ Twister effect @done(23-11-28)
+	☐ Prisoner of war
+		✔ Rescue @done(24-01-03)
+		✔ Load proper tiles in campaign mode @done(24-01-03)
+		☐ Tile animation
+		☐ Trigger comments regarding transmissions
+	✔ Detonation vs activation dillema @done(24-01-16)
+	☐ Detonation cutscene
+		✔ Trigger explosions @done(24-01-16)
+		✔ Undraw the gate @done(24-01-16 18:17)
+		✔ Stop transmissions @done(24-01-27)
+		✔ Rebuke on detonating without commissar knowing @done(24-01-27)
+		☐ Game over if commissar knows about gate
 	☐ Endings
 		✘ Secret scientist ending @cancelled(23-10-02)
-		☐ Dino invansion ending
-		☐ Army defensive ending
-		☐ Message on unfinished dino-skeleton
+		✔ Gate open animation @done(23-11-04)
+		✔ Dino invansion ending text @done(23-12-13)
+		✔ Army defensive ending text @done(23-12-13)
+		☐ Trigger message on unfinished dino-skeleton
+	☐ Bugs
+		✔ Empty office after destroying gate @done(24-01-27)
+		☐ Gate (collectibles) not drawing properly on teleport-in
 
 Crate quests:
 	☐ Agent quest flow
@@ -149,6 +171,12 @@ Crate quests:
 		☐ Capsule at the bottom of mine
 		☐ Spend parts to build mega-teleporter
 		☐ Spend parts to open capsule
+
+Messages:
+	☐ Prisoner grateful on destroying gate
+	☐ Arch angry on destroying gate
+	☐ Commissar furious on destroing if knows about gate
+	☐ Outro msg for news on destroying gate?
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07)

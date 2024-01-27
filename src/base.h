@@ -26,10 +26,13 @@ typedef enum tBaseId {
 	BASE_ID_COUNT,
 } tBaseId;
 
+typedef void (*tCbBaseProcess)(void);
+
 typedef struct _tBase {
 	UBYTE pTilePattern[DEFS_MINE_DIGGABLE_WIDTH * BASE_PATTERN_HEIGHT];
 	UWORD uwTileDepth;
 	tUwAbsRect sRectRestock;
+	tCbBaseProcess cbProcess;
 } tBase;
 
 void baseCreate(tTileBufferManager *pManager);

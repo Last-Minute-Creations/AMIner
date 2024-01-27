@@ -5,6 +5,8 @@
 #include "base.h"
 #include "game.h"
 #include "tile.h"
+#include "hud.h"
+#include "tile_variant.h"
 
 #define BASE_TILE_DEPTH_GROUND 0
 #define BASE_TILE_DEPTH_DINO 100
@@ -14,9 +16,7 @@
 //----------------------------------------------------------------- PRIVATE VARS
 
 static tBaseId s_eBaseCurrent;
-static UBYTE s_isFinishLineLoaded;
 static tBitMap *s_pBaseTiles[BASE_ID_COUNT_UNIQUE];
-static tBitMap *s_pCheckpointTiles;
 static tTileBufferManager *s_pManager;
 
 static const tBase s_pBases[BASE_ID_COUNT] = {
@@ -39,10 +39,11 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwY1 = (BASE_TILE_DEPTH_GROUND + 7) * TILE_SIZE,
 			.uwX2 = 9 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_GROUND + 8) * TILE_SIZE
-		}
+		},
+		.cbProcess = 0,
 	},
 	[BASE_ID_DINO] = {
-		.uwTileDepth = 100,
+		.uwTileDepth = BASE_TILE_DEPTH_DINO,
 		.pTilePattern = {
 			43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
 			44, 43, 43, 43, 43, 45, 43, 44, 43, 43,
@@ -60,17 +61,18 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwY1 = (BASE_TILE_DEPTH_DINO + 7) * TILE_SIZE,
 			.uwX2 = 3 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_DINO + 8) * TILE_SIZE
-		}
+		},
+		.cbProcess = 0,
 	},
 	[BASE_ID_GATE] = {
-		.uwTileDepth = 209,
+		.uwTileDepth = BASE_TILE_DEPTH_GATE,
 		.pTilePattern = {
 			43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
 			44, 43, 43, 43, 43, 45, 43, 44, 43, 43,
 			43, 45, 43, 43, 43, 43, 43, 43, 43, 49,
 			43, 43, 43, 43, 43, 48, 45, 43, 43, 45,
-			 4,  5, 43, 43,  6,  5, 43, 43, 44, 43,
-			 7,  8, 45, 43,  9, 10, 49, 11, 43, 43,
+			 0,  1, 43, 43,  2,  1, 43, 43, 44, 43,
+			 3,  4, 45, 43,  5,  6, 49,  7, 43, 43,
 			12, 13, 43, 43, 14, 15, 16, 17, 18, 19,
 			20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
 			34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
@@ -81,7 +83,8 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwY1 = (BASE_TILE_DEPTH_GATE + 7) * TILE_SIZE,
 			.uwX2 = 10 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_GATE + 8) * TILE_SIZE
-		}
+		},
+		.cbProcess = gameProcessBaseGate,
 	},
 	[BASE_ID_DINO_POPULATED] = {
 		.uwTileDepth = BASE_TILE_DEPTH_VARIANT,
@@ -128,41 +131,23 @@ void baseCreate(tTileBufferManager *pManager) {
 	s_pBaseTiles[BASE_ID_GROUND] = bitmapCreateFromFile("data/base0.bm", 1);
 	s_pBaseTiles[BASE_ID_DINO] = bitmapCreateFromFile("data/base1.bm", 1);
 	s_pBaseTiles[BASE_ID_GATE] = bitmapCreateFromFile("data/base2.bm", 1);
-	s_pCheckpointTiles = bitmapCreateFromFile("data/checkpoint.bm", 1);
 	baseTileLoad(BASE_ID_GROUND);
-	s_isFinishLineLoaded = 0;
 }
 
 void baseDestroy(void) {
 	bitmapDestroy(s_pBaseTiles[0]);
 	bitmapDestroy(s_pBaseTiles[1]);
 	bitmapDestroy(s_pBaseTiles[2]);
-	bitmapDestroy(s_pCheckpointTiles);
 }
-
-#define TILE_BYTE_COUNT (TILE_SIZE * (TILE_SIZE / 8) * 5)
 
 void baseProcess(void) {
 	UWORD uwCamY = s_pManager->pCamera->uPos.uwY;
 	if(g_isChallenge) {
-		tBitMap *pTiles = s_pManager->pTileSet;
 		if(uwCamY >= TILE_ROW_CHALLENGE_CHECKPOINT_3 * TILE_SIZE) {
-			if(!s_isFinishLineLoaded) {
-				memcpy(
-					&pTiles->Planes[0][TILE_CHECKPOINT_1 * TILE_BYTE_COUNT],
-					&s_pCheckpointTiles->Planes[0][10 * TILE_BYTE_COUNT],
-					10 * TILE_BYTE_COUNT
-				);
-				s_isFinishLineLoaded = 1;
-			}
+			tileVariantChangeTo(TILE_VARIANT_FINISH);
 		}
-		else if(s_isFinishLineLoaded) {
-			memcpy(
-				&pTiles->Planes[0][TILE_CHECKPOINT_1 * TILE_BYTE_COUNT],
-				s_pCheckpointTiles->Planes[0],
-				10 * TILE_BYTE_COUNT
-			);
-			s_isFinishLineLoaded = 0;
+		else {
+			tileVariantChangeTo(TILE_VARIANT_CHECKPOINT);
 		}
 	}
 	else {
@@ -177,6 +162,11 @@ void baseProcess(void) {
 				break;
 			}
 		}
+	}
+
+	const tBase *pBase = baseGetCurrent();
+	if(pBase->cbProcess) {
+		pBase->cbProcess();
 	}
 }
 

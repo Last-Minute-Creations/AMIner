@@ -24,6 +24,6 @@ UBYTE pageQuestioningLoad(tFile *pFile);
 
 void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit);
 
-tQuestioningBit pageQuestioningGetQuestioningReports(void);
+UBYTE pageQuestioningIsReported(tQuestioningBit eQuestioning);
 
 #endif // _AMINER_COMM_PAGE_QUESTIONING_H_
