@@ -141,24 +141,23 @@ Gate quest:
 		✔ Rescue @done(24-01-03)
 		✔ Load proper tiles in campaign mode @done(24-01-03)
 		☐ Tile animation
-		☐ Comments regarding transmissions
+		☐ Trigger comments regarding transmissions
 	✔ Detonation vs activation dillema @done(24-01-16)
 	☐ Detonation cutscene
 		✔ Trigger explosions @done(24-01-16)
 		✔ Undraw the gate @done(24-01-16 18:17)
-		☐ Rebuke on detonating without commissar knowing
-		☐ Game over on commissar knowing
-		☐ Stop transmissions
-		☐ Msg: prisoner grateful on destroying
-		☐ Msg: arch angry on destroying
-		☐ Msg: commissar furious on destroing if knowing
-		☐ Outro msg for news on destroying gate?
+		✔ Stop transmissions @done(24-01-27)
+		✔ Rebuke on detonating without commissar knowing @done(24-01-27)
+		☐ Game over if commissar knows about gate
 	☐ Endings
 		✘ Secret scientist ending @cancelled(23-10-02)
 		✔ Gate open animation @done(23-11-04)
 		✔ Dino invansion ending text @done(23-12-13)
 		✔ Army defensive ending text @done(23-12-13)
-		☐ Message on unfinished dino-skeleton
+		☐ Trigger message on unfinished dino-skeleton
+	☐ Bugs
+		✔ Empty office after destroying gate @done(24-01-27)
+		☐ Gate (collectibles) not drawing properly on teleport-in
 
 Crate quests:
 	☐ Agent quest flow
@@ -172,6 +171,12 @@ Crate quests:
 		☐ Capsule at the bottom of mine
 		☐ Spend parts to build mega-teleporter
 		☐ Spend parts to open capsule
+
+Messages:
+	☐ Prisoner grateful on destroying gate
+	☐ Arch angry on destroying gate
+	☐ Commissar furious on destroing if knows about gate
+	☐ Outro msg for news on destroying gate?
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07)
