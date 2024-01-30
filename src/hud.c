@@ -586,8 +586,8 @@ void hudUpdate(void) {
 			);
 			s_sMsgCharPos.uwX += HUD_FACE_SIZE + 1;
 			blitRect(
-				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY,
-				283, 2 * s_ubLineHeight + 1, HUD_COLOR_BG
+				s_pHudBuffer->pBack, s_sMsgCharPos.uwX, s_sMsgCharPos.uwY - 1,
+				283, 2 * s_ubLineHeight + 3, HUD_COLOR_BG
 			);
 			s_sMsgCharPos.uwY -= 2;
 

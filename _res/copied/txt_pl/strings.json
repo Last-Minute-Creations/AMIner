@@ -15,8 +15,8 @@
 		],
 		"guest": "Panie Dyrektorze, ma Pan gościa. Zapraszam do gabinetu.",
 		"waitingUrzedas": [
-			"Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne. Mówiłam,",
-			"że Pan Dyrektor ma naradę ale się uparł i czeka. Zapraszam do gabinetu."
+			"Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne.",
+			"Mówiłam że jest narada ale się uparł i czeka."
 		],
 		"dinoFoundBone": [
 			"Doskonale! Odnaleźliście kolejny fragment szkieletu!"
@@ -31,7 +31,7 @@
 				"eksperymenty ... ... ... Ziemi. ... ..."
 			],
 			[
-				"... ... ... wrócić ... ... ... ... ....",
+				"... ... ... wrócić ... ... ... ... ...",
 				"... ... ... ... - ... ... pomoc"
 			],
 			[
@@ -44,7 +44,7 @@
 				"eksperymenty nazistów ... wnętrzu Ziemi. Bez ..."
 			],
 			[
-				"portalu ... możemy wrócić ... domu ... ... ....",
+				"portalu ... możemy wrócić ... domu ... ... ...",
 				"Ktokolwiek ... ... wiadomość - ... ... pomoc"
 			],
 			[
