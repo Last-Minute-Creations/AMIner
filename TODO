@@ -159,6 +159,7 @@ Gate quest:
 		✔ Empty office after destroying gate @done(24-01-27)
 		☐ Gate (collectibles) not drawing properly on teleport-in
 		☐ Prisoner is not always placed
+		☐ Jet sfx looping if fly-entering (urgent) msg in base
 
 Crate quests:
 	☐ Agent quest flow
