@@ -212,6 +212,9 @@ static void tileGenerateTerrain(
 static UBYTE tileTryPlaceQuestItemInRow(UBYTE **pTiles, UWORD uwY, tTile eTile) {
 	for(UBYTE i = 0; i < ARRAY_SIZE(s_pRowSpawnPattern); ++i) {
 		UBYTE ubX = s_pRowSpawnPattern[s_ubNextRowPatternPos++];
+		if(s_ubNextRowPatternPos >= ARRAY_SIZE(s_pRowSpawnPattern)) {
+			s_ubNextRowPatternPos = 0;
+		}
 		if(pTiles[ubX][uwY] == TILE_DIRT_1 || pTiles[ubX][uwY] == TILE_DIRT_2) {
 			pTiles[ubX][uwY] = eTile;
 			return 1;
