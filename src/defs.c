@@ -146,6 +146,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_ARCH_ACCOLADE] = "officePages.archAccolade",
 	[MSG_PAGE_PRISONER_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_PRISONER_WELCOME] = "officePages.commonWelcome",
+	[MSG_PAGE_PRISONER_GATE_DESTROYED] = "officePages.commonGateDestroyed",
 	// Count
 	[MSG_COUNT] = 0
 };

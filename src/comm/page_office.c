@@ -209,7 +209,7 @@ void pageOfficeUnlockPerson(tFaceId ePerson) {
 
 UBYTE pageOfficeHasPerson(tFaceId ePerson) {
 	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
-		if(s_pActivePpl[s_ubUnlockedPplCount] == ePerson) {
+		if(s_pActivePpl[i] == ePerson) {
 			return 1;
 		}
 	}

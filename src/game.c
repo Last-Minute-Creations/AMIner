@@ -408,7 +408,6 @@ static UBYTE gameProcessGateCutscene(void) {
 				vehicleSetPos(&g_pVehicles[0], 64, 216 * TILE_SIZE);
 				vehicleSetPos(&g_pVehicles[1], 160, 216 * TILE_SIZE);
 				++s_eGateCutsceneStep;
-				// fadeMorphTo(FADE_STATE_IN, 0);
 			}
 			break;
 		case GATE_CUTSCENE_TELEPORT_STEP_FADE_IN:
@@ -420,8 +419,13 @@ static UBYTE gameProcessGateCutscene(void) {
 			if(++s_ubGateCutsceneCooldown > 100) {
 				s_ubGateCutsceneCooldown = 0;
 				// TODO: remove pending questioning msgs
-				inboxPushBack(COMM_SHOP_PAGE_ARCH_GATE_PLEA, 1);
-				inboxPushBack(COMM_SHOP_PAGE_PRISONER_GATE_PLEA, 1);
+				if(questGateIsPrisonerFound()) {
+					inboxPushBack(COMM_SHOP_PAGE_PRISONER_GATE_PLEA, 1);
+				}
+				if(dinoIsQuestStarted()) {
+					inboxPushBack(COMM_SHOP_PAGE_ARCH_GATE_PLEA, 1);
+				}
+
 				inboxPushBack(COMM_SHOP_PAGE_GATE_DILEMMA, 1);
 				statePush(g_pGameStateManager, &g_sStateShop);
 				++s_eGateCutsceneStep;
@@ -715,6 +719,8 @@ static UBYTE gameProcessGateCutscene(void) {
 
 				if(questGateIsPrisonerFound()) {
 					// TODO: prisoner grateful
+					pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_PRISONER_GATE_DESTROYED);
+					inboxPushBack(COMM_SHOP_PAGE_PRISONER_GATE_DESTROYED, 1);
 				}
 				if(dinoIsQuestStarted() && !pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
 					// TODO: arch angry telling commissar about situation

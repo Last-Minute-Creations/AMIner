@@ -158,6 +158,7 @@ Gate quest:
 	☐ Bugs
 		✔ Empty office after destroying gate @done(24-01-27)
 		☐ Gate (collectibles) not drawing properly on teleport-in
+		☐ Prisoner is not always placed
 
 Crate quests:
 	☐ Agent quest flow
@@ -173,7 +174,7 @@ Crate quests:
 		☐ Spend parts to open capsule
 
 Message texts:
-	☐ Prisoner grateful on destroying gate
+	✔ Prisoner grateful on destroying gate @done(24-02-01)
 	☐ Arch angry on destroying gate
 	☐ Commissar furious on destroing if knows about gate
 	☐ Outro msg for news on destroying gate?
