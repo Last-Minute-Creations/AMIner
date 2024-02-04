@@ -79,7 +79,7 @@ General:
 	✔ Show save stats preview in main menu @done(23-09-30)
 	✔ Pending message icon on HUD @done(23-10-01)
 	✔ Mode management via floating buttons @done(23-10-02)
-	☐ Animated base elements
+	☐ Animated main base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
 		☐ Smoke
@@ -99,6 +99,7 @@ Bugs:
 	✔ Prisoner is not always placed @done(24-02-01)
 	☐ Gate (collectibles) not drawing properly on teleport-in
 	☐ Jet sfx looping if fly-entering (urgent) msg in base
+	☐ Game doesn't launch properly from icon
 
 QoL refinements:
 	☐ Onboard player on need to maintain income
@@ -108,14 +109,14 @@ QoL refinements:
 Commrade:
 	✔ Mineral market @done(23-09-16)
 	☐ Redo warehouse/plan management
-	☐ Workshop upgrade icons?
+	☐ Workshop icons for upgrades?
 	☐ Improve tab changing on commrade by allowing cursor to move to buttons
 	☐ Figure out where to hide sokoban and how to hint it
 
 Optimizations:
 	✔ Comm message page loading @done(23-09-07)
 	✔ Mine generation progress bar @done(23-09-08)
-	✔ Show progress bar instantly after selecting new/continue game @done(24-02-04 12:52)
+	✔ Show progress bar instantly after selecting new/continue game @done(24-02-04)
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
@@ -171,16 +172,17 @@ Crate quests:
 	☐ Agent quest flow
 		☐ Agent appears after first crate
 		☐ Ability to sell create
-		☐ Questionings after finding crate
-		☐ Bad questioning causes confiscating of all crates
-		☐ Report agent to remove him and get accolade
+		☐ Questionings
+			☐ Trigger after finding each crate
+			☐ Bad questioning causes confiscating of all crates
+			☐ Report agent to remove him and get accolade
 	☐ Travelers quest flow
 		☐ Implement base
 		☐ Capsule at the bottom of mine
 		☐ Spend parts to build mega-teleporter
 		☐ Spend parts to open capsule
 
-Message texts:
+Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)
 	☐ Arch angry on destroying gate
 	☐ Commissar furious on destroing if knows about gate

@@ -251,13 +251,6 @@ static void menuOnEnterStory(void) {
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
-	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
-		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
-		.isHidden = 0,
-		.sOptCb = {.cbSelect = menuOnStoryStart}
-	};
-
 	if(menuLoadSummaryFromSave("save_story.dat", &s_sSummary)) {
 		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
 			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
@@ -266,6 +259,13 @@ static void menuOnEnterStory(void) {
 			.sOptCb = {.cbSelect = menuOnStoryLoad}
 		};
 	}
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnStoryStart}
+	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
 		.szCaption = g_pMenuCaptions[MENU_CAPTION_PLAYER_COUNT],
@@ -293,13 +293,6 @@ static void menuOnEnterFree(void) {
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
-	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
-		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
-		.isHidden = 0,
-		.sOptCb = {.cbSelect = menuOnFreeStart}
-	};
-
 	if(fileExists("save_free.dat")) {
 		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
 			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
@@ -308,6 +301,13 @@ static void menuOnEnterFree(void) {
 			.sOptCb = {.cbSelect = menuOnFreeLoad}
 		};
 	}
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnFreeStart}
+	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
 		.szCaption = g_pMenuCaptions[MENU_CAPTION_PLAYER_COUNT],
