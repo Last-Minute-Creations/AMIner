@@ -79,7 +79,6 @@ General:
 	✔ Show save stats preview in main menu @done(23-09-30)
 	✔ Pending message icon on HUD @done(23-10-01)
 	✔ Mode management via floating buttons @done(23-10-02)
-	☐ Figure out where to hide sokoban and how to hint it
 	☐ Animated base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
@@ -95,10 +94,23 @@ General:
 		☐ Remove debug teleport return button
 		☐ Bring back teleport damage on zeroeth upgrade
 
+Bugs:
+	✔ Empty office after destroying gate @done(24-01-27)
+	✔ Prisoner is not always placed @done(24-02-01)
+	☐ Gate (collectibles) not drawing properly on teleport-in
+	☐ Jet sfx looping if fly-entering (urgent) msg in base
+
+QoL refinements:
+	☐ Onboard player on need to maintain income
+	☐ Remove first base mineral pattern so that bricking it won't penalize new players?
+	☐ Skippable LMC/ACE logos by fire button
+
 Commrade:
 	✔ Mineral market @done(23-09-16)
 	☐ Redo warehouse/plan management
 	☐ Workshop upgrade icons?
+	☐ Improve tab changing on commrade by allowing cursor to move to buttons
+	☐ Figure out where to hide sokoban and how to hint it
 
 Optimizations:
 	✔ Comm message page loading @done(23-09-07)
@@ -107,8 +119,7 @@ Optimizations:
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
-
-Main quest:
+	☐ Show progress bar instantly after selecting new/continue game
 
 Dino quest:
 	✔ Figure out the final flow @done(23-10-05)
@@ -140,8 +151,8 @@ Gate quest:
 	☐ Prisoner of war
 		✔ Rescue @done(24-01-03)
 		✔ Load proper tiles in campaign mode @done(24-01-03)
+		✔ Trigger comments regarding transmissions @done(24-02-04)
 		☐ Tile animation
-		☐ Trigger comments regarding transmissions
 	✔ Detonation vs activation dillema @done(24-01-16)
 	☐ Detonation cutscene
 		✔ Trigger explosions @done(24-01-16)
@@ -155,11 +166,6 @@ Gate quest:
 		✔ Dino invansion ending text @done(23-12-13)
 		✔ Army defensive ending text @done(23-12-13)
 		☐ Trigger message on unfinished dino-skeleton
-	☐ Bugs
-		✔ Empty office after destroying gate @done(24-01-27)
-		✔ Prisoner is not always placed @done(24-02-01)
-		☐ Gate (collectibles) not drawing properly on teleport-in
-		☐ Jet sfx looping if fly-entering (urgent) msg in base
 
 Crate quests:
 	☐ Agent quest flow

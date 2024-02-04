@@ -147,6 +147,9 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_PRISONER_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_PRISONER_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_PRISONER_GATE_DESTROYED] = "officePages.commonGateDestroyed",
+	[MSG_PAGE_PRISONER_RADIO_1] = "officePages.prisonerRadio1",
+	[MSG_PAGE_PRISONER_RADIO_2] = "officePages.prisonerRadio2",
+	[MSG_PAGE_PRISONER_RADIO_3] = "officePages.prisonerRadio3",
 	// Count
 	[MSG_COUNT] = 0
 };

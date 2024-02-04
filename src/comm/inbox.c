@@ -6,7 +6,7 @@
 #include <ace/managers/log.h>
 #include "../save.h"
 
-#define INBOX_SIZE 10
+#define INBOX_SIZE 20
 
 static tCommShopPage s_pInbox[INBOX_SIZE];
 static UWORD s_uwPendingInboxCount;

@@ -960,14 +960,25 @@ void gameProcessBaseGate(void) {
 	if(s_ubRadioMessageCounter == 0) {
 		UBYTE ubFoundCount = questGateGetFoundFragmentCount();
 		UBYTE ubMaxCount = questGateGetMaxFragmentCount();
-		tMsg eMsgStart = MSG_HUD_RADIO_START_0;
+		tMsg eMsgStart;
+		tCommShopPage ePrisonerPageUnlock;
 		if(ubFoundCount >= (ubMaxCount * 2) / 3) {
 			eMsgStart = MSG_HUD_RADIO_FULL_0;
+			ePrisonerPageUnlock = COMM_SHOP_PAGE_PRISONER_RADIO_3;
 		}
 		else if(ubFoundCount >= (ubMaxCount * 1) / 3) {
 			eMsgStart = MSG_HUD_RADIO_HALF_0;
+			ePrisonerPageUnlock = COMM_SHOP_PAGE_PRISONER_RADIO_2;
+		}
+		else {
+			eMsgStart = MSG_HUD_RADIO_START_0;
+			ePrisonerPageUnlock = COMM_SHOP_PAGE_PRISONER_RADIO_1;
 		}
 
+		if(questGateIsPrisonerFound()) {
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, ePrisonerPageUnlock);
+			inboxPushBack(ePrisonerPageUnlock, 0);
+		}
 		hudShowMessage(FACE_ID_RADIO, g_pMsgs[eMsgStart + s_ubRadioMessageIndex]);
 		if(++s_ubRadioMessageIndex >= RADIO_MESSAGE_COUNT) {
 			s_ubRadioMessageIndex = 0;

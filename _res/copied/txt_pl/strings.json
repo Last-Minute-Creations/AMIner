@@ -140,7 +140,7 @@
 		"cargoFull": "Ładownia pełna!",
 		"restock": "Rozładunek!",
 		"foundBone": "Kość #%hhu",
-		"foundGate": "Fragment bramy #%hhu"
+		"foundGate": "Fragment portalu #%hhu"
 	},
 	"shop": {
 		"timeRemaining": "Pozostało %d dni",
@@ -178,7 +178,7 @@
 	"officePages": {
 		"commonWelcome": "Powitanie",
 		"commonDossier": "Dossier",
-		"commonGateDestroyed": "Zniszczenie bramy",
+		"commonGateDestroyed": "Zniszczenie portalu",
 		"main": "Powrót",
 		"listMietek": "Mietek",
 		"listKrystyna": "Krystyna",
@@ -201,7 +201,10 @@
 		"komisarzArchAccolade": "Kompletny dinozaur",
 		"archPlanFail": "Awans",
 		"archGateFail": "Inwazja",
-		"archAccolade": "Kompletny dinozaur"
+		"archAccolade": "Kompletny dinozaur",
+		"prisonerRadio1": "Złe przeczucia",
+		"prisonerRadio2": "Mgliste wspomnienia",
+		"prisonerRadio3": "Reminiscencja"
 	},
 	"officePageContents": {
 		"bribeA": [

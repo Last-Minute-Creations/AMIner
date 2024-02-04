@@ -241,6 +241,15 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_PRISONER_GATE_DESTROYED:
 			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_gate_destroyed", onBack);
 			break;
+		case COMM_SHOP_PAGE_PRISONER_RADIO_1:
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_1", onBack);
+			break;
+		case COMM_SHOP_PAGE_PRISONER_RADIO_2:
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_2", onBack);
+			break;
+		case COMM_SHOP_PAGE_PRISONER_RADIO_3:
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_3", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
