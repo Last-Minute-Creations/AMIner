@@ -115,11 +115,11 @@ Commrade:
 Optimizations:
 	✔ Comm message page loading @done(23-09-07)
 	✔ Mine generation progress bar @done(23-09-08)
+	✔ Show progress bar instantly after selecting new/continue game @done(24-02-04 12:52)
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
-	☐ Show progress bar instantly after selecting new/continue game
 
 Dino quest:
 	✔ Figure out the final flow @done(23-10-05)

@@ -92,6 +92,7 @@ static void menuEnableAtari(void) {
 
 static void menuStartGame(UBYTE isChallenge) {
 	commEraseAll();
+	commProgressInit();
 	gameStart(
 		isChallenge,
 		g_sSettings.is1pKbd ? steerInitKey(STEER_KEYMAP_WSAD) : steerInitJoy(0),
@@ -105,6 +106,7 @@ static void menuStartGame(UBYTE isChallenge) {
 
 static void menuLoadGame(const char *szSavePath) {
 	commEraseAll();
+	commProgressInit();
 	gameStart(
 		1, // challenge loading is faster due to less terrain prep
 		g_sSettings.is1pKbd ? steerInitKey(STEER_KEYMAP_WSAD) : steerInitJoy(0),
