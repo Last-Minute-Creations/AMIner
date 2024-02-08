@@ -426,9 +426,16 @@ static UBYTE gameProcessGateCutscene(void) {
 					inboxPushBack(COMM_SHOP_PAGE_ARCH_GATE_PLEA, 1);
 				}
 
-				inboxPushBack(COMM_SHOP_PAGE_GATE_DILEMMA, 1);
-				statePush(g_pGameStateManager, &g_sStateShop);
-				++s_eGateCutsceneStep;
+				if(!pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
+					inboxPushBack(COMM_SHOP_PAGE_GATE_DILEMMA, 1);
+					statePush(g_pGameStateManager, &g_sStateShop);
+					++s_eGateCutsceneStep;
+				}
+				else {
+					// TODO: commissar text before cutscene?
+					gameTriggerCutscene(GAME_CUTSCENE_GATE_OPEN);
+					// Don't push step here bacause cutscene trigger changes it already
+				}
 				return 1;
 			}
 			break;
@@ -718,17 +725,12 @@ static UBYTE gameProcessGateCutscene(void) {
 				++s_eGateCutsceneStep;
 
 				if(questGateIsPrisonerFound()) {
-					// TODO: prisoner grateful
 					pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_PRISONER_GATE_DESTROYED);
 					inboxPushBack(COMM_SHOP_PAGE_PRISONER_GATE_DESTROYED, 1);
 				}
 				if(dinoIsQuestStarted() && !pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
 					// TODO: arch angry telling commissar about situation
 					gameAddRebuke();
-				}
-				if(pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
-					// TODO: commissar on destroyed ambush?
-					// inboxPushBack(COMM_SHOP_PAGE_NEWS_GATE_DESTROYED, 1);
 				}
 
 				if(inboxGetState() == INBOX_STATE_URGENT) {

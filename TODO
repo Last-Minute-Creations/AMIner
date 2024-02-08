@@ -156,12 +156,13 @@ Gate quest:
 		✔ Trigger comments regarding transmissions @done(24-02-04)
 		☐ Tile animation
 	✔ Detonation vs activation dillema @done(24-01-16)
-	☐ Detonation cutscene
+	✔ Only trigger dillema if comissar doesn't know about the gate @done(24-02-08 13:38)
+	✔ Detonation cutscene @done(24-02-08)
 		✔ Trigger explosions @done(24-01-16)
 		✔ Undraw the gate @done(24-01-16 18:17)
 		✔ Stop transmissions @done(24-01-27)
 		✔ Rebuke on detonating without commissar knowing @done(24-01-27)
-		☐ Game over if commissar knows about gate
+		✘ Game over if commissar knows about gate @cancelled(24-02-08)
 	☐ Endings
 		✘ Secret scientist ending @cancelled(23-10-02)
 		✔ Gate open animation @done(23-11-04)

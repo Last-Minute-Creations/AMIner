@@ -63,6 +63,10 @@ void pageQuestioningCreate(void) {
 		s_eQuestioningCurrent <<= 1;
 	}
 
+	if(s_eQuestioningCurrent >= QUESTIONING_BIT_END) {
+		s_eQuestioningCurrent = QUESTIONING_BIT_END;
+	}
+
 	const char *szMsg = "???";
 	switch (s_eQuestioningCurrent)
 	{
@@ -72,6 +76,9 @@ void pageQuestioningCreate(void) {
 		case QUESTIONING_BIT_TELEPORT_PARTS:
 			szMsg = "Have you found some teleport parts?";
 			break;
+		case QUESTIONING_BIT_END:
+			commShopGoBack();
+			return;
 		default:
 			logWrite("ERR: Unhandled questioning value: %d\n", s_eQuestioningCurrent);
 			// TODO: exit earlier?
@@ -128,6 +135,12 @@ void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit) {
 	if(ePendingQuestioningPrev != s_eQuestioningsPending) {
 		inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING, 1);
 		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_URZEDAS]);
+	}
+}
+
+void pageQuestioningTryCancelPendingQuestioning(tQuestioningBit eQuestioningBit) {
+	if(s_eQuestioningsPending & eQuestioningBit) {
+		s_eQuestioningsPending &= ~eQuestioningBit;
 	}
 }
 

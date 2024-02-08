@@ -54,6 +54,7 @@ UBYTE questGateAddFragment(void) {
 		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_GATE);
 	}
 	else {
+		pageQuestioningTryCancelPendingQuestioning(QUESTIONING_BIT_GATE);
 		gameTriggerCutscene(GAME_CUTSCENE_TELEPORT);
 	}
 
