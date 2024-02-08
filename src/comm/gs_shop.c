@@ -29,6 +29,9 @@
 static tCommTab s_eTab;
 static tCommShopPage s_eCurrentPage;
 static tCommShopPage s_eCameFrom;
+static tTabNavigationState s_eTabNavigationState;
+static UBYTE s_ubLedBlinkCounter;
+static UBYTE s_ubLedBlinkState;
 
 //------------------------------------------------------------------ PRIVATE FNS
 
@@ -68,6 +71,7 @@ static void commGsShopCreate(void) {
 		return;
 	}
 
+	s_eTabNavigationState = TAB_NAVIGATION_STATE_DISABLED;
 	pageOfficeResetSelection();
 
 	tCommShopPage ePage;
@@ -129,11 +133,55 @@ static void commGsShopLoop(void) {
 		}
 	}
 
-	if(!commProcessPage()) {
-		gameTriggerSave();
-		logWrite("shop quit\n");
-		statePop(g_pGameStateManager);
-		return;
+	if(s_eTabNavigationState == TAB_NAVIGATION_STATE_ENABLED) {
+		tCommTab eOldTab = s_eTab;
+		if(commNavUse(DIRECTION_LEFT)) {
+			if(s_eTab) {
+				--s_eTab;
+			}
+			else {
+				s_eTab = COMM_TAB_COUNT - 1;
+			}
+		}
+		else if(commNavUse(DIRECTION_RIGHT)) {
+			if(s_eTab < COMM_TAB_COUNT - 1) {
+				++s_eTab;
+			}
+			else {
+				s_eTab = 0;
+			}
+		}
+		else if(commNavUse(DIRECTION_UP)) {
+			s_eTabNavigationState = TAB_NAVIGATION_STATE_DISABLING;
+		}
+
+		if(s_eTab != eOldTab) {
+			tCommShopPage ePage = commShopTabToPage(s_eTab);
+			commShopChangePage(s_eCurrentPage, ePage);
+			return;
+		}
+
+		if(s_eTabNavigationState == TAB_NAVIGATION_STATE_DISABLING) {
+			commSetActiveLed(s_eTab);
+		}
+		else {
+			if(++s_ubLedBlinkCounter > 15) {
+				commSetActiveLed(s_ubLedBlinkState ? s_eTab : COMM_TAB_COUNT);
+				s_ubLedBlinkState = !s_ubLedBlinkState;
+				s_ubLedBlinkCounter = 0;
+			}
+		}
+	}
+	else {
+		if(!commProcessPage()) {
+			gameTriggerSave();
+			logWrite("shop quit\n");
+			statePop(g_pGameStateManager);
+			return;
+		}
+		if(s_eTabNavigationState == TAB_NAVIGATION_STATE_DISABLING) {
+			s_eTabNavigationState = TAB_NAVIGATION_STATE_DISABLED;
+		}
 	}
 }
 
@@ -154,7 +202,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 	s_eCurrentPage = ePage;
 	s_eTab = commShopPageToTab(ePage);
 
-	commSetActiveLed(s_eTab);
+	if(s_eTabNavigationState != TAB_NAVIGATION_STATE_ENABLED) {
+		commSetActiveLed(s_eTab);
+	}
 	commEraseAll();
 
 	s_eCameFrom = eCameFrom;
@@ -319,6 +369,16 @@ tMsg commShopPageToTitle(tCommShopPage ePage) {
 
 void commShopGoBack(void) {
 	onBack();
+}
+
+tTabNavigationState commShopGetTabNavigationState(void)
+{
+	return s_eTabNavigationState;
+}
+
+void commShopFocusOnTabNavigation(void)
+{
+	s_eTabNavigationState = TAB_NAVIGATION_STATE_ENABLED;
 }
 
 tState g_sStateShop = {

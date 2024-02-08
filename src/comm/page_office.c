@@ -58,6 +58,10 @@ static UBYTE pageOfficeIsSelectionOnButton(UBYTE ubSelection) {
 	return ubSelection == s_ubUnlockedPplCount;
 }
 
+static UBYTE pageOfficeIsSelectionOnPortrait(UBYTE ubSelection) {
+	return ubSelection < s_ubUnlockedPplCount;
+}
+
 static void pageOfficeProcess(void) {
 	BYTE bOldSelection = s_bSelectionCurr;
 
@@ -73,14 +77,21 @@ static void pageOfficeProcess(void) {
 	}
 	else if(commNavUse(DIRECTION_DOWN)) {
 		if(pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
-			s_bSelectionCurr = 0;
+			++s_bSelectionCurr;
 		}
-		else {
+		else if(pageOfficeIsSelectionOnPortrait(s_bSelectionCurr)) {
 			s_bSelectionCurr += PPL_PER_ROW;
+			if(s_bSelectionCurr > s_ubUnlockedPplCount) {
+				// don't teleport selection from portrait to nav
+				s_bSelectionCurr = s_ubUnlockedPplCount;
+			}
 		}
 	}
-	else if(commNavUse(DIRECTION_UP)){
-		if(pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
+	else if(
+		commNavUse(DIRECTION_UP) ||
+		commShopGetTabNavigationState() == TAB_NAVIGATION_STATE_DISABLING
+	){
+		if(!pageOfficeIsSelectionOnPortrait(s_bSelectionCurr)) {
 			--s_bSelectionCurr;
 		}
 		else {
@@ -91,8 +102,8 @@ static void pageOfficeProcess(void) {
 	if(s_bSelectionCurr < 0) {
 		s_bSelectionCurr = s_ubUnlockedPplCount;
 	}
-	else if(s_bSelectionCurr > s_ubUnlockedPplCount) {
-		s_bSelectionCurr = s_ubUnlockedPplCount;
+	else if(s_bSelectionCurr > s_ubUnlockedPplCount + 1) {
+		s_bSelectionCurr = s_ubUnlockedPplCount + 1;
 	}
 
 	if(s_bSelectionCurr != bOldSelection) {
@@ -100,7 +111,7 @@ static void pageOfficeProcess(void) {
 			buttonDeselectAll();
 			buttonDrawAll(commGetDisplayBuffer());
 		}
-		else {
+		else if(pageOfficeIsSelectionOnPortrait(bOldSelection)) {
 			officeDrawFaceAtPos(bOldSelection);
 		}
 
@@ -108,8 +119,11 @@ static void pageOfficeProcess(void) {
 			buttonSelect(0);
 			buttonDrawAll(commGetDisplayBuffer());
 		}
-		else {
+		else if(pageOfficeIsSelectionOnPortrait(s_bSelectionCurr)) {
 			officeDrawFaceAtPos(s_bSelectionCurr);
+		}
+		else if(s_bSelectionCurr == s_ubUnlockedPplCount + 1) {
+			commShopFocusOnTabNavigation();
 		}
 	}
 
@@ -118,7 +132,7 @@ static void pageOfficeProcess(void) {
 			commRegisterPage(0, 0);
 			return;
 		}
-		else  {
+		else if(pageOfficeIsSelectionOnPortrait(s_bSelectionCurr)) {
 			commShopChangePage(
 				COMM_SHOP_PAGE_OFFICE_MAIN,
 				COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_pActivePpl[s_bSelectionCurr] - FACE_ID_MIETEK
@@ -134,6 +148,14 @@ void pageOfficeResetSelection(void) {
 }
 
 void pageOfficeShow(void) {
+	if(commShopGetTabNavigationState() == TAB_NAVIGATION_STATE_ENABLED) {
+		s_bSelectionCurr = s_ubUnlockedPplCount + 1;
+	}
+	else if(s_bSelectionCurr == s_ubUnlockedPplCount + 1) {
+		// was on nav, moved to other page with non-nav
+		pageOfficeResetSelection();
+	}
+
 	commRegisterPage(pageOfficeProcess, 0);
 	for(tFaceId i = 0; i < s_ubUnlockedPplCount; ++i) {
 		officeDrawFaceAtPos(i);

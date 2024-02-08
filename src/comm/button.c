@@ -50,6 +50,10 @@ UBYTE buttonAdd(const char *szName) {
 }
 
 void buttonDraw(UBYTE ubIdx, tBitMap *pBfr) {
+	if(ubIdx >= s_ubButtonCount) {
+		return;
+	}
+
 	UBYTE ubColor = (
 		ubIdx == s_ubSelected ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);

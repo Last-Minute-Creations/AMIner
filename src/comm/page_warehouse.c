@@ -139,7 +139,13 @@ static void redraw(void) {
 	buttonAdd(g_pMsgs[MSG_COMM_CONFIRM]);
 	buttonAdd(g_pMsgs[MSG_COMM_MARKET]);
 	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);
-	buttonSelect(s_ubButtonCurrent);
+	if(commShopGetTabNavigationState() != TAB_NAVIGATION_STATE_ENABLED) {
+		buttonSelect(s_ubButtonCurrent);
+	}
+	else {
+		s_ubPosCurr = s_ubPosCount + 1;
+		buttonDeselectAll();
+	}
 	buttonRowApply();
 	buttonDrawAll(pBmDraw);
 
@@ -185,29 +191,39 @@ static void pageWarehouseProcess(void) {
 
 	UBYTE isButtonRefresh = 0;
 	UBYTE ubPosPrev = s_ubPosCurr;
-	if(commNavUse(DIRECTION_UP) && s_ubPosCurr) {
+	// s_ubPosCount is row with buttons
+	// s_ubPosCount + 1 is navigation row
+	if(commShopGetTabNavigationState() == TAB_NAVIGATION_STATE_DISABLING) {
+		s_ubPosCurr = s_ubPosCount;
+	}
+	else if(commNavUse(DIRECTION_UP) && s_ubPosCurr) {
 		 s_ubPosCurr = MAX(0, s_ubPosCurr - 1);
 	}
-	else if(commNavUse(DIRECTION_DOWN) && s_ubPosCurr < s_ubPosCount) {
-		s_ubPosCurr = MIN(s_ubPosCount, s_ubPosCurr + 1);
+	else if(commNavUse(DIRECTION_DOWN)) {
+		s_ubPosCurr = MIN(s_ubPosCount + 1, s_ubPosCurr + 1);
 	}
 
 	if(s_ubPosCurr != ubPosPrev) {
 		// Deselect previous pos
-		if(ubPosPrev < s_ubPosCount) {
+		if(ubPosPrev == s_ubPosCount) {
+			buttonDeselectAll();
+			isButtonRefresh = 1;
+		}
+		else if(ubPosPrev < s_ubPosCount) {
 			drawRow(ubPosPrev);
 		}
 		// Select new pos
 		if(s_ubPosCurr < s_ubPosCount) {
 			drawRow(s_ubPosCurr);
-			if(ubPosPrev >= s_ubPosCount) {
-				buttonDeselectAll();
-				isButtonRefresh = 1;
-			}
 		}
-		else {
+		else if(s_ubPosCurr == s_ubPosCount) {
 			s_ubButtonCurrent = 0;
 			buttonSelect(s_ubButtonCurrent);
+			isButtonRefresh = 1;
+		}
+		else if(s_ubPosCurr == s_ubPosCount + 1) {
+			buttonDeselectAll();
+			commShopFocusOnTabNavigation();
 			isButtonRefresh = 1;
 		}
 	}
@@ -228,7 +244,7 @@ static void pageWarehouseProcess(void) {
 			drawRow(ubPosPrev);
 		}
 	}
-	else {
+	else if(s_ubPosCurr == s_ubPosCount) {
 		// Navigation between buttons
 		if(commNavUse(DIRECTION_RIGHT)) {
 			if(s_ubButtonCurrent < 2) {
@@ -250,6 +266,7 @@ static void pageWarehouseProcess(void) {
 			isButtonRefresh = 1;
 		}
 	}
+
 	if(isButtonRefresh) {
 		buttonDrawAll(commGetDisplayBuffer());
 	}

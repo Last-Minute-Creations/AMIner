@@ -66,6 +66,12 @@ typedef enum _tCommShopPage {
 	COMM_SHOP_PAGE_COUNT
 } tCommShopPage;
 
+typedef enum tTabNavigationState {
+	TAB_NAVIGATION_STATE_DISABLED,
+	TAB_NAVIGATION_STATE_ENABLED,
+	TAB_NAVIGATION_STATE_DISABLING,
+} tTabNavigationState;
+
 extern tState g_sStateShop;
 
 UBYTE commShopIsActive(void);
@@ -79,5 +85,9 @@ tMsg commShopPageToTitle(tCommShopPage ePage);
 void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage);
 
 void commShopGoBack(void);
+
+tTabNavigationState commShopGetTabNavigationState(void);
+
+void commShopFocusOnTabNavigation(void);
 
 #endif // _COMM_SHOP_H_

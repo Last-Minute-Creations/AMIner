@@ -5,16 +5,23 @@
 #include "page_workshop.h"
 #include <comm/comm.h>
 #include <comm/button.h>
+#include <comm/gs_shop.h>
 #include "../string_array.h"
 #include "../vehicle.h"
 #include "../inventory.h"
 #include "../defs.h"
 #include "../hud.h"
 
+typedef enum tWorkshopRow {
+	WORKSHOP_ROW_BUY,
+	WORKSHOP_ROW_EXIT,
+	WORKSHOP_ROW_NAV,
+} tWorkshopRow;
+
 char **g_pShopNames;
 
-static UBYTE s_ubWorkshopPos = 0;
-static UBYTE s_isOnExitBtn = 0;
+static tPartKind s_eSelectedPart = 0;
+static tWorkshopRow s_eWorkshopRow;
 
 static UBYTE workshopIsPartAcquirable(tPartKind ePart) {
 	UBYTE isAcquirable = (
@@ -23,8 +30,8 @@ static UBYTE workshopIsPartAcquirable(tPartKind ePart) {
 	return isAcquirable;
 }
 
-static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
-	s_ubWorkshopPos = ubPart;
+static void commShopSelectWorkshopPart(tPartKind ePart, UBYTE isActive) {
+	s_eSelectedPart = ePart;
 	static const char szCaption[] = "KRTEK 2600";
 
 	const UBYTE ubRowSize = commGetLineHeight() + 1;
@@ -37,12 +44,12 @@ static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 	UWORD uwOffsY = 0;
 	commDrawText(0, uwOffsY, szCaption, ubFontFlags, ubColor);
 	uwOffsY += ubRowSize;
-	commDrawText(0, uwOffsY, g_pShopNames[ubPart], ubFontFlags, ubColor);
+	commDrawText(0, uwOffsY, g_pShopNames[ePart], ubFontFlags, ubColor);
 	uwOffsY += 2 * ubRowSize;
 	char szBfr[50];
 
-	UBYTE isAcquirable = workshopIsPartAcquirable(s_ubWorkshopPos);
-	UBYTE ubLevel = inventoryGetPartDef(s_ubWorkshopPos)->ubLevel;
+	UBYTE isAcquirable = workshopIsPartAcquirable(s_eSelectedPart);
+	UBYTE ubLevel = inventoryGetPartDef(s_eSelectedPart)->ubLevel;
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
 		sprintf(szBfr, "%s%hhu", g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
@@ -58,7 +65,7 @@ static void commShopSelectWorkshopPos(UBYTE ubPart, UBYTE isActive) {
 
 	const char *szDescription = 0;
 	// TODO: load from json
-	if(s_ubWorkshopPos == INVENTORY_PART_TNT && ubLevel < UPGRADE_LEVEL_COUNT) {
+	if(s_eSelectedPart == INVENTORY_PART_TNT && ubLevel < UPGRADE_LEVEL_COUNT) {
 		static const char *pDescriptions[UPGRADE_LEVEL_COUNT] = {
 			"Pojedynczy ladunek pozwalajacy na zniszczenie prostej przeszkody terenowej.\nNiszczy surowce zawarte w terenie.",
 			"Dwa ladunki pozwalajace drazyc dluzszy tunel lub zniszczyc pojedyncza skale.\nNiszczy surowce zawarte w terenie.",
@@ -97,50 +104,62 @@ static UBYTE commShopWorkshopBuyIsFull(UBYTE ubGot, UBYTE ubMax, const char *szM
 }
 
 static void pageWorkshopProcess(void) {
-	if(s_isOnExitBtn) {
-		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			// Exit
-			commRegisterPage(0, 0);
-		}
-		else if(commNavUse(DIRECTION_UP)) {
-			buttonSelect(0);
-			buttonDrawAll(commGetDisplayBuffer());
-			s_isOnExitBtn = 0;
-			commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
+	tWorkshopRow ePrevRow = s_eWorkshopRow;
+
+	if(commNavUse(DIRECTION_UP) || commShopGetTabNavigationState() == TAB_NAVIGATION_STATE_DISABLING) {
+		if(s_eWorkshopRow > WORKSHOP_ROW_BUY) {
+			--s_eWorkshopRow;
 		}
 	}
-	else {
+	if(commNavUse(DIRECTION_DOWN)) {
+		if(s_eWorkshopRow < WORKSHOP_ROW_NAV) {
+			++s_eWorkshopRow;
+		}
+	}
+
+	if(ePrevRow != s_eWorkshopRow) {
+		if(s_eWorkshopRow == WORKSHOP_ROW_NAV) {
+			commShopFocusOnTabNavigation();
+			buttonDeselectAll();
+		}
+		else {
+			buttonSelect(s_eWorkshopRow);
+		}
+		commShopSelectWorkshopPart(s_eSelectedPart, s_eWorkshopRow == WORKSHOP_ROW_BUY);
+	}
+
+	if(s_eWorkshopRow == WORKSHOP_ROW_BUY) {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			if(s_ubWorkshopPos < INVENTORY_PART_COUNT) {
-				const tPartDef *pPart = inventoryGetPartDef(s_ubWorkshopPos);
+			if(s_eSelectedPart < INVENTORY_PART_COUNT) {
+				const tPartDef *pPart = inventoryGetPartDef(s_eSelectedPart);
 				UBYTE ubLevel = pPart->ubLevel;
 				if(!commShopWorkshopBuyIsFull(
 					ubLevel, g_ubUpgradeLevels, g_pMsgs[MSG_COMM_ALREADY_MAX]
 				) && commShopWorkshopBuyFor(g_pUpgradeCosts[ubLevel])) {
-					inventorySetPartLevel(s_ubWorkshopPos, ubLevel+1);
-					commShopSelectWorkshopPos(s_ubWorkshopPos, 1);
+					inventorySetPartLevel(s_eSelectedPart, ubLevel+1);
+					commShopSelectWorkshopPart(s_eSelectedPart, 1);
 				}
 			}
 		}
-		else if(commNavUse(DIRECTION_DOWN)) {
-			buttonSelect(1);
-			buttonDrawAll(commGetDisplayBuffer());
-			s_isOnExitBtn = 1;
-			commShopSelectWorkshopPos(s_ubWorkshopPos, 0);
-		}
 		else if(commNavUse(DIRECTION_RIGHT)) {
-			BYTE bNewPos = s_ubWorkshopPos + 1;
+			BYTE bNewPos = s_eSelectedPart + 1;
 			if(bNewPos >= WORKSHOP_ITEM_COUNT) {
 				bNewPos = 0;
 			}
-			commShopSelectWorkshopPos(bNewPos, 1);
+			commShopSelectWorkshopPart(bNewPos, 1);
 		}
 		else if(commNavUse(DIRECTION_LEFT)) {
-			BYTE bNewPos = s_ubWorkshopPos - 1;
+			BYTE bNewPos = s_eSelectedPart - 1;
 			if(bNewPos < 0) {
 				bNewPos = WORKSHOP_ITEM_COUNT - 1;
 			}
-			commShopSelectWorkshopPos(bNewPos, 1);
+			commShopSelectWorkshopPart(bNewPos, 1);
+		}
+	}
+	else if(s_eWorkshopRow == WORKSHOP_ROW_EXIT) {
+		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+			// Exit
+			commRegisterPage(0, 0);
 		}
 	}
 }
@@ -153,9 +172,15 @@ void pageWorkshopCreate(void) {
 	buttonReset(BUTTON_LAYOUT_VERTICAL, uwBtnY);
 	buttonAdd(g_pMsgs[MSG_COMM_BUY]);
 	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);
-	buttonSelect(0);
+	if(commShopGetTabNavigationState() == TAB_NAVIGATION_STATE_ENABLED) {
+		buttonDeselectAll();
+		s_eWorkshopRow = WORKSHOP_ROW_NAV;
+	}
+	else {
+		buttonSelect(0);
+		s_eWorkshopRow = WORKSHOP_ROW_BUY;
+	}
 	buttonRowApply();
 
-	commShopSelectWorkshopPos(0, 1);
-	s_isOnExitBtn = 0;
+	commShopSelectWorkshopPart(0, 1);
 }
