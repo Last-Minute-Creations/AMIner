@@ -219,6 +219,12 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_welcome", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_FIRST_PLAN:
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_first_plan", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_PLAN_COMPLETE:
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_plan_complete", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER:
 			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "krystyna_dossier", onBack);
 			break;

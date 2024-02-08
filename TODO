@@ -101,16 +101,16 @@ Bugs:
 	☐ Jet sfx looping if fly-entering (urgent) msg in base
 	☐ Game doesn't launch properly from icon
 
-QoL refinements:
+Misc QoL refinements:
 	☐ Onboard player on need to maintain income
 	☐ Remove first base mineral pattern so that bricking it won't penalize new players?
 	☐ Skippable LMC/ACE logos by fire button
 
 Commrade:
 	✔ Mineral market @done(23-09-16)
+	✔ Improve tab changing on commrade by allowing cursor to move to buttons @done(24-02-08)
 	☐ Redo warehouse/plan management
 	☐ Workshop icons for upgrades?
-	☐ Improve tab changing on commrade by allowing cursor to move to buttons
 	☐ Figure out where to hide sokoban and how to hint it
 
 Optimizations:
@@ -120,6 +120,7 @@ Optimizations:
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
+	☐ Workshop tab flicker on navigating
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
 
 Dino quest:
