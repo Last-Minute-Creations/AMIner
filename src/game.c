@@ -725,8 +725,8 @@ static UBYTE gameProcessGateCutscene(void) {
 				++s_eGateCutsceneStep;
 
 				if(questGateIsPrisonerFound()) {
-					pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_PRISONER_GATE_DESTROYED);
-					inboxPushBack(COMM_SHOP_PAGE_PRISONER_GATE_DESTROYED, 1);
+					pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_GATE_DESTROYED);
+					inboxPushBack(COMM_SHOP_PAGE_OFFICE_PRISONER_GATE_DESTROYED, 1);
 				}
 				if(dinoIsQuestStarted() && !pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
 					// TODO: arch angry telling commissar about situation
@@ -966,15 +966,15 @@ void gameProcessBaseGate(void) {
 		tCommShopPage ePrisonerPageUnlock;
 		if(ubFoundCount >= (ubMaxCount * 2) / 3) {
 			eMsgStart = MSG_HUD_RADIO_FULL_0;
-			ePrisonerPageUnlock = COMM_SHOP_PAGE_PRISONER_RADIO_3;
+			ePrisonerPageUnlock = COMM_SHOP_PAGE_OFFICE_PRISONER_RADIO_3;
 		}
 		else if(ubFoundCount >= (ubMaxCount * 1) / 3) {
 			eMsgStart = MSG_HUD_RADIO_HALF_0;
-			ePrisonerPageUnlock = COMM_SHOP_PAGE_PRISONER_RADIO_2;
+			ePrisonerPageUnlock = COMM_SHOP_PAGE_OFFICE_PRISONER_RADIO_2;
 		}
 		else {
 			eMsgStart = MSG_HUD_RADIO_START_0;
-			ePrisonerPageUnlock = COMM_SHOP_PAGE_PRISONER_RADIO_1;
+			ePrisonerPageUnlock = COMM_SHOP_PAGE_OFFICE_PRISONER_RADIO_1;
 		}
 
 		if(questGateIsPrisonerFound()) {

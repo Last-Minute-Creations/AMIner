@@ -100,6 +100,7 @@ Bugs:
 	☐ Gate (collectibles) not drawing properly on teleport-in
 	☐ Jet sfx looping if fly-entering (urgent) msg in base
 	☐ Game doesn't launch properly from icon
+	☐ Distorted main base in challenge mode
 
 Misc QoL refinements:
 	☐ Onboard player on need to maintain income
@@ -171,6 +172,7 @@ Gate quest:
 		☐ Trigger message on unfinished dino-skeleton
 
 Crate quests:
+	☐ Spawn crates in mine
 	☐ Agent quest flow
 		☐ Agent appears after first crate
 		☐ Ability to sell create
@@ -187,8 +189,9 @@ Crate quests:
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)
 	☐ Arch angry on destroying gate
-	☐ Commissar furious on destroing if knows about gate
-	☐ Outro msg for news on destroying gate?
+	☐ Commissar before gate opens if he knows about it
+	✘ Outro msg for news on destroying gate? @cancelled(24-02-08 14:21)
+	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08 14:21)
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07)
