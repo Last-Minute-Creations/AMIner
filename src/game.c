@@ -978,8 +978,9 @@ void gameProcessBaseGate(void) {
 		}
 
 		if(questGateIsPrisonerFound()) {
-			pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, ePrisonerPageUnlock);
-			inboxPushBack(ePrisonerPageUnlock, 0);
+			if(pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, ePrisonerPageUnlock)) {
+				inboxPushBack(ePrisonerPageUnlock, 0);
+			}
 		}
 		hudShowMessage(FACE_ID_RADIO, g_pMsgs[eMsgStart + s_ubRadioMessageIndex]);
 		if(++s_ubRadioMessageIndex >= RADIO_MESSAGE_COUNT) {
