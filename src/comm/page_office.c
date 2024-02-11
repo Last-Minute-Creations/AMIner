@@ -78,6 +78,9 @@ static void pageOfficeProcess(void) {
 	else if(commNavUse(DIRECTION_DOWN)) {
 		if(pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
 			++s_bSelectionCurr;
+			if(s_bSelectionCurr > s_ubUnlockedPplCount + 1) {
+				s_bSelectionCurr = s_ubUnlockedPplCount + 1;
+			}
 		}
 		else if(pageOfficeIsSelectionOnPortrait(s_bSelectionCurr)) {
 			s_bSelectionCurr += PPL_PER_ROW;
@@ -96,15 +99,12 @@ static void pageOfficeProcess(void) {
 		}
 		else {
 			s_bSelectionCurr -= PPL_PER_ROW;
+			if(s_bSelectionCurr < 0) {
+				s_bSelectionCurr = 0;
+			}
 		}
 	}
 
-	if(s_bSelectionCurr < 0) {
-		s_bSelectionCurr = s_ubUnlockedPplCount;
-	}
-	else if(s_bSelectionCurr > s_ubUnlockedPplCount + 1) {
-		s_bSelectionCurr = s_ubUnlockedPplCount + 1;
-	}
 
 	if(s_bSelectionCurr != bOldSelection) {
 		if(pageOfficeIsSelectionOnButton(bOldSelection)) {
