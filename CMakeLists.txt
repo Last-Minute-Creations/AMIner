@@ -287,6 +287,7 @@ convertTileset(
 include("base0.cmake")
 include("base1.cmake")
 include("base2.cmake")
+include("base3.cmake")
 include("tiles.cmake")
 include("checkpoint.cmake")
 

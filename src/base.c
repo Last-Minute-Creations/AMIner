@@ -11,6 +11,7 @@
 #define BASE_TILE_DEPTH_GROUND 0
 #define BASE_TILE_DEPTH_DINO 100
 #define BASE_TILE_DEPTH_GATE 209
+#define BASE_TILE_DEPTH_WESTERN 500
 #define BASE_TILE_LOADING_MARGIN 10
 
 //----------------------------------------------------------------- PRIVATE VARS
@@ -86,6 +87,28 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 		},
 		.cbProcess = gameProcessBaseGate,
 	},
+	[BASE_ID_WESTERN] = {
+		.uwTileDepth = BASE_TILE_DEPTH_WESTERN,
+		.pTilePattern = {
+			43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
+			44, 43, 43, 43, 43, 45, 43, 44, 43, 43,
+			43, 45, 43, 43, 43, 43, 43, 43, 43, 49,
+			43, 43, 43, 43, 43, 48, 45, 43, 43, 45,
+			 0,  1, 43, 43,  2,  1, 43, 43, 44, 43,
+			 3,  4, 45, 43,  5,  6, 49,  7, 43, 43,
+			12, 13, 43, 43, 14, 15, 16, 17, 18, 19,
+			20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+			34, 35, 36, 37, 38, 33, 39, 40, 41, 42,
+			54, 55, 54, 55, 54, 48, 54, 55, 54, 55,
+		},
+		.sRectRestock = {
+			.uwX1 = 8 * TILE_SIZE,
+			.uwY1 = (BASE_TILE_DEPTH_WESTERN + 7) * TILE_SIZE,
+			.uwX2 = 10 * TILE_SIZE,
+			.uwY2 = (BASE_TILE_DEPTH_WESTERN + 8) * TILE_SIZE
+		},
+		.cbProcess = 0,
+	},
 	[BASE_ID_DINO_POPULATED] = {
 		.uwTileDepth = BASE_TILE_DEPTH_VARIANT,
 		.pTilePattern = {
@@ -131,6 +154,7 @@ void baseCreate(tTileBufferManager *pManager) {
 	s_pBaseTiles[BASE_ID_GROUND] = bitmapCreateFromFile("data/base0.bm", 1);
 	s_pBaseTiles[BASE_ID_DINO] = bitmapCreateFromFile("data/base1.bm", 1);
 	s_pBaseTiles[BASE_ID_GATE] = bitmapCreateFromFile("data/base2.bm", 1);
+	s_pBaseTiles[BASE_ID_WESTERN] = bitmapCreateFromFile("data/base3.bm", 1);
 	baseTileLoad(BASE_ID_GROUND);
 }
 
