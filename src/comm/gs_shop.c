@@ -285,8 +285,11 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_ARCH_PLAN_FAIL:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_plan_fail", onBack);
 			break;
-		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_FAIL:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_fail", onBack);
+		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_opened", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_DESTROYED:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_destroyed", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_DOSSIER:
 			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_dossier", onBack);

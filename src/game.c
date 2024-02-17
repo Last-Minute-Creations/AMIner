@@ -669,6 +669,7 @@ static UBYTE gameProcessGateCutscene(void) {
 		case GATE_CUTSCENE_OPEN_STEP_FADE_IN:
 			if(fadeGetState() == FADE_STATE_IN) {
 				++s_eGateCutsceneStep;
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED, 0);
 				tCommShopPage ePage = (
 					pageQuestioningIsReported(QUESTIONING_BIT_GATE) ?
 					COMM_SHOP_PAGE_NEWS_GATE_RED :
@@ -728,8 +729,8 @@ static UBYTE gameProcessGateCutscene(void) {
 					pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_GATE_DESTROYED);
 					inboxPushBack(COMM_SHOP_PAGE_OFFICE_PRISONER_GATE_DESTROYED, 1);
 				}
-				if(dinoIsQuestStarted() && !pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
-					// TODO: arch angry telling commissar about situation
+				if(pageOfficeHasPerson(FACE_ID_ARCH) && !pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
+					inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_DESTROYED, 1);
 					gameAddRebuke();
 				}
 

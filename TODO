@@ -93,6 +93,7 @@ General:
 		☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button
 		☐ Bring back teleport damage on zeroeth upgrade
+	✘ Modifiable challenge end level? @cancelled(24-02-11)
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
@@ -164,12 +165,12 @@ Gate quest:
 		✔ Stop transmissions @done(24-01-27)
 		✔ Rebuke on detonating without commissar knowing @done(24-01-27)
 		✘ Game over if commissar knows about gate @cancelled(24-02-08)
-	☐ Endings
+	✔ Endings @done(24-02-17)
 		✘ Secret scientist ending @cancelled(23-10-02)
 		✔ Gate open animation @done(23-11-04)
 		✔ Dino invansion ending text @done(23-12-13)
 		✔ Army defensive ending text @done(23-12-13)
-		☐ Trigger message on unfinished dino-skeleton
+		✘ Trigger message on unfinished dino-skeleton @cancelled(24-02-17)
 
 Crate quests:
 	☐ Spawn crates in mine
@@ -182,13 +183,13 @@ Crate quests:
 			☐ Report agent to remove him and get accolade
 	☐ Travelers quest flow
 		☐ Implement base
-		☐ Capsule at the bottom of mine
+		☐ Spawn capsule at the bottom of mine
 		☐ Spend parts to build mega-teleporter
 		☐ Spend parts to open capsule
 
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)
-	☐ Arch angry on destroying gate
+	✔ Arch angry on destroying gate @done(24-02-17)
 	☐ Commissar before gate opens if he knows about it
 	✘ Outro msg for news on destroying gate? @cancelled(24-02-08 14:21)
 	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08 14:21)
