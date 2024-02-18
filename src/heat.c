@@ -6,7 +6,7 @@
 #include "core.h"
 #include "save.h"
 
-#define HEAT_VALUE_MIN 10
+#define HEAT_VALUE_MIN 0
 #define HEAT_VALUE_MAX 90
 #define HEAT_VALUE_START HEAT_VALUE_MIN
 
@@ -21,7 +21,11 @@ void heatTryIncrease(UBYTE ubPercent) {
 }
 
 void heatTryReduce(UBYTE ubPercent) {
-	s_ubHeat = MAX(s_ubHeat - ubPercent, HEAT_VALUE_MIN);
+	BYTE bHeatNew = s_ubHeat - ubPercent;
+	if(bHeatNew < HEAT_VALUE_MIN) {
+		bHeatNew = HEAT_VALUE_MIN;
+	}
+	s_ubHeat = bHeatNew;
 }
 
 void heatReset(void) {
