@@ -17,21 +17,21 @@ void pauseGsLoop(void) {
 	steerProcess(&pSteers[1]);
 
 	if(
-		steerDirCheck(&pSteers[0], DIRECTION_LEFT) ||
-		(g_is2pPlaying && steerDirCheck(&pSteers[1], DIRECTION_LEFT))
+		steerDirUse(&pSteers[0], DIRECTION_LEFT) ||
+		(g_is2pPlaying && steerDirUse(&pSteers[1], DIRECTION_LEFT))
 	) {
 		hudSelect(0);
 	}
 	else if(
-		steerDirCheck(&pSteers[0], DIRECTION_RIGHT) ||
-		(g_is2pPlaying && steerDirCheck(&pSteers[1], DIRECTION_RIGHT))
+		steerDirUse(&pSteers[0], DIRECTION_RIGHT) ||
+		(g_is2pPlaying && steerDirUse(&pSteers[1], DIRECTION_RIGHT))
 	) {
 		hudSelect(1);
 	}
 	else if(
-		steerDirCheck(&pSteers[0], DIRECTION_FIRE) ||
-		(g_is2pPlaying && steerDirCheck(&pSteers[1], DIRECTION_FIRE)) ||
-		keyCheck(KEY_SPACE) || keyCheck(KEY_RETURN)
+		steerDirUse(&pSteers[0], DIRECTION_FIRE) ||
+		(g_is2pPlaying && steerDirUse(&pSteers[1], DIRECTION_FIRE)) ||
+		keyUse(KEY_SPACE) || keyUse(KEY_RETURN)
 	) {
 		if(hudGetSelection() == 0) {
 			stateChange(g_pGameStateManager, &g_sStateGame);
