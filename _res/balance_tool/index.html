@@ -40,6 +40,7 @@
 					<label>Plans per accolade <input type="number" name="defs_plans_per_accoldade" value="10" min="1" max="65535"></label>
 					<label>Accolades <input type="number" name="defs_accolades" value="5" min="1" max="65535"></label>
 					<label>Rebukes <input type="number" name="defs_rebukes" value="3" min="1" max="65535"></label>
+					<label>Rebuke debt <input type="number" name="defs_rebuke_debt" value="-2000" min="-65000" max="-5"></label>
 					<label>Extra plan money <input type="number" name="extra_plan_money" min="0" max="65535" value="50"></label>
 					<label>Upgrade costs <input name="defs_upgrade_costs" value="100, 300, 600, 1000"></label>
 					<label>Hull price <input type="number" name="defs_hull_price" min="0" max="1000" value="2"></label>
@@ -48,6 +49,7 @@
 					<label>Bribe base cost <input type="number" name="defs_bribe_base_cost" min="1" max="65535" step="1" value="100"></label>
 					<label>Bribe cost multiplier <input type="number" name="defs_bribe_cost_multiplier" min="0.1" max="1.0" step="0.1" value=".5"></label>
 					<label>Heat % add per accounting <input type="number" name="defs_heat_add_accounting" value="5"></label>
+					<label>Money add per accounting <input type="number" name="defs_money_add_accounting" value="500"></label>
 					<label>Heat % decrement per plan <input type="number" name="defs_heat_remove_plan" value="3"></label>
 					<label>Heat from gate <input type="number" name="defs_heat_from_gate" value="10"></label>
 					<label>Dino depths <input name="defs_dino_depths" value="80, 200, 240, 310, 350, 410, 530, 610, 710"></label>
@@ -141,7 +143,8 @@
 					<div class="button_row">
 						<button id="btn_favor" class="btn_large">Favor (Reroll plan)</buton>
 						<button id="btn_bribe" class="btn_large">Bribe (Add time to plan)</buton>
-						<button id="btn_accounting" class="btn_large">Accounting (force next plan)</buton>
+						<button id="btn_accounting_plan" class="btn_large">Accounting: force next plan</buton>
+						<button id="btn_accounting_money" class="btn_large">Accounting: add money</buton>
 					</div>
 					<div class="button_row">
 						<button id="btn_sell_crate" class="btn_large">Sell crate</buton>

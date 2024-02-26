@@ -312,6 +312,11 @@ class Vehicle {
 
 		// Simulated damage
 		this.damage(g_defs.damageAfterRestock)
+
+		if(this.money < g_defs.rebukeDebt) {
+			this.addRebuke('Too big debt');
+			this.money = 0;
+		}
 	}
 
 	trySell(mineralType, amount) {
@@ -396,7 +401,7 @@ class Vehicle {
 		}
 	}
 
-	doAccounting() {
+	doAccountingPlans() {
 		let pick = g_rand.next16MinMax(1, 100);
 		if(pick > this.heat) {
 			// Bring back stuff already spent on plan
@@ -410,7 +415,18 @@ class Vehicle {
 			this.advanceAccolade();
 		}
 		else {
-			this.addRebuke('Accounting failed');
+			this.addRebuke('Accounting plans failed');
+		}
+		this.heat = Math.min(this.heat + g_defs.heatAddPerAccounting, 99);
+	}
+
+	doAccountingMoney() {
+		let pick = g_rand.next16MinMax(1, 100);
+		if(pick > this.heat) {
+			this.money += g_defs.moneyAddPerAccounting
+		}
+		else {
+			this.addRebuke('Accounting money failed');
 		}
 		this.heat = Math.min(this.heat + g_defs.heatAddPerAccounting, 99);
 	}

@@ -320,14 +320,24 @@ function onRestockClicked(evt) {
 	updateWarehouse();
 }
 
-function onAccountingClicked() {
+function onAccountingPlanClicked() {
 	if(g_vehicle.isGameOver()) {
 		return;
 	}
 
-	g_vehicle.doAccounting();
+	g_vehicle.doAccountingPlans();
 	updateVehicleStats();
 	updateWarehouse();
+	updateOfficeStats();
+}
+
+function onAccountingMoneyClicked() {
+	if(g_vehicle.isGameOver()) {
+		return;
+	}
+
+	g_vehicle.doAccountingMoney();
+	updateVehicleStats();
 	updateOfficeStats();
 }
 
@@ -469,7 +479,8 @@ function addMessage(text, className) {
 window.addEventListener('load', function() {
 	document.querySelector('#btn_vehicle_restock').addEventListener('click', onRestockClicked);
 
-	document.querySelector('#btn_accounting').addEventListener('click', function() {onAccountingClicked(); });
+	document.querySelector('#btn_accounting_plan').addEventListener('click', function() {onAccountingPlanClicked(); });
+	document.querySelector('#btn_accounting_money').addEventListener('click', function() {onAccountingMoneyClicked(); });
 	document.querySelector('#btn_bribe').addEventListener('click', function() {onBribeClicked(); });
 	for(let mineralType of MineralType.collectibles) {
 		let name = mineralType.name;
