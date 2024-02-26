@@ -35,7 +35,7 @@ class Tile {
 		}
 		else if(TileIndex.STONE_1 <= tileIndex && tileIndex <= TileIndex.STONE_4) {
 			this.mineralType = MineralType.ROCK;
-			this.mineralAmount = 0;
+			this.mineralAmount = 3;
 		}
 		else if(TileIndex.BASE_GROUND_1 <= tileIndex && tileIndex <= TileIndex.BASE_GROUND_9) {
 			// TODO: unbreakable

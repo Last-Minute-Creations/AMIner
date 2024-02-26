@@ -232,7 +232,7 @@ class TileMap {
 				// Fill mine segment with minerals required for faux-plan, merging some in the process
 				let totalMinerals = fauxPlanMinerals.reduce((sum, value) => sum + value, 0);
 				let mineralsRemaining = fauxPlanMinerals.map((x) => x);
-				let allowedMineralIds = MineralType.collectibles.map((mineralType) => mineralType.id);
+				let allowedMineralIds = MineralType.plannables.map((mineralType) => mineralType.id);
 				while(totalMinerals > 0) {
 					// pick mineral and count
 					let placedMineralId = allowedMineralIds[g_rand.next16MinMax(0, allowedMineralIds.length - 1)];

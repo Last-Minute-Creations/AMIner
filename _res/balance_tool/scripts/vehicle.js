@@ -258,7 +258,7 @@ class Vehicle {
 		if(this.cargoCurr == this.cargoMax) {
 			addMessage('Cargo full', 'warning');
 		}
-		if(tile.mineralType.isCollectible && g_plans.mineralsUnlocked.indexOf(mineralId) == -1) {
+		if(tile.mineralType.isPlannable && g_plans.mineralsUnlocked.indexOf(mineralId) == -1) {
 			g_plans.mineralsUnlocked.push(mineralId);
 		}
 
@@ -405,7 +405,7 @@ class Vehicle {
 		let pick = g_rand.next16MinMax(1, 100);
 		if(pick > this.heat) {
 			// Bring back stuff already spent on plan
-			for(let mineralType of MineralType.collectibles) {
+			for(let mineralType of MineralType.plannables) {
 				this.stock[mineralType.id] += g_plans.mineralsCollected[mineralType.id];
 				g_plans.mineralsCollected[mineralType.id] = 0;
 			}

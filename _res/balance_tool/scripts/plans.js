@@ -69,8 +69,8 @@ class Plans {
 		let costRemaining = this.targetSum;
 		let i = 0;
 		do {
-			let collectibleIndex = g_rand.next16MinMax(0, MineralType.collectibles.length - 1);
-			let mineralId = MineralType.collectibles[collectibleIndex].id;
+			let collectibleIndex = g_rand.next16MinMax(0, MineralType.plannables.length - 1);
+			let mineralId = MineralType.plannables[collectibleIndex].id;
 			if(this.mineralsUnlocked.indexOf(mineralId) != -1) {
 				let reward = MineralType.all[mineralId].reward;
 				let count = g_rand.next16Max(Math.floor((costRemaining + reward - 1) / reward));

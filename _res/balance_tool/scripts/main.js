@@ -77,8 +77,10 @@ function updateWarehouse() {
 		let name = mineralType.name;
 		document.querySelector(`#stock_${name}`).textContent = g_vehicle.stock[mineralType.id];
 		document.querySelector(`#sold_${name}`).textContent = g_vehicle.sold[mineralType.id];
-		document.querySelector(`#plan_${name}_spent`).textContent = g_plans.mineralsCollected[mineralType.id];
-		document.querySelector(`#plan_${name}_required`).textContent = g_plans.getCurrentPlanInfo().mineralsRequired[mineralType.id];
+		if(mineralType.isPlannable) {
+			document.querySelector(`#plan_${name}_spent`).textContent = g_plans.mineralsCollected[mineralType.id];
+			document.querySelector(`#plan_${name}_required`).textContent = g_plans.getCurrentPlanInfo().mineralsRequired[mineralType.id];
+		}
 	}
 }
 
@@ -90,7 +92,7 @@ function generateBlackMarketTable() {
 	let cell = document.createElement('th');
 	cell.textContent = 'buy\\sell';
 	tr.appendChild(cell);
-	for(let mineralType of MineralType.collectibles) {
+	for(let mineralType of MineralType.plannables) {
 		cell = document.createElement('th');
 		cell.textContent = mineralType.name;
 		tr.appendChild(cell);
@@ -98,14 +100,14 @@ function generateBlackMarketTable() {
 	table.appendChild(tr);
 
 	let mineralBuyIndex = 0;
-	for(let mineralTypeBuy of MineralType.collectibles) {
+	for(let mineralTypeBuy of MineralType.plannables) {
 		tr = document.createElement('tr');
 		cell = document.createElement('th');
 		cell.textContent = mineralTypeBuy.name;
 		tr.appendChild(cell);
 
 		let mineralSellIndex = 0;
-		for(let mineralTypeSell of MineralType.collectibles) {
+		for(let mineralTypeSell of MineralType.plannables) {
 			cell = document.createElement('td');
 			if(mineralSellIndex == mineralBuyIndex) {
 				cell.innerHTML = '-';
@@ -396,7 +398,7 @@ function updateTotalMoneyStats() {
 	document.querySelector('#upgrade_cost_total').textContent = g_defs.upgradeCosts.reduce((sum, value) => sum + value, 0) * 3;
 	document.querySelector('#plan_cost_total').textContent = totalPlanCost;
 	document.querySelector('#separate_plan_costs').textContent = planCosts.join(', ');
-	for (const mineralType of MineralType.collectibles) {
+	for (const mineralType of MineralType.plannables) {
 		document.querySelector(`#plan_total_${mineralType.name}`).textContent = totalMineralsInPlans[mineralType.id];
 		document.querySelector(`#plan_margin_${mineralType.name}`).textContent = g_tileMap.totalMineralCounts[mineralType.id] - totalMineralsInPlans[mineralType.id];
 	}
@@ -487,8 +489,10 @@ window.addEventListener('load', function() {
 		document.querySelector(`#${name}_price`).textContent = mineralType.reward;
 		document.querySelector(`#btn_${name}_sell_1`).addEventListener('click', function() {onSellClicked(mineralType, 1); });
 		document.querySelector(`#btn_${name}_sell_10`).addEventListener('click', function() {onSellClicked(mineralType, 10); });
-		document.querySelector(`#btn_${name}_plan_1`).addEventListener('click', function() {onPlanFillClicked(mineralType, 1); });
-		document.querySelector(`#btn_${name}_plan_fill`).addEventListener('click', function() {onPlanFillClicked(mineralType, 1000000); });
+		if(mineralType.isPlannable)  {
+			document.querySelector(`#btn_${name}_plan_1`).addEventListener('click', function() {onPlanFillClicked(mineralType, 1); });
+			document.querySelector(`#btn_${name}_plan_fill`).addEventListener('click', function() {onPlanFillClicked(mineralType, 1000000); });
+		}
 	}
 	document.querySelector('#btn_sell_all').addEventListener('click', function() {onSellAllClicked(); });
 	document.querySelector('#btn_fill_plan').addEventListener('click', function() {onFillAllPlanClicked(); });
