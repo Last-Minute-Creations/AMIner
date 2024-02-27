@@ -423,7 +423,7 @@ class Vehicle {
 	doAccountingMoney() {
 		let pick = g_rand.next16MinMax(1, 100);
 		if(pick > this.heat) {
-			this.money += g_defs.moneyAddPerAccounting
+			this.money = Math.min(0, this.money + g_defs.moneyAddPerAccounting);
 		}
 		else {
 			this.addRebuke('Accounting money failed');
