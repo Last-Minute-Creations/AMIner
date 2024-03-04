@@ -254,7 +254,7 @@ class Vehicle {
 		// Add to cargo
 		let cargoDelta = Math.min(tile.mineralAmount, this.cargoMax - this.cargoCurr);
 		this.cargoMinerals[mineralId] += cargoDelta;
-		this.cargoCurr += cargoDelta;
+		this.cargoCurr += tile.mineralType.isInRock ? Math.min(3, this.cargoMax - this.cargoCurr) : cargoDelta;
 		if(this.cargoCurr == this.cargoMax) {
 			addMessage('Cargo full', 'warning');
 		}
