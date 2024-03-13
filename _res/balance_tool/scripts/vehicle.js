@@ -306,8 +306,11 @@ class Vehicle {
 		if(this.strikeState.isHullRepair) {
 			restockCost += (this.hullMax - this.hullCurr) * g_defs.hullPrice;
 			this.hullCurr = this.hullMax;
+		}
+
+		if(document.querySelector('[name=enable_damage_between_restocks]').checked) {
 			// Simulated damage
-			this.damage(g_defs.damageAfterRestock)
+			this.damage(g_defs.damageAfterRestock);
 		}
 
 		restockCost += drillUnits * g_defs.drillUnitPrice;
