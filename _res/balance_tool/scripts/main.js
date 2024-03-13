@@ -271,6 +271,7 @@ function onSellAllClicked() {
 		g_vehicle.trySell(mineralType, 1000000);
 	}
 	updateVehicleStats();
+	updateOfficeStats();
 	updateWarehouse();
 }
 
@@ -417,6 +418,9 @@ function updateMineralStats() {
 function updateOfficeStats() {
 	document.querySelector('#office_ending').textContent = g_vehicle.ending.description;
 	document.querySelector('#office_ending').className = g_vehicle.ending.className;
+
+	document.querySelector('#office_strike').textContent = g_vehicle.strikeState.description;
+	document.querySelector('#office_strike').className = g_vehicle.strikeState.className;
 
 	document.querySelector('#office_dino_quest_state').textContent = g_vehicle.dinoQuestState.description;
 	document.querySelector('#office_dino_quest_state').className = g_vehicle.dinoQuestState.className;

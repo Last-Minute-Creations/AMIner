@@ -43,6 +43,7 @@ Simulator:
 	✘ Approximate time spent in-game @cancelled(23-09-04)
 		✘ Time spent on drilling @cancelled(23-09-04)
 		✘ Time spent on backtracking to restock @cancelled(23-09-04)
+	☐ Add TNT on RMB/MMB
 
 General:
 	✔ Loaded game doesn't always show the terrain properly - related to ground layers @done(23-02-25)
@@ -107,6 +108,7 @@ Misc QoL refinements:
 	☐ Onboard player on need to maintain income
 	☐ Remove first base mineral pattern so that bricking it won't penalize new players?
 	☐ Skippable LMC/ACE logos by fire button
+	☐ Page beads on workshop page
 
 Commrade:
 	✔ Mineral market @done(23-09-16)

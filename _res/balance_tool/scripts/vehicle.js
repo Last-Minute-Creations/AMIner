@@ -33,6 +33,7 @@ class Vehicle {
 		this.minerIsBaseReported = false;
 		this.minerIsAgentReported = false;
 		this.minerIsJayFound = false;
+		this.strikeState = StrikeState.NONE;
 
 		this.respawn();
 	}
@@ -301,21 +302,46 @@ class Vehicle {
 
 		let drillUnits = Math.floor((this.drillMax - this.drillCurr + 0.5 * g_defs.dillInUnit) / g_defs.dillInUnit);
 		let restockCost = 0;
-		restockCost += (this.hullMax - this.hullCurr) * g_defs.hullPrice;
+
+		if(this.strikeState.isHullRepair) {
+			restockCost += (this.hullMax - this.hullCurr) * g_defs.hullPrice;
+			this.hullCurr = this.hullMax;
+			// Simulated damage
+			this.damage(g_defs.damageAfterRestock)
+		}
+
 		restockCost += drillUnits * g_defs.drillUnitPrice;
 		this.moneySpentOnRestock += restockCost;
 		this.money -= restockCost;
 
-		this.hullCurr = this.hullMax;
 		this.cargoCurr = 0;
 		this.drillCurr = Math.min(this.drillCurr + drillUnits * g_defs.dillInUnit, this.drillMax);
 
-		// Simulated damage
-		this.damage(g_defs.damageAfterRestock)
 
-		if(this.money < g_defs.rebukeDebt) {
-			this.addRebuke('Too big debt');
-			this.money = 0;
+		this.processStrike();
+	}
+
+	processStrike() {
+		let oldStrike = this.strikeState;
+
+		if(this.money <= g_defs.strike_cash_uprising) {
+			this.strikeState = StrikeState.UPRISING;
+			this.ending = Ending.UPRISING
+			addMessage('Game ended with uprising', 'error');
+			return;
+		}
+		else if(this.money <= g_defs.strike_cash_active) {
+			this.strikeState = StrikeState.ACTIVE;
+		}
+		else if(this.money <= g_defs.strike_cash_warning) {
+			this.strikeState = StrikeState.WARNING;
+		}
+		else {
+			this.strikeState = StrikeState.NONE;
+		}
+
+		if(oldStrike != this.strikeState) {
+			addMessage('Strike state changed to: ' + this.strikeState.description, oldStrike.level > this.strikeState.level ? 'success' : 'error')
 		}
 	}
 

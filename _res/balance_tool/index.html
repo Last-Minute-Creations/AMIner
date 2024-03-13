@@ -15,6 +15,7 @@
 		<script type="text/javascript" src="scripts/tile_map.js"></script>
 		<script type="text/javascript" src="scripts/ending.js"></script>
 		<script type="text/javascript" src="scripts/quest_state.js"></script>
+		<script type="text/javascript" src="scripts/strike_state.js"></script>
 		<script type="text/javascript" src="scripts/vehicle.js"></script>
 		<script type="text/javascript" src="scripts/plans.js"></script>
 		<script type="text/javascript" src="scripts/main.js"></script>
@@ -40,7 +41,6 @@
 					<label>Plans per accolade <input type="number" name="defs_plans_per_accoldade" value="10" min="1" max="65535"></label>
 					<label>Accolades <input type="number" name="defs_accolades" value="5" min="1" max="65535"></label>
 					<label>Rebukes <input type="number" name="defs_rebukes" value="3" min="1" max="65535"></label>
-					<label>Rebuke debt <input type="number" name="defs_rebuke_debt" value="-2000" min="-65000" max="-5"></label>
 					<label>Extra plan money <input type="number" name="extra_plan_money" min="0" max="65535" value="50"></label>
 					<label>Upgrade costs <input name="defs_upgrade_costs" value="100, 300, 600, 1000"></label>
 					<label>Hull price <input type="number" name="defs_hull_price" min="0" max="1000" value="2"></label>
@@ -63,6 +63,9 @@
 					<label>Escape heat <input type="number" name="defs_escape_heat" min="1" max="65535" step="1" value="20"></label>
 					<label>Crate count for interrogation <input type="number" name="defs_crate_count_for_interrogation" min="1" max="65535" step="1" value="3"></label>
 					<label>Heat from crate questioning <input type="number" name="defs_heat_from_crate_questioning" min="1" max="65535" step="1" value="3"></label>
+					<label>Strike cash for warning <input type="number" name="defs_strike_cash_warning" min="-10000" max="0" step="1" value="-1000"></label>
+					<label>Strike cash for active <input type="number" name="defs_strike_cash_active" min="-10000" max="0" step="1" value="-2000"></label>
+					<label>Strike cash for uprising <input type="number" name="defs_strike_cash_uprising" min="-10000" max="0" step="1" value="-3000"></label>
 					<button id="btn_game_reload" class="btn_large">Reload game</button>
 				</div>
 
@@ -123,6 +126,7 @@
 				<div>
 					<ul>
 						<li>Ending: <span class="stat_value" id="office_ending">?</span> <button id="ending_reset">Reset</button>
+						<li>Strike state: <span class="stat_value" id="office_strike">?</span>
 						<li>Dino quest state: <span class="stat_value" id="office_dino_quest_state">?</span>, found bones: <span class="stat_value" id="office_dino_found_bones">?</span></li>
 						<li>Gate quest state: <span class="stat_value" id="office_gate_quest_state">?</span>, is reported: <span class="stat_value" id="office_gate_reported">?</span>, found gates: <span class="stat_value" id="office_gate_found_gates">?</span></li>
 						<li>Miner quest: is base reported: <span class="stat_value" id="office_miner_is_base_reported">?</span>, is agent reported: <span class="stat_value" id="office_miner_is_agent_reported">?</span>, is Jay found: <span class="stat_value" id="office_miner_is_jay_found">?</span></li>

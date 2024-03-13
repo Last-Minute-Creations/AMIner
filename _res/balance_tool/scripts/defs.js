@@ -4,7 +4,6 @@ class Defs {
 		this.minePercentForPlans = parseInt(document.querySelector('[name=defs_mine_percent_for_plans]').value) / 100;
 		this.daysPerPlan = parseInt(document.querySelector('[name=defs_days_per_plan]').value);
 		this.maxRebukes = parseInt(document.querySelector('[name=defs_rebukes]').value);
-		this.rebukeDebt = parseInt(document.querySelector('[name=defs_rebuke_debt]').value);
 		this.maxSubAccolades = parseInt(document.querySelector('[name=defs_plans_per_accoldade]').value);
 		this.maxAccolades = parseInt(document.querySelector('[name=defs_accolades]').value);
 		this.extraPlanMoney = parseInt(document.querySelector('[name=extra_plan_money]').value);
@@ -22,6 +21,10 @@ class Defs {
 		this.cargoBase = 20;
 		this.cargoAddPerLevel = 10;
 		this.damageAfterRestock = 10;
+
+		this.strike_cash_uprising = parseInt(document.querySelector('[name=defs_strike_cash_uprising]').value);
+		this.strike_cash_active = parseInt(document.querySelector('[name=defs_strike_cash_active]').value);
+		this.strike_cash_warning = parseInt(document.querySelector('[name=defs_strike_cash_warning]').value);
 
 		this.bribeBaseCost = parseInt(document.querySelector('[name=defs_bribe_base_cost]').value);
 		this.bribeCostMultiplier = parseFloat(document.querySelector('[name=defs_bribe_cost_multiplier]').value);

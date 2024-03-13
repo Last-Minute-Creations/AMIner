@@ -61,12 +61,12 @@ H2 {
 	font-weight: bold;
 }
 
-.end_good {
+.end_good, .strike_good {
 	color: green;
 	font-weight: bold;
 }
 
-.end_bad {
+.end_bad, .strike_bad {
 	color: darkred;
 	font-weight: bold;
 }

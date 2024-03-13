@@ -9,4 +9,5 @@ class Ending {
 	static ESCAPED_TO_WEST = {description: 'escaped to west', className: 'end_good'};
 	static CAUGHT_ESCAPING_TO_WEST = {description: 'caught escaping to west', className: 'end_bad'};
 	static GATE_BAD_TELEPORTED_TO_WEST = {description: 'gate secret, bad, teleported to the west', className: 'end_good'};
+	static UPRISING = {description: 'uprising', className: 'end_bad'};
 }
