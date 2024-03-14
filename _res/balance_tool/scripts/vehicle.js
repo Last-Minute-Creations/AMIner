@@ -8,7 +8,7 @@ class Vehicle {
 		this.subAccolades = 0;
 		this.accolades = 0;
 		this.rebukes = 0;
-		this.heat = 5;
+		this.heat = 0;
 		this.bribeCount = 0;
 		this.ending = Ending.NONE;
 		this.stock = new Array(MineralType.all.length).fill(0); // [mineralId] => count
