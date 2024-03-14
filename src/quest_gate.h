@@ -6,6 +6,7 @@
 #define QUEST_GATE_H
 
 #include <ace/utils/file.h>
+
 #define GATE_DEPTH_PX 6816
 
 void questGateReset(void);

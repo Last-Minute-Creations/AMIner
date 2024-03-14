@@ -309,6 +309,11 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_RADIO_3:
 			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_3", onBack);
 			break;
+
+		case COMM_SHOP_PAGE_AGENT_WELCOME:
+			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_welcome", onBack);
+			break;
+
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:

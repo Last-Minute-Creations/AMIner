@@ -27,6 +27,7 @@
 #include "core.h"
 #include "dino.h"
 #include "quest_gate.h"
+#include "quest_crate.h"
 #include "debug.h"
 #include "inventory.h"
 #include "defs.h"
@@ -307,6 +308,9 @@ static void gameProcessHotkeys(void) {
 	}
 	if(keyUse(KEY_COMMA)) {
 		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 104 * TILE_SIZE);
+	}
+	if(keyUse(KEY_PERIOD)) {
+		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 504 * TILE_SIZE);
 	}
 
 	if(keyUse(KEY_F1) && !g_isChallenge) {
@@ -921,6 +925,7 @@ static void gameSave(tFile *pFile) {
 	inboxSave(pFile);
 	dinoSave(pFile);
 	questGateSave(pFile);
+	questCrateSave(pFile);
 	tutorialSave(pFile);
 	pageOfficeSave(pFile);
 	warehouseSave(pFile);
@@ -1138,6 +1143,7 @@ UBYTE gameLoad(tFile *pFile) {
 	return inboxLoad(pFile) &&
 		dinoLoad(pFile) &&
 		questGateLoad(pFile) &&
+		questCrateLoad(pFile) &&
 		tutorialLoad(pFile) &&
 		pageOfficeLoad(pFile) &&
 		warehouseLoad(pFile) &&
@@ -1172,6 +1178,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	inboxReset();
 	dinoReset();
 	questGateReset();
+	questCrateReset();
 	collectiblesReset();
 	tutorialReset();
 	pageOfficeReset();
@@ -1247,6 +1254,7 @@ static void gameGsLoop(void) {
 	}
 	dinoProcess();
 	questGateProcess();
+	questCrateProcess();
 	UBYTE isGameStateChange = gameProcessGateCutscene();
 	if(isGameStateChange) {
 		return;

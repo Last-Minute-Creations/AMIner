@@ -764,6 +764,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
 		}
 		else if(ubTile == TILE_CRATE_1) {
+			questCrateAdd();
 			textBobSet(
 				&pVehicle->sTextBob, g_pMsgs[MSG_MISC_FOUND_CRATE], COLOR_GREEN,
 				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
@@ -773,6 +774,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
 		}
 		else if(ubTile == TILE_CAPSULE) {
+			questCrateSetCapsuleState(CAPSULE_STATE_FOUND);
 			textBobSet(
 				&pVehicle->sTextBob, g_pMsgs[MSG_MISC_FOUND_CAPSULE], COLOR_GREEN,
 				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
