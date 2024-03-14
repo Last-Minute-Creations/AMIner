@@ -19,6 +19,7 @@
 #include "inventory.h"
 #include "save.h"
 #include "quest_gate.h"
+#include "quest_crate.h"
 #include "assets.h"
 #include "blitter_mutex.h"
 
@@ -665,32 +666,7 @@ static void vehicleEndChallenge(tVehicle *pVehicle) {
 void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	// Load mineral to vehicle
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwTileX][uwTileY];
-	if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
-		// TODO: other message when redundant bone found?
-		char szMessage[50];
-		UBYTE ubBoneIndex = dinoAddBone();
-		sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_BONE], ubBoneIndex);
-		textBobSet(
-			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
-			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-			pVehicle->sBobBody.sPos.uwY,
-			pVehicle->sBobBody.sPos.uwY - 32, 1
-		);
-		audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
-	}
-	else if(ubTile == TILE_GATE_1 || ubTile == TILE_GATE_2) {
-		char szMessage[50];
-		UBYTE ubFragmentIndex = questGateAddFragment();
-		sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_GATE], ubFragmentIndex);
-		textBobSet(
-			&pVehicle->sTextBob, szMessage, COLOR_GREEN,
-			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-			pVehicle->sBobBody.sPos.uwY,
-			pVehicle->sBobBody.sPos.uwY - 32, 1
-		);
-		audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
-	}
-	else if(g_pTileDefs[ubTile].ubSlots) {
+	if(g_pTileDefs[ubTile].ubSlots) {
 		UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
 		UBYTE ubMineralType = g_pTileDefs[ubTile].ubMineral;
 		const tMineralDef *pMineral = &g_pMinerals[ubMineralType];
@@ -761,6 +737,49 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			);
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
 			questGateUnlockPrisoner();
+		}
+		else if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
+			// TODO: other message when redundant bone found?
+			char szMessage[50];
+			UBYTE ubBoneIndex = dinoAddBone();
+			sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_BONE], ubBoneIndex);
+			textBobSet(
+				&pVehicle->sTextBob, szMessage, COLOR_GREEN,
+				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.uwY,
+				pVehicle->sBobBody.sPos.uwY - 32, 1
+			);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+		}
+		else if(ubTile == TILE_GATE_1 || ubTile == TILE_GATE_2) {
+			char szMessage[50];
+			UBYTE ubFragmentIndex = questGateAddFragment();
+			sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_GATE], ubFragmentIndex);
+			textBobSet(
+				&pVehicle->sTextBob, szMessage, COLOR_GREEN,
+				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.uwY,
+				pVehicle->sBobBody.sPos.uwY - 32, 1
+			);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+		}
+		else if(ubTile == TILE_CRATE_1) {
+			textBobSet(
+				&pVehicle->sTextBob, g_pMsgs[MSG_MISC_FOUND_CRATE], COLOR_GREEN,
+				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.uwY,
+				pVehicle->sBobBody.sPos.uwY - 32, 1
+			);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+		}
+		else if(ubTile == TILE_CAPSULE) {
+			textBobSet(
+				&pVehicle->sTextBob, g_pMsgs[MSG_MISC_FOUND_CAPSULE], COLOR_GREEN,
+				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+				pVehicle->sBobBody.sPos.uwY,
+				pVehicle->sBobBody.sPos.uwY - 32, 1
+			);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
 		}
 	}
 

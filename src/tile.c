@@ -361,10 +361,25 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 #endif
 
 		// Quest tile: prisoner
-		UWORD uwPrisonerDepth = 220;
-		if(!tileTryPlaceQuestItemInRow(pTiles, uwPrisonerDepth, TILE_PRISONER_1)) {
-			logWrite("ERR: Can't find place for prisoner at row %hu\n", uwPrisonerDepth);
-			pTiles[5][uwPrisonerDepth] = TILE_PRISONER_1;
+		if(!tileTryPlaceQuestItemInRow(pTiles, g_uwPrisonerDepth, TILE_PRISONER_1)) {
+			logWrite("ERR: Can't find place for prisoner at row %hu\n", g_uwPrisonerDepth);
+			pTiles[5][g_uwPrisonerDepth] = TILE_PRISONER_1;
+		}
+
+		// Quest items: crates
+		s_ubNextRowPatternPos = 0;
+		for(UBYTE i = 0; i < DEFS_QUEST_DINO_BONE_COUNT; ++i) {
+			tTile eTile = (i == 0) ? TILE_BONE_HEAD : TILE_BONE_1;
+			if(!tileTryPlaceQuestItemInRow(pTiles, g_pCrateDepths[i], eTile)) {
+				logWrite("ERR: Can't find place for crate #%hhu at row %hu\n", i + 1, g_pCrateDepths[i]);
+				pTiles[5][g_pCrateDepths[i]] = eTile;
+			}
+		}
+
+		// Quest tile: capsule
+		if(!tileTryPlaceQuestItemInRow(pTiles, g_uwCapsuleDepth, TILE_CAPSULE)) {
+			logWrite("ERR: Can't find place for capsule at row %hu\n", g_uwCapsuleDepth);
+			pTiles[5][g_uwCapsuleDepth] = TILE_CAPSULE;
 		}
 
 		commProgress(55, g_pMsgs[MSG_LOADING_FINISHING]);

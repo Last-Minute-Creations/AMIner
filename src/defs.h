@@ -13,6 +13,7 @@
 #define DEFS_QUEST_DINO_BONE_COUNT 9
 #define DEFS_MINE_DIGGABLE_WIDTH 10
 #define DEFS_QUEST_GATE_PART_COUNT 16
+#define DEFS_QUEST_CRATE_COUNT 10
 
 typedef enum _tMsg {
 	// Plan
@@ -63,6 +64,8 @@ typedef enum _tMsg {
 	MSG_MISC_RESTOCK,
 	MSG_MISC_FOUND_BONE,
 	MSG_MISC_FOUND_GATE,
+	MSG_MISC_FOUND_CRATE,
+	MSG_MISC_FOUND_CAPSULE,
 	// HUD
 	MSG_HUD_P1,
 	MSG_HUD_P2,
@@ -136,6 +139,8 @@ typedef enum _tMsg {
 	MSG_PAGE_PRISONER_RADIO_1,
 	MSG_PAGE_PRISONER_RADIO_2,
 	MSG_PAGE_PRISONER_RADIO_3,
+
+	MSG_PAGE_AGENT_WELCOME,
 	// Count
 	MSG_COUNT
 } tMsg;
@@ -156,6 +161,9 @@ extern ULONG g_ulExtraPlanMoney;
 extern LONG g_pUpgradeCosts[10];
 extern UWORD g_pDinoDepths[DEFS_QUEST_DINO_BONE_COUNT];
 extern UWORD g_pGateDepths[DEFS_QUEST_GATE_PART_COUNT];
+extern UWORD g_pCrateDepths[DEFS_QUEST_CRATE_COUNT];
+extern UWORD g_uwCapsuleDepth;
+extern UWORD g_uwPrisonerDepth;
 extern UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
 
 extern char **g_pMsgs;

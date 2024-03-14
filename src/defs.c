@@ -31,6 +31,9 @@ fix16_t g_fPlanIncreaseRatioMultiplayer;
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[DEFS_QUEST_DINO_BONE_COUNT];
 UWORD g_pGateDepths[DEFS_QUEST_GATE_PART_COUNT];
+UWORD g_pCrateDepths[DEFS_QUEST_CRATE_COUNT];
+UWORD g_uwCapsuleDepth;
+UWORD g_uwPrisonerDepth;
 UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
 UBYTE g_ubMinePercentForPlans;
 UBYTE g_ubTrailingMineralCountPercent;
@@ -78,6 +81,8 @@ const char * s_pLangDom[] = {
 	[MSG_MISC_RESTOCK] = "misc.restock",
 	[MSG_MISC_FOUND_BONE] = "misc.foundBone",
 	[MSG_MISC_FOUND_GATE] = "misc.foundGate",
+	[MSG_MISC_FOUND_CRATE] = "misc.foundCrate",
+	[MSG_MISC_FOUND_CAPSULE] = "misc.foundCapsule",
 	// HUD: UI
 	[MSG_HUD_P1] = "hud.p1",
 	[MSG_HUD_P2] = "hud.p2",
@@ -153,6 +158,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_PRISONER_RADIO_1] = "officePages.prisonerRadio1",
 	[MSG_PAGE_PRISONER_RADIO_2] = "officePages.prisonerRadio2",
 	[MSG_PAGE_PRISONER_RADIO_3] = "officePages.prisonerRadio3",
+	[MSG_PAGE_AGENT_WELCOME] = "officePages.commonWelcome",
 	// Count
 	[MSG_COUNT] = 0
 };
@@ -229,6 +235,20 @@ void defsInit(void) {
 		g_pGateDepths[i] = jsonTokToUlong(pJson, uwIdx);
 	}
 
+	// Crate parts
+	UWORD uwIdxCrateDepths = jsonGetDom(pJson, "crateDepths");
+	ubDepthCount = pJson->pTokens[uwIdxCrateDepths].size;
+	if(ubDepthCount != DEFS_QUEST_CRATE_COUNT) {
+		logWrite("ERR: Crate count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_CRATE_PART_COUNT);
+	}
+	for(UBYTE i = 0; i < ubDepthCount; ++i) {
+		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxCrateDepths, i);
+		g_pCrateDepths[i] = jsonTokToUlong(pJson, uwIdx);
+	}
+
+	// Single quest tiles
+	g_uwCapsuleDepth = jsonTokToUlong(pJson, jsonGetDom(pJson, "capsuleDepth"));
+	g_uwPrisonerDepth = jsonTokToUlong(pJson, jsonGetDom(pJson, "prisonerDepth"));
 
 	// Minerals
 	UWORD uwIdxMineralPlans = jsonGetDom(pJson, "mineralPlans");

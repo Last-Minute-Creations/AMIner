@@ -140,7 +140,9 @@
 		"cargoFull": "Ładownia pełna!",
 		"restock": "Rozładunek!",
 		"foundBone": "Kość #%hhu",
-		"foundGate": "Fragment portalu #%hhu"
+		"foundGate": "Fragment portalu #%hhu",
+		"foundCrate": "Skrzynia z częściami",
+		"foundCapsule": "Kapsuła"
 	},
 	"shop": {
 		"timeRemaining": "Pozostało %d dni",
