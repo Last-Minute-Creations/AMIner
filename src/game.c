@@ -1205,7 +1205,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	heatReset();
 	groundLayerReset(1, 0);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
-	tileVariantChangeTo(TILE_VARIANT_PRISONER);
+	tileVariantChangeTo(TILE_VARIANT_CAMPAIGN);
 }
 
 void gameTriggerSave(void) {

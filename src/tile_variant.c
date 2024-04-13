@@ -38,9 +38,9 @@ void tileVariantChangeTo(tTileVariant eVariant) {
 				TILE_VARIANT_COUNT * BYTES_PER_TILE
 			);
 			break;
-		case TILE_VARIANT_PRISONER:
+		case TILE_VARIANT_CAMPAIGN:
 			bitmapLoadFromFile(
-				g_pMainBuffer->pTileSet, "data/prisoner.bm",
+				g_pMainBuffer->pTileSet, "data/campaign.bm",
 				0, TILE_CHECKPOINT_1 * TILE_SIZE
 			);
 			break;

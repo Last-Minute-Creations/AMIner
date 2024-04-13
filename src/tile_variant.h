@@ -9,7 +9,7 @@ typedef enum tTileVariant {
 	TILE_VARIANT_DEFAULT, // Unpredictable - placeholder tiles loaded with tileset
 	TILE_VARIANT_CHECKPOINT,
 	TILE_VARIANT_FINISH,
-	TILE_VARIANT_PRISONER,
+	TILE_VARIANT_CAMPAIGN,
 } tTileVariant;
 
 void tileVariantManagerCreate(void);

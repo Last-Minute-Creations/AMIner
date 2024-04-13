@@ -183,7 +183,7 @@ Crate quests:
 			☐ Report agent to remove him and get accolade
 	☐ Travelers quest flow
 		☐ Implement base
-		☐ Spawn capsule at the bottom of mine
+		✔ Spawn capsule at the bottom of mine @done(24-04-13 17:50)
 		☐ Spend parts to build mega-teleporter
 		☐ Spend parts to open capsule
 
