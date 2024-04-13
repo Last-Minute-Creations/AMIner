@@ -173,7 +173,7 @@ Gate quest:
 		✘ Trigger message on unfinished dino-skeleton @cancelled(24-02-17)
 
 Crate quests:
-	☐ Spawn crates in mine
+	✔ Spawn crates in mine @done(24-04-13)
 	☐ Agent quest flow
 		☐ Agent appears after first crate
 		☐ Ability to sell create
@@ -182,8 +182,8 @@ Crate quests:
 			☐ Bad questioning causes confiscating of all crates
 			☐ Report agent to remove him and get accolade
 	☐ Travelers quest flow
-		✔ Implement base @done(24-04-13 18:12)
-		✔ Spawn capsule at the bottom of mine @done(24-04-13 17:50)
+		✔ Implement base @done(24-04-13)
+		✔ Spawn capsule at the bottom of mine @done(24-04-13)
 		☐ Spend parts to build mega-teleporter
 		☐ Spend parts to open capsule
 

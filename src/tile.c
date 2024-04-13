@@ -368,8 +368,8 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 
 		// Quest items: crates
 		s_ubNextRowPatternPos = 0;
-		for(UBYTE i = 0; i < DEFS_QUEST_DINO_BONE_COUNT; ++i) {
-			tTile eTile = (i == 0) ? TILE_BONE_HEAD : TILE_BONE_1;
+		for(UBYTE i = 0; i < DEFS_QUEST_CRATE_COUNT; ++i) {
+			tTile eTile = TILE_CRATE_1;
 			if(!tileTryPlaceQuestItemInRow(pTiles, g_pCrateDepths[i], eTile)) {
 				logWrite("ERR: Can't find place for crate #%hhu at row %hu\n", i + 1, g_pCrateDepths[i]);
 				pTiles[5][g_pCrateDepths[i]] = eTile;
