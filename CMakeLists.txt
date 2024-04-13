@@ -71,6 +71,7 @@ file(GLOB palette_aminer_gpl ${RES_DIR}/palettes/aminer.gpl)
 set(palette_aminer "${DATA_DIR}/aminer.plt")
 convertPalette(${GAME_EXECUTABLE} ${palette_aminer_gpl} ${palette_aminer})
 set(transparency_hex "#993399")
+set(transparency_black_hex "#221100")
 
 #-------------------------------------------------------------------------- BODY
 file(MAKE_DIRECTORY ${GEN_DIR}/drill)
@@ -236,14 +237,14 @@ extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/minerals.png
 	GENERATED_FILE_LIST "DINO_FRAGS"
 	DESTINATIONS
 		${GEN_DIR}/bones/0.png 0 384 80 22 # true width: 32
-		${GEN_DIR}/bones/1.png 0 408 80 10 # true width: 32
-		${GEN_DIR}/bones/2.png 0 419 80 15 # true width: 32
-		${GEN_DIR}/bones/3.png 0 435 80 24 # true width: 32
-		${GEN_DIR}/bones/4.png 0 460 80 44 # true width: 48
-		${GEN_DIR}/bones/5.png 0 505 80 29 # true width: 48
-		${GEN_DIR}/bones/6.png 0 535 80 45 # true width: 16
-		${GEN_DIR}/bones/7.png 0 581 80 45 # true width: 32
-		${GEN_DIR}/bones/8.png 0 627 80 22 # true width: 80
+		${GEN_DIR}/bones/1.png 0 416 80 10 # true width: 32
+		${GEN_DIR}/bones/2.png 0 448 80 15 # true width: 32
+		${GEN_DIR}/bones/3.png 0 480 80 24 # true width: 32
+		${GEN_DIR}/bones/4.png 0 512 80 44 # true width: 48
+		${GEN_DIR}/bones/5.png 0 576 80 29 # true width: 48
+		${GEN_DIR}/bones/6.png 0 608 80 45 # true width: 16
+		${GEN_DIR}/bones/7.png 0 672 80 45 # true width: 32
+		${GEN_DIR}/bones/8.png 0 736 80 22 # true width: 80
 )
 
 convertTileset(
@@ -355,27 +356,36 @@ convertBitmaps(
 	INTERLEAVED SOURCES
 		${GEN_DIR}/drill.png ${GEN_DIR}/tool.png ${GEN_DIR}/wreck.png
 		${GEN_DIR}/drill_2.png ${GEN_DIR}/tool_2.png ${GEN_DIR}/wreck_2.png
-		${GEN_DIR}/track.png ${RES_DIR}/jet.png ${GEN_DIR}/bones.png
-		${GEN_DIR}/gate.png ${RES_DIR}/smoke.png ${RES_DIR}/mode_icon_mask.png
+		${GEN_DIR}/track.png ${RES_DIR}/jet.png
+		${RES_DIR}/smoke.png ${RES_DIR}/mode_icon_mask.png
 		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png
 		${RES_DIR}/bomb_marker.png ${RES_DIR}/player_markers.png
 		${RES_DIR}/commrade/edges.png ${RES_DIR}/gate_eye_mask.png
 	DESTINATIONS
 		${DATA_DIR}/drill.bm ${DATA_DIR}/tool.bm ${DATA_DIR}/wreck.bm
 		${DATA_DIR}/drill_2.bm ${DATA_DIR}/tool_2.bm ${DATA_DIR}/wreck_2.bm
-		${DATA_DIR}/track.bm ${DATA_DIR}/jet.bm ${DATA_DIR}/bones.bm
-		${DATA_DIR}/gate.bm ${DATA_DIR}/smoke.bm NONE
+		${DATA_DIR}/track.bm ${DATA_DIR}/jet.bm
+		${DATA_DIR}/smoke.bm NONE
 		${DATA_DIR}/explosion.bm ${DATA_DIR}/teleport.bm
 		${DATA_DIR}/bomb_marker.bm ${DATA_DIR}/player_markers.bm
 		NONE NONE
 	MASKS
 		${DATA_DIR}/drill_mask.bm ${DATA_DIR}/tool_mask.bm ${DATA_DIR}/wreck_mask.bm
 		NONE NONE NONE
-		${DATA_DIR}/track_mask.bm ${DATA_DIR}/jet_mask.bm ${DATA_DIR}/bones_mask.bm
-		${DATA_DIR}/gate_mask.bm ${DATA_DIR}/smoke_mask.bm ${DATA_DIR}/mode_icon_mask.bm
+		${DATA_DIR}/track_mask.bm ${DATA_DIR}/jet_mask.bm
+		${DATA_DIR}/smoke_mask.bm ${DATA_DIR}/mode_icon_mask.bm
 		${DATA_DIR}/explosion_mask.bm ${DATA_DIR}/teleport_mask.bm
 		${DATA_DIR}/bomb_marker_mask.bm ${DATA_DIR}/player_marker_mask.bm
 		${DATA_DIR}/comm_edges_mask.bm ${DATA_DIR}/gate_eye_mask.bm
+)
+convertBitmaps(
+	TARGET ${GAME_EXECUTABLE} PALETTE ${palette_aminer_unique} MASK_COLOR ${transparency_black_hex}
+	INTERLEAVED SOURCES
+		${GEN_DIR}/bones.png ${GEN_DIR}/gate.png
+	DESTINATIONS
+		${DATA_DIR}/bones.bm ${DATA_DIR}/gate.bm
+	MASKS
+		${DATA_DIR}/bones_mask.bm ${DATA_DIR}/gate_mask.bm
 )
 
 convertFont(
