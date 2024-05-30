@@ -15,6 +15,8 @@ typedef enum tQuestioningBit {
 	QUESTIONING_BIT_END ///< Not really a bit, used for iterating
 } tQuestioningBit;
 
+typedef void (*tQuestioningHandler)(tQuestioningBit eQuestioningBit, UBYTE isReported);
+
 void pageQuestioningCreate(void);
 
 void pageQuestioningReset(void);
@@ -28,5 +30,7 @@ void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit);
 void pageQuestioningTryCancelPendingQuestioning(tQuestioningBit eQuestioningBit);
 
 UBYTE pageQuestioningIsReported(tQuestioningBit eQuestioning);
+
+void pageQuestioningSetHandler(tQuestioningBit eQuestioningBit, tQuestioningHandler cbOnQuestioningEnded);
 
 #endif // _AMINER_COMM_PAGE_QUESTIONING_H_

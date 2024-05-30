@@ -175,12 +175,12 @@ Gate quest:
 Crate quests:
 	✔ Spawn crates in mine @done(24-04-13)
 	☐ Agent quest flow
-		☐ Agent appears after first crate
+		✔ Agent appears after first crate @done(24-03-14)
 		☐ Ability to sell create
-		☐ Questionings
-			☐ Trigger after finding each crate
-			☐ Bad questioning causes confiscating of all crates
-			☐ Report agent to remove him and get accolade
+		✔ Questionings @done(24-05-30)
+			✔ Trigger after finding each crate @done(24-05-30)
+			✔ Bad questioning causes confiscating of all crates @done(24-05-30)
+		☐ Report agent to remove him and get accolade
 	☐ Travelers quest flow
 		✔ Implement base @done(24-04-13)
 		✔ Spawn capsule at the bottom of mine @done(24-04-13)
@@ -191,6 +191,11 @@ Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)
 	✔ Arch angry on destroying gate @done(24-02-17)
 	☐ Commissar before gate opens if he knows about it
+	☐ Commissar questionings:
+		☐ After failed lying on gate
+		☐ After reporting on gate
+		☐ After failed lying on crates
+		☐ After reporting on crates
 	✘ Outro msg for news on destroying gate? @cancelled(24-02-08 14:21)
 	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08 14:21)
 

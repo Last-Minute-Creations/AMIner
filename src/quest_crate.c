@@ -4,6 +4,7 @@
 
 #include "quest_crate.h"
 #include <comm/page_office.h>
+#include <comm/page_questioning.h>
 #include <comm/inbox.h>
 #include <save.h>
 
@@ -11,9 +12,18 @@ static UBYTE s_ubCrateCount;
 static UBYTE s_isAgentTriggered;
 static tCapsuleState s_eCapsuleState;
 
+static void questCrateOnQuestioningEnd(tQuestioningBit eQuestioningBit, UBYTE isReported) {
+	if(eQuestioningBit == QUESTIONING_BIT_TELEPORT_PARTS) {
+		if(isReported) {
+			s_ubCrateCount = 0;
+		}
+	}
+}
+
 void questCrateReset(void) {
 	s_ubCrateCount = 0;
 	s_isAgentTriggered = 0;
+	pageQuestioningSetHandler(QUESTIONING_BIT_TELEPORT_PARTS, questCrateOnQuestioningEnd);
 }
 
 void questCrateSave(tFile *pFile) {
@@ -45,6 +55,7 @@ void questCrateAdd(void) {
 		s_isAgentTriggered = 1;
 		pageOfficeUnlockPerson(FACE_ID_AGENT);
 		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_AGENT_WELCOME);
+		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_TELEPORT_PARTS);
 		inboxPushBack(COMM_SHOP_PAGE_AGENT_WELCOME, 0);
 	}
 }

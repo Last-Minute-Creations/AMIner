@@ -15,10 +15,12 @@
 
 #define QUESTIONING_HEAT_INCREASE 5
 #define QUESTIONING_HEAT_DECREASE_TRUTH 5
+#define QUESTIONING_BIT_COUNT 2
 
 static tQuestioningBit s_eQuestioningsPending;
 static tQuestioningBit s_eQuestioningsReported;
 static tQuestioningBit s_eQuestioningCurrent;
+static tQuestioningHandler s_pQuestioningHandlers[QUESTIONING_BIT_COUNT] = {0};
 
 static void pageQuestioningProcess(void) {
 	BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
@@ -39,12 +41,18 @@ static void pageQuestioningProcess(void) {
 			s_eQuestioningsReported |= s_eQuestioningCurrent;
 		}
 		else {
-			if(heatTryPassCheck()) {
-				s_eQuestioningsPending &= ~(s_eQuestioningCurrent);
-			}
-			else {
+			if(!heatTryPassCheck()) {
 				gameAddRebuke();
+				s_eQuestioningsReported |= s_eQuestioningCurrent;
 			}
+		}
+
+		// Questioning has ended - clear pending and launch callback
+		s_eQuestioningsPending &= ~(s_eQuestioningCurrent);
+		if(s_pQuestioningHandlers[s_eQuestioningCurrent]) {
+			s_pQuestioningHandlers[s_eQuestioningCurrent](
+				s_eQuestioningCurrent, pageQuestioningIsReported(s_eQuestioningCurrent)
+			);
 		}
 		commShopGoBack();
 	}
@@ -146,4 +154,10 @@ void pageQuestioningTryCancelPendingQuestioning(tQuestioningBit eQuestioningBit)
 
 UBYTE pageQuestioningIsReported(tQuestioningBit eQuestioning) {
 	return (s_eQuestioningsReported & eQuestioning) != 0;
+}
+
+void pageQuestioningSetHandler(
+	tQuestioningBit eQuestioningBit, tQuestioningHandler cbOnQuestioningEnded
+) {
+	s_pQuestioningHandlers[eQuestioningBit] = cbOnQuestioningEnded;
 }
