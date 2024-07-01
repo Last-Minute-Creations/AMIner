@@ -78,6 +78,8 @@ UBYTE gameIsCutsceneActive(void);
 
 void gameTriggerCutscene(tGameCutscene eCutscene);
 
+void gameProcessBaseWestern(void);
+
 void gameProcessBaseGate(void);
 
 // Game config

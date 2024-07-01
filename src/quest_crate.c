@@ -7,9 +7,11 @@
 #include <comm/page_questioning.h>
 #include <comm/inbox.h>
 #include <save.h>
+#include <hud.h>
 
 static UBYTE s_ubCrateCount;
 static UBYTE s_isAgentTriggered;
+static UBYTE s_isScientistUnlocked;
 static tCapsuleState s_eCapsuleState;
 
 static void questCrateOnQuestioningEnd(
@@ -34,6 +36,7 @@ static void questCrateOnQuestioningEnd(
 void questCrateReset(void) {
 	s_ubCrateCount = 0;
 	s_isAgentTriggered = 0;
+	s_isScientistUnlocked = 0;
 	pageQuestioningSetHandler(QUESTIONING_BIT_TELEPORT_PARTS, questCrateOnQuestioningEnd);
 	pageQuestioningSetHandler(QUESTIONING_BIT_AGENT, questCrateOnQuestioningEnd);
 }
@@ -42,6 +45,7 @@ void questCrateSave(tFile *pFile) {
 	saveWriteHeader(pFile, "CRTE");
 	fileWrite(pFile, &s_ubCrateCount, sizeof(s_ubCrateCount));
 	fileWrite(pFile, &s_isAgentTriggered, sizeof(s_isAgentTriggered));
+	fileWrite(pFile, &s_isScientistUnlocked, sizeof(s_isScientistUnlocked));
 	fileWrite(pFile, &s_eCapsuleState, sizeof(s_eCapsuleState));
 }
 
@@ -52,6 +56,7 @@ UBYTE questCrateLoad(tFile *pFile) {
 
 	fileRead(pFile, &s_ubCrateCount, sizeof(s_ubCrateCount));
 	fileRead(pFile, &s_isAgentTriggered, sizeof(s_isAgentTriggered));
+	fileRead(pFile, &s_isScientistUnlocked, sizeof(s_isScientistUnlocked));
 	fileRead(pFile, &s_eCapsuleState, sizeof(s_eCapsuleState));
 
 	return 1;
@@ -94,4 +99,14 @@ void questCrateSetCapsuleState(tCapsuleState eNewState) {
 
 tCapsuleState questCrateGetCapsuleState(void) {
 	return s_eCapsuleState;
+}
+
+void questCrateProcessBase(void) {
+	if(!s_isScientistUnlocked) {
+		pageOfficeUnlockPerson(FACE_ID_SCIENTIST);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_SCIENTIST_WELCOME);
+		inboxPushBack(COMM_SHOP_PAGE_SCIENTIST_WELCOME, 0);
+		hudShowMessage(FACE_ID_SCIENTIST, g_pMsgs[MSG_HUD_SCI_WELCOME]);
+		s_isScientistUnlocked = 1;
+	}
 }

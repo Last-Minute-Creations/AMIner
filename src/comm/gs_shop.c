@@ -329,12 +329,17 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_welcome", onBack);
 			break;
 
+		case COMM_SHOP_PAGE_SCIENTIST_WELCOME:
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_welcome", onBack);
+			break;
+
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
 		case COMM_SHOP_PAGE_OFFICE_LIST_ARCH:
 		case COMM_SHOP_PAGE_OFFICE_LIST_PRISONER:
 		case COMM_SHOP_PAGE_OFFICE_LIST_AGENT:
+		case COMM_SHOP_PAGE_OFFICE_LIST_SCI:
 		case COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS: {
 			tFaceId eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + FACE_ID_MIETEK;
 			pageListCreate(eFace, officeGetPagesForFace(eFace));

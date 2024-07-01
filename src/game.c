@@ -945,6 +945,10 @@ static void gameSave(tFile *pFile) {
 static UBYTE s_ubRadioMessageCounter = RADIO_MESSAGE_INTERVAL;
 static UBYTE s_ubRadioMessageIndex = 0;
 
+void gameProcessBaseWestern(void) {
+	questCrateProcessBase();
+}
+
 void gameProcessBaseGate(void) {
 	if(gameIsCutsceneActive()) {
 		return;

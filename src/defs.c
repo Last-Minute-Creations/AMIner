@@ -113,6 +113,7 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_WAITING_KOMISARZ] = "hudMessages.waitingKomisarz",
 	[MSG_HUD_GUEST] = "hudMessages.guest",
 	[MSG_HUD_WAITING_URZEDAS] = "hudMessages.waitingUrzedas",
+	[MSG_HUD_SCI_WELCOME] = "hudMessages.sciWelcome",
 	// Loading
 	[MSG_LOADING_GEN_TERRAIN] = "loading.genTerrain",
 	[MSG_LOADING_GEN_BASES] = "loading.genBases",
@@ -126,6 +127,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_LIST_ARCH] = "officePages.listArch",
 	[MSG_PAGE_LIST_PRISONER] = "officePages.listPrisoner",
 	[MSG_PAGE_LIST_AGENT] = "officePages.listAgent",
+	[MSG_PAGE_LIST_SCI] = "officePages.listSci",
 	[MSG_PAGE_MIETEK_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_MIETEK_FIRST_PLAN] = "officePages.mietekFirstPlan",
 	[MSG_PAGE_MIETEK_PLAN_COMPLETE] = "officePages.mietekPlanComplete",
@@ -163,6 +165,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_PRISONER_RADIO_2] = "officePages.prisonerRadio2",
 	[MSG_PAGE_PRISONER_RADIO_3] = "officePages.prisonerRadio3",
 	[MSG_PAGE_AGENT_WELCOME] = "officePages.commonWelcome",
+	[MSG_PAGE_SCIENTIST_WELCOME] = "officePages.commonWelcome",
 	// Count
 	[MSG_COUNT] = 0
 };

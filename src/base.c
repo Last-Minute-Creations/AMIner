@@ -107,7 +107,7 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwX2 = 4 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_WESTERN + 8) * TILE_SIZE
 		},
-		.cbProcess = 0,
+		.cbProcess = gameProcessBaseWestern,
 	},
 	[BASE_ID_DINO_POPULATED] = {
 		.uwTileDepth = BASE_TILE_DEPTH_VARIANT,

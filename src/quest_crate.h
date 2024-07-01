@@ -31,4 +31,6 @@ void questCrateSetCapsuleState(tCapsuleState eNewState);
 
 tCapsuleState questCrateGetCapsuleState(void);
 
+void questCrateProcessBase(void);
+
 #endif // QUEST_CRATE_H

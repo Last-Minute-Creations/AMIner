@@ -63,7 +63,8 @@
 			[
 				"w uruchomieniu portalu. Pospiesz się, tutaj umieramy."
 			]
-		]
+		],
+		"sciWelcome": "Hej, Ty! W maszynie! Z nieba nam spadłeś!"
 	},
 	"hiScore": {
 		"new": "Nowy rekord! Wpisz imię.",
@@ -189,6 +190,7 @@
 		"listArch": "Iwan Jensonow",
 		"listPrisoner": "Więzień",
 		"listAgent": "Agent",
+		"listSci": "Naukowiec",
 		"mietekFirstPlan": "Kariera",
 		"mietekPlanComplete": "Zawody",
 		"krystynaAccounting": "Kreatywna Księgowość",
