@@ -228,6 +228,18 @@ void pageOfficeUnlockPerson(tFaceId ePerson) {
 	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
 }
 
+void pageOfficeLockPerson(tFaceId ePerson) {
+	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
+		if(s_pActivePpl[i] == ePerson) {
+			while(++i < s_ubUnlockedPplCount) {
+				s_pActivePpl[i - 1] = s_pActivePpl[i];
+			}
+			--s_ubUnlockedPplCount;
+			break;
+		}
+	}
+}
+
 UBYTE pageOfficeHasPerson(tFaceId ePerson) {
 	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
 		if(s_pActivePpl[i] == ePerson) {

@@ -97,11 +97,10 @@ General:
 		✔ Add "Reproting" option for commissar @done(24-07-01)
 		✔ Add ability to report on non-reported stuff from questioning @done(24-07-01)
 			✔ Trigger same handler as after questioning @done(24-07-01)
-		☐ Add ability to report on Agent
+		✔ Add ability to report on Agent @done(24-07-01)
 			✔ Add option upon his arrival @done(24-07-01)
 			✔ Remove option after he's reported @done(24-07-01)
-			☐ Remove NPC from office on reporting
-			☐ Make sure the NPC won't come back after certain events
+			✔ Remove NPC from office on reporting @done(24-07-01)
 	✘ Modifiable challenge end level? @cancelled(24-02-11)
 
 Bugs:

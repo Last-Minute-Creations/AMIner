@@ -15,10 +15,19 @@ static tCapsuleState s_eCapsuleState;
 static void questCrateOnQuestioningEnd(
 	tQuestioningBit eQuestioningBit, UBYTE isReportedOrCaught
 ) {
-	if(eQuestioningBit == QUESTIONING_BIT_TELEPORT_PARTS) {
-		if(isReportedOrCaught) {
-			s_ubCrateCount = 0;
-		}
+	switch(eQuestioningBit) {
+		case QUESTIONING_BIT_TELEPORT_PARTS:
+			if(isReportedOrCaught) {
+				s_ubCrateCount = 0;
+			}
+			break;
+		case QUESTIONING_BIT_AGENT:
+			if(isReportedOrCaught) {
+				pageOfficeLockPerson(FACE_ID_AGENT);
+			}
+			break;
+		default:
+			break;
 	}
 }
 
@@ -26,6 +35,7 @@ void questCrateReset(void) {
 	s_ubCrateCount = 0;
 	s_isAgentTriggered = 0;
 	pageQuestioningSetHandler(QUESTIONING_BIT_TELEPORT_PARTS, questCrateOnQuestioningEnd);
+	pageQuestioningSetHandler(QUESTIONING_BIT_AGENT, questCrateOnQuestioningEnd);
 }
 
 void questCrateSave(tFile *pFile) {

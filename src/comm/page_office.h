@@ -22,6 +22,8 @@ void pageOfficeShow(void);
 
 void pageOfficeUnlockPerson(tFaceId ePerson);
 
+void pageOfficeLockPerson(tFaceId ePerson);
+
 UBYTE pageOfficeHasPerson(tFaceId ePerson);
 
 UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
