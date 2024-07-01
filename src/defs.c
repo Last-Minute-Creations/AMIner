@@ -165,7 +165,9 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_PRISONER_RADIO_2] = "officePages.prisonerRadio2",
 	[MSG_PAGE_PRISONER_RADIO_3] = "officePages.prisonerRadio3",
 	[MSG_PAGE_AGENT_WELCOME] = "officePages.commonWelcome",
+	[MSG_PAGE_AGENT_SCIENTISTS] = "officePages.agentSci",
 	[MSG_PAGE_SCIENTIST_WELCOME] = "officePages.commonWelcome",
+	[MSG_PAGE_SCIENTIST_FIRST_CRATE] = "officePages.sciFirstCrate",
 	// Count
 	[MSG_COUNT] = 0
 };

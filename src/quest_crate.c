@@ -10,8 +10,8 @@
 #include <hud.h>
 
 static UBYTE s_ubCrateCount;
-static UBYTE s_isAgentTriggered;
 static UBYTE s_isScientistUnlocked;
+static UBYTE s_isFirstCrateFound;
 static tCapsuleState s_eCapsuleState;
 
 static void questCrateOnQuestioningEnd(
@@ -35,8 +35,8 @@ static void questCrateOnQuestioningEnd(
 
 void questCrateReset(void) {
 	s_ubCrateCount = 0;
-	s_isAgentTriggered = 0;
 	s_isScientistUnlocked = 0;
+	s_isFirstCrateFound = 0;
 	pageQuestioningSetHandler(QUESTIONING_BIT_TELEPORT_PARTS, questCrateOnQuestioningEnd);
 	pageQuestioningSetHandler(QUESTIONING_BIT_AGENT, questCrateOnQuestioningEnd);
 }
@@ -44,8 +44,8 @@ void questCrateReset(void) {
 void questCrateSave(tFile *pFile) {
 	saveWriteHeader(pFile, "CRTE");
 	fileWrite(pFile, &s_ubCrateCount, sizeof(s_ubCrateCount));
-	fileWrite(pFile, &s_isAgentTriggered, sizeof(s_isAgentTriggered));
 	fileWrite(pFile, &s_isScientistUnlocked, sizeof(s_isScientistUnlocked));
+	fileWrite(pFile, &s_isFirstCrateFound, sizeof(s_isFirstCrateFound));
 	fileWrite(pFile, &s_eCapsuleState, sizeof(s_eCapsuleState));
 }
 
@@ -55,8 +55,8 @@ UBYTE questCrateLoad(tFile *pFile) {
 	}
 
 	fileRead(pFile, &s_ubCrateCount, sizeof(s_ubCrateCount));
-	fileRead(pFile, &s_isAgentTriggered, sizeof(s_isAgentTriggered));
 	fileRead(pFile, &s_isScientistUnlocked, sizeof(s_isScientistUnlocked));
+	fileRead(pFile, &s_isFirstCrateFound, sizeof(s_isFirstCrateFound));
 	fileRead(pFile, &s_eCapsuleState, sizeof(s_eCapsuleState));
 
 	return 1;
@@ -68,12 +68,18 @@ void questCrateProcess(void) {
 
 void questCrateAdd(void) {
 	s_ubCrateCount += 1;
-	if(!s_isAgentTriggered) {
-		s_isAgentTriggered = 1;
+	if(s_isFirstCrateFound) {
+		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_TELEPORT_PARTS);
+	}
+	else {
+		s_isFirstCrateFound = 1;
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_SCIENTIST_FIRST_CRATE);
+		inboxPushBack(COMM_SHOP_PAGE_SCIENTIST_FIRST_CRATE, 0);
+
 		pageOfficeUnlockPerson(FACE_ID_AGENT);
 		pageQuestioningAddReporting(QUESTIONING_BIT_AGENT);
 		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_AGENT_WELCOME);
-		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_TELEPORT_PARTS);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_AGENT_SCIENTISTS);
 		inboxPushBack(COMM_SHOP_PAGE_AGENT_WELCOME, 0);
 	}
 }

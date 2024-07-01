@@ -328,9 +328,15 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_AGENT_WELCOME:
 			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_welcome", onBack);
 			break;
+		case COMM_SHOP_PAGE_AGENT_SCIENTISTS:
+			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_sci", onBack);
+			break;
 
 		case COMM_SHOP_PAGE_SCIENTIST_WELCOME:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_welcome", onBack);
+			break;
+		case COMM_SHOP_PAGE_SCIENTIST_FIRST_CRATE:
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_first_crate", onBack);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:

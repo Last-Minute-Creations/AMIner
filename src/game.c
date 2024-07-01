@@ -343,8 +343,12 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 	else if(keyUse(KEY_5)) {
+		g_ubDrillingCost = 0;
+		g_pVehicles[0].lCash = 50000;
+		g_pVehicles[0].wHullCurr = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
 	}
 	else if(keyUse(KEY_6)) {
+		questCrateAdd();
 	}
 	else if(keyUse(KEY_7)) {
 		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);

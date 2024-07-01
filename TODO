@@ -110,6 +110,7 @@ Bugs:
 	☐ Jet sfx looping if fly-entering (urgent) msg in base
 	☐ Game doesn't launch properly from icon
 	☐ Distorted main base in challenge mode
+	☐ Warehouse corruption (after entering accounting?)
 
 Misc QoL refinements:
 	☐ Onboard player on need to maintain income
@@ -193,7 +194,7 @@ Crate quests:
 		✔ Implement base @done(24-04-13)
 		✔ Spawn capsule at the bottom of mine @done(24-04-13)
 		✔ Add scientist NPC @done(24-07-01)
-		☐ Trigger scientist message on first picked up crate
+		✔ Trigger scientist message on first picked up crate @done(24-07-01 20:10)
 		☐ Spend parts to build mega-teleporter
 		☐ Spend parts to open capsule
 
@@ -205,9 +206,11 @@ Missing message texts:
 		☐ After reporting on gate
 		☐ After reporting on crates
 		☐ After reporting on agent
+	☐ Scientist welcome hud message
 	☐ Scientist welcome message
 	☐ Scientist first crate message
 	☐ Agent welcome message
+	☐ Agent on scientist
 	✘ Outro msg for news on destroying gate? @cancelled(24-02-08)
 	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08)
 
