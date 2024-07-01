@@ -322,7 +322,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_LIST_AGENT:
 		case COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS: {
 			tFaceId eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + FACE_ID_MIETEK;
-			pageListCreate(eFace);
+			pageListCreate(eFace, officeGetPagesForFace(eFace));
 		} break;
 		case COMM_SHOP_PAGE_NEWS_ACCOLADES:
 			pageNewsCreate(NEWS_KIND_ACCOLADES);

@@ -8,6 +8,8 @@
 #include <comm/comm.h>
 #include <comm/gs_shop.h>
 
+#define PAGE_OFFICE_SUBPAGES_PER_PERSON 10
+
 void pageOfficeReset(void);
 
 void pageOfficeSave(tFile *pFile);

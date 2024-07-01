@@ -239,7 +239,7 @@ void defsInit(void) {
 	UWORD uwIdxCrateDepths = jsonGetDom(pJson, "crateDepths");
 	ubDepthCount = pJson->pTokens[uwIdxCrateDepths].size;
 	if(ubDepthCount != DEFS_QUEST_CRATE_COUNT) {
-		logWrite("ERR: Crate count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_CRATE_PART_COUNT);
+		logWrite("ERR: Crate count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_CRATE_COUNT);
 	}
 	for(UBYTE i = 0; i < ubDepthCount; ++i) {
 		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxCrateDepths, i);
