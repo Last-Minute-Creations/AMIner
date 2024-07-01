@@ -49,7 +49,7 @@ static void pageQuestioningProcess(void) {
 		UBYTE isShowReportMessage = 0;
 		if(bButtonCurr == 0) {
 			// Told the truth
-			pageQuestioningReport(s_eQuestioningBitCurrent);
+			pageQuestioningReport(s_eQuestioningBitCurrent, 0);
 			isShowReportMessage = 1;
 		}
 		else {
@@ -59,7 +59,7 @@ static void pageQuestioningProcess(void) {
 			else {
 				// Got caught
 				gameAddRebuke();
-				pageQuestioningReport(s_eQuestioningBitCurrent);
+				pageQuestioningReport(s_eQuestioningBitCurrent, 0);
 				isShowReportMessage = 1;
 			}
 		}
@@ -200,10 +200,14 @@ const tCommShopPage *pageQuestioningGetNotReportedPages(void) {
 	return s_pOfficeQuestioningPages;
 }
 
-void pageQuestioningReport(tQuestioningBit eQuestioningBit) {
+void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily) {
 	s_eQuestioningsReported |= BV(eQuestioningBit);
 	s_eQuestioningsNotReported &= ~BV(eQuestioningBit);
 	s_eQuestioningsPending &= ~BV(eQuestioningBit);
+
+	if(isVoluntarily) {
+		gameAddAccolade();
+	}
 }
 
 void pageQuestioningAddReporting(tQuestioningBit eQuestioningBit) {

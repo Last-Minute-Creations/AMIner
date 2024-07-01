@@ -166,10 +166,10 @@ Gate quest:
 		✔ Trigger comments regarding transmissions @done(24-02-04)
 		☐ Tile animation
 	✔ Detonation vs activation dillema @done(24-01-16)
-	✔ Only trigger dillema if comissar doesn't know about the gate @done(24-02-08 13:38)
+	✔ Only trigger dillema if comissar doesn't know about the gate @done(24-02-08)
 	✔ Detonation cutscene @done(24-02-08)
 		✔ Trigger explosions @done(24-01-16)
-		✔ Undraw the gate @done(24-01-16 18:17)
+		✔ Undraw the gate @done(24-01-16)
 		✔ Stop transmissions @done(24-01-27)
 		✔ Rebuke on detonating without commissar knowing @done(24-01-27)
 		✘ Game over if commissar knows about gate @cancelled(24-02-08)
@@ -184,11 +184,11 @@ Crate quests:
 	✔ Spawn crates in mine @done(24-04-13)
 	☐ Agent quest flow
 		✔ Agent appears after first crate @done(24-03-14)
-		☐ Ability to sell create
+		☐ Ability to sell crate
 		✔ Questionings @done(24-05-30)
 			✔ Trigger after finding each crate @done(24-05-30)
 			✔ Bad questioning causes confiscating of all crates @done(24-05-30)
-		☐ Report agent to remove him and get accolade
+		✔ Report agent to remove him and get accolade @done(24-07-01)
 	☐ Travelers quest flow
 		✔ Implement base @done(24-04-13)
 		✔ Spawn capsule at the bottom of mine @done(24-04-13)
@@ -200,12 +200,11 @@ Missing message texts:
 	✔ Arch angry on destroying gate @done(24-02-17)
 	☐ Commissar before gate opens if he knows about it
 	☐ Commissar questionings:
-		☐ After failed lying on gate
 		☐ After reporting on gate
-		☐ After failed lying on crates
 		☐ After reporting on crates
-	✘ Outro msg for news on destroying gate? @cancelled(24-02-08 14:21)
-	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08 14:21)
+		☐ After reporting on agent
+	✘ Outro msg for news on destroying gate? @cancelled(24-02-08)
+	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08)
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07)

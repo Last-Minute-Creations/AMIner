@@ -45,7 +45,7 @@ void pageQuestioningSetHandler(tQuestioningBit eQuestioningBit, tQuestioningHand
 
 const tCommShopPage *pageQuestioningGetNotReportedPages(void);
 
-void pageQuestioningReport(tQuestioningBit eQuestioningBit);
+void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily);
 
 void pageQuestioningAddReporting(tQuestioningBit eQuestioningBit);
 
