@@ -12,9 +12,11 @@ static UBYTE s_ubCrateCount;
 static UBYTE s_isAgentTriggered;
 static tCapsuleState s_eCapsuleState;
 
-static void questCrateOnQuestioningEnd(tQuestioningBit eQuestioningBit, UBYTE isReported) {
+static void questCrateOnQuestioningEnd(
+	tQuestioningBit eQuestioningBit, UBYTE isReportedOrCaught
+) {
 	if(eQuestioningBit == QUESTIONING_BIT_TELEPORT_PARTS) {
-		if(isReported) {
+		if(isReportedOrCaught) {
 			s_ubCrateCount = 0;
 		}
 	}
@@ -54,6 +56,7 @@ void questCrateAdd(void) {
 	if(!s_isAgentTriggered) {
 		s_isAgentTriggered = 1;
 		pageOfficeUnlockPerson(FACE_ID_AGENT);
+		pageQuestioningAddReporting(QUESTIONING_BIT_AGENT);
 		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_AGENT_WELCOME);
 		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_TELEPORT_PARTS);
 		inboxPushBack(COMM_SHOP_PAGE_AGENT_WELCOME, 0);

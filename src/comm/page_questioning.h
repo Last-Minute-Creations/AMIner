@@ -7,15 +7,25 @@
 
 #include <ace/utils/file.h>
 #include <ace/macros.h>
+#include <comm/gs_shop.h>
 
+// Be sure to update pageQuestioningBitToShopPage() accordingly
 typedef enum tQuestioningBit {
-	QUESTIONING_BIT_NONE = 0,
-	QUESTIONING_BIT_GATE = BV(0),
-	QUESTIONING_BIT_TELEPORT_PARTS = BV(1),
-	QUESTIONING_BIT_END ///< Not really a bit, used for iterating
+	QUESTIONING_BIT_GATE,
+	QUESTIONING_BIT_TELEPORT_PARTS,
+	QUESTIONING_BIT_AGENT,
+	QUESTIONING_BIT_COUNT ///< Not really a bit, used for iterating
 } tQuestioningBit;
 
-typedef void (*tQuestioningHandler)(tQuestioningBit eQuestioningBit, UBYTE isReported);
+typedef enum tQuestioningFlag {
+	QUESTIONING_FLAG_NONE = 0,
+	QUESTIONING_FLAG_GATE = BV(QUESTIONING_BIT_GATE),
+	QUESTIONING_FLAG_TELEPORT_PARTS = BV(QUESTIONING_BIT_TELEPORT_PARTS),
+	QUESTIONING_FLAG_AGENT = BV(QUESTIONING_BIT_AGENT),
+	QUESTIONING_FLAG_END ///< Not really a bit, used for iterating
+} tQuestioningFlag;
+
+typedef void (*tQuestioningHandler)(tQuestioningBit eQuestioningBit, UBYTE isReportedOrCaught);
 
 void pageQuestioningCreate(void);
 
@@ -29,8 +39,14 @@ void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit);
 
 void pageQuestioningTryCancelPendingQuestioning(tQuestioningBit eQuestioningBit);
 
-UBYTE pageQuestioningIsReported(tQuestioningBit eQuestioning);
+UBYTE pageQuestioningIsReported(tQuestioningBit eQuestioningBit);
 
 void pageQuestioningSetHandler(tQuestioningBit eQuestioningBit, tQuestioningHandler cbOnQuestioningEnded);
+
+const tCommShopPage *pageQuestioningGetNotReportedPages(void);
+
+void pageQuestioningReport(tQuestioningBit eQuestioningBit);
+
+void pageQuestioningAddReporting(tQuestioningBit eQuestioningBit);
 
 #endif // _AMINER_COMM_PAGE_QUESTIONING_H_
