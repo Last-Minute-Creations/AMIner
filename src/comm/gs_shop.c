@@ -15,6 +15,7 @@
 #include <comm/page_favor.h>
 #include <comm/page_gate_dilemma.h>
 #include <comm/page_questioning.h>
+#include <comm/page_sell_crates.h>
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
 #include <comm/page_market.h>
@@ -325,17 +326,20 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_3", onBack);
 			break;
 
-		case COMM_SHOP_PAGE_AGENT_WELCOME:
+		case COMM_SHOP_PAGE_OFFICE_AGENT_WELCOME:
 			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_welcome", onBack);
 			break;
-		case COMM_SHOP_PAGE_AGENT_SCIENTISTS:
+		case COMM_SHOP_PAGE_OFFICE_AGENT_SCIENTISTS:
 			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_sci", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_AGENT_SELL_CRATES:
+			pageSellCratesCreate();
+			break;
 
-		case COMM_SHOP_PAGE_SCIENTIST_WELCOME:
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_welcome", onBack);
 			break;
-		case COMM_SHOP_PAGE_SCIENTIST_FIRST_CRATE:
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_first_crate", onBack);
 			break;
 

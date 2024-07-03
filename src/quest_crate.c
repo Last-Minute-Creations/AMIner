@@ -73,14 +73,15 @@ void questCrateAdd(void) {
 	}
 	else {
 		s_isFirstCrateFound = 1;
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_SCIENTIST_FIRST_CRATE);
-		inboxPushBack(COMM_SHOP_PAGE_SCIENTIST_FIRST_CRATE, 0);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE);
+		inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE, 0);
 
 		pageOfficeUnlockPerson(FACE_ID_AGENT);
 		pageQuestioningAddReporting(QUESTIONING_BIT_AGENT);
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_AGENT_WELCOME);
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_AGENT_SCIENTISTS);
-		inboxPushBack(COMM_SHOP_PAGE_AGENT_WELCOME, 0);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_WELCOME);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_SCIENTISTS);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_SELL_CRATES);
+		inboxPushBack(COMM_SHOP_PAGE_OFFICE_AGENT_WELCOME, 0);
 	}
 }
 
@@ -99,7 +100,7 @@ UBYTE questCrateTrySell(void) {
 void questCrateSetCapsuleState(tCapsuleState eNewState) {
 	s_eCapsuleState = eNewState;
 	if(s_eCapsuleState == CAPSULE_STATE_FOUND) {
-		// pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_SCIENTIST_ABOUT_CAPSULE);
+		// pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_ABOUT_CAPSULE);
 	}
 }
 
@@ -110,8 +111,8 @@ tCapsuleState questCrateGetCapsuleState(void) {
 void questCrateProcessBase(void) {
 	if(!s_isScientistUnlocked) {
 		pageOfficeUnlockPerson(FACE_ID_SCIENTIST);
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_SCIENTIST_WELCOME);
-		inboxPushBack(COMM_SHOP_PAGE_SCIENTIST_WELCOME, 0);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME);
+		inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME, 0);
 		hudShowMessage(FACE_ID_SCIENTIST, g_pMsgs[MSG_HUD_SCI_WELCOME]);
 		s_isScientistUnlocked = 1;
 	}
