@@ -217,7 +217,8 @@
 		"prisonerRadio3": "Reminiscencja",
 		"sciFirstCrate": "Odnalezione części",
 		"agentSci": "Naukowcy",
-		"agentSellCrates": "Sprzedaż skrzyń"
+		"agentSellCrates": "Sprzedaż skrzyń",
+		"agentEscape": "Ucieczka na Zachód"
 	},
 	"officePageContents": {
 		"bribeA": [

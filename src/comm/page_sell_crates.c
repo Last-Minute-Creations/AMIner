@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include <comm/page_sell_crates.h>
 #include <comm/page_office.h>
 #include <comm/button.h>
 #include "../vehicle.h"

@@ -16,6 +16,7 @@
 #include <comm/page_gate_dilemma.h>
 #include <comm/page_questioning.h>
 #include <comm/page_sell_crates.h>
+#include <comm/page_escape.h>
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
 #include <comm/page_market.h>
@@ -335,6 +336,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_AGENT_SELL_CRATES:
 			pageSellCratesCreate();
 			break;
+		case COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE:
+			pageEscapeCreate();
+			break;
 
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_welcome", onBack);
@@ -362,6 +366,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_NEWS_GATE_RED:
 			pageNewsCreate(NEWS_KIND_GATE_RED);
+			break;
+		case COMM_SHOP_PAGE_NEWS_ESCAPE_AGENT:
+			pageNewsCreate(NEWS_KIND_ESCAPE_AGENT);
 			break;
 		case COMM_SHOP_PAGE_SOKOBAN:
 			pageSokobanCreate();
