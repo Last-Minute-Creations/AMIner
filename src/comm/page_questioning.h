@@ -35,7 +35,7 @@ void pageQuestioningSave(tFile *pFile);
 
 UBYTE pageQuestioningLoad(tFile *pFile);
 
-void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit);
+void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit, UBYTE isForce);
 
 void pageQuestioningTryCancelPendingQuestioning(tQuestioningBit eQuestioningBit);
 

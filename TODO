@@ -190,7 +190,7 @@ Crate quests:
 		✔ Questionings @done(24-05-30)
 			✔ Trigger after finding each crate @done(24-05-30)
 			✔ Bad questioning causes confiscating of all crates @done(24-05-30)
-			☐ Trigger after finding next one past reported/interrogation
+			✔ Trigger after finding next one past reported/interrogation @done(24-07-05)
 		✔ Report agent to remove him and get accolade @done(24-07-01)
 		✔ Add escape option after selling 10 crates @done(24-07-03)
 	☐ Travelers quest flow

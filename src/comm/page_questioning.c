@@ -155,11 +155,10 @@ UBYTE pageQuestioningLoad(tFile *pFile) {
 	return 1;
 }
 
-void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit) {
+void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit, UBYTE isForce) {
 	tQuestioningFlag ePendingQuestioningPrev = s_eQuestioningsPending;
 
-
-	if(!(s_eQuestioningsReported & BV(eQuestioningBit))) {
+	if(isForce || !pageQuestioningIsReported(eQuestioningBit)) {
 		// Not reported yet - increase heat and add as pending questioning.
 		// Increases heat each time it's triggered, even when questioning is already pending.
 		s_eQuestioningsPending |= BV(eQuestioningBit);

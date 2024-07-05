@@ -73,7 +73,7 @@ void questCrateProcess(void) {
 void questCrateAdd(void) {
 	s_ubCrateCount += 1;
 	if(s_isFirstCrateFound) {
-		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_TELEPORT_PARTS);
+		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_TELEPORT_PARTS, 1);
 	}
 	else {
 		s_isFirstCrateFound = 1;
