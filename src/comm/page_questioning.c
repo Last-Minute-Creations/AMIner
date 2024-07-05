@@ -205,6 +205,7 @@ void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily)
 	s_eQuestioningsPending &= ~BV(eQuestioningBit);
 
 	if(isVoluntarily) {
+		heatTryReduce(100);
 		gameAddAccolade();
 	}
 }
