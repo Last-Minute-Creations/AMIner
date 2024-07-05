@@ -41,6 +41,6 @@ void pageEscapeCreate(void) {
 		"Za Twoje zaslugi mozemy Cie przetransportowac na zachod. Daj znac jak bedziesz gotowy.", 0, uwPosY
 	) * ubLineHeight;
 
-	buttonInitAcceptDecline("Uciekaj", "Powrot");
+	buttonInitAcceptDecline("Uciekaj", g_pMsgs[MSG_PAGE_BACK]);
 	buttonDrawAll(commGetDisplayBuffer());
 }

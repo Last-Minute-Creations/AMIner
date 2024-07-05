@@ -15,7 +15,7 @@
 #include <comm/page_favor.h>
 #include <comm/page_gate_dilemma.h>
 #include <comm/page_questioning.h>
-#include <comm/page_sell_crates.h>
+#include <comm/page_use_crates.h>
 #include <comm/page_escape.h>
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
@@ -334,7 +334,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_sci", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_SELL_CRATES:
-			pageSellCratesCreate();
+			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_SELL);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE:
 			pageEscapeCreate();
@@ -345,6 +345,18 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_first_crate", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER:
+			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_TELEPORTER);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_CAPSULE:
+			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_CAPSULE);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_ESCAPE:
+			pageEscapeCreate();
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER:
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_miner", onBack);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:

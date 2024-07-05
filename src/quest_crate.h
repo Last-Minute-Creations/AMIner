@@ -25,6 +25,8 @@ void questCrateAdd(void);
 
 UBYTE questCrateGetCount(void);
 
+UBYTE questCrateTryConsume(UBYTE ubAmount);
+
 UBYTE questCrateTrySell(void);
 
 void questCrateSetCapsuleState(tCapsuleState eNewState);

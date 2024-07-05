@@ -119,7 +119,7 @@ const char * s_pLangDom[] = {
 	[MSG_LOADING_GEN_BASES] = "loading.genBases",
 	[MSG_LOADING_FINISHING] = "loading.finishing",
 	// Office
-	[MSG_PAGE_MAIN] = "officePages.main",
+	[MSG_PAGE_BACK] = "officePages.commonBack",
 	[MSG_PAGE_LIST_MIETEK] = "officePages.listMietek",
 	[MSG_PAGE_LIST_KRYSTYNA] = "officePages.listKrystyna",
 	[MSG_PAGE_LIST_KOMISARZ] = "officePages.listPutin",
@@ -167,9 +167,13 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_AGENT_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_AGENT_SCIENTISTS] = "officePages.agentSci",
 	[MSG_PAGE_AGENT_SELL_CRATE] = "officePages.agentSellCrates",
-	[MSG_PAGE_AGENT_ESCAPE] = "officePages.agentEscape",
+	[MSG_PAGE_AGENT_ESCAPE] = "officePages.commonEscape",
 	[MSG_PAGE_SCIENTIST_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_SCIENTIST_FIRST_CRATE] = "officePages.sciFirstCrate",
+	[MSG_PAGE_SCIENTIST_CRATE_TELEPORTER] = "officePages.sciCrateTeleporter",
+	[MSG_PAGE_SCIENTIST_CRATE_CAPSULE] = "officePages.sciCrateCapsule",
+	[MSG_PAGE_SCIENTIST_ESCAPE] = "officePages.commonEscape",
+	[MSG_PAGE_SCIENTIST_MINER] = "officePages.sciMiner",
 	// Count
 	[MSG_COUNT] = 0
 };

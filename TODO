@@ -122,6 +122,7 @@ Commrade:
 	✔ Improve tab changing on commrade by allowing cursor to move to buttons @done(24-02-08)
 	☐ Redo warehouse/plan management
 	☐ Workshop icons for upgrades?
+	☐ Add left/right arrows in workshop to indicate nav possibility
 	☐ Figure out where to hide sokoban and how to hint it
 
 Optimizations:
@@ -189,15 +190,17 @@ Crate quests:
 		✔ Questionings @done(24-05-30)
 			✔ Trigger after finding each crate @done(24-05-30)
 			✔ Bad questioning causes confiscating of all crates @done(24-05-30)
+			☐ Trigger after finding next one past reported/interrogation
 		✔ Report agent to remove him and get accolade @done(24-07-01)
 		✔ Add escape option after selling 10 crates @done(24-07-03)
 	☐ Travelers quest flow
 		✔ Implement base @done(24-04-13)
 		✔ Spawn capsule at the bottom of mine @done(24-04-13)
 		✔ Add scientist NPC @done(24-07-01)
-		✔ Trigger scientist message on first picked up crate @done(24-07-01 20:10)
-		☐ Spend parts to build mega-teleporter
-		☐ Spend parts to open capsule
+		✔ Trigger scientist message on first picked up crate @done(24-07-01)
+		✔ Spend parts to build mega-teleporter @done(24-07-05)
+		✔ Spend parts to open capsule @done(24-07-05)
+		☐ Screen with text and capsule contents
 
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)

@@ -182,7 +182,8 @@
 		"commonWelcome": "Powitanie",
 		"commonDossier": "Dossier",
 		"commonGateDestroyed": "Zniszczenie portalu",
-		"main": "Powrót",
+		"commonEscape": "Ucieczka na Zachód",
+		"commonBack": "Powrót",
 		"listMietek": "Mietek",
 		"listKrystyna": "Krystyna",
 		"listPutin": "Komisarz Putienko",
@@ -216,9 +217,11 @@
 		"prisonerRadio2": "Mgliste wspomnienia",
 		"prisonerRadio3": "Reminiscencja",
 		"sciFirstCrate": "Odnalezione części",
+		"sciCrateTeleporter": "Naprawa teleportera",
+		"sciCrateCapsule": "Stabilizacja kapsuły",
+		"sciMiner": "Jay Miner",
 		"agentSci": "Naukowcy",
-		"agentSellCrates": "Sprzedaż skrzyń",
-		"agentEscape": "Ucieczka na Zachód"
+		"agentSellCrates": "Sprzedaż skrzyń"
 	},
 	"officePageContents": {
 		"bribeA": [

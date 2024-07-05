@@ -26,6 +26,8 @@ void pageOfficeLockPerson(tFaceId ePerson);
 
 UBYTE pageOfficeHasPerson(tFaceId ePerson);
 
+void pageOfficeLockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
+
 UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
 
 const tCommShopPage *officeGetPagesForFace(tFaceId eFace);

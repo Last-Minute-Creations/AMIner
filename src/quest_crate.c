@@ -78,6 +78,7 @@ void questCrateAdd(void) {
 	else {
 		s_isFirstCrateFound = 1;
 		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER);
 		inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE, 0);
 
 		pageOfficeUnlockPerson(FACE_ID_AGENT);
@@ -93,9 +94,16 @@ UBYTE questCrateGetCount(void) {
 	return s_ubCrateCount;
 }
 
+UBYTE questCrateTryConsume(UBYTE ubAmount) {
+	if(questCrateGetCount() >= ubAmount) {
+		s_ubCrateCount -= ubAmount;
+		return 1;
+	}
+	return 0;
+}
+
 UBYTE questCrateTrySell(void) {
-	if(questCrateGetCount()) {
-		s_ubCrateCount -= 1;
+	if(questCrateTryConsume(1)) {
 		s_ubCratesSold += 1;
 		if(s_ubCratesSold >= 10) {
 			pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE);
@@ -107,8 +115,17 @@ UBYTE questCrateTrySell(void) {
 
 void questCrateSetCapsuleState(tCapsuleState eNewState) {
 	s_eCapsuleState = eNewState;
-	if(s_eCapsuleState == CAPSULE_STATE_FOUND) {
-		// pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_ABOUT_CAPSULE);
+	switch(s_eCapsuleState) {
+		case CAPSULE_STATE_NOT_FOUND:
+			break;
+		case CAPSULE_STATE_FOUND:
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_CAPSULE);
+			break;
+		case CAPSULE_STATE_OPENED:
+			pageOfficeLockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_CAPSULE);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER);
+			commShopChangePage(COMM_SHOP_PAGE_OFFICE_LIST_SCI, COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER);
+			break;
 	}
 }
 

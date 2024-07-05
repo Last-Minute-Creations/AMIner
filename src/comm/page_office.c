@@ -249,6 +249,18 @@ UBYTE pageOfficeHasPerson(tFaceId ePerson) {
 	return 0;
 }
 
+void pageOfficeLockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
+	for(UBYTE i = 0; i < PAGE_OFFICE_SUBPAGES_PER_PERSON - 1; ++i) {
+		if(s_pOfficePages[ePerson][i] == eSubpage) {
+			do {
+				++i;
+				s_pOfficePages[ePerson][i - 1] = s_pOfficePages[ePerson][i];
+			} while(s_pOfficePages[ePerson][i] != COMM_SHOP_PAGE_OFFICE_MAIN);
+			break;
+		}
+	}
+}
+
 UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
 	for(UBYTE i = 0; i < PAGE_OFFICE_SUBPAGES_PER_PERSON - 1; ++i) {
 		if(s_pOfficePages[ePerson][i] == eSubpage) {

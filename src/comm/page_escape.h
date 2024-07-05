@@ -7,6 +7,4 @@
 
 void pageEscapeCreate(void);
 
-void pageEscapeReset(void);
-
 #endif // _AMINER_COMM_PAGE_ESCAPE_H_
