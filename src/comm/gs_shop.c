@@ -337,7 +337,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_SELL);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE:
-			pageEscapeCreate();
+			pageEscapeCreate(PAGE_ESCAPE_SCENARIO_AGENT);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME:
@@ -353,7 +353,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_CAPSULE);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_ESCAPE:
-			pageEscapeCreate();
+			pageEscapeCreate(PAGE_ESCAPE_SCENARIO_TELEPORT);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_miner", onBack);
@@ -379,8 +379,14 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_NEWS_GATE_RED:
 			pageNewsCreate(NEWS_KIND_GATE_RED);
 			break;
-		case COMM_SHOP_PAGE_NEWS_ESCAPE_AGENT:
+		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_AGENT:
 			pageNewsCreate(NEWS_KIND_ESCAPE_AGENT);
+			break;
+		case COMM_SHOP_PAGE_NEWS_ESCAPE_FAIL:
+			pageNewsCreate(NEWS_KIND_ESCAPE_FAIL);
+			break;
+		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_TELEPORT:
+			pageNewsCreate(NEWS_KIND_ESCAPE_TELEPORT);
 			break;
 		case COMM_SHOP_PAGE_SOKOBAN:
 			pageSokobanCreate();

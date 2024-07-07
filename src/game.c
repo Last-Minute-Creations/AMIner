@@ -342,6 +342,9 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+	else if(keyUse(KEY_4)) {
+		questCrateSetCapsuleState(CAPSULE_STATE_FOUND);
+	}
 	else if(keyUse(KEY_5)) {
 		g_ubDrillingCost = 0;
 		g_pVehicles[0].lCash = 50000;

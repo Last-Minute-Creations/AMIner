@@ -2,11 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include <comm/page_escape.h>
 #include <comm/page_office.h>
 #include <comm/button.h>
 #include "../vehicle.h"
 #include "../quest_crate.h"
 #include "../hud.h"
+#include "../heat.h"
+
+static tPageEscapeScenario s_eScenario;
 
 static void pageEscapeProcess(void) {
 	BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
@@ -24,7 +28,20 @@ static void pageEscapeProcess(void) {
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(bButtonCurr == 0) {
-			commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_NEWS_ESCAPE_AGENT);
+			switch(s_eScenario) {
+				case PAGE_ESCAPE_SCENARIO_AGENT:
+					heatTryIncrease(20);
+					if(heatTryPassCheck()) {
+						commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_AGENT);
+					}
+					else {
+						commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_NEWS_ESCAPE_FAIL);
+					}
+					break;
+				case PAGE_ESCAPE_SCENARIO_TELEPORT:
+					commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_TELEPORT);
+					break;
+			}
 		}
 		else {
 			commShopGoBack();
@@ -32,7 +49,8 @@ static void pageEscapeProcess(void) {
 	}
 }
 
-void pageEscapeCreate(void) {
+void pageEscapeCreate(tPageEscapeScenario eScenario) {
+	s_eScenario = eScenario;
 	commRegisterPage(pageEscapeProcess, 0);
 	const UBYTE ubLineHeight = commGetLineHeight();
 	UWORD uwPosY = 0;

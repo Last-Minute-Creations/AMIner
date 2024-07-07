@@ -14,6 +14,7 @@
 
 #define QUESTIONING_HEAT_INCREASE 5
 #define QUESTIONING_HEAT_DECREASE_TRUTH 5
+#define QUESTIONING_HEAT_DECREASE_REPORT 100
 
 static tQuestioningFlag s_eQuestioningsPending;
 static tQuestioningFlag s_eQuestioningsReported;
@@ -49,6 +50,7 @@ static void pageQuestioningProcess(void) {
 		UBYTE isShowReportMessage = 0;
 		if(bButtonCurr == 0) {
 			// Told the truth
+			heatTryReduce(QUESTIONING_HEAT_DECREASE_TRUTH);
 			pageQuestioningReport(s_eQuestioningBitCurrent, 0);
 			isShowReportMessage = 1;
 		}
@@ -205,7 +207,7 @@ void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily)
 	s_eQuestioningsPending &= ~BV(eQuestioningBit);
 
 	if(isVoluntarily) {
-		heatTryReduce(100);
+		heatTryReduce(QUESTIONING_HEAT_DECREASE_REPORT);
 		gameAddAccolade();
 	}
 }

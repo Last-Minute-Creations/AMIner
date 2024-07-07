@@ -5,6 +5,11 @@
 #ifndef _AMINER_COMM_PAGE_ESCAPE_H_
 #define _AMINER_COMM_PAGE_ESCAPE_H_
 
-void pageEscapeCreate(void);
+typedef enum tPageEscapeScenario {
+	PAGE_ESCAPE_SCENARIO_AGENT,
+	PAGE_ESCAPE_SCENARIO_TELEPORT,
+} tPageEscapeScenario;
+
+void pageEscapeCreate(tPageEscapeScenario eScenario);
 
 #endif // _AMINER_COMM_PAGE_ESCAPE_H_
