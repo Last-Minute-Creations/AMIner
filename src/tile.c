@@ -22,6 +22,7 @@
 
 static const UBYTE s_pRowSpawnPattern[] = {5, 3, 7, 1, 4, 6, 8, 2, 9, 10};
 
+static UBYTE s_ubPrisonerX;
 static UBYTE s_ubNextRowPatternPos;
 static UWORD s_uwPlanFillPatternLength;
 static tUbCoordYX s_pPlanFillPattern[DEFS_MINE_DIGGABLE_WIDTH * ROWS_PER_PLAN_MAX];
@@ -209,6 +210,14 @@ static void tileGenerateTerrain(
 	}
 }
 
+/**
+ * @brief Places specified quest tile on given row.
+ *
+ * @param pTiles Tilemap.
+ * @param uwY Depth to be placed on.
+ * @param eTile Quest item's tile.
+ * @return X position on row if placed, zero on failure.
+ */
 static UBYTE tileTryPlaceQuestItemInRow(UBYTE **pTiles, UWORD uwY, tTile eTile) {
 	for(UBYTE i = 0; i < ARRAY_SIZE(s_pRowSpawnPattern); ++i) {
 		UBYTE ubX = s_pRowSpawnPattern[s_ubNextRowPatternPos++];
@@ -217,7 +226,7 @@ static UBYTE tileTryPlaceQuestItemInRow(UBYTE **pTiles, UWORD uwY, tTile eTile) 
 		}
 		if(pTiles[ubX][uwY] == TILE_DIRT_1 || pTiles[ubX][uwY] == TILE_DIRT_2) {
 			pTiles[ubX][uwY] = eTile;
-			return 1;
+			return ubX;
 		}
 	}
 
@@ -283,6 +292,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 	}
 
 	UBYTE **pTiles = g_pMainBuffer->pTileData;
+	s_ubPrisonerX = 0;
 
 	// Generate terrain
 	UBYTE ubProgressTerrainEnd = 30;
@@ -361,9 +371,11 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 #endif
 
 		// Quest tile: prisoner
-		if(!tileTryPlaceQuestItemInRow(pTiles, g_uwPrisonerDepth, TILE_PRISONER_1)) {
+		s_ubPrisonerX = tileTryPlaceQuestItemInRow(pTiles, g_uwPrisonerDepth, TILE_PRISONER_1);
+		if(!s_ubPrisonerX) {
 			logWrite("ERR: Can't find place for prisoner at row %hu\n", g_uwPrisonerDepth);
-			pTiles[5][g_uwPrisonerDepth] = TILE_PRISONER_1;
+			s_ubPrisonerX = 5;
+			pTiles[s_ubPrisonerX][g_uwPrisonerDepth] = TILE_PRISONER_1;
 		}
 
 		// Quest items: crates
@@ -703,6 +715,7 @@ void tileSave(tFile *pFile) {
 	for(UWORD uwX = 0; uwX < uwSizeX; ++uwX) {
 		fileWrite(pFile, &pTiles[uwX][0], sizeof(pTiles[0][0]) * uwSizeY);
 	}
+	fileWrite(pFile, &s_ubPrisonerX, sizeof(s_ubPrisonerX));
 }
 
 UBYTE tileLoad(tFile *pFile) {
@@ -718,6 +731,7 @@ UBYTE tileLoad(tFile *pFile) {
 	for(UWORD uwX = 0; uwX < uwSizeX; ++uwX) {
 		fileRead(pFile, &pTiles[uwX][0], sizeof(pTiles[0][0]) * uwSizeY);
 	}
+	fileRead(pFile, &s_ubPrisonerX, sizeof(s_ubPrisonerX));
 	return 1;
 }
 
@@ -762,4 +776,21 @@ void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant) {
 	}
 
 	tileSetBaseTiles(pBaseVariant, pBase->uwTileDepth, 1);
+}
+
+tTile tileGetPrisoner(void) {
+	return g_pMainBuffer->pTileData[s_ubPrisonerX][g_uwPrisonerDepth];
+}
+
+void tileSetPrisoner(tTile eNewTile) {
+	if(eNewTile < TILE_PRISONER_1 || TILE_PRISONER_8 < eNewTile) {
+		logWrite("ERR: eNewTile out of range: %d\n", eNewTile);
+	}
+
+	tTile ePrevTile = g_pMainBuffer->pTileData[s_ubPrisonerX][g_uwPrisonerDepth];
+	if(ePrevTile < TILE_PRISONER_1 || TILE_PRISONER_8 < ePrevTile) {
+		logWrite("ERR: prev tile out of range: %d\n", ePrevTile);
+	}
+
+	tileBufferSetTile(g_pMainBuffer, s_ubPrisonerX, g_uwPrisonerDepth, eNewTile);
 }

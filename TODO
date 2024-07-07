@@ -162,11 +162,11 @@ Gate quest:
 		✔ Teleport player to cutscene with simple fadeout @done(24-01-27)
 		✔ Light up the runes @done(23-12-13)
 		✔ Twister effect @done(23-11-28)
-	☐ Prisoner of war
+	✔ Prisoner of war @done(24-07-07)
 		✔ Rescue @done(24-01-03)
 		✔ Load proper tiles in campaign mode @done(24-01-03)
 		✔ Trigger comments regarding transmissions @done(24-02-04)
-		☐ Tile animation
+		✔ Tile animation @done(24-07-07)
 	✔ Detonation vs activation dillema @done(24-01-16)
 	✔ Only trigger dillema if comissar doesn't know about the gate @done(24-02-08)
 	✔ Detonation cutscene @done(24-02-08)

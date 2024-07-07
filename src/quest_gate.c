@@ -10,25 +10,35 @@
 #include "hud.h"
 #include "save.h"
 #include "game.h"
+#include "core.h"
+#include "tile.h"
+
+#define PRISONER_ANIM_COOLDOWN 6
 
 typedef enum tQuestGateState {
 	QUEST_GATE_STATE_UNEXPLODED,
 	QUEST_GATE_STATE_EXPLODED,
-
 } tQuestGateState;
 
 static tQuestGateState s_eGateQuestState;
 static UBYTE s_ubFoundFragments;
+static UBYTE s_isPrisonerFound;
+static UBYTE s_ubPrisonerAnimCooldown;
+static tTile s_ePrisonerAnimFrame;
 
 void questGateReset(void) {
 	s_eGateQuestState = QUEST_GATE_STATE_UNEXPLODED;
 	s_ubFoundFragments = 0;
+	s_isPrisonerFound = 0;
+	s_ePrisonerAnimFrame = TILE_PRISONER_1;
+	s_ubPrisonerAnimCooldown = PRISONER_ANIM_COOLDOWN;
 }
 
 void questGateSave(tFile *pFile) {
 	saveWriteHeader(pFile, "GATE");
-	fileWrite(pFile, &s_ubFoundFragments, sizeof(s_ubFoundFragments));
 	fileWrite(pFile, &s_eGateQuestState, sizeof(s_eGateQuestState));
+	fileWrite(pFile, &s_ubFoundFragments, sizeof(s_ubFoundFragments));
+	fileWrite(pFile, &s_isPrisonerFound, sizeof(s_isPrisonerFound));
 }
 
 UBYTE questGateLoad(tFile *pFile) {
@@ -36,14 +46,38 @@ UBYTE questGateLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_ubFoundFragments, sizeof(s_ubFoundFragments));
 	fileRead(pFile, &s_eGateQuestState, sizeof(s_eGateQuestState));
+	fileRead(pFile, &s_ubFoundFragments, sizeof(s_ubFoundFragments));
+	fileRead(pFile, &s_isPrisonerFound, sizeof(s_isPrisonerFound));
 	collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, s_ubFoundFragments);
 	return 1;
 }
 
 void questGateProcess(void) {
-
+	if(!questGateIsPrisonerFound()) {
+		if(s_ubPrisonerAnimCooldown) {
+			--s_ubPrisonerAnimCooldown;
+		}
+		else {
+			s_ubPrisonerAnimCooldown = PRISONER_ANIM_COOLDOWN;
+			UWORD uwCamTopPos = g_pMainBuffer->pCamera->uPos.uwY;
+			UWORD uwCamBottomPos = uwCamTopPos + g_pMainBuffer->sCommon.pVPort->uwHeight- TILE_SIZE;
+			UWORD uwPrisonerPos = g_uwPrisonerDepth * TILE_SIZE;
+			if(uwCamTopPos < uwPrisonerPos && uwPrisonerPos < uwCamBottomPos) {
+				if(s_ePrisonerAnimFrame < TILE_PRISONER_8) {
+					++s_ePrisonerAnimFrame;
+				}
+			}
+			else {
+				if(s_ePrisonerAnimFrame > TILE_PRISONER_1) {
+					--s_ePrisonerAnimFrame;
+				}
+			}
+			if(tileGetPrisoner() != s_ePrisonerAnimFrame) {
+				tileSetPrisoner(s_ePrisonerAnimFrame);
+			}
+		}
+	}
 }
 
 UBYTE questGateAddFragment(void) {
@@ -90,5 +124,5 @@ void questGateUnlockPrisoner(void) {
 }
 
 UBYTE questGateIsPrisonerFound(void) {
-	return pageOfficeHasPerson(FACE_ID_PRISONER);
+	return s_isPrisonerFound;
 }
