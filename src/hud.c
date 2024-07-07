@@ -436,6 +436,7 @@ void hudUpdate(void) {
 			}
 			else {
 				lCash = s_pPlayerData[0].lCash + s_pPlayerData[1].lCash;
+				lCash = MIN(lCash, 99999); // Prevent trashing inbox icon
 			}
 			if(lCash != pData->lCashDisp) {
 				ULONG ulDisp;

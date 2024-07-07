@@ -9,6 +9,8 @@
 #include <save.h>
 #include <hud.h>
 
+#define QUEST_CRATE_MIN_SELLS_FOR_ESCAPE 5
+
 static UBYTE s_ubCrateCount;
 static UBYTE s_ubCratesSold;
 static UBYTE s_isScientistUnlocked;
@@ -107,7 +109,7 @@ UBYTE questCrateTryConsume(UBYTE ubAmount) {
 UBYTE questCrateTrySell(void) {
 	if(questCrateTryConsume(1)) {
 		s_ubCratesSold += 1;
-		if(s_ubCratesSold >= 10) {
+		if(s_ubCratesSold >= QUEST_CRATE_MIN_SELLS_FOR_ESCAPE) {
 			pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE);
 		}
 		return 1;
