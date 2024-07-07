@@ -73,8 +73,10 @@ void questCrateProcess(void) {
 void questCrateAdd(void) {
 	s_ubCrateCount += 1;
 	if(s_isFirstCrateFound) {
+		if(s_ubCrateCount % 3 == 0) {
 			pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_TELEPORT_PARTS, 1);
 		}
+	}
 	else {
 		s_isFirstCrateFound = 1;
 		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE);
