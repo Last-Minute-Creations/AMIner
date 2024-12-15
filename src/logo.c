@@ -105,7 +105,8 @@ static void logoGsCreate(void) {
 
 static void logoGsLoop(void) {
 	s_isAnyPressed = (
-		keyUse(KEY_RETURN) | keyUse(KEY_ESCAPE) | keyUse(KEY_SPACE)
+		keyUse(KEY_RETURN) | keyUse(KEY_ESCAPE) | keyUse(KEY_SPACE) |
+		keyUse(KEY_LSHIFT) | keyUse(KEY_RSHIFT) | joyUse(JOY1_FIRE) | joyUse(JOY2_FIRE)
 	);
 
 	fadeProcess();

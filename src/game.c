@@ -27,6 +27,7 @@
 #include "core.h"
 #include "dino.h"
 #include "quest_gate.h"
+#include "quest_crate.h"
 #include "debug.h"
 #include "inventory.h"
 #include "defs.h"
@@ -308,6 +309,9 @@ static void gameProcessHotkeys(void) {
 	if(keyUse(KEY_COMMA)) {
 		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 104 * TILE_SIZE);
 	}
+	if(keyUse(KEY_PERIOD)) {
+		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 504 * TILE_SIZE);
+	}
 
 	if(keyUse(KEY_F1) && !g_isChallenge) {
 		if(!g_is2pPlaying) {
@@ -338,9 +342,16 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+	else if(keyUse(KEY_4)) {
+		questCrateSetCapsuleState(CAPSULE_STATE_FOUND);
+	}
 	else if(keyUse(KEY_5)) {
+		g_ubDrillingCost = 0;
+		g_pVehicles[0].lCash = 50000;
+		g_pVehicles[0].wHullCurr = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
 	}
 	else if(keyUse(KEY_6)) {
+		questCrateAdd();
 	}
 	else if(keyUse(KEY_7)) {
 		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_GUEST]);
@@ -921,6 +932,7 @@ static void gameSave(tFile *pFile) {
 	inboxSave(pFile);
 	dinoSave(pFile);
 	questGateSave(pFile);
+	questCrateSave(pFile);
 	tutorialSave(pFile);
 	pageOfficeSave(pFile);
 	warehouseSave(pFile);
@@ -939,6 +951,10 @@ static void gameSave(tFile *pFile) {
 
 static UBYTE s_ubRadioMessageCounter = RADIO_MESSAGE_INTERVAL;
 static UBYTE s_ubRadioMessageIndex = 0;
+
+void gameProcessBaseWestern(void) {
+	questCrateProcessBase();
+}
 
 void gameProcessBaseGate(void) {
 	if(gameIsCutsceneActive()) {
@@ -1138,6 +1154,7 @@ UBYTE gameLoad(tFile *pFile) {
 	return inboxLoad(pFile) &&
 		dinoLoad(pFile) &&
 		questGateLoad(pFile) &&
+		questCrateLoad(pFile) &&
 		tutorialLoad(pFile) &&
 		pageOfficeLoad(pFile) &&
 		warehouseLoad(pFile) &&
@@ -1172,6 +1189,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	inboxReset();
 	dinoReset();
 	questGateReset();
+	questCrateReset();
 	collectiblesReset();
 	tutorialReset();
 	pageOfficeReset();
@@ -1198,7 +1216,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	heatReset();
 	groundLayerReset(1, 0);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
-	tileVariantChangeTo(TILE_VARIANT_PRISONER);
+	tileVariantChangeTo(TILE_VARIANT_CAMPAIGN);
 }
 
 void gameTriggerSave(void) {
@@ -1247,6 +1265,7 @@ static void gameGsLoop(void) {
 	}
 	dinoProcess();
 	questGateProcess();
+	questCrateProcess();
 	UBYTE isGameStateChange = gameProcessGateCutscene();
 	if(isGameStateChange) {
 		return;

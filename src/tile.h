@@ -30,7 +30,7 @@ typedef enum _tTile {
 	TILE_GOLD_1, TILE_GOLD_2, TILE_GOLD_3,
 	TILE_COAL_1, TILE_COAL_2, TILE_COAL_3,
 	TILE_MAGMA_1, TILE_MAGMA_2,
-	TILE_PRISONER_1, TILE_PRISONER_8 = TILE_PRISONER_1 + 7,
+	TILE_PRISONER_1, TILE_PRISONER_8 = TILE_PRISONER_1 + 7, TILE_CAPSULE,
 	TILE_CHECKPOINT_1 = TILE_PRISONER_1, TILE_CHECKPOINT_10 = TILE_CHECKPOINT_1 + 9,
 	TILE_STONE_1, TILE_STONE_2, TILE_STONE_3, TILE_STONE_4,
 	TILE_EMERALD_1, TILE_EMERALD_2, TILE_EMERALD_3,
@@ -65,6 +65,10 @@ UBYTE tileLoad(tFile *pFile);
 void tileExcavate(UWORD uwX, UWORD uwY);
 
 void tileReplaceBaseWithVariant(tBaseId eBase, tBaseId eNewVariant);
+
+tTile tileGetPrisoner(void);
+
+void tileSetPrisoner(tTile eNewTile);
 
 extern const tTileDef g_pTileDefs[TILE_COUNT];
 extern const tTile g_pMineralToFirstTile[MINERAL_TYPE_COUNT];

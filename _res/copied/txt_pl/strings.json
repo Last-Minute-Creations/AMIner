@@ -63,7 +63,8 @@
 			[
 				"w uruchomieniu portalu. Pospiesz się, tutaj umieramy."
 			]
-		]
+		],
+		"sciWelcome": "Hej, Ty! W maszynie! Z nieba nam spadłeś!"
 	},
 	"hiScore": {
 		"new": "Nowy rekord! Wpisz imię.",
@@ -140,7 +141,9 @@
 		"cargoFull": "Ładownia pełna!",
 		"restock": "Rozładunek!",
 		"foundBone": "Kość #%hhu",
-		"foundGate": "Fragment portalu #%hhu"
+		"foundGate": "Fragment portalu #%hhu",
+		"foundCrate": "Skrzynia z częściami",
+		"foundCapsule": "Kapsuła"
 	},
 	"shop": {
 		"timeRemaining": "Pozostało %d dni",
@@ -179,7 +182,8 @@
 		"commonWelcome": "Powitanie",
 		"commonDossier": "Dossier",
 		"commonGateDestroyed": "Zniszczenie portalu",
-		"main": "Powrót",
+		"commonEscape": "Ucieczka na Zachód",
+		"commonBack": "Powrót",
 		"listMietek": "Mietek",
 		"listKrystyna": "Krystyna",
 		"listPutin": "Komisarz Putienko",
@@ -187,6 +191,7 @@
 		"listArch": "Iwan Jensonow",
 		"listPrisoner": "Więzień",
 		"listAgent": "Agent",
+		"listSci": "Naukowiec",
 		"mietekFirstPlan": "Kariera",
 		"mietekPlanComplete": "Zawody",
 		"krystynaAccounting": "Kreatywna Księgowość",
@@ -200,13 +205,23 @@
 		"komisarzRebuke_2": "Druga nagana",
 		"komisarzRebuke_3": "Ostatnia nagana",
 		"komisarzQuestioning": "Przesłuchanie",
+		"komisarzReportList": "Raportowanie",
+		"komisarzReportGate": "Znaleziony Portal",
+		"komisarzReportParts": "Skrzynie z częściami",
+		"komisarzReportAgent": "Obcy agent",
 		"komisarzArchAccolade": "Kompletny dinozaur",
 		"archPlanFail": "Awans",
 		"archGateOpened": "Otwarcie portalu",
 		"archAccolade": "Kompletny dinozaur",
 		"prisonerRadio1": "Złe przeczucia",
 		"prisonerRadio2": "Mgliste wspomnienia",
-		"prisonerRadio3": "Reminiscencja"
+		"prisonerRadio3": "Reminiscencja",
+		"sciFirstCrate": "Odnalezione części",
+		"sciCrateTeleporter": "Naprawa teleportera",
+		"sciCrateCapsule": "Stabilizacja kapsuły",
+		"sciMiner": "Jay Miner",
+		"agentSci": "Naukowcy",
+		"agentSellCrates": "Sprzedaż skrzyń"
 	},
 	"officePageContents": {
 		"bribeA": [

@@ -9,6 +9,6 @@
 #include "comm/page_office.h"
 #include "comm/comm.h"
 
-void pageListCreate(tFaceId eFace);
+void pageListCreate(tFaceId eFace, const tCommShopPage *pPages);
 
 #endif // _AMINER_COMM_PAGE_LIST_H_

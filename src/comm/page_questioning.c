@@ -6,7 +6,6 @@
 #include <comm/comm.h>
 #include <comm/page_office.h>
 #include <comm/button.h>
-#include <comm/gs_shop.h>
 #include <comm/inbox.h>
 #include "../save.h"
 #include "../heat.h"
@@ -15,10 +14,23 @@
 
 #define QUESTIONING_HEAT_INCREASE 5
 #define QUESTIONING_HEAT_DECREASE_TRUTH 5
+#define QUESTIONING_HEAT_DECREASE_REPORT 100
 
-static tQuestioningBit s_eQuestioningsPending;
-static tQuestioningBit s_eQuestioningsReported;
-static tQuestioningBit s_eQuestioningCurrent;
+static tQuestioningFlag s_eQuestioningsPending;
+static tQuestioningFlag s_eQuestioningsReported;
+static tQuestioningFlag s_eQuestioningsNotReported; // for future reporting at will
+static tQuestioningBit s_eQuestioningBitCurrent;
+static tQuestioningHandler s_pQuestioningHandlers[QUESTIONING_BIT_COUNT] = {0};
+static tCommShopPage s_pOfficeQuestioningPages[PAGE_OFFICE_SUBPAGES_PER_PERSON];
+
+static tCommShopPage pageQuestioningBitToShopPage(tQuestioningBit eBit) {
+	static const tCommShopPage pQuestioningPages[QUESTIONING_BIT_COUNT] = {
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_GATE,
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_TELEPORT_PARTS,
+		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_AGENT,
+	};
+	return pQuestioningPages[eBit];
+}
 
 static void pageQuestioningProcess(void) {
 	BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
@@ -35,18 +47,40 @@ static void pageQuestioningProcess(void) {
 	}
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+		UBYTE isShowReportMessage = 0;
 		if(bButtonCurr == 0) {
-			s_eQuestioningsReported |= s_eQuestioningCurrent;
+			// Told the truth
+			heatTryReduce(QUESTIONING_HEAT_DECREASE_TRUTH);
+			pageQuestioningReport(s_eQuestioningBitCurrent, 0);
+			isShowReportMessage = 1;
 		}
 		else {
 			if(heatTryPassCheck()) {
-				s_eQuestioningsPending &= ~(s_eQuestioningCurrent);
+				s_eQuestioningsNotReported |= BV(s_eQuestioningBitCurrent);
 			}
 			else {
+				// Got caught
 				gameAddRebuke();
+				pageQuestioningReport(s_eQuestioningBitCurrent, 0);
+				isShowReportMessage = 1;
 			}
 		}
-		commShopGoBack();
+
+		// Questioning has ended - clear pending and launch callback
+		s_eQuestioningsPending &= ~BV(s_eQuestioningBitCurrent);
+		if(s_pQuestioningHandlers[s_eQuestioningBitCurrent]) {
+			s_pQuestioningHandlers[s_eQuestioningBitCurrent](
+				s_eQuestioningBitCurrent, pageQuestioningIsReported(s_eQuestioningBitCurrent)
+			);
+		}
+
+		if(isShowReportMessage) {
+			tCommShopPage eNextPage = pageQuestioningBitToShopPage(s_eQuestioningBitCurrent);
+			commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, eNextPage);
+		}
+		else {
+			commShopGoBack();
+		}
 	}
 }
 
@@ -55,20 +89,21 @@ void pageQuestioningCreate(void) {
 	UWORD uwPosY = 0;
 	UBYTE ubLineHeight = commGetLineHeight();
 
-	s_eQuestioningCurrent = QUESTIONING_BIT_GATE;
-	while(s_eQuestioningCurrent < QUESTIONING_BIT_END) {
-		if(s_eQuestioningCurrent & s_eQuestioningsPending) {
+	s_eQuestioningBitCurrent = QUESTIONING_BIT_GATE;
+	while(s_eQuestioningBitCurrent < QUESTIONING_BIT_COUNT) {
+		if(s_eQuestioningsPending & BV(s_eQuestioningBitCurrent)) {
 			break;
 		}
-		s_eQuestioningCurrent <<= 1;
+		++s_eQuestioningBitCurrent;
 	}
 
-	if(s_eQuestioningCurrent >= QUESTIONING_BIT_END) {
-		s_eQuestioningCurrent = QUESTIONING_BIT_END;
+	if(s_eQuestioningBitCurrent >= QUESTIONING_BIT_COUNT) {
+		commShopGoBack();
+		return;
 	}
 
 	const char *szMsg = "???";
-	switch (s_eQuestioningCurrent)
+	switch (s_eQuestioningBitCurrent)
 	{
 		case QUESTIONING_BIT_GATE:
 			szMsg = "Have you found some gate parts?";
@@ -76,11 +111,8 @@ void pageQuestioningCreate(void) {
 		case QUESTIONING_BIT_TELEPORT_PARTS:
 			szMsg = "Have you found some teleport parts?";
 			break;
-		case QUESTIONING_BIT_END:
-			commShopGoBack();
-			return;
 		default:
-			logWrite("ERR: Unhandled questioning value: %d\n", s_eQuestioningCurrent);
+			logWrite("ERR: Unhandled questioning value: %d\n", s_eQuestioningBitCurrent);
 			// TODO: exit earlier?
 	}
 
@@ -104,12 +136,14 @@ void pageQuestioningCreate(void) {
 void pageQuestioningReset(void) {
 	s_eQuestioningsPending = 0;
 	s_eQuestioningsReported = 0;
+	s_eQuestioningsNotReported = 0;
 }
 
 void pageQuestioningSave(tFile *pFile) {
 	saveWriteHeader(pFile, "QTNG");
 	fileWrite(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
 	fileWrite(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
+	fileWrite(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
 }
 
 UBYTE pageQuestioningLoad(tFile *pFile) {
@@ -119,31 +153,65 @@ UBYTE pageQuestioningLoad(tFile *pFile) {
 
 	fileRead(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
 	fileRead(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
+	fileRead(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
 	return 1;
 }
 
-void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit) {
-	tQuestioningBit ePendingQuestioningPrev = s_eQuestioningsPending;
+void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit, UBYTE isForce) {
+	tQuestioningFlag ePendingQuestioningPrev = s_eQuestioningsPending;
 
-	if(!(s_eQuestioningsReported & eQuestioningBit)) {
+	if(isForce || !pageQuestioningIsReported(eQuestioningBit)) {
 		// Not reported yet - increase heat and add as pending questioning.
 		// Increases heat each time it's triggered, even when questioning is already pending.
-		s_eQuestioningsPending |= eQuestioningBit;
+		s_eQuestioningsPending |= BV(eQuestioningBit);
 		heatTryIncrease(QUESTIONING_HEAT_INCREASE);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_LIST);
 	}
 
 	if(ePendingQuestioningPrev != s_eQuestioningsPending) {
 		inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING, 1);
-		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_URZEDAS]);
+		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
 	}
 }
 
 void pageQuestioningTryCancelPendingQuestioning(tQuestioningBit eQuestioningBit) {
-	if(s_eQuestioningsPending & eQuestioningBit) {
-		s_eQuestioningsPending &= ~eQuestioningBit;
+	s_eQuestioningsPending &= ~BV(eQuestioningBit);
+}
+
+UBYTE pageQuestioningIsReported(tQuestioningBit eQuestioningBit) {
+	return (s_eQuestioningsReported & BV(eQuestioningBit)) != 0;
+}
+
+void pageQuestioningSetHandler(
+	tQuestioningBit eQuestioningBit, tQuestioningHandler cbOnQuestioningEnded
+) {
+	s_pQuestioningHandlers[eQuestioningBit] = cbOnQuestioningEnded;
+}
+
+const tCommShopPage *pageQuestioningGetNotReportedPages(void) {
+	UBYTE ubPos = 0;
+	for(tQuestioningBit eBit = 0; eBit < QUESTIONING_BIT_COUNT; ++eBit) {
+		if(s_eQuestioningsNotReported & BV(eBit)) {
+			s_pOfficeQuestioningPages[ubPos] = pageQuestioningBitToShopPage(eBit);
+			++ubPos;
+		}
+	}
+
+	s_pOfficeQuestioningPages[ubPos] = COMM_SHOP_PAGE_OFFICE_MAIN; // Serves as list terminator
+	return s_pOfficeQuestioningPages;
+}
+
+void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily) {
+	s_eQuestioningsReported |= BV(eQuestioningBit);
+	s_eQuestioningsNotReported &= ~BV(eQuestioningBit);
+	s_eQuestioningsPending &= ~BV(eQuestioningBit);
+
+	if(isVoluntarily) {
+		heatTryReduce(QUESTIONING_HEAT_DECREASE_REPORT);
+		gameAddAccolade();
 	}
 }
 
-UBYTE pageQuestioningIsReported(tQuestioningBit eQuestioning) {
-	return (s_eQuestioningsReported & eQuestioning) != 0;
+void pageQuestioningAddReporting(tQuestioningBit eQuestioningBit) {
+	s_eQuestioningsNotReported |= BV(eQuestioningBit);
 }

@@ -15,9 +15,12 @@
 #include <comm/page_favor.h>
 #include <comm/page_gate_dilemma.h>
 #include <comm/page_questioning.h>
+#include <comm/page_use_crates.h>
+#include <comm/page_escape.h>
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
 #include <comm/page_market.h>
+#include <comm/page_portrait.h>
 #include "core.h"
 #include "dino.h"
 #include "game.h"
@@ -276,6 +279,21 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_ARCH_ACCOLADE:
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_arch_accolade", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_LIST:
+			pageListCreate(FACE_ID_KOMISARZ, pageQuestioningGetNotReportedPages());
+			break;
+		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_GATE:
+			pageQuestioningReport(QUESTIONING_BIT_GATE, 1); // HACK HACK HACK
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_gate", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_TELEPORT_PARTS:
+			pageQuestioningReport(QUESTIONING_BIT_TELEPORT_PARTS, 1); // HACK HACK HACK
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_teleport", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_AGENT:
+			pageQuestioningReport(QUESTIONING_BIT_AGENT, 1); // HACK HACK HACK
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_agent", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_welcome", onBack);
 			break;
@@ -309,15 +327,52 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_RADIO_3:
 			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_3", onBack);
 			break;
+
+		case COMM_SHOP_PAGE_OFFICE_AGENT_WELCOME:
+			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_welcome", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_AGENT_SCIENTISTS:
+			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_sci", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_AGENT_SELL_CRATES:
+			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_SELL);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE:
+			pageEscapeCreate(PAGE_ESCAPE_SCENARIO_AGENT);
+			break;
+
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME:
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_welcome", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE:
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_first_crate", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER:
+			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_TELEPORTER);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_CAPSULE:
+			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_CAPSULE);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_ESCAPE:
+			pageEscapeCreate(PAGE_ESCAPE_SCENARIO_TELEPORT);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER_PORTRAIT:
+			pagePortraitCreate();
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER_TEXT:
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_miner", onBack);
+			break;
+
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
 		case COMM_SHOP_PAGE_OFFICE_LIST_ARCH:
 		case COMM_SHOP_PAGE_OFFICE_LIST_PRISONER:
 		case COMM_SHOP_PAGE_OFFICE_LIST_AGENT:
+		case COMM_SHOP_PAGE_OFFICE_LIST_SCI:
 		case COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS: {
 			tFaceId eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + FACE_ID_MIETEK;
-			pageListCreate(eFace);
+			pageListCreate(eFace, officeGetPagesForFace(eFace));
 		} break;
 		case COMM_SHOP_PAGE_NEWS_ACCOLADES:
 			pageNewsCreate(NEWS_KIND_ACCOLADES);
@@ -327,6 +382,15 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_NEWS_GATE_RED:
 			pageNewsCreate(NEWS_KIND_GATE_RED);
+			break;
+		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_AGENT:
+			pageNewsCreate(NEWS_KIND_ESCAPE_AGENT);
+			break;
+		case COMM_SHOP_PAGE_NEWS_ESCAPE_FAIL:
+			pageNewsCreate(NEWS_KIND_ESCAPE_FAIL);
+			break;
+		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_TELEPORT:
+			pageNewsCreate(NEWS_KIND_ESCAPE_TELEPORT);
 			break;
 		case COMM_SHOP_PAGE_SOKOBAN:
 			pageSokobanCreate();

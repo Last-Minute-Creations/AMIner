@@ -79,6 +79,13 @@ General:
 	✔ Show save stats preview in main menu @done(23-09-30)
 	✔ Pending message icon on HUD @done(23-10-01)
 	✔ Mode management via floating buttons @done(23-10-02)
+	✔ Markers for offscreen players @done(23-10-06)
+	✔ Offscreen players can focus by pressing fire @done(23-10-06)
+	☐ Fast travel between bases
+	☐ Portable teleport as a vehicle upgrade
+		☐ Figure out the teleport upgrades
+		☐ Remove debug teleport return button
+		☐ Bring back teleport damage on zeroeth upgrade
 	☐ Animated main base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
@@ -94,26 +101,37 @@ General:
 		☐ Remove debug teleport return button
 		☐ Bring back teleport damage on zeroeth upgrade
 	☐ Add 2s pauses between music tracks?
+	✔ Reporting mechanics @done(24-07-01)
+		✔ Add "Reproting" option for commissar @done(24-07-01)
+		✔ Add ability to report on non-reported stuff from questioning @done(24-07-01)
+			✔ Trigger same handler as after questioning @done(24-07-01)
+		✔ Add ability to report on Agent @done(24-07-01)
+			✔ Add option upon his arrival @done(24-07-01)
+			✔ Remove option after he's reported @done(24-07-01)
+			✔ Remove NPC from office on reporting @done(24-07-01)
 	✘ Modifiable challenge end level? @cancelled(24-02-11)
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
 	✔ Prisoner is not always placed @done(24-02-01)
+	✔ Limit cash display to prevent trashing of message icon? @done(24-07-07)
 	☐ Gate (collectibles) not drawing properly on teleport-in
-	☐ Jet sfx looping if fly-entering (urgent) msg in base
+	☐ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time
 	☐ Game doesn't launch properly from icon
 	☐ Distorted main base in challenge mode
+	☐ Warehouse corruption (after entering accounting?)
 
 Misc QoL refinements:
+	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)
+	✔ Skippable LMC/ACE logos by fire button @done(24-07-07)
 	☐ Onboard player on need to maintain income
-	☐ Remove first base mineral pattern so that bricking it won't penalize new players?
-	☐ Skippable LMC/ACE logos by fire button
 
 Commrade:
 	✔ Mineral market @done(23-09-16)
 	✔ Improve tab changing on commrade by allowing cursor to move to buttons @done(24-02-08)
 	☐ Redo warehouse/plan management
 	☐ Workshop icons for upgrades?
+	☐ Add left/right arrows in workshop to indicate nav possibility
 	☐ Figure out where to hide sokoban and how to hint it
 
 Optimizations:
@@ -153,16 +171,16 @@ Gate quest:
 		✔ Teleport player to cutscene with simple fadeout @done(24-01-27)
 		✔ Light up the runes @done(23-12-13)
 		✔ Twister effect @done(23-11-28)
-	☐ Prisoner of war
+	✔ Prisoner of war @done(24-07-07)
 		✔ Rescue @done(24-01-03)
 		✔ Load proper tiles in campaign mode @done(24-01-03)
 		✔ Trigger comments regarding transmissions @done(24-02-04)
-		☐ Tile animation
+		✔ Tile animation @done(24-07-07)
 	✔ Detonation vs activation dillema @done(24-01-16)
-	✔ Only trigger dillema if comissar doesn't know about the gate @done(24-02-08 13:38)
+	✔ Only trigger dillema if comissar doesn't know about the gate @done(24-02-08)
 	✔ Detonation cutscene @done(24-02-08)
 		✔ Trigger explosions @done(24-01-16)
-		✔ Undraw the gate @done(24-01-16 18:17)
+		✔ Undraw the gate @done(24-01-16)
 		✔ Stop transmissions @done(24-01-27)
 		✔ Rebuke on detonating without commissar knowing @done(24-01-27)
 		✘ Game over if commissar knows about gate @cancelled(24-02-08)
@@ -174,26 +192,38 @@ Gate quest:
 		✘ Trigger message on unfinished dino-skeleton @cancelled(24-02-17)
 
 Crate quests:
-	☐ Spawn crates in mine
-	☐ Agent quest flow
-		☐ Agent appears after first crate
-		☐ Ability to sell create
-		☐ Questionings
-			☐ Trigger after finding each crate
-			☐ Bad questioning causes confiscating of all crates
-			☐ Report agent to remove him and get accolade
-	☐ Travelers quest flow
-		☐ Implement base
-		☐ Spawn capsule at the bottom of mine
-		☐ Spend parts to build mega-teleporter
-		☐ Spend parts to open capsule
+	✔ Spawn crates in mine @done(24-04-13)
+	✔ Agent quest flow @done(24-07-03)
+		✔ Agent appears after first crate @done(24-03-14)
+		✔ Ability to sell crate @done(24-07-03)
+		✔ Questionings @done(24-05-30)
+			✔ Trigger after finding each crate @done(24-05-30)
+			✔ Bad questioning causes confiscating of all crates @done(24-05-30)
+			✔ Trigger after finding next one past reported/interrogation @done(24-07-05)
+		✔ Report agent to remove him and get accolade @done(24-07-01)
+		✔ Add escape option after selling 10 crates @done(24-07-03)
+	✔ Travelers quest flow @done(24-12-15)
+		✔ Implement base @done(24-04-13)
+		✔ Spawn capsule at the bottom of mine @done(24-04-13)
+		✔ Add scientist NPC @done(24-07-01)
+		✔ Trigger scientist message on first picked up crate @done(24-07-01)
+		✔ Spend parts to build mega-teleporter @done(24-07-05)
+		✔ Spend parts to open capsule @done(24-07-05)
+		✔ Screen with text and capsule contents @done(24-12-15)
 
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)
 	✔ Arch angry on destroying gate @done(24-02-17)
 	☐ Commissar before gate opens if he knows about it
-	✘ Outro msg for news on destroying gate? @cancelled(24-02-08 14:21)
-	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08 14:21)
+	☐ Commissar questionings:
+		☐ After reporting on gate
+		☐ After reporting on crates
+		☐ After reporting on agent
+	✘ Outro msg for news on destroying gate? @cancelled(24-02-08)
+	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08)
+
+Missing graphics:
+	☐ Scientist portrait
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07)

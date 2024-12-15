@@ -8,6 +8,8 @@
 #include <comm/comm.h>
 #include <comm/gs_shop.h>
 
+#define PAGE_OFFICE_SUBPAGES_PER_PERSON 10
+
 void pageOfficeReset(void);
 
 void pageOfficeSave(tFile *pFile);
@@ -20,7 +22,11 @@ void pageOfficeShow(void);
 
 void pageOfficeUnlockPerson(tFaceId ePerson);
 
+void pageOfficeLockPerson(tFaceId ePerson);
+
 UBYTE pageOfficeHasPerson(tFaceId ePerson);
+
+void pageOfficeLockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
 
 UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage);
 

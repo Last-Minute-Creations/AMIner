@@ -31,6 +31,9 @@ fix16_t g_fPlanIncreaseRatioMultiplayer;
 LONG g_pUpgradeCosts[10];
 UWORD g_pDinoDepths[DEFS_QUEST_DINO_BONE_COUNT];
 UWORD g_pGateDepths[DEFS_QUEST_GATE_PART_COUNT];
+UWORD g_pCrateDepths[DEFS_QUEST_CRATE_COUNT];
+UWORD g_uwCapsuleDepth;
+UWORD g_uwPrisonerDepth;
 UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
 UBYTE g_ubMinePercentForPlans;
 UBYTE g_ubTrailingMineralCountPercent;
@@ -78,6 +81,8 @@ const char * s_pLangDom[] = {
 	[MSG_MISC_RESTOCK] = "misc.restock",
 	[MSG_MISC_FOUND_BONE] = "misc.foundBone",
 	[MSG_MISC_FOUND_GATE] = "misc.foundGate",
+	[MSG_MISC_FOUND_CRATE] = "misc.foundCrate",
+	[MSG_MISC_FOUND_CAPSULE] = "misc.foundCapsule",
 	// HUD: UI
 	[MSG_HUD_P1] = "hud.p1",
 	[MSG_HUD_P2] = "hud.p2",
@@ -108,12 +113,13 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_WAITING_KOMISARZ] = "hudMessages.waitingKomisarz",
 	[MSG_HUD_GUEST] = "hudMessages.guest",
 	[MSG_HUD_WAITING_URZEDAS] = "hudMessages.waitingUrzedas",
+	[MSG_HUD_SCI_WELCOME] = "hudMessages.sciWelcome",
 	// Loading
 	[MSG_LOADING_GEN_TERRAIN] = "loading.genTerrain",
 	[MSG_LOADING_GEN_BASES] = "loading.genBases",
 	[MSG_LOADING_FINISHING] = "loading.finishing",
 	// Office
-	[MSG_PAGE_MAIN] = "officePages.main",
+	[MSG_PAGE_BACK] = "officePages.commonBack",
 	[MSG_PAGE_LIST_MIETEK] = "officePages.listMietek",
 	[MSG_PAGE_LIST_KRYSTYNA] = "officePages.listKrystyna",
 	[MSG_PAGE_LIST_KOMISARZ] = "officePages.listPutin",
@@ -121,6 +127,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_LIST_ARCH] = "officePages.listArch",
 	[MSG_PAGE_LIST_PRISONER] = "officePages.listPrisoner",
 	[MSG_PAGE_LIST_AGENT] = "officePages.listAgent",
+	[MSG_PAGE_LIST_SCI] = "officePages.listSci",
 	[MSG_PAGE_MIETEK_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_MIETEK_FIRST_PLAN] = "officePages.mietekFirstPlan",
 	[MSG_PAGE_MIETEK_PLAN_COMPLETE] = "officePages.mietekPlanComplete",
@@ -140,6 +147,10 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_KOMISARZ_REBUKE_2] = "officePages.komisarzRebuke_2",
 	[MSG_PAGE_KOMISARZ_REBUKE_3] = "officePages.komisarzRebuke_3",
 	[MSG_PAGE_KOMISARZ_QUESTIONING] = "officePages.komisarzQuestioning",
+	[MSG_PAGE_KOMISARZ_REPORTING_LIST] = "officePages.komisarzReportList",
+	[MSG_PAGE_KOMISARZ_REPORTING_GATE] = "officePages.komisarzReportGate",
+	[MSG_PAGE_KOMISARZ_REPORTING_TELEPORT_PARTS] = "officePages.komisarzReportParts",
+	[MSG_PAGE_KOMISARZ_REPORTING_AGENT] = "officePages.komisarzReportAgent",
 	[MSG_PAGE_KOMISARZ_ARCH_ACCOLADE] = "officePages.komisarzArchAccolade",
 	[MSG_PAGE_ARCH_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_ARCH_WELCOME] = "officePages.commonWelcome",
@@ -153,6 +164,17 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_PRISONER_RADIO_1] = "officePages.prisonerRadio1",
 	[MSG_PAGE_PRISONER_RADIO_2] = "officePages.prisonerRadio2",
 	[MSG_PAGE_PRISONER_RADIO_3] = "officePages.prisonerRadio3",
+	[MSG_PAGE_AGENT_WELCOME] = "officePages.commonWelcome",
+	[MSG_PAGE_AGENT_SCIENTISTS] = "officePages.agentSci",
+	[MSG_PAGE_AGENT_SELL_CRATE] = "officePages.agentSellCrates",
+	[MSG_PAGE_AGENT_ESCAPE] = "officePages.commonEscape",
+	[MSG_PAGE_SCIENTIST_WELCOME] = "officePages.commonWelcome",
+	[MSG_PAGE_SCIENTIST_FIRST_CRATE] = "officePages.sciFirstCrate",
+	[MSG_PAGE_SCIENTIST_CRATE_TELEPORTER] = "officePages.sciCrateTeleporter",
+	[MSG_PAGE_SCIENTIST_CRATE_CAPSULE] = "officePages.sciCrateCapsule",
+	[MSG_PAGE_SCIENTIST_ESCAPE] = "officePages.commonEscape",
+	[MSG_PAGE_SCIENTIST_MINER_PORTRAIT] = "officePages.sciMiner",
+	[MSG_PAGE_SCIENTIST_MINER_TEXT] = "officePages.sciMiner",
 	// Count
 	[MSG_COUNT] = 0
 };
@@ -229,6 +251,20 @@ void defsInit(void) {
 		g_pGateDepths[i] = jsonTokToUlong(pJson, uwIdx);
 	}
 
+	// Crate parts
+	UWORD uwIdxCrateDepths = jsonGetDom(pJson, "crateDepths");
+	ubDepthCount = pJson->pTokens[uwIdxCrateDepths].size;
+	if(ubDepthCount != DEFS_QUEST_CRATE_COUNT) {
+		logWrite("ERR: Crate count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_CRATE_COUNT);
+	}
+	for(UBYTE i = 0; i < ubDepthCount; ++i) {
+		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxCrateDepths, i);
+		g_pCrateDepths[i] = jsonTokToUlong(pJson, uwIdx);
+	}
+
+	// Single quest tiles
+	g_uwCapsuleDepth = jsonTokToUlong(pJson, jsonGetDom(pJson, "capsuleDepth"));
+	g_uwPrisonerDepth = jsonTokToUlong(pJson, jsonGetDom(pJson, "prisonerDepth"));
 
 	// Minerals
 	UWORD uwIdxMineralPlans = jsonGetDom(pJson, "mineralPlans");

@@ -16,18 +16,16 @@
 #define PORTRAIT_X 0
 #define PORTRAIT_Y 0
 #define PORTRAIT_HEIGHT 32
-#define LIST_X 40
-#define LIST_Y 40
-#define TITLE_HEIGHT 8
-#define TITLE_X LIST_X
-#define TITLE_Y (PORTRAIT_HEIGHT - TITLE_HEIGHT)
 #define LIST_SPACING_Y 10
+#define LIST_X 40
+#define LIST_Y LIST_SPACING_Y
+#define TITLE_X LIST_X
+#define TITLE_Y PORTRAIT_Y
 
 static BYTE s_bPosCurr, s_bPosCount;
 static const tCommShopPage *s_pCurrentList;
-static tFaceId s_eFace;
 
-static void officeDrawListPos(tCommShopPage eListPage, UBYTE ubPos) {
+static void pageListDrawPos(tCommShopPage eListPage, UBYTE ubPos) {
 	UBYTE ubColor = (
 		ubPos == s_bPosCurr ?
 		COMM_DISPLAY_COLOR_TEXT :
@@ -54,32 +52,27 @@ static void pageListProcess(void) {
 	}
 
 	if(bPrevPos != s_bPosCurr) {
-		officeDrawListPos(s_pCurrentList[bPrevPos], bPrevPos);
-		officeDrawListPos(s_pCurrentList[s_bPosCurr], s_bPosCurr);
+		pageListDrawPos(s_pCurrentList[bPrevPos], bPrevPos);
+		pageListDrawPos(s_pCurrentList[s_bPosCurr], s_bPosCurr);
 	}
 	else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		commShopChangePage(
-			COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + s_eFace - FACE_ID_MIETEK,
-			s_pCurrentList[s_bPosCurr]
-		);
+		commShopChangePage(commShopGetCurrentPage(), s_pCurrentList[s_bPosCurr]);
 	}
 }
 
-void pageListCreate(tFaceId eFace) {
-	const tCommShopPage *pPages = officeGetPagesForFace(eFace);
-	s_eFace = eFace;
+void pageListCreate(tFaceId eFace, const tCommShopPage *pPages) {
 	s_pCurrentList = pPages;
 	commRegisterPage(pageListProcess, 0);
 	s_bPosCurr = 0;
 
-	commDrawTitle(TITLE_X, TITLE_Y, g_pMsgs[MSG_PAGE_LIST_MIETEK + s_eFace]);
-	commDrawFaceAt(s_eFace, PORTRAIT_X, PORTRAIT_Y);
+	commDrawTitle(TITLE_X, TITLE_Y, g_pMsgs[MSG_PAGE_LIST_MIETEK + eFace]);
+	commDrawFaceAt(eFace, PORTRAIT_X, PORTRAIT_Y);
 
 	tCommShopPage eListPage;
 	s_bPosCount = 0;
 	do {
 		eListPage = pPages[s_bPosCount];
-		officeDrawListPos(eListPage, s_bPosCount);
+		pageListDrawPos(eListPage, s_bPosCount);
 		++s_bPosCount;
 	} while(eListPage != COMM_SHOP_PAGE_OFFICE_MAIN);
 }

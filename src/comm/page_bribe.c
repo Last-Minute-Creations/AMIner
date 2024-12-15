@@ -71,7 +71,7 @@ void pageBribeCreate(void) {
 		uwPosY += commDrawMultilineText(
 			"You have no active plan! What do you want me to do?", 0, uwPosY
 		) * ubLineHeight;
-		buttonInitOk("Back");
+		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 	else if(!planManagerGet()->isExtendedTimeByFavor) {
 		sprintf(szBfr, "Bribe for extra %hhu days for plan.", 14);
@@ -89,7 +89,7 @@ void pageBribeCreate(void) {
 	}
 	else {
 		uwPosY += commDrawMultilineText("Comrade, not now... I've already helped you with current plan!", 0, uwPosY) * ubLineHeight;
-		buttonInitOk("Back");
+		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 
 	buttonDrawAll(commGetDisplayBuffer());

@@ -53,7 +53,7 @@ void pageAccountingCreate(void) {
 		uwPosY += commDrawMultilineText(
 			"You have no active plan! What do you want me to do?", 0, uwPosY
 		) * ubLineHeight;
-		buttonInitOk("Back");
+		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 	else {
 		uwPosY += commDrawMultilineText(

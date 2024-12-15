@@ -14,7 +14,6 @@
 #include "../heat.h"
 
 #define PPL_PER_ROW 4
-#define SUBPAGES_PER_PERSON 8
 
 typedef enum _tOfficeControls {
 	OFFICE_CONTROLS_ACCEPT_DECLINE,
@@ -24,7 +23,7 @@ typedef enum _tOfficeControls {
 //----------------------------------------------------------------- PRIVATE VARS
 
 static tFaceId s_pActivePpl[FACE_ID_COUNT]; // Key: pos in office, val: ppl
-static tCommShopPage s_pOfficePages[FACE_ID_COUNT][SUBPAGES_PER_PERSON];
+static tCommShopPage s_pOfficePages[FACE_ID_COUNT][PAGE_OFFICE_SUBPAGES_PER_PERSON];
 static BYTE s_bSelectionCurr;
 static UBYTE s_ubUnlockedPplCount;
 
@@ -201,7 +200,7 @@ void pageOfficeReset(void) {
 void pageOfficeSave(tFile *pFile) {
 	saveWriteHeader(pFile, "OFFC");
 	fileWrite(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
-	fileWrite(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * SUBPAGES_PER_PERSON);
+	fileWrite(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
 	fileWrite(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
 	fileWrite(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
 	pageFavorSave(pFile);
@@ -216,7 +215,7 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 	}
 
 	fileRead(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
-	fileRead(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * SUBPAGES_PER_PERSON);
+	fileRead(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
 	fileRead(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
 	fileRead(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
 	return pageFavorLoad(pFile) &&
@@ -229,6 +228,18 @@ void pageOfficeUnlockPerson(tFaceId ePerson) {
 	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
 }
 
+void pageOfficeLockPerson(tFaceId ePerson) {
+	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
+		if(s_pActivePpl[i] == ePerson) {
+			while(++i < s_ubUnlockedPplCount) {
+				s_pActivePpl[i - 1] = s_pActivePpl[i];
+			}
+			--s_ubUnlockedPplCount;
+			break;
+		}
+	}
+}
+
 UBYTE pageOfficeHasPerson(tFaceId ePerson) {
 	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
 		if(s_pActivePpl[i] == ePerson) {
@@ -238,8 +249,20 @@ UBYTE pageOfficeHasPerson(tFaceId ePerson) {
 	return 0;
 }
 
+void pageOfficeLockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
+	for(UBYTE i = 0; i < PAGE_OFFICE_SUBPAGES_PER_PERSON - 1; ++i) {
+		if(s_pOfficePages[ePerson][i] == eSubpage) {
+			do {
+				++i;
+				s_pOfficePages[ePerson][i - 1] = s_pOfficePages[ePerson][i];
+			} while(s_pOfficePages[ePerson][i] != COMM_SHOP_PAGE_OFFICE_MAIN);
+			break;
+		}
+	}
+}
+
 UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
-	for(UBYTE i = 0; i < SUBPAGES_PER_PERSON - 1; ++i) {
+	for(UBYTE i = 0; i < PAGE_OFFICE_SUBPAGES_PER_PERSON - 1; ++i) {
 		if(s_pOfficePages[ePerson][i] == eSubpage) {
 			// Already unlocked
 			return 0;

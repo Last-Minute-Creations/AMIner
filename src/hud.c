@@ -36,6 +36,8 @@
 #define HUD_MSG_BFR_SIZE 250
 #define HUD_MSG_WAIT_CNT 150
 
+#define HUD_ICON_INBOX_SRC_OFFS_Y 144
+
 typedef enum _tHudPage {
 	HUD_PAGE_MAIN,
 	HUD_PAGE_NOISE_1,
@@ -434,6 +436,7 @@ void hudUpdate(void) {
 			}
 			else {
 				lCash = s_pPlayerData[0].lCash + s_pPlayerData[1].lCash;
+				lCash = MIN(lCash, 99999); // Prevent trashing inbox icon
 			}
 			if(lCash != pData->lCashDisp) {
 				ULONG ulDisp;
@@ -658,14 +661,14 @@ void hudUpdate(void) {
 					break;
 				case INBOX_STATE_PENDING:
 					blitCopy(
-						s_pFaces, 0, 128, s_pHudBuffer->pBack, MSG_ICON_X + 2, MSG_ICON_Y,
+						s_pFaces, 0, HUD_ICON_INBOX_SRC_OFFS_Y, s_pHudBuffer->pBack, MSG_ICON_X + 2, MSG_ICON_Y,
 						MSG_ICON_WIDTH - 2, MSG_ICON_HEIGHT,
 						MINTERM_COOKIE
 					);
 					break;
 				case INBOX_STATE_URGENT:
 					blitCopy(
-						s_pFaces, 0, 128, s_pHudBuffer->pBack, MSG_ICON_X, MSG_ICON_Y,
+						s_pFaces, 0, HUD_ICON_INBOX_SRC_OFFS_Y, s_pHudBuffer->pBack, MSG_ICON_X, MSG_ICON_Y,
 						MSG_ICON_WIDTH, MSG_ICON_HEIGHT,
 						MINTERM_COOKIE
 					);

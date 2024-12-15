@@ -53,7 +53,7 @@ void pageFavorCreate(void) {
 		uwPosY += commDrawMultilineText(
 			"You have no active plan! What do you want me to do?", 0, uwPosY
 		) * ubLineHeight;
-		buttonInitOk("Back");
+		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 	else if(s_ubFavorsLeft > 0 && wDays >= 15) {
 		uwPosY += commDrawMultilineText(
@@ -73,7 +73,7 @@ void pageFavorCreate(void) {
 	}
 	else {
 		uwPosY += commDrawMultilineText("You ask me for too much, Comrade. Do some real work, will you?", 0, uwPosY) * ubLineHeight;
-		buttonInitOk("Back");
+		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 
 	buttonDrawAll(commGetDisplayBuffer());
