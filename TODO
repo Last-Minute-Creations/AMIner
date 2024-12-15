@@ -193,14 +193,14 @@ Crate quests:
 			✔ Trigger after finding next one past reported/interrogation @done(24-07-05)
 		✔ Report agent to remove him and get accolade @done(24-07-01)
 		✔ Add escape option after selling 10 crates @done(24-07-03)
-	☐ Travelers quest flow
+	✔ Travelers quest flow @done(24-12-15)
 		✔ Implement base @done(24-04-13)
 		✔ Spawn capsule at the bottom of mine @done(24-04-13)
 		✔ Add scientist NPC @done(24-07-01)
 		✔ Trigger scientist message on first picked up crate @done(24-07-01)
 		✔ Spend parts to build mega-teleporter @done(24-07-05)
 		✔ Spend parts to open capsule @done(24-07-05)
-		☐ Screen with text and capsule contents
+		✔ Screen with text and capsule contents @done(24-12-15)
 
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)

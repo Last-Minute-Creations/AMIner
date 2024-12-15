@@ -20,6 +20,7 @@
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
 #include <comm/page_market.h>
+#include <comm/page_portrait.h>
 #include "core.h"
 #include "dino.h"
 #include "game.h"
@@ -355,7 +356,10 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_ESCAPE:
 			pageEscapeCreate(PAGE_ESCAPE_SCENARIO_TELEPORT);
 			break;
-		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER:
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER_PORTRAIT:
+			pagePortraitCreate();
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER_TEXT:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_miner", onBack);
 			break;
 

@@ -29,9 +29,9 @@ static void pageUseCratesDrawAll(void) {
 	UBYTE ubCrateCount = questCrateGetCount();
 	char szBfr[150];
 
-	const char *szMsgPremise;
-	const char *szMsgNotYet;
-	const char *szMsgUse;
+	const char *szMsgPremise = 0;
+	const char *szMsgNotYet = 0;
+	const char *szMsgUse = 0;
 	UBYTE ubMinAmount = pageUseCratesGetMinAmount();
 	switch(s_eScenario) {
 		case PAGE_USE_CRATES_SCENARIO_TELEPORTER:

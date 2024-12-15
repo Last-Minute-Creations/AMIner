@@ -173,7 +173,8 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_SCIENTIST_CRATE_TELEPORTER] = "officePages.sciCrateTeleporter",
 	[MSG_PAGE_SCIENTIST_CRATE_CAPSULE] = "officePages.sciCrateCapsule",
 	[MSG_PAGE_SCIENTIST_ESCAPE] = "officePages.commonEscape",
-	[MSG_PAGE_SCIENTIST_MINER] = "officePages.sciMiner",
+	[MSG_PAGE_SCIENTIST_MINER_PORTRAIT] = "officePages.sciMiner",
+	[MSG_PAGE_SCIENTIST_MINER_TEXT] = "officePages.sciMiner",
 	// Count
 	[MSG_COUNT] = 0
 };
