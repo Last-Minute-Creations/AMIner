@@ -159,9 +159,10 @@ void baseCreate(tTileBufferManager *pManager) {
 }
 
 void baseDestroy(void) {
-	bitmapDestroy(s_pBaseTiles[0]);
-	bitmapDestroy(s_pBaseTiles[1]);
-	bitmapDestroy(s_pBaseTiles[2]);
+	bitmapDestroy(s_pBaseTiles[BASE_ID_GROUND]);
+	bitmapDestroy(s_pBaseTiles[BASE_ID_DINO]);
+	bitmapDestroy(s_pBaseTiles[BASE_ID_GATE]);
+	bitmapDestroy(s_pBaseTiles[BASE_ID_WESTERN]);
 }
 
 void baseProcess(void) {

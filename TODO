@@ -81,26 +81,8 @@ General:
 	✔ Mode management via floating buttons @done(23-10-02)
 	✔ Markers for offscreen players @done(23-10-06)
 	✔ Offscreen players can focus by pressing fire @done(23-10-06)
-	☐ Fast travel between bases
-	☐ Portable teleport as a vehicle upgrade
-		☐ Figure out the teleport upgrades
-		☐ Remove debug teleport return button
-		☐ Bring back teleport damage on zeroeth upgrade
-	☐ Animated main base elements
-		✔ Leaking pipe @done(23-09-29)
-		☐ Workers
-		☐ Smoke
-		☐ Ufo?
-		☐ Clouds?
-	☐ Limit cash to prevent trashing of message icon?
-	☐ Fast travel between bases
 	✔ Markers for offscreen players @done(23-10-06)
 	✔ Offscreen players can focus by pressing fire @done(23-10-06)
-	☐ Portable teleport as a vehicle upgrade
-		☐ Figure out the teleport upgrades
-		☐ Remove debug teleport return button
-		☐ Bring back teleport damage on zeroeth upgrade
-	☐ Add 2s pauses between music tracks?
 	✔ Reporting mechanics @done(24-07-01)
 		✔ Add "Reproting" option for commissar @done(24-07-01)
 		✔ Add ability to report on non-reported stuff from questioning @done(24-07-01)
@@ -110,6 +92,24 @@ General:
 			✔ Remove option after he's reported @done(24-07-01)
 			✔ Remove NPC from office on reporting @done(24-07-01)
 	✘ Modifiable challenge end level? @cancelled(24-02-11)
+	☐ Fast travel between bases
+		☐ Rectangle on each base
+		☐ Show question mark near the rectangle
+		☐ Pressing fire on question mark shows context menu
+		☐ Up/down options
+	☐ Portable teleport as a vehicle upgrade
+		☐ Figure out the teleport upgrades
+		☐ Remove debug teleport return button
+		☐ Bring back teleport damage on zeroeth upgrade
+		☐ Return option in fast travel teleporter
+	☐ Animated main base elements
+		✔ Leaking pipe @done(23-09-29)
+		☐ Workers
+		☐ Smoke
+		☐ Ufo?
+		☐ Clouds?
+	☐ Limit cash to prevent trashing of message icon?
+	☐ Add 2s pauses between music tracks?
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
@@ -133,6 +133,9 @@ Commrade:
 	☐ Workshop icons for upgrades?
 	☐ Add left/right arrows in workshop to indicate nav possibility
 	☐ Figure out where to hide sokoban and how to hint it
+		☐ Persistent unlock after Jay quest?
+		☐ Enter via pressing fire on warehouse button
+		☐ Add option to exit the sokoban page
 
 Optimizations:
 	✔ Comm message page loading @done(23-09-07)
