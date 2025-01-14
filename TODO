@@ -93,10 +93,12 @@ General:
 			✔ Remove NPC from office on reporting @done(24-07-01)
 	✘ Modifiable challenge end level? @cancelled(24-02-11)
 	☐ Fast travel between bases
-		☐ Rectangle on each base
-		☐ Show question mark near the rectangle
-		☐ Pressing fire on question mark shows context menu
+		✔ Display on each base @done(25-01-14)
+		✔ Show prompt near bounds @done(25-01-14)
+		☐ Pressing fire on prompt shows context menu
 		☐ Up/down options
+		☐ Teleport using old animation
+		☐ Teleport using new animation
 	☐ Portable teleport as a vehicle upgrade
 		☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button

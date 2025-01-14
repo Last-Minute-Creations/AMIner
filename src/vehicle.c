@@ -22,6 +22,7 @@
 #include "quest_crate.h"
 #include "assets.h"
 #include "blitter_mutex.h"
+#include "base_teleporter.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -461,6 +462,19 @@ UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
 	);
 
 	return isNearShop;
+}
+
+UBYTE vehicleIsNearBaseTeleporter(const tVehicle *pVehicle) {
+	const tBase *pBase = baseGetCurrent();
+
+	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2;
+	UWORD uwY = pVehicle->sBobBody.sPos.uwY;
+	UBYTE isNearTeleporter = (
+		pBase->sPosTeleport.uwX <= uwCenterX && uwCenterX <= pBase->sPosTeleport.uwX + BASE_TELEPORTER_WIDTH &&
+		pBase->sPosTeleport.uwY <= uwY && uwY <= pBase->sPosTeleport.uwY + BASE_TELEPORTER_HEIGHT
+	);
+
+	return isNearTeleporter;
 }
 
 UBYTE vehicleIsInBase(const tVehicle *pVehicle) {

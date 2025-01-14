@@ -5,6 +5,9 @@
 #ifndef _AMINER_BASE_TELEPORTER_H_
 #define _AMINER_BASE_TELEPORTER_H_
 
+#define BASE_TELEPORTER_WIDTH 48
+#define BASE_TELEPORTER_HEIGHT 32
+
 void baseTeleporterCreate(void);
 
 void baseTeleporterProcess(void);

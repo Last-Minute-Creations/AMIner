@@ -15,7 +15,7 @@ void baseTeleporterCreate(void) {
 	s_pTeleporterMasks = bitmapCreateFromFile("data/base_teleporter_mask.bm", 0);
 
 	bobInit(
-		&s_sTeleporterBob, 48, 32, 1,
+		&s_sTeleporterBob, BASE_TELEPORTER_WIDTH, BASE_TELEPORTER_HEIGHT, 1,
 		bobCalcFrameAddress(s_pTeleporterFrames, 0),
 		bobCalcFrameAddress(s_pTeleporterMasks, 0),
 		0, 0

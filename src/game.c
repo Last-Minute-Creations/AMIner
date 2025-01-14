@@ -53,7 +53,7 @@ typedef enum _tCameraType {
 typedef enum tModePreset {
 	MODE_PRESET_DEFAULT,
 	MODE_PRESET_SHOP,
-	MODE_PRESET_FAST_TRAVEL,
+	MODE_PRESET_FAST_TRAVEL_PROMPT,
 	MODE_PRESET_COUNT,
 } tModePreset;
 
@@ -135,7 +135,8 @@ static UBYTE gameChangeModePreset(UBYTE ubPlayerIndex, tModePreset ePreset) {
 			modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
 			// }
 			break;
-		case MODE_PRESET_FAST_TRAVEL:
+		case MODE_PRESET_FAST_TRAVEL_PROMPT:
+			modeMenuAddOption(pModeMenu, MODE_OPTION_EXCLAMATION);
 			break;
 		default:
 			break;
@@ -206,6 +207,11 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 			if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE) || inboxGetState() == INBOX_STATE_URGENT) {
 				statePush(g_pGameStateManager, &g_sStateShop);
 				return 1;
+			}
+		}
+		else if(vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer])) {
+			if(gameChangeModePreset(ubPlayer, MODE_PRESET_FAST_TRAVEL_PROMPT)) {
+				modeMenuEnterSelection(&s_pModeMenus[ubPlayer]);
 			}
 		}
 		else {
