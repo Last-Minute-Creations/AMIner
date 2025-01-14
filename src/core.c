@@ -34,6 +34,7 @@
 #include "blitter_mutex.h"
 #include "mode_menu.h"
 #include "tile_variant.h"
+#include "base_teleporter.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
@@ -100,10 +101,11 @@ void coreProcessBeforeBobs(void) {
 	tileBufferQueueProcess(g_pMainBuffer);
 
 	// Draw collectibles and bg anims before anything else
+	collectiblesProcess();
 	if(!gameIsCutsceneActive()) {
 		bobSequenceProcess(g_pMainBuffer);
+		baseTeleporterProcess();
 	}
-	collectiblesProcess();
 }
 
 void coreProcessAfterBobs(void) {
@@ -280,6 +282,7 @@ static void coreGsCreate(void) {
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 80);
 
 	assetsMarkersCreate();
+	baseTeleporterCreate();
 	modeMenuManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 85);
 	gameInitBombMarkerBobs();
@@ -357,6 +360,7 @@ static void coreGsDestroy(void) {
 	assetsAudioDestroy();
 
 	assetsMarkersDestroy();
+	baseTeleporterDestroy();
 	modeMenuManagerDestroy();
 	assetsTileOverlayDestroy();
 	explosionManagerDestroy();
