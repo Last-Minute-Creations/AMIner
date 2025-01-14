@@ -1069,9 +1069,10 @@ void gameInitBombMarkerBobs(void) {
 }
 
 UBYTE gameCanPushBob(const tBob *pBob) {
+	const tRedrawState *pBufferState = &g_pMainBuffer->pRedrawStates[g_pMainBuffer->ubStateIdx];
 	UBYTE isOnCamera = (
-		pBob->sPos.uwY + pBob->uwHeight >= g_pMainBuffer->pCamera->uPos.uwY &&
-		pBob->sPos.uwY < g_pMainBuffer->pCamera->uPos.uwY + s_pVpMain->uwHeight
+		pBob->sPos.uwY >= (((pBufferState->sMarginU.wTilePos + 1) << TILE_SHIFT)) &&
+		pBob->sPos.uwY + pBob->uwHeight <= ((pBufferState->sMarginD.wTilePos) << TILE_SHIFT)
 	);
 	return isOnCamera;
 }
