@@ -213,6 +213,10 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 			if(gameChangeModePreset(ubPlayer, MODE_PRESET_FAST_TRAVEL_PROMPT)) {
 				modeMenuEnterSelection(&s_pModeMenus[ubPlayer]);
 			}
+			if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
+				vehicleTeleport(&g_pVehicles[ubPlayer], 4 * TILE_SIZE, 212 * TILE_SIZE);
+				return 1;
+			}
 		}
 		else {
 			if(gameChangeModePreset(ubPlayer, MODE_PRESET_DEFAULT)) {
@@ -305,18 +309,6 @@ static void gameProcessHotkeys(void) {
 	}
 	if(keyUse(KEY_R) && s_sTeleportReturn.ulYX != -1u && g_pVehicles[0].ubVehicleState == VEHICLE_STATE_MOVING) {
 		vehicleTeleport(&g_pVehicles[0], s_sTeleportReturn.uwX, s_sTeleportReturn.uwY);
-	}
-	if(keyUse(KEY_N)) {
-		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 212 * TILE_SIZE);
-	}
-	if(keyUse(KEY_M)) {
-		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 4 * TILE_SIZE);
-	}
-	if(keyUse(KEY_COMMA)) {
-		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 104 * TILE_SIZE);
-	}
-	if(keyUse(KEY_PERIOD)) {
-		vehicleTeleport(&g_pVehicles[0], 4 * TILE_SIZE, 504 * TILE_SIZE);
 	}
 
 	if(keyUse(KEY_F1) && !g_isChallenge) {
