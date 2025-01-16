@@ -47,6 +47,8 @@ const tBase *baseGetById(tBaseId eId);
 
 const tBase *baseGetCurrent(void);
 
+tBaseId baseGetCurrentId(void);
+
 void baseUpdateDinoTileset(UBYTE isPopulated);
 
 #endif // _AMINER_BASE_H_

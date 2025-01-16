@@ -223,6 +223,10 @@ const tBase *baseGetCurrent(void) {
 	return &s_pBases[s_eBaseCurrent];
 }
 
+tBaseId baseGetCurrentId(void) {
+	return s_eBaseCurrent;
+}
+
 void baseUpdateDinoTileset(UBYTE isPopulated) {
 	if(isPopulated) {
 		bitmapLoadFromFile(s_pBaseTiles[BASE_ID_DINO], "data/base1_populated.bm", 0, 20 * TILE_SIZE);
