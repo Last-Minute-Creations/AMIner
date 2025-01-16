@@ -84,7 +84,7 @@ General:
 	✔ Markers for offscreen players @done(23-10-06)
 	✔ Offscreen players can focus by pressing fire @done(23-10-06)
 	✔ Reporting mechanics @done(24-07-01)
-		✔ Add "Reproting" option for commissar @done(24-07-01)
+		✔ Add "Reporting" option for commissar @done(24-07-01)
 		✔ Add ability to report on non-reported stuff from questioning @done(24-07-01)
 			✔ Trigger same handler as after questioning @done(24-07-01)
 		✔ Add ability to report on Agent @done(24-07-01)
@@ -97,6 +97,7 @@ General:
 		✔ Show prompt near bounds @done(25-01-14)
 		✔ Pressing fire on prompt shows context menu @done(25-01-16)
 		✔ Teleport using old animation @done(25-01-14)
+		☐ Make flipbook code use 32- or 48-wide bobs
 		☐ Teleport using new animation
 		✘ Up/down options @cancelled(25-01-16)
 	☐ Portable teleport as a vehicle upgrade

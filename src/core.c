@@ -21,7 +21,7 @@
 #include "ground_layer.h"
 #include "hi_score.h"
 #include "tile.h"
-#include "explosion.h"
+#include "flipbook.h"
 #include <comm/comm.h>
 #include <comm/page_news.h>
 #include "defs.h"
@@ -272,7 +272,7 @@ static void coreGsCreate(void) {
 		g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 60);
-	explosionManagerCreate();
+	flipbookManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 65);
 	groundLayerCreate(s_pVpMain);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 70);
@@ -363,7 +363,7 @@ static void coreGsDestroy(void) {
 	baseTeleporterDestroy();
 	modeMenuManagerDestroy();
 	assetsTileOverlayDestroy();
-	explosionManagerDestroy();
+	flipbookManagerDestroy();
 	coreBobSequencesDestroy();
 	defsDestroyLocale();
 

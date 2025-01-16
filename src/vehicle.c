@@ -12,7 +12,7 @@
 #include "tile.h"
 #include "warehouse.h"
 #include "color.h"
-#include "explosion.h"
+#include "flipbook.h"
 #include "dino.h"
 #include "ground_layer.h"
 #include "defs.h"
@@ -296,9 +296,9 @@ static void vehicleCrash(tVehicle *pVehicle) {
 	);
 	pVehicle->sBobSmoke.sPos.uwX = fix16_to_int(pVehicle->fX);
 
-	explosionAdd(
+	flipbookAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnExplodePeak, pVehicle->ubPlayerIdx, 0, EXPLOSION_KIND_BOOM
+		vehicleOnExplodePeak, pVehicle->ubPlayerIdx, 0, FLIPBOOK_KIND_BOOM
 	);
 	pVehicle->ubVehicleState = VEHICLE_STATE_EXPLODING;
 
@@ -1396,9 +1396,9 @@ static void vehicleOnTeleportOutPeak(ULONG ulData) {
 	pVehicle->ubTeleportAnimCnt = 0;
 	vehicleSetPos(pVehicle, pVehicle->uwTeleportX, pVehicle->uwTeleportY);
 	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_IN;
-	explosionAdd(
+	flipbookAdd(
 		pVehicle->uwTeleportX, pVehicle->uwTeleportY,
-		vehicleOnTeleportInPeak, (ULONG)pVehicle, 0, EXPLOSION_KIND_TELEPORT
+		vehicleOnTeleportInPeak, (ULONG)pVehicle, 0, FLIPBOOK_KIND_TELEPORT
 	);
 }
 
@@ -1406,9 +1406,9 @@ void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->uwTeleportX = uwX;
 	pVehicle->uwTeleportY = uwY;
 	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_OUT;
-	explosionAdd(
+	flipbookAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnTeleportOutPeak, (ULONG)pVehicle, 0, EXPLOSION_KIND_TELEPORT
+		vehicleOnTeleportOutPeak, (ULONG)pVehicle, 0, FLIPBOOK_KIND_TELEPORT
 	);
 }
 

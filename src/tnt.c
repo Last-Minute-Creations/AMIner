@@ -1,5 +1,5 @@
 #include "tnt.h"
-#include "explosion.h"
+#include "flipbook.h"
 #include "tile.h"
 #include "vehicle.h"
 #include "inventory.h"
@@ -37,10 +37,10 @@ static void onExplosionPeak(ULONG ulData) {
 
 	// Trigger next explosion
 	if(++pTnt->ubCurrent < pTnt->ubCoordCount) {
-		explosionAdd(
+		flipbookAdd(
 			pTnt->pCoords[pTnt->ubCurrent].uwX << 5,
 			pTnt->pCoords[pTnt->ubCurrent].uwY << 5,
-			onExplosionPeak, ulData, 1, EXPLOSION_KIND_BOOM
+			onExplosionPeak, ulData, 1, FLIPBOOK_KIND_BOOM
 		);
 	}
 }
@@ -63,8 +63,8 @@ void tntDetonate(tTnt *pTnt) {
 
 	pTnt->ubCurrent = 0;
 	const tUwCoordYX *pFirst = &pTnt->pCoords[0];
-	explosionAdd(
-		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pTnt, 1, EXPLOSION_KIND_BOOM
+	flipbookAdd(
+		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pTnt, 1, FLIPBOOK_KIND_BOOM
 	);
 }
 

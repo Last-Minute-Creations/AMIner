@@ -21,7 +21,7 @@
 #include "base.h"
 #include "warehouse.h"
 #include "tutorial.h"
-#include "explosion.h"
+#include "flipbook.h"
 #include "fade.h"
 #include "pause.h"
 #include "core.h"
@@ -770,9 +770,9 @@ static UBYTE gameProcessGateCutscene(void) {
 				s_ubGateCutsceneCooldown = 0;
 				UWORD uwAddX = randUwMax(&g_sRand, 90);
 				UWORD uwAddY = randUwMax(&g_sRand, 90);
-				explosionAdd(
+				flipbookAdd(
 					32 + 35 + uwAddX, GATE_DEPTH_PX + uwAddY,
-					0, 0, 1, EXPLOSION_KIND_BOOM
+					0, 0, 1, FLIPBOOK_KIND_BOOM
 				);
 			}
 
@@ -1351,7 +1351,7 @@ static void gameGsLoop(void) {
 		vehicleProcess(&g_pVehicles[1]);
 	}
 	debugColor(0x808);
-	explosionManagerProcess();
+	flipbookManagerProcess();
 	if(!gameIsCutsceneActive()) {
 		modeMenuTryDisplay(&s_pModeMenus[0]);
 		modeMenuTryDisplay(&s_pModeMenus[1]);
