@@ -10,23 +10,22 @@
 
 //------------------------------------------------------------------------ TYPES
 
-#define MODE_BOBS_PER_PLAYER 3
-
 typedef enum tModeOption {
 	MODE_OPTION_EXCLAMATION,
 	// MODE_OPTION_QUESTION,
 	MODE_OPTION_DRILL,
 	MODE_OPTION_TNT,
 	MODE_OPTION_TELEPORT,
-	// MODE_OPTION_TRAVEL_UP,
-	// MODE_OPTION_TRAVEL_DOWN,
-	// MODE_OPTION_TRAVEL_RETURN,
+	MODE_OPTION_TRAVEL_BASE1_GROUND,
+	MODE_OPTION_TRAVEL_BASE2_DINO,
+	MODE_OPTION_TRAVEL_BASE3_GATE,
+	MODE_OPTION_TRAVEL_BASE4_SCI,
 	MODE_OPTION_COUNT
 } tModeOption;
 
 typedef struct tModeMenu {
 	tBob sBob;
-	tModeOption pModeOptions[MODE_BOBS_PER_PLAYER];
+	tModeOption pModeOptions[MODE_OPTION_COUNT];
 	UBYTE ubCount;
 	UBYTE ubCurrent;
 	UBYTE isActive;
@@ -45,9 +44,9 @@ void modeMenuAddOption(tModeMenu *pModeMenu, tModeOption eOption);
 
 void modeMenuProcess(tModeMenu *pModeMenu, tDirection eDirection);
 
-void modeMenuEnterSelection(tModeMenu *pModeMenu);
+void modeMenuShow(tModeMenu *pModeMenu);
 
-tModeOption modeMenuExitSelection(tModeMenu *pModeMenu);
+tModeOption modeMenuHide(tModeMenu *pModeMenu);
 
 tModeOption modeMenuGetSelected(tModeMenu *pModeMenu);
 

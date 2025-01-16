@@ -95,10 +95,10 @@ General:
 	☐ Fast travel between bases
 		✔ Display on each base @done(25-01-14)
 		✔ Show prompt near bounds @done(25-01-14)
-		☐ Pressing fire on prompt shows context menu
-		☐ Up/down options
+		✔ Pressing fire on prompt shows context menu @done(25-01-16)
 		✔ Teleport using old animation @done(25-01-14)
 		☐ Teleport using new animation
+		✘ Up/down options @cancelled(25-01-16)
 	☐ Portable teleport as a vehicle upgrade
 		☐ Figure out the teleport upgrades
 		☐ Remove debug teleport return button
@@ -233,6 +233,7 @@ Missing graphics:
 	☐ Jay portrait large final
 	☐ Protest banners on factory
 	☐ Sci base final
+	☐ News slides for each ending
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07)

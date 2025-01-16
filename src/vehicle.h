@@ -12,6 +12,7 @@
 #include "mineral.h"
 #include "tnt.h"
 #include "string_array.h"
+#include "mode_menu.h"
 
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 24
@@ -67,6 +68,7 @@ typedef struct _tVehicle {
 	UBYTE ubJetAnimFrame;
 	UBYTE ubJetAnimCnt;
 	UBYTE ubToolAnimCnt;
+	tModeOption eDrillMode;
 	// Drilling
 	UBYTE ubDrillDir;
 	UBYTE ubDrillVAnimCnt;

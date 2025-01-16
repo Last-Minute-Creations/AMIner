@@ -331,6 +331,7 @@ static void vehicleHullRepair(tVehicle *pVehicle) {
 }
 
 void vehicleRespawn(tVehicle *pVehicle) {
+	pVehicle->eDrillMode = MODE_OPTION_DRILL;
 	pVehicle->uwCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
 	pVehicle->uwDrillCurr = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;

@@ -51,9 +51,11 @@ typedef enum _tCameraType {
 } tCameraType;
 
 typedef enum tModePreset {
-	MODE_PRESET_DEFAULT,
-	MODE_PRESET_SHOP,
-	MODE_PRESET_FAST_TRAVEL_PROMPT,
+	MODE_PRESET_OFF,
+	MODE_PRESET_PROMPT_SHOP,
+	MODE_PRESET_PROMPT_TRAVEL,
+	MODE_PRESET_TOOLS,
+	MODE_PRESET_TRAVEL,
 	MODE_PRESET_COUNT,
 } tModePreset;
 
@@ -88,7 +90,6 @@ typedef enum tGateCutsceneStep {
 static tBob s_pPlayerBombMarkers[2][3];
 static tModePreset s_pPlayerModePreset[2];
 
-static const UWORD s_pBaseTeleportY[2] = {220, 3428};
 static tUwCoordYX s_sTeleportReturn;
 
 static tSteer s_pPlayerSteers[2];
@@ -122,10 +123,19 @@ static UBYTE gameChangeModePreset(UBYTE ubPlayerIndex, tModePreset ePreset) {
 	tModeMenu *pModeMenu = &s_pModeMenus[ubPlayerIndex];
 	modeMenuClearOptions(pModeMenu);
 	switch(ePreset) {
-		case MODE_PRESET_SHOP:
+		case MODE_PRESET_PROMPT_SHOP:
 			modeMenuAddOption(pModeMenu, MODE_OPTION_EXCLAMATION);
 			break;
-		case MODE_PRESET_DEFAULT:
+		case MODE_PRESET_PROMPT_TRAVEL:
+			modeMenuAddOption(pModeMenu, MODE_OPTION_EXCLAMATION);
+			break;
+		case MODE_PRESET_TRAVEL:
+			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE1_GROUND);
+			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE2_DINO);
+			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE3_GATE);
+			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE4_SCI);
+			break;
+		case MODE_PRESET_TOOLS:
 			modeMenuAddOption(pModeMenu, MODE_OPTION_DRILL);
 			if(inventoryGetPartDef(INVENTORY_PART_TNT)->ubLevel) {
 				modeMenuAddOption(pModeMenu, MODE_OPTION_TNT);
@@ -135,20 +145,22 @@ static UBYTE gameChangeModePreset(UBYTE ubPlayerIndex, tModePreset ePreset) {
 			modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
 			// }
 			break;
-		case MODE_PRESET_FAST_TRAVEL_PROMPT:
-			modeMenuAddOption(pModeMenu, MODE_OPTION_EXCLAMATION);
-			break;
+		case MODE_PRESET_OFF:
 		default:
 			break;
 	}
 	return 1;
 }
 
+static tBaseId gameModeToBaseId(tModeOption eMode) {
+	return (eMode - MODE_OPTION_TRAVEL_BASE1_GROUND) + BASE_ID_GROUND;
+}
+
 static void gameResetModePreset(UBYTE ubPlayerIndex) {
 	// set to  anything else to trigger change
-	s_pPlayerModePreset[ubPlayerIndex] = MODE_PRESET_SHOP;
+	s_pPlayerModePreset[ubPlayerIndex] = MODE_PRESET_PROMPT_SHOP;
 
-	gameChangeModePreset(ubPlayerIndex, MODE_PRESET_DEFAULT);
+	gameChangeModePreset(ubPlayerIndex, MODE_PRESET_OFF);
 }
 
 static void gameProcessModeTnt(UBYTE ubPlayer) {
@@ -167,14 +179,14 @@ static void gameProcessModeTnt(UBYTE ubPlayer) {
 	}
 	else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
 		tntDetonate(pTnt);
-		s_pModeMenus[ubPlayer].ubCurrent = 0;
+		g_pVehicles[ubPlayer].eDrillMode = MODE_OPTION_DRILL;
 	}
 }
 
 static void gameDisplayModeTnt(UBYTE ubPlayer) {
 	if(
 		s_pModeMenus[ubPlayer].isActive ||
-		modeMenuGetSelected(&s_pModeMenus[ubPlayer]) != MODE_OPTION_TNT
+		g_pVehicles[ubPlayer].eDrillMode != MODE_OPTION_TNT
 	) {
 		return;
 	}
@@ -192,58 +204,94 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 		.uwX = fix16_to_int(g_pVehicles[ubPlayer].fX),
 		.uwY = fix16_to_int(g_pVehicles[ubPlayer].fY)
 	};
-	vehicleTeleport(&g_pVehicles[ubPlayer], 160, s_pBaseTeleportY[0]);
-	s_pModeMenus[ubPlayer].ubCurrent = 0;
+	const tBase *pBase = baseGetCurrent();
+	vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
+	g_pVehicles[ubPlayer].eDrillMode = MODE_OPTION_DRILL;
 }
 
 static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	tModeMenu *pModeMenu = &s_pModeMenus[ubPlayer];
 
 	if(!g_isChallenge) {
-		if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-			if(gameChangeModePreset(ubPlayer, MODE_PRESET_SHOP)) {
-				modeMenuEnterSelection(&s_pModeMenus[ubPlayer]);
-			}
-			if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE) || inboxGetState() == INBOX_STATE_URGENT) {
-				statePush(g_pGameStateManager, &g_sStateShop);
-				return 1;
-			}
-		}
-		else if(vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer])) {
-			if(gameChangeModePreset(ubPlayer, MODE_PRESET_FAST_TRAVEL_PROMPT)) {
-				modeMenuEnterSelection(&s_pModeMenus[ubPlayer]);
-			}
-			if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
-				vehicleTeleport(&g_pVehicles[ubPlayer], 4 * TILE_SIZE, 212 * TILE_SIZE);
-				return 1;
-			}
-		}
-		else {
-			if(gameChangeModePreset(ubPlayer, MODE_PRESET_DEFAULT)) {
-				modeMenuExitSelection(&s_pModeMenus[ubPlayer]);
-			}
-			if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
-				if(g_pVehicles[ubPlayer].isMarkerShown) {
-					s_eCameraType = (ubPlayer == 0) ? CAMERA_TYPE_P1 : CAMERA_TYPE_P2;
+		tModePreset eNextPreset = s_pPlayerModePreset[ubPlayer];
+		switch(eNextPreset) {
+			case MODE_PRESET_COUNT:
+				eNextPreset = MODE_PRESET_OFF;
+				// fallthrough
+			case MODE_PRESET_OFF:
+				if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+					eNextPreset = MODE_PRESET_PROMPT_SHOP;
 				}
-				else if(!pModeMenu->isActive) {
-					modeMenuEnterSelection(pModeMenu);
+				else if(vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer])) {
+					eNextPreset = MODE_PRESET_PROMPT_TRAVEL;
 				}
 				else {
-					tModeOption eSelectedmode = modeMenuExitSelection(pModeMenu);
-					if(eSelectedmode == MODE_OPTION_TNT) {
+					if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
+						if(g_pVehicles[ubPlayer].isMarkerShown) {
+							// Focus on player if off-screen
+							s_eCameraType = (ubPlayer == 0) ? CAMERA_TYPE_P1 : CAMERA_TYPE_P2;
+						}
+						else {
+							eNextPreset = MODE_PRESET_TOOLS;
+						}
+					}
+				}
+				break;
+			case MODE_PRESET_TOOLS:
+				if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
+					tModeOption eSelectedMode = modeMenuHide(pModeMenu);
+					if(eSelectedMode == MODE_OPTION_TNT) {
 						tUwCoordYX sTilePos = {
 							.uwX = (g_pVehicles[ubPlayer].sBobBody.sPos.uwX + VEHICLE_WIDTH / 2) >> 5,
 							.uwY = (g_pVehicles[ubPlayer].sBobBody.sPos.uwY + VEHICLE_WIDTH / 2) >> 5
 						};
 						tntReset(&g_pVehicles[ubPlayer].sDynamite, ubPlayer, sTilePos);
 					}
+					g_pVehicles[ubPlayer].eDrillMode = eSelectedMode;
+					eNextPreset = MODE_PRESET_OFF;
 				}
+				break;
+			case MODE_PRESET_PROMPT_SHOP:
+					if(!vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
+						eNextPreset = MODE_PRESET_OFF;
+					}
+					else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE) || inboxGetState() == INBOX_STATE_URGENT) {
+						statePush(g_pGameStateManager, &g_sStateShop);
+						return 1;
+					}
+					break;
+			case MODE_PRESET_PROMPT_TRAVEL:
+				if(!vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer])) {
+					eNextPreset = MODE_PRESET_OFF;
+				}
+				else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
+					eNextPreset = MODE_PRESET_TRAVEL;
+				}
+				break;
+			case MODE_PRESET_TRAVEL:
+				if(!vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer])) {
+					eNextPreset = MODE_PRESET_OFF;
+				}
+				else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
+					tModeOption eSelectedMode = modeMenuHide(pModeMenu);
+					const tBase *pBase = baseGetById(gameModeToBaseId(eSelectedMode));
+					vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
+					eNextPreset = MODE_PRESET_OFF;
+				}
+				break;
+		}
+
+		if(gameChangeModePreset(ubPlayer, eNextPreset)) {
+			if(eNextPreset == MODE_PRESET_OFF) {
+				modeMenuHide(&s_pModeMenus[ubPlayer]);
+			}
+			else {
+				modeMenuShow(&s_pModeMenus[ubPlayer]);
 			}
 		}
 	}
 
-	if(pModeMenu->isActive && s_pPlayerModePreset[ubPlayer] != MODE_PRESET_SHOP) {
+	if(pModeMenu->isActive && s_pPlayerModePreset[ubPlayer] >= MODE_PRESET_TOOLS) {
 		tDirection eDirection = DIRECTION_COUNT;
 		if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_LEFT)) {
 			eDirection = DIRECTION_LEFT;
@@ -273,8 +321,7 @@ static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 			isReturnImmediately = gameProcessModeDrill(ubPlayer);
 		}
 		else {
-			tModeOption eMode = modeMenuGetSelected(&s_pModeMenus[ubPlayer]);
-			switch(eMode) {
+			switch(g_pVehicles[ubPlayer].eDrillMode) {
 				case MODE_OPTION_DRILL:
 					isReturnImmediately = gameProcessModeDrill(ubPlayer);
 					break;
@@ -668,8 +715,9 @@ static UBYTE gameProcessGateCutscene(void) {
 			break;
 		case GATE_CUTSCENE_OPEN_STEP_FADE_OUT:
 			if(fadeGetState() == FADE_STATE_OUT) {
-				vehicleSetPos(&g_pVehicles[0], 160, s_pBaseTeleportY[0]);
-				vehicleSetPos(&g_pVehicles[1], 160, s_pBaseTeleportY[0]);
+				const tBase *pBaseGround = baseGetById(BASE_ID_GROUND);
+				vehicleSetPos(&g_pVehicles[0], pBaseGround->sPosTeleport.uwX, pBaseGround->sPosTeleport.uwY);
+				vehicleSetPos(&g_pVehicles[1], pBaseGround->sPosTeleport.uwX, pBaseGround->sPosTeleport.uwY);
 				s_isCameraShake = 0;
 				twisterDisable();
 				++s_eGateCutsceneStep;
@@ -1009,7 +1057,7 @@ void gameProcessBaseGate(void) {
 
 void gameCancelModeForPlayer(UBYTE ubPlayer) {
 	if(!s_pModeMenus[ubPlayer].isActive) {
-		s_pModeMenus[ubPlayer].ubCurrent = 0;
+		g_pVehicles[ubPlayer].eDrillMode = MODE_OPTION_DRILL;
 	}
 }
 
