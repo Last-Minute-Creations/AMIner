@@ -347,6 +347,7 @@ void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
 	pVehicle->isChallengeEnded = 0;
 	pVehicle->lCash = g_lInitialCash;
+	pVehicle->eLastVisitedBase = BASE_ID_GROUND;
 	vehicleRespawn(pVehicle);
 }
 
@@ -374,6 +375,8 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	fileWrite(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
 	fileWrite(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
 	fileWrite(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
+	// fileWrite(pFile, &pVehicle->eDrillMode, sizeof(pVehicle->eDrillMode));
+	fileWrite(pFile, &pVehicle->eLastVisitedBase, sizeof(pVehicle->eLastVisitedBase));
 	fileWrite(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
 	fileWrite(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
 	fileWrite(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
@@ -426,6 +429,8 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
 	fileRead(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
 	fileRead(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
+	// fileRead(pFile, &pVehicle->eDrillMode, sizeof(pVehicle->eDrillMode));
+	fileRead(pFile, &pVehicle->eLastVisitedBase, sizeof(pVehicle->eLastVisitedBase));
 	fileRead(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
 	fileRead(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
 	fileRead(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
@@ -639,6 +644,7 @@ static inline UBYTE vehicleStartDrilling(
 }
 
 static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
+	pVehicle->eLastVisitedBase = baseGetCurrentId();
 	LONG *pCash = ubUseCashP1 ? &g_pVehicles[0].lCash : &pVehicle->lCash;
 
 	pVehicle->uwCargoCurr = 0;

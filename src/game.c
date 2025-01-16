@@ -130,6 +130,9 @@ static UBYTE gameChangeModePreset(UBYTE ubPlayerIndex, tModePreset ePreset) {
 			modeMenuAddOption(pModeMenu, MODE_OPTION_EXCLAMATION);
 			break;
 		case MODE_PRESET_TRAVEL:
+			if(s_sTeleportReturn.ulYX != -1u) {
+				modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
+			}
 			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE1_GROUND);
 			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE2_DINO);
 			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE3_GATE);
@@ -204,7 +207,7 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 		.uwX = fix16_to_int(g_pVehicles[ubPlayer].fX),
 		.uwY = fix16_to_int(g_pVehicles[ubPlayer].fY)
 	};
-	const tBase *pBase = baseGetCurrent();
+	const tBase *pBase = baseGetById(g_pVehicles[ubPlayer].eLastVisitedBase);
 	vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
 	g_pVehicles[ubPlayer].eDrillMode = MODE_OPTION_DRILL;
 }
@@ -274,8 +277,18 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				}
 				else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
 					tModeOption eSelectedMode = modeMenuHide(pModeMenu);
-					const tBase *pBase = baseGetById(gameModeToBaseId(eSelectedMode));
-					vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
+					if(eSelectedMode == MODE_OPTION_TELEPORT) {
+						vehicleTeleport(&g_pVehicles[ubPlayer], s_sTeleportReturn.uwX, s_sTeleportReturn.uwY);
+						s_sTeleportReturn.ulYX = -1;
+					}
+					else {
+						tBaseId eSelectedBaseId = gameModeToBaseId(eSelectedMode);
+						const tBase *pBase = baseGetById(eSelectedBaseId);
+						if(pBase != baseGetCurrent()) {
+							g_pVehicles[ubPlayer].eLastVisitedBase = eSelectedBaseId;
+							vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
+						}
+					}
 					eNextPreset = MODE_PRESET_OFF;
 				}
 				break;
@@ -353,9 +366,6 @@ static void gameProcessHotkeys(void) {
 		vPortWaitForEnd(s_pVpMain);
 		vPortWaitForEnd(s_pVpMain);
 		vPortWaitForEnd(s_pVpMain);
-	}
-	if(keyUse(KEY_R) && s_sTeleportReturn.ulYX != -1u && g_pVehicles[0].ubVehicleState == VEHICLE_STATE_MOVING) {
-		vehicleTeleport(&g_pVehicles[0], s_sTeleportReturn.uwX, s_sTeleportReturn.uwY);
 	}
 
 	if(keyUse(KEY_F1) && !g_isChallenge) {
