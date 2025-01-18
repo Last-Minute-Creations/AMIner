@@ -43,7 +43,7 @@ typedef struct tFlipbookSpawn {
 	tBob *pBob;
 	const tFlipbookAnimData *pAnimData;
 	tCbOnPeak cbOnPeak;
-	ULONG ulCbData;
+	void *pCbData;
 	UBYTE ubFrame;
 	UBYTE ubCnt;
 } tFlipbookSpawn;
@@ -132,13 +132,13 @@ void flipbookManagerCreate(void) {
 	);
 
 	flipbookAnimDataCreate(
-		&s_pAnimDatas[FLIPBOOK_KIND_TELEPORTER_OUT], 10, 25,
+		&s_pAnimDatas[FLIPBOOK_KIND_TELEPORTER_OUT], 20, 25,
 		(UBYTE[]){0, 1, 2, 3, 4, 5, 6, 7, 0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23},
 		(UBYTE[]){4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 		s_pTeleporterFrames, s_pTeleporterFramesMask, &s_sBobRingWide, s_pSfxTeleport
 	);
 	flipbookAnimDataCreate(
-		&s_pAnimDatas[FLIPBOOK_KIND_TELEPORTER_IN], 10, 16,
+		&s_pAnimDatas[FLIPBOOK_KIND_TELEPORTER_IN], 15, 16,
 		(UBYTE[]){23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8},
 		(UBYTE[]){2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 		s_pTeleporterFrames, s_pTeleporterFramesMask, &s_sBobRingWide, s_pSfxTeleport
@@ -179,7 +179,7 @@ void flipbookManagerDestroy(void) {
 }
 
 void flipbookAdd(
-	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData, tFlipbookKind eKind
+	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, void *pCbData, tFlipbookKind eKind
 ) {
 	const tFlipbookAnimData *pAnimData = &s_pAnimDatas[eKind];
 	tFlipbookSpawn *pStart = s_pFlipbookNext;
@@ -201,7 +201,7 @@ void flipbookAdd(
 		s_pFlipbookNext->cbOnPeak
 	) {
 		// Call pStart's callback if it's before peak
-		s_pFlipbookNext->cbOnPeak(s_pFlipbookNext->ulCbData);
+		s_pFlipbookNext->cbOnPeak(s_pFlipbookNext->pCbData);
 	}
 
 	s_pFlipbookNext->pBob = flipbookBobRingGetNext(pAnimData->pBobRing);
@@ -210,7 +210,7 @@ void flipbookAdd(
 	s_pFlipbookNext->ubFrame = 0;
 	s_pFlipbookNext->ubCnt = 0;
 	s_pFlipbookNext->cbOnPeak = cbOnPeak;
-	s_pFlipbookNext->ulCbData = ulCbData;
+	s_pFlipbookNext->pCbData = pCbData;
 	s_pFlipbookNext->pAnimData = pAnimData;
 
 	bobSetFrame(
@@ -231,7 +231,7 @@ void flipbookManagerProcess(void) {
 				pFlipbook->ubCnt = 0;
 				++pFlipbook->ubFrame;
 				if(pFlipbook->ubFrame == pAnimData->ubPeakFrameIndex && pFlipbook->cbOnPeak) {
-					pFlipbook->cbOnPeak(pFlipbook->ulCbData);
+					pFlipbook->cbOnPeak(pFlipbook->pCbData);
 				}
 				bobSetFrame(
 					pFlipbook->pBob,

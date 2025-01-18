@@ -208,7 +208,7 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 		.uwY = fix16_to_int(g_pVehicles[ubPlayer].fY)
 	};
 	const tBase *pBase = baseGetById(g_pVehicles[ubPlayer].eLastVisitedBase);
-	vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
+	vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY, TELEPORT_KIND_MINE_TO_BASE);
 	g_pVehicles[ubPlayer].eDrillMode = MODE_OPTION_DRILL;
 }
 
@@ -278,7 +278,11 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE)) {
 					tModeOption eSelectedMode = modeMenuHide(pModeMenu);
 					if(eSelectedMode == MODE_OPTION_TELEPORT) {
-						vehicleTeleport(&g_pVehicles[ubPlayer], s_sTeleportReturn.uwX, s_sTeleportReturn.uwY);
+						vehicleTeleport(
+							&g_pVehicles[ubPlayer],
+							s_sTeleportReturn.uwX, s_sTeleportReturn.uwY,
+							TELEPORT_KIND_BASE_TO_MINE
+						);
 						s_sTeleportReturn.ulYX = -1;
 					}
 					else {
@@ -286,7 +290,11 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 						const tBase *pBase = baseGetById(eSelectedBaseId);
 						if(pBase != baseGetCurrent()) {
 							g_pVehicles[ubPlayer].eLastVisitedBase = eSelectedBaseId;
-							vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
+							vehicleTeleport(
+								&g_pVehicles[ubPlayer],
+								pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY,
+								TELEPORT_KIND_BASE_TO_BASE
+							);
 						}
 					}
 					eNextPreset = MODE_PRESET_OFF;

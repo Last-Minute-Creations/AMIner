@@ -282,8 +282,9 @@ void vehicleUpdateBodyBob(tVehicle *pVehicle) {
 	);
 }
 
-static void vehicleOnExplodePeak(ULONG ulData) {
-	tVehicle *pVehicle = &g_pVehicles[ulData];
+static void vehicleOnExplodePeak(void *pData) {
+	UBYTE ubPlayerIdx = (UBYTE)(ULONG)pData;
+	tVehicle *pVehicle = &g_pVehicles[ubPlayerIdx];
 	pVehicle->ubVehicleState = VEHICLE_STATE_SMOKING;
 }
 
@@ -298,7 +299,7 @@ static void vehicleCrash(tVehicle *pVehicle) {
 
 	flipbookAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnExplodePeak, pVehicle->ubPlayerIdx, FLIPBOOK_KIND_BOOM
+		vehicleOnExplodePeak, (void*)(ULONG)(pVehicle->ubPlayerIdx), FLIPBOOK_KIND_BOOM
 	);
 	pVehicle->ubVehicleState = VEHICLE_STATE_EXPLODING;
 
@@ -379,17 +380,16 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	fileWrite(pFile, &pVehicle->eLastVisitedBase, sizeof(pVehicle->eLastVisitedBase));
 	fileWrite(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
 	fileWrite(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
+	fileWrite(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
 	fileWrite(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
 	fileWrite(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
 	fileWrite(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
 	fileWrite(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
 	fileWrite(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
 	fileWrite(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
-	fileWrite(pFile, &pVehicle->ubTeleportAnimFrame, sizeof(pVehicle->ubTeleportAnimFrame));
-	fileWrite(pFile, &pVehicle->ubTeleportAnimCnt, sizeof(pVehicle->ubTeleportAnimCnt));
 	fileWrite(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
 	fileWrite(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
-	fileWrite(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
+	// fileWrite(pFile, &pVehicle->eTeleportInFlipbook, sizeof(pVehicle->eTeleportInFlipbook));
 	fileWrite(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
 	fileWrite(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
 	fileWrite(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
@@ -421,7 +421,6 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
 	fileRead(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
 	fileRead(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
-	fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
 	fileRead(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
 	fileRead(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
 	fileRead(pFile, &pVehicle->isJetting, sizeof(pVehicle->isJetting));
@@ -437,13 +436,12 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
 	fileRead(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
 	fileRead(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
+	fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
 	fileRead(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
 	fileRead(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
-	fileRead(pFile, &pVehicle->ubTeleportAnimFrame, sizeof(pVehicle->ubTeleportAnimFrame));
-	fileRead(pFile, &pVehicle->ubTeleportAnimCnt, sizeof(pVehicle->ubTeleportAnimCnt));
+	fileRead(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
 	fileRead(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
 	fileRead(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
-	fileRead(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
 	fileRead(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
 	fileRead(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
 	fileRead(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
@@ -1378,8 +1376,8 @@ uint8_t vehiclesAreClose(void) {
 	return 0;
 }
 
-static void vehicleOnTeleportInPeak(ULONG ulData) {
-	tVehicle *pVehicle = (tVehicle*)ulData;
+static void vehicleOnTeleportInPeak(void *pData) {
+	tVehicle *pVehicle = pData;
 	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
 	// UWORD uwMaxHealth = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
 	// if(randUwMax(&g_sRand, 100) <= 5) {
@@ -1390,25 +1388,48 @@ static void vehicleOnTeleportInPeak(ULONG ulData) {
 	// }
 }
 
-static void vehicleOnTeleportOutPeak(ULONG ulData) {
-	tVehicle *pVehicle = (tVehicle*)ulData;
-	pVehicle->ubTeleportAnimFrame = 0;
-	pVehicle->ubTeleportAnimCnt = 0;
-	vehicleSetPos(pVehicle, pVehicle->uwTeleportX, pVehicle->uwTeleportY);
-	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_IN;
+static void vehicleOnTeleportOutPeak(void *pData) {
+	tVehicle *pVehicle = pData;
 	flipbookAdd(
 		pVehicle->uwTeleportX, pVehicle->uwTeleportY,
-		vehicleOnTeleportInPeak, (ULONG)pVehicle, FLIPBOOK_KIND_TELEPORT
+		vehicleOnTeleportInPeak, pVehicle, pVehicle->eTeleportInFlipbook
 	);
+
+	if(pVehicle->eTeleportInFlipbook == FLIPBOOK_KIND_TELEPORTER_IN) {
+		pVehicle->uwTeleportX += 7;
+	}
+	vehicleSetPos(pVehicle, pVehicle->uwTeleportX, pVehicle->uwTeleportY);
+	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_IN;
 }
 
-void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
+void vehicleTeleport(
+	tVehicle *pVehicle, UWORD uwX, UWORD uwY, tTeleportKind eTeleportKind
+) {
 	pVehicle->uwTeleportX = uwX;
 	pVehicle->uwTeleportY = uwY;
 	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_OUT;
+
+	UWORD uwFlipbookX;
+	UWORD uwFlipbookY;
+	tFlipbookKind eFlipbookKind;
+	if(eTeleportKind == TELEPORT_KIND_MINE_TO_BASE) {
+		uwFlipbookX = pVehicle->sBobBody.sPos.uwX;
+		uwFlipbookY = pVehicle->sBobBody.sPos.uwY;
+		eFlipbookKind = FLIPBOOK_KIND_TELEPORT;
+	}
+	else {
+		const tBase *pBase = baseGetCurrent();
+		eFlipbookKind = FLIPBOOK_KIND_TELEPORTER_OUT;
+		uwFlipbookX = pBase->sPosTeleport.uwX - 7;
+		uwFlipbookY = pBase->sPosTeleport.uwY - 3;
+		vehicleSetPos(pVehicle, pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
+	}
+
+	pVehicle->eTeleportInFlipbook = (eTeleportKind == TELEPORT_KIND_BASE_TO_MINE)
+		? FLIPBOOK_KIND_TELEPORT : FLIPBOOK_KIND_TELEPORTER_IN;
 	flipbookAdd(
-		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnTeleportOutPeak, (ULONG)pVehicle, FLIPBOOK_KIND_TELEPORT
+		uwFlipbookX, uwFlipbookY,
+		vehicleOnTeleportOutPeak, pVehicle, eFlipbookKind
 	);
 }
 

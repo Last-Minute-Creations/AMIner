@@ -14,9 +14,16 @@
 #include "string_array.h"
 #include "mode_menu.h"
 #include "base.h"
+#include "flipbook.h"
 
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 24
+
+typedef enum tTeleportKind {
+	TELEPORT_KIND_BASE_TO_BASE,
+	TELEPORT_KIND_BASE_TO_MINE,
+	TELEPORT_KIND_MINE_TO_BASE,
+} tTeleportKind;
 
 typedef enum _tDrillDir {
 	DRILL_DIR_NONE = 0,
@@ -83,11 +90,10 @@ typedef struct _tVehicle {
 	UBYTE ubTrackFrame;
 	UBYTE ubSmokeAnimFrame;
 	UBYTE ubSmokeAnimCnt;
-	UBYTE ubTeleportAnimFrame;
-	UBYTE ubTeleportAnimCnt;
+	UBYTE ubDrillState;
 	UWORD uwTeleportX;
 	UWORD uwTeleportY;
-	UBYTE ubDrillState;
+	tFlipbookKind eTeleportInFlipbook;
 	// Cargo
 	UBYTE uwCargoCurr;
 	UWORD uwCargoScore;
@@ -130,7 +136,7 @@ void vehicleProcessText(void);
 
 void vehicleProcess(tVehicle *pVehicle);
 
-void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
+void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY, tTeleportKind eTeleportKind);
 
 uint8_t vehiclesAreClose(void);
 
