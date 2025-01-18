@@ -772,7 +772,7 @@ static UBYTE gameProcessGateCutscene(void) {
 				UWORD uwAddY = randUwMax(&g_sRand, 90);
 				flipbookAdd(
 					32 + 35 + uwAddX, GATE_DEPTH_PX + uwAddY,
-					0, 0, 1, FLIPBOOK_KIND_BOOM
+					0, 0, FLIPBOOK_KIND_BOOM
 				);
 			}
 

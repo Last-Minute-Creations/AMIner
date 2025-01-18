@@ -14,6 +14,7 @@ typedef enum tFlipbookKind {
 	FLIPBOOK_KIND_TELEPORT,
 	FLIPBOOK_KIND_TELEPORTER_OUT,
 	FLIPBOOK_KIND_TELEPORTER_IN,
+	FLIPBOOK_KIND_COUNT,
 } tFlipbookKind;
 
 void flipbookManagerCreate(void);
@@ -21,8 +22,7 @@ void flipbookManagerCreate(void);
 void flipbookManagerDestroy(void);
 
 void flipbookAdd(
-	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData,
-	UBYTE isQuick, tFlipbookKind eKind
+	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, ULONG ulCbData, tFlipbookKind eKind
 );
 
 void flipbookManagerProcess(void);

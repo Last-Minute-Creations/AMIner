@@ -298,7 +298,7 @@ static void vehicleCrash(tVehicle *pVehicle) {
 
 	flipbookAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnExplodePeak, pVehicle->ubPlayerIdx, 0, FLIPBOOK_KIND_BOOM
+		vehicleOnExplodePeak, pVehicle->ubPlayerIdx, FLIPBOOK_KIND_BOOM
 	);
 	pVehicle->ubVehicleState = VEHICLE_STATE_EXPLODING;
 
@@ -1398,7 +1398,7 @@ static void vehicleOnTeleportOutPeak(ULONG ulData) {
 	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_IN;
 	flipbookAdd(
 		pVehicle->uwTeleportX, pVehicle->uwTeleportY,
-		vehicleOnTeleportInPeak, (ULONG)pVehicle, 0, FLIPBOOK_KIND_TELEPORT
+		vehicleOnTeleportInPeak, (ULONG)pVehicle, FLIPBOOK_KIND_TELEPORT
 	);
 }
 
@@ -1408,7 +1408,7 @@ void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_OUT;
 	flipbookAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnTeleportOutPeak, (ULONG)pVehicle, 0, FLIPBOOK_KIND_TELEPORT
+		vehicleOnTeleportOutPeak, (ULONG)pVehicle, FLIPBOOK_KIND_TELEPORT
 	);
 }
 

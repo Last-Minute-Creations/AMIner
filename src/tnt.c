@@ -40,7 +40,7 @@ static void onExplosionPeak(ULONG ulData) {
 		flipbookAdd(
 			pTnt->pCoords[pTnt->ubCurrent].uwX << 5,
 			pTnt->pCoords[pTnt->ubCurrent].uwY << 5,
-			onExplosionPeak, ulData, 1, FLIPBOOK_KIND_BOOM
+			onExplosionPeak, ulData, FLIPBOOK_KIND_BOOM
 		);
 	}
 }
@@ -64,7 +64,7 @@ void tntDetonate(tTnt *pTnt) {
 	pTnt->ubCurrent = 0;
 	const tUwCoordYX *pFirst = &pTnt->pCoords[0];
 	flipbookAdd(
-		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pTnt, 1, FLIPBOOK_KIND_BOOM
+		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pTnt, FLIPBOOK_KIND_BOOM
 	);
 }
 
