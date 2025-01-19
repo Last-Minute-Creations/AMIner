@@ -273,6 +273,7 @@ static void coreGsCreate(void) {
 	);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 60);
 	flipbookManagerCreate();
+	baseTeleporterCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 65);
 	groundLayerCreate(s_pVpMain);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 70);
@@ -282,10 +283,9 @@ static void coreGsCreate(void) {
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 80);
 
 	assetsMarkersCreate();
-	baseTeleporterCreate();
 	modeMenuManagerCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 85);
-	gameInitBombMarkerBobs();
+	gameInitBobs();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 90);
 
 	menuPreload();
@@ -360,10 +360,10 @@ static void coreGsDestroy(void) {
 	assetsAudioDestroy();
 
 	assetsMarkersDestroy();
-	baseTeleporterDestroy();
 	modeMenuManagerDestroy();
 	assetsTileOverlayDestroy();
 	flipbookManagerDestroy();
+	baseTeleporterDestroy();
 	coreBobSequencesDestroy();
 	defsDestroyLocale();
 

@@ -44,7 +44,7 @@ UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary);
 
 void gameGsLoopEnterScore(void);
 
-void gameInitBombMarkerBobs(void);
+void gameInitBobs(void);
 
 UBYTE gameCanPushBob(const tBob *pBob);
 

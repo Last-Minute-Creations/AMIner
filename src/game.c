@@ -1120,7 +1120,7 @@ UBYTE gameGetRebukes(void) {
 	return s_ubRebukes;
 }
 
-void gameInitBombMarkerBobs(void) {
+void gameInitBobs(void) {
 	UBYTE *pAddressFrame = bobCalcFrameAddress(g_pBombMarker, 0);
 	UBYTE *pAddressMask = bobCalcFrameAddress(g_pBombMarkerMask, 0);
 	for(UBYTE ubPlayer = 0; ubPlayer < 2; ++ubPlayer) {
@@ -1131,6 +1131,9 @@ void gameInitBombMarkerBobs(void) {
 			);
 		}
 	}
+
+	modeMenuInitBob(&s_pModeMenus[0]);
+	modeMenuInitBob(&s_pModeMenus[1]);
 }
 
 UBYTE gameCanPushBob(const tBob *pBob) {

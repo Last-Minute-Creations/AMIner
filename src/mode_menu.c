@@ -42,6 +42,14 @@ void modeMenuManagerCreate(void) {
 	}
 }
 
+void modeMenuInitBob(tModeMenu *pModeMenu) {
+	bobInit(
+		&pModeMenu->sBob,
+		MODE_ICON_WIDTH, MODE_ICON_HEIGHT,
+		1, 0, s_pModeIconMask->Planes[0], 0, 0
+	);
+}
+
 void modeMenuManagerDestroy(void) {
 	bitmapDestroy(s_pModeIcons);
 	bitmapDestroy(s_pModeIconMask);
@@ -53,12 +61,6 @@ void modeMenuReset(tModeMenu *pModeMenu, UBYTE ubPlayerIndex) {
 	pModeMenu->ubCurrent = 0;
 	pModeMenu->isActive = 0;
 	pModeMenu->ubPlayerIndex = ubPlayerIndex;
-
-	bobInit(
-		&pModeMenu->sBob,
-		MODE_ICON_WIDTH, MODE_ICON_HEIGHT,
-		1, 0, s_pModeIconMask->Planes[0], 0, 0
-	);
 }
 
 void modeMenuClearOptions(tModeMenu *pModeMenu) {

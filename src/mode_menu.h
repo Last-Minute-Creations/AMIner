@@ -34,6 +34,8 @@ typedef struct tModeMenu {
 
 void modeMenuManagerCreate(void);
 
+void modeMenuInitBob(tModeMenu *pModeMenu);
+
 void modeMenuManagerDestroy(void);
 
 void modeMenuReset(tModeMenu *pModeMenu, UBYTE ubPlayerIndex);
