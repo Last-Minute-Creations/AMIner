@@ -103,7 +103,7 @@ void coreProcessBeforeBobs(void) {
 	// Draw collectibles and bg anims before anything else
 	collectiblesProcess();
 	if(!gameIsCutsceneActive()) {
-		bobSequenceProcess(g_pMainBuffer);
+		bobSequenceProcess();
 		baseTeleporterProcess();
 	}
 }
