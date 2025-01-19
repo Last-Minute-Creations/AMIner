@@ -84,7 +84,7 @@ General:
 	✔ Markers for offscreen players @done(23-10-06)
 	✔ Offscreen players can focus by pressing fire @done(23-10-06)
 	✔ Reporting mechanics @done(24-07-01)
-		✔ Add "Reproting" option for commissar @done(24-07-01)
+		✔ Add "Reporting" option for commissar @done(24-07-01)
 		✔ Add ability to report on non-reported stuff from questioning @done(24-07-01)
 			✔ Trigger same handler as after questioning @done(24-07-01)
 		✔ Add ability to report on Agent @done(24-07-01)
@@ -92,16 +92,19 @@ General:
 			✔ Remove option after he's reported @done(24-07-01)
 			✔ Remove NPC from office on reporting @done(24-07-01)
 	✘ Modifiable challenge end level? @cancelled(24-02-11)
-	☐ Fast travel between bases
-		☐ Rectangle on each base
-		☐ Show question mark near the rectangle
-		☐ Pressing fire on question mark shows context menu
-		☐ Up/down options
+	✔ Fast travel between bases @done(25-01-19)
+		✔ Display on each base @done(25-01-14)
+		✔ Show prompt near bounds @done(25-01-14)
+		✔ Pressing fire on prompt shows context menu @done(25-01-16)
+		✔ Teleport using old animation @done(25-01-14)
+		✔ Make flipbook code use 32- or 48-wide bobs @done(25-01-18)
+		✔ Teleport using new animation @done(25-01-19)
+		✘ Up/down options @cancelled(25-01-16)
 	☐ Portable teleport as a vehicle upgrade
+		✔ Return option in fast travel teleporter @done(25-01-16)
+		✔ Remove debug teleport return button @done(25-01-16)
 		☐ Figure out the teleport upgrades
-		☐ Remove debug teleport return button
 		☐ Bring back teleport damage on zeroeth upgrade
-		☐ Return option in fast travel teleporter
 	☐ Animated main base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
@@ -115,11 +118,12 @@ Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
 	✔ Prisoner is not always placed @done(24-02-01)
 	✔ Limit cash display to prevent trashing of message icon? @done(24-07-07)
-	☐ Gate (collectibles) not drawing properly on teleport-in
+	☐ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place
 	☐ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time
 	☐ Game doesn't launch properly from icon
 	☐ Distorted main base in challenge mode
 	☐ Warehouse corruption (after entering accounting?)
+	☐ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up
 
 Misc QoL refinements:
 	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)
@@ -227,6 +231,11 @@ Missing message texts:
 
 Missing graphics:
 	☐ Scientist portrait
+	☐ Jay portrait small
+	☐ Jay portrait large final
+	☐ Protest banners on factory
+	☐ Sci base final
+	☐ News slides for each ending
 
 Free mode:
 	✘ figure out the rules @cancelled(23-09-07)

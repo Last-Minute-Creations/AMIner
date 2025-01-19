@@ -12,9 +12,18 @@
 #include "mineral.h"
 #include "tnt.h"
 #include "string_array.h"
+#include "mode_menu.h"
+#include "base.h"
+#include "flipbook.h"
 
 #define VEHICLE_WIDTH 32
 #define VEHICLE_HEIGHT 24
+
+typedef enum tTeleportKind {
+	TELEPORT_KIND_BASE_TO_BASE,
+	TELEPORT_KIND_BASE_TO_MINE,
+	TELEPORT_KIND_MINE_TO_BASE,
+} tTeleportKind;
 
 typedef enum _tDrillDir {
 	DRILL_DIR_NONE = 0,
@@ -39,9 +48,10 @@ typedef enum _tVehicleState {
 	VEHICLE_STATE_DRILLING,
 	VEHICLE_STATE_EXPLODING,
 	VEHICLE_STATE_SMOKING,
-	VEHICLE_STATE_TELEPORTING_OUT,
 	VEHICLE_STATE_TELEPORTING_WAIT_FOR_CAMERA,
-	VEHICLE_STATE_TELEPORTING_IN,
+	VEHICLE_STATE_TELEPORTING_INVISIBLE,
+	VEHICLE_STATE_TELEPORTING_VISIBLE,
+	VEHICLE_STATE_COUNT,
 } tVehicleState;
 
 typedef struct _tVehicle {
@@ -67,6 +77,8 @@ typedef struct _tVehicle {
 	UBYTE ubJetAnimFrame;
 	UBYTE ubJetAnimCnt;
 	UBYTE ubToolAnimCnt;
+	tModeOption eDrillMode;
+	tBaseId eLastVisitedBase;
 	// Drilling
 	UBYTE ubDrillDir;
 	UBYTE ubDrillVAnimCnt;
@@ -79,11 +91,10 @@ typedef struct _tVehicle {
 	UBYTE ubTrackFrame;
 	UBYTE ubSmokeAnimFrame;
 	UBYTE ubSmokeAnimCnt;
-	UBYTE ubTeleportAnimFrame;
-	UBYTE ubTeleportAnimCnt;
+	UBYTE ubDrillState;
 	UWORD uwTeleportX;
 	UWORD uwTeleportY;
-	UBYTE ubDrillState;
+	tFlipbookKind eTeleportInFlipbook;
 	// Cargo
 	UBYTE uwCargoCurr;
 	UWORD uwCargoScore;
@@ -106,6 +117,8 @@ void vehicleManagerDestroy(void);
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle);
 
+UBYTE vehicleIsNearBaseTeleporter(const tVehicle *pVehicle);
+
 UBYTE vehicleIsInBase(const tVehicle *pVehicle);
 
 void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
@@ -124,7 +137,7 @@ void vehicleProcessText(void);
 
 void vehicleProcess(tVehicle *pVehicle);
 
-void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY);
+void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY, tTeleportKind eTeleportKind);
 
 uint8_t vehiclesAreClose(void);
 

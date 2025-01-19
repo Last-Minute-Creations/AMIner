@@ -1,5 +1,5 @@
 #include "tnt.h"
-#include "explosion.h"
+#include "flipbook.h"
 #include "tile.h"
 #include "vehicle.h"
 #include "inventory.h"
@@ -9,8 +9,8 @@
 
 #define DETONATION_CURRENT_INVALID 0xFF
 
-static void onExplosionPeak(ULONG ulData) {
-	tTnt *pTnt = (tTnt*)ulData;
+static void onExplosionPeak(void *pData) {
+	tTnt *pTnt = pData;
 	UWORD uwX = pTnt->pCoords[pTnt->ubCurrent].uwX;
 	UWORD uwY = pTnt->pCoords[pTnt->ubCurrent].uwY;
 	// TODO Hurt player if is on explosion tile?
@@ -37,10 +37,10 @@ static void onExplosionPeak(ULONG ulData) {
 
 	// Trigger next explosion
 	if(++pTnt->ubCurrent < pTnt->ubCoordCount) {
-		explosionAdd(
+		flipbookAdd(
 			pTnt->pCoords[pTnt->ubCurrent].uwX << 5,
 			pTnt->pCoords[pTnt->ubCurrent].uwY << 5,
-			onExplosionPeak, ulData, 1, EXPLOSION_KIND_BOOM
+			onExplosionPeak, 0, pData, FLIPBOOK_KIND_BOOM
 		);
 	}
 }
@@ -63,8 +63,8 @@ void tntDetonate(tTnt *pTnt) {
 
 	pTnt->ubCurrent = 0;
 	const tUwCoordYX *pFirst = &pTnt->pCoords[0];
-	explosionAdd(
-		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, (ULONG)pTnt, 1, EXPLOSION_KIND_BOOM
+	flipbookAdd(
+		pFirst->uwX << 5, pFirst->uwY << 5, onExplosionPeak, 0, pTnt, FLIPBOOK_KIND_BOOM
 	);
 }
 

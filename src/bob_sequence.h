@@ -33,6 +33,6 @@ void bobSequenceAdd(
 	UBYTE ubSpeed
 );
 
-void bobSequenceProcess(tTileBufferManager *pBuffer);
+void bobSequenceProcess(void);
 
 #endif // _AMINER_BOB_SEQUENCE_H_

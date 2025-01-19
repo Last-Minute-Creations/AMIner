@@ -33,6 +33,7 @@ typedef struct _tBase {
 	UBYTE pTilePattern[DEFS_MINE_DIGGABLE_WIDTH * BASE_PATTERN_HEIGHT];
 	UWORD uwTileDepth;
 	tUwAbsRect sRectRestock;
+	tUwCoordYX sPosTeleport;
 	tCbBaseProcess cbProcess;
 } tBase;
 
@@ -45,6 +46,8 @@ void baseProcess(void);
 const tBase *baseGetById(tBaseId eId);
 
 const tBase *baseGetCurrent(void);
+
+tBaseId baseGetCurrentId(void);
 
 void baseUpdateDinoTileset(UBYTE isPopulated);
 

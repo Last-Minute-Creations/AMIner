@@ -38,8 +38,12 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 		.sRectRestock = {
 			.uwX1 = 7 * TILE_SIZE,
 			.uwY1 = (BASE_TILE_DEPTH_GROUND + 7) * TILE_SIZE,
-			.uwX2 = 9 * TILE_SIZE,
+			.uwX2 = 8 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_GROUND + 8) * TILE_SIZE
+		},
+		.sPosTeleport = {
+			.uwX = 5 * TILE_SIZE,
+			.uwY = (BASE_TILE_DEPTH_GROUND + 7) * TILE_SIZE
 		},
 		.cbProcess = 0,
 	},
@@ -63,6 +67,10 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwX2 = 3 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_DINO + 8) * TILE_SIZE
 		},
+		.sPosTeleport = {
+			.uwX = 9 * TILE_SIZE,
+			.uwY = (BASE_TILE_DEPTH_DINO + 7) * TILE_SIZE
+		},
 		.cbProcess = 0,
 	},
 	[BASE_ID_GATE] = {
@@ -84,6 +92,10 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwY1 = (BASE_TILE_DEPTH_GATE + 7) * TILE_SIZE,
 			.uwX2 = 10 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_GATE + 8) * TILE_SIZE
+		},
+		.sPosTeleport = {
+			.uwX = 2 * TILE_SIZE,
+			.uwY = (BASE_TILE_DEPTH_GATE + 7) * TILE_SIZE
 		},
 		.cbProcess = gameProcessBaseGate,
 	},
@@ -107,6 +119,10 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwX2 = 4 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_WESTERN + 8) * TILE_SIZE
 		},
+		.sPosTeleport = {
+			.uwX = 9 * TILE_SIZE,
+			.uwY = (BASE_TILE_DEPTH_WESTERN + 7) * TILE_SIZE
+		},
 		.cbProcess = gameProcessBaseWestern,
 	},
 	[BASE_ID_DINO_POPULATED] = {
@@ -128,7 +144,11 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwY1 = (BASE_TILE_DEPTH_DINO + 7) * TILE_SIZE,
 			.uwX2 = 3 * TILE_SIZE,
 			.uwY2 = (BASE_TILE_DEPTH_DINO + 8) * TILE_SIZE
-		}
+		},
+		.sPosTeleport = {
+			.uwX = 9 * TILE_SIZE,
+			.uwY = (BASE_TILE_DEPTH_DINO + 7) * TILE_SIZE
+		},
 	},
 };
 
@@ -201,6 +221,10 @@ const tBase *baseGetById(tBaseId eId) {
 
 const tBase *baseGetCurrent(void) {
 	return &s_pBases[s_eBaseCurrent];
+}
+
+tBaseId baseGetCurrentId(void) {
+	return s_eBaseCurrent;
 }
 
 void baseUpdateDinoTileset(UBYTE isPopulated) {

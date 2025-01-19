@@ -6,6 +6,7 @@
 #include <ace/managers/bob.h>
 #include "core.h"
 #include "tile.h"
+#include "game.h"
 
 #define COLLECTIBLES_BOB_MAX 16
 
@@ -139,9 +140,7 @@ static void collectibleDrawNext(void) {
 	for(UBYTE i = s_pZones[s_ubCurrentZone].ubCount; i--;) {
 		tBob *pBob = &s_pBobs[s_ubCurrentBob];
 
-		UBYTE isOnBuffer = tileBufferIsRectFullyOnBuffer(
-			g_pMainBuffer, pBob->sPos.uwX, pBob->sPos.uwY, pBob->uwWidth, pBob->uwHeight
-		);
+		UBYTE isOnBuffer = gameCanPushBob(pBob);
 		if(isOnBuffer) {
 			if(s_ubCurrentBob < ubFoundCount && s_pBobsDrawCounts[s_ubCurrentBob] < 2) {
 				bobPush(pBob);

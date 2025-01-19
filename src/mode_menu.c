@@ -94,13 +94,13 @@ void modeMenuProcess(tModeMenu *pModeMenu, tDirection eDirection) {
 	pModeMenu->sBob.pFrameData = s_pModeIconOffsets[modeMenuGetSelected(pModeMenu)];
 }
 
-void modeMenuEnterSelection(tModeMenu *pModeMenu) {
+void modeMenuShow(tModeMenu *pModeMenu) {
 	pModeMenu->isActive = 1;
 	pModeMenu->sBob.pFrameData = s_pModeIconOffsets[modeMenuGetSelected(pModeMenu)];
 	pModeMenu->sBob.pMaskData = s_pModeMaskOffsets[pModeMenu->ubCount == 1];
 }
 
-tModeOption modeMenuExitSelection(tModeMenu *pModeMenu) {
+tModeOption modeMenuHide(tModeMenu *pModeMenu) {
 	pModeMenu->isActive = 0;
 	return modeMenuGetSelected(pModeMenu);
 }

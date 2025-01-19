@@ -4,6 +4,7 @@
 
 #include "bob_sequence.h"
 #include <ace/managers/log.h>
+#include "game.h"
 
 #define BOB_SEQUENCE_COUNT_MAX 5
 
@@ -46,7 +47,7 @@ void bobSequenceAdd(
 	++s_ubSequenceCount;
 }
 
-void bobSequenceProcess(tTileBufferManager *pBuffer) {
+void bobSequenceProcess(void) {
 	UBYTE ubStartSequence = s_ubCurrentSequence;
 	do {
 		tBobSequence *pSequence = &s_pSequences[s_ubCurrentSequence++];
@@ -54,10 +55,7 @@ void bobSequenceProcess(tTileBufferManager *pBuffer) {
 			s_ubCurrentSequence = 0;
 		}
 
-		UBYTE isOnBuffer = tileBufferIsRectFullyOnBuffer(
-			pBuffer, pSequence->sAnimRect.uwX, pSequence->sAnimRect.uwY,
-			pSequence->sAnimRect.uwWidth, pSequence->sAnimRect.uwHeight
-		);
+		UBYTE isOnBuffer = gameCanPushBob(&pSequence->sBob);
 		if(isOnBuffer) {
 			if(!pSequence->ubWasVisible) {
 				pSequence->ubCurrentFrame = 0xFF-1;
