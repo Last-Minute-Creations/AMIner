@@ -42,7 +42,8 @@ typedef struct tFlipbookAnimData {
 typedef struct tFlipbookSpawn {
 	tBob *pBob;
 	const tFlipbookAnimData *pAnimData;
-	tCbOnPeak cbOnPeak;
+	tCbFlipbook cbOnPeak;
+	tCbFlipbook cbOnEnd;
 	void *pCbData;
 	UBYTE ubFrame;
 	UBYTE ubCnt;
@@ -138,7 +139,7 @@ void flipbookManagerCreate(void) {
 		s_pTeleporterFrames, s_pTeleporterFramesMask, &s_sBobRingWide, s_pSfxTeleport
 	);
 	flipbookAnimDataCreate(
-		&s_pAnimDatas[FLIPBOOK_KIND_TELEPORTER_IN], 15, 16,
+		&s_pAnimDatas[FLIPBOOK_KIND_TELEPORTER_IN], 8, 16,
 		(UBYTE[]){23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8},
 		(UBYTE[]){2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 		s_pTeleporterFrames, s_pTeleporterFramesMask, &s_sBobRingWide, s_pSfxTeleport
@@ -179,7 +180,8 @@ void flipbookManagerDestroy(void) {
 }
 
 void flipbookAdd(
-	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, void *pCbData, tFlipbookKind eKind
+	UWORD uwX, UWORD uwY, tCbFlipbook cbOnPeak, tCbFlipbook cbOnEnd,
+	void *pCbData, tFlipbookKind eKind
 ) {
 	const tFlipbookAnimData *pAnimData = &s_pAnimDatas[eKind];
 	tFlipbookSpawn *pStart = s_pFlipbookNext;
@@ -197,11 +199,18 @@ void flipbookAdd(
 
 	if(
 		s_pFlipbookNext == pStart &&
-		s_pFlipbookNext->ubFrame != FLIPBOOK_FRAME_INDEX_FINISHED &&
-		s_pFlipbookNext->cbOnPeak
+		s_pFlipbookNext->ubFrame != FLIPBOOK_FRAME_INDEX_FINISHED
 	) {
-		// Call pStart's callback if it's before peak
-		s_pFlipbookNext->cbOnPeak(s_pFlipbookNext->pCbData);
+		if(
+			s_pFlipbookNext->ubFrame < s_pFlipbookNext->pAnimData->ubPeakFrameIndex &&
+			s_pFlipbookNext->cbOnPeak
+		) {
+			// Call pStart's callback if it's before peak
+			s_pFlipbookNext->cbOnPeak(s_pFlipbookNext->pCbData);
+		}
+		if(s_pFlipbookNext->cbOnEnd) {
+			s_pFlipbookNext->cbOnEnd(s_pFlipbookNext->pCbData);
+		}
 	}
 
 	s_pFlipbookNext->pBob = flipbookBobRingGetNext(pAnimData->pBobRing);
@@ -210,6 +219,7 @@ void flipbookAdd(
 	s_pFlipbookNext->ubFrame = 0;
 	s_pFlipbookNext->ubCnt = 0;
 	s_pFlipbookNext->cbOnPeak = cbOnPeak;
+	s_pFlipbookNext->cbOnEnd = cbOnEnd;
 	s_pFlipbookNext->pCbData = pCbData;
 	s_pFlipbookNext->pAnimData = pAnimData;
 
@@ -246,6 +256,9 @@ void flipbookManagerProcess(void) {
 				gameTryPushBob(pFlipbook->pBob);
 			}
 			else {
+				if(pFlipbook->cbOnEnd) {
+					pFlipbook->cbOnEnd(pFlipbook->pCbData);
+				}
 				pFlipbook->ubFrame = FLIPBOOK_FRAME_INDEX_FINISHED;
 			}
 		}

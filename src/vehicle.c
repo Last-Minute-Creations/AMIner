@@ -129,6 +129,23 @@ static void vehicleDestroy(tVehicle *pVehicle) {
 	textBobDestroy(&pVehicle->sTextBob);
 }
 
+static void vehicleSetState(tVehicle *pVehicle, tVehicleState eNewState) {
+#if defined(GAME_DEBUG)
+	static const char *pStateNames[VEHICLE_STATE_COUNT] = {
+		[VEHICLE_STATE_MOVING] = "MOVING",
+		[VEHICLE_STATE_DRILLING] = "DRILLING",
+		[VEHICLE_STATE_EXPLODING] = "EXPLODING",
+		[VEHICLE_STATE_SMOKING] = "SMOKING",
+		[VEHICLE_STATE_TELEPORTING_WAIT_FOR_CAMERA] = "TELEPORTING_WAIT_FOR_CAMERA",
+		[VEHICLE_STATE_TELEPORTING_INVISIBLE] = "TELEPORTING_INVISIBLE",
+		[VEHICLE_STATE_TELEPORTING_VISIBLE] = "TELEPORTING_VISIBLE",
+	};
+
+	logWrite("Vehicle state: %s -> %s", pStateNames[pVehicle->ubVehicleState], pStateNames[eNewState]);
+#endif
+	pVehicle->ubVehicleState = eNewState;
+}
+
 //------------------------------------------------------------------- PUBLIC FNS
 
 void vehicleManagerCreate(void) {
@@ -210,7 +227,7 @@ void vehicleManagerDestroy(void) {
 void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubDrillDir = DRILL_DIR_NONE;
 	pVehicle->ubDrillState = DRILL_STATE_OFF;
-	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
+	vehicleSetState(pVehicle, VEHICLE_STATE_MOVING);
 	pVehicle->fToolOffset = 0;
 
 	pVehicle->fTrackAnimCnt = 0;
@@ -285,7 +302,7 @@ void vehicleUpdateBodyBob(tVehicle *pVehicle) {
 static void vehicleOnExplodePeak(void *pData) {
 	UBYTE ubPlayerIdx = (UBYTE)(ULONG)pData;
 	tVehicle *pVehicle = &g_pVehicles[ubPlayerIdx];
-	pVehicle->ubVehicleState = VEHICLE_STATE_SMOKING;
+	vehicleSetState(pVehicle, VEHICLE_STATE_SMOKING);
 }
 
 static void vehicleCrash(tVehicle *pVehicle) {
@@ -299,9 +316,9 @@ static void vehicleCrash(tVehicle *pVehicle) {
 
 	flipbookAdd(
 		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
-		vehicleOnExplodePeak, (void*)(ULONG)(pVehicle->ubPlayerIdx), FLIPBOOK_KIND_BOOM
+		vehicleOnExplodePeak, 0, (void*)(ULONG)(pVehicle->ubPlayerIdx), FLIPBOOK_KIND_BOOM
 	);
-	pVehicle->ubVehicleState = VEHICLE_STATE_EXPLODING;
+	vehicleSetState(pVehicle, VEHICLE_STATE_EXPLODING);
 
 	s_ubBebCountdown = 200;
 }
@@ -625,7 +642,7 @@ static inline UBYTE vehicleStartDrilling(
 	pVehicle->ubDrillState = (
 		ubDrillDir == DRILL_DIR_V ? DRILL_STATE_VERT_ANIM_IN : DRILL_STATE_DRILLING
 	);
-	pVehicle->ubVehicleState = VEHICLE_STATE_DRILLING;
+	vehicleSetState(pVehicle, VEHICLE_STATE_DRILLING);
 	pVehicle->ubDrillDir = ubDrillDir;
 
 	pVehicle->sDrillTile.uwX = uwTileX;
@@ -1176,6 +1193,21 @@ UBYTE transitionVarToBy(fix16_t *pVar, fix16_t fDest, fix16_t fDelta) {
 	return 0;
 }
 
+static void vehicleDrawOrMarker(tVehicle *pVehicle) {
+	UBYTE isAnyDrawn = (
+		gameTryPushBob(&pVehicle->sBobTrack) |
+		gameTryPushBob(&pVehicle->sBobBody) |
+		gameTryPushBob(&pVehicle->sBobTool)
+	);
+	if(!isAnyDrawn) {
+		vehicleDrawMarker(pVehicle);
+		pVehicle->isMarkerShown = 1;
+	}
+	else {
+		pVehicle->isMarkerShown = 0;
+	}
+}
+
 static void vehicleProcessDrilling(tVehicle *pVehicle) {
 	static const UBYTE pTrackAnimOffs[DRILL_V_ANIM_LEN] = {
 		0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0
@@ -1200,7 +1232,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				if(!--pVehicle->ubDrillVAnimCnt) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
 					pVehicle->ubDrillState = DRILL_STATE_OFF;
-					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
+					vehicleSetState(pVehicle, VEHICLE_STATE_MOVING);
 				}
 				else if(pVehicle->ubDrillVAnimCnt == 5) {
 					bobSetFrame(
@@ -1239,7 +1271,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				if(pVehicle->ubDrillDir == DRILL_DIR_H) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
 					pVehicle->ubDrillState = DRILL_STATE_OFF;
-					pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
+					vehicleSetState(pVehicle, VEHICLE_STATE_MOVING);
 					stopLoopAudio(pVehicle->ubPlayerIdx);
 				}
 				else {
@@ -1292,18 +1324,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 			break;
 	}
 
-	UBYTE isAnyDrawn = (
-		gameTryPushBob(&pVehicle->sBobTrack) |
-		gameTryPushBob(&pVehicle->sBobBody) |
-		gameTryPushBob(&pVehicle->sBobTool)
-	);
-	if(!isAnyDrawn) {
-		vehicleDrawMarker(pVehicle);
-		pVehicle->isMarkerShown = 1;
-	}
-	else {
-		pVehicle->isMarkerShown = 0;
-	}
+	vehicleDrawOrMarker(pVehicle);
 }
 
 void vehicleProcessText(void) {
@@ -1320,18 +1341,17 @@ void vehicleProcessExploding(tVehicle *pVehicle) {
 	pVehicle->sBobTrack.sPos.uwY += VEHICLE_BODY_HEIGHT - 1;
 	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
 
-	UBYTE isAnyDrawn = (
-		gameTryPushBob(&pVehicle->sBobTrack) |
-		gameTryPushBob(&pVehicle->sBobBody) |
-		gameTryPushBob(&pVehicle->sBobTool)
-	);
-	if(!isAnyDrawn) {
-		vehicleDrawMarker(pVehicle);
-		pVehicle->isMarkerShown = 1;
-	}
-	else {
-		pVehicle->isMarkerShown = 0;
-	}
+	vehicleDrawOrMarker(pVehicle);
+}
+
+static void vehicleProcessTeleportingVisible(tVehicle *pVehicle) {
+	pVehicle->sBobBody.sPos.uwX = fix16_to_int(pVehicle->fX);
+	pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
+	pVehicle->sBobTrack.sPos.ulYX = pVehicle->sBobBody.sPos.ulYX;
+	pVehicle->sBobTrack.sPos.uwY += VEHICLE_BODY_HEIGHT - 1;
+	vehicleSetTool(pVehicle, TOOL_STATE_IDLE, 0);
+
+	vehicleDrawOrMarker(pVehicle);
 }
 
 void vehicleProcess(tVehicle *pVehicle) {
@@ -1343,13 +1363,15 @@ void vehicleProcess(tVehicle *pVehicle) {
 			vehicleProcessMovement(pVehicle);
 			break;
 		case VEHICLE_STATE_EXPLODING:
-		case VEHICLE_STATE_TELEPORTING_OUT:
 			vehicleProcessExploding(pVehicle);
 			break;
 		case VEHICLE_STATE_SMOKING:
 			vehicleProcessSmoking(pVehicle);
 			break;
-		case VEHICLE_STATE_TELEPORTING_IN:
+		case VEHICLE_STATE_TELEPORTING_INVISIBLE:
+			break;
+		case VEHICLE_STATE_TELEPORTING_VISIBLE:
+			vehicleProcessTeleportingVisible(pVehicle);
 			break;
 	}
 
@@ -1376,9 +1398,14 @@ uint8_t vehiclesAreClose(void) {
 	return 0;
 }
 
+static void vehicleOnTeleportInEnd(void *pData) {
+	tVehicle *pVehicle = pData;
+	vehicleSetState(pVehicle, VEHICLE_STATE_MOVING);
+}
+
 static void vehicleOnTeleportInPeak(void *pData) {
 	tVehicle *pVehicle = pData;
-	pVehicle->ubVehicleState = VEHICLE_STATE_MOVING;
+	vehicleSetState(pVehicle, VEHICLE_STATE_TELEPORTING_VISIBLE);
 	// UWORD uwMaxHealth = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
 	// if(randUwMax(&g_sRand, 100) <= 5) {
 	// 	vehicleHullDamage(pVehicle, uwMaxHealth);
@@ -1392,14 +1419,17 @@ static void vehicleOnTeleportOutPeak(void *pData) {
 	tVehicle *pVehicle = pData;
 	flipbookAdd(
 		pVehicle->uwTeleportX, pVehicle->uwTeleportY,
-		vehicleOnTeleportInPeak, pVehicle, pVehicle->eTeleportInFlipbook
+		vehicleOnTeleportInPeak, vehicleOnTeleportInEnd,
+		pVehicle, pVehicle->eTeleportInFlipbook
 	);
 
+	// pVehicle->uwTeleportX/Y is flipbook pos - add a bit to vehicle pos to accomodate for its wide bob
 	if(pVehicle->eTeleportInFlipbook == FLIPBOOK_KIND_TELEPORTER_IN) {
 		pVehicle->uwTeleportX += 7;
+		pVehicle->uwTeleportY += 3;
 	}
 	vehicleSetPos(pVehicle, pVehicle->uwTeleportX, pVehicle->uwTeleportY);
-	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_IN;
+	vehicleSetState(pVehicle, VEHICLE_STATE_TELEPORTING_INVISIBLE);
 }
 
 void vehicleTeleport(
@@ -1407,7 +1437,6 @@ void vehicleTeleport(
 ) {
 	pVehicle->uwTeleportX = uwX;
 	pVehicle->uwTeleportY = uwY;
-	pVehicle->ubVehicleState = VEHICLE_STATE_TELEPORTING_OUT;
 
 	UWORD uwFlipbookX;
 	UWORD uwFlipbookY;
@@ -1420,16 +1449,17 @@ void vehicleTeleport(
 	else {
 		const tBase *pBase = baseGetCurrent();
 		eFlipbookKind = FLIPBOOK_KIND_TELEPORTER_OUT;
-		uwFlipbookX = pBase->sPosTeleport.uwX - 7;
-		uwFlipbookY = pBase->sPosTeleport.uwY - 3;
-		vehicleSetPos(pVehicle, pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY);
+		uwFlipbookX = pBase->sPosTeleport.uwX;
+		uwFlipbookY = pBase->sPosTeleport.uwY;
+		vehicleSetPos(pVehicle, pBase->sPosTeleport.uwX + 7, pBase->sPosTeleport.uwY + 3);
 	}
+	vehicleSetState(pVehicle, VEHICLE_STATE_TELEPORTING_VISIBLE);
 
 	pVehicle->eTeleportInFlipbook = (eTeleportKind == TELEPORT_KIND_BASE_TO_MINE)
 		? FLIPBOOK_KIND_TELEPORT : FLIPBOOK_KIND_TELEPORTER_IN;
 	flipbookAdd(
 		uwFlipbookX, uwFlipbookY,
-		vehicleOnTeleportOutPeak, pVehicle, eFlipbookKind
+		vehicleOnTeleportOutPeak, 0, pVehicle, eFlipbookKind
 	);
 }
 

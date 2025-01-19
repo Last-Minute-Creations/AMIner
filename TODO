@@ -97,7 +97,7 @@ General:
 		✔ Show prompt near bounds @done(25-01-14)
 		✔ Pressing fire on prompt shows context menu @done(25-01-16)
 		✔ Teleport using old animation @done(25-01-14)
-		☐ Make flipbook code use 32- or 48-wide bobs
+		✔ Make flipbook code use 32- or 48-wide bobs @done(25-01-18)
 		☐ Teleport using new animation
 		✘ Up/down options @cancelled(25-01-16)
 	☐ Portable teleport as a vehicle upgrade

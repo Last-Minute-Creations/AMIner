@@ -7,7 +7,7 @@
 
 #include <ace/types.h>
 
-typedef void (*tCbOnPeak)(void *pData);
+typedef void (*tCbFlipbook)(void *pData);
 
 typedef enum tFlipbookKind {
 	FLIPBOOK_KIND_BOOM,
@@ -22,7 +22,8 @@ void flipbookManagerCreate(void);
 void flipbookManagerDestroy(void);
 
 void flipbookAdd(
-	UWORD uwX, UWORD uwY, tCbOnPeak cbOnPeak, void *pCbData, tFlipbookKind eKind
+	UWORD uwX, UWORD uwY, tCbFlipbook cbOnPeak, tCbFlipbook cbOnEnd,
+	void *pCbData, tFlipbookKind eKind
 );
 
 void flipbookManagerProcess(void);
