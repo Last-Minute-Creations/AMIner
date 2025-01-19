@@ -135,8 +135,6 @@ Commrade:
 	✔ Improve tab changing on commrade by allowing cursor to move to buttons @done(24-02-08)
 	☐ Redo warehouse/plan management
 	☐ Workshop icons for upgrades?
-	☐ Remove X draw margins from tilebuffer
-	☐ Use pristine buffer for bobs
 	☐ Add left/right arrows in workshop to indicate nav possibility
 	☐ Figure out where to hide sokoban and how to hint it
 		☐ Persistent unlock after Jay quest?
@@ -147,11 +145,13 @@ Optimizations:
 	✔ Comm message page loading @done(23-09-07)
 	✔ Mine generation progress bar @done(23-09-08)
 	✔ Show progress bar instantly after selecting new/continue game @done(24-02-04)
+	✔ Remove X draw margins from tilebuffer @done(25-01-19)
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
 	☐ Workshop tab flicker on navigating
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
+	☐ Use pristine buffer for bobs
 
 Dino quest:
 	✔ Figure out the final flow @done(23-10-05)

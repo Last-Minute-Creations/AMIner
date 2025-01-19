@@ -205,11 +205,13 @@ static void coreGsCreate(void) {
 		TAG_VPORT_BPP, GAME_BPP,
 	TAG_END);
 
+	// It should be fine with 1 extra on TAG_TILEBUFFER_BOUND_TILE_X to the left -
+	// if something gets drawn to the right it will flow to the offscreen left.
 	s_pTiles = bitmapCreateFromPath("data/tiles.bm", 0);
 	g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
-		TAG_TILEBUFFER_BOUND_TILE_X, 11,
+		TAG_TILEBUFFER_BOUND_TILE_X, 1 + 10,
 		TAG_TILEBUFFER_BOUND_TILE_Y, 32768 / 32,
 		TAG_TILEBUFFER_IS_DBLBUF, 1,
 		TAG_TILEBUFFER_TILE_SHIFT, 5,
