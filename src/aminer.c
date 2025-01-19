@@ -23,7 +23,7 @@ void genericCreate(void) {
 	ptplayerCreate(1);
 	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
-	g_pFont = fontCreate("data/uni54.fnt");
+	g_pFont = fontCreateFromPath("data/uni54.fnt");
 
 	if(memGetChipSize() < (1024+512) * 1024) {
 		statePush(g_pGameStateManager, &g_sStateSorry);

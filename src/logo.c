@@ -114,7 +114,7 @@ static void logoGsLoop(void) {
 	if(eState == FADE_STATE_IN_MORPHING || eState == FADE_STATE_OUT_MORPHING) {
 		UBYTE ubLevel = fadeGetLevel();
 		paletteDim(s_pPaletteRef, s_pVp->pPalette, 32, ubLevel);
-		viewUpdatePalette(s_pView);
+		viewUpdateGlobalPalette(s_pView);
 		vPortWaitForEnd(s_pVp);
 	}
 	else if(eState == FADE_STATE_IN) {
@@ -146,9 +146,9 @@ static void logoGsDestroy(void) {
 
 static void logoLmcCreate(void) {
 	systemUse();
-	paletteLoad("data/logo/lmc.plt", s_pPaletteRef, 1 << s_pVp->ubBPP);
-	tBitMap *pLogo = bitmapCreateFromFile("data/logo/lmc.bm", 0);
-	s_pSfxLmc = ptplayerSfxCreateFromFile("data/logo/lmc.sfx", 0);
+	paletteLoadFromPath("data/logo/lmc.plt", s_pPaletteRef, 1 << s_pVp->ubBpp);
+	tBitMap *pLogo = bitmapCreateFromPath("data/logo/lmc.bm", 0);
+	s_pSfxLmc = ptplayerSfxCreateFromPath("data/logo/lmc.sfx", 0);
 	systemUnuse();
 
 	s_sLogoRect.uwWidth = bitmapGetByteWidth(pLogo) * 8;
@@ -224,7 +224,7 @@ static void logoAceCreate(void) {
 		s_pPaletteRef[i] = 0;
 	}
 
-	tBitMap *pLogoAce = bitmapCreateFromFile("data/logo/ace.bm", 0);
+	tBitMap *pLogoAce = bitmapCreateFromPath("data/logo/ace.bm", 0);
 	s_sLogoRect.uwWidth = bitmapGetByteWidth(pLogoAce) * 8;
 	s_sLogoRect.uwHeight = pLogoAce->Rows;
 	UWORD uwLogoOffsY = (256 - s_sLogoRect.uwHeight) / 2;
@@ -242,7 +242,7 @@ static void logoAceCreate(void) {
 	s_bRatioFlashE = FLASH_RATIO_INACTIVE;
 	s_bRatioFlashPwr = FLASH_RATIO_INACTIVE;
 
-	s_pSfxAce = ptplayerSfxCreateFromFile("data/logo/ace.sfx", 0);
+	s_pSfxAce = ptplayerSfxCreateFromPath("data/logo/ace.sfx", 0);
 	systemUnuse();
 
 	blitCopy(
@@ -374,8 +374,8 @@ static void drawLangNames(void) {
 void logoLangCreate(void) {
 	systemUse();
 	s_pLineBuffer = fontCreateTextBitMap(320, g_pFont->uwHeight);
-	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << s_pVp->ubBPP);
-	tBitMap *pFaces = bitmapCreateFromFile("data/lang_select.bm", 0);
+	paletteLoadFromPath("data/aminer.plt", s_pPaletteRef, 1 << s_pVp->ubBpp);
+	tBitMap *pFaces = bitmapCreateFromPath("data/lang_select.bm", 0);
 	systemUnuse();
 
 	// Set first color to black, fill rest with colors from layer 1

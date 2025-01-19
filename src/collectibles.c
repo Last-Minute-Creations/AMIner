@@ -162,8 +162,8 @@ static void collectibleDrawNext(void) {
 
 void collectiblesCreate(void) {
 	for(tCollectibleKind eKind = 0; eKind < COLLECTIBLE_KIND_COUNT; ++eKind) {
-		s_pZoneDatas[eKind].pBitmapFrames = bitmapCreateFromFile(s_pZones[eKind].szFramesFile, 0);
-		s_pZoneDatas[eKind].pBitmapMasks = bitmapCreateFromFile(s_pZones[eKind].szMasksFile, 0);
+		s_pZoneDatas[eKind].pBitmapFrames = bitmapCreateFromPath(s_pZones[eKind].szFramesFile, 0);
+		s_pZoneDatas[eKind].pBitmapMasks = bitmapCreateFromPath(s_pZones[eKind].szMasksFile, 0);
 
 		s_pZoneDatas[eKind].ubFoundCount = 0;
 		UWORD uwOffsY = 0;

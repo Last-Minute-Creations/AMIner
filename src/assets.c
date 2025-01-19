@@ -19,18 +19,18 @@ tBitMap *g_pTileOverlayMasks;
 tFont *g_pFont;
 
 void assetsAudioCreate(void) {
-	g_pSfxFlyLoop = ptplayerSfxCreateFromFile("data/sfx/fly_loop.sfx", 1);
-	g_pSfxDrill = ptplayerSfxCreateFromFile("data/sfx/drill1.sfx", 1);
-	g_pSfxOre = ptplayerSfxCreateFromFile("data/sfx/ore2.sfx", 1);
-	g_pSfxPenalty = ptplayerSfxCreateFromFile("data/sfx/penalty.sfx", 1);
+	g_pSfxFlyLoop = ptplayerSfxCreateFromPath("data/sfx/fly_loop.sfx", 1);
+	g_pSfxDrill = ptplayerSfxCreateFromPath("data/sfx/drill1.sfx", 1);
+	g_pSfxOre = ptplayerSfxCreateFromPath("data/sfx/ore2.sfx", 1);
+	g_pSfxPenalty = ptplayerSfxCreateFromPath("data/sfx/penalty.sfx", 1);
 
 	for(UBYTE i = 0; i < ASSETS_GAME_MOD_COUNT; ++i) {
 		char szModPath[30];
 		sprintf(szModPath, "data/music/game%hhu.mod", i);
-		g_pGameMods[i] = ptplayerModCreate(szModPath);
+		g_pGameMods[i] = ptplayerModCreateFromPath(szModPath);
 	}
-	g_pMenuMod = ptplayerModCreate("data/music/menu.mod");
-	g_pModSampleData = ptplayerSampleDataCreate("data/music/samples.samplepack");
+	g_pMenuMod = ptplayerModCreateFromPath("data/music/menu.mod");
+	g_pModSampleData = ptplayerSampleDataCreateFromPath("data/music/samples.samplepack");
 }
 
 void assetsAudioDestroy(void) {
@@ -47,8 +47,8 @@ void assetsAudioDestroy(void) {
 }
 
 void assetsMarkersCreate(void) {
-	g_pBombMarker = bitmapCreateFromFile("data/bomb_marker.bm", 0);
-	g_pBombMarkerMask = bitmapCreateFromFile("data/bomb_marker_mask.bm", 0);
+	g_pBombMarker = bitmapCreateFromPath("data/bomb_marker.bm", 0);
+	g_pBombMarkerMask = bitmapCreateFromPath("data/bomb_marker_mask.bm", 0);
 }
 
 void assetsMarkersDestroy(void) {
@@ -57,8 +57,8 @@ void assetsMarkersDestroy(void) {
 }
 
 void assetsTileOverlayCreate(void) {
-	g_pTileOverlays = bitmapCreateFromFile("data/tiles_overlay.bm", 0);
-	g_pTileOverlayMasks = bitmapCreateFromFile("data/tiles_overlay_masks.bm", 0);
+	g_pTileOverlays = bitmapCreateFromPath("data/tiles_overlay.bm", 0);
+	g_pTileOverlayMasks = bitmapCreateFromPath("data/tiles_overlay_masks.bm", 0);
 }
 
 void assetsTileOverlayDestroy(void) {

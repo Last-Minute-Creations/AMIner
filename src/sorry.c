@@ -28,7 +28,7 @@ logBlockBegin("logoGsCreate()");
 		TAG_VPORT_BPP, 5,
 		TAG_VPORT_VIEW, s_pView,
 	TAG_END);
-	paletteLoad("data/aminer.plt", s_pVp->pPalette, 1 << s_pVp->ubBPP);
+	paletteLoadFromPath("data/aminer.plt", s_pVp->pPalette, 1 << s_pVp->ubBpp);
 	// Same colors as logo
 	s_pVp->pPalette[0] = 0x0000;
 	s_pVp->pPalette[27] = RGB(51, 34, 0);
@@ -44,7 +44,7 @@ logBlockBegin("logoGsCreate()");
 		TAG_SIMPLEBUFFER_IS_DBLBUF, 0,
 	TAG_END);
 
-	tBitMap *pBitMap = bitmapCreateFromFile("data/lang_select.bm", 0);
+	tBitMap *pBitMap = bitmapCreateFromPath("data/lang_select.bm", 0);
 	blitCopy(
 		pBitMap, 0, 64, s_pBfr->pBack, (320 - 64) / 2, (256 - 64) / 2,
 		64, 64, MINTERM_COPY

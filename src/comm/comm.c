@@ -154,25 +154,25 @@ void commCreate(void) {
 	systemUse();
 	s_pBmRestore = bitmapCreate(
 		COMM_WIDTH, COMM_HEIGHT,
-		g_pMainBuffer->sCommon.pVPort->ubBPP, BMF_INTERLEAVED
+		g_pMainBuffer->sCommon.pVPort->ubBpp, BMF_INTERLEAVED
 	);
-	s_pBg = bitmapCreateFromFile("data/comm_bg.bm", 0);
-	s_pButtons = bitmapCreateFromFile("data/comm_buttons.bm", 0);
+	s_pBg = bitmapCreateFromPath("data/comm_bg.bm", 0);
+	s_pButtons = bitmapCreateFromPath("data/comm_buttons.bm", 0);
 	s_pLineBuffer = fontCreateTextBitMap(
 		CEIL_TO_FACTOR(COMM_DISPLAY_WIDTH, 16), g_pFont->uwHeight
 	);
-	s_pBmEdgesMask = bitmapCreateFromFile("data/comm_edges_mask.bm", 0);
+	s_pBmEdgesMask = bitmapCreateFromPath("data/comm_edges_mask.bm", 0);
 
 	for(UBYTE i = 0; i < 4; ++i) {
 		char szPath[40];
 		sprintf(szPath, "data/sfx/key_press_%hhu.sfx", i);
-		s_pSfxKeyPress[i] = ptplayerSfxCreateFromFile(szPath, 1);
+		s_pSfxKeyPress[i] = ptplayerSfxCreateFromPath(szPath, 1);
 		sprintf(szPath, "data/sfx/key_release_%hhu.sfx", i);
-		s_pSfxKeyRelease[i] = ptplayerSfxCreateFromFile(szPath, 1);
+		s_pSfxKeyRelease[i] = ptplayerSfxCreateFromPath(szPath, 1);
 	}
 
-	g_pCommBmFaces = bitmapCreateFromFile("data/comm_faces_office.bm", 0);
-	g_pCommBmSelection = bitmapCreateFromFile("data/comm_office_selection.bm", 0);
+	g_pCommBmFaces = bitmapCreateFromPath("data/comm_faces_office.bm", 0);
+	g_pCommBmSelection = bitmapCreateFromPath("data/comm_office_selection.bm", 0);
 	systemUnuse();
 
 	s_isCommShown = 0;

@@ -128,7 +128,7 @@ void pageNewsCreate(tNewsKind eNewsKind) {
 	s_isScrollDone = 0;
 
 	tUwCoordYX sOrigin = commGetOrigin();
-	tBitMap *pBitmapNews = bitmapCreateFromFile("data/comm_news.bm", 0);
+	tBitMap *pBitmapNews = bitmapCreateFromPath("data/comm_news.bm", 0);
 	blitCopy(
 		pBitmapNews, 0, 0, commGetDisplayBuffer(), sOrigin.uwX + 25, sOrigin.uwY + 28,
 		bitmapGetByteWidth(pBitmapNews) * 8, pBitmapNews->Rows, MINTERM_COOKIE

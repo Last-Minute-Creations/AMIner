@@ -580,7 +580,7 @@ void tLevelState::drawDirty(void) {
 
 void pageSokobanCreate(void) {
 	s_ubCurrentLevelIndex = 0;
-	s_pBmTiles = bitmapCreateFromFile("data/soko.bm", 0);
+	s_pBmTiles = bitmapCreateFromPath("data/soko.bm", 0);
 	commRegisterPage(pageSokobanProcess, pageSokobanDestroy);
 	loadLevel(0);
 }

@@ -8,6 +8,7 @@
 #include <ace/managers/system.h>
 #include <ace/utils/custom.h>
 #include <ace/utils/chunky.h>
+#include <ace/utils/disk_file.h>
 #include <comm/gs_shop.h>
 #include <comm/page_questioning.h>
 #include <comm/page_office.h>
@@ -1287,11 +1288,11 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 void gameTriggerSave(void) {
 	logWrite("game save");
 	systemUse();
-	tFile *pSave = fileOpen("save_story.tmp", "wb");
+	tFile *pSave = diskFileOpen("save_story.tmp", "wb");
 	gameSave(pSave);
 	fileClose(pSave);
-	fileDelete("save_story.dat");
-	fileMove("save_story.tmp", "save_story.dat");
+	diskFileDelete("save_story.dat");
+	diskFileMove("save_story.tmp", "save_story.dat");
 	systemUnuse();
 }
 

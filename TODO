@@ -135,6 +135,8 @@ Commrade:
 	✔ Improve tab changing on commrade by allowing cursor to move to buttons @done(24-02-08)
 	☐ Redo warehouse/plan management
 	☐ Workshop icons for upgrades?
+	☐ Remove X draw margins from tilebuffer
+	☐ Use pristine buffer for bobs
 	☐ Add left/right arrows in workshop to indicate nav possibility
 	☐ Figure out where to hide sokoban and how to hint it
 		☐ Persistent unlock after Jay quest?

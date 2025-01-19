@@ -14,8 +14,8 @@ static tBitMap *s_pTeleporterIdleFrame;
 static tBitMap *s_pTeleporterIdleMask;
 
 void baseTeleporterCreate(void) {
-	s_pTeleporterIdleFrame = bitmapCreateFromFile("data/base_teleporter_idle.bm", 0);
-	s_pTeleporterIdleMask = bitmapCreateFromFile("data/base_teleporter_idle_mask.bm", 0);
+	s_pTeleporterIdleFrame = bitmapCreateFromPath("data/base_teleporter_idle.bm", 0);
+	s_pTeleporterIdleMask = bitmapCreateFromPath("data/base_teleporter_idle_mask.bm", 0);
 
 	bobInit(
 		&s_sTeleporterIdleBob, BASE_TELEPORTER_WIDTH, BASE_TELEPORTER_IDLE_FRAME_HEIGHT, 1,

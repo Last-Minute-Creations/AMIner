@@ -171,10 +171,10 @@ static void baseTileLoad(tBaseId eBaseId) {
 
 void baseCreate(tTileBufferManager *pManager) {
 	s_pManager = pManager;
-	s_pBaseTiles[BASE_ID_GROUND] = bitmapCreateFromFile("data/base0.bm", 1);
-	s_pBaseTiles[BASE_ID_DINO] = bitmapCreateFromFile("data/base1.bm", 1);
-	s_pBaseTiles[BASE_ID_GATE] = bitmapCreateFromFile("data/base2.bm", 1);
-	s_pBaseTiles[BASE_ID_WESTERN] = bitmapCreateFromFile("data/base3.bm", 1);
+	s_pBaseTiles[BASE_ID_GROUND] = bitmapCreateFromPath("data/base0.bm", 1);
+	s_pBaseTiles[BASE_ID_DINO] = bitmapCreateFromPath("data/base1.bm", 1);
+	s_pBaseTiles[BASE_ID_GATE] = bitmapCreateFromPath("data/base2.bm", 1);
+	s_pBaseTiles[BASE_ID_WESTERN] = bitmapCreateFromPath("data/base3.bm", 1);
 	baseTileLoad(BASE_ID_GROUND);
 }
 
@@ -229,10 +229,10 @@ tBaseId baseGetCurrentId(void) {
 
 void baseUpdateDinoTileset(UBYTE isPopulated) {
 	if(isPopulated) {
-		bitmapLoadFromFile(s_pBaseTiles[BASE_ID_DINO], "data/base1_populated.bm", 0, 20 * TILE_SIZE);
+		bitmapLoadFromPath(s_pBaseTiles[BASE_ID_DINO], "data/base1_populated.bm", 0, 20 * TILE_SIZE);
 	}
 	else {
 		// Sub-optimal speed, but whatever
-		bitmapLoadFromFile(s_pBaseTiles[BASE_ID_DINO], "data/base1.bm", 0, 0);
+		bitmapLoadFromPath(s_pBaseTiles[BASE_ID_DINO], "data/base1.bm", 0, 0);
 	}
 }

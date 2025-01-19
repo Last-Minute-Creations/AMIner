@@ -79,7 +79,7 @@ static void coreBobSequencesCreate(void) {
 	blitRect(s_pDripMask, 0, 0, 16, 20, (1 << GAME_BPP) - 1);
 	bobSequenceReset(s_pDripMask->Planes[0]);
 
-	s_pDripBitmap = bitmapCreateFromFile("data/bg_factory_drip.bm", 0);
+	s_pDripBitmap = bitmapCreateFromPath("data/bg_factory_drip.bm", 0);
 	for(UBYTE i = 0; i < DRIP_ANIM_LENGTH; ++i) {
 		s_pDripFrames[i].pAddrFrame = bobCalcFrameAddress(s_pDripBitmap, i * 20);
 	}
@@ -205,7 +205,7 @@ static void coreGsCreate(void) {
 		TAG_VPORT_BPP, GAME_BPP,
 	TAG_END);
 
-	s_pTiles = bitmapCreateFromFile("data/tiles.bm", 0);
+	s_pTiles = bitmapCreateFromPath("data/tiles.bm", 0);
 	g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
@@ -219,7 +219,7 @@ static void coreGsCreate(void) {
 	TAG_END);
 
 	// Load the view and draw the progress bar
-	paletteLoad("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
+	paletteLoadFromPath("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
 	memcpy(pVpHud->pPalette, s_pPaletteRef, sizeof(pVpHud->pPalette));
 	defsCreateLocale(languageGetPrefix());
 	commCreate();
@@ -290,7 +290,7 @@ static void coreGsCreate(void) {
 
 	menuPreload();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 95);
-	bobReallocateBgBuffers();
+	bobReallocateBuffers();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 100);
 	systemUnuse();
 
@@ -325,7 +325,7 @@ static void coreGsCreate(void) {
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
 	memset(pVpHud->pPalette, 0, sizeof(pVpHud->pPalette));
 	s_pColorBg = &pVpHud->pPalette[0];
-	viewUpdatePalette(s_pView);
+	viewUpdateGlobalPalette(s_pView);
 
 	// Initial background
 	tileBufferRedrawAll(g_pMainBuffer);

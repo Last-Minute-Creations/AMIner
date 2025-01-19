@@ -111,15 +111,15 @@ static tBob *flipbookBobRingGetNext(tFlipbookBobRing *pRing) {
 }
 
 void flipbookManagerCreate(void) {
-	s_pBoomFrames = bitmapCreateFromFile("data/explosion.bm", 0);
-	s_pBoomFramesMask = bitmapCreateFromFile("data/explosion_mask.bm", 0);
-	s_pTpFrames = bitmapCreateFromFile("data/teleport.bm", 0);
-	s_pTpFramesMask = bitmapCreateFromFile("data/teleport_mask.bm", 0);
-	s_pTeleporterFrames = bitmapCreateFromFile("data/base_teleporter.bm", 0);
-	s_pTeleporterFramesMask = bitmapCreateFromFile("data/base_teleporter_mask.bm", 0);
+	s_pBoomFrames = bitmapCreateFromPath("data/explosion.bm", 0);
+	s_pBoomFramesMask = bitmapCreateFromPath("data/explosion_mask.bm", 0);
+	s_pTpFrames = bitmapCreateFromPath("data/teleport.bm", 0);
+	s_pTpFramesMask = bitmapCreateFromPath("data/teleport_mask.bm", 0);
+	s_pTeleporterFrames = bitmapCreateFromPath("data/base_teleporter.bm", 0);
+	s_pTeleporterFramesMask = bitmapCreateFromPath("data/base_teleporter_mask.bm", 0);
 
-	s_pSfxBoom = ptplayerSfxCreateFromFile("data/sfx/explosion.sfx", 1);
-	s_pSfxTeleport = ptplayerSfxCreateFromFile("data/sfx/teleport.sfx", 1);
+	s_pSfxBoom = ptplayerSfxCreateFromPath("data/sfx/explosion.sfx", 1);
+	s_pSfxTeleport = ptplayerSfxCreateFromPath("data/sfx/teleport.sfx", 1);
 
 
 	flipbookBobRingInit(

@@ -7,6 +7,7 @@
 #include <ace/managers/system.h>
 #include <ace/managers/timer.h>
 #include <ace/utils/bitmap.h>
+#include <ace/utils/disk_file.h>
 #include <comm/comm.h>
 #include "defs.h"
 #include "assets.h"
@@ -46,9 +47,8 @@ static ULONG s_ulCursorStart = 0;
 
 void hiScoreLoad(void) {
 	systemUse();
-	tFile *pFile = fileOpen("scores.dat", "r");
-	if(pFile) {
-		logWrite("opened scores file");
+	if(diskFileExists("scores.dat")) {
+		tFile *pFile = diskFileOpen("scores.dat", "r");
 		for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 			fileRead(pFile, &s_pScores[i], sizeof(s_pScores[i]));
 		}
@@ -63,7 +63,7 @@ void hiScoreLoad(void) {
 
 static void hiScoreSave(void) {
 	systemUse();
-	tFile *pFile = fileOpen("scores.dat", "w");
+	tFile *pFile = diskFileOpen("scores.dat", "w");
 	if(pFile) {
 		for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 			fileWrite(pFile, &s_pScores[i], sizeof(s_pScores[i]));

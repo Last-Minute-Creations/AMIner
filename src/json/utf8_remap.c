@@ -6,7 +6,7 @@
 #include <json/utf8.h>
 #include <ace/managers/log.h>
 #include <ace/managers/system.h>
-#include <ace/utils/file.h>
+#include <ace/utils/disk_file.h>
 
 char remapChar(const tCodeRemap *pRemap, ULONG ulCodepoint) {
 	if(ulCodepoint < 128) {
@@ -26,19 +26,19 @@ char *remapFile(
 ) {
 	systemUse();
 	// Read whole file to plain buffer
-	tFile *pFilecontents = fileOpen(szFilePath, "r");
+	tFile *pFileContents = diskFileOpen(szFilePath, "r");
 
-	if(!pFilecontents) {
+	if(!pFileContents) {
 		logWrite("ERR: Couldn't read contents of '%s'\n", szFilePath);
 		systemUnuse();
 		return 0;
 	}
 
-	UWORD uwRemainingChars = fileGetSize(szFilePath);
+	UWORD uwRemainingChars = fileGetSize(pFileContents);
 	UWORD uwFileContentsBufferSize = uwRemainingChars + 1;
 	char *szFileContents = memAllocFast(uwFileContentsBufferSize);
-	fileRead(pFilecontents, szFileContents, uwFileContentsBufferSize);
-	fileClose(pFilecontents);
+	fileRead(pFileContents, szFileContents, uwFileContentsBufferSize);
+	fileClose(pFileContents);
 	systemUnuse();
 
 	// Unicode takes more or same space than ascii - can convert in-place

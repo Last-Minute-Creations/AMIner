@@ -211,8 +211,8 @@ void hudCreate(tVPort *pVpHud, const tFont *pFont) {
 		TAG_SIMPLEBUFFER_BOUND_HEIGHT, HUD_HEIGHT * HUD_PAGE_COUNT,
   TAG_END);
 
-	bitmapLoadFromFile(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
-	s_pFaces = bitmapCreateFromFile("data/comm_faces.bm", 0);
+	bitmapLoadFromPath(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
+	s_pFaces = bitmapCreateFromPath("data/comm_faces.bm", 0);
 
 	s_pFont = pFont;
 	s_ubLineHeight = 7;

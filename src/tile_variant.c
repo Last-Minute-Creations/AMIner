@@ -10,7 +10,7 @@ static tBitMap *s_pCheckpointTiles;
 static tTileVariant s_eCurrentVariant;
 
 void tileVariantManagerCreate(void) {
-	s_pCheckpointTiles = bitmapCreateFromFile("data/checkpoint.bm", 1);
+	s_pCheckpointTiles = bitmapCreateFromPath("data/checkpoint.bm", 1);
 	s_eCurrentVariant = TILE_VARIANT_DEFAULT;
 }
 
@@ -39,7 +39,7 @@ void tileVariantChangeTo(tTileVariant eVariant) {
 			);
 			break;
 		case TILE_VARIANT_CAMPAIGN:
-			bitmapLoadFromFile(
+			bitmapLoadFromPath(
 				g_pMainBuffer->pTileSet, "data/campaign.bm",
 				0, TILE_CHECKPOINT_1 * TILE_SIZE
 			);

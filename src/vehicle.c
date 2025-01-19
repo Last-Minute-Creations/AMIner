@@ -150,29 +150,29 @@ static void vehicleSetState(tVehicle *pVehicle, tVehicleState eNewState) {
 
 void vehicleManagerCreate(void) {
 	// Load gfx
-	s_pBodyFrames[0] = bitmapCreateFromFile("data/drill.bm", 0);
-	s_pBodyFrames[1] = bitmapCreateFromFile("data/drill_2.bm", 0);
-	s_pBodyMask = bitmapCreateFromFile("data/drill_mask.bm", 0);
+	s_pBodyFrames[0] = bitmapCreateFromPath("data/drill.bm", 0);
+	s_pBodyFrames[1] = bitmapCreateFromPath("data/drill_2.bm", 0);
+	s_pBodyMask = bitmapCreateFromPath("data/drill_mask.bm", 0);
 
-	s_pTrackFrames = bitmapCreateFromFile("data/track.bm", 0);
-	s_pTrackMask = bitmapCreateFromFile("data/track_mask.bm", 0);
+	s_pTrackFrames = bitmapCreateFromPath("data/track.bm", 0);
+	s_pTrackMask = bitmapCreateFromPath("data/track_mask.bm", 0);
 
-	s_pJetFrames = bitmapCreateFromFile("data/jet.bm", 0);
-	s_pJetMask = bitmapCreateFromFile("data/jet_mask.bm", 0);
+	s_pJetFrames = bitmapCreateFromPath("data/jet.bm", 0);
+	s_pJetMask = bitmapCreateFromPath("data/jet_mask.bm", 0);
 
-	s_pToolFrames[0] = bitmapCreateFromFile("data/tool.bm", 0);
-	s_pToolFrames[1] = bitmapCreateFromFile("data/tool_2.bm", 0);
-	s_pToolMask = bitmapCreateFromFile("data/tool_mask.bm", 0);
+	s_pToolFrames[0] = bitmapCreateFromPath("data/tool.bm", 0);
+	s_pToolFrames[1] = bitmapCreateFromPath("data/tool_2.bm", 0);
+	s_pToolMask = bitmapCreateFromPath("data/tool_mask.bm", 0);
 
-	s_pWreckFrames[0] = bitmapCreateFromFile("data/wreck.bm", 0);
-	s_pWreckFrames[1] = bitmapCreateFromFile("data/wreck_2.bm", 0);
-	s_pWreckMask = bitmapCreateFromFile("data/wreck_mask.bm", 0);
+	s_pWreckFrames[0] = bitmapCreateFromPath("data/wreck.bm", 0);
+	s_pWreckFrames[1] = bitmapCreateFromPath("data/wreck_2.bm", 0);
+	s_pWreckMask = bitmapCreateFromPath("data/wreck_mask.bm", 0);
 
-	s_pSmokeFrames = bitmapCreateFromFile("data/smoke.bm", 0);
-	s_pSmokeMask = bitmapCreateFromFile("data/smoke_mask.bm", 0);
+	s_pSmokeFrames = bitmapCreateFromPath("data/smoke.bm", 0);
+	s_pSmokeMask = bitmapCreateFromPath("data/smoke_mask.bm", 0);
 
-	s_pPlayerMarkerFrames = bitmapCreateFromFile("data/player_markers.bm", 0);
-	s_pPlayerMarkerMask = bitmapCreateFromFile("data/player_marker_mask.bm", 0);
+	s_pPlayerMarkerFrames = bitmapCreateFromPath("data/player_markers.bm", 0);
+	s_pPlayerMarkerMask = bitmapCreateFromPath("data/player_marker_mask.bm", 0);
 
 	for(UBYTE ubDir = 0; ubDir < 2; ++ubDir) {
 		for(UBYTE ubPlayerIndex = 0; ubPlayerIndex < 2; ++ubPlayerIndex) {

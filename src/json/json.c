@@ -7,7 +7,7 @@
 #include <ace/managers/log.h>
 #include <ace/managers/memory.h>
 #include <ace/managers/system.h>
-#include <ace/utils/file.h>
+#include <ace/utils/disk_file.h>
 #include "utf8.h"
 
 tJson *jsonCreate(const char *szFilePath) {
@@ -15,14 +15,14 @@ tJson *jsonCreate(const char *szFilePath) {
 	logBlockBegin("jsonCreate(szFilePath: '%s')", szFilePath);
 
 	// Open file and get its size
-	tFile *pFile = fileOpen(szFilePath, "rb");
+	tFile *pFile = diskFileOpen(szFilePath, "rb");
 	if(!pFile) {
 		logWrite("ERR: File doesn't exist\n");
 		logBlockEnd("jsonCreate()");
 		systemUnuse();
 		return 0;
 	}
-	LONG lFileSize = fileGetSize(szFilePath);
+	LONG lFileSize = fileGetSize(pFile);
 
 	// Read whole file for json processing
 	tJson *pJson = memAllocFast(sizeof(tJson));

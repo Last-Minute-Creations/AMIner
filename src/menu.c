@@ -7,6 +7,7 @@
 #include <ace/managers/joy.h>
 #include <ace/managers/key.h>
 #include <ace/managers/bob.h>
+#include <ace/utils/disk_file.h>
 #include <ace/contrib/managers/audio_mixer.h>
 #include <comm/comm.h>
 #include "game.h"
@@ -114,7 +115,7 @@ static void menuLoadGame(const char *szSavePath) {
 	);
 
 	systemUse();
-	tFile *pSave = fileOpen(szSavePath, "rb");
+	tFile *pSave = diskFileOpen(szSavePath, "rb");
 	if(pSave) {
 		if(!gameLoad(pSave)) {
 			logWrite("ERR: Failed to load game\n");
@@ -231,7 +232,7 @@ static void menuRedraw(void) {
 
 static UBYTE menuLoadSummaryFromSave(const char *szPath, tGameSummary *pSummary) {
 	systemUse();
-	tFile *pFileSave = fileOpen(szPath, "rb");
+	tFile *pFileSave = diskFileOpen(szPath, "rb");
 	if(!pFileSave) {
 		logWrite("ERR: Save file not found\n");
 		systemUnuse();
@@ -293,7 +294,7 @@ static void menuOnEnterFree(void) {
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
-	if(fileExists("save_free.dat")) {
+	if(diskFileExists("save_free.dat")) {
 		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
 			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
 			.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
@@ -523,7 +524,7 @@ static void menuOnBackToMainFromSettings(void) {
 	// Update the 2nd port steer to prevent interfering with mouse
 	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitIdle() : steerInitJoy(STEER_MODE_JOY_2);
 
-	tFile *pFileSettings = fileOpen("settings.dat", "wb");
+	tFile *pFileSettings = diskFileOpen("settings.dat", "wb");
 	if(pFileSettings) {
 		settingsSave(pFileSettings);
 		fileClose(pFileSettings);
@@ -695,10 +696,10 @@ static void menuScoreGsDestroy(void) {
 //------------------------------------------------------------------- PUBLIC FNS
 
 void menuPreload(void) {
-	s_pLogo = bitmapCreateFromFile("data/logo.bm", 0);
-	s_pSfxAtari = ptplayerSfxCreateFromFile("data/sfx/atari.sfx", 1);
+	s_pLogo = bitmapCreateFromPath("data/logo.bm", 0);
+	s_pSfxAtari = ptplayerSfxCreateFromPath("data/sfx/atari.sfx", 1);
 
-	tFile *pFileSettings = fileOpen("settings.dat", "rb");
+	tFile *pFileSettings = diskFileOpen("settings.dat", "rb");
 	if(pFileSettings) {
 		if(settingsLoad(pFileSettings)) {
 			logWrite("Saved settings\n");
