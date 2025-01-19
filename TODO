@@ -92,13 +92,13 @@ General:
 			✔ Remove option after he's reported @done(24-07-01)
 			✔ Remove NPC from office on reporting @done(24-07-01)
 	✘ Modifiable challenge end level? @cancelled(24-02-11)
-	☐ Fast travel between bases
+	✔ Fast travel between bases @done(25-01-19)
 		✔ Display on each base @done(25-01-14)
 		✔ Show prompt near bounds @done(25-01-14)
 		✔ Pressing fire on prompt shows context menu @done(25-01-16)
 		✔ Teleport using old animation @done(25-01-14)
 		✔ Make flipbook code use 32- or 48-wide bobs @done(25-01-18)
-		☐ Teleport using new animation
+		✔ Teleport using new animation @done(25-01-19)
 		✘ Up/down options @cancelled(25-01-16)
 	☐ Portable teleport as a vehicle upgrade
 		✔ Return option in fast travel teleporter @done(25-01-16)

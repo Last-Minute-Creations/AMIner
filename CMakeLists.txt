@@ -234,6 +234,12 @@ convertTileset(
 file(MAKE_DIRECTORY ${GEN_DIR}/base_teleporter)
 
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/base_teleporter.png
+	GENERATED_FILE_LIST "BASE_TELEPORTER_IDLE_FRAMES"
+	DESTINATIONS
+		${GEN_DIR}/base_teleporter_idle.png 0 20 48 12
+)
+
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/base_teleporter.png
 	GENERATED_FILE_LIST "BASE_TELEPORTER_FRAMES"
 	DESTINATIONS
 		${GEN_DIR}/base_teleporter/0.png    0   0 48 32
@@ -399,7 +405,7 @@ convertBitmaps(
 	INTERLEAVED SOURCES
 		${GEN_DIR}/drill.png ${GEN_DIR}/tool.png ${GEN_DIR}/wreck.png
 		${GEN_DIR}/drill_2.png ${GEN_DIR}/tool_2.png ${GEN_DIR}/wreck_2.png
-		${GEN_DIR}/base_teleporter.png
+		${GEN_DIR}/base_teleporter.png ${GEN_DIR}/base_teleporter_idle.png
 		${GEN_DIR}/track.png ${RES_DIR}/jet.png
 		${RES_DIR}/smoke.png ${RES_DIR}/mode_icon_mask.png
 		${RES_DIR}/explosion.png ${RES_DIR}/teleport.png
@@ -408,7 +414,7 @@ convertBitmaps(
 	DESTINATIONS
 		${DATA_DIR}/drill.bm ${DATA_DIR}/tool.bm ${DATA_DIR}/wreck.bm
 		${DATA_DIR}/drill_2.bm ${DATA_DIR}/tool_2.bm ${DATA_DIR}/wreck_2.bm
-		${DATA_DIR}/base_teleporter.bm
+		${DATA_DIR}/base_teleporter.bm ${DATA_DIR}/base_teleporter_idle.bm
 		${DATA_DIR}/track.bm ${DATA_DIR}/jet.bm
 		${DATA_DIR}/smoke.bm NONE
 		${DATA_DIR}/explosion.bm ${DATA_DIR}/teleport.bm
@@ -417,7 +423,7 @@ convertBitmaps(
 	MASKS
 		${DATA_DIR}/drill_mask.bm ${DATA_DIR}/tool_mask.bm ${DATA_DIR}/wreck_mask.bm
 		NONE NONE NONE
-		${DATA_DIR}/base_teleporter_mask.bm
+		${DATA_DIR}/base_teleporter_mask.bm ${DATA_DIR}/base_teleporter_idle_mask.bm
 		${DATA_DIR}/track_mask.bm ${DATA_DIR}/jet_mask.bm
 		${DATA_DIR}/smoke_mask.bm ${DATA_DIR}/mode_icon_mask.bm
 		${DATA_DIR}/explosion_mask.bm ${DATA_DIR}/teleport_mask.bm

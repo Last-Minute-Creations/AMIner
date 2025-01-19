@@ -6,29 +6,31 @@
 #include "game.h"
 #include "base.h"
 
-tBob s_sTeleporterBob;
-tBitMap *s_pTeleporterFrames;
-tBitMap *s_pTeleporterMasks;
+#define BASE_TELEPORTER_IDLE_FRAME_HEIGHT 12
+#define BASE_TELEPORTER_IDLE_DELTA_Y (BASE_TELEPORTER_HEIGHT - BASE_TELEPORTER_IDLE_FRAME_HEIGHT)
+
+static tBob s_sTeleporterIdleBob;
+static tBitMap *s_pTeleporterIdleFrame;
+static tBitMap *s_pTeleporterIdleMask;
 
 void baseTeleporterCreate(void) {
-	s_pTeleporterFrames = bitmapCreateFromFile("data/base_teleporter.bm", 0);
-	s_pTeleporterMasks = bitmapCreateFromFile("data/base_teleporter_mask.bm", 0);
+	s_pTeleporterIdleFrame = bitmapCreateFromFile("data/base_teleporter_idle.bm", 0);
+	s_pTeleporterIdleMask = bitmapCreateFromFile("data/base_teleporter_idle_mask.bm", 0);
 
 	bobInit(
-		&s_sTeleporterBob, BASE_TELEPORTER_WIDTH, BASE_TELEPORTER_HEIGHT, 1,
-		bobCalcFrameAddress(s_pTeleporterFrames, 0),
-		bobCalcFrameAddress(s_pTeleporterMasks, 0),
-		0, 0
+		&s_sTeleporterIdleBob, BASE_TELEPORTER_WIDTH, BASE_TELEPORTER_IDLE_FRAME_HEIGHT, 1,
+		s_pTeleporterIdleFrame->Planes[0], s_pTeleporterIdleMask->Planes[0], 0, 0
 	);
 }
 
 void baseTeleporterProcess(void) {
 	const tBase *pBase = baseGetCurrent();
-	s_sTeleporterBob.sPos.ulYX = pBase->sPosTeleport.ulYX;
-	gameTryPushBob(&s_sTeleporterBob);
+	s_sTeleporterIdleBob.sPos.ulYX = pBase->sPosTeleport.ulYX;
+	s_sTeleporterIdleBob.sPos.uwY += BASE_TELEPORTER_IDLE_DELTA_Y;
+	gameTryPushBob(&s_sTeleporterIdleBob);
 }
 
 void baseTeleporterDestroy(void) {
-	bitmapDestroy(s_pTeleporterFrames);
-	bitmapDestroy(s_pTeleporterMasks);
+	bitmapDestroy(s_pTeleporterIdleFrame);
+	bitmapDestroy(s_pTeleporterIdleMask);
 }

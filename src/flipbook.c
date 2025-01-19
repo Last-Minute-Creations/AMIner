@@ -117,7 +117,6 @@ void flipbookManagerCreate(void) {
 	s_pTpFramesMask = bitmapCreateFromFile("data/teleport_mask.bm", 0);
 	s_pTeleporterFrames = bitmapCreateFromFile("data/base_teleporter.bm", 0);
 	s_pTeleporterFramesMask = bitmapCreateFromFile("data/base_teleporter_mask.bm", 0);
-	// TODO: DEDUPLICATE BM LOAD
 
 	s_pSfxBoom = ptplayerSfxCreateFromFile("data/sfx/explosion.sfx", 1);
 	s_pSfxTeleport = ptplayerSfxCreateFromFile("data/sfx/teleport.sfx", 1);
