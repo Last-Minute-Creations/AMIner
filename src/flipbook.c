@@ -173,6 +173,8 @@ void flipbookManagerDestroy(void) {
 	bitmapDestroy(s_pBoomFramesMask);
 	bitmapDestroy(s_pTpFrames);
 	bitmapDestroy(s_pTpFramesMask);
+	bitmapDestroy(s_pTeleporterFrames);
+	bitmapDestroy(s_pTeleporterFramesMask);
 
 	ptplayerSfxDestroy(s_pSfxBoom);
 	ptplayerSfxDestroy(s_pSfxTeleport);
