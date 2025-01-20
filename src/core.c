@@ -51,6 +51,7 @@ static tVPort *s_pVpMain;
 static tBitMap *s_pDripBitmap;
 static tBitMap *s_pDripMask;
 static tBobAnimFrame s_pDripFrames[DRIP_ANIM_LENGTH];
+static tBitMap *s_pPristineBuffer;
 
 static const tProgressBarConfig s_sProgressBarConfig = {
 	.sBarPos = {
@@ -77,7 +78,9 @@ static void mainPaletteProcess(UBYTE ubFadeLevel) {
 static void coreBobSequencesCreate(void) {
 	s_pDripMask = bitmapCreate(16, 20, GAME_BPP, BMF_INTERLEAVED);
 	blitRect(s_pDripMask, 0, 0, 16, 20, (1 << GAME_BPP) - 1);
+	memCheckIntegrity();
 	bobSequenceReset(s_pDripMask->Planes[0]);
+	memCheckIntegrity();
 
 	s_pDripBitmap = bitmapCreateFromPath("data/bg_factory_drip.bm", 0);
 	for(UBYTE i = 0; i < DRIP_ANIM_LENGTH; ++i) {
@@ -153,39 +156,42 @@ static void onTileDraw(
 	UNUSED_ARG UWORD uwTileX, UNUSED_ARG UWORD uwTileY,
 	tBitMap *pBitMap, UWORD uwBitMapX, UWORD uwBitMapY
 ) {
-	if(!tileIsExcavated(uwTileX, uwTileY)) {
-		return;
-	}
-
-	BYTE bOverlay = -1;
-	if(tileIsSolid(uwTileX, uwTileY - 1)) {
-		bOverlay += 1;
-	}
-
-	const tBase *pBase = baseGetCurrent();
-	if(uwTileY < pBase->uwTileDepth || pBase->uwTileDepth + BASE_CAVE_HEIGHT < uwTileY) {
-		if(tileIsSolid(uwTileX, uwTileY + 1)) {
-			bOverlay += 2;
+	if(tileIsExcavated(uwTileX, uwTileY)) {
+		BYTE bOverlay = -1;
+		if(tileIsSolid(uwTileX, uwTileY - 1)) {
+			bOverlay += 1;
 		}
 
-		if(uwTileX >= 10 || tileIsSolid(uwTileX + 1, uwTileY)) {
-			bOverlay += 4;
+		const tBase *pBase = baseGetCurrent();
+		if(uwTileY < pBase->uwTileDepth || pBase->uwTileDepth + BASE_CAVE_HEIGHT < uwTileY) {
+			if(tileIsSolid(uwTileX, uwTileY + 1)) {
+				bOverlay += 2;
+			}
+
+			if(uwTileX >= 10 || tileIsSolid(uwTileX + 1, uwTileY)) {
+				bOverlay += 4;
+			}
+
+			if(tileIsSolid(uwTileX - 1, uwTileY)) {
+				bOverlay += 8;
+			}
 		}
 
-		if(tileIsSolid(uwTileX - 1, uwTileY)) {
-			bOverlay += 8;
+		if(bOverlay >= 0) {
+			// TODO: optimize with custom blitter code
+			blitCopyMask(
+				g_pTileOverlays, 0, (UBYTE)bOverlay * TILE_SIZE,
+				pBitMap, uwBitMapX, uwBitMapY, TILE_SIZE, TILE_SIZE,
+				g_pTileOverlayMasks->Planes[0]
+			);
+			// blitRect(pBitMap, uwBitMapX + 5, uwBitMapY + 5, 20, 20, COMM_DISPLAY_COLOR_TEXT);
 		}
 	}
 
-	if(bOverlay >= 0) {
-		// TODO: optimize with custom blitter code
-		blitCopyMask(
-			g_pTileOverlays, 0, (UBYTE)bOverlay * TILE_SIZE,
-			pBitMap, uwBitMapX, uwBitMapY, TILE_SIZE, TILE_SIZE,
-			g_pTileOverlayMasks->Planes[0]
-		);
-		// blitRect(pBitMap, uwBitMapX + 5, uwBitMapY + 5, 20, 20, COMM_DISPLAY_COLOR_TEXT);
-	}
+	blitCopyAligned(
+		pBitMap, uwBitMapX, uwBitMapY,
+		s_pPristineBuffer, uwBitMapX, uwBitMapY, TILE_SIZE, TILE_SIZE
+	);
 }
 
 static void coreGsCreate(void) {
@@ -219,6 +225,10 @@ static void coreGsCreate(void) {
 		TAG_TILEBUFFER_CALLBACK_TILE_DRAW, onTileDraw,
 		TAG_TILEBUFFER_TILESET, s_pTiles,
 	TAG_END);
+	s_pPristineBuffer = bitmapCreate(
+		bitmapGetByteWidth(g_pMainBuffer->pScroll->pBack) * 8,
+		g_pMainBuffer->pScroll->pBack->Rows, GAME_BPP, BMF_INTERLEAVED
+	);
 
 	// Load the view and draw the progress bar
 	paletteLoadFromPath("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
@@ -271,7 +281,7 @@ static void coreGsCreate(void) {
 
 	bobManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
-		g_pMainBuffer->pScroll->uwBmAvailHeight
+		s_pPristineBuffer, g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 60);
 	flipbookManagerCreate();
@@ -371,6 +381,7 @@ static void coreGsDestroy(void) {
 
   hudDestroy();
   viewDestroy(s_pView);
+	bitmapDestroy(s_pPristineBuffer);
 }
 
 //---------------------------------------------------------------------- GLOBALS

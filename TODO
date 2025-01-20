@@ -124,6 +124,7 @@ Bugs:
 	☐ Distorted main base in challenge mode
 	☐ Warehouse corruption (after entering accounting?)
 	☐ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up
+	☐ Loading screen trashing memory after pristine buffer change
 
 Misc QoL refinements:
 	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)
@@ -146,12 +147,12 @@ Optimizations:
 	✔ Mine generation progress bar @done(23-09-08)
 	✔ Show progress bar instantly after selecting new/continue game @done(24-02-04)
 	✔ Remove X draw margins from tilebuffer @done(25-01-19)
+	✔ Use pristine buffer for bobs @done(25-01-20)
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
 	☐ Workshop tab flicker on navigating
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
-	☐ Use pristine buffer for bobs
 
 Dino quest:
 	✔ Figure out the final flow @done(23-10-05)
