@@ -118,13 +118,13 @@ Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
 	✔ Prisoner is not always placed @done(24-02-01)
 	✔ Limit cash display to prevent trashing of message icon? @done(24-07-07)
+	✔ Loading screen trashing memory after pristine buffer change @done(25-01-20 19:25)
 	☐ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place
 	☐ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time
 	☐ Game doesn't launch properly from icon
 	☐ Distorted main base in challenge mode
 	☐ Warehouse corruption (after entering accounting?)
 	☐ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up
-	☐ Loading screen trashing memory after pristine buffer change
 
 Misc QoL refinements:
 	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)

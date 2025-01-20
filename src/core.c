@@ -78,9 +78,7 @@ static void mainPaletteProcess(UBYTE ubFadeLevel) {
 static void coreBobSequencesCreate(void) {
 	s_pDripMask = bitmapCreate(16, 20, GAME_BPP, BMF_INTERLEAVED);
 	blitRect(s_pDripMask, 0, 0, 16, 20, (1 << GAME_BPP) - 1);
-	memCheckIntegrity();
 	bobSequenceReset(s_pDripMask->Planes[0]);
-	memCheckIntegrity();
 
 	s_pDripBitmap = bitmapCreateFromPath("data/bg_factory_drip.bm", 0);
 	for(UBYTE i = 0; i < DRIP_ANIM_LENGTH; ++i) {
