@@ -244,7 +244,7 @@ extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/base_teleporter.png
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/base_teleporter.png
 	GENERATED_FILE_LIST "BASE_TELEPORTER_FRAMES"
 	DESTINATIONS
-		${GEN_DIR}/base_teleporter/0.png    0   0 48 32
+		${GEN_DIR}/base_teleporter/0.png   48   0 48 32
 		${GEN_DIR}/base_teleporter/1.png   96   0 48 32
 		${GEN_DIR}/base_teleporter/2.png  144   0 48 32
 		${GEN_DIR}/base_teleporter/3.png  192   0 48 32
