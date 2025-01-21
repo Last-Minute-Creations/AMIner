@@ -135,8 +135,8 @@ Commrade:
 	✔ Mineral market @done(23-09-16)
 	✔ Improve tab changing on commrade by allowing cursor to move to buttons @done(24-02-08)
 	✔ Workshop icons for upgrades? @done(25-01-21)
+	✔ Add left/right arrows in workshop to indicate nav possibility @done(25-01-21)
 	☐ Redo warehouse/plan management
-	☐ Add left/right arrows in workshop to indicate nav possibility
 	☐ Figure out where to hide sokoban and how to hint it
 		☐ Persistent unlock after Jay quest?
 		☐ Enter via pressing fire on warehouse button

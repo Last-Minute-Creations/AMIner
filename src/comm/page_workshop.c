@@ -91,6 +91,11 @@ static void commShopSelectWorkshopPart(tPartKind ePart, UBYTE isActive) {
 		commDrawMultilineText(szDescription, 0, uwOffsY);
 	}
 
+	tUwCoordYX sButtonBuyPosition = buttonGetPosition(0);
+	UBYTE ubArrowColor = (buttonGetSelected() == 0) ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK;
+	commDrawText(sButtonBuyPosition.uwX - 4, sButtonBuyPosition.uwY + 2, "<", FONT_RIGHT | FONT_VCENTER | FONT_COOKIE, ubArrowColor);
+	commDrawText(sButtonBuyPosition.uwX + 5 + buttonGetWidth(0), sButtonBuyPosition.uwY + 2, ">", FONT_LEFT | FONT_VCENTER | FONT_COOKIE, ubArrowColor);
+
 	buttonDrawAll(commGetDisplayBuffer());
 }
 

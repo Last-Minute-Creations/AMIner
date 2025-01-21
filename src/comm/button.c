@@ -144,6 +144,10 @@ UBYTE buttonGetSelected(void) {
 	return s_ubSelected;
 }
 
+tUwCoordYX buttonGetPosition(UBYTE ubIndex) {
+	return s_pButtons[ubIndex].sPos;
+}
+
 UWORD buttonGetWidth(UBYTE ubIndex) {
 	const tButton *pButton = &s_pButtons[ubIndex];
 	UWORD uwWidth = fontMeasureText(g_pFont, pButton->szName).uwX + (BORDER_LR_DEPTH + TEXT_PADDING_X) * 2;

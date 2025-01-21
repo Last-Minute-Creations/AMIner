@@ -42,6 +42,8 @@ UBYTE buttonGetCount(void);
 
 UBYTE buttonGetSelected(void);
 
+tUwCoordYX buttonGetPosition(UBYTE ubIndex);
+
 UWORD buttonGetWidth(UBYTE ubIndex);
 
 UBYTE buttonGetHeight(void);
