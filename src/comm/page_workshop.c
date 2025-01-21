@@ -26,45 +26,35 @@ char **g_pShopNames;
 static tPartKind s_eSelectedPart = 0;
 static tWorkshopRow s_eWorkshopRow;
 
-static UBYTE workshopIsPartAcquirable(tPartKind ePart) {
+static UBYTE pageWorkshopIsPartAcquirable(tPartKind ePart) {
 	UBYTE isAcquirable = (
 		ePart == INVENTORY_PART_TELEPORT || ePart == INVENTORY_PART_TNT
 	);
 	return isAcquirable;
 }
 
-static void commShopSelectWorkshopPart(tPartKind ePart, UBYTE isActive) {
-	s_eSelectedPart = ePart;
-	static const char szCaption[] = "KRTEK 2600";
-
+static void pageWorkshopUpdateText(void) {
+	UBYTE isActive = (s_eWorkshopRow == WORKSHOP_ROW_BUY);
 	const UBYTE ubRowSize = commGetLineHeight() + 1;
 	const UBYTE ubFontFlags = FONT_COOKIE | FONT_SHADOW;
 	const UBYTE ubColor = (
 		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
-	commEraseAll();
+	static const char szCaption[] = "KRTEK 2600";
 	UWORD uwOffsY = 0;
 	commDrawText(0, uwOffsY, szCaption, ubFontFlags, ubColor);
 	uwOffsY += ubRowSize;
 
-	tUwCoordYX sOrigin = commGetOriginDisplay();
-	blitCopy(
-		g_pCommWorkshopIcons, 0, WORKSHOP_PART_ICON_HEIGHT * ePart,
-		commGetDisplayBuffer(),
-		sOrigin.uwX + COMM_DISPLAY_WIDTH - WORKSHOP_PART_ICON_WIDTH, sOrigin.uwY,
-		WORKSHOP_PART_ICON_WIDTH, WORKSHOP_PART_ICON_HEIGHT, MINTERM_COOKIE
-	);
-
 	char szBfr[50];
-	UBYTE isAcquirable = workshopIsPartAcquirable(s_eSelectedPart);
+	UBYTE isAcquirable = pageWorkshopIsPartAcquirable(s_eSelectedPart);
 	UBYTE ubLevel = inventoryGetPartDef(s_eSelectedPart)->ubLevel;
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
-		sprintf(szBfr, "%s %s%hhu", g_pShopNames[ePart], g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
+		sprintf(szBfr, "%s %s%hhu", g_pShopNames[s_eSelectedPart], g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
 	}
 	else {
-		strcpy(szBfr, g_pShopNames[ePart]);
+		strcpy(szBfr, g_pShopNames[s_eSelectedPart]);
 	}
 	commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
 	uwOffsY += ubRowSize;
@@ -99,24 +89,38 @@ static void commShopSelectWorkshopPart(tPartKind ePart, UBYTE isActive) {
 	buttonDrawAll(commGetDisplayBuffer());
 }
 
+static void pageWorkshopNavigateToPart(tPartKind ePart) {
+	s_eSelectedPart = ePart;
 
-static UBYTE commShopWorkshopBuyFor(LONG lCost) {
+	commEraseAll();
+	tUwCoordYX sOrigin = commGetOriginDisplay();
+	blitCopy(
+		g_pCommWorkshopIcons, 0, WORKSHOP_PART_ICON_HEIGHT * ePart,
+		commGetDisplayBuffer(),
+		sOrigin.uwX + COMM_DISPLAY_WIDTH - WORKSHOP_PART_ICON_WIDTH, sOrigin.uwY,
+		WORKSHOP_PART_ICON_WIDTH, WORKSHOP_PART_ICON_HEIGHT, MINTERM_COOKIE
+	);
+
+	pageWorkshopUpdateText();
+}
+
+static UBYTE pageWorkshopBuyFor(LONG lCost) {
 	if(g_pVehicles[0].lCash >= lCost) {
 		g_pVehicles[0].lCash -= lCost;
 		hudSetCash(0, g_pVehicles[0].lCash);
 		return 1;
 	}
-	logWrite("commShopWorkshopBuyFor: not enough cash\n");
+	logWrite("pageWorkshopBuyFor: not enough cash\n");
 	// TODO: msg "you don't have enough cash"
 	return 0;
 }
 
-static UBYTE commShopWorkshopBuyIsFull(UBYTE ubGot, UBYTE ubMax, const char *szMsg) {
+static UBYTE pageWorkshopBuyIsFull(UBYTE ubGot, UBYTE ubMax, const char *szMsg) {
 	if(ubGot < ubMax) {
 		return 0;
 	}
 	// TODO: msg szMsg
-	logWrite("commShopWorkshopBuyIsFull: '%s'\n", szMsg);
+	logWrite("pageWorkshopBuyIsFull: '%s'\n", szMsg);
 	return 1;
 }
 
@@ -142,7 +146,7 @@ static void pageWorkshopProcess(void) {
 		else {
 			buttonSelect(s_eWorkshopRow);
 		}
-		commShopSelectWorkshopPart(s_eSelectedPart, s_eWorkshopRow == WORKSHOP_ROW_BUY);
+		pageWorkshopUpdateText();
 	}
 
 	if(s_eWorkshopRow == WORKSHOP_ROW_BUY) {
@@ -150,11 +154,12 @@ static void pageWorkshopProcess(void) {
 			if(s_eSelectedPart < INVENTORY_PART_COUNT) {
 				const tPartDef *pPart = inventoryGetPartDef(s_eSelectedPart);
 				UBYTE ubLevel = pPart->ubLevel;
-				if(!commShopWorkshopBuyIsFull(
+				if(!pageWorkshopBuyIsFull(
 					ubLevel, g_ubUpgradeLevels, g_pMsgs[MSG_COMM_ALREADY_MAX]
-				) && commShopWorkshopBuyFor(g_pUpgradeCosts[ubLevel])) {
+				) && pageWorkshopBuyFor(g_pUpgradeCosts[ubLevel])) {
 					inventorySetPartLevel(s_eSelectedPart, ubLevel+1);
-					commShopSelectWorkshopPart(s_eSelectedPart, 1);
+					// text have changed, so draw everything again
+					pageWorkshopNavigateToPart(s_eSelectedPart);
 				}
 			}
 		}
@@ -163,14 +168,14 @@ static void pageWorkshopProcess(void) {
 			if(bNewPos >= WORKSHOP_ITEM_COUNT) {
 				bNewPos = 0;
 			}
-			commShopSelectWorkshopPart(bNewPos, 1);
+			pageWorkshopNavigateToPart(bNewPos);
 		}
 		else if(commNavUse(DIRECTION_LEFT)) {
 			BYTE bNewPos = s_eSelectedPart - 1;
 			if(bNewPos < 0) {
 				bNewPos = WORKSHOP_ITEM_COUNT - 1;
 			}
-			commShopSelectWorkshopPart(bNewPos, 1);
+			pageWorkshopNavigateToPart(bNewPos);
 		}
 	}
 	else if(s_eWorkshopRow == WORKSHOP_ROW_EXIT) {
@@ -199,5 +204,5 @@ void pageWorkshopCreate(void) {
 	}
 	buttonRowApply();
 
-	commShopSelectWorkshopPart(0, 1);
+	pageWorkshopNavigateToPart(0);
 }

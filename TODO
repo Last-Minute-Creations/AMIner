@@ -148,10 +148,10 @@ Optimizations:
 	✔ Show progress bar instantly after selecting new/continue game @done(24-02-04)
 	✔ Remove X draw margins from tilebuffer @done(25-01-19)
 	✔ Use pristine buffer for bobs @done(25-01-20)
+	✔ Workshop tab flicker on navigating @done(25-01-21)
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code
-	☐ Workshop tab flicker on navigating
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
 
 Dino quest:
