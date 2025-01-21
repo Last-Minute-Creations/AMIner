@@ -385,8 +385,8 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	fileWrite(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
 	fileWrite(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
 	fileWrite(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
-	fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
-	fileWrite(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
+	// fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
+	// fileWrite(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
 	fileWrite(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
 	fileWrite(pFile, &pVehicle->isJetting, sizeof(pVehicle->isJetting));
 	fileWrite(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
@@ -438,7 +438,8 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
 	fileRead(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
 	fileRead(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
-	fileRead(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
+	// fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
+	// fileRead(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
 	fileRead(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
 	fileRead(pFile, &pVehicle->isJetting, sizeof(pVehicle->isJetting));
 	fileRead(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
