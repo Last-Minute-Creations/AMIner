@@ -54,6 +54,7 @@ static tProgressBarConfig s_sProgressBarConfig = {
 
 tBitMap *g_pCommBmFaces;
 tBitMap *g_pCommBmSelection;
+tBitMap *g_pCommWorkshopIcons;
 char **g_pCommPageNames;
 
 //------------------------------------------------------------ PRIVATE FUNCTIONS
@@ -173,6 +174,7 @@ void commCreate(void) {
 
 	g_pCommBmFaces = bitmapCreateFromPath("data/comm_faces_office.bm", 0);
 	g_pCommBmSelection = bitmapCreateFromPath("data/comm_office_selection.bm", 0);
+	g_pCommWorkshopIcons = bitmapCreateFromPath("data/comm_workshop_icons.bm", 0);
 	systemUnuse();
 
 	s_isCommShown = 0;
@@ -193,6 +195,7 @@ void commDestroy(void) {
 
 	bitmapDestroy(g_pCommBmFaces);
 	bitmapDestroy(g_pCommBmSelection);
+	bitmapDestroy(g_pCommWorkshopIcons);
 
 	systemUnuse();
 }

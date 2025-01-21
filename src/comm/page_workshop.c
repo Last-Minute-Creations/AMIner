@@ -12,6 +12,9 @@
 #include "../defs.h"
 #include "../hud.h"
 
+#define WORKSHOP_PART_ICON_WIDTH 64
+#define WORKSHOP_PART_ICON_HEIGHT 56
+
 typedef enum tWorkshopRow {
 	WORKSHOP_ROW_BUY,
 	WORKSHOP_ROW_EXIT,
@@ -44,24 +47,33 @@ static void commShopSelectWorkshopPart(tPartKind ePart, UBYTE isActive) {
 	UWORD uwOffsY = 0;
 	commDrawText(0, uwOffsY, szCaption, ubFontFlags, ubColor);
 	uwOffsY += ubRowSize;
-	commDrawText(0, uwOffsY, g_pShopNames[ePart], ubFontFlags, ubColor);
-	uwOffsY += 2 * ubRowSize;
-	char szBfr[50];
 
+	tUwCoordYX sOrigin = commGetOriginDisplay();
+	blitCopy(
+		g_pCommWorkshopIcons, 0, WORKSHOP_PART_ICON_HEIGHT * ePart,
+		commGetDisplayBuffer(),
+		sOrigin.uwX + COMM_DISPLAY_WIDTH - WORKSHOP_PART_ICON_WIDTH, sOrigin.uwY,
+		WORKSHOP_PART_ICON_WIDTH, WORKSHOP_PART_ICON_HEIGHT, MINTERM_COOKIE
+	);
+
+	char szBfr[50];
 	UBYTE isAcquirable = workshopIsPartAcquirable(s_eSelectedPart);
 	UBYTE ubLevel = inventoryGetPartDef(s_eSelectedPart)->ubLevel;
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
-		sprintf(szBfr, "%s%hhu", g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
-		commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
+		sprintf(szBfr, "%s %s%hhu", g_pShopNames[ePart], g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
 	}
+	else {
+		strcpy(szBfr, g_pShopNames[ePart]);
+	}
+	commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
 	uwOffsY += ubRowSize;
 
 	if(ubLevel < g_ubUpgradeLevels) {
 		sprintf(szBfr, "%s%hhu: %lu\x1F", g_pMsgs[MSG_COMM_UPGRADE_TO_MK], ubDisplayLevel + 1, g_pUpgradeCosts[ubLevel]);
 		commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
 	}
-	uwOffsY += ubRowSize;
+	uwOffsY += 2 * ubRowSize;
 
 	const char *szDescription = 0;
 	// TODO: load from json
@@ -70,7 +82,7 @@ static void commShopSelectWorkshopPart(tPartKind ePart, UBYTE isActive) {
 			"Pojedynczy ladunek pozwalajacy na zniszczenie prostej przeszkody terenowej.\nNiszczy surowce zawarte w terenie.",
 			"Dwa ladunki pozwalajace drazyc dluzszy tunel lub zniszczyc pojedyncza skale.\nNiszczy surowce zawarte w terenie.",
 			"Trzy ladunki jeszcze bardziej zwieksza Twoj zasieg.\nNiszczy surowce zawarte w terenie.",
-			"Ulepszona formula materialu wybuchowego pozwala zachowac surowce w detonowanym terenie."
+			"Ulepszona formula materialu wybuchowego pozwoli zachowac surowce w detonowanym terenie."
 		};
 		szDescription = pDescriptions[ubLevel];
 	}
