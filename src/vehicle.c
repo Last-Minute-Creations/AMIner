@@ -224,6 +224,10 @@ void vehicleManagerDestroy(void) {
 	vehicleDestroy(&g_pVehicles[1]);
 }
 
+void vehicleStopLoopAudio(UBYTE ubPlayerIdx) {
+	audioMixerStopSfxOnChannel(SFX_CHANNEL_LOOP_P1 + ubPlayerIdx);
+}
+
 void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubDrillDir = DRILL_DIR_NONE;
 	pVehicle->ubDrillState = DRILL_STATE_OFF;
@@ -826,10 +830,6 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	gameUpdateMaxDepth(uwTileY);
 }
 
-static void stopLoopAudio(UBYTE ubPlayerIdx) {
-	audioMixerStopSfxOnChannel(SFX_CHANNEL_LOOP_P1 + ubPlayerIdx);
-}
-
 static void vehicleDrawMarker(tVehicle *pVehicle) {
 	pVehicle->sBobMarker.sPos.uwX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
 	pVehicle->sBobMarker.sPos.uwY = g_pMainBuffer->pCamera->uPos.uwY;
@@ -946,7 +946,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 	else {
 		if(pVehicle->isJetting) {
-			stopLoopAudio(pVehicle->ubPlayerIdx);
+			vehicleStopLoopAudio(pVehicle->ubPlayerIdx);
 			pVehicle->isJetting = 0;
 		}
 		if(pVehicle->ubJetShowFrame) {
@@ -1273,7 +1273,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					pVehicle->ubDrillDir = DRILL_DIR_NONE;
 					pVehicle->ubDrillState = DRILL_STATE_OFF;
 					vehicleSetState(pVehicle, VEHICLE_STATE_MOVING);
-					stopLoopAudio(pVehicle->ubPlayerIdx);
+					vehicleStopLoopAudio(pVehicle->ubPlayerIdx);
 				}
 				else {
 					const UBYTE ubAdd = 4; // No grass past this point
@@ -1287,7 +1287,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					}
 					else {
 						pVehicle->ubDrillState = DRILL_STATE_VERT_ANIM_OUT;
-						stopLoopAudio(pVehicle->ubPlayerIdx);
+						vehicleStopLoopAudio(pVehicle->ubPlayerIdx);
 					}
 				}
 			}

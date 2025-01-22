@@ -120,8 +120,8 @@ Bugs:
 	✔ Limit cash display to prevent trashing of message icon? @done(24-07-07)
 	✔ Loading screen trashing memory after pristine buffer change @done(25-01-20)
 	✔ Distorted main base in challenge mode @done(25-01-22)
+	✔ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time @done(25-01-22)
 	☐ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place
-	☐ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time
 	☐ Game doesn't launch properly from icon
 	☐ Warehouse corruption (after entering accounting?)
 	☐ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up

@@ -260,6 +260,8 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 						eNextPreset = MODE_PRESET_OFF;
 					}
 					else if(steerDirUse(&s_pPlayerSteers[ubPlayer], DIRECTION_FIRE) || inboxGetState() == INBOX_STATE_URGENT) {
+						vehicleStopLoopAudio(0);
+						vehicleStopLoopAudio(1);
 						statePush(g_pGameStateManager, &g_sStateShop);
 						return 1;
 					}

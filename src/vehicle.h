@@ -115,6 +115,8 @@ void vehicleManagerCreate(void);
 
 void vehicleManagerDestroy(void);
 
+void vehicleStopLoopAudio(UBYTE ubPlayerIdx);
+
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle);
 
 UBYTE vehicleIsNearBaseTeleporter(const tVehicle *pVehicle);
