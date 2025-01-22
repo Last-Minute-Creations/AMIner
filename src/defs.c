@@ -94,6 +94,7 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_PAUSED] = "hud.paused",
 	[MSG_HUD_RESUME] = "hud.resume",
 	[MSG_HUD_SAVE_QUIT] = "hud.saveQuit",
+	[MSG_HUD_QUIT] = "hud.quit",
 	// HUD: Misc
 	[MSG_HUD_DINO_COMPLETE] = "hudMessages.dinoComplete",
 	[MSG_HUD_DINO_FOUND_BONE] = "hudMessages.dinoFoundBone",

@@ -707,7 +707,7 @@ void hudUpdate(void) {
 					FONT_COOKIE | FONT_HCENTER
 				);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_SAVE_QUIT]);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[s_isChallenge ? MSG_HUD_QUIT : MSG_HUD_SAVE_QUIT]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,

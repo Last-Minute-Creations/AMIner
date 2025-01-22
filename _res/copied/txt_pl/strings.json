@@ -176,7 +176,8 @@
 		"depth": "Poziom:",
 		"paused": "Pauza gry",
 		"resume": "Wznów",
-		"saveQuit": "Zapisz i wyjdź"
+		"saveQuit": "Zapisz i wyjdź",
+		"quit": "Wyjdź"
 	},
 	"officePages": {
 		"commonWelcome": "Powitanie",
