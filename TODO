@@ -113,6 +113,12 @@ General:
 		☐ Clouds?
 	☐ Limit cash to prevent trashing of message icon?
 	☐ Add 2s pauses between music tracks?
+	☐ Achievements
+		☐ Transfer achievements from Miro to GDD
+		☐ Add achievement storage outside main game save
+		☐ Unlock achievements in-game
+		☐ Save achievements on commrade/game exit (same as game save)
+		☐ Display achievements in menu
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
@@ -149,12 +155,13 @@ Optimizations:
 	✔ Remove X draw margins from tilebuffer @done(25-01-19)
 	✔ Use pristine buffer for bobs @done(25-01-20)
 	✔ Workshop tab flicker on navigating @done(25-01-21)
+	✔ Strip symbols from release builds @done(25-01-22)
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
 	☐ Excavated ground overlay - custom blitter code?
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
-	☐ Strip symbols from release builds
-	☐ Pakfile + compression?
+	☐ Pakfile + compression of data files?
+	☐ Shrinkler for exe?
 
 Dino quest:
 	✔ Figure out the final flow @done(23-10-05)
@@ -223,6 +230,10 @@ Crate quests:
 		✔ Spend parts to open capsule @done(24-07-05)
 		✔ Screen with text and capsule contents @done(24-12-15)
 
+Free mode:
+	☐ Figure out the rules
+	☐ Implement
+
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)
 	✔ Arch angry on destroying gate @done(24-02-17)
@@ -241,6 +252,3 @@ Missing graphics:
 	☐ Protest banners on factory
 	☐ Sci base final
 	☐ News slides for each ending
-
-Free mode:
-	✘ figure out the rules @cancelled(23-09-07)
