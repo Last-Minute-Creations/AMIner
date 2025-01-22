@@ -119,10 +119,10 @@ Bugs:
 	✔ Prisoner is not always placed @done(24-02-01)
 	✔ Limit cash display to prevent trashing of message icon? @done(24-07-07)
 	✔ Loading screen trashing memory after pristine buffer change @done(25-01-20)
+	✔ Distorted main base in challenge mode @done(25-01-22)
 	☐ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place
 	☐ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time
 	☐ Game doesn't launch properly from icon
-	☐ Distorted main base in challenge mode
 	☐ Warehouse corruption (after entering accounting?)
 	☐ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up
 
@@ -151,8 +151,10 @@ Optimizations:
 	✔ Workshop tab flicker on navigating @done(25-01-21)
 	☐ Font drawing? - quasi-register values inside font file
 	☐ Gate collectibles draw?
-	☐ Excavated ground overlay - custom blitter code
+	☐ Excavated ground overlay - custom blitter code?
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
+	☐ Strip symbols from release builds
+	☐ Pakfile + compression?
 
 Dino quest:
 	✔ Figure out the final flow @done(23-10-05)

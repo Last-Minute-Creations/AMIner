@@ -236,3 +236,7 @@ void baseUpdateDinoTileset(UBYTE isPopulated) {
 		bitmapLoadFromPath(s_pBaseTiles[BASE_ID_DINO], "data/base1.bm", 0, 0);
 	}
 }
+
+void baseTilesetPrepareForChallenge(UBYTE isCoal) {
+	baseTileLoad(BASE_ID_GROUND);
+}

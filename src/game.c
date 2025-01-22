@@ -1263,6 +1263,9 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	tutorialReset();
 	pageOfficeReset();
 	warehouseReset();
+	if(g_isChallenge) {
+		baseTilesetPrepareForChallenge(g_isAtari);
+	}
 	tileReset(g_isAtari, g_isChallenge);
 	inventoryReset();
 	vehicleReset(&g_pVehicles[0]);
