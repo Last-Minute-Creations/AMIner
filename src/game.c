@@ -1337,12 +1337,15 @@ static void gameGsLoop(void) {
 	if(tutorialProcess()) {
 		return;
 	}
-	dinoProcess();
-	questGateProcess();
-	questCrateProcess();
-	UBYTE isGameStateChange = gameProcessGateCutscene();
-	if(isGameStateChange) {
-		return;
+
+	if(!g_isChallenge) {
+		dinoProcess();
+		questGateProcess();
+		questCrateProcess();
+		UBYTE isGameStateChange = gameProcessGateCutscene();
+		if(isGameStateChange) {
+			return;
+		}
 	}
 
 	debugColor(0x080);
@@ -1351,7 +1354,7 @@ static void gameGsLoop(void) {
 		steerProcess(&s_pPlayerSteers[0]);
 		steerProcess(&s_pPlayerSteers[1]);
 		gameProcessHotkeys();
-		isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
+		UBYTE isGameStateChange = gameProcessSteer(0) | gameProcessSteer(1);
 		if(isGameStateChange) {
 			return;
 		}
