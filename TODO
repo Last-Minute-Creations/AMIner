@@ -136,11 +136,11 @@ Commrade:
 	✔ Improve tab changing on commrade by allowing cursor to move to buttons @done(24-02-08)
 	✔ Workshop icons for upgrades? @done(25-01-21)
 	✔ Add left/right arrows in workshop to indicate nav possibility @done(25-01-21)
+	✔ Figure out where to hide sokoban and how to hint it @done(25-01-22)
+		✔ Persistent unlock after Jay quest @done(25-01-22)
+		✔ Enter via pressing fire on warehouse button @done(25-01-22)
+		✔ Add option to exit the sokoban page @done(25-01-22)
 	☐ Redo warehouse/plan management
-	☐ Figure out where to hide sokoban and how to hint it
-		☐ Persistent unlock after Jay quest?
-		☐ Enter via pressing fire on warehouse button
-		☐ Add option to exit the sokoban page
 
 Optimizations:
 	✔ Comm message page loading @done(23-09-07)

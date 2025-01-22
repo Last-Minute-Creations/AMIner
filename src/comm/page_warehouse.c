@@ -184,11 +184,6 @@ static void redraw(void) {
 }
 
 static void pageWarehouseProcess(void) {
-	if(keyUse(KEY_H)) {
-		commShopChangePage(COMM_SHOP_PAGE_WAREHOUSE, COMM_SHOP_PAGE_SOKOBAN);
-		return;
-	}
-
 	UBYTE isButtonRefresh = 0;
 	UBYTE ubPosPrev = s_ubPosCurr;
 	// s_ubPosCount is row with buttons

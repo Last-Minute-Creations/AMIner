@@ -28,6 +28,7 @@
 #include "inbox.h"
 #include "menu.h"
 #include "tutorial.h"
+#include "settings.h"
 
 static tCommTab s_eTab;
 static tCommShopPage s_eCurrentPage;
@@ -156,6 +157,13 @@ static void commGsShopLoop(void) {
 		}
 		else if(commNavUse(DIRECTION_UP)) {
 			s_eTabNavigationState = TAB_NAVIGATION_STATE_DISABLING;
+		}
+		else if(
+			commNavUse(DIRECTION_FIRE) && s_eTab == COMM_TAB_WAREHOUSE &&
+			g_sSettings.ubSokoUnlock == SETTINGS_SOKO_UNLOCK_ON
+		) {
+			commShopChangePage(COMM_SHOP_PAGE_WAREHOUSE, COMM_SHOP_PAGE_SOKOBAN);
+			return;
 		}
 
 		if(s_eTab != eOldTab) {

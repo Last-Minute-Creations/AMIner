@@ -9,6 +9,10 @@
 #include <comm/comm.h>
 #include "defs.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum _tCommShopPage {
 	COMM_SHOP_PAGE_WAREHOUSE,
 	COMM_SHOP_PAGE_WORKSHOP,
@@ -120,5 +124,9 @@ void commShopGoBack(void);
 tTabNavigationState commShopGetTabNavigationState(void);
 
 void commShopFocusOnTabNavigation(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _COMM_SHOP_H_

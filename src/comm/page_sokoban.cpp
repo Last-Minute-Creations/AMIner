@@ -4,7 +4,8 @@
 
 #include "page_sokoban.h"
 #include <ace/types.h>
-#include <comm/comm.h>
+#include <ace/managers/key.h>
+#include <comm/gs_shop.h>
 
 namespace {
 
@@ -357,6 +358,9 @@ void pageSokobanProcess(void) {
 		}
 		else if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			loadLevel(s_ubCurrentLevelIndex);
+		}
+		else if(keyUse(KEY_ESCAPE)) {
+			commShopChangePage(COMM_SHOP_PAGE_SOKOBAN, COMM_SHOP_PAGE_WAREHOUSE);
 		}
 	}
 }

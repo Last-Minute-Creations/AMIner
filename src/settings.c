@@ -10,6 +10,7 @@ tSettings g_sSettings = {
 	.is1pKbd = 0,
 	.is2pKbd = 1,
 	.isAtariHidden = 1,
+	.ubSokoUnlock = 0,
 };
 
 void settingsSave(tFile *pFile) {
@@ -17,6 +18,7 @@ void settingsSave(tFile *pFile) {
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileWrite(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
+	fileWrite(pFile, &g_sSettings.ubSokoUnlock, sizeof(g_sSettings.ubSokoUnlock));
 }
 
 UBYTE settingsLoad(tFile*pFile) {
@@ -27,5 +29,6 @@ UBYTE settingsLoad(tFile*pFile) {
 	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
+	fileRead(pFile, &g_sSettings.ubSokoUnlock, sizeof(g_sSettings.ubSokoUnlock));
 	return 1;
 }
