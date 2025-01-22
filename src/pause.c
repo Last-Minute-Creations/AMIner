@@ -37,7 +37,9 @@ void pauseGsLoop(void) {
 			stateChange(g_pGameStateManager, &g_sStateGame);
 		}
 		else {
-			gameTriggerSave();
+			if(!g_isChallenge) {
+				gameTriggerSave();
+			}
 			menuGsEnter(0);
 		}
 	}

@@ -406,6 +406,7 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	fileWrite(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
 	fileWrite(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
 	fileWrite(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
+	// fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
 	fileWrite(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
 	fileWrite(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
 	fileWrite(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
@@ -454,16 +455,17 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->eLastVisitedBase, sizeof(pVehicle->eLastVisitedBase));
 	fileRead(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
 	fileRead(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
+	fileRead(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
 	fileRead(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
 	fileRead(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
 	fileRead(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
 	fileRead(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
-	fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
+	// fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
 	fileRead(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
 	fileRead(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
-	fileRead(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
 	fileRead(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
 	fileRead(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
+	// fileRead(pFile, &pVehicle->eTeleportInFlipbook, sizeof(pVehicle->eTeleportInFlipbook));
 	fileRead(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
 	fileRead(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
 	fileRead(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
