@@ -29,6 +29,7 @@ static UBYTE settingsLoad(tFile*pFile) {
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
 	fileRead(pFile, &g_sSettings.ubSokoUnlock, sizeof(g_sSettings.ubSokoUnlock));
+	fileRead(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
 	return saveReadTag(pFile, SAVE_TAG_SETTINGS_END);
 }
 
@@ -37,6 +38,7 @@ static void settingsReset(void) {
 	g_sSettings.is2pKbd = 1;
 	g_sSettings.isAtariHidden = 1;
 	g_sSettings.ubSokoUnlock = 0;
+	g_sSettings.ulAchievementsUnlocked = 0;
 }
 
 //------------------------------------------------------------------- PUBLIC FNS
@@ -63,4 +65,12 @@ void settingsFileLoad(void) {
 
 		fileClose(pFileSettings);
 	}
+}
+
+UBYTE settingsTryUnlockAchievement(UBYTE ubAchievementIndex) {
+	if(g_sSettings.ulAchievementsUnlocked & BV(ubAchievementIndex)) {
+		return 0;
+	}
+	g_sSettings.ulAchievementsUnlocked |= BV(ubAchievementIndex);
+	return 1;
 }
