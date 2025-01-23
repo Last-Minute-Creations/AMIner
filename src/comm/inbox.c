@@ -20,15 +20,16 @@ void inboxReset(void) {
 }
 
 void inboxSave(tFile *pFile) {
-	saveWriteHeader(pFile, "INBX");
+	saveWriteTag(pFile, SAVE_TAG_INBOX);
 	fileWrite(pFile, s_pInbox, sizeof(s_pInbox));
 	fileWrite(pFile, &s_uwPendingInboxCount, sizeof(s_uwPendingInboxCount));
 	fileWrite(pFile, &s_uwPopPos, sizeof(s_uwPopPos));
 	fileWrite(pFile, &s_eState, sizeof(s_eState));
+	saveWriteTag(pFile, SAVE_TAG_INBOX_END);
 }
 
 UBYTE inboxLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "INBX")) {
+	if(!saveReadTag(pFile, SAVE_TAG_INBOX)) {
 		return 0;
 	}
 
@@ -36,7 +37,7 @@ UBYTE inboxLoad(tFile *pFile) {
 	fileRead(pFile, &s_uwPendingInboxCount, sizeof(s_uwPendingInboxCount));
 	fileRead(pFile, &s_uwPopPos, sizeof(s_uwPopPos));
 	fileRead(pFile, &s_eState, sizeof(s_eState));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_INBOX_END);
 }
 
 

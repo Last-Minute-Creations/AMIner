@@ -288,7 +288,7 @@ void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
 }
 
 void hudSave(tFile *pFile) {
-	saveWriteHeader(pFile, "HUD ");
+	saveWriteTag(pFile, SAVE_TAG_HUD);
 	fileWrite(pFile, &s_ubLineHeight, sizeof(s_ubLineHeight));
 	fileWrite(pFile, &s_isBitmapFilled, sizeof(s_isBitmapFilled));
 	fileWrite(pFile, s_pPlayerData, sizeof(s_pPlayerData));
@@ -309,10 +309,11 @@ void hudSave(tFile *pFile) {
 	fileWrite(pFile, &s_ubSelection, sizeof(s_ubSelection));
 	fileWrite(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
 	fileWrite(pFile, &s_ubHudShowStack, sizeof(s_ubHudShowStack));
+	saveWriteTag(pFile, SAVE_TAG_HUD_END);
 }
 
 UBYTE hudLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "HUD ")) {
+	if(!saveReadTag(pFile, SAVE_TAG_HUD)) {
 		return 0;
 	}
 
@@ -338,7 +339,7 @@ UBYTE hudLoad(tFile *pFile) {
 	fileRead(pFile, &s_ubHudShowStack, sizeof(s_ubHudShowStack));
 
 	hudRefresh();
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_HUD_END);
 }
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth) {

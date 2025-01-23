@@ -188,14 +188,15 @@ void tutorialReset(void) {
 }
 
 void tutorialSave(tFile *pFile) {
-	saveWriteHeader(pFile, "TUTR");
+	saveWriteTag(pFile, SAVE_TAG_TUTORIAL);
 	fileWrite(pFile, &s_eTutorialState, sizeof(s_eTutorialState));
 	fileWrite(pFile, s_pDescriptionShownForTabs, sizeof(s_pDescriptionShownForTabs[0]) * COMM_TAB_COUNT);
 	fileWrite(pFile, &s_ulStartTime, sizeof(s_ulStartTime));
+	saveWriteTag(pFile, SAVE_TAG_TUTORIAL_END);
 }
 
 UBYTE tutorialLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "TUTR")) {
+	if(!saveReadTag(pFile, SAVE_TAG_TUTORIAL)) {
 		return 0;
 	}
 
@@ -203,7 +204,7 @@ UBYTE tutorialLoad(tFile *pFile) {
 	fileRead(pFile, s_pDescriptionShownForTabs, sizeof(s_pDescriptionShownForTabs[0]) * COMM_TAB_COUNT);
 	fileRead(pFile, &s_ulStartTime, sizeof(s_ulStartTime));
 
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_TUTORIAL_END);
 }
 
 UBYTE tutorialProcess(void) {

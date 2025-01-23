@@ -705,7 +705,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 }
 
 void tileSave(tFile *pFile) {
-	saveWriteHeader(pFile, "TILE");
+	saveWriteTag(pFile, SAVE_TAG_TILE);
 	UBYTE **pTiles = g_pMainBuffer->pTileData;
 	UWORD uwSizeX = g_pMainBuffer->uTileBounds.uwX;
 	UWORD uwSizeY = g_pMainBuffer->uTileBounds.uwY;
@@ -716,10 +716,11 @@ void tileSave(tFile *pFile) {
 		fileWrite(pFile, &pTiles[uwX][0], sizeof(pTiles[0][0]) * uwSizeY);
 	}
 	fileWrite(pFile, &s_ubPrisonerX, sizeof(s_ubPrisonerX));
+	saveWriteTag(pFile, SAVE_TAG_TILE_END);
 }
 
 UBYTE tileLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "TILE")) {
+	if(!saveReadTag(pFile, SAVE_TAG_TILE)) {
 		return 0;
 	}
 
@@ -732,7 +733,7 @@ UBYTE tileLoad(tFile *pFile) {
 		fileRead(pFile, &pTiles[uwX][0], sizeof(pTiles[0][0]) * uwSizeY);
 	}
 	fileRead(pFile, &s_ubPrisonerX, sizeof(s_ubPrisonerX));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_TILE_END);
 }
 
 void tileExcavate(UWORD uwX, UWORD uwY) {

@@ -33,17 +33,18 @@ void heatReset(void) {
 }
 
 void heatSave(tFile *pFile) {
-	saveWriteHeader(pFile, "HEAT");
+	saveWriteTag(pFile, SAVE_TAG_HEAT);
 	fileWrite(pFile, &s_ubHeat, sizeof(s_ubHeat));
+	saveWriteTag(pFile, SAVE_TAG_HEAT_END);
 }
 
 UBYTE heatLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "HEAT")) {
+	if(!saveReadTag(pFile, SAVE_TAG_HEAT)) {
 		return 0;
 	}
 
 	fileRead(pFile, &s_ubHeat, sizeof(s_ubHeat));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_HEAT_END);
 }
 
 

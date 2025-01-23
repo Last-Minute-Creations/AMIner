@@ -374,7 +374,7 @@ void vehicleReset(tVehicle *pVehicle) {
 }
 
 void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
-	saveWriteHeader(pFile, "VHCL");
+	saveWriteTag(pFile, SAVE_TAG_VEHICLE);
 	fileWrite(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
 	// textBobSave(&pVehicle->sTextBob, pFile);
 	// bobSave(&pVehicle->sBobBody, pFile);
@@ -422,10 +422,11 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	fileWrite(pFile, &pVehicle->ubHullDamageFrame, sizeof(pVehicle->ubHullDamageFrame));
 	fileWrite(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
 	fileWrite(pFile, &pVehicle->ubDamageBlinkCooldown, sizeof(pVehicle->ubDamageBlinkCooldown));
+	saveWriteTag(pFile, SAVE_TAG_VEHICLE_END);
 }
 
 UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
-	if(!saveReadHeader(pFile, "VHCL")) {
+	if(!saveReadTag(pFile, SAVE_TAG_VEHICLE)) {
 		return 0;
 	}
 
@@ -476,7 +477,7 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->ubHullDamageFrame, sizeof(pVehicle->ubHullDamageFrame));
 	fileRead(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
 	fileRead(pFile, &pVehicle->ubDamageBlinkCooldown, sizeof(pVehicle->ubDamageBlinkCooldown));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_VEHICLE_END);
 }
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {

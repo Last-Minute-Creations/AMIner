@@ -35,14 +35,15 @@ void questGateReset(void) {
 }
 
 void questGateSave(tFile *pFile) {
-	saveWriteHeader(pFile, "GATE");
+	saveWriteTag(pFile, SAVE_TAG_GATE);
 	fileWrite(pFile, &s_eGateQuestState, sizeof(s_eGateQuestState));
 	fileWrite(pFile, &s_ubFoundFragments, sizeof(s_ubFoundFragments));
 	fileWrite(pFile, &s_isPrisonerFound, sizeof(s_isPrisonerFound));
+	saveWriteTag(pFile, SAVE_TAG_GATE_END);
 }
 
 UBYTE questGateLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "GATE")) {
+	if(!saveReadTag(pFile, SAVE_TAG_GATE)) {
 		return 0;
 	}
 
@@ -50,7 +51,7 @@ UBYTE questGateLoad(tFile *pFile) {
 	fileRead(pFile, &s_ubFoundFragments, sizeof(s_ubFoundFragments));
 	fileRead(pFile, &s_isPrisonerFound, sizeof(s_isPrisonerFound));
 	collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, s_ubFoundFragments);
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_GATE_END);
 }
 
 void questGateProcess(void) {

@@ -46,16 +46,17 @@ void questCrateReset(void) {
 }
 
 void questCrateSave(tFile *pFile) {
-	saveWriteHeader(pFile, "CRTE");
+	saveWriteTag(pFile, SAVE_TAG_CRATE);
 	fileWrite(pFile, &s_ubCrateCount, sizeof(s_ubCrateCount));
 	fileWrite(pFile, &s_ubCratesSold, sizeof(s_ubCratesSold));
 	fileWrite(pFile, &s_isScientistUnlocked, sizeof(s_isScientistUnlocked));
 	fileWrite(pFile, &s_isFirstCrateFound, sizeof(s_isFirstCrateFound));
 	fileWrite(pFile, &s_eCapsuleState, sizeof(s_eCapsuleState));
+	saveWriteTag(pFile, SAVE_TAG_CRATE_END);
 }
 
 UBYTE questCrateLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "CRTE")) {
+	if(!saveReadTag(pFile, SAVE_TAG_CRATE)) {
 		return 0;
 	}
 
@@ -65,7 +66,7 @@ UBYTE questCrateLoad(tFile *pFile) {
 	fileRead(pFile, &s_isFirstCrateFound, sizeof(s_isFirstCrateFound));
 	fileRead(pFile, &s_eCapsuleState, sizeof(s_eCapsuleState));
 
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_CRATE_END);
 }
 
 void questCrateProcess(void) {

@@ -20,8 +20,9 @@ typedef struct tSettings {
 
 extern tSettings g_sSettings;
 
-void settingsSave(tFile *pFile);
+void settingsFileSave(void);
 
-UBYTE settingsLoad(tFile*pFile);
+void settingsFileLoad(void);
+
 
 #endif // SETTINGS_H

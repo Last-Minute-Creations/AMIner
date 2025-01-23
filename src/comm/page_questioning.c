@@ -140,21 +140,22 @@ void pageQuestioningReset(void) {
 }
 
 void pageQuestioningSave(tFile *pFile) {
-	saveWriteHeader(pFile, "QTNG");
+	saveWriteTag(pFile, SAVE_TAG_QUESTIONING);
 	fileWrite(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
 	fileWrite(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
 	fileWrite(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
+	saveWriteTag(pFile, SAVE_TAG_QUESTIONING_END);
 }
 
 UBYTE pageQuestioningLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "QTNG")) {
+	if(!saveReadTag(pFile, SAVE_TAG_QUESTIONING)) {
 		return 0;
 	}
 
 	fileRead(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
 	fileRead(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
 	fileRead(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_QUESTIONING_END);
 }
 
 void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit, UBYTE isForce) {

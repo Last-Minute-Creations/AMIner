@@ -6,12 +6,12 @@
 #include <string.h>
 #include <ace/managers/log.h>
 
-UBYTE saveReadHeader(tFile *pFile, const char *szHeader) {
-	char szHeaderRead[5] = {'\0'};
-	fileRead(pFile, szHeaderRead, sizeof(szHeaderRead) - 1);
-	if(memcmp(szHeaderRead, szHeader, sizeof(szHeaderRead) - 1)) {
+UBYTE saveReadTag(tFile *pFile, const char *szTag) {
+	char szTagRead[5] = {'\0'};
+	fileRead(pFile, szTagRead, sizeof(szTagRead) - 1);
+	if(memcmp(szTagRead, szTag, sizeof(szTagRead) - 1)) {
 		logWrite(
-			"ERR: Save header mismatch, got %s, expected %s\n", szHeaderRead, szHeader
+			"ERR: Save tag mismatch, got %s, expected %s\n", szTagRead, szTag
 		);
 		return 0;
 	}
@@ -19,6 +19,6 @@ UBYTE saveReadHeader(tFile *pFile, const char *szHeader) {
 	return 1;
 }
 
-void saveWriteHeader(tFile *pFile, const char *szHeader) {
-	fileWrite(pFile, szHeader, strlen(szHeader));
+void saveWriteTag(tFile *pFile, const char *szTag) {
+	fileWrite(pFile, szTag, strlen(szTag));
 }

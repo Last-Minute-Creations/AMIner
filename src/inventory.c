@@ -21,17 +21,18 @@ void inventoryReset(void) {
 }
 
 void inventorySave(tFile *pFile) {
-	saveWriteHeader(pFile, "IVTR");
+	saveWriteTag(pFile, SAVE_TAG_INVENTORY);
 	fileWrite(pFile, &s_sInventory, sizeof(s_sInventory));
+	saveWriteTag(pFile, SAVE_TAG_INVENTORY_END);
 }
 
 UBYTE inventoryLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "IVTR")) {
+	if(!saveReadTag(pFile, SAVE_TAG_INVENTORY)) {
 		return 0;
 	}
 
 	fileRead(pFile, &s_sInventory, sizeof(s_sInventory));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_INVENTORY_END);
 }
 
 const tPartDef *inventoryGetPartDef(tPartKind eName) {

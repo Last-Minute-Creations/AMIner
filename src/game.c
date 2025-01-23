@@ -955,7 +955,7 @@ static void gameChallengeResult(void) {
 }
 
 static void gameSaveSummary(tFile *pFile) {
-	saveWriteHeader(pFile, "SMRY");
+	saveWriteTag(pFile, SAVE_TAG_SUMMARY);
 	tGameSummary sSummary = {
 		.lCash = g_pVehicles[0].lCash,
 		.ubAccolades = s_ubAccolades,
@@ -973,11 +973,12 @@ static void gameSaveSummary(tFile *pFile) {
 	fileWrite(pFile, &sSummary.ubAccolades, sizeof(sSummary.ubAccolades));
 	fileWrite(pFile, &sSummary.ubHeatPercent, sizeof(sSummary.ubHeatPercent));
 	fileWrite(pFile, &sSummary.ubPlanIndex, sizeof(sSummary.ubPlanIndex));
+	saveWriteTag(pFile, SAVE_TAG_SUMMARY_END);
 }
 
 static void gameSave(tFile *pFile) {
 	gameSaveSummary(pFile);
-	saveWriteHeader(pFile, "GAME");
+	saveWriteTag(pFile, SAVE_TAG_GAME);
 	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
@@ -1009,6 +1010,7 @@ static void gameSave(tFile *pFile) {
 	vehicleSave(&g_pVehicles[1], pFile);
 	hudSave(pFile);
 	heatSave(pFile);
+	saveWriteTag(pFile, SAVE_TAG_GAME_END);
 }
 
 //------------------------------------------------------------------- PUBLIC FNS
@@ -1200,7 +1202,7 @@ UBYTE gameLoad(tFile *pFile) {
 		}
 	}
 
-	if(!saveReadHeader(pFile, "GAME")) {
+	if(!saveReadTag(pFile, SAVE_TAG_GAME)) {
 		return 0;
 	}
 
@@ -1234,11 +1236,12 @@ UBYTE gameLoad(tFile *pFile) {
 		vehicleLoad(&g_pVehicles[0], pFile) &&
 		vehicleLoad(&g_pVehicles[1], pFile) &&
 		hudLoad(pFile) &&
-		heatLoad(pFile);
+		heatLoad(pFile) &&
+		saveReadTag(pFile, SAVE_TAG_GAME_END);
 }
 
 UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary) {
-	if(!saveReadHeader(pFile, "SMRY")) {
+	if(!saveReadTag(pFile, SAVE_TAG_SUMMARY)) {
 		return 0;
 	}
 
@@ -1249,7 +1252,7 @@ UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary) {
 	fileRead(pFile, &pSummary->ubAccolades, sizeof(pSummary->ubAccolades));
 	fileRead(pFile, &pSummary->ubHeatPercent, sizeof(pSummary->ubHeatPercent));
 	fileRead(pFile, &pSummary->ubPlanIndex, sizeof(pSummary->ubPlanIndex));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_SUMMARY_END);
 }
 
 void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {

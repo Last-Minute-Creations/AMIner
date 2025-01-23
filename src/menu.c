@@ -524,12 +524,7 @@ static void menuOnBackToMainFromSettings(void) {
 	// Update the 2nd port steer to prevent interfering with mouse
 	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitIdle() : steerInitJoy(STEER_MODE_JOY_2);
 
-	tFile *pFileSettings = diskFileOpen("settings.dat", "wb");
-	if(pFileSettings) {
-		settingsSave(pFileSettings);
-		fileClose(pFileSettings);
-		logWrite("Saved settings\n");
-	}
+	settingsFileSave();
 	menuOnEnterMain();
 }
 
@@ -699,17 +694,7 @@ void menuPreload(void) {
 	s_pLogo = bitmapCreateFromPath("data/logo.bm", 0);
 	s_pSfxAtari = ptplayerSfxCreateFromPath("data/sfx/atari.sfx", 1);
 
-	tFile *pFileSettings = diskFileOpen("settings.dat", "rb");
-	if(pFileSettings) {
-		if(settingsLoad(pFileSettings)) {
-			logWrite("Saved settings\n");
-		}
-		else {
-			logWrite("ERR: Can't save settings\n");
-		}
-
-		fileClose(pFileSettings);
-	}
+	settingsFileLoad();
 
 	// Init all steers except joy2 if not explicitly selected, because mouse may be connected there
 	s_pMenuSteers[0] = steerInitJoy(STEER_MODE_JOY_1);

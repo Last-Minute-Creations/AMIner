@@ -78,13 +78,14 @@ void pageAccountingReset(void) {
 }
 
 void pageAccountingSave(tFile *pFile) {
-	saveWriteHeader(pFile, "ACTG");
+	saveWriteTag(pFile, SAVE_TAG_ACCOUNTING);
+	saveWriteTag(pFile, SAVE_TAG_ACCOUNTING_END);
 	// TODO: number of accounting operations for post-game stats - move with bribe/favor to some generalized stats chunk?
 }
 
 UBYTE pageAccountingLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "ACTG")) {
+	if(!saveReadTag(pFile, SAVE_TAG_ACCOUNTING)) {
 		return 0;
 	}
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_ACCOUNTING_END);
 }

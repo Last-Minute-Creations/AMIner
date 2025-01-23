@@ -6,23 +6,22 @@
 #include "save.h"
 
 // Default config
-tSettings g_sSettings = {
-	.is1pKbd = 0,
-	.is2pKbd = 1,
-	.isAtariHidden = 1,
-	.ubSokoUnlock = 0,
-};
+tSettings g_sSettings;
 
-void settingsSave(tFile *pFile) {
-	saveWriteHeader(pFile, "STGS");
+//------------------------------------------------------------------ PRIVATE FNS
+
+static void settingsSave(tFile *pFile) {
+	saveWriteTag(pFile, SAVE_TAG_SETTINGS);
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileWrite(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
 	fileWrite(pFile, &g_sSettings.ubSokoUnlock, sizeof(g_sSettings.ubSokoUnlock));
+	fileWrite(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
+	saveWriteTag(pFile, SAVE_TAG_SETTINGS_END);
 }
 
-UBYTE settingsLoad(tFile*pFile) {
-	if(!saveReadHeader(pFile, "STGS")) {
+static UBYTE settingsLoad(tFile*pFile) {
+	if(!saveReadTag(pFile, SAVE_TAG_SETTINGS)) {
 		return 0;
 	}
 
@@ -30,5 +29,38 @@ UBYTE settingsLoad(tFile*pFile) {
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
 	fileRead(pFile, &g_sSettings.ubSokoUnlock, sizeof(g_sSettings.ubSokoUnlock));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_SETTINGS_END);
+}
+
+static void settingsReset(void) {
+	g_sSettings.is1pKbd = 0;
+	g_sSettings.is2pKbd = 1;
+	g_sSettings.isAtariHidden = 1;
+	g_sSettings.ubSokoUnlock = 0;
+}
+
+//------------------------------------------------------------------- PUBLIC FNS
+
+void settingsFileSave(void) {
+	tFile *pFileSettings = diskFileOpen("settings.dat", "wb");
+	if(pFileSettings) {
+		settingsSave(pFileSettings);
+		fileClose(pFileSettings);
+		logWrite("Saved settings\n");
+	}
+}
+
+void settingsFileLoad(void) {
+	tFile *pFileSettings = diskFileOpen("settings.dat", "rb");
+	if(pFileSettings) {
+		if(settingsLoad(pFileSettings)) {
+			logWrite("Loaded settings\n");
+		}
+		else {
+			logWrite("ERR: Can't load settings - restoring defaults\n");
+			settingsReset();
+		}
+
+		fileClose(pFileSettings);
+	}
 }

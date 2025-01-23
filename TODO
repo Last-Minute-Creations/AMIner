@@ -114,10 +114,11 @@ General:
 	☐ Limit cash to prevent trashing of message icon?
 	☐ Add 2s pauses between music tracks?
 	☐ Achievements
-		☐ Transfer achievements from Miro to GDD
+		✔ Transfer achievements from Miro to GDD @done(25-01-23)
 		☐ Add achievement storage outside main game save
 		☐ Unlock achievements in-game
-		☐ Save achievements on commrade/game exit (same as game save)
+		☐ Display achievement popup
+		☐ Save achievements on commrade/game exit (same as game save + settings)
 		☐ Display achievements in menu
 
 Bugs:
@@ -230,9 +231,14 @@ Crate quests:
 		✔ Spend parts to open capsule @done(24-07-05)
 		✔ Screen with text and capsule contents @done(24-12-15)
 
-Free mode:
-	☐ Figure out the rules
-	☐ Implement
+Deadline mode:
+	☐ Don't generate underground bases
+	☐ End the game after some time
+	☐ Display time remaining in commrade's warehouse
+	☐ Implement stopwatch gathering
+	☐ Use separate save file
+	☐ Use separate high scores
+	☐ Add intro text
 
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)

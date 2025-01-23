@@ -72,17 +72,18 @@ void planManagerInit(void) {
 }
 
 void planManagerSave(tFile *pFile) {
-	saveWriteHeader(pFile, "PLAN");
+	saveWriteTag(pFile, SAVE_TAG_PLAN);
 	fileWrite(pFile, &s_sPlanManager, sizeof(s_sPlanManager));
+	saveWriteTag(pFile, SAVE_TAG_PLAN_END);
 }
 
 UBYTE planManagerLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "PLAN")) {
+	if(!saveReadTag(pFile, SAVE_TAG_PLAN)) {
 		return 0;
 	}
 
 	fileRead(pFile, &s_sPlanManager, sizeof(s_sPlanManager));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_PLAN_END);
 }
 
 const tPlanManager *planManagerGet(void) {

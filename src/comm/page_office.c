@@ -198,7 +198,7 @@ void pageOfficeReset(void) {
 }
 
 void pageOfficeSave(tFile *pFile) {
-	saveWriteHeader(pFile, "OFFC");
+	saveWriteTag(pFile, SAVE_TAG_OFFICE);
 	fileWrite(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
 	fileWrite(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
 	fileWrite(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
@@ -207,10 +207,11 @@ void pageOfficeSave(tFile *pFile) {
 	pageBribeSave(pFile);
 	pageAccountingSave(pFile);
 	pageQuestioningSave(pFile);
+	saveWriteTag(pFile, SAVE_TAG_OFFICE_END);
 }
 
 UBYTE pageOfficeLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "OFFC")) {
+	if(!saveReadTag(pFile, SAVE_TAG_OFFICE)) {
 		return 0;
 	}
 
@@ -221,7 +222,8 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 	return pageFavorLoad(pFile) &&
 		pageBribeLoad(pFile) &&
 		pageAccountingLoad(pFile) &&
-		pageQuestioningLoad(pFile);
+		pageQuestioningLoad(pFile) &&
+		saveReadTag(pFile, SAVE_TAG_OFFICE_END);
 }
 
 void pageOfficeUnlockPerson(tFaceId ePerson) {

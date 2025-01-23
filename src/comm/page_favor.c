@@ -84,14 +84,15 @@ void pageFavorReset(void) {
 }
 
 void pageFavorSave(tFile *pFile) {
-	saveWriteHeader(pFile, "FAVR");
+	saveWriteTag(pFile, SAVE_TAG_FAVOR);
 	fileWrite(pFile, &s_ubFavorsLeft, sizeof(s_ubFavorsLeft));
+	saveWriteTag(pFile, SAVE_TAG_FAVOR_END);
 }
 
 UBYTE pageFavorLoad(tFile *pFile) {
-	if(!saveReadHeader(pFile, "FAVR")) {
+	if(!saveReadTag(pFile, SAVE_TAG_FAVOR)) {
 		return 0;
 	}
 	fileRead(pFile, &s_ubFavorsLeft, sizeof(s_ubFavorsLeft));
-	return 1;
+	return saveReadTag(pFile, SAVE_TAG_FAVOR_END);
 }
