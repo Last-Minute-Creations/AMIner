@@ -115,10 +115,10 @@ General:
 	☐ Add 2s pauses between music tracks?
 	☐ Achievements
 		✔ Transfer achievements from Miro to GDD @done(25-01-23)
-		☐ Add achievement storage outside main game save
-		☐ Unlock achievements in-game
-		☐ Display achievement popup
-		☐ Save achievements on commrade/game exit (same as game save + settings)
+		✔ Add achievement storage outside main game save @done(25-01-23)
+		✔ Unlock achievements in-game @done(25-01-23)
+		✔ Save achievements on commrade/game exit (same as game save + settings) @done(25-01-23)
+		☐ Display achievement popup somehow
 		☐ Display achievements in menu
 
 Bugs:

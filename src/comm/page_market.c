@@ -8,8 +8,9 @@
 #include <comm/button.h>
 #include <comm/gs_shop.h>
 #include <comm/page_warehouse.h>
-#include <defs.h>
-#include <warehouse.h>
+#include "defs.h"
+#include "warehouse.h"
+#include "save.h"
 
 #define TARGET_ROW_COUNT 4
 #define MARKET_LINE_HEIGHT 9
@@ -44,6 +45,7 @@ typedef struct tTargetMineral {
 static tMarketRow s_eRow;
 static tMineralType s_eSource;
 static tTargetMineral s_pTargets[TARGET_ROW_COUNT];
+static UWORD s_uwResourcesTraded;
 
 //------------------------------------------------------------ PRIVATE FUNCTIONS
 
@@ -150,6 +152,7 @@ static UBYTE tryTrade(void) {
 	uwSourceStock -= pTarget->ubPrice;
 	warehouseSetStock(s_eSource, uwSourceStock);
 	warehouseSetStock(pTarget->eMineral, warehouseGetStock(pTarget->eMineral) + 1);
+	s_uwResourcesTraded += pTarget->ubPrice;
 	return 1;
 }
 
@@ -230,4 +233,26 @@ void pageMarketCreate(void) {
 	buttonInitOk(g_pMsgs[MSG_COMM_EXIT]);
 	buttonDeselectAll();
 	setSource(MINERAL_TYPE_SILVER);
+}
+
+void pageMarketReset(void) {
+	s_uwResourcesTraded = 0;
+}
+
+void pageMarketSave(tFile *pFile) {
+	saveWriteTag(pFile, SAVE_TAG_MARKET);
+	fileWrite(pFile, &s_uwResourcesTraded, sizeof(s_uwResourcesTraded));
+	saveWriteTag(pFile, SAVE_TAG_MARKET_END);
+}
+
+UBYTE pageMarketLoad(tFile *pFile) {
+	if(!saveReadTag(pFile, SAVE_TAG_MARKET)) {
+		return 0;
+	}
+	fileRead(pFile, &s_uwResourcesTraded, sizeof(s_uwResourcesTraded));
+	return saveReadTag(pFile, SAVE_TAG_MARKET_END);
+}
+
+UBYTE pageMarketGetResourcesTraded(void) {
+	return s_uwResourcesTraded;
 }

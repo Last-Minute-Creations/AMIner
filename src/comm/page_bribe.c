@@ -11,6 +11,7 @@
 #include "../vehicle.h"
 #include "../save.h"
 #include "../heat.h"
+#include "page_bribe.h"
 
 static UWORD s_uwBribeCount;
 static UWORD s_uwBribeCost;
@@ -114,3 +115,6 @@ UBYTE pageBribeLoad(tFile *pFile) {
 	return saveReadTag(pFile, SAVE_TAG_BRIBE_END);
 }
 
+UBYTE pageBribeGetCount(void) {
+	return s_uwBribeCount;
+}

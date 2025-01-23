@@ -11,6 +11,7 @@
 #include "../heat.h"
 #include "../game.h"
 #include "../hud.h"
+#include "../achievement.h"
 
 #define QUESTIONING_HEAT_INCREASE 5
 #define QUESTIONING_HEAT_DECREASE_TRUTH 5
@@ -22,6 +23,7 @@ static tQuestioningFlag s_eQuestioningsNotReported; // for future reporting at w
 static tQuestioningBit s_eQuestioningBitCurrent;
 static tQuestioningHandler s_pQuestioningHandlers[QUESTIONING_BIT_COUNT] = {0};
 static tCommShopPage s_pOfficeQuestioningPages[PAGE_OFFICE_SUBPAGES_PER_PERSON];
+static UWORD s_uwLiesCount;
 
 static tCommShopPage pageQuestioningBitToShopPage(tQuestioningBit eBit) {
 	static const tCommShopPage pQuestioningPages[QUESTIONING_BIT_COUNT] = {
@@ -55,6 +57,7 @@ static void pageQuestioningProcess(void) {
 			isShowReportMessage = 1;
 		}
 		else {
+			++s_uwLiesCount;
 			if(heatTryPassCheck()) {
 				s_eQuestioningsNotReported |= BV(s_eQuestioningBitCurrent);
 			}
@@ -137,6 +140,7 @@ void pageQuestioningReset(void) {
 	s_eQuestioningsPending = 0;
 	s_eQuestioningsReported = 0;
 	s_eQuestioningsNotReported = 0;
+	s_uwLiesCount = 0;
 }
 
 void pageQuestioningSave(tFile *pFile) {
@@ -144,6 +148,7 @@ void pageQuestioningSave(tFile *pFile) {
 	fileWrite(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
 	fileWrite(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
 	fileWrite(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
+	fileWrite(pFile, &s_uwLiesCount, sizeof(s_uwLiesCount));
 	saveWriteTag(pFile, SAVE_TAG_QUESTIONING_END);
 }
 
@@ -211,8 +216,20 @@ void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily)
 		heatTryReduce(QUESTIONING_HEAT_DECREASE_REPORT);
 		gameAddAccolade();
 	}
+
+	if(s_eQuestioningsReported == QUESTIONING_FLAG_ALL) {
+		achievementUnlock(ACHIEVEMENT_CONFIDENT);
+	}
 }
 
 void pageQuestioningAddReporting(tQuestioningBit eQuestioningBit) {
 	s_eQuestioningsNotReported |= BV(eQuestioningBit);
+}
+
+UBYTE pageQuestioningIsAnyReported(void) {
+	return s_eQuestioningsReported != 0;
+}
+
+UBYTE pageQuestioningGetLiesCount(void) {
+	return s_uwLiesCount;
 }

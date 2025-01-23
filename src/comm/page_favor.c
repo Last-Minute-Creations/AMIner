@@ -12,6 +12,7 @@
 #include "../save.h"
 
 static UBYTE s_ubFavorsLeft;
+static UBYTE s_ubFavorsUses;
 
 static void pageFavorProcess(void) {
 	if(buttonGetPreset() == BUTTON_PRESET_ACCEPT_DECLINE) {
@@ -32,6 +33,7 @@ static void pageFavorProcess(void) {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(bButtonCurr == 0) {
 				--s_ubFavorsLeft;
+				++s_ubFavorsUses;
 				planReroll();
 			}
 			commShopGoBack();
@@ -81,11 +83,13 @@ void pageFavorCreate(void) {
 
 void pageFavorReset(void) {
 	s_ubFavorsLeft = 10;
+	s_ubFavorsUses = 0;
 }
 
 void pageFavorSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_FAVOR);
 	fileWrite(pFile, &s_ubFavorsLeft, sizeof(s_ubFavorsLeft));
+	fileWrite(pFile, &s_ubFavorsUses, sizeof(s_ubFavorsUses));
 	saveWriteTag(pFile, SAVE_TAG_FAVOR_END);
 }
 
@@ -94,5 +98,10 @@ UBYTE pageFavorLoad(tFile *pFile) {
 		return 0;
 	}
 	fileRead(pFile, &s_ubFavorsLeft, sizeof(s_ubFavorsLeft));
+	fileRead(pFile, &s_ubFavorsUses, sizeof(s_ubFavorsUses));
 	return saveReadTag(pFile, SAVE_TAG_FAVOR_END);
+}
+
+UBYTE pageFavorGetUses(void) {
+	return s_ubFavorsUses;
 }

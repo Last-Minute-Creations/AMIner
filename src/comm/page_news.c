@@ -7,6 +7,7 @@
 #include "../assets.h"
 #include "../language.h"
 #include "menu.h"
+#include "achievement.h"
 
 #define SCROLL_SPEED_SLOW 1
 #define SCROLL_SPEED_FAST 8
@@ -103,6 +104,9 @@ static void pageNewsProcess(void) {
 		s_wDrawnTextEnd = 0;
 		s_isScrollDone = 1;
 		if(!commIsIntro()) {
+			if(g_is2pPlaying) {
+				achievementUnlock(ACHIEVEMENT_CO_OP);
+			}
 			commRegisterPage(0, 0);
 			menuGsEnter(0);
 		}

@@ -20,7 +20,7 @@ typedef enum tNewsKind {
 	NEWS_KIND_COUNT
 } tNewsKind;
 
-void pageNewsCreate(tNewsKind eEnding);
+void pageNewsCreate(tNewsKind eNewsKind);
 
 // Use only for initial loading screen!
 void pageNewsDestroy(void);

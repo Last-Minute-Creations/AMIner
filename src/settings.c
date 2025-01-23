@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "settings.h"
+#include <ace/managers/log.h>
+#include <ace/utils/disk_file.h>
 #include "save.h"
 
 // Default config
@@ -44,10 +46,12 @@ static void settingsReset(void) {
 //------------------------------------------------------------------- PUBLIC FNS
 
 void settingsFileSave(void) {
-	tFile *pFileSettings = diskFileOpen("settings.dat", "wb");
+	tFile *pFileSettings = diskFileOpen("settings.tmp", "wb");
 	if(pFileSettings) {
 		settingsSave(pFileSettings);
 		fileClose(pFileSettings);
+		diskFileDelete("settings.dat");
+		diskFileMove("settings.tmp", "settings.dat");
 		logWrite("Saved settings\n");
 	}
 }

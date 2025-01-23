@@ -7,6 +7,7 @@
 #include <comm/page_bribe.h>
 #include <comm/page_accounting.h>
 #include <comm/page_questioning.h>
+#include <comm/page_market.h>
 #include <comm/gs_shop.h>
 #include <comm/inbox.h>
 #include <comm/button.h>
@@ -195,6 +196,7 @@ void pageOfficeReset(void) {
 	pageBribeReset();
 	pageAccountingReset();
 	pageQuestioningReset();
+	pageMarketReset();
 }
 
 void pageOfficeSave(tFile *pFile) {
@@ -207,6 +209,7 @@ void pageOfficeSave(tFile *pFile) {
 	pageBribeSave(pFile);
 	pageAccountingSave(pFile);
 	pageQuestioningSave(pFile);
+	pageMarketSave(pFile);
 	saveWriteTag(pFile, SAVE_TAG_OFFICE_END);
 }
 
@@ -223,6 +226,7 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 		pageBribeLoad(pFile) &&
 		pageAccountingLoad(pFile) &&
 		pageQuestioningLoad(pFile) &&
+		pageMarketLoad(pFile) &&
 		saveReadTag(pFile, SAVE_TAG_OFFICE_END);
 }
 

@@ -1299,11 +1299,14 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 void gameTriggerSave(void) {
 	logWrite("game save");
 	systemUse();
-	tFile *pSave = diskFileOpen("save_story.tmp", "wb");
-	gameSave(pSave);
-	fileClose(pSave);
-	diskFileDelete("save_story.dat");
-	diskFileMove("save_story.tmp", "save_story.dat");
+	tFile *pFileSave = diskFileOpen("save_story.tmp", "wb");
+	if(pFileSave) {
+		gameSave(pFileSave);
+		fileClose(pFileSave);
+		diskFileDelete("save_story.dat");
+		diskFileMove("save_story.tmp", "save_story.dat");
+	}
+	settingsFileSave();
 	systemUnuse();
 }
 
