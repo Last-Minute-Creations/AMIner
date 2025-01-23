@@ -9,6 +9,7 @@
 #include <ace/utils/custom.h>
 #include <ace/utils/chunky.h>
 #include <ace/utils/disk_file.h>
+#include <ace/utils/string.h>
 #include <comm/gs_shop.h>
 #include <comm/page_questioning.h>
 #include <comm/page_office.h>
@@ -1299,12 +1300,19 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 void gameTriggerSave(void) {
 	logWrite("game save");
 	systemUse();
-	tFile *pFileSave = diskFileOpen("save_story.tmp", "wb");
+	UBYTE isStory = 1;
+	char szPathTmp[20], szPathDat[20];
+	char *pEndTmp = stringCopy("save_", szPathTmp);
+	pEndTmp = stringCopy(isStory ? "story" : "deadline", pEndTmp);
+	char *pEndDat = stringCopy(szPathTmp, szPathDat);
+	pEndTmp = stringCopy(".tmp", pEndTmp);
+	pEndDat = stringCopy(".dat", pEndDat);
+	tFile *pFileSave = diskFileOpen(szPathTmp, "wb");
 	if(pFileSave) {
 		gameSave(pFileSave);
 		fileClose(pFileSave);
-		diskFileDelete("save_story.dat");
-		diskFileMove("save_story.tmp", "save_story.dat");
+		diskFileDelete(szPathDat);
+		diskFileMove(szPathTmp, szPathDat);
 	}
 	settingsFileSave();
 	systemUnuse();
