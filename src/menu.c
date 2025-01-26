@@ -21,6 +21,7 @@
 #include "menu_list.h"
 #include "steer.h"
 #include "assets.h"
+#include "achievement.h"
 
 #define SFX_CHANNEL_ATARI 1
 #define MENU_OPTIONS_MAX 10
@@ -49,12 +50,14 @@ static void menuOnBackToMainFromSettings();
 static void menuOnEnterStory();
 static void menuOnEnterFree();
 static void menuOnEnterChallenge();
+static void menuOnEnterAchievements();
 static void menuOnEnterSettings();
 static void menuOnEnterCredits();
 
 //----------------------------------------------------------------- PRIVATE VARS
 
 static tState s_sStateMenuScore;
+static tState s_sStateMenuAchievements;
 
 static tMenuListOption s_pMenuOptions[MENU_OPTIONS_MAX];
 static UBYTE s_ubMenuOptionCount;
@@ -398,6 +401,10 @@ static void menuOnEnterChallenge(void) {
 	menuRedraw();
 }
 
+static void menuOnEnterAchievements(void) {
+	statePush(g_pGameStateManager, &s_sStateMenuAchievements);
+}
+
 static void menuOnEnterSettings(void) {
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
@@ -483,6 +490,13 @@ static void menuOnEnterMain(void) {
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnEnterChallenge}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_ACHIEVEMENTS],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnEnterAchievements}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
@@ -688,6 +702,131 @@ static void menuScoreGsDestroy(void) {
 	menuInitialDraw(); // g_pMainBuffer->pScroll->pFront
 }
 
+#define ACHIEVEMENT_ICON_SIZE 24
+#define ACHIEVEMENT_SELECTION_BORDER_WIDTH 2
+#define ACHIEVEMENT_BORDERED_ICON_SIZE (ACHIEVEMENT_ICON_SIZE + 2 * ACHIEVEMENT_SELECTION_BORDER_WIDTH)
+#define ACHIEVEMENTS_PER_ROW (COMM_DISPLAY_WIDTH / ACHIEVEMENT_BORDERED_ICON_SIZE)
+
+static tBitMap *s_pAchievementIcons;
+static UBYTE s_ubSelectedAchievement;
+
+static void menuDrawAchievementIcon(UBYTE ubIndex) {
+	UWORD uwX = (ubIndex % ACHIEVEMENTS_PER_ROW) * ACHIEVEMENT_BORDERED_ICON_SIZE;
+	UWORD uwY = (ubIndex / ACHIEVEMENTS_PER_ROW) * ACHIEVEMENT_BORDERED_ICON_SIZE;
+	tUwCoordYX sOrigin = commGetOriginDisplay();
+
+	if(ubIndex == s_ubSelectedAchievement) {
+		blitCopy(
+			g_pCommBmSelection, 9, 0,
+			commGetDisplayBuffer(), sOrigin.uwX + uwX,
+			sOrigin.uwY + uwY,
+			7, 7, MINTERM_COOKIE
+		);
+		blitCopy(
+			g_pCommBmSelection, 9, 7,
+			commGetDisplayBuffer(), sOrigin.uwX + uwX + ACHIEVEMENT_BORDERED_ICON_SIZE - 7,
+			sOrigin.uwY + uwY,
+			7, 7, MINTERM_COOKIE
+		);
+		blitCopy(
+			g_pCommBmSelection, 9, 14,
+			commGetDisplayBuffer(), sOrigin.uwX + uwX,
+			sOrigin.uwY + uwY + ACHIEVEMENT_BORDERED_ICON_SIZE - 7,
+			7, 7, MINTERM_COOKIE
+		);
+		blitCopy(
+			g_pCommBmSelection, 9, 21,
+			commGetDisplayBuffer(), sOrigin.uwX + uwX + ACHIEVEMENT_BORDERED_ICON_SIZE - 7,
+			sOrigin.uwY + uwY + ACHIEVEMENT_BORDERED_ICON_SIZE - 7,
+			7, 7, MINTERM_COOKIE
+		);
+	}
+	else {
+		commErase(uwX, uwY, ACHIEVEMENT_BORDERED_ICON_SIZE, ACHIEVEMENT_BORDERED_ICON_SIZE);
+	}
+
+	blitCopy(
+		s_pAchievementIcons, achievementIsUnlocked(ubIndex) ? ACHIEVEMENT_ICON_SIZE : 0, 0,
+		commGetDisplayBuffer(), sOrigin.uwX + uwX + 2, sOrigin.uwY + uwY + 2,
+		ACHIEVEMENT_ICON_SIZE, ACHIEVEMENT_ICON_SIZE, MINTERM_COOKIE
+	);
+}
+
+static void menuAchievementsGsCreate(void) {
+	commEraseAll();
+	s_pAchievementIcons = bitmapCreateFromPath("data/comm_achievements.bm", 0);
+	s_ubSelectedAchievement = 0;
+
+	for(UBYTE i = 0; i < 18; ++i) {
+		menuDrawAchievementIcon(i);
+	}
+
+	UWORD uwDescriptionY = 	3 * ACHIEVEMENT_BORDERED_ICON_SIZE - 2;
+	commDrawTitle(0, uwDescriptionY, "OSTATNI SPRAWIEDLIWY");
+	uwDescriptionY += commGetLineHeight() - 2;
+	commDrawMultilineText("Opis achievementa na dwie linie tekstu", 0, uwDescriptionY);
+
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT - 1,
+		"Nacisnij FIRE by wyjsc",
+		FONT_BOTTOM | FONT_HCENTER | FONT_SHADOW | FONT_COOKIE,
+		COMM_DISPLAY_COLOR_TEXT
+	);
+}
+
+static void menuAchievementsGsLoop(void) {
+	commProcess();
+	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+		statePop(g_pGameStateManager);
+		return;
+	}
+
+	BYTE bNewSelection = s_ubSelectedAchievement;
+	if(commNavUse(DIRECTION_LEFT)) {
+		if(bNewSelection % ACHIEVEMENTS_PER_ROW >= 1) {
+			--bNewSelection;
+		}
+		else {
+			bNewSelection = (bNewSelection / ACHIEVEMENTS_PER_ROW) * ACHIEVEMENTS_PER_ROW + (ACHIEVEMENTS_PER_ROW - 1);
+		}
+	}
+	if(commNavUse(DIRECTION_RIGHT)) {
+		if(bNewSelection % ACHIEVEMENTS_PER_ROW < (ACHIEVEMENTS_PER_ROW - 1)) {
+			++bNewSelection;
+		}
+		else {
+			bNewSelection = (bNewSelection / ACHIEVEMENTS_PER_ROW) * ACHIEVEMENTS_PER_ROW;
+		}
+	}
+	if(commNavUse(DIRECTION_UP)) {
+		bNewSelection -= ACHIEVEMENTS_PER_ROW;
+		if(bNewSelection < 0) {
+			bNewSelection += 18;
+		}
+	}
+	else if(commNavUse(DIRECTION_DOWN)) {
+		bNewSelection += ACHIEVEMENTS_PER_ROW;
+		if(bNewSelection >= 18) {
+			bNewSelection -= 18;
+		}
+	}
+
+	if(bNewSelection != s_ubSelectedAchievement) {
+		UBYTE ubPrevSelection = s_ubSelectedAchievement;
+		s_ubSelectedAchievement = bNewSelection;
+		menuDrawAchievementIcon(ubPrevSelection);
+		menuDrawAchievementIcon(s_ubSelectedAchievement);
+	}
+
+	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
+}
+
+static void menuAchievementsGsDestroy(void) {
+	bitmapDestroy(s_pAchievementIcons);
+
+	menuInitialDraw();
+}
+
 //------------------------------------------------------------------- PUBLIC FNS
 
 void menuPreload(void) {
@@ -727,4 +866,10 @@ static tState s_sStateMenuScore = {
 	.cbCreate = menuScoreGsCreate,
 	.cbLoop = menuScoreGsLoop,
 	.cbDestroy = menuScoreGsDestroy
+};
+
+static tState s_sStateMenuAchievements = {
+	.cbCreate = menuAchievementsGsCreate,
+	.cbLoop = menuAchievementsGsLoop,
+	.cbDestroy = menuAchievementsGsDestroy
 };

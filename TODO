@@ -118,8 +118,9 @@ General:
 		✔ Add achievement storage outside main game save @done(25-01-23)
 		✔ Unlock achievements in-game @done(25-01-23)
 		✔ Save achievements on commrade/game exit (same as game save + settings) @done(25-01-23)
+		✔ Display achievement icons in menu @done(25-01-26)
 		☐ Display achievement popup somehow
-		☐ Display achievements in menu
+		☐ Display proper achievement texts
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)

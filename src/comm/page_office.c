@@ -45,10 +45,10 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 
 	// Draw selection
 	if(bPos == s_bSelectionCurr) {
-		blitCopy(g_pCommBmSelection, 0, 0,  pBmDraw, uwX - 2, uwY - 2, 16, 9, MINTERM_COOKIE);
-		blitCopy(g_pCommBmSelection, 0, 9,  pBmDraw, uwX - 2 + 36 - 16, uwY - 2, 16, 9, MINTERM_COOKIE);
-		blitCopy(g_pCommBmSelection, 0, 18, pBmDraw, uwX - 2, uwY - 2 + 36 - 9, 16, 9, MINTERM_COOKIE);
-		blitCopy(g_pCommBmSelection, 0, 27, pBmDraw, uwX - 2 + 36 - 16, uwY - 2 + 36 - 9, 16, 9, MINTERM_COOKIE);
+		blitCopy(g_pCommBmSelection, 0, 0,  pBmDraw, uwX - 2, uwY - 2, 9, 9, MINTERM_COOKIE);
+		blitCopy(g_pCommBmSelection, 0, 9,  pBmDraw, uwX + 7 - 2 + 36 - 16, uwY - 2, 9, 9, MINTERM_COOKIE);
+		blitCopy(g_pCommBmSelection, 0, 18, pBmDraw, uwX - 2, uwY - 2 + 36 - 9, 9, 9, MINTERM_COOKIE);
+		blitCopy(g_pCommBmSelection, 0, 27, pBmDraw, uwX + 7 - 2 + 36 - 16, uwY - 2 + 36 - 9, 9, 9, MINTERM_COOKIE);
 	}
 
 	commDrawFaceAt(s_pActivePpl[bPos], uwRelativeX, uwRelativeY);
