@@ -7,6 +7,7 @@
 #include <comm/page_bribe.h>
 #include <comm/page_accounting.h>
 #include <comm/page_questioning.h>
+#include <comm/page_market.h>
 #include <comm/gs_shop.h>
 #include <comm/inbox.h>
 #include <comm/button.h>
@@ -44,10 +45,10 @@ static void officeDrawFaceAtPos(BYTE bPos) {
 
 	// Draw selection
 	if(bPos == s_bSelectionCurr) {
-		blitCopy(g_pCommBmSelection, 0, 0,  pBmDraw, uwX - 2, uwY - 2, 16, 9, MINTERM_COOKIE);
-		blitCopy(g_pCommBmSelection, 0, 9,  pBmDraw, uwX - 2 + 36 - 16, uwY - 2, 16, 9, MINTERM_COOKIE);
-		blitCopy(g_pCommBmSelection, 0, 18, pBmDraw, uwX - 2, uwY - 2 + 36 - 9, 16, 9, MINTERM_COOKIE);
-		blitCopy(g_pCommBmSelection, 0, 27, pBmDraw, uwX - 2 + 36 - 16, uwY - 2 + 36 - 9, 16, 9, MINTERM_COOKIE);
+		blitCopy(g_pCommBmSelection, 0, 0,  pBmDraw, uwX - 2, uwY - 2, 9, 9, MINTERM_COOKIE);
+		blitCopy(g_pCommBmSelection, 0, 9,  pBmDraw, uwX + 7 - 2 + 36 - 16, uwY - 2, 9, 9, MINTERM_COOKIE);
+		blitCopy(g_pCommBmSelection, 0, 18, pBmDraw, uwX - 2, uwY - 2 + 36 - 9, 9, 9, MINTERM_COOKIE);
+		blitCopy(g_pCommBmSelection, 0, 27, pBmDraw, uwX + 7 - 2 + 36 - 16, uwY - 2 + 36 - 9, 9, 9, MINTERM_COOKIE);
 	}
 
 	commDrawFaceAt(s_pActivePpl[bPos], uwRelativeX, uwRelativeY);
@@ -195,6 +196,7 @@ void pageOfficeReset(void) {
 	pageBribeReset();
 	pageAccountingReset();
 	pageQuestioningReset();
+	pageMarketReset();
 }
 
 void pageOfficeSave(tFile *pFile) {
@@ -207,6 +209,7 @@ void pageOfficeSave(tFile *pFile) {
 	pageBribeSave(pFile);
 	pageAccountingSave(pFile);
 	pageQuestioningSave(pFile);
+	pageMarketSave(pFile);
 	saveWriteTag(pFile, SAVE_TAG_OFFICE_END);
 }
 
@@ -223,6 +226,7 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 		pageBribeLoad(pFile) &&
 		pageAccountingLoad(pFile) &&
 		pageQuestioningLoad(pFile) &&
+		pageMarketLoad(pFile) &&
 		saveReadTag(pFile, SAVE_TAG_OFFICE_END);
 }
 

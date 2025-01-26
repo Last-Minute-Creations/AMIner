@@ -13,6 +13,12 @@
 #include "../vehicle.h"
 #include "../save.h"
 #include "../heat.h"
+#include "../achievement.h"
+
+#define ACCOUNTING_SLACKER_THRESHOLD 10
+
+static UWORD s_uwAccountingStreak;
+static UBYTE s_ubAccountingUses;
 
 static void pageAccountingProcess(void) {
 	BYTE bButtonPrev = buttonGetSelected(), bButtonCurr = bButtonPrev;
@@ -31,10 +37,15 @@ static void pageAccountingProcess(void) {
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 		if(planManagerGet()->isPlanActive) {
 			if(bButtonCurr == 0) {
+				++s_ubAccountingUses;
 				if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
+					if(++s_uwAccountingStreak >= ACCOUNTING_SLACKER_THRESHOLD) {
+						achievementUnlock(ACHIEVEMENT_SLACKER);
+					}
 					warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED_ACCOUNTING);
 				}
 				else {
+					s_uwAccountingStreak = 0;
 					gameAddRebuke();
 				}
 
@@ -75,17 +86,26 @@ void pageAccountingCreate(void) {
 }
 
 void pageAccountingReset(void) {
+	s_uwAccountingStreak = 0;
+	s_ubAccountingUses = 0;
 }
 
 void pageAccountingSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_ACCOUNTING);
+	fileWrite(pFile, &s_uwAccountingStreak, sizeof(s_uwAccountingStreak));
+	fileWrite(pFile, &s_ubAccountingUses, sizeof(s_ubAccountingUses));
 	saveWriteTag(pFile, SAVE_TAG_ACCOUNTING_END);
-	// TODO: number of accounting operations for post-game stats - move with bribe/favor to some generalized stats chunk?
 }
 
 UBYTE pageAccountingLoad(tFile *pFile) {
 	if(!saveReadTag(pFile, SAVE_TAG_ACCOUNTING)) {
 		return 0;
 	}
+	fileRead(pFile, &s_uwAccountingStreak, sizeof(s_uwAccountingStreak));
+	fileRead(pFile, &s_ubAccountingUses, sizeof(s_ubAccountingUses));
 	return saveReadTag(pFile, SAVE_TAG_ACCOUNTING_END);
+}
+
+UBYTE pageAccountingGetUses(void) {
+	return s_ubAccountingUses;
 }

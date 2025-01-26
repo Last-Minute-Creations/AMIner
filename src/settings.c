@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "settings.h"
+#include <ace/managers/log.h>
+#include <ace/utils/disk_file.h>
 #include "save.h"
 
 // Default config
@@ -29,6 +31,7 @@ static UBYTE settingsLoad(tFile*pFile) {
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
 	fileRead(pFile, &g_sSettings.ubSokoUnlock, sizeof(g_sSettings.ubSokoUnlock));
+	fileRead(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
 	return saveReadTag(pFile, SAVE_TAG_SETTINGS_END);
 }
 
@@ -37,15 +40,18 @@ static void settingsReset(void) {
 	g_sSettings.is2pKbd = 1;
 	g_sSettings.isAtariHidden = 1;
 	g_sSettings.ubSokoUnlock = 0;
+	g_sSettings.ulAchievementsUnlocked = 0;
 }
 
 //------------------------------------------------------------------- PUBLIC FNS
 
 void settingsFileSave(void) {
-	tFile *pFileSettings = diskFileOpen("settings.dat", "wb");
+	tFile *pFileSettings = diskFileOpen("settings.tmp", "wb");
 	if(pFileSettings) {
 		settingsSave(pFileSettings);
 		fileClose(pFileSettings);
+		diskFileDelete("settings.dat");
+		diskFileMove("settings.tmp", "settings.dat");
 		logWrite("Saved settings\n");
 	}
 }
@@ -63,4 +69,12 @@ void settingsFileLoad(void) {
 
 		fileClose(pFileSettings);
 	}
+}
+
+UBYTE settingsTryUnlockAchievement(UBYTE ubAchievementIndex) {
+	if(g_sSettings.ulAchievementsUnlocked & BV(ubAchievementIndex)) {
+		return 0;
+	}
+	g_sSettings.ulAchievementsUnlocked |= BV(ubAchievementIndex);
+	return 1;
 }

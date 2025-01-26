@@ -22,7 +22,7 @@ typedef enum tQuestioningFlag {
 	QUESTIONING_FLAG_GATE = BV(QUESTIONING_BIT_GATE),
 	QUESTIONING_FLAG_TELEPORT_PARTS = BV(QUESTIONING_BIT_TELEPORT_PARTS),
 	QUESTIONING_FLAG_AGENT = BV(QUESTIONING_BIT_AGENT),
-	QUESTIONING_FLAG_END ///< Not really a bit, used for iterating
+	QUESTIONING_FLAG_ALL = (BV(QUESTIONING_BIT_COUNT) - 1)
 } tQuestioningFlag;
 
 typedef void (*tQuestioningHandler)(tQuestioningBit eQuestioningBit, UBYTE isReportedOrCaught);
@@ -48,5 +48,9 @@ const tCommShopPage *pageQuestioningGetNotReportedPages(void);
 void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily);
 
 void pageQuestioningAddReporting(tQuestioningBit eQuestioningBit);
+
+UBYTE pageQuestioningIsAnyReported(void);
+
+UBYTE pageQuestioningGetLiesCount(void);
 
 #endif // _AMINER_COMM_PAGE_QUESTIONING_H_

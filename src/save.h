@@ -46,6 +46,8 @@
 #define SAVE_TAG_VEHICLE_END "VHCE"
 #define SAVE_TAG_WAREHOUSE "WHS1"
 #define SAVE_TAG_WAREHOUSE_END "WHSE"
+#define SAVE_TAG_MARKET "MKT1"
+#define SAVE_TAG_MARKET_END "MKTE"
 
 UBYTE saveReadTag(tFile *pFile, const char *szHeader);
 

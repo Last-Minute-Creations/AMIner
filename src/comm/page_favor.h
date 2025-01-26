@@ -15,4 +15,6 @@ void pageFavorSave(tFile *pFile);
 
 UBYTE pageFavorLoad(tFile *pFile);
 
+UBYTE pageFavorGetUses(void);
+
 #endif // _AMINER_COMM_PAGE_FAVOR_H_

@@ -12,6 +12,8 @@
 #include "game.h"
 #include "core.h"
 #include "tile.h"
+#include "dino.h"
+#include "achievement.h"
 
 #define PRISONER_ANIM_COOLDOWN 6
 
@@ -99,6 +101,13 @@ UBYTE questGateAddFragment(void) {
 void questGateMarkExploded(void) {
 	s_eGateQuestState = QUEST_GATE_STATE_EXPLODED;
 	collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, 0);
+	achievementUnlock(ACHIEVEMENT_LOST_WISDOM);
+	if(
+		!s_isPrisonerFound && !dinoIsQuestStarted() &&
+		!pageQuestioningIsReported(QUESTIONING_BIT_GATE)
+	) {
+		achievementUnlock(ACHIEVEMENT_NO_WITNESSES);
+	}
 }
 
 UBYTE questGateIsExploded(void) {

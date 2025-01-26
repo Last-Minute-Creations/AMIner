@@ -15,4 +15,6 @@ void pageAccountingSave(tFile *pFile);
 
 UBYTE pageAccountingLoad(tFile *pFile);
 
+UBYTE pageAccountingGetUses(void);
+
 #endif // _AMINER_COMM_PAGE_ACCOUNTING_H_

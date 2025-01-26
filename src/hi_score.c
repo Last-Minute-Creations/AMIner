@@ -12,6 +12,7 @@
 #include "defs.h"
 #include "assets.h"
 #include "game.h"
+#include "achievement.h"
 
 #define SCORE_NAME_LENGTH 20
 #define SCORE_COUNT 10
@@ -188,6 +189,12 @@ void hiScoreSetup(LONG lScore, const char *szResult) {
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		if(s_pScores[i].lScore < lScore) {
 			s_isEnteringHiScore = 1;
+			if(g_isChallenge) {
+				achievementUnlock(ACHIEVEMENT_RECORD_HOLDER);
+				if(g_isAtari) {
+					achievementUnlock(ACHIEVEMENT_MORE_COAL);
+				}
+			}
 			s_isShift = 0;
 			s_isCursor = 0;
 			s_ulCursorStart = timerGet();

@@ -16,6 +16,7 @@ typedef struct tSettings {
 	UBYTE is2pKbd;
 	UBYTE isAtariHidden;
 	UBYTE ubSokoUnlock;
+	ULONG ulAchievementsUnlocked;
 } tSettings;
 
 extern tSettings g_sSettings;
@@ -24,5 +25,6 @@ void settingsFileSave(void);
 
 void settingsFileLoad(void);
 
+UBYTE settingsTryUnlockAchievement(UBYTE ubAchievementIndex);
 
 #endif // SETTINGS_H

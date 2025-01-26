@@ -15,4 +15,6 @@ void pageBribeSave(tFile *pFile);
 
 UBYTE pageBribeLoad(tFile *pFile);
 
+UBYTE pageBribeGetCount(void);
+
 #endif // _AMINER_COMM_PAGE_BRIBE_H_

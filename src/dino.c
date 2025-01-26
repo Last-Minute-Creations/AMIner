@@ -13,6 +13,7 @@
 #include "comm/gs_shop.h"
 #include "comm/inbox.h"
 #include "comm/page_office.h"
+#include "achievement.h"
 
 typedef enum tDinoState {
 	DINO_STATE_WAITING_FOR_FIRST_BONE,
@@ -91,6 +92,7 @@ void dinoProcess(void) {
 		case DINO_STATE_WAITING_FOR_RECEIVING_ACCOLADE:
 			if(commShopIsActive()) {
 				gameAddAccolade();
+				achievementUnlock(ACHIEVEMENT_ARCHEO_ENTUSIAST);
 				++s_eQuestState;
 			}
 			break;

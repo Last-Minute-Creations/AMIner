@@ -28,6 +28,7 @@
 #include "inbox.h"
 #include "menu.h"
 #include "tutorial.h"
+#include "achievement.h"
 #include "settings.h"
 
 static tCommTab s_eTab;
@@ -383,12 +384,16 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageListCreate(eFace, officeGetPagesForFace(eFace));
 		} break;
 		case COMM_SHOP_PAGE_NEWS_ACCOLADES:
+			achievementUnlock(ACHIEVEMENT_WORK_LEADER);
+			achievementTryUnlockRighteous();
 			pageNewsCreate(NEWS_KIND_ACCOLADES);
 			break;
 		case COMM_SHOP_PAGE_NEWS_GATE_ENEMY:
+			achievementUnlock(ACHIEVEMENT_ARCHEO_VICTIM);
 			pageNewsCreate(NEWS_KIND_GATE_ENEMY);
 			break;
 		case COMM_SHOP_PAGE_NEWS_GATE_RED:
+			achievementUnlock(ACHIEVEMENT_BATTLE_OF_CENTURY);
 			pageNewsCreate(NEWS_KIND_GATE_RED);
 			break;
 		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_AGENT:
