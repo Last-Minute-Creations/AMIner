@@ -119,7 +119,8 @@ General:
 		✔ Unlock achievements in-game @done(25-01-23)
 		✔ Save achievements on commrade/game exit (same as game save + settings) @done(25-01-23)
 		✔ Display achievement icons in menu @done(25-01-26)
-		☐ Display achievement popup somehow
+		☐ Test if all achievements pop up properly on hud (especially ending ones)
+		☐ Display achievement unlock text with achievement name + icon
 		☐ Display proper achievement texts
 
 Bugs:
@@ -129,10 +130,10 @@ Bugs:
 	✔ Loading screen trashing memory after pristine buffer change @done(25-01-20)
 	✔ Distorted main base in challenge mode @done(25-01-22)
 	✔ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time @done(25-01-22)
+	✔ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up
 	☐ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place
 	☐ Game doesn't launch properly from icon
 	☐ Warehouse corruption (after entering accounting?)
-	☐ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up
 
 Misc QoL refinements:
 	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)
@@ -256,6 +257,7 @@ Missing graphics:
 	☐ Scientist portrait
 	☐ Jay portrait small
 	☐ Jay portrait large final
+	☐ After-invasion newscaster
 	☐ Protest banners on factory
 	☐ Sci base final
 	☐ News slides for each ending
