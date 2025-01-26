@@ -347,6 +347,9 @@ void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth) {
 }
 
 void hudSetCash(UBYTE ubPlayer, LONG lCash) {
+	if(lCash > 99999) {
+		lCash = 99999;
+	}
 	s_pPlayerData[ubPlayer].lCash = lCash;
 }
 

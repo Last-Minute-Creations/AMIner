@@ -100,6 +100,7 @@ General:
 		✔ Make flipbook code use 32- or 48-wide bobs @done(25-01-18)
 		✔ Teleport using new animation @done(25-01-19)
 		✘ Up/down options @cancelled(25-01-16)
+	✔ Limit cash to prevent trashing of message icon? @done(25-01-26)
 	☐ Portable teleport as a vehicle upgrade
 		✔ Return option in fast travel teleporter @done(25-01-16)
 		✔ Remove debug teleport return button @done(25-01-16)
@@ -111,7 +112,6 @@ General:
 		☐ Smoke
 		☐ Ufo?
 		☐ Clouds?
-	☐ Limit cash to prevent trashing of message icon?
 	☐ Add 2s pauses between music tracks?
 	☐ Achievements
 		✔ Transfer achievements from Miro to GDD @done(25-01-23)
