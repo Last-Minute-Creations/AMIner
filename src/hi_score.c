@@ -5,7 +5,6 @@
 #include "hi_score.h"
 #include <ace/managers/key.h>
 #include <ace/managers/system.h>
-#include <ace/managers/timer.h>
 #include <ace/utils/bitmap.h>
 #include <ace/utils/disk_file.h>
 #include <comm/comm.h>
@@ -44,7 +43,7 @@ static UBYTE s_ubNewScorePos;
 static UBYTE s_isEnteringHiScore;
 static UBYTE s_isShift = 0;
 static UBYTE s_isCursor = 0;
-static ULONG s_ulCursorStart = 0;
+static UBYTE s_ubBlinkTicks = 0;
 
 void hiScoreLoad(void) {
 	systemUse();
@@ -167,9 +166,9 @@ void hiScoreEnteringProcess(void) {
 			isUpdateNeeded = 0;
 		}
 	}
-	ULONG ulDelta = timerGetDelta(s_ulCursorStart, timerGet());
-	if(ulDelta >= SCORE_CURSOR_BLINK_TICKS) {
-		s_ulCursorStart += SCORE_CURSOR_BLINK_TICKS;
+
+	if(++s_ubBlinkTicks >= SCORE_CURSOR_BLINK_TICKS) {
+		s_ubBlinkTicks = 0;
 		s_isCursor = !s_isCursor;
 		isUpdateNeeded = 1;
 	}
@@ -197,7 +196,7 @@ void hiScoreSetup(LONG lScore, const char *szResult) {
 			}
 			s_isShift = 0;
 			s_isCursor = 0;
-			s_ulCursorStart = timerGet();
+			s_ubBlinkTicks = 0;
 			s_ubNewScorePos = i;
 
 			// Move worse score down

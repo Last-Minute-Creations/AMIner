@@ -138,7 +138,6 @@ Bugs:
 Misc QoL refinements:
 	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)
 	✔ Skippable LMC/ACE logos by fire button @done(24-07-07)
-	☐ Onboard player on need to maintain income
 
 Commrade:
 	✔ Mineral market @done(23-09-16)
@@ -149,7 +148,7 @@ Commrade:
 		✔ Persistent unlock after Jay quest @done(25-01-22)
 		✔ Enter via pressing fire on warehouse button @done(25-01-22)
 		✔ Add option to exit the sokoban page @done(25-01-22)
-	☐ Redo warehouse/plan management
+	✘ Redo warehouse/plan management @cancelled(25-01-26)
 
 Optimizations:
 	✔ Comm message page loading @done(23-09-07)
@@ -159,9 +158,9 @@ Optimizations:
 	✔ Use pristine buffer for bobs @done(25-01-20)
 	✔ Workshop tab flicker on navigating @done(25-01-21)
 	✔ Strip symbols from release builds @done(25-01-22)
-	☐ Font drawing? - quasi-register values inside font file
+	✘ Font drawing? - quasi-register values inside font file @cancelled(25-01-26)
+	✘ Excavated ground overlay - custom blitter code? @cancelled(25-01-26)
 	☐ Gate collectibles draw?
-	☐ Excavated ground overlay - custom blitter code?
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
 	☐ Pakfile + compression of data files?
 	☐ Shrinkler for exe?
@@ -241,6 +240,20 @@ Deadline mode:
 	☐ Use separate save file
 	☐ Use separate high scores
 	☐ Add intro text
+
+Protests:
+	☐ Warning message on 1st negative cash threshold
+	☐ Protest phase on 2nd negative cash threshold
+		☐ Display banner
+		☐ Commrade message
+	☐ Strike phase on 3rd negative cash threshold
+		☐ Display banner
+		☐ Commrade message
+	☐ Turmoil phase on 4th negative cash threshold
+		☐ Display extra gfx
+		☐ Trigger ending
+	☐ Make sure that messages retrigger after re-entering phase
+	☐ Make sure that graphics (un)load on re-entering phases
 
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)
