@@ -7,6 +7,7 @@
 #include <ace/managers/system.h>
 #include <ace/utils/bitmap.h>
 #include <ace/utils/disk_file.h>
+#include <ace/utils/string.h>
 #include <comm/comm.h>
 #include "defs.h"
 #include "assets.h"
@@ -16,6 +17,7 @@
 #define SCORE_NAME_LENGTH 20
 #define SCORE_COUNT 10
 #define SCORE_CURSOR_BLINK_TICKS 25 // 25 ticks = 500ms
+#define SCORE_RESULT_MSG_MAX 40
 
 typedef struct _tHiScore {
 	LONG lScore;
@@ -37,13 +39,13 @@ static tHiScore s_pPrevScores[SCORE_COUNT] = {
 	{.lScore = 1, .szName = "Score"},
 };
 
-
 static UBYTE s_ubNewNameLength;
 static UBYTE s_ubNewScorePos;
 static UBYTE s_isEnteringHiScore;
 static UBYTE s_isShift = 0;
 static UBYTE s_isCursor = 0;
 static UBYTE s_ubBlinkTicks = 0;
+static char s_szResultMsg[SCORE_RESULT_MSG_MAX];
 
 void hiScoreLoad(void) {
 	systemUse();
@@ -75,7 +77,7 @@ static void hiScoreSave(void) {
 }
 
 static void hiScoreDrawPosition(UBYTE ubPos) {
-	UWORD uwY = 5 + (ubPos * 10);
+	UWORD uwY = ubPos * 10;
 
 	// Clear BG
 	commErase(0, uwY, COMM_DISPLAY_WIDTH, commGetLineHeight());
@@ -103,8 +105,14 @@ void hiScoreDrawAll(void) {
 
 	// End text
 	commErase(
-		0, COMM_DISPLAY_HEIGHT - g_pFont->uwHeight,
-		COMM_DISPLAY_WIDTH, g_pFont->uwHeight
+		0, COMM_DISPLAY_HEIGHT - g_pFont->uwHeight * 2,
+		COMM_DISPLAY_WIDTH, g_pFont->uwHeight * 2
+	);
+
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT - g_pFont->uwHeight, s_szResultMsg,
+		FONT_LAZY | FONT_COOKIE | FONT_HCENTER | FONT_BOTTOM,
+		COMM_DISPLAY_COLOR_TEXT
 	);
 	const char *szMsg = (
 		g_pMsgs[hiScoreIsEnteringNew() ? MSG_HI_SCORE_NEW : MSG_HI_SCORE_PRESS]
@@ -183,6 +191,7 @@ UBYTE hiScoreIsEnteringNew(void) {
 }
 
 void hiScoreSetup(LONG lScore, const char *szResult) {
+	stringCopyLimited(szResult, s_szResultMsg, SCORE_RESULT_MSG_MAX);
 	s_isEnteringHiScore = 0;
 	s_ubNewNameLength = 0;
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
