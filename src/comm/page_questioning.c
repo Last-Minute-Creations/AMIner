@@ -160,6 +160,7 @@ UBYTE pageQuestioningLoad(tFile *pFile) {
 	fileRead(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
 	fileRead(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
 	fileRead(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
+	fileRead(pFile, &s_uwLiesCount, sizeof(s_uwLiesCount));
 	return saveReadTag(pFile, SAVE_TAG_QUESTIONING_END);
 }
 
