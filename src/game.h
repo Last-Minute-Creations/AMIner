@@ -46,6 +46,8 @@ void gameGsLoopEnterScore(void);
 
 void gameInitBobs(void);
 
+UBYTE gameIsRangeVisibleOnCamera(UWORD uwStartY, UWORD uwEndY);
+
 UBYTE gameCanPushBob(const tBob *pBob);
 
 UBYTE gameTryPushBob(tBob *pBob);

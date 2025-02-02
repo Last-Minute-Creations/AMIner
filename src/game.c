@@ -1141,13 +1141,19 @@ void gameInitBobs(void) {
 	modeMenuInitBob(&s_pModeMenus[1]);
 }
 
-UBYTE gameCanPushBob(const tBob *pBob) {
+UBYTE gameIsRangeVisibleOnCamera(UWORD uwStartY, UWORD uwEndY) {
 	const tRedrawState *pBufferState = &g_pMainBuffer->pRedrawStates[g_pMainBuffer->ubStateIdx];
 	UBYTE isOnCamera = (
-		pBob->sPos.uwY >= (((pBufferState->sMarginU.wTilePos + 1) << TILE_SHIFT)) &&
-		pBob->sPos.uwY + pBob->uwHeight <= ((pBufferState->sMarginD.wTilePos) << TILE_SHIFT)
+		uwStartY >= (((pBufferState->sMarginU.wTilePos + 1) << TILE_SHIFT)) &&
+		uwEndY <= ((pBufferState->sMarginD.wTilePos) << TILE_SHIFT)
 	);
 	return isOnCamera;
+}
+
+UBYTE gameCanPushBob(const tBob *pBob) {
+	return gameIsRangeVisibleOnCamera(
+		pBob->sPos.uwY, pBob->sPos.uwY + pBob->uwHeight
+	);
 }
 
 UBYTE gameTryPushBob(tBob *pBob) {

@@ -6,8 +6,10 @@
 #include <comm/page_office.h>
 #include <comm/page_questioning.h>
 #include <comm/inbox.h>
-#include <save.h>
-#include <hud.h>
+#include "save.h"
+#include "hud.h"
+#include "game.h"
+#include "base.h"
 
 #define QUEST_CRATE_MIN_SELLS_FOR_ESCAPE 5
 
@@ -140,10 +142,13 @@ tCapsuleState questCrateGetCapsuleState(void) {
 
 void questCrateProcessBase(void) {
 	if(!s_isScientistUnlocked) {
-		pageOfficeUnlockPerson(FACE_ID_SCIENTIST);
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME);
-		inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME, 0);
-		hudShowMessage(FACE_ID_SCIENTIST, g_pMsgs[MSG_HUD_SCI_WELCOME]);
-		s_isScientistUnlocked = 1;
+		const tBase *pBase = baseGetCurrent();
+		if(gameIsRangeVisibleOnCamera(pBase->sPosTeleport.uwY, pBase->sPosTeleport.uwY + 32)) {
+			pageOfficeUnlockPerson(FACE_ID_SCIENTIST);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME);
+			inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME, 0);
+			hudShowMessage(FACE_ID_SCIENTIST, g_pMsgs[MSG_HUD_SCI_WELCOME]);
+			s_isScientistUnlocked = 1;
+		}
 	}
 }
