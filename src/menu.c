@@ -235,6 +235,13 @@ static void menuRedraw(void) {
 
 static UBYTE menuLoadSummaryFromSave(const char *szPath, tGameSummary *pSummary) {
 	systemUse();
+
+	if(!diskFileExists(szPath)) {
+		logWrite("No save file to load summary file from\n");
+		systemUnuse();
+		return 0;
+	}
+
 	tFile *pFileSave = diskFileOpen(szPath, "rb");
 	if(!pFileSave) {
 		logWrite("ERR: Save file not found\n");
