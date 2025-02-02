@@ -99,8 +99,8 @@ static void menuStartGame(UBYTE isChallenge) {
 	commProgressInit();
 	gameStart(
 		isChallenge,
-		g_sSettings.is1pKbd ? steerInitKey(STEER_KEYMAP_WSAD) : steerInitJoy(0),
-		g_sSettings.is2pKbd ? steerInitKey(STEER_KEYMAP_ARROWS) : steerInitJoy(1)
+		g_sSettings.is1pKbd ? steerInitFromMode(STEER_MODE_KEY_WSAD) : steerInitFromMode(STEER_MODE_JOY_1),
+		g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_KEY_ARROWS) : steerInitFromMode(STEER_MODE_JOY_2)
 	);
 	commHide();
 	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
@@ -113,8 +113,8 @@ static void menuLoadGame(const char *szSavePath) {
 	commProgressInit();
 	gameStart(
 		1, // challenge loading is faster due to less terrain prep
-		g_sSettings.is1pKbd ? steerInitKey(STEER_KEYMAP_WSAD) : steerInitJoy(0),
-		g_sSettings.is2pKbd ? steerInitKey(STEER_KEYMAP_ARROWS) : steerInitJoy(1)
+		g_sSettings.is1pKbd ? steerInitFromMode(STEER_MODE_KEY_WSAD) : steerInitFromMode(STEER_MODE_JOY_1),
+		g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_KEY_ARROWS) : steerInitFromMode(STEER_MODE_JOY_2)
 	);
 
 	systemUse();
@@ -543,7 +543,7 @@ static void menuOnBackToMain(void) {
 
 static void menuOnBackToMainFromSettings(void) {
 	// Update the 2nd port steer to prevent interfering with mouse
-	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitIdle() : steerInitJoy(STEER_MODE_JOY_2);
+	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_IDLE) : steerInitFromMode(STEER_MODE_JOY_2);
 
 	settingsFileSave();
 	menuOnEnterMain();
@@ -843,10 +843,10 @@ void menuPreload(void) {
 	settingsFileLoad();
 
 	// Init all steers except joy2 if not explicitly selected, because mouse may be connected there
-	s_pMenuSteers[0] = steerInitJoy(STEER_MODE_JOY_1);
-	s_pMenuSteers[1] = steerInitKey(STEER_KEYMAP_WSAD);
-	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitIdle() : steerInitJoy(STEER_MODE_JOY_2);
-	s_pMenuSteers[3] = steerInitKey(STEER_KEYMAP_ARROWS);
+	s_pMenuSteers[0] = steerInitFromMode(STEER_MODE_JOY_1);
+	s_pMenuSteers[1] = steerInitFromMode(STEER_MODE_KEY_WSAD);
+	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_IDLE) : steerInitFromMode(STEER_MODE_JOY_2);
+	s_pMenuSteers[3] = steerInitFromMode(STEER_MODE_KEY_ARROWS);
 }
 
 void menuUnload(void) {

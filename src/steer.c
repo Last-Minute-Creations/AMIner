@@ -67,6 +67,30 @@ static void onIdle(UNUSED_ARG tSteer *pSteer) {
 	// Do nothing
 }
 
+static tSteer steerInitJoy(UBYTE ubJoy) {
+	tSteer sSteer = {
+		.cbProcess = onJoy,
+		.ubJoy = ubJoy
+	};
+	return sSteer;
+}
+
+static tSteer steerInitKey(tSteerKeymap eKeymap) {
+	tSteer sSteer = {
+		.cbProcess = onKey,
+		.eKeymap = eKeymap
+	};
+	return sSteer;
+}
+
+static tSteer steerInitIdle(void) {
+	tSteer sSteer = {
+		.cbProcess = onIdle
+	};
+	return sSteer;
+}
+
+
 //------------------------------------------------------------------- PUBLIC FNS
 
 tSteer steerInitFromMode(tSteerMode eMode) {
@@ -82,29 +106,6 @@ tSteer steerInitFromMode(tSteerMode eMode) {
 		default:
 			return steerInitIdle();
 	}
-}
-
-tSteer steerInitJoy(UBYTE ubJoy) {
-	tSteer sSteer = {
-		.cbProcess = onJoy,
-		.ubJoy = ubJoy
-	};
-	return sSteer;
-}
-
-tSteer steerInitKey(tSteerKeymap eKeymap) {
-	tSteer sSteer = {
-		.cbProcess = onKey,
-		.eKeymap = eKeymap
-	};
-	return sSteer;
-}
-
-tSteer steerInitIdle(void) {
-	tSteer sSteer = {
-		.cbProcess = onIdle
-	};
-	return sSteer;
 }
 
 void steerProcess(tSteer *pSteer) {

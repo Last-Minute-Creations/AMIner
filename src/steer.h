@@ -48,13 +48,7 @@ typedef struct tSteer {
 
 tSteer steerInitFromMode(tSteerMode eMode);
 
-tSteer steerInitJoy(UBYTE ubJoy);
-
-tSteer steerInitKey(tSteerKeymap eKeymap);
-
 void steerProcess(tSteer *pSteer);
-
-tSteer steerInitIdle(void);
 
 UBYTE steerIsPlayer(const tSteer *pSteer);
 
