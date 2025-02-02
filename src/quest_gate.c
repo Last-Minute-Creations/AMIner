@@ -123,6 +123,7 @@ UBYTE questGateGetMaxFragmentCount(void) {
 }
 
 void questGateUnlockPrisoner(void) {
+	s_isPrisonerFound = 1;
 	hudShowMessage(
 		FACE_ID_MIETEK,
 		"Panie derektorze, wyglada na wyglodzonego.\nPrzywiezie go Pan do bazy."
