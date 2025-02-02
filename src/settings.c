@@ -69,6 +69,10 @@ void settingsFileLoad(void) {
 
 		fileClose(pFileSettings);
 	}
+	else {
+		logWrite("ERR: Can't load settings - restoring defaults\n");
+		settingsReset();
+	}
 }
 
 UBYTE settingsTryUnlockAchievement(UBYTE ubAchievementIndex) {
