@@ -984,7 +984,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			if(pVehicle->fDy > 2 * fix16_one) {
 				// vehicleHullDamage(pVehicle, fix16_to_int(pVehicle->fDy - 4 * fix16_one));
 				vehicleHullDamage(pVehicle, fix16_to_int(fix16_mul(
-					pVehicle->fDy - 2 * fix16_one, fix16_one * 8
+					pVehicle->fDy - 2 * fix16_one, fix16_one * 4
 				)));
 			}
 			pVehicle->fDy = 0;
@@ -1269,7 +1269,7 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				tTile eTile = g_pMainBuffer->pTileData[pVehicle->sDrillTile.uwX][pVehicle->sDrillTile.uwY];
 				vehicleExcavateTile(pVehicle, pVehicle->sDrillTile.uwX, pVehicle->sDrillTile.uwY);
 				if(eTile == TILE_MAGMA_1 || eTile == TILE_MAGMA_2) {
-					vehicleHullDamage(pVehicle, 80 + (randUw(&g_sRand) & 0x7) * 2 - inventoryGetPartDef(INVENTORY_PART_HULL)->ubLevel * 16);
+					vehicleHullDamage(pVehicle, 5 + (randUw(&g_sRand) & 0x7));
 				}
 
 				if(pVehicle->ubDrillDir == DRILL_DIR_H) {
