@@ -132,6 +132,7 @@ From QA tests:
 	☐ Display time on HUD instead of cash when in mine
 	☐ Make the sideways drilling smooth between tiles
 	☐ Teleporter shouldn't be accessible from start
+	☐ Tab blink should reset to green state on navigation
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
