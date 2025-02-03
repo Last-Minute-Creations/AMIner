@@ -127,12 +127,12 @@ General:
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)
 	✔ Make HUD messages slower @done(25-02-03)
+	✔ Tab blink should reset to green state on navigation @done(25-02-03)
 	☐ It's not clear what to do with negative cash
 	☐ Make sure there is message for each accolade received (plans!)
 	☐ Display time on HUD instead of cash when in mine
 	☐ Make the sideways drilling smooth between tiles
 	☐ Teleporter shouldn't be accessible from start
-	☐ Tab blink should reset to green state on navigation
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)

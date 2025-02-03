@@ -31,6 +31,8 @@
 #include "achievement.h"
 #include "settings.h"
 
+#define LED_BLINK_COUNTER_MAX 15
+
 static tCommTab s_eTab;
 static tCommShopPage s_eCurrentPage;
 static tCommShopPage s_eCameFrom;
@@ -168,6 +170,8 @@ static void commGsShopLoop(void) {
 		}
 
 		if(s_eTab != eOldTab) {
+			commSetActiveLed(s_eTab);
+			s_ubLedBlinkCounter = 0;
 			tCommShopPage ePage = commShopTabToPage(s_eTab);
 			commShopChangePage(s_eCurrentPage, ePage);
 			return;
@@ -177,9 +181,9 @@ static void commGsShopLoop(void) {
 			commSetActiveLed(s_eTab);
 		}
 		else {
-			if(++s_ubLedBlinkCounter > 15) {
-				commSetActiveLed(s_ubLedBlinkState ? s_eTab : COMM_TAB_COUNT);
+			if(++s_ubLedBlinkCounter > LED_BLINK_COUNTER_MAX) {
 				s_ubLedBlinkState = !s_ubLedBlinkState;
+				commSetActiveLed(s_ubLedBlinkState ? s_eTab : COMM_TAB_COUNT);
 				s_ubLedBlinkCounter = 0;
 			}
 		}
@@ -216,6 +220,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 
 	if(s_eTabNavigationState != TAB_NAVIGATION_STATE_ENABLED) {
 		commSetActiveLed(s_eTab);
+		s_ubLedBlinkCounter = 0;
 	}
 	commEraseAll();
 
