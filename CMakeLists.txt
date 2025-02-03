@@ -339,6 +339,27 @@ convertTileset(
 	TILE_PATHS ${GATE_FRAGS}
 )
 
+#---------------------------------------------------------------- WORKSHOP_ICONS
+file(MAKE_DIRECTORY ${GEN_DIR}/workshop_icons)
+
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/commrade/workshop_icons.png
+	GENERATED_FILE_LIST "FRAMES_WORKSHOP_ICONS"
+	DESTINATIONS
+	${GEN_DIR}/workshop_icons/0.png 0    4 64 56 # drill
+	${GEN_DIR}/workshop_icons/1.png 0   71 64 56 # hull
+	${GEN_DIR}/workshop_icons/2.png 0  258 64 56 # cargo
+	${GEN_DIR}/workshop_icons/3.png 0  323 64 56 # tnt
+	${GEN_DIR}/workshop_icons/4.png 0  200 64 56 # teleport
+	${GEN_DIR}/workshop_icons/5.png 64  22 64 56 # platform
+	${GEN_DIR}/workshop_icons/6.png 0  200 64 56 # workshop
+)
+
+convertTileset(
+	TARGET ${GAME_EXECUTABLE} SIZE 64 HEIGHT 56
+	SOURCE ${GEN_DIR}/workshop_icons DESTINATION ${GEN_DIR}/workshop_icons.png
+	TILE_PATHS ${FRAMES_WORKSHOP_ICONS}
+)
+
 #---------------------------------------------------------------------- TILESETS
 
 include("base0.cmake")
@@ -399,7 +420,7 @@ convertBitmaps(
 		${RES_DIR}/commrade/bg.png ${RES_DIR}/commrade/buttons.png ${RES_DIR}/commrade/faces_hud.png
 		${RES_DIR}/commrade/jay.png ${RES_DIR}/hud.png ${RES_DIR}/logo.png ${RES_DIR}/lang_select.png
 		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png ${RES_DIR}/commrade/news.png
-		${RES_DIR}/commrade/soko.png ${RES_DIR}/commrade/workshop_icons.png ${RES_DIR}/commrade/achievements.png
+		${RES_DIR}/commrade/soko.png ${GEN_DIR}/workshop_icons.png ${RES_DIR}/commrade/achievements.png
 		${GEN_DIR}/bg_factory_drip.png ${RES_DIR}/mode_icons.png
 	DESTINATIONS
 		${DATA_DIR}/comm_bg.bm ${DATA_DIR}/comm_buttons.bm ${DATA_DIR}/comm_faces.bm

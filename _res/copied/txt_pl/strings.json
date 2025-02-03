@@ -1,5 +1,5 @@
 {
-	"shopNames": ["Wiertło", "Ładownia", "Kadłub", "Karbid", "Teleport"],
+	"shopNames": ["Wiertło", "Ładownia", "Kadłub", "Karbid", "Przenośny teleport", "Platforma teleportacyjna", "Warsztat"],
 	"commPageNames": ["Biuro", "Warsztat", "Magazyn"],
 	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
 	"hudMessages": {
