@@ -34,7 +34,7 @@
 #define ROW_1_Y (HUD_ORIGIN_Y + 0)
 #define ROW_2_Y (HUD_ORIGIN_Y + 9)
 #define HUD_MSG_BFR_SIZE 250
-#define HUD_MSG_WAIT_CNT 150
+#define HUD_MSG_WAIT_CNT 200
 
 #define HUD_ICON_INBOX_SRC_OFFS_Y 144
 
