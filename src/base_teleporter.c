@@ -5,6 +5,7 @@
 #include "base_teleporter.h"
 #include "game.h"
 #include "base.h"
+#include "inventory.h"
 
 #define BASE_TELEPORTER_IDLE_FRAME_HEIGHT 12
 #define BASE_TELEPORTER_IDLE_DELTA_Y (BASE_TELEPORTER_HEIGHT - BASE_TELEPORTER_IDLE_FRAME_HEIGHT)
@@ -24,10 +25,12 @@ void baseTeleporterCreate(void) {
 }
 
 void baseTeleporterProcess(void) {
-	const tBase *pBase = baseGetCurrent();
-	s_sTeleporterIdleBob.sPos.ulYX = pBase->sPosTeleport.ulYX;
-	s_sTeleporterIdleBob.sPos.uwY += BASE_TELEPORTER_IDLE_DELTA_Y;
-	gameTryPushBob(&s_sTeleporterIdleBob);
+	if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, baseGetCurrentId())) {
+		const tBase *pBase = baseGetCurrent();
+		s_sTeleporterIdleBob.sPos.ulYX = pBase->sPosTeleport.ulYX;
+		s_sTeleporterIdleBob.sPos.uwY += BASE_TELEPORTER_IDLE_DELTA_Y;
+		gameTryPushBob(&s_sTeleporterIdleBob);
+	}
 }
 
 void baseTeleporterDestroy(void) {

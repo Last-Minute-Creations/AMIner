@@ -104,9 +104,20 @@ General:
 	☐ Portable teleport as a vehicle upgrade
 		✔ Return option in fast travel teleporter @done(25-01-16)
 		✔ Remove debug teleport return button @done(25-01-16)
-		☐ Implement initial teleport upgrades
-		☐ Bring back teleport damage on zeroeth upgrade
-		☐ Display/interactable teleporter pad only when unlocked at given base
+		✔ Teleporter in mode menu shouldn't be accessible from start @done(25-02-03)
+		✔ Allow return to mine only on 2nd upgrade @done(25-02-03)
+		✔ Bring back teleport damage on zeroeth upgrade @done(25-02-03)
+		✔ Randomize teleport location in base on zeroeth upgrade @done(25-02-03)
+		✔ Make selectable in workshop @done(25-02-03)
+		☐ Add descriptions in workshop
+	✔ Teleporter platform upgrades @done(25-02-03)
+		✔ Per-base teleporter upgrades @done(25-02-03)
+		✔ Display/interactable teleporter pad only when unlocked at given base @done(25-02-03)
+		✔ Enable cargo unstock when platform is built @done(25-02-03)
+		☐ Add descriptions in workshop
+	☐ Unlockable workshop in bases
+		✔ First unlock allows repair @done(25-02-03)
+		☐ Second unlock allows buying upgrades
 	☐ Animated main base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
@@ -132,7 +143,6 @@ From QA tests:
 	☐ Make sure there is message for each accolade received (plans!)
 	☐ Display time on HUD instead of cash when in mine
 	☐ Make the sideways drilling smooth between tiles
-	☐ Teleporter shouldn't be accessible from start
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)

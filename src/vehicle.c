@@ -369,7 +369,7 @@ void vehicleReset(tVehicle *pVehicle) {
 	// Initial values
 	pVehicle->isChallengeEnded = 0;
 	pVehicle->lCash = g_lInitialCash;
-	pVehicle->eLastVisitedBase = BASE_ID_GROUND;
+	pVehicle->eLastVisitedTeleportableBase = BASE_ID_COUNT_UNIQUE;
 	vehicleRespawn(pVehicle);
 }
 
@@ -398,7 +398,7 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	fileWrite(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
 	fileWrite(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
 	// fileWrite(pFile, &pVehicle->eDrillMode, sizeof(pVehicle->eDrillMode));
-	fileWrite(pFile, &pVehicle->eLastVisitedBase, sizeof(pVehicle->eLastVisitedBase));
+	fileWrite(pFile, &pVehicle->eLastVisitedTeleportableBase, sizeof(pVehicle->eLastVisitedTeleportableBase));
 	fileWrite(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
 	fileWrite(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
 	fileWrite(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
@@ -453,7 +453,7 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	fileRead(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
 	fileRead(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
 	// fileRead(pFile, &pVehicle->eDrillMode, sizeof(pVehicle->eDrillMode));
-	fileRead(pFile, &pVehicle->eLastVisitedBase, sizeof(pVehicle->eLastVisitedBase));
+	fileRead(pFile, &pVehicle->eLastVisitedTeleportableBase, sizeof(pVehicle->eLastVisitedTeleportableBase));
 	fileRead(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
 	fileRead(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
 	fileRead(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
@@ -494,6 +494,9 @@ UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
 }
 
 UBYTE vehicleIsNearBaseTeleporter(const tVehicle *pVehicle) {
+	if(!inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, baseGetCurrentId())) {
+		return 0;
+	}
 	const tBase *pBase = baseGetCurrent();
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2;
@@ -666,44 +669,51 @@ static inline UBYTE vehicleStartDrilling(
 	return 1;
 }
 
-static WORD vehicleRestock(tVehicle *pVehicle, UBYTE ubUseCashP1) {
-	pVehicle->eLastVisitedBase = baseGetCurrentId();
-	LONG *pCash = ubUseCashP1 ? &g_pVehicles[0].lCash : &pVehicle->lCash;
+static WORD vehicleRestock(tVehicle *pVehicle) {
+	if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, baseGetCurrentId())) {
+		pVehicle->eLastVisitedTeleportableBase = baseGetCurrentId();
+	}
 
 	pVehicle->uwCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
 	UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
-	hudSetCargo(pVehicle->ubPlayerIdx, 0, uwCargoMax);
-	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
-		warehouseSetStock(i, warehouseGetStock(i) + pVehicle->pStock[i]);
-		pVehicle->pStock[i] = 0;
+	if(g_isChallenge || inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, baseGetCurrentId())) {
+		hudSetCargo(pVehicle->ubPlayerIdx, 0, uwCargoMax);
+		for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
+			warehouseSetStock(i, warehouseGetStock(i) + pVehicle->pStock[i]);
+			pVehicle->pStock[i] = 0;
+		}
 	}
 
-	// Buy as much fuel as needed
-	// Start refueling if half a liter is spent
-	UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
-	UWORD uwRefuelLiters = (
-		uwDrillMax - pVehicle->uwDrillCurr + g_ubFuelInLiter / 2
-	) / g_ubFuelInLiter;
+	WORD wRestockPrice = 0;
+	if(g_isChallenge || inventoryGetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, baseGetCurrentId())) {
+		// Buy as much fuel as needed
+		// Start refueling if half a liter is spent
+		UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
+		UWORD uwRefuelLiters = (
+			uwDrillMax - pVehicle->uwDrillCurr + g_ubFuelInLiter / 2
+		) / g_ubFuelInLiter;
 
-	// It's possible to buy more fuel than needed (last liter) - fill up to max
-	pVehicle->uwDrillCurr = MIN(
-		pVehicle->uwDrillCurr + uwRefuelLiters * g_ubFuelInLiter, uwDrillMax
-	);
+		// It's possible to buy more fuel than needed (last liter) - fill up to max
+		pVehicle->uwDrillCurr = MIN(
+			pVehicle->uwDrillCurr + uwRefuelLiters * g_ubFuelInLiter, uwDrillMax
+		);
 
-	// Buy as much hull as needed
-	UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
-	UWORD uwRehullCost = g_ubHullPrice * (uwHullMax - pVehicle->wHullCurr);
-	vehicleHullRepair(pVehicle);
+		// Buy as much hull as needed
+		UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
+		UWORD uwRehullCost = g_ubHullPrice * (uwHullMax - pVehicle->wHullCurr);
+		vehicleHullRepair(pVehicle);
 
-	// Pay for your fuel & hull!
-	WORD wRestockValue = uwRefuelLiters * g_ubLiterPrice + uwRehullCost;
-	*pCash -= wRestockValue;
-	return -wRestockValue;
+		// Pay for your fuel & hull!
+		wRestockPrice = uwRefuelLiters * g_ubLiterPrice + uwRehullCost;
+		LONG *pCash = g_isChallenge ? &g_pVehicles[0].lCash : &pVehicle->lCash;
+		*pCash -= wRestockPrice;
+	}
+	return -wRestockPrice;
 }
 
 static void vehicleEndChallenge(tVehicle *pVehicle) {
-	vehicleRestock(pVehicle, 0);
+	vehicleRestock(pVehicle);
 	pVehicle->isChallengeEnded = 1;
 }
 
@@ -766,7 +776,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 					pVehicle->sBobBody.sPos.uwY - 32, 1
 				);
 				pVehicle->lCash += pVehicle->uwCargoScore;
-				vehicleRestock(pVehicle, 0);
+				vehicleRestock(pVehicle);
 			}
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
 		}
@@ -1105,7 +1115,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 
 	if(vehicleIsNearShop(pVehicle)) {
 		// If restocked then play audio & display score
-		WORD wDeltaScore = vehicleRestock(pVehicle, 1);
+		WORD wDeltaScore = vehicleRestock(pVehicle);
 		if(wDeltaScore) {
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
 			textBobSetText(
@@ -1410,13 +1420,15 @@ static void vehicleOnTeleportInEnd(void *pData) {
 static void vehicleOnTeleportInPeak(void *pData) {
 	tVehicle *pVehicle = pData;
 	vehicleSetState(pVehicle, VEHICLE_STATE_TELEPORTING_VISIBLE);
-	// UWORD uwMaxHealth = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
-	// if(randUwMax(&g_sRand, 100) <= 5) {
-	// 	vehicleHullDamage(pVehicle, uwMaxHealth);
-	// }
-	// else if(randUwMax(&g_sRand, 100) <= 20) {
-	// 	vehicleHullDamage(pVehicle, uwMaxHealth / 2);
-	// }
+	if(inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel == INVENTORY_LEVEL_TELEPORTER_WEAK) {
+		UWORD uwMaxHealth = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
+		if(randUwMax(&g_sRand, 100) <= 5) {
+			vehicleHullDamage(pVehicle, (uwMaxHealth * 4) / 5);
+		}
+		else if(randUwMax(&g_sRand, 100) <= 20) {
+			vehicleHullDamage(pVehicle, uwMaxHealth / 2);
+		}
+	}
 }
 
 static void vehicleOnTeleportOutPeak(void *pData) {
@@ -1439,8 +1451,16 @@ static void vehicleOnTeleportOutPeak(void *pData) {
 void vehicleTeleport(
 	tVehicle *pVehicle, UWORD uwX, UWORD uwY, tTeleportKind eTeleportKind
 ) {
+	UBYTE isWeakTeleporter = (
+		eTeleportKind == TELEPORT_KIND_MINE_TO_BASE &&
+		inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel == INVENTORY_LEVEL_TELEPORTER_WEAK
+	);
 	pVehicle->uwTeleportX = uwX;
 	pVehicle->uwTeleportY = uwY;
+	if(isWeakTeleporter) {
+		pVehicle->uwTeleportX += randUwMax(&g_sRand, 64) - 32;
+		pVehicle->uwTeleportY -= randUwMax(&g_sRand, 64);
+	}
 
 	UWORD uwFlipbookX;
 	UWORD uwFlipbookY;
@@ -1459,7 +1479,9 @@ void vehicleTeleport(
 	}
 	vehicleSetState(pVehicle, VEHICLE_STATE_TELEPORTING_VISIBLE);
 
-	pVehicle->eTeleportInFlipbook = (eTeleportKind == TELEPORT_KIND_BASE_TO_MINE)
+	pVehicle->eTeleportInFlipbook = (
+		eTeleportKind == TELEPORT_KIND_BASE_TO_MINE || isWeakTeleporter
+	)
 		? FLIPBOOK_KIND_TELEPORT : FLIPBOOK_KIND_TELEPORTER_IN;
 	flipbookAdd(
 		uwFlipbookX, uwFlipbookY,

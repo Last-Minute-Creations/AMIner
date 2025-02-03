@@ -116,6 +116,14 @@ UBYTE g_isAtari;
 //------------------------------------------------------------ PRIVATE FNS: MODE
 // TODO: reformat somehow? Move to separate file?
 
+static tBaseId gameModeToBaseId(tModeOption eMode) {
+	return (eMode - MODE_OPTION_TRAVEL_BASE1_GROUND) + BASE_ID_GROUND;
+}
+
+static tModeOption gameBaseIdToMode(tBaseId eBaseId) {
+	return (eBaseId - BASE_ID_GROUND) + MODE_OPTION_TRAVEL_BASE1_GROUND;
+}
+
 static UBYTE gameChangeModePreset(UBYTE ubPlayerIndex, tModePreset ePreset) {
 	if(s_pPlayerModePreset[ubPlayerIndex] == ePreset) {
 		return 0;
@@ -132,33 +140,60 @@ static UBYTE gameChangeModePreset(UBYTE ubPlayerIndex, tModePreset ePreset) {
 			modeMenuAddOption(pModeMenu, MODE_OPTION_EXCLAMATION);
 			break;
 		case MODE_PRESET_TRAVEL:
-			if(s_sTeleportReturn.ulYX != -1u) {
+			UBYTE ubPlatformLevel = inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, baseGetCurrentId());
+			if(
+				inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel >= 3 &&
+				s_sTeleportReturn.ulYX != -1u &&
+				inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel >= 3
+			) {
 				modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
 			}
-			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE1_GROUND);
-			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE2_DINO);
-			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE3_GATE);
-			modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE4_SCI);
+			if(ubPlatformLevel == INVENTORY_LEVEL_PLATFORM_ADJACENT) {
+				BYTE bPrevBaseId = (BYTE)baseGetCurrentId() - 1;
+				BYTE bNextBaseId = (BYTE)baseGetCurrentId() + 1;
+				if(
+					bPrevBaseId >= BASE_ID_GROUND &&
+					inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, bPrevBaseId)
+				) {
+					modeMenuAddOption(pModeMenu, gameBaseIdToMode(baseGetCurrentId() - 1));
+				}
+				modeMenuAddOption(pModeMenu, gameBaseIdToMode(baseGetCurrentId()));
+				if(
+					baseGetCurrentId() + 1 < BASE_ID_COUNT_UNIQUE &&
+					inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, bNextBaseId)
+				) {
+					modeMenuAddOption(pModeMenu, gameBaseIdToMode(baseGetCurrentId() + 1));
+				}
+			}
+			else if(ubPlatformLevel == INVENTORY_LEVEL_PLATFORM_ALL) {
+				if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_GROUND)) {
+					modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE1_GROUND);
+				}
+				if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_DINO)) {
+					modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE2_DINO);
+				}
+				if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_GATE)) {
+					modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE3_GATE);
+				}
+				if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_WESTERN)) {
+					modeMenuAddOption(pModeMenu, MODE_OPTION_TRAVEL_BASE4_SCI);
+				}
+			}
 			break;
 		case MODE_PRESET_TOOLS:
 			modeMenuAddOption(pModeMenu, MODE_OPTION_DRILL);
 			if(inventoryGetPartDef(INVENTORY_PART_TNT)->ubLevel) {
 				modeMenuAddOption(pModeMenu, MODE_OPTION_TNT);
 			}
-			// TODO: check conditions for teleport
-			// if(inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel) {
-			modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
-			// }
+			if(inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel) {
+				modeMenuAddOption(pModeMenu, MODE_OPTION_TELEPORT);
+			}
 			break;
 		case MODE_PRESET_OFF:
 		default:
 			break;
 	}
 	return 1;
-}
-
-static tBaseId gameModeToBaseId(tModeOption eMode) {
-	return (eMode - MODE_OPTION_TRAVEL_BASE1_GROUND) + BASE_ID_GROUND;
 }
 
 static void gameResetModePreset(UBYTE ubPlayerIndex) {
@@ -209,8 +244,10 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 		.uwX = fix16_to_int(g_pVehicles[ubPlayer].fX),
 		.uwY = fix16_to_int(g_pVehicles[ubPlayer].fY)
 	};
-	const tBase *pBase = baseGetById(g_pVehicles[ubPlayer].eLastVisitedBase);
-	vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY, TELEPORT_KIND_MINE_TO_BASE);
+	if(g_pVehicles[ubPlayer].eLastVisitedTeleportableBase != BASE_ID_COUNT_UNIQUE) {
+		const tBase *pBase = baseGetById(g_pVehicles[ubPlayer].eLastVisitedTeleportableBase);
+		vehicleTeleport(&g_pVehicles[ubPlayer], pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY, TELEPORT_KIND_MINE_TO_BASE);
+	}
 	g_pVehicles[ubPlayer].eDrillMode = MODE_OPTION_DRILL;
 }
 
@@ -227,7 +264,10 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
 					eNextPreset = MODE_PRESET_PROMPT_SHOP;
 				}
-				else if(vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer])) {
+				else if(
+					vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer]) &&
+					inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, baseGetCurrentId()) >= INVENTORY_LEVEL_PLATFORM_ADJACENT
+				) {
 					eNextPreset = MODE_PRESET_PROMPT_TRAVEL;
 				}
 				else {
@@ -293,7 +333,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 						tBaseId eSelectedBaseId = gameModeToBaseId(eSelectedMode);
 						const tBase *pBase = baseGetById(eSelectedBaseId);
 						if(pBase != baseGetCurrent()) {
-							g_pVehicles[ubPlayer].eLastVisitedBase = eSelectedBaseId;
+							g_pVehicles[ubPlayer].eLastVisitedTeleportableBase = eSelectedBaseId;
 							vehicleTeleport(
 								&g_pVehicles[ubPlayer],
 								pBase->sPosTeleport.uwX, pBase->sPosTeleport.uwY,

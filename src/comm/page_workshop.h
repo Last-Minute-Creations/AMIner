@@ -7,8 +7,6 @@
 
 #include "string_array.h"
 
-#define WORKSHOP_ITEM_COUNT 4
-
 extern char **g_pShopNames;
 
 void pageWorkshopCreate(void);

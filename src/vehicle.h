@@ -22,7 +22,7 @@
 typedef enum tTeleportKind {
 	TELEPORT_KIND_BASE_TO_BASE,
 	TELEPORT_KIND_BASE_TO_MINE,
-	TELEPORT_KIND_MINE_TO_BASE,
+	TELEPORT_KIND_MINE_TO_BASE
 } tTeleportKind;
 
 typedef enum _tDrillDir {
@@ -78,7 +78,7 @@ typedef struct _tVehicle {
 	UBYTE ubJetAnimCnt;
 	UBYTE ubToolAnimCnt;
 	tModeOption eDrillMode;
-	tBaseId eLastVisitedBase;
+	tBaseId eLastVisitedTeleportableBase;
 	// Drilling
 	UBYTE ubDrillDir;
 	UBYTE ubDrillVAnimCnt;

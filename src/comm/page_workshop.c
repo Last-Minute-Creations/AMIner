@@ -28,9 +28,48 @@ static tWorkshopRow s_eWorkshopRow;
 
 static UBYTE pageWorkshopIsPartAcquirable(tPartKind ePart) {
 	UBYTE isAcquirable = (
-		ePart == INVENTORY_PART_TELEPORT || ePart == INVENTORY_PART_TNT
+		ePart == INVENTORY_PART_TELEPORT || ePart == INVENTORY_PART_TNT ||
+		ePart == INVENTORY_PART_BASE_WORKSHOP || ePart == INVENTORY_PART_BASE_PLATFORM
 	);
 	return isAcquirable;
+}
+
+static UBYTE pageWorkshopGetPartMaxLevel(void) {
+	if(
+		s_eSelectedPart == INVENTORY_PART_TELEPORT ||
+		s_eSelectedPart == INVENTORY_PART_BASE_PLATFORM
+	) {
+		return 3;
+	}
+	else if(s_eSelectedPart == INVENTORY_PART_BASE_WORKSHOP) {
+		return 2;
+	}
+	return g_ubUpgradeLevels;
+}
+
+static UBYTE pageWorkshopGetPartCurrentLevel(void) {
+	if(inventoryIsBasePart(s_eSelectedPart)) {
+		return inventoryGetBasePartLevel(s_eSelectedPart, baseGetCurrentId());
+	}
+	return inventoryGetPartDef(s_eSelectedPart)->ubLevel;
+}
+
+static void pageWorkshopSetPartCurrentLevel(UBYTE ubLevel) {
+	if(inventoryIsBasePart(s_eSelectedPart)) {
+		inventorySetBasePartLevel(s_eSelectedPart, baseGetCurrentId(), ubLevel);
+	}
+	else {
+		inventorySetPartLevel(s_eSelectedPart, ubLevel);
+	}
+}
+
+static ULONG pageWorkshopGetPartUpgradeCost(UBYTE ubCurrentLevel) {
+	if(inventoryIsBasePart(s_eSelectedPart)) {
+		return g_pUpgradeCosts[ubCurrentLevel];
+	}
+	else {
+		return g_pUpgradeCosts[ubCurrentLevel + (s_eSelectedPart == INVENTORY_PART_TELEPORT ? 1 : 0)];
+	}
 }
 
 static void pageWorkshopUpdateText(void) {
@@ -48,7 +87,8 @@ static void pageWorkshopUpdateText(void) {
 
 	char szBfr[50];
 	UBYTE isAcquirable = pageWorkshopIsPartAcquirable(s_eSelectedPart);
-	UBYTE ubLevel = inventoryGetPartDef(s_eSelectedPart)->ubLevel;
+	UBYTE ubLevel = pageWorkshopGetPartCurrentLevel();
+
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
 		sprintf(szBfr, "%s %s%hhu", g_pShopNames[s_eSelectedPart], g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
@@ -59,8 +99,12 @@ static void pageWorkshopUpdateText(void) {
 	commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
 	uwOffsY += ubRowSize;
 
-	if(ubLevel < g_ubUpgradeLevels) {
-		sprintf(szBfr, "%s%hhu: %lu\x1F", g_pMsgs[MSG_COMM_UPGRADE_TO_MK], ubDisplayLevel + 1, g_pUpgradeCosts[ubLevel]);
+	if(ubLevel < pageWorkshopGetPartMaxLevel()) {
+		sprintf(
+			szBfr, "%s%hhu: %lu\x1F",
+			g_pMsgs[MSG_COMM_UPGRADE_TO_MK],
+			ubDisplayLevel + 1, pageWorkshopGetPartUpgradeCost(ubLevel)
+		);
 		commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
 	}
 	uwOffsY += 2 * ubRowSize;
@@ -115,12 +159,12 @@ static UBYTE pageWorkshopBuyFor(LONG lCost) {
 	return 0;
 }
 
-static UBYTE pageWorkshopBuyIsFull(UBYTE ubGot, UBYTE ubMax, const char *szMsg) {
+static UBYTE pageWorkshopBuyIsMax(UBYTE ubGot, UBYTE ubMax, const char *szMsg) {
 	if(ubGot < ubMax) {
 		return 0;
 	}
 	// TODO: msg szMsg
-	logWrite("pageWorkshopBuyIsFull: '%s'\n", szMsg);
+	logWrite("pageWorkshopBuyIsMax: '%s'\n", szMsg);
 	return 1;
 }
 
@@ -152,12 +196,11 @@ static void pageWorkshopProcess(void) {
 	if(s_eWorkshopRow == WORKSHOP_ROW_BUY) {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(s_eSelectedPart < INVENTORY_PART_COUNT) {
-				const tPartDef *pPart = inventoryGetPartDef(s_eSelectedPart);
-				UBYTE ubLevel = pPart->ubLevel;
-				if(!pageWorkshopBuyIsFull(
-					ubLevel, g_ubUpgradeLevels, g_pMsgs[MSG_COMM_ALREADY_MAX]
-				) && pageWorkshopBuyFor(g_pUpgradeCosts[ubLevel])) {
-					inventorySetPartLevel(s_eSelectedPart, ubLevel+1);
+				UBYTE ubLevel = pageWorkshopGetPartCurrentLevel();
+				if(!pageWorkshopBuyIsMax(
+					ubLevel, pageWorkshopGetPartMaxLevel(), g_pMsgs[MSG_COMM_ALREADY_MAX]
+				) && pageWorkshopBuyFor(pageWorkshopGetPartUpgradeCost(ubLevel))) {
+					pageWorkshopSetPartCurrentLevel(ubLevel+1);
 					// text have changed, so draw everything again
 					pageWorkshopNavigateToPart(s_eSelectedPart);
 				}
@@ -165,7 +208,7 @@ static void pageWorkshopProcess(void) {
 		}
 		else if(commNavUse(DIRECTION_RIGHT)) {
 			BYTE bNewPos = s_eSelectedPart + 1;
-			if(bNewPos >= WORKSHOP_ITEM_COUNT) {
+			if(bNewPos >= INVENTORY_PART_COUNT) {
 				bNewPos = 0;
 			}
 			pageWorkshopNavigateToPart(bNewPos);
@@ -173,7 +216,7 @@ static void pageWorkshopProcess(void) {
 		else if(commNavUse(DIRECTION_LEFT)) {
 			BYTE bNewPos = s_eSelectedPart - 1;
 			if(bNewPos < 0) {
-				bNewPos = WORKSHOP_ITEM_COUNT - 1;
+				bNewPos = INVENTORY_PART_COUNT - 1;
 			}
 			pageWorkshopNavigateToPart(bNewPos);
 		}
