@@ -12,8 +12,8 @@
 				"addPerLevel": 250
 			},
 			"cargo": {
-				"base": 50,
-				"addPerLevel": 20
+				"base": 30,
+				"addPerLevel": 10
 			},
 			"tnt": {
 				"base": 0,
