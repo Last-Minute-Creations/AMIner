@@ -85,3 +85,7 @@ void audioMixerStopSfxOnChannel(UBYTE ubMixerChannel) {
 UBYTE audioMixerIsPlaybackDone(void) {
 	return mixer.mx_mixer_entries[0].mxe_channels[0].mch_status == 0;
 }
+
+void audioMixerSetVolume(UBYTE ubVolume) {
+	MixerVolume(ubVolume);
+}

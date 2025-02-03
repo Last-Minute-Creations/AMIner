@@ -32,4 +32,6 @@ void audioMixerStopSfxOnChannel(UBYTE ubChannel);
 
 UBYTE audioMixerIsPlaybackDone(void);
 
+void audioMixerSetVolume(UBYTE ubVolume);
+
 #endif // ACE_MIXER_AUDIO_MIXER_H

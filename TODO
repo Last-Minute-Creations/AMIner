@@ -104,8 +104,9 @@ General:
 	☐ Portable teleport as a vehicle upgrade
 		✔ Return option in fast travel teleporter @done(25-01-16)
 		✔ Remove debug teleport return button @done(25-01-16)
-		☐ Figure out the teleport upgrades
+		☐ Implement initial teleport upgrades
 		☐ Bring back teleport damage on zeroeth upgrade
+		☐ Display/interactable teleporter pad only when unlocked at given base
 	☐ Animated main base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
@@ -122,6 +123,15 @@ General:
 		☐ Test if all achievements pop up properly on hud (especially ending ones)
 		☐ Display achievement unlock text with achievement name + icon
 		☐ Display proper achievement texts
+
+From QA tests:
+	✔ Audio settings not working @done(25-02-03)
+	☐ It's not clear what to do with negative cash
+	☐ Make sure there is message for each accolade received (plans!)
+	☐ Display time on HUD instead of cash when in mine
+	☐ Make HUD messages slower
+	☐ Make the sideways drilling smooth between tiles
+	☐ Teleporter shouldn't be accessible from start
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)

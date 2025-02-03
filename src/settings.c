@@ -14,6 +14,8 @@ tSettings g_sSettings;
 
 static void settingsSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_SETTINGS);
+	fileWrite(pFile, &g_sSettings.ubSoundVolume, sizeof(g_sSettings.ubSoundVolume));
+	fileWrite(pFile, &g_sSettings.ubMusicVolume, sizeof(g_sSettings.ubMusicVolume));
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileWrite(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
@@ -27,6 +29,8 @@ static UBYTE settingsLoad(tFile*pFile) {
 		return 0;
 	}
 
+	fileRead(pFile, &g_sSettings.ubSoundVolume, sizeof(g_sSettings.ubSoundVolume));
+	fileRead(pFile, &g_sSettings.ubMusicVolume, sizeof(g_sSettings.ubMusicVolume));
 	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
@@ -36,6 +40,8 @@ static UBYTE settingsLoad(tFile*pFile) {
 }
 
 static void settingsReset(void) {
+	g_sSettings.ubSoundVolume = 10;
+	g_sSettings.ubMusicVolume = 5;
 	g_sSettings.is1pKbd = 0;
 	g_sSettings.is2pKbd = 1;
 	g_sSettings.isAtariHidden = 1;

@@ -412,6 +412,11 @@ static void menuOnEnterAchievements(void) {
 	statePush(g_pGameStateManager, &s_sStateMenuAchievements);
 }
 
+static void menuUpdateVolume(void) {
+	ptplayerSetMasterVolume((g_sSettings.ubMusicVolume * 16) / 10);
+	audioMixerSetVolume((g_sSettings.ubSoundVolume * 64) / 10);
+}
+
 static void menuOnEnterSettings(void) {
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
@@ -424,7 +429,8 @@ static void menuOnEnterSettings(void) {
 			.pVar = &g_sSettings.ubSoundVolume,
 			.ubMax = 10,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumVolume
+			.pEnumLabels = (const char **)g_pMenuEnumVolume,
+			.cbOnValChange = menuUpdateVolume,
 		}
 	};
 
@@ -436,7 +442,8 @@ static void menuOnEnterSettings(void) {
 			.pVar = &g_sSettings.ubMusicVolume,
 			.ubMax = 10,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumVolume
+			.pEnumLabels = (const char **)g_pMenuEnumVolume,
+			.cbOnValChange = menuUpdateVolume,
 		}
 	};
 
@@ -841,6 +848,7 @@ void menuPreload(void) {
 	s_pSfxAtari = ptplayerSfxCreateFromPath("data/sfx/atari.sfx", 1);
 
 	settingsFileLoad();
+	// menuUpdateVolume();
 
 	// Init all steers except joy2 if not explicitly selected, because mouse may be connected there
 	s_pMenuSteers[0] = steerInitFromMode(STEER_MODE_JOY_1);
