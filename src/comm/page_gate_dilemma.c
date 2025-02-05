@@ -43,7 +43,7 @@ void pageGateDilemmaCreate(void) {
 	UWORD uwPosY = 0;
 
 	uwPosY += commDrawMultilineText(
-		"The mysterious gate is about to be activated. "
+		"The mysterious gate is about to be activated.\n"
 		"There are explosives set up around it. Do you want to detonate them?",
 		0, uwPosY
 	) * ubLineHeight;

@@ -21,6 +21,7 @@
 #include <comm/page_sokoban.h>
 #include <comm/page_market.h>
 #include <comm/page_portrait.h>
+#include <comm/page_comm_unlock.h>
 #include "core.h"
 #include "dino.h"
 #include "game.h"
@@ -30,6 +31,7 @@
 #include "tutorial.h"
 #include "achievement.h"
 #include "settings.h"
+#include "inventory.h"
 
 #define LED_BLINK_COUNTER_MAX 15
 
@@ -228,10 +230,35 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 	const char *szTitle = g_pMsgs[commShopPageToTitle(ePage)];
 	switch(ePage) {
 		case COMM_SHOP_PAGE_WORKSHOP:
-			pageWorkshopCreate();
+			if(inventoryGetCommUnlockState(baseGetCurrentId()) >= COMM_UNLOCK_STATE_OFFICE_WORKSHOP) {
+				pageWorkshopCreate();
+			}
+			else {
+				pageCommUnlockCreate(
+					COMM_UNLOCK_STATE_OFFICE_WORKSHOP,
+					COMM_SHOP_PAGE_WORKSHOP,
+					g_pMsgs[MSG_COMM_UNLOCK_OFFICE_WORKSHOP], 100
+				);
+			}
 			break;
 		case COMM_SHOP_PAGE_WAREHOUSE:
-			pageWarehouseCreate();
+			if(inventoryGetCommUnlockState(baseGetCurrentId()) >= COMM_UNLOCK_STATE_WAREHOUSE) {
+				pageWarehouseCreate();
+			}
+			else if(inventoryGetCommUnlockState(baseGetCurrentId()) >= COMM_UNLOCK_STATE_OFFICE_WORKSHOP) {
+				pageCommUnlockCreate(
+					COMM_UNLOCK_STATE_WAREHOUSE,
+					COMM_SHOP_PAGE_WAREHOUSE,
+					g_pMsgs[MSG_COMM_UNLOCK_WAREHOUSE], 100
+				);
+			}
+			else {
+				pageCommUnlockCreate(
+					COMM_UNLOCK_STATE_OFFICE_WORKSHOP,
+					COMM_SHOP_PAGE_WAREHOUSE,
+					g_pMsgs[MSG_COMM_UNLOCK_OFFICE_WORKSHOP], 100
+				);
+			}
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_welcome", onBack);
@@ -427,7 +454,16 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MAIN:
 		default:
-			pageOfficeShow();
+			if(inventoryGetCommUnlockState(baseGetCurrentId()) >= COMM_UNLOCK_STATE_OFFICE_WORKSHOP) {
+				pageOfficeShow();
+			}
+			else {
+				pageCommUnlockCreate(
+					COMM_UNLOCK_STATE_OFFICE_WORKSHOP,
+					COMM_SHOP_PAGE_OFFICE_MAIN,
+					g_pMsgs[MSG_COMM_UNLOCK_OFFICE_WORKSHOP], 100
+				);
+			}
 			break;
 	}
 }

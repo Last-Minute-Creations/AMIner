@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-typedef enum _tCommShopPage {
+typedef enum tCommShopPage {
 	COMM_SHOP_PAGE_WAREHOUSE,
 	COMM_SHOP_PAGE_WORKSHOP,
 	// Office - must be same order as MSG_PAGE_* in defs.h

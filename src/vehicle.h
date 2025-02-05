@@ -141,9 +141,11 @@ void vehicleProcess(tVehicle *pVehicle);
 
 void vehicleTeleport(tVehicle *pVehicle, UWORD uwX, UWORD uwY, tTeleportKind eTeleportKind);
 
-uint8_t vehiclesAreClose(void);
+UBYTE vehiclesAreClose(void);
 
 void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY);
+
+UBYTE vehicleTrySpendCash(UBYTE ubPlayerIndex, LONG lCost);
 
 extern tVehicle g_pVehicles[2];
 

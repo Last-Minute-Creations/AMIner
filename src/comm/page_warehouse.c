@@ -43,7 +43,7 @@ static UBYTE getMineralsOnList(UBYTE *pMineralsOnList) {
 	return ubCount;
 }
 
-static void drawRow(UBYTE ubPos) {
+static void pageWarehouseDrawRow(UBYTE ubPos) {
 	UBYTE ubMineral = s_pMineralsOnList[ubPos];
 	UBYTE ubColor = (
 		ubPos == s_ubPosCurr ?
@@ -110,7 +110,7 @@ static void drawRow(UBYTE ubPos) {
 	commDrawText(s_pColOffs[3], uwRowOffsY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 }
 
-static void redraw(void) {
+static void pageWarehouseRedraw(void) {
 	for(UBYTE ubCol = 0; ubCol < 4; ++ubCol) {
 		commDrawText(
 			s_pColOffs[ubCol], 0, g_pWarehouseColNames[ubCol],
@@ -129,7 +129,7 @@ static void redraw(void) {
 	s_ubPosCount = getMineralsOnList(s_pMineralsOnList);
 	s_ubPosCurr = s_ubPosCount; // move to buttons on start
 	for(UBYTE i = 0; i < s_ubPosCount; ++i) {
-		drawRow(i);
+		pageWarehouseDrawRow(i);
 	}
 
 	// Buttons
@@ -205,11 +205,11 @@ static void pageWarehouseProcess(void) {
 			isButtonRefresh = 1;
 		}
 		else if(ubPosPrev < s_ubPosCount) {
-			drawRow(ubPosPrev);
+			pageWarehouseDrawRow(ubPosPrev);
 		}
 		// Select new pos
 		if(s_ubPosCurr < s_ubPosCount) {
-			drawRow(s_ubPosCurr);
+			pageWarehouseDrawRow(s_ubPosCurr);
 		}
 		else if(s_ubPosCurr == s_ubPosCount) {
 			s_ubButtonCurrent = 0;
@@ -228,7 +228,7 @@ static void pageWarehouseProcess(void) {
 		if(commNavUse(DIRECTION_LEFT) && s_pTmpStock[ubMineral]) {
 			++s_pTmpSell[ubMineral];
 			--s_pTmpStock[ubMineral];
-			drawRow(ubPosPrev);
+			pageWarehouseDrawRow(ubPosPrev);
 		}
 		else if(
 			commNavUse(DIRECTION_RIGHT) && s_pTmpStock[ubMineral] &&
@@ -236,7 +236,7 @@ static void pageWarehouseProcess(void) {
 		) {
 			++s_pTmpPlan[ubMineral];
 			--s_pTmpStock[ubMineral];
-			drawRow(ubPosPrev);
+			pageWarehouseDrawRow(ubPosPrev);
 		}
 	}
 	else if(s_ubPosCurr == s_ubPosCount) {
@@ -292,7 +292,7 @@ static void pageWarehouseProcess(void) {
 					}
 				}
 				commEraseAll();
-				redraw();
+				pageWarehouseRedraw();
 			} break;
 			case 1:
 				// Market
@@ -310,5 +310,5 @@ static void pageWarehouseProcess(void) {
 
 void pageWarehouseCreate(void) {
 	commRegisterPage(pageWarehouseProcess, 0);
-	redraw();
+	pageWarehouseRedraw();
 }

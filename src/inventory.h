@@ -29,6 +29,12 @@ typedef enum tPartKind {
 	INVENTORY_PART_COUNT
 } tPartKind;
 
+typedef enum tCommUnlockState {
+	COMM_UNLOCK_STATE_NONE,
+	COMM_UNLOCK_STATE_OFFICE_WORKSHOP,
+	COMM_UNLOCK_STATE_WAREHOUSE,
+} tCommUnlockState;
+
 typedef struct tPartDef {
 	UBYTE ubLevel;
 	UWORD uwMaxBase;
@@ -38,6 +44,7 @@ typedef struct tPartDef {
 
 typedef struct _tInventory {
 	tPartDef pParts[INVENTORY_PART_COUNT];
+	tCommUnlockState pCommUnlock[BASE_ID_COUNT_UNIQUE];
 } tInventory;
 
 void inventoryReset(void);
@@ -57,5 +64,9 @@ void inventorySetBasePartLevel(tPartKind ePart, tBaseId eBaseId, UBYTE ubLevel);
 UBYTE inventoryIsBasePart(tPartKind ePart);
 
 void inventoryInit(const UWORD *pPartsBase, const UWORD *pPartsAddPerLevel);
+
+void inventorySetCommUnlock(tBaseId eBase, tCommUnlockState eState);
+
+tCommUnlockState inventoryGetCommUnlockState(tBaseId eBase);
 
 #endif // _INVENTORY_H_

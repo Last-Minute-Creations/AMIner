@@ -148,17 +148,6 @@ static void pageWorkshopNavigateToPart(tPartKind ePart) {
 	pageWorkshopUpdateText();
 }
 
-static UBYTE pageWorkshopBuyFor(LONG lCost) {
-	if(g_pVehicles[0].lCash >= lCost) {
-		g_pVehicles[0].lCash -= lCost;
-		hudSetCash(0, g_pVehicles[0].lCash);
-		return 1;
-	}
-	logWrite("pageWorkshopBuyFor: not enough cash\n");
-	// TODO: msg "you don't have enough cash"
-	return 0;
-}
-
 static UBYTE pageWorkshopBuyIsMax(UBYTE ubGot, UBYTE ubMax, const char *szMsg) {
 	if(ubGot < ubMax) {
 		return 0;
@@ -220,7 +209,7 @@ static void pageWorkshopProcess(void) {
 				UBYTE ubLevel = pageWorkshopGetPartCurrentLevel();
 				if(!pageWorkshopBuyIsMax(
 					ubLevel, pageWorkshopGetPartMaxLevel(), g_pMsgs[MSG_COMM_ALREADY_MAX]
-				) && pageWorkshopBuyFor(pageWorkshopGetPartUpgradeCost(ubLevel))) {
+				) && vehicleTrySpendCash(0, pageWorkshopGetPartUpgradeCost(ubLevel))) {
 					pageWorkshopSetPartCurrentLevel(ubLevel+1);
 					// text have changed, so draw everything again
 					pageWorkshopNavigateToPart(s_eSelectedPart);

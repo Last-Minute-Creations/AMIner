@@ -115,14 +115,15 @@ General:
 		✔ Display/interactable teleporter pad only when unlocked at given base @done(25-02-03)
 		✔ Enable cargo unstock when platform is built @done(25-02-03)
 		☐ Add descriptions in workshop
-	☐ Unlockable commrade in bases
-		☐ Unlockable workshop in bases
-			✔ First unlock allows repair @done(25-02-03)
-			✔ Second unlock allows buying upgrades @done(25-02-05)
-			☐ Display graphics in base after unlock
-		☐ Unlockable warehouse
-			☐ Add unlock page
-			☐ Display graphics in base after unlock
+	✔ Unlockable workshop in bases @done(25-02-05)
+		✔ First unlock allows repair @done(25-02-03)
+		✔ Second unlock allows buying upgrades @done(25-02-05)
+	✔ Unlockable commrade in bases @done(25-02-05)
+		✔ Add system for unlocking commrade parts @done(25-02-05)
+		✔ Add unlock page for office @done(25-02-05)
+		✔ Display antenna graphics in base after office unlock @done(25-02-05)
+		✔ Add unlock page for warehouse @done(25-02-05)
+		✔ Display workers graphics in base after warehouse unlock @done(25-02-05)
 	☐ Animated main base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
@@ -148,6 +149,7 @@ From QA tests:
 	☐ Make sure there is message for each accolade received (plans!)
 	☐ Display time on HUD instead of cash when in mine
 	☐ Make the sideways drilling smooth between tiles
+	☐ Improve contrast of selected item in commrade
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
@@ -186,6 +188,7 @@ Optimizations:
 	✔ Strip symbols from release builds @done(25-01-22)
 	✘ Font drawing? - quasi-register values inside font file @cancelled(25-01-26)
 	✘ Excavated ground overlay - custom blitter code? @cancelled(25-01-26)
+	☐ Base unlocks draw
 	☐ Gate collectibles draw?
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
 	☐ Pakfile + compression of data files?

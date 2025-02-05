@@ -843,6 +843,17 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	gameUpdateMaxDepth(uwTileY);
 }
 
+UBYTE vehicleTrySpendCash(UBYTE ubPlayerIndex, LONG lCost) {
+	tVehicle *pVehicle = &g_pVehicles[ubPlayerIndex];
+	if(pVehicle->lCash >= lCost) {
+		pVehicle->lCash -= lCost;
+		hudSetCash(ubPlayerIndex, pVehicle->lCash);
+		return 1;
+	}
+	logWrite("Not enough cash\n");
+	return 0;
+}
+
 static void vehicleDrawMarker(tVehicle *pVehicle) {
 	pVehicle->sBobMarker.sPos.uwX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
 	pVehicle->sBobMarker.sPos.uwY = g_pMainBuffer->pCamera->uPos.uwY;

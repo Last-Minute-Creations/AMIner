@@ -18,9 +18,13 @@ void inventoryReset(void) {
 	for(UBYTE i = 0; i < INVENTORY_PART_COUNT; ++i) {
 		inventorySetPartLevel(i, 0);
 	}
+	for(tBaseId eBase = 0; eBase < BASE_ID_COUNT_UNIQUE; ++eBase) {
+		inventorySetCommUnlock(eBase, COMM_UNLOCK_STATE_NONE);
+	}
 
 	// default base unlocks
 	inventorySetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, BASE_ID_GROUND, 2);
+	inventorySetCommUnlock(BASE_ID_GROUND, COMM_UNLOCK_STATE_WAREHOUSE);
 }
 
 void inventorySave(tFile *pFile) {
@@ -63,4 +67,12 @@ void inventorySetBasePartLevel(tPartKind ePart, tBaseId eBaseId, UBYTE ubLevel) 
 
 UBYTE inventoryIsBasePart(tPartKind ePart) {
 	return ePart == INVENTORY_PART_BASE_PLATFORM || ePart == INVENTORY_PART_BASE_WORKSHOP;
+}
+
+void inventorySetCommUnlock(tBaseId eBase, tCommUnlockState eState) {
+	s_sInventory.pCommUnlock[eBase] = eState;
+}
+
+tCommUnlockState inventoryGetCommUnlockState(tBaseId eBase) {
+	return s_sInventory.pCommUnlock[eBase];
 }

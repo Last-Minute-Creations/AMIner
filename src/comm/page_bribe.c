@@ -33,8 +33,7 @@ static void pageBribeProcess(void) {
 
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(planManagerGet()->isPlanActive) {
-				if(bButtonCurr == 0) {
-					g_pVehicles[0].lCash -= s_uwBribeCost;
+				if(bButtonCurr == 0 && vehicleTrySpendCash(0, s_uwBribeCost)) {
 					if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
 						// Success
 						pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);

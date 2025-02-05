@@ -34,6 +34,8 @@ typedef struct _tBase {
 	UWORD uwTileDepth;
 	tUwAbsRect sRectRestock;
 	tUwCoordYX sPosTeleport;
+	tUwCoordYX sPosAntenna;
+	tUwCoordYX sPosWorkshop;
 	tCbBaseProcess cbProcess;
 } tBase;
 
