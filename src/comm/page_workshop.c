@@ -168,6 +168,27 @@ static UBYTE pageWorkshopBuyIsMax(UBYTE ubGot, UBYTE ubMax, const char *szMsg) {
 	return 1;
 }
 
+static tPartKind pageWorkshopGetNextPart(BYTE bDir) {
+	UBYTE isPartUpgradeUnlocked = inventoryGetBasePartLevel(
+		INVENTORY_PART_BASE_WORKSHOP, baseGetCurrentId()
+	) >= 2;
+	BYTE bNewPos = s_eSelectedPart;
+	do {
+		bNewPos += bDir;
+		if(bNewPos >= INVENTORY_PART_COUNT) {
+			bNewPos = 0;
+		}
+		else if(bNewPos < 0) {
+			bNewPos = INVENTORY_PART_COUNT - 1;
+		}
+
+		if(isPartUpgradeUnlocked || inventoryIsBasePart(bNewPos)) {
+			break;
+		}
+	} while((tPartKind)bNewPos != s_eSelectedPart);
+	return bNewPos;
+}
+
 static void pageWorkshopProcess(void) {
 	tWorkshopRow ePrevRow = s_eWorkshopRow;
 
@@ -207,18 +228,12 @@ static void pageWorkshopProcess(void) {
 			}
 		}
 		else if(commNavUse(DIRECTION_RIGHT)) {
-			BYTE bNewPos = s_eSelectedPart + 1;
-			if(bNewPos >= INVENTORY_PART_COUNT) {
-				bNewPos = 0;
-			}
-			pageWorkshopNavigateToPart(bNewPos);
+			tPartKind eNewPart = pageWorkshopGetNextPart(+1);
+			pageWorkshopNavigateToPart(eNewPart);
 		}
 		else if(commNavUse(DIRECTION_LEFT)) {
-			BYTE bNewPos = s_eSelectedPart - 1;
-			if(bNewPos < 0) {
-				bNewPos = INVENTORY_PART_COUNT - 1;
-			}
-			pageWorkshopNavigateToPart(bNewPos);
+			tPartKind eNewPart = pageWorkshopGetNextPart(-1);
+			pageWorkshopNavigateToPart(eNewPart);
 		}
 	}
 	else if(s_eWorkshopRow == WORKSHOP_ROW_EXIT) {
@@ -247,5 +262,6 @@ void pageWorkshopCreate(void) {
 	}
 	buttonRowApply();
 
-	pageWorkshopNavigateToPart(0);
+	s_eSelectedPart = INVENTORY_PART_COUNT;
+	pageWorkshopNavigateToPart(pageWorkshopGetNextPart(+1));
 }

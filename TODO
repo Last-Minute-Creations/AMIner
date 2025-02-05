@@ -115,9 +115,14 @@ General:
 		✔ Display/interactable teleporter pad only when unlocked at given base @done(25-02-03)
 		✔ Enable cargo unstock when platform is built @done(25-02-03)
 		☐ Add descriptions in workshop
-	☐ Unlockable workshop in bases
-		✔ First unlock allows repair @done(25-02-03)
-		☐ Second unlock allows buying upgrades
+	☐ Unlockable commrade in bases
+		☐ Unlockable workshop in bases
+			✔ First unlock allows repair @done(25-02-03)
+			✔ Second unlock allows buying upgrades @done(25-02-05)
+			☐ Display graphics in base after unlock
+		☐ Unlockable warehouse
+			☐ Add unlock page
+			☐ Display graphics in base after unlock
 	☐ Animated main base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
