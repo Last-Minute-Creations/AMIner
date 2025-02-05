@@ -101,7 +101,7 @@ General:
 		✔ Teleport using new animation @done(25-01-19)
 		✘ Up/down options @cancelled(25-01-16)
 	✔ Limit cash to prevent trashing of message icon? @done(25-01-26)
-	☐ Portable teleport as a vehicle upgrade
+	✔ Portable teleport as a vehicle upgrade @done(25-02-05)
 		✔ Return option in fast travel teleporter @done(25-01-16)
 		✔ Remove debug teleport return button @done(25-01-16)
 		✔ Teleporter in mode menu shouldn't be accessible from start @done(25-02-03)
@@ -109,12 +109,12 @@ General:
 		✔ Bring back teleport damage on zeroeth upgrade @done(25-02-03)
 		✔ Randomize teleport location in base on zeroeth upgrade @done(25-02-03)
 		✔ Make selectable in workshop @done(25-02-03)
-		☐ Add descriptions in workshop
+		✔ Add descriptions in workshop @done(25-02-05)
 	✔ Teleporter platform upgrades @done(25-02-03)
 		✔ Per-base teleporter upgrades @done(25-02-03)
 		✔ Display/interactable teleporter pad only when unlocked at given base @done(25-02-03)
 		✔ Enable cargo unstock when platform is built @done(25-02-03)
-		☐ Add descriptions in workshop
+		✔ Add descriptions in workshop @done(25-02-05)
 	✔ Unlockable workshop in bases @done(25-02-05)
 		✔ First unlock allows repair @done(25-02-03)
 		✔ Second unlock allows buying upgrades @done(25-02-05)
@@ -138,8 +138,8 @@ General:
 		✔ Save achievements on commrade/game exit (same as game save + settings) @done(25-01-23)
 		✔ Display achievement icons in menu @done(25-01-26)
 		☐ Test if all achievements pop up properly on hud (especially ending ones)
-		☐ Display achievement unlock text with achievement name + icon
 		☐ Display proper achievement texts
+		☐ Display achievement unlock text with achievement name + icon
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)

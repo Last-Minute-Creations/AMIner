@@ -88,6 +88,7 @@ static void pageWorkshopUpdateText(void) {
 	char szBfr[50];
 	UBYTE isAcquirable = pageWorkshopIsPartAcquirable(s_eSelectedPart);
 	UBYTE ubLevel = pageWorkshopGetPartCurrentLevel();
+	UBYTE ubMaxLevel = pageWorkshopGetPartMaxLevel();
 
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
@@ -99,7 +100,7 @@ static void pageWorkshopUpdateText(void) {
 	commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
 	uwOffsY += ubRowSize;
 
-	if(ubLevel < pageWorkshopGetPartMaxLevel()) {
+	if(ubLevel < ubMaxLevel) {
 		sprintf(
 			szBfr, "%s%hhu: %lu\x1F",
 			g_pMsgs[MSG_COMM_UPGRADE_TO_MK],
@@ -110,17 +111,19 @@ static void pageWorkshopUpdateText(void) {
 	uwOffsY += 2 * ubRowSize;
 
 	const char *szDescription = 0;
-	// TODO: load from json
-	if(s_eSelectedPart == INVENTORY_PART_TNT && ubLevel < UPGRADE_LEVEL_COUNT) {
-		static const char *pDescriptions[UPGRADE_LEVEL_COUNT] = {
-			"Pojedynczy ladunek pozwalajacy na zniszczenie prostej przeszkody terenowej.\nNiszczy surowce zawarte w terenie.",
-			"Dwa ladunki pozwalajace drazyc dluzszy tunel lub zniszczyc pojedyncza skale.\nNiszczy surowce zawarte w terenie.",
-			"Trzy ladunki jeszcze bardziej zwieksza Twoj zasieg.\nNiszczy surowce zawarte w terenie.",
-			"Ulepszona formula materialu wybuchowego pozwoli zachowac surowce w detonowanym terenie."
-		};
-		szDescription = pDescriptions[ubLevel];
+	if(ubLevel < ubMaxLevel) {
+		if(s_eSelectedPart == INVENTORY_PART_TNT) {
+			szDescription = g_pMsgs[MSG_COMM_WORKSHOP_TNT_0 + ubLevel];
+		}
+		else if(s_eSelectedPart == INVENTORY_PART_TELEPORT) {
+			szDescription = g_pMsgs[MSG_COMM_WORKSHOP_TELEPORT_0 + ubLevel];
+		}
+		else if(s_eSelectedPart == INVENTORY_PART_BASE_PLATFORM) {
+			szDescription = g_pMsgs[MSG_COMM_WORKSHOP_PLATFORM_0 + ubLevel];
+		}
 	}
 
+	uwOffsY = WORKSHOP_PART_ICON_HEIGHT;
 	if(szDescription) {
 		commDrawMultilineText(szDescription, 0, uwOffsY);
 	}

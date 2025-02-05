@@ -71,8 +71,21 @@ const char * s_pLangDom[] = {
 	[MSG_COMM_MARKET] = "shop.market",
 	[MSG_COMM_ALREADY_MAX] = "shop.alreadyMax",
 	[MSG_COMM_ALREADY_FULL] = "shop.alreadyFull",
+	// Workshop
+	[MSG_COMM_WORKSHOP_TNT_0] = "workshop.tnt0",
+	[MSG_COMM_WORKSHOP_TNT_1] = "workshop.tnt1",
+	[MSG_COMM_WORKSHOP_TNT_2] = "workshop.tnt2",
+	[MSG_COMM_WORKSHOP_TNT_3] = "workshop.tnt3",
+	[MSG_COMM_WORKSHOP_TELEPORT_0] = "workshop.teleport0",
+	[MSG_COMM_WORKSHOP_TELEPORT_1] = "workshop.teleport1",
+	[MSG_COMM_WORKSHOP_TELEPORT_2] = "workshop.teleport2",
+	[MSG_COMM_WORKSHOP_PLATFORM_0] = "workshop.platform0",
+	[MSG_COMM_WORKSHOP_PLATFORM_1] = "workshop.platform1",
+	[MSG_COMM_WORKSHOP_PLATFORM_2] = "workshop.platform2",
+	// Unlock
 	[MSG_COMM_UNLOCK_OFFICE_WORKSHOP] = "shop.unlockOfficeWorkshop",
 	[MSG_COMM_UNLOCK_WAREHOUSE] = "shop.unlockWarehouse",
+	// Market
 	[MSG_COMM_MARKET_TRADE_COL] = "market.tradeCol",
 	[MSG_COMM_MARKET_FOR_COL] = "market.forCol",
 	// Challenge

@@ -166,6 +166,18 @@
 		"unlockOfficeWorkshop": "BŁĄD: Nie można połączyć z biurem. Wymagana zewnętrzna antena sygnałowa.",
 		"unlockWarehouse": "BŁĄD: Brak rąk do pracy. Wymagany zewnętrzny robotnik."
 	},
+	"workshop": {
+		"tnt0": "Pojedynczy ładunek pozwalający na zniszczenie prostej przeszkody terenowej. Niszczy surowce zawarte w terenie.",
+		"tnt1": "Dwa ładunki pozwalające drążyc dłuższy tunel lub zniszczyć pojedynczą skałe. Niszczy surowce zawarte w terenie.",
+		"tnt2": "Trzy ładunki jeszcze bardziej zwiekszą długość tunelu. Niszczy surowce zawarte w terenie.",
+		"tnt3": "Ulepszona formuła materialu wybuchowego pozwoli zachować surowce w detonowanym terenie.",
+		"teleport0": "Pozwala na powrót w okolice ostatnio odwiedzonej bazy z platformą odbiorczą. Teleportacja może uszkodzić maszynę.",
+		"teleport1": "Dodatkowy mechanizm naprowadzania pozwala na celne i bezbolesne teleportacje.",
+		"teleport2": "Wykorzystując splątanie kwantowe umożliwia powrót z platformy odbiorczej do ostatniego miejsca użycia teleportera.",
+		"platform0": "Pozwala na przesył urobku na powierzchnię między bazami oraz na powrót przenośnym teleporterem.",
+		"platform1": "Modernizacja pozwala na bezpieczną teleportację do sąsiedniej bazy, o ile ma platformę odbiorczą.",
+		"platform2": "Powiększony zasięg pozwala na przeskok do dowolnej bazy, o ile ma platformę odbiorczą."
+	},
 	"market": {
 		"tradeCol": "Wymień...",
 		"forCol": "Za..."
@@ -227,5 +239,5 @@
 		"sciMiner": "Jay Miner",
 		"agentSci": "Naukowcy",
 		"agentSellCrates": "Sprzedaż skrzyń"
-	},
+	}
 }
