@@ -158,10 +158,13 @@
 		"stock": "Stan",
 		"buy": "Kup",
 		"exit": "Wyjdź",
+		"price": "Koszt",
 		"confirm": "Zatwierdź",
 		"market": "Giełda",
 		"alreadyMax": "you already have max level!",
-		"alreadyFull": "you're already full!"
+		"alreadyFull": "you're already full!",
+		"unlockOfficeWorkshop": "BŁĄD: Nie można połączyć z biurem. Wymagana zewnętrzna antena sygnałowa.",
+		"unlockWarehouse": "BŁĄD: Brak rąk do pracy. Wymagany zewnętrzny robotnik."
 	},
 	"market": {
 		"tradeCol": "Wymień...",
@@ -225,23 +228,4 @@
 		"agentSci": "Naukowcy",
 		"agentSellCrates": "Sprzedaż skrzyń"
 	},
-	"officePageContents": {
-		"bribeA": [
-			"Towarzyszu, nie wyrobimy się z planem. Pomożecie?",
-			"No, myślę że coś da się zrobić. Załatwię Wam 2 tygodnie ale to będzie Was kosztować %hu"
-		],
-		"bribeB": [
-			"Towarzyszu, Nagana źle wpłynie na wizerunek zakładu w Centrali. Pomożecie?",
-			"Hmm... Znam kogoś kto może to załatwić. To będzie kosztować %hu"
-		],
-		"bribeOk": "W porządku",
-		"bribeCancel": "Nie, dzięki",
-		"favor": "",
-		"accounting": [
-			"- Pani Krystyno kochana, mamy problem i tylko w Pani nadzieja. Potrzebujemy trochę podkolorować stany magazynowe żeby się Centrala nie czepiała. Ja tu mam dla Pani jedwabne rajstopy i prawdziwą czekoladę. %hu zapłaciłem z prywatnej kasy zakładowej.",
-			"- Panie Dyrektorze, nie trzeba było. Ja to i bez tego za Panem jak w ogień..."
-		],
-		"accountingOk": "Wręcz suwenir",
-		"accountingCancel": "Wróć"
-	}
 }
