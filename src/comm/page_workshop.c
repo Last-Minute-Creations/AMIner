@@ -76,13 +76,13 @@ static void pageWorkshopUpdateText(void) {
 	UBYTE isActive = (s_eWorkshopRow == WORKSHOP_ROW_BUY);
 	const UBYTE ubRowSize = commGetLineHeight() + 1;
 	const UBYTE ubFontFlags = FONT_COOKIE | FONT_SHADOW;
-	const UBYTE ubColor = (
+	const UBYTE ubColorText = (
 		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
 	static const char szCaption[] = "KRTEK 2600";
 	UWORD uwOffsY = 0;
-	commDrawText(0, uwOffsY, szCaption, ubFontFlags, ubColor);
+	commDrawText(0, uwOffsY, szCaption, ubFontFlags, ubColorText);
 	uwOffsY += ubRowSize;
 
 	char szBfr[50];
@@ -97,7 +97,7 @@ static void pageWorkshopUpdateText(void) {
 	else {
 		strcpy(szBfr, g_pShopNames[s_eSelectedPart]);
 	}
-	commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
+	commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColorText);
 	uwOffsY += ubRowSize;
 
 	if(ubLevel < ubMaxLevel) {
@@ -106,7 +106,7 @@ static void pageWorkshopUpdateText(void) {
 			g_pMsgs[MSG_COMM_UPGRADE_TO_MK],
 			ubDisplayLevel + 1, pageWorkshopGetPartUpgradeCost(ubLevel)
 		);
-		commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColor);
+		commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColorText);
 	}
 	uwOffsY += 2 * ubRowSize;
 
@@ -129,7 +129,7 @@ static void pageWorkshopUpdateText(void) {
 	}
 
 	tUwCoordYX sButtonBuyPosition = buttonGetPosition(0);
-	UBYTE ubArrowColor = (buttonGetSelected() == 0) ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK;
+	UBYTE ubArrowColor = (buttonGetSelected() == 0) ? COMM_DISPLAY_COLOR_TEXT_HOVER : COMM_DISPLAY_COLOR_TEXT_DARK;
 	commDrawText(sButtonBuyPosition.uwX - 4, sButtonBuyPosition.uwY + 2, "<", FONT_RIGHT | FONT_VCENTER | FONT_COOKIE, ubArrowColor);
 	commDrawText(sButtonBuyPosition.uwX + 5 + buttonGetWidth(0), sButtonBuyPosition.uwY + 2, ">", FONT_LEFT | FONT_VCENTER | FONT_COOKIE, ubArrowColor);
 

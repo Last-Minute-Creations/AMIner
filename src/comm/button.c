@@ -55,7 +55,7 @@ void buttonDraw(UBYTE ubIdx, tBitMap *pBfr) {
 	}
 
 	UBYTE ubColor = (
-		ubIdx == s_ubSelected ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
+		ubIdx == s_ubSelected ? COMM_DISPLAY_COLOR_TEXT_HOVER : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	const tButton *pButton = &s_pButtons[ubIdx];
 	tUwCoordYX sSize = {.uwX = pButton->uwWidth, .uwY = buttonGetHeight()};

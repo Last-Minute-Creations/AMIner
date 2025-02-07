@@ -170,7 +170,7 @@ static void onMenuPosDraw(
 	commDrawText(
 		uwX  + COMM_DISPLAY_WIDTH / 2, uwY,
 		szText, FONT_SHADOW | FONT_COOKIE | FONT_HCENTER,
-		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
+		isActive ? COMM_DISPLAY_COLOR_TEXT_HOVER : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	*pUndrawWidth = fontMeasureText(g_pFont, szText).uwX;
 
@@ -796,9 +796,9 @@ static void menuAchievementsGsCreate(void) {
 
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT - 1,
-		"Nacisnij FIRE by wyjsc",
+		g_pMsgs[MSG_HI_SCORE_PRESS],
 		FONT_BOTTOM | FONT_HCENTER | FONT_SHADOW | FONT_COOKIE,
-		COMM_DISPLAY_COLOR_TEXT
+		COMM_DISPLAY_COLOR_TEXT_HOVER
 	);
 }
 

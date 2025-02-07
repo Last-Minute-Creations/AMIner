@@ -63,7 +63,7 @@ static void drawSourceStock(void) {
 static void drawRowStock(tMarketRow eRow) {
 	UBYTE ubColor = (
 		(eRow == s_eRow) ?
-		COMM_DISPLAY_COLOR_TEXT :
+		COMM_DISPLAY_COLOR_TEXT_HOVER :
 		COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
@@ -81,7 +81,7 @@ static void drawRowStock(tMarketRow eRow) {
 static void drawRow(tMarketRow eRow) {
 	UBYTE ubColor = (
 		(eRow == s_eRow) ?
-		COMM_DISPLAY_COLOR_TEXT :
+		COMM_DISPLAY_COLOR_TEXT_HOVER :
 		COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 

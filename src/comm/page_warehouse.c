@@ -47,7 +47,7 @@ static void pageWarehouseDrawRow(UBYTE ubPos) {
 	UBYTE ubMineral = s_pMineralsOnList[ubPos];
 	UBYTE ubColor = (
 		ubPos == s_ubPosCurr ?
-		COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
+		COMM_DISPLAY_COLOR_TEXT_HOVER : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
 	UWORD uwRowOffsY = 11 + ubPos * 10;

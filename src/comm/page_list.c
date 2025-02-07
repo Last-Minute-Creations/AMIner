@@ -28,7 +28,7 @@ static const tCommShopPage *s_pCurrentList;
 static void pageListDrawPos(tCommShopPage eListPage, UBYTE ubPos) {
 	UBYTE ubColor = (
 		ubPos == s_bPosCurr ?
-		COMM_DISPLAY_COLOR_TEXT :
+		COMM_DISPLAY_COLOR_TEXT_HOVER :
 		COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 	commDrawText(

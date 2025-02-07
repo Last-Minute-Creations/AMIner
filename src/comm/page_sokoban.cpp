@@ -351,7 +351,7 @@ void pageSokobanProcess(void) {
 						COMM_DISPLAY_WIDTH / 2, uwY,
 						"Level complete! FIRE to continue",
 						FONT_COOKIE | FONT_BOTTOM | FONT_HCENTER,
-						COMM_DISPLAY_COLOR_TEXT
+						COMM_DISPLAY_COLOR_TEXT_HOVER
 					);
 				}
 			}

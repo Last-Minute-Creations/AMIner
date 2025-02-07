@@ -78,6 +78,9 @@ static void hiScoreSave(void) {
 
 static void hiScoreDrawPosition(UBYTE ubPos) {
 	UWORD uwY = ubPos * 10;
+	UBYTE ubColor = (s_isEnteringHiScore && ubPos == s_ubNewScorePos)
+		? COMM_DISPLAY_COLOR_TEXT_HOVER
+		: COMM_DISPLAY_COLOR_TEXT;
 
 	// Clear BG
 	commErase(0, uwY, COMM_DISPLAY_WIDTH, commGetLineHeight());
@@ -86,15 +89,14 @@ static void hiScoreDrawPosition(UBYTE ubPos) {
 	char szBfr[SCORE_NAME_LENGTH + 5];
 	sprintf(szBfr, "%hhu. %s", ubPos + 1, s_pScores[ubPos].szName);
 	commDrawText(
-		16, uwY, szBfr, FONT_LAZY | FONT_COOKIE | FONT_SHADOW,
-		COMM_DISPLAY_COLOR_TEXT
+		16, uwY, szBfr, FONT_LAZY | FONT_COOKIE | FONT_SHADOW, ubColor
 	);
 
 	// Score count
-	sprintf(szBfr, "%lu", s_pScores[ubPos].lScore);
+	stringDecimalFromULong(s_pScores[ubPos].lScore, szBfr);
 	commDrawText(
 		COMM_DISPLAY_WIDTH - 16, uwY, szBfr,
-		FONT_LAZY | FONT_COOKIE | FONT_RIGHT | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
+		FONT_LAZY | FONT_COOKIE | FONT_RIGHT | FONT_SHADOW, ubColor
 	);
 }
 
@@ -120,7 +122,7 @@ void hiScoreDrawAll(void) {
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szMsg,
 		FONT_LAZY | FONT_COOKIE | FONT_HCENTER | FONT_BOTTOM,
-		COMM_DISPLAY_COLOR_TEXT
+		COMM_DISPLAY_COLOR_TEXT_HOVER
 	);
 }
 
