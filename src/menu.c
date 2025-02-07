@@ -766,6 +766,14 @@ static void menuDrawAchievementIcon(UBYTE ubIndex) {
 	);
 }
 
+static void menuDrawCurrentAchievementDescription(void) {
+	UWORD uwDescriptionY = 3 * ACHIEVEMENT_BORDERED_ICON_SIZE;
+	commErase(0, uwDescriptionY, COMM_DISPLAY_WIDTH, commGetLineHeight() * 3 - 2);
+	commDrawTitle(0, uwDescriptionY, g_pMsgs[MSG_ACHIEVEMENT_TITLE_LAST_RIGHTEOUS + s_ubSelectedAchievement]);
+	uwDescriptionY += commGetLineHeight() - 2;
+	commDrawMultilineText(g_pMsgs[MSG_ACHIEVEMENT_DESC_LAST_RIGHTEOUS + s_ubSelectedAchievement], 0, uwDescriptionY);
+}
+
 static void menuAchievementsGsCreate(void) {
 	commEraseAll();
 	s_pAchievementIcons = bitmapCreateFromPath("data/comm_achievements.bm", 0);
@@ -775,10 +783,7 @@ static void menuAchievementsGsCreate(void) {
 		menuDrawAchievementIcon(i);
 	}
 
-	UWORD uwDescriptionY = 	3 * ACHIEVEMENT_BORDERED_ICON_SIZE - 2;
-	commDrawTitle(0, uwDescriptionY, "OSTATNI SPRAWIEDLIWY");
-	uwDescriptionY += commGetLineHeight() - 2;
-	commDrawMultilineText("Opis achievementa na dwie linie tekstu", 0, uwDescriptionY);
+	menuDrawCurrentAchievementDescription();
 
 	commDrawText(
 		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT - 1,
@@ -830,6 +835,7 @@ static void menuAchievementsGsLoop(void) {
 		s_ubSelectedAchievement = bNewSelection;
 		menuDrawAchievementIcon(ubPrevSelection);
 		menuDrawAchievementIcon(s_ubSelectedAchievement);
+		menuDrawCurrentAchievementDescription();
 	}
 
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);

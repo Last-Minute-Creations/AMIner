@@ -239,5 +239,25 @@
 		"sciMiner": "Jay Miner",
 		"agentSci": "Naukowcy",
 		"agentSellCrates": "Sprzedaż skrzyń"
-	}
+	},
+	"achievements": [
+		{"name": "OSTATNI SPRAWIEDLIWY", "description": "TODO"},
+		{"name": "PRZODOWNIK PRACY", "description": "TODO"},
+		{"name": "NAJWIĘKSZA KONFITURA", "description": "TODO"},
+		{"name": "NAJWIĘKSZY ŚLIZGACZ", "description": "TODO"},
+		{"name": "ENTUZJASTA ARCHEOLOGII", "description": "TODO"},
+		{"name": "OFIARA ARCHEOLOGII", "description": "TODO"},
+		{"name": "BITWA STULECIA", "description": "TODO"},
+		{"name": "STRACONA WIEDZA", "description": "TODO"},
+		{"name": "WIĘCEJ WĘGLA", "description": "TODO"},
+		{"name": "REKORDZISTA", "description": "TODO"},
+		{"name": "TAKICH 3 JAK NAS 2", "description": "Przejdź kampanię w trybie 2 graczy"},
+		{"name": "BEZ ŚWIADKÓW", "description": "TODO"},
+		{"name": "PRESJA CZASU", "description": "TODO"},
+		{"name": "PRECZ Z KOMUNĄ", "description": "TODO"},
+		{"name": "UCIECZKA DO TROPIKÓW", "description": "TODO"},
+		{"name": "???", "description": "TODO"},
+		{"name": "???", "description": "TODO"},
+		{"name": "???", "description": "TODO"}
+	]
 }
