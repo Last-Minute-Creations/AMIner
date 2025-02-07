@@ -599,7 +599,7 @@ static inline void vehicleSetTool(
 }
 
 static inline UBYTE vehicleStartDrilling(
-	tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY, UBYTE ubDrillDir
+	tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY, tDrillDir eDrillDir
 ) {
 	if(pVehicle->isChallengeEnded) {
 		return 0;
@@ -651,15 +651,15 @@ static inline UBYTE vehicleStartDrilling(
 	}
 
 	pVehicle->ubDrillState = (
-		ubDrillDir == DRILL_DIR_V ? DRILL_STATE_VERT_ANIM_IN : DRILL_STATE_DRILLING
+		eDrillDir == DRILL_DIR_V ? DRILL_STATE_VERT_ANIM_IN : DRILL_STATE_DRILLING
 	);
 	vehicleSetState(pVehicle, VEHICLE_STATE_DRILLING);
-	pVehicle->ubDrillDir = ubDrillDir;
+	pVehicle->ubDrillDir = eDrillDir;
 
 	pVehicle->sDrillTile.uwX = uwTileX;
 	pVehicle->sDrillTile.uwY = uwTileY;
-	pVehicle->fDrillDestX = fix16_from_int(uwTileX << 5);
-	pVehicle->fDrillDestY = fix16_from_int(((uwTileY + 1) << 5) - VEHICLE_HEIGHT - 4);
+	pVehicle->fDrillDestX = fix16_from_int(uwTileX << TILE_SHIFT);
+	pVehicle->fDrillDestY = fix16_from_int(((uwTileY + 1) << TILE_SHIFT) - VEHICLE_HEIGHT - 4);
 	pVehicle->fDrillDelta = (fix16_one * 3)/(bDrillDuration * 2);
 
 	pVehicle->fDx = 0;
@@ -939,18 +939,18 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	UBYTE ubHalfWidth = 12;
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
-	UWORD uwTileBottom = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
-	UWORD uwTileMid = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT / 2) >> 5;
-	UWORD uwTileCenter = uwCenterX >> 5;
-	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> 5;
-	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> 5;
+	UWORD uwTileBottom = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT + ubAdd) >> TILE_SHIFT;
+	UWORD uwTileMid = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT / 2) >> TILE_SHIFT;
+	UWORD uwTileCenter = uwCenterX >> TILE_SHIFT;
+	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> TILE_SHIFT;
+	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> TILE_SHIFT;
 
 	if(tileIsSolid(uwTileLeft, uwTileMid)) {
-		pVehicle->fX = fix16_from_int(((uwTileLeft+1) << 5) - VEHICLE_WIDTH / 2 + ubHalfWidth);
+		pVehicle->fX = fix16_from_int(((uwTileLeft+1) << TILE_SHIFT) - VEHICLE_WIDTH / 2 + ubHalfWidth);
 		pVehicle->fDx = 0;
 	}
 	else if(tileIsSolid(uwTileRight, uwTileMid)) {
-		pVehicle->fX = fix16_from_int((uwTileRight << 5) - VEHICLE_WIDTH / 2 - ubHalfWidth);
+		pVehicle->fX = fix16_from_int((uwTileRight << TILE_SHIFT) - VEHICLE_WIDTH / 2 - ubHalfWidth);
 		pVehicle->fDx = 0;
 	}
 
@@ -980,7 +980,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	}
 
 	if(pVehicle->fDy < 0) {
-		UWORD uwTileTop = (fix16_to_int(pVehicle->fY) - 1) >> 5;
+		UWORD uwTileTop = (fix16_to_int(pVehicle->fY) - 1) >> TILE_SHIFT;
 		// Flying
 		pVehicle->fY += pVehicle->fDy;
 		if(pVehicle->fY < F16(VEHICLE_TOOL_OFFSET_Y)) {
@@ -988,7 +988,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			pVehicle->fDy = 0;
 		}
 		else if(tileIsSolid(uwTileCenter, uwTileTop)) {
-			pVehicle->fY = fix16_from_int((uwTileTop+1) << 5);
+			pVehicle->fY = fix16_from_int((uwTileTop+1) << TILE_SHIFT);
 			pVehicle->fDy = 0;
 		}
 	}
@@ -1001,7 +1001,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		else {
 			// Collision with ground
 			isOnGround = 1;
-			pVehicle->fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
+			pVehicle->fY = fix16_from_int((uwTileBottom << TILE_SHIFT) - VEHICLE_HEIGHT - ubAdd);
 			if(pVehicle->fDy > 2 * fix16_one) {
 				// vehicleHullDamage(pVehicle, fix16_to_int(pVehicle->fDy - 4 * fix16_one));
 				vehicleHullDamage(pVehicle, fix16_to_int(fix16_mul(
