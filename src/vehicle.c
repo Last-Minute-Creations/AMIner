@@ -42,6 +42,7 @@
 #define VEHICLE_SMOKE_FRAMES 12
 #define VEHICLE_JET_SHOW_FRAME_COUNT 10
 #define VEHICLE_TOOL_PATH_LENGTH 8
+#define VEHICLE_HALF_WIDTH 12
 
 #define SFX_CHANNEL_LOOP_P1 0
 #define SFX_CHANNEL_LOOP_P2 1
@@ -599,7 +600,7 @@ static inline void vehicleSetTool(
 }
 
 static inline UBYTE vehicleStartDrilling(
-	tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY, tDrillDir eDrillDir
+	tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY, tDrillDir eDrillDir, WORD wAddX
 ) {
 	if(pVehicle->isChallengeEnded) {
 		return 0;
@@ -658,7 +659,7 @@ static inline UBYTE vehicleStartDrilling(
 
 	pVehicle->sDrillTile.uwX = uwTileX;
 	pVehicle->sDrillTile.uwY = uwTileY;
-	pVehicle->fDrillDestX = fix16_from_int(uwTileX << TILE_SHIFT);
+	pVehicle->fDrillDestX = fix16_from_int((uwTileX << TILE_SHIFT) + wAddX);
 	pVehicle->fDrillDestY = fix16_from_int(((uwTileY + 1) << TILE_SHIFT) - VEHICLE_HEIGHT - 4);
 	pVehicle->fDrillDelta = (fix16_one * 3)/(bDrillDuration * 2);
 
@@ -936,21 +937,20 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	pVehicle->fX = CLAMP(pVehicle->fX + pVehicle->fDx, fix16_from_int(32), fMaxPosX);
 	pVehicle->sBobBody.sPos.uwX = fix16_to_int(pVehicle->fX);
 	UBYTE ubAdd = (pVehicle->sBobBody.sPos.uwY > (1 + TILE_ROW_BASE_DIRT) * TILE_SIZE) ? 4 : 2;
-	UBYTE ubHalfWidth = 12;
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
 	UWORD uwTileBottom = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT + ubAdd) >> TILE_SHIFT;
 	UWORD uwTileMid = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT / 2) >> TILE_SHIFT;
 	UWORD uwTileCenter = uwCenterX >> TILE_SHIFT;
-	UWORD uwTileLeft = (uwCenterX - ubHalfWidth) >> TILE_SHIFT;
-	UWORD uwTileRight = (uwCenterX + ubHalfWidth) >> TILE_SHIFT;
+	UWORD uwTileLeft = (uwCenterX - VEHICLE_HALF_WIDTH) >> TILE_SHIFT;
+	UWORD uwTileRight = (uwCenterX + VEHICLE_HALF_WIDTH) >> TILE_SHIFT;
 
 	if(tileIsSolid(uwTileLeft, uwTileMid)) {
-		pVehicle->fX = fix16_from_int(((uwTileLeft+1) << TILE_SHIFT) - VEHICLE_WIDTH / 2 + ubHalfWidth);
+		pVehicle->fX = fix16_from_int(((uwTileLeft+1) << TILE_SHIFT) - VEHICLE_WIDTH / 2 + VEHICLE_HALF_WIDTH);
 		pVehicle->fDx = 0;
 	}
 	else if(tileIsSolid(uwTileRight, uwTileMid)) {
-		pVehicle->fX = fix16_from_int((uwTileRight << TILE_SHIFT) - VEHICLE_WIDTH / 2 - ubHalfWidth);
+		pVehicle->fX = fix16_from_int((uwTileRight << TILE_SHIFT) - VEHICLE_WIDTH / 2 - VEHICLE_HALF_WIDTH);
 		pVehicle->fDx = 0;
 	}
 
@@ -1098,15 +1098,15 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 	// Drilling
 	if(isOnGround && !tntIsDetonationActive(&pVehicle->sDynamite)) {
 		if(pVehicle->sSteer.bX > 0 && tileIsDrillable(uwTileRight, uwTileMid)) {
-			vehicleStartDrilling(pVehicle, uwTileRight, uwTileMid, DRILL_DIR_H);
+			vehicleStartDrilling(pVehicle, uwTileRight, uwTileMid, DRILL_DIR_H, TILE_SIZE / 2 - VEHICLE_HALF_WIDTH);
 		}
 		else if(pVehicle->sSteer.bX < 0 && tileIsDrillable(uwTileLeft, uwTileMid)) {
-			vehicleStartDrilling(pVehicle, uwTileLeft, uwTileMid, DRILL_DIR_H);
+			vehicleStartDrilling(pVehicle, uwTileLeft, uwTileMid, DRILL_DIR_H, -TILE_SIZE / 2 + VEHICLE_HALF_WIDTH);
 		}
 		else if(
 			pVehicle->sSteer.bY > 0 && tileIsDrillable(uwTileCenter, uwTileBottom)
 		) {
-			vehicleStartDrilling(pVehicle, uwTileCenter, uwTileBottom, DRILL_DIR_V);
+			vehicleStartDrilling(pVehicle, uwTileCenter, uwTileBottom, DRILL_DIR_V, 0);
 		}
 	}
 	if(isVehicleVisible) {
@@ -1147,9 +1147,9 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 static void vehicleProcessDeadGravity(tVehicle *pVehicle) {
 	UWORD uwY = fix16_to_int(pVehicle->fY);
 	UBYTE ubAdd = (uwY > (1 + TILE_ROW_BASE_DIRT) * TILE_SIZE) ? 4 : 2;
-	UWORD uwTileBottom = (uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
+	UWORD uwTileBottom = (uwY + VEHICLE_HEIGHT + ubAdd) >> TILE_SHIFT;
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH / 2;
-	UWORD uwTileCenter = uwCenterX >> 5;
+	UWORD uwTileCenter = uwCenterX >> TILE_SHIFT;
 	if(!tileIsSolid(uwTileCenter, uwTileBottom)) {
 		// Gravity
 		pVehicle->fDy = MIN(s_fMaxGravDy, pVehicle->fDy + s_fAccGrav);
@@ -1157,7 +1157,7 @@ static void vehicleProcessDeadGravity(tVehicle *pVehicle) {
 	}
 	else {
 		// Collision with ground
-		pVehicle->fY = fix16_from_int((uwTileBottom << 5) - VEHICLE_HEIGHT - ubAdd);
+		pVehicle->fY = fix16_from_int((uwTileBottom << TILE_SHIFT) - VEHICLE_HEIGHT - ubAdd);
 		pVehicle->fDy = 0;
 	}
 }
@@ -1301,11 +1301,11 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 				}
 				else {
 					const UBYTE ubAdd = 4; // No grass past this point
-					UWORD uwTileBottom = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT + ubAdd) >> 5;
-					UWORD uwTileX = pVehicle->sBobBody.sPos.uwX >> 5;
+					UWORD uwTileBottom = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT + ubAdd) >> TILE_SHIFT;
+					UWORD uwTileX = pVehicle->sBobBody.sPos.uwX >> TILE_SHIFT;
 					if(
 						pVehicle->sSteer.bY > 0 && tileIsDrillable(uwTileX, uwTileBottom) &&
-						vehicleStartDrilling(pVehicle, uwTileX, uwTileBottom, DRILL_DIR_V)
+						vehicleStartDrilling(pVehicle, uwTileX, uwTileBottom, DRILL_DIR_V, 0)
 					) {
 						pVehicle->ubDrillState = DRILL_STATE_DRILLING;
 					}
