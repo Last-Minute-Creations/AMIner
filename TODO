@@ -131,15 +131,15 @@ General:
 		☐ Ufo?
 		☐ Clouds?
 	☐ Add 2s pauses between music tracks?
-	☐ Achievements
+	✔ Achievements @done(25-02-07)
 		✔ Transfer achievements from Miro to GDD @done(25-01-23)
 		✔ Add achievement storage outside main game save @done(25-01-23)
 		✔ Unlock achievements in-game @done(25-01-23)
 		✔ Save achievements on commrade/game exit (same as game save + settings) @done(25-01-23)
 		✔ Display achievement icons in menu @done(25-01-26)
-		☐ Test if all achievements pop up properly on hud (especially ending ones)
-		☐ Display proper achievement texts
-		☐ Display achievement unlock text with achievement name + icon
+		✔ Display proper achievement texts @done(25-02-07)
+		✔ Display achievement unlock text with achievement name + icon @done(25-02-07)
+		✔ Test if all achievements pop up properly on hud (especially ending ones) @done(25-02-07)
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)
@@ -162,6 +162,7 @@ Bugs:
 	☐ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place
 	☐ Game doesn't launch properly from icon
 	☐ Warehouse corruption (after entering accounting?)
+	☐ Finishing game with gate and starting challenge corrupts the memory
 
 Misc QoL refinements:
 	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)

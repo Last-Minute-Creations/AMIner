@@ -102,7 +102,7 @@ static void commGsShopLoop(void) {
 	tutorialProcess();
 	dinoProcess();
 
-	hudUpdate();
+	hudProcess();
 	// Process only managers of HUD because we want single buffering on main one
 	vPortProcessManagers(g_pMainBuffer->sCommon.pVPort->pView->pFirstVPort);
 	copProcessBlocks();

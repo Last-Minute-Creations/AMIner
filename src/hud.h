@@ -41,7 +41,7 @@ void hudSetHull(UBYTE ubPlayer, UWORD uwHull, UWORD uwHullMax);
 
 void hudClearInboxNotification(void);
 
-void hudUpdate(void);
+void hudProcess(void);
 
 UBYTE hudIsShowingMessage(void);
 

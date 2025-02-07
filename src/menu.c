@@ -587,7 +587,6 @@ static void menuGsCreate(void) {
 
 static void menuProcessSelecting(void) {
 	commProcess();
-	hudUpdate();
 
 	menuListDraw();
 
@@ -620,6 +619,11 @@ static void menuProcessSelecting(void) {
 			menuEnableAtari();
 		}
 	}
+
+	hudProcess();
+	// Process only managers of HUD because we want single buffering on main one
+	vPortProcessManagers(g_pMainBuffer->sCommon.pVPort->pView->pFirstVPort);
+	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 }
 
@@ -709,6 +713,11 @@ static void menuScoreGsLoop(void) {
 			return;
 		}
 	}
+
+	hudProcess();
+	// Process only managers of HUD because we want single buffering on main one
+	vPortProcessManagers(g_pMainBuffer->sCommon.pVPort->pView->pFirstVPort);
+	copProcessBlocks();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 }
 
@@ -871,9 +880,9 @@ void menuUnload(void) {
 void menuGsEnter(UBYTE isScoreShow) {
 	// Switch to menu, after popping it will process gameGsLoop
 	s_isScoreShowAfterRollIn = isScoreShow;
-	if(!isScoreShow) {
-		hudReset(0, 0);
-	}
+	// if(!isScoreShow) {
+	// 	hudReset(0, 0);
+	// }
 	stateChange(g_pGameStateManager, &g_sStateMenu);
 }
 

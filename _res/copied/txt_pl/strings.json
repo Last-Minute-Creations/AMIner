@@ -3,6 +3,7 @@
 	"commPageNames": ["Biuro", "Warsztat", "Magazyn"],
 	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
 	"hudMessages": {
+		"achievementUnlocked": "Osiągnięcie zdobyte",
 		"newPlan": "Panie Derektorze, dostaliście nowy plan.",
 		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan.",
 		"extending": [

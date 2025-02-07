@@ -161,6 +161,7 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_RADIO_FULL_1] = "hudMessages.radioFull[1]",
 	[MSG_HUD_RADIO_FULL_2] = "hudMessages.radioFull[2]",
 	// HUD: Plan
+	[MSG_HUD_ACHIEVEMENT_UNLOCKED] = "hudMessages.achievementUnlocked",
 	[MSG_HUD_NEW_PLAN] = "hudMessages.newPlan",
 	[MSG_HUD_PLAN_REMAINING] = "hudMessages.remaining",
 	[MSG_HUD_PLAN_EXTENDING] = "hudMessages.extending",

@@ -117,7 +117,7 @@ void coreProcessAfterBobs(void) {
 
 	if(!gameIsCutsceneActive()) {
 		// Update HUD state machine and draw stuff
-		hudUpdate();
+		hudProcess();
 	}
 
 	// Load next base tiles, if needed

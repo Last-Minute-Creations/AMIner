@@ -386,7 +386,7 @@ void hudClearInboxNotification(void) {
 	);
 }
 
-void hudUpdate(void) {
+void hudProcess(void) {
 	tHudPlayerData * const pData = &s_pPlayerData[s_ePlayer];
 	char szBfr[20];
 	UBYTE ubPercent;

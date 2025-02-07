@@ -43,7 +43,7 @@ void pauseGsLoop(void) {
 			menuGsEnter(0);
 		}
 	}
-	hudUpdate();
+	hudProcess();
 
 	tView *pView = g_pMainBuffer->sCommon.pVPort->pView;
 	tVPort *pVpHud = pView->pFirstVPort;

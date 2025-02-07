@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "achievement.h"
+#include <ace/utils/string.h>
 #include "settings.h"
 #include "hud.h"
 #include <comm/page_accounting.h>
@@ -11,10 +12,16 @@
 #include <comm/page_questioning.h>
 #include <comm/page_market.h>
 
+static char s_szAchievementMsgBuffer[50];
+
 void achievementUnlock(tAchievement eAchievement) {
 	if(settingsTryUnlockAchievement(eAchievement)) {
 		logWrite("Unlocking achievement %hu\n", eAchievement);
-		hudShowMessage(FACE_ID_MIETEK, "ACHIEVEMENT UNLOCKED!");
+		char *pEnd = stringCopy(g_pMsgs[MSG_HUD_ACHIEVEMENT_UNLOCKED], s_szAchievementMsgBuffer);
+		*(pEnd++) = ':';
+		*(pEnd++) = '\n';
+		stringCopy(g_pMsgs[MSG_ACHIEVEMENT_TITLE_LAST_RIGHTEOUS + eAchievement], pEnd);
+		hudShowMessage(FACE_ID_MIETEK, s_szAchievementMsgBuffer);
 	}
 }
 
