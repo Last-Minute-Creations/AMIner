@@ -10,10 +10,13 @@
 #include <ace/utils/font.h>
 #include <ace/managers/rand.h>
 #include <ace/managers/ptplayer.h>
+#include <ace/managers/bob.h>
 
 void coreProcessBeforeBobs(void);
 
 void coreProcessAfterBobs(void);
+
+void coreTransferBobToPristine(tBob *pBob);
 
 extern tTileBufferManager *g_pMainBuffer;
 extern tRandManager g_sRand;

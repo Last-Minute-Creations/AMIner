@@ -144,6 +144,7 @@ static void collectibleDrawNext(void) {
 		if(isOnBuffer) {
 			if(s_ubCurrentBob < ubFoundCount && s_pBobsDrawCounts[s_ubCurrentBob] < 2) {
 				bobPush(pBob);
+				coreTransferBobToPristine(pBob);
 				++s_pBobsDrawCounts[s_ubCurrentBob];
 				break;
 			}

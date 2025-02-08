@@ -65,6 +65,8 @@ static const tProgressBarConfig s_sProgressBarConfig = {
 	.ubColorBar = COMM_DISPLAY_COLOR_TEXT_DARK,
 };
 
+//------------------------------------------------------------------ PRIVATE FNS
+
 static void mainPaletteProcess(UBYTE ubFadeLevel) {
 	tFadeState eState = fadeGetState();
 	if(eState == FADE_STATE_IN_MORPHING || eState == FADE_STATE_OUT_MORPHING) {
@@ -91,51 +93,6 @@ static void coreBobSequencesCreate(void) {
 static void coreBobSequencesDestroy(void) {
 	bitmapDestroy(s_pDripMask);
 	bitmapDestroy(s_pDripBitmap);
-}
-
-void coreProcessBeforeBobs(void) {
-	// Undraw all bobs
-	debugColor(0x008);
-	bobBegin(g_pMainBuffer->pScroll->pBack);
-
-	// Draw pending tiles
-	tileBufferQueueProcess(g_pMainBuffer);
-
-	// Draw collectibles and bg anims before anything else
-	collectiblesProcess();
-	if(!gameIsCutsceneActive()) {
-		bobSequenceProcess();
-		baseTeleporterProcess();
-	}
-}
-
-void coreProcessAfterBobs(void) {
-
-	// Finish bob drawing
-	bobPushingDone();
-	bobEnd();
-
-	if(!gameIsCutsceneActive()) {
-		// Update HUD state machine and draw stuff
-		hudProcess();
-	}
-
-	// Load next base tiles, if needed
-	baseProcess();
-
-	// Update palette for new ground layers, also take into account fade level
-	fadeProcess();
-	UBYTE ubFadeLevel = fadeGetLevel();
-	groundLayerProcess(g_pMainBuffer->pCamera->uPos.uwY, ubFadeLevel, fadeGetSecondaryColor());
-	mainPaletteProcess(ubFadeLevel);
-
-	debugColor(0x800);
-	viewProcessManagers(s_pView);
-	copProcessBlocks();
-	debugColor(*s_pColorBg);
-	systemIdleBegin();
-	vPortWaitUntilEnd(s_pVpMain);
-	systemIdleEnd();
 }
 
 static void coreVblankHandler(
@@ -191,6 +148,91 @@ static void onTileDraw(
 		s_pPristineBuffer, uwBitMapX, uwBitMapY, TILE_SIZE, TILE_SIZE
 	);
 }
+
+//------------------------------------------------------------------- PUBLIC FNS
+
+void coreProcessBeforeBobs(void) {
+	// Undraw all bobs
+	debugColor(0x008);
+	bobBegin(g_pMainBuffer->pScroll->pBack);
+
+	// Draw pending tiles
+	tileBufferQueueProcess(g_pMainBuffer);
+
+	// Draw collectibles and bg anims before anything else
+	collectiblesProcess();
+	if(!gameIsCutsceneActive()) {
+		bobSequenceProcess();
+		baseTeleporterProcess();
+	}
+}
+
+void coreProcessAfterBobs(void) {
+
+	// Finish bob drawing
+	bobPushingDone();
+	bobEnd();
+
+	if(!gameIsCutsceneActive()) {
+		// Update HUD state machine and draw stuff
+		hudProcess();
+	}
+
+	// Load next base tiles, if needed
+	baseProcess();
+
+	// Update palette for new ground layers, also take into account fade level
+	fadeProcess();
+	UBYTE ubFadeLevel = fadeGetLevel();
+	groundLayerProcess(g_pMainBuffer->pCamera->uPos.uwY, ubFadeLevel, fadeGetSecondaryColor());
+	mainPaletteProcess(ubFadeLevel);
+
+	debugColor(0x800);
+	viewProcessManagers(s_pView);
+	copProcessBlocks();
+	debugColor(*s_pColorBg);
+	systemIdleBegin();
+	vPortWaitUntilEnd(s_pVpMain);
+	systemIdleEnd();
+}
+
+void coreTransferBobToPristine(tBob *pBob) {
+	bobProcessAll();
+	UWORD uwAvailHeight = g_pMainBuffer->pScroll->uwBmAvailHeight;
+	UWORD uwPartHeight = uwAvailHeight - SCROLLBUFFER_HEIGHT_MODULO(pBob->sPos.uwY, uwAvailHeight);
+
+	UBYTE ubDstOffs = pBob->sPos.uwX & 0xF;
+	UWORD uwBlitWidth = (pBob->uwWidth + ubDstOffs + 15) & 0xFFF0;
+	UWORD uwBlitWords = uwBlitWidth >> 4;
+	UWORD uwBlitSize = ((pBob->_uwInterleavedHeight) << HSIZEBITS) | uwBlitWords;
+	UBYTE *pB = pBob->pFrameData;
+	ULONG ulDestinationOffset = pBob->_pSaveOffsets[bobGetCurrentBufferIndex()];
+	UBYTE *pCD = &s_pPristineBuffer->Planes[0][ulDestinationOffset];
+
+	blitWait();
+	if(pBob->pMaskData) {
+		UBYTE *pA = pBob->pMaskData;
+		g_pCustom->bltapt = (APTR)pA;
+	}
+
+	g_pCustom->bltbpt = (APTR)pB;
+	g_pCustom->bltcpt = (APTR)pCD;
+	g_pCustom->bltdpt = (APTR)pCD;
+	if(uwPartHeight >= pBob->uwHeight) {
+		g_pCustom->bltsize = uwBlitSize;
+	}
+	else {
+		UWORD uwInterleavedPartHeight = uwPartHeight * GAME_BPP;
+		g_pCustom->bltsize = (uwInterleavedPartHeight << HSIZEBITS) | uwBlitWords;
+		pCD = &s_pPristineBuffer->Planes[0][pBob->sPos.uwX / 8];
+		blitWait();
+		g_pCustom->bltcpt = (APTR)pCD;
+		g_pCustom->bltdpt = (APTR)pCD;
+		g_pCustom->bltsize =((pBob->_uwInterleavedHeight - uwInterleavedPartHeight) << HSIZEBITS) | uwBlitWords;
+	}
+}
+
+//-------------------------------------------------------------------- GAMESTATE
 
 static void coreGsCreate(void) {
 	// Create bare-minimum display

@@ -159,7 +159,7 @@ Bugs:
 	✔ Distorted main base in challenge mode @done(25-01-22)
 	✔ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time @done(25-01-22)
 	✔ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up
-	☐ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place
+	✔ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place @done(25-02-08)
 	☐ Game doesn't launch properly from icon
 	☐ Warehouse corruption (after entering accounting?)
 	☐ Finishing game with gate and starting challenge corrupts the memory

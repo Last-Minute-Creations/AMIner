@@ -5,6 +5,7 @@
 #include "bob_sequence.h"
 #include <ace/managers/log.h>
 #include "game.h"
+#include "core.h"
 
 #define BOB_SEQUENCE_COUNT_MAX 5
 
@@ -66,6 +67,7 @@ void bobSequenceProcess(void) {
 			else if(pSequence->isDrawnOnce) {
 				pSequence->isDrawnOnce = 0;
 				bobPush(&pSequence->sBob);
+				coreTransferBobToPristine(&pSequence->sBob);
 				break;
 			}
 			else {
@@ -77,6 +79,7 @@ void bobSequenceProcess(void) {
 					const tBobAnimFrame *pAnimFrame = &pSequence->pAnimFrames[pSequence->ubCurrentFrame];
 					bobSetFrame(&pSequence->sBob, pAnimFrame->pAddrFrame, s_pFrameMask);
 					bobPush(&pSequence->sBob);
+					coreTransferBobToPristine(&pSequence->sBob);
 					pSequence->isDrawnOnce = 1;
 					break;
 				}
