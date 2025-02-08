@@ -232,7 +232,7 @@ static void coreGsCreate(void) {
 	paletteLoadFromPath("data/aminer.plt", s_pPaletteRef, 1 << GAME_BPP);
 	memcpy(pVpHud->pPalette, s_pPaletteRef, sizeof(pVpHud->pPalette));
 	defsCreateLocale(languageGetPrefix());
-	commCreate();
+	commCreate(s_pPristineBuffer);
 	viewLoad(s_pView);
 	viewProcessManagers(s_pView);
 	commTryShow(0, 0, 1);

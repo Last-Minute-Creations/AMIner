@@ -55,7 +55,7 @@ typedef enum _tBtnState {
 	BTN_STATE_USED
 } tBtnState;
 
-void commCreate(void);
+void commCreate(tBitMap *pPristineBuffer);
 
 void commDestroy(void);
 

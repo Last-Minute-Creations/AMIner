@@ -189,6 +189,7 @@ Optimizations:
 	✔ Strip symbols from release builds @done(25-01-22)
 	✘ Font drawing? - quasi-register values inside font file @cancelled(25-01-26)
 	✘ Excavated ground overlay - custom blitter code? @cancelled(25-01-26)
+	✔ Replace commrade undraw buffer with pristine buffer @done(25-02-08)
 	☐ Base unlocks draw
 	☐ Gate collectibles draw?
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx

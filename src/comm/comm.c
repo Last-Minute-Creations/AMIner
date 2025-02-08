@@ -29,7 +29,7 @@
 #define COMM_PROGRESS_BAR_BORDER_DISTANCE 2
 
 static tBitMap *s_pBmEdgesMask;
-static tBitMap *s_pBmRestore;
+static tBitMap *s_pPristineBuffer;
 static tBitMap *s_pBg, *s_pButtons;
 static UBYTE s_pNav[DIRECTION_COUNT] = {BTN_STATE_NACTIVE};
 static UBYTE s_pNavEx[COMM_NAV_EX_COUNT] = {BTN_STATE_NACTIVE};
@@ -112,23 +112,20 @@ static void drawButtonLabels(void) {
 static void fixNextBackgroundEdge(UWORD uwX, UWORD uwY, UWORD uwHeight) {
 	tUwCoordYX sOrigin = commGetOrigin();
 	UWORD uwBlitWidthInWords = 1;
-	ULONG ulOffsB = s_pBmRestore->BytesPerRow * uwY + (uwX / 8);
-	ULONG ulOffsCD = s_pBmDraw->BytesPerRow * (uwY + sOrigin.uwY) + ((uwX + sOrigin.uwX) / 8);
+	ULONG ulOffsBCD = s_pBmDraw->BytesPerRow * (uwY + sOrigin.uwY) + ((uwX + sOrigin.uwX) / 8);
 	blitWait();
-	g_pCustom->bltbpt = (UBYTE*)((ULONG)s_pBmRestore->Planes[0] + ulOffsB);
-	g_pCustom->bltcpt = (UBYTE*)((ULONG)s_pBmDraw->Planes[0] + ulOffsCD);
-	g_pCustom->bltdpt = (UBYTE*)((ULONG)s_pBmDraw->Planes[0] + ulOffsCD);
+	g_pCustom->bltbpt = (UBYTE*)((ULONG)s_pPristineBuffer->Planes[0] + ulOffsBCD);
+	g_pCustom->bltcpt = (UBYTE*)((ULONG)s_pBmDraw->Planes[0] + ulOffsBCD);
+	g_pCustom->bltdpt = (UBYTE*)((ULONG)s_pBmDraw->Planes[0] + ulOffsBCD);
 	g_pCustom->bltsize = ((uwHeight * GAME_BPP) << HSIZEBITS) | (uwBlitWidthInWords);
 }
 
 static void fixBackgroundEdges(void) {
-
 	// A: edge mask, B: restore buffer, C/D: display buffer
 	// Use C channel instead of A - same speed, less regs to set up
 	UWORD uwBltCon0 = USEA|USEB|USEC|USED | MINTERM_COOKIE;
 	UWORD uwBlitWidthInWords = 1;
-	WORD wModuloB = bitmapGetByteWidth(s_pBmRestore) - (uwBlitWidthInWords << 1);
-	WORD wModuloCD = bitmapGetByteWidth(s_pBmDraw) - (uwBlitWidthInWords << 1);
+	WORD wModuloBCD = bitmapGetByteWidth(s_pBmDraw) - (uwBlitWidthInWords << 1);
 
 	blitWait();
 	g_pCustom->bltafwm = 0xFFFF;
@@ -138,11 +135,10 @@ static void fixBackgroundEdges(void) {
 
 	g_pCustom->bltapt = (UBYTE*)((ULONG)s_pBmEdgesMask->Planes[0]);
 	g_pCustom->bltamod = 0;
-	g_pCustom->bltbmod = wModuloB;
-	g_pCustom->bltcmod = wModuloCD;
-	g_pCustom->bltdmod = wModuloCD;
+	g_pCustom->bltbmod = wModuloBCD;
+	g_pCustom->bltcmod = wModuloBCD;
+	g_pCustom->bltdmod = wModuloBCD;
 
-	// First edge
 	fixNextBackgroundEdge(0, 0, 5);
 	fixNextBackgroundEdge(COMM_WIDTH - 16, 0, 4);
 	fixNextBackgroundEdge(0, COMM_HEIGHT - 4, 4);
@@ -151,12 +147,9 @@ static void fixBackgroundEdges(void) {
 
 //------------------------------------------------------------- PUBLIC FUNCTIONS
 
-void commCreate(void) {
+void commCreate(tBitMap *pPristineBuffer) {
 	systemUse();
-	s_pBmRestore = bitmapCreate(
-		COMM_WIDTH, COMM_HEIGHT,
-		g_pMainBuffer->sCommon.pVPort->ubBpp, BMF_INTERLEAVED
-	);
+	s_pPristineBuffer = pPristineBuffer;
 	s_pBg = bitmapCreateFromPath("data/comm_bg.bm", 0);
 	s_pButtons = bitmapCreateFromPath("data/comm_buttons.bm", 0);
 	s_pLineBuffer = fontCreateTextBitMap(
@@ -187,7 +180,6 @@ void commDestroy(void) {
 		ptplayerSfxDestroy(s_pSfxKeyRelease[i]);
 	}
 
-	bitmapDestroy(s_pBmRestore);
 	bitmapDestroy(s_pBg);
 	bitmapDestroy(s_pButtons);
 	bitmapDestroy(s_pBmEdgesMask);
@@ -229,12 +221,6 @@ UBYTE commTryShow(tSteer *pSteers, UBYTE ubSteerCount, UBYTE isIntro) {
 	s_ubSteerCount = ubSteerCount;
 
 	s_pBmDraw = g_pMainBuffer->pScroll->pBack;
-
-	// Store content beneath commrade
-	blitCopyAligned(
-		s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
-		s_pBmRestore, 0, 0, COMM_WIDTH, COMM_HEIGHT
-	);
 
 	// Draw commrade background
 	blitCopyAligned(
@@ -365,7 +351,8 @@ void commHide(void) {
 	tUwCoordYX sOrigin = commGetOrigin();
 	// Restore content beneath commrade
 	blitCopyAligned(
-		s_pBmRestore, 0, 0, s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
+		s_pPristineBuffer, sOrigin.uwX, sOrigin.uwY,
+		s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
 		COMM_WIDTH, COMM_HEIGHT
 	);
 }
