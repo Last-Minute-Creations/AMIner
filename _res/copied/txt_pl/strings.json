@@ -65,7 +65,11 @@
 				"w uruchomieniu portalu. Pospiesz się, tutaj umieramy."
 			]
 		],
-		"sciWelcome": "Hej, Ty! W maszynie! Z nieba nam spadłeś!"
+		"sciWelcome": "Hej, Ty! W maszynie! Z nieba nam spadłeś!",
+		"prisonerFound": [
+			"Panie derektorze, wygląda na wygłodzonego.",
+			"Przywiezie go Pan do bazy."
+		]
 	},
 	"hiScore": {
 		"new": "Nowy rekord! Wpisz imię.",
@@ -109,6 +113,7 @@
 		"finishing": "Ruchy tektoniczne"
 	},
 	"tutorial": {
+		"introduction": "Wprowadzenie",
 		"start": [
 			"Panie Derektorze, Kumbajnem podjedziecie",
 			"do bramy i wciśniecie guzik na wihajstrze"
@@ -148,6 +153,7 @@
 		"foundCapsule": "Kapsuła"
 	},
 	"shop": {
+		"pressSkip": "Naciśnij FIRE lub ENTER aby pominąć",
 		"timeRemaining": "Pozostało %d dni",
 		"accolades": "Pochwały:",
 		"rebukes": "Nagany:",
@@ -158,14 +164,34 @@
 		"upgradeToMk": "Ulepsz do Wz",
 		"stock": "Stan",
 		"buy": "Kup",
+		"accept": "Akceptuj",
 		"exit": "Wyjdź",
 		"price": "Koszt",
 		"confirm": "Zatwierdź",
+		"gateOpening": [
+			"Tajemnicza brama lada chwila się aktywuje.",
+			"Wokół niej są ładunki wybuchowe. Czy chcesz ją zdetonować?"
+		],
+		"detonate": "Detonuj",
+		"doNothing": "Nic nie rób",
+		"escapeOffer": "Za Twoje zasługi możemy Cię przetransportować na Zachód. Daj znać jak będziesz gotowy.",
+		"escape": "Uciekaj",
 		"market": "Giełda",
-		"alreadyMax": "you already have max level!",
-		"alreadyFull": "you're already full!",
 		"unlockOfficeWorkshop": "BŁĄD: Nie można połączyć z biurem. Wymagana zewnętrzna antena sygnałowa.",
 		"unlockWarehouse": "BŁĄD: Brak rąk do pracy. Wymagany zewnętrzny robotnik."
+	},
+	"tricks": {
+		"noPlan": "Nie masz aktywnego planu! Co mam niby zrobić?",
+		"accountingPremise": "Zleć Kreatywną Księgowość aby natychmiast wykonać plan.",
+		"accountingDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
+		"bribePremise": "Wręćż łapówkę aby zyskać %hhu dni na realizację planu.",
+		"bribeDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
+		"bribeUsed": "Towarzyszu, nie teraz... Już Ci pomogłem przy obecnym planie!",
+		"bribePrice": "Będzie Cię to kosztować %hu%c.",
+		"favorFlavor": "Towarzyszu, uwielbiam z Tobą pracować. Słyszałem że obecny plan jest ciężki. Jeśli chcesz, mogę zadzwonić tu i tam i może coś załatwić.",
+		"favorPremise": "Urzędas może zamienić obecny plan na inny.",
+		"favorLeft": "Zostało %hhu przysług.",
+		"favorNone": "Prosisz mnie o zbyt wiele, Towarzyszu. Przestań się ociągać!"
 	},
 	"workshop": {
 		"tnt0": "Pojedynczy ładunek pozwalający na zniszczenie prostej przeszkody terenowej. Niszczy surowce zawarte w terenie.",
@@ -178,6 +204,32 @@
 		"platform0": "Pozwala na przesył urobku na powierzchnię między bazami oraz na powrót przenośnym teleporterem.",
 		"platform1": "Modernizacja pozwala na bezpieczną teleportację do sąsiedniej bazy, o ile ma platformę odbiorczą.",
 		"platform2": "Powiększony zasięg pozwala na przeskok do dowolnej bazy, o ile ma platformę odbiorczą."
+	},
+	"crates": {
+		"premiseTeleport": "Aby naprawić teleporter potrzebujemy części z 5 skrzyń.",
+		"premiseCapsule": "Aby ustabilizować i otworzyć kapsułę potrzebujemy części z 5 skrzyń.",
+		"premiseSell": "Kupię od Ciebie każdą skrzynię za %hu%c.",
+		"notYetGive": "Daj znać jak je zbierzesz.",
+		"notYetSell": "Wróć jak będziesz miał coś na sprzedaż.",
+		"give": "Przekaż skrzynię",
+		"sell": "Sprzedaj skrzynię",
+		"remaining": "Pozostałe skrzynie: %hhu"
+	},
+	"bonus": {
+		"complete": "Poziom ukończony!",
+		"level": "Poziom: %hhu",
+		"steps": "Kroki: %hu"
+	},
+	"questioning": {
+		"gate": "Czy znalazłeś jakieś podejrzane kawałki bramy?",
+		"crate": "Czy znalazłeś jakieś podejrzane skrzynie?",
+		"description": [
+			"Jeśli powiesz prawdę, przypał spadnie o %d i nie dostaniesz nagany.",
+			"",
+			"Jeśli zaryzykujesz kłamstwo, masz %hhu%% szans na przyłapanie, po którym dostaniesz naganę i Komisarz odkryje prawdę."
+		],
+		"truth": "Powiedz prawdę",
+		"lie": "Skłam"
 	},
 	"market": {
 		"tradeCol": "Wymień...",

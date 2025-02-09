@@ -349,7 +349,7 @@ void pageSokobanProcess(void) {
 					commErase(0, uwY - 10, COMM_DISPLAY_WIDTH, 10);
 					commDrawText(
 						COMM_DISPLAY_WIDTH / 2, uwY,
-						"Level complete! FIRE to continue",
+						g_pMsgs[MSG_BONUS_COMPLETE],
 						FONT_COOKIE | FONT_BOTTOM | FONT_HCENTER,
 						COMM_DISPLAY_COLOR_TEXT_HOVER
 					);
@@ -543,14 +543,14 @@ void tLevelState::drawTileAt(UBYTE ubX, UBYTE ubY) {
 }
 
 void tLevelState::drawLevelIndex(void) {
-	char szLevelText[sizeof("Level: 23")];
-	sprintf(szLevelText, "Level: %hhu", s_ubCurrentLevelIndex + 1);
+	char szLevelText[15];
+	sprintf(szLevelText, g_pMsgs[MSG_BONUS_LEVEL], s_ubCurrentLevelIndex + 1);
 	commDrawText(COMM_DISPLAY_WIDTH - 60, COMM_DISPLAY_HEIGHT - 10, szLevelText, FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
 }
 
 void tLevelState::drawStepCount(void) {
-	char szStepText[sizeof("Steps: 65535")];
-	sprintf(szStepText, "Steps: %hu", m_uwStepCount);
+	char szStepText[15];
+	sprintf(szStepText, g_pMsgs[MSG_BONUS_STEPS], m_uwStepCount);
 	commErase(20, COMM_DISPLAY_HEIGHT - 10, 60, 10);
 	commDrawText(20, COMM_DISPLAY_HEIGHT - 10, szStepText, FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
 }

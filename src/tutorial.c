@@ -38,7 +38,7 @@ static UBYTE tutorialProcessChallenge(void) {
 	UBYTE isEarlyReturn = 0;
 	switch(s_eTutorialState) {
 		case TUTORIAL_SHOW_MESSAGE_INTRO:
-			gsMsgInit(FACE_ID_MIETEK, "intro_challenge", "Wprowadzenie");
+			gsMsgInit(FACE_ID_MIETEK, "intro_challenge", g_pMsgs[MSG_TUTORIAL_INTRODUCTION]);
 			statePush(g_pGameStateManager, &g_sStateMsg);
 			s_eTutorialState = TUTORIAL_DONE;
 			isEarlyReturn = 1;
@@ -79,12 +79,13 @@ static UBYTE tutorialProcessStory(void) {
 	UBYTE isEarlyReturn = 0;
 	switch(s_eTutorialState) {
 		case TUTORIAL_SHOW_MESSAGE_INTRO:
-			gsMsgInit(FACE_ID_URZEDAS, "intro_campaign", "Wprowadzenie");
+			gsMsgInit(FACE_ID_URZEDAS, "intro_campaign", g_pMsgs[MSG_TUTORIAL_INTRODUCTION]);
 			statePush(g_pGameStateManager, &g_sStateMsg);
 			++s_eTutorialState;
 			isEarlyReturn = 1;
 			break;
 		case TUTORIAL_GO_MEET_MIETEK:
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_DOSSIER);
 			pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME);
 			inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME, 0);
 			hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_GO_MEET_MIETEK]);

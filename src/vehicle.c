@@ -671,14 +671,18 @@ static inline UBYTE vehicleStartDrilling(
 }
 
 static WORD vehicleRestock(tVehicle *pVehicle) {
+	tBaseId eBaseId = baseGetCurrentId();
 	if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, baseGetCurrentId())) {
-		pVehicle->eLastVisitedTeleportableBase = baseGetCurrentId();
+		pVehicle->eLastVisitedTeleportableBase = eBaseId;
 	}
 
 	pVehicle->uwCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
 	UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
-	if(g_isChallenge || inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, baseGetCurrentId())) {
+	if(
+		g_isChallenge ||
+		(eBaseId == BASE_ID_GROUND || inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, eBaseId))
+	) {
 		hudSetCargo(pVehicle->ubPlayerIdx, 0, uwCargoMax);
 		for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 			warehouseSetStock(i, warehouseGetStock(i) + pVehicle->pStock[i]);
@@ -687,7 +691,7 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 	}
 
 	WORD wRestockPrice = 0;
-	if(g_isChallenge || inventoryGetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, baseGetCurrentId())) {
+	if(g_isChallenge || inventoryGetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, eBaseId)) {
 		// Buy as much fuel as needed
 		// Start refueling if half a liter is spent
 		UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;

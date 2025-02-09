@@ -62,24 +62,20 @@ void pageAccountingCreate(void) {
 	UBYTE ubLineHeight = commGetLineHeight();
 	if (!planManagerGet()->isPlanActive) {
 		uwPosY += commDrawMultilineText(
-			"You have no active plan! What do you want me to do?", 0, uwPosY
+			g_pMsgs[MSG_TRICKS_NO_PLAN], 0, uwPosY
 		) * ubLineHeight;
 		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 	else {
 		uwPosY += commDrawMultilineText(
-			"I can do some Creative Acccounting for you and fulfill your plan instantly.",
-			0, uwPosY
+			g_pMsgs[MSG_TRICKS_ACCOUNTING_PREMISE], 0, uwPosY
 		) * ubLineHeight;
 		char szBfr[150];
 		uwPosY += ubLineHeight / 2;
-		sprintf(
-			szBfr, "There is %hhu%% chance that we will get caught, which would result in instantly getting a rebuke.",
-			heatGetPercent()
-		);
+		sprintf(szBfr, g_pMsgs[MSG_TRICKS_ACCOUNTING_DETAILS], heatGetPercent());
 		uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
 
-		buttonInitAcceptDecline("Accept", "Decline");
+		buttonInitAcceptDecline(g_pMsgs[MSG_COMM_ACCEPT], g_pMsgs[MSG_PAGE_BACK]);
 	}
 
 	buttonDrawAll(commGetDisplayBuffer());

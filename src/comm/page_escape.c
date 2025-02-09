@@ -56,9 +56,9 @@ void pageEscapeCreate(tPageEscapeScenario eScenario) {
 	UWORD uwPosY = 0;
 
 	uwPosY += commDrawMultilineText(
-		"Za Twoje zaslugi mozemy Cie przetransportowac na zachod. Daj znac jak bedziesz gotowy.", 0, uwPosY
+		g_pMsgs[MSG_COMM_ESCAPE_OFFER], 0, uwPosY
 	) * ubLineHeight;
 
-	buttonInitAcceptDecline("Uciekaj", g_pMsgs[MSG_PAGE_BACK]);
+	buttonInitAcceptDecline(g_pMsgs[MSG_COMM_ESCAPE], g_pMsgs[MSG_PAGE_BACK]);
 	buttonDrawAll(commGetDisplayBuffer());
 }

@@ -80,9 +80,11 @@ static void pageWorkshopUpdateText(void) {
 		isActive ? COMM_DISPLAY_COLOR_TEXT : COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
-	static const char szCaption[] = "KRTEK 2600";
 	UWORD uwOffsY = 0;
-	commDrawText(0, uwOffsY, szCaption, ubFontFlags, ubColorText);
+	commDrawText(
+		0, uwOffsY, inventoryIsBasePart(s_eSelectedPart) ? "BAZA" : "KRTEK 2600" ,
+		ubFontFlags, ubColorText
+	);
 	uwOffsY += ubRowSize;
 
 	char szBfr[50];
@@ -151,12 +153,12 @@ static void pageWorkshopNavigateToPart(tPartKind ePart) {
 	pageWorkshopUpdateText();
 }
 
-static UBYTE pageWorkshopBuyIsMax(UBYTE ubGot, UBYTE ubMax, const char *szMsg) {
+static UBYTE pageWorkshopBuyIsMax(UBYTE ubGot, UBYTE ubMax) {
 	if(ubGot < ubMax) {
 		return 0;
 	}
 	// TODO: msg szMsg
-	logWrite("pageWorkshopBuyIsMax: '%s'\n", szMsg);
+	logWrite("pageWorkshopBuyIsMax: Exceeded max level %hhu\n", ubMax);
 	return 1;
 }
 
@@ -210,9 +212,10 @@ static void pageWorkshopProcess(void) {
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
 			if(s_eSelectedPart < INVENTORY_PART_COUNT) {
 				UBYTE ubLevel = pageWorkshopGetPartCurrentLevel();
-				if(!pageWorkshopBuyIsMax(
-					ubLevel, pageWorkshopGetPartMaxLevel(), g_pMsgs[MSG_COMM_ALREADY_MAX]
-				) && vehicleTrySpendCash(0, pageWorkshopGetPartUpgradeCost(ubLevel))) {
+				if(
+					!pageWorkshopBuyIsMax(ubLevel, pageWorkshopGetPartMaxLevel()) &&
+					vehicleTrySpendCash(0, pageWorkshopGetPartUpgradeCost(ubLevel))
+				) {
 					pageWorkshopSetPartCurrentLevel(ubLevel+1);
 					// text have changed, so draw everything again
 					pageWorkshopNavigateToPart(s_eSelectedPart);

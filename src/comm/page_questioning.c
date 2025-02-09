@@ -109,10 +109,10 @@ void pageQuestioningCreate(void) {
 	switch (s_eQuestioningBitCurrent)
 	{
 		case QUESTIONING_BIT_GATE:
-			szMsg = "Have you found some gate parts?";
+			szMsg = g_pMsgs[MSG_QUESTIONING_GATE];
 			break;
 		case QUESTIONING_BIT_TELEPORT_PARTS:
-			szMsg = "Have you found some teleport parts?";
+			szMsg = g_pMsgs[MSG_QUESTIONING_CRATE];
 			break;
 		default:
 			logWrite("ERR: Unhandled questioning value: %d\n", s_eQuestioningBitCurrent);
@@ -124,15 +124,13 @@ void pageQuestioningCreate(void) {
 	uwPosY += ubLineHeight / 2;
 	sprintf(
 		szBfr,
-		"If you tell the truth, heat will decrease by %d and you will not get a rebuke.\n\n"
-		"If you risk lying to commissar, there is %hhu%% chance that you will get caught, "
-		"which will result in instantly getting a rebuke and him discovering the truth.",
+		g_pMsgs[MSG_QUESTIONING_DESCRIPTION],
 		QUESTIONING_HEAT_DECREASE_TRUTH,
 		heatGetPercent()
 	);
 	uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
 
-	buttonInitAcceptDecline("Tell the truth", "Lie");
+	buttonInitAcceptDecline(g_pMsgs[MSG_QUESTIONING_TRUTH], g_pMsgs[MSG_QUESTIONING_LIE]);
 	buttonDrawAll(commGetDisplayBuffer());
 }
 

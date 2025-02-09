@@ -53,28 +53,26 @@ void pageFavorCreate(void) {
 	WORD wDays = planGetRemainingDays();
 	if (!planManagerGet()->isPlanActive) {
 		uwPosY += commDrawMultilineText(
-			"You have no active plan! What do you want me to do?", 0, uwPosY
+			g_pMsgs[MSG_TRICKS_NO_PLAN], 0, uwPosY
 		) * ubLineHeight;
 		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 	else if(s_ubFavorsLeft > 0 && wDays >= 15) {
 		uwPosY += commDrawMultilineText(
-			"I like working with you Comrade, I really do."
-			" I heard that current plan is tough for you. If you want,"
-			" I can make some calls and try to do something about it.",
+			g_pMsgs[MSG_TRICKS_FAVOR_FLAVOR],
 			0, uwPosY
 		) * ubLineHeight;
 
 		uwPosY += ubLineHeight / 2;
-		uwPosY += commDrawMultilineText("Urz\x84""das can replace current plan with another one.", 0, uwPosY) * ubLineHeight;
+		uwPosY += commDrawMultilineText(g_pMsgs[MSG_TRICKS_FAVOR_PREMISE], 0, uwPosY) * ubLineHeight;
 		char szBfr[100];
-		sprintf(szBfr, "You have %hhu favors left.", s_ubFavorsLeft);
+		sprintf(szBfr, g_pMsgs[MSG_TRICKS_FAVOR_LEFT], s_ubFavorsLeft);
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
-		buttonInitAcceptDecline("Accept", "Decline");
+		buttonInitAcceptDecline(g_pMsgs[MSG_COMM_ACCEPT], g_pMsgs[MSG_PAGE_BACK]);
 	}
 	else {
-		uwPosY += commDrawMultilineText("You ask me for too much, Comrade. Do some real work, will you?", 0, uwPosY) * ubLineHeight;
+		uwPosY += commDrawMultilineText(g_pMsgs[MSG_TRICKS_FAVOR_NONE], 0, uwPosY) * ubLineHeight;
 		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 

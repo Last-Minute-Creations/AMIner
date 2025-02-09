@@ -126,7 +126,7 @@ void questGateUnlockPrisoner(void) {
 	s_isPrisonerFound = 1;
 	hudShowMessage(
 		FACE_ID_MIETEK,
-		"Panie derektorze, wyglada na wyglodzonego.\nPrzywiezie go Pan do bazy."
+		g_pMsgs[MSG_HUD_PRISONER_FOUND]
 	);
 	pageOfficeUnlockPerson(FACE_ID_PRISONER);
 	pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_DOSSIER);

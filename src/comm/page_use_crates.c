@@ -35,20 +35,20 @@ static void pageUseCratesDrawAll(void) {
 	UBYTE ubMinAmount = pageUseCratesGetMinAmount();
 	switch(s_eScenario) {
 		case PAGE_USE_CRATES_SCENARIO_TELEPORTER:
-			szMsgPremise = "Aby naprawic teleporter potrzebujemy czesci z 5 skrzyn.";
-			szMsgNotYet = "Daj znac jak je zbierzesz.";
-			szMsgUse = "Przekaz skrzynie";
+			szMsgPremise = g_pMsgs[MSG_CRATES_PREMISE_TELEPORT];
+			szMsgNotYet = g_pMsgs[MSG_CRATES_NOT_YET_GIVE];
+			szMsgUse = g_pMsgs[MSG_CRATES_GIVE];
 			break;
 		case PAGE_USE_CRATES_SCENARIO_CAPSULE:
-			szMsgPremise = "Aby ustabilizowac i otworzyc kapsule potrzebujemy czesci z 5 skrzyn.";
-			szMsgNotYet = "Daj znac jak je zbierzesz.";
-			szMsgUse = "Przekaz skrzynie";
+			szMsgPremise = g_pMsgs[MSG_CRATES_PREMISE_CAPSULE];
+			szMsgNotYet = g_pMsgs[MSG_CRATES_NOT_YET_GIVE];
+			szMsgUse = g_pMsgs[MSG_CRATES_GIVE];
 			break;
 		case PAGE_USE_CRATES_SCENARIO_SELL:
-			sprintf(szBfr, "Kupie od Ciebie kazda skrzynie za %hu\x1F.", 1000);
+			sprintf(szBfr, g_pMsgs[MSG_CRATES_PREMISE_SELL], 1000, '\x1F');
 			szMsgPremise = szBfr;
-			szMsgNotYet = "Wroc jak bedziesz mial cos na sprzedaz.";
-			szMsgUse = "Sprzedaj skrzynie";
+			szMsgNotYet = g_pMsgs[MSG_CRATES_NOT_YET_SELL];
+			szMsgUse = g_pMsgs[MSG_CRATES_SELL];
 			break;
 	}
 
@@ -61,7 +61,7 @@ static void pageUseCratesDrawAll(void) {
 		buttonInitAcceptDecline(szMsgUse, g_pMsgs[MSG_PAGE_BACK]);
 	}
 
-	sprintf(szBfr, "Pozostale skrzynie: %hhu", ubCrateCount);
+	sprintf(szBfr, g_pMsgs[MSG_CRATES_REMAINING], ubCrateCount);
 	uwPosY += ubLineHeight;
 	uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 

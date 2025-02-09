@@ -43,13 +43,12 @@ void pageGateDilemmaCreate(void) {
 	UWORD uwPosY = 0;
 
 	uwPosY += commDrawMultilineText(
-		"The mysterious gate is about to be activated.\n"
-		"There are explosives set up around it. Do you want to detonate them?",
+		g_pMsgs[MSG_COMM_GATE_OPENING],
 		0, uwPosY
 	) * ubLineHeight;
 	// uwPosY += ubLineHeight / 2;
 
-	buttonInitAcceptDecline("Detonate", "Do nothing");
+	buttonInitAcceptDecline(g_pMsgs[MSG_COMM_DETONATE], g_pMsgs[MSG_COMM_DO_NOTHING]);
 	buttonSelect(1);
 	buttonDrawAll(commGetDisplayBuffer());
 }

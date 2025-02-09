@@ -354,7 +354,7 @@ static void coreGsCreate(void) {
 		s_sProgressBarConfig.sBarPos.uwX - 2, s_sProgressBarConfig.sBarPos.uwY - 2,
 		s_sProgressBarConfig.uwWidth + 4, s_sProgressBarConfig.uwHeight + 4, 0
 	);
-	tTextBitMap *pTextBm = fontCreateTextBitMapFromStr(g_pFont, "Nacisnij przycisk aby pominac");
+	tTextBitMap *pTextBm = fontCreateTextBitMapFromStr(g_pFont, g_pMsgs[MSG_COMM_PRESS_SKIP]);
 	fontDrawTextBitMap(
 		g_pMainBuffer->pScroll->pFront,
 		pTextBm, SCREEN_PAL_WIDTH / 2, s_sProgressBarConfig.sBarPos.uwY,
