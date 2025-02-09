@@ -1338,7 +1338,6 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_wLastReminder = 0;
 	s_sTeleportReturn.ulYX = -1;
 	s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
-	twisterDisable();
 	hudReset(g_isChallenge, g_is2pPlaying);
 	heatReset();
 	groundLayerReset(1, 0);

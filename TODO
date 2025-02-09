@@ -163,9 +163,11 @@ Bugs:
 	✔ Jet/drill sfx looping if flying/drilling and triggering (urgent) msg in base at the same time @done(25-01-22)
 	✔ tileBufferResetRedrawState() in tileBufferRedrawAll() causes teleport-in anim in base-base travel not show up
 	✔ Gate (collectibles) not drawing properly on teleport-in / spawning when standing in its place @done(25-02-08)
+	✔ Finishing game with gate and starting challenge corrupts the memory @done(25-02-09)
+	☐ Finishing game with gate, then doing challege shows scores without entering high score
+	☐ Quitting game after finishing game with gate, then doing challege, ends in endless state pop loop
 	☐ Game doesn't launch properly from icon
 	☐ Warehouse corruption (after entering accounting?)
-	☐ Finishing game with gate and starting challenge corrupts the memory
 
 Misc QoL refinements:
 	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)
