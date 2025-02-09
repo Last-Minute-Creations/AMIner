@@ -221,6 +221,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_LIST_PRISONER] = "officePages.listPrisoner",
 	[MSG_PAGE_LIST_AGENT] = "officePages.listAgent",
 	[MSG_PAGE_LIST_SCI] = "officePages.listSci",
+	[MSG_PAGE_MIETEK_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_MIETEK_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_MIETEK_FIRST_PLAN] = "officePages.mietekFirstPlan",
 	[MSG_PAGE_MIETEK_PLAN_COMPLETE] = "officePages.mietekPlanComplete",

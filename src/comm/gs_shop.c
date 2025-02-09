@@ -260,6 +260,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 				);
 			}
 			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_DOSSIER:
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_dossier", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_welcome", onBack);
 			break;
@@ -334,6 +337,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_AGENT:
 			pageQuestioningReport(QUESTIONING_BIT_AGENT, 1); // HACK HACK HACK
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_agent", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_ARCH_DOSSIER:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_welcome", onBack);
