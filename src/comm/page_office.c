@@ -67,12 +67,16 @@ static void pageOfficeProcess(void) {
 
 	if(commNavUse(DIRECTION_LEFT)) {
 		if(!pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
-			--s_bSelectionCurr;
+			if(s_bSelectionCurr) {
+				--s_bSelectionCurr;
+			}
 		}
 	}
 	else if(commNavUse(DIRECTION_RIGHT)) {
 		if(!pageOfficeIsSelectionOnButton(s_bSelectionCurr)) {
-			++s_bSelectionCurr;
+			if(s_bSelectionCurr + 1 < s_ubUnlockedPplCount) {
+				++s_bSelectionCurr;
+			}
 		}
 	}
 	else if(commNavUse(DIRECTION_DOWN)) {
