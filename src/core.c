@@ -280,8 +280,18 @@ static void coreGsCreate(void) {
 	commTryShow(0, 0, 1);
 	viewProcessManagers(s_pView);
 	copProcessBlocks();
+
+#ifdef GAME_DEBUG
+	randInit(&g_sRand, 2184, 1911);
+#else
+	// Seed from beam pos Y & X
+	tRayPos sRayPos = getRayPos();
+	randInit(&g_sRand, 1 + (sRayPos.bfPosY << 8), 1 + sRayPos.bfPosX);
+#endif
+
+
 	progressBarInit(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront);
-	pageNewsCreate(NEWS_KIND_INTRO_1);
+	pageNewsCreate(randUwMinMax(&g_sRand, NEWS_KIND_INTRO_1, NEWS_KIND_INTRO_3));
 
 	systemSetInt(INTB_VERTB, &coreVblankHandler, 0);
 
@@ -307,14 +317,6 @@ static void coreGsCreate(void) {
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 45);
 	assetsAudioCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 50);
-
-#ifdef GAME_DEBUG
-	randInit(&g_sRand, 2184, 1911);
-#else
-	// Seed from beam pos Y & X
-	tRayPos sRayPos = getRayPos();
-	randInit(&g_sRand, 1 + (sRayPos.bfPosY << 8), 1 + sRayPos.bfPosX);
-#endif
 
 	tileReset(0, 1);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 55);
