@@ -37,6 +37,7 @@
 #define HUD_MSG_WAIT_CNT 200
 
 #define HUD_ICON_INBOX_SRC_OFFS_Y 144
+#define HUD_NOISE_DURATION 25
 
 typedef enum _tHudPage {
 	HUD_PAGE_MAIN,
@@ -260,7 +261,7 @@ void hudShowMessage(tFaceId eFace, const char *szMsg) {
 	logWrite("hudShowMessage(eFace: %d, szMsg: '%s')\n", eFace, szMsg);
 	stringCopyLimited(szMsg, s_szMsg, HUD_MSG_BFR_SIZE);
 	s_eState = STATE_MSG_NOISE_IN;
-	s_uwFrameDelay = 25;
+	s_uwFrameDelay = HUD_NOISE_DURATION;
 	s_uwStateCounter = 0;
 	s_eFaceToDraw = eFace;
 }
@@ -645,7 +646,7 @@ void hudProcess(void) {
 		case STATE_MSG_WAIT_OUT:
 			if (++s_uwFrameDelay == HUD_MSG_WAIT_CNT) {
 				s_eState = STATE_MSG_NOISE_OUT;
-				s_uwFrameDelay = 25;
+				s_uwFrameDelay = HUD_NOISE_DURATION;
 			}
 			break;
 		case STATE_MSG_NOISE_OUT:
