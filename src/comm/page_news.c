@@ -108,6 +108,7 @@ static void pageNewsProcess(void) {
 				achievementUnlock(ACHIEVEMENT_CO_OP);
 			}
 			commRegisterPage(0, 0);
+			statePop(g_pGameStateManager);
 			menuGsEnter(0);
 		}
 	}
