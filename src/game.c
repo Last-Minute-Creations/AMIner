@@ -791,7 +791,9 @@ static UBYTE gameProcessGateCutscene(void) {
 		case GATE_CUTSCENE_OPEN_STEP_FADE_IN:
 			if(fadeGetState() == FADE_STATE_IN) {
 				++s_eGateCutsceneStep;
-				inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED, 0);
+				if(dinoIsQuestStarted()) {
+					inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED, 0);
+				}
 				tCommShopPage ePage = (
 					pageQuestioningIsReported(QUESTIONING_BIT_GATE) ?
 					COMM_SHOP_PAGE_NEWS_GATE_RED :
@@ -1139,7 +1141,7 @@ void gameAddAccolade(void) {
 	++s_ubAccolades;
 
 	if(s_ubAccolades >= g_ubAccoladesInMainStory) {
-		if(!dinoIsAllFound()) {
+		if(dinoIsQuestStarted() && !dinoIsAllFound()) {
 			inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_PLAN_FAIL, 0);
 		}
 		inboxPushBack(COMM_SHOP_PAGE_NEWS_ACCOLADES, 0);
