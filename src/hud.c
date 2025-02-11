@@ -3,7 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "hud.h"
+#include <ace/managers/ptplayer.h>
 #include <ace/managers/viewport/simplebuffer.h>
+#include <ace/contrib/managers/audio_mixer.h>
 #include <ace/utils/palette.h>
 #include <ace/utils/chunky.h>
 #include <ace/utils/string.h>
@@ -38,6 +40,9 @@
 
 #define HUD_ICON_INBOX_SRC_OFFS_Y 144
 #define HUD_NOISE_DURATION 25
+
+#define SFX_CHANNEL_HUD 2
+#define SFX_PRIORITY_HUD 5
 
 typedef enum _tHudPage {
 	HUD_PAGE_MAIN,
@@ -86,6 +91,8 @@ static tSimpleBufferManager *s_pHudBuffer;
 static const tFont *s_pFont;
 static tTextBitMap *s_pLineBuffer;
 static tBitMap *s_pFaces;
+static tPtplayerSfx *s_pSfxNoise;
+static tPtplayerSfx *s_pSfxMsg;
 
 static UBYTE s_ubLineHeight;
 static UBYTE s_isBitmapFilled = 0;
@@ -214,6 +221,8 @@ void hudCreate(tVPort *pVpHud, const tFont *pFont) {
 
 	bitmapLoadFromPath(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
 	s_pFaces = bitmapCreateFromPath("data/comm_faces.bm", 0);
+	s_pSfxNoise = ptplayerSfxCreateFromPath("data/sfx/hud_noise.sfx", 1);
+	s_pSfxMsg = ptplayerSfxCreateFromPath("data/sfx/hud_msg.sfx", 1);
 
 	s_pFont = pFont;
 	s_ubLineHeight = 7;
@@ -264,6 +273,7 @@ void hudShowMessage(tFaceId eFace, const char *szMsg) {
 	s_uwFrameDelay = HUD_NOISE_DURATION;
 	s_uwStateCounter = 0;
 	s_eFaceToDraw = eFace;
+	audioMixerPlaySfx(s_pSfxNoise, SFX_CHANNEL_HUD, SFX_PRIORITY_HUD, 0);
 }
 
 void hudSet2pPlaying(UBYTE isPlaying) {
@@ -583,6 +593,7 @@ void hudProcess(void) {
 			}
 			break;
 		case STATE_MSG_DRAW_FACE:
+			audioMixerPlaySfx(s_pSfxMsg, SFX_CHANNEL_HUD, SFX_PRIORITY_HUD, 0);
 			isLineOverflow = 0;
 			s_sMsgCharPos.uwX = HUD_ORIGIN_X;
 			s_sMsgCharPos.uwY = 4 * HUD_HEIGHT + HUD_ORIGIN_Y;
@@ -647,6 +658,7 @@ void hudProcess(void) {
 			if (++s_uwFrameDelay == HUD_MSG_WAIT_CNT) {
 				s_eState = STATE_MSG_NOISE_OUT;
 				s_uwFrameDelay = HUD_NOISE_DURATION;
+				audioMixerPlaySfx(s_pSfxNoise, SFX_CHANNEL_HUD, SFX_PRIORITY_HUD, 0);
 			}
 			break;
 		case STATE_MSG_NOISE_OUT:
@@ -729,6 +741,8 @@ void hudProcess(void) {
 void hudDestroy(void) {
 	fontDestroyTextBitMap(s_pLineBuffer);
 	bitmapDestroy(s_pFaces);
+	ptplayerSfxDestroy(s_pSfxNoise);
+	ptplayerSfxDestroy(s_pSfxMsg);
 }
 
 void hudShowMain(void) {

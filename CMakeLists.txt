@@ -562,6 +562,17 @@ convertAudio(
 	DESTINATION ${DATA_DIR}/sfx/key_release_3.sfx
 )
 
+convertAudio(
+	TARGET ${GAME_EXECUTABLE}
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/hud_noise.wav
+	DESTINATION ${DATA_DIR}/sfx/hud_noise.sfx
+)
+convertAudio(
+	TARGET ${GAME_EXECUTABLE}
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 4 SOURCE ${RES_DIR}/audio/hud_msg.wav
+	DESTINATION ${DATA_DIR}/sfx/hud_msg.sfx
+)
+
 #------------------------------------------------------------------------- MUSIC
 file(MAKE_DIRECTORY ${DATA_DIR}/music)
 

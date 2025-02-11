@@ -47,6 +47,8 @@
 #define SFX_CHANNEL_LOOP_P1 0
 #define SFX_CHANNEL_LOOP_P2 1
 #define SFX_CHANNEL_EFFECT 2
+#define SFX_PRIORITY_PENALTY 1
+#define SFX_PRIORITY_PICKUP 0
 
 #define TRACK_OFFSET_TRACK 0
 #define TRACK_OFFSET_JET 28
@@ -639,7 +641,7 @@ static inline UBYTE vehicleStartDrilling(
 					pVehicle->sBobBody.sPos.uwY,
 					pVehicle->sBobBody.sPos.uwY - 32, 1
 				);
-				audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, 1, 0);
+				audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PENALTY, 0);
 				ubCooldown = 25;
 			}
 			else {
@@ -743,7 +745,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		if(pVehicle->uwCargoCurr == uwCargoMax) {
 			szMessage = g_pMsgs[MSG_MISC_CARGO_FULL];
 			ubColor = COLOR_REDEST;
-			audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PENALTY, 0);
 		}
 		else {
 			char *pEnd = szMsg;
@@ -753,7 +755,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			pEnd = stringDecimalFromULong(g_pTileDefs[ubTile].ubSlots, pEnd);
 			szMessage = szMsg;
 			ubColor = pMineral->ubTitleColor;
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
 		}
 		textBobSet(
 			&pVehicle->sTextBob, szMessage, ubColor,
@@ -783,7 +785,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				pVehicle->lCash += pVehicle->uwCargoScore;
 				vehicleRestock(pVehicle);
 			}
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
 		}
 	}
 	else {
@@ -794,7 +796,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				pVehicle->sBobBody.sPos.uwY,
 				pVehicle->sBobBody.sPos.uwY - 32, 1
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
 			questGateUnlockPrisoner();
 		}
 		else if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
@@ -808,7 +810,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				pVehicle->sBobBody.sPos.uwY,
 				pVehicle->sBobBody.sPos.uwY - 32, 1
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
 		}
 		else if(ubTile == TILE_GATE_1 || ubTile == TILE_GATE_2) {
 			char szMessage[50];
@@ -820,7 +822,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				pVehicle->sBobBody.sPos.uwY,
 				pVehicle->sBobBody.sPos.uwY - 32, 1
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
 		}
 		else if(ubTile == TILE_CRATE_1) {
 			questCrateAdd();
@@ -830,7 +832,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				pVehicle->sBobBody.sPos.uwY,
 				pVehicle->sBobBody.sPos.uwY - 32, 1
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
 		}
 		else if(ubTile == TILE_CAPSULE) {
 			questCrateSetCapsuleState(CAPSULE_STATE_FOUND);
@@ -840,7 +842,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				pVehicle->sBobBody.sPos.uwY,
 				pVehicle->sBobBody.sPos.uwY - 32, 1
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
 		}
 	}
 
@@ -896,7 +898,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->fY = fix16_from_int(uwTileY * TILE_SIZE);
 		pVehicle->fDy = fix16_from_int(-1); // HACK HACK HACK
 		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
-		audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, 1, 0);
+		audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PENALTY, 0);
 		UWORD uwTeleportPenalty = 50;
 		textBobSetText(
 			&pVehicle->sTextBob, "%s -%hu\x1F",
@@ -1132,7 +1134,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		// If restocked then play audio & display score
 		WORD wDeltaScore = vehicleRestock(pVehicle);
 		if(wDeltaScore) {
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, 1, 0);
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
 			textBobSetText(
 				&pVehicle->sTextBob, "%s %hd\x1F",
 				g_pMsgs[MSG_MISC_RESTOCK], wDeltaScore
