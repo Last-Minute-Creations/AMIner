@@ -7,6 +7,14 @@
 
 #include <ace/utils/file.h>
 
+typedef enum tProtestState {
+	PROTEST_STATE_NONE,
+	PROTEST_STATE_WARNING,
+	PROTEST_STATE_PROTEST,
+	PROTEST_STATE_STRIKE,
+	PROTEST_STATE_RIOTS,
+} tProtestState;
+
 void protestsCreate(void);
 
 void protestsDestroy(void);
@@ -20,5 +28,7 @@ UBYTE protestsLoad(tFile *pFile);
 void protestsProcess(void);
 
 void protestsDrawBobs(void);
+
+tProtestState protestsGetState(void);
 
 #endif // PROTESTS_H

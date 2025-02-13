@@ -12,6 +12,7 @@
 #include "../game.h"
 #include "../hud.h"
 #include "../achievement.h"
+#include "../protests.h"
 
 #define QUESTIONING_HEAT_INCREASE 5
 #define QUESTIONING_HEAT_DECREASE_TRUTH 5
@@ -169,7 +170,11 @@ void pageQuestioningTrySetPendingQuestioning(tQuestioningBit eQuestioningBit, UB
 		// Not reported yet - increase heat and add as pending questioning.
 		// Increases heat each time it's triggered, even when questioning is already pending.
 		s_eQuestioningsPending |= BV(eQuestioningBit);
-		heatTryIncrease(QUESTIONING_HEAT_INCREASE);
+		UBYTE ubHeat = QUESTIONING_HEAT_INCREASE;
+		if(protestsGetState() >= PROTEST_STATE_STRIKE) {
+			ubHeat *= 2;
+		}
+		heatTryIncrease(ubHeat);
 		pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_LIST);
 	}
 

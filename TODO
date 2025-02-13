@@ -287,11 +287,12 @@ Protests:
 	✔ Strike phase on 3rd negative cash threshold @done(25-02-13)
 		✔ Display banner @done(25-02-13)
 		✔ Commrade message @done(25-02-13)
-	☐ Turmoil phase on 4th negative cash threshold
-		☐ Display extra gfx
+	✔ Turmoil phase on 4th negative cash threshold @done(25-02-13)
 		✔ Trigger ending @done(25-02-13)
 	✔ Make sure that messages retrigger after re-entering phase @done(25-02-13)
 	✔ Make sure that graphics (un)load on re-entering phases @done(25-02-13)
+	✔ Add protest phase consequences @done(25-02-13)
+	✔ Add strike phase consequences @done(25-02-13)
 
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)

@@ -151,6 +151,7 @@ const char * s_pLangDom[] = {
 	[MSG_QUESTIONING_LIE] = "questioning.lie",
 	// Tricks
 	[MSG_TRICKS_NO_PLAN] = "tricks.noPlan",
+	[MSG_TRICKS_ACCOUNING_STRIKE] = "tricks.accoutingStrike",
 	[MSG_TRICKS_ACCOUNTING_PREMISE] = "tricks.accountingPremise",
 	[MSG_TRICKS_ACCOUNTING_DETAILS] = "tricks.accountingDetails",
 	[MSG_TRICKS_BRIBE_PREMISE] = "tricks.bribePremise",

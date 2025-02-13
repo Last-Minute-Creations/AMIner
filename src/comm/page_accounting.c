@@ -14,6 +14,7 @@
 #include "../save.h"
 #include "../heat.h"
 #include "../achievement.h"
+#include "../protests.h"
 
 #define ACCOUNTING_SLACKER_THRESHOLD 10
 
@@ -35,7 +36,7 @@ static void pageAccountingProcess(void) {
 	}
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		if(planManagerGet()->isPlanActive) {
+		if(buttonGetCount() != 1) {
 			if(bButtonCurr == 0) {
 				++s_ubAccountingUses;
 				if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
@@ -49,7 +50,11 @@ static void pageAccountingProcess(void) {
 					gameAddRebuke();
 				}
 
-				heatTryIncrease(5);
+				UBYTE ubHeat = 5;
+				if(protestsGetState() >= PROTEST_STATE_PROTEST) {
+					ubHeat *= 2;
+				}
+				heatTryIncrease(ubHeat);
 			}
 		}
 		commShopGoBack();
@@ -63,6 +68,12 @@ void pageAccountingCreate(void) {
 	if (!planManagerGet()->isPlanActive) {
 		uwPosY += commDrawMultilineText(
 			g_pMsgs[MSG_TRICKS_NO_PLAN], 0, uwPosY
+		) * ubLineHeight;
+		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
+	}
+	else if(protestsGetState() >= PROTEST_STATE_STRIKE) {
+		uwPosY += commDrawMultilineText(
+			g_pMsgs[MSG_TRICKS_ACCOUNING_STRIKE], 0, uwPosY
 		) * ubLineHeight;
 		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}

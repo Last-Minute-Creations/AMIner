@@ -349,9 +349,9 @@ static void vehicleHullDamage(tVehicle *pVehicle, UWORD uwDmg) {
 	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, uwHullMax);
 }
 
-static void vehicleHullRepair(tVehicle *pVehicle) {
+static void vehicleHullRepair(tVehicle *pVehicle, UWORD uwNewValue) {
 	UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
-	pVehicle->wHullCurr = uwHullMax;
+	pVehicle->wHullCurr = uwNewValue;
 	pVehicle->ubHullDamageFrame = VEHICLE_DESTRUCTION_FRAMES - 1;
 	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, uwHullMax);
 }
@@ -361,7 +361,7 @@ void vehicleRespawn(tVehicle *pVehicle) {
 	pVehicle->uwCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
 	pVehicle->uwDrillCurr = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
-	vehicleHullRepair(pVehicle);
+	vehicleHullRepair(pVehicle, inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax);
 	pVehicle->ubDamageBlinkCooldown = 0;
 	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 		pVehicle->pStock[i] = 0;
@@ -695,9 +695,13 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 
 	WORD wRestockPrice = 0;
 	if(g_isChallenge || inventoryGetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, eBaseId)) {
+		tProtestState eProtestState = protestsGetState();
 		// Buy as much fuel as needed
 		// Start refueling if half a liter is spent
 		UWORD uwDrillMax = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
+		if(eProtestState >= PROTEST_STATE_PROTEST) {
+			uwDrillMax /= 2;
+		}
 		UWORD uwRefuelLiters = (
 			uwDrillMax - pVehicle->uwDrillCurr + g_ubFuelInLiter / 2
 		) / g_ubFuelInLiter;
@@ -707,10 +711,16 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 			pVehicle->uwDrillCurr + uwRefuelLiters * g_ubFuelInLiter, uwDrillMax
 		);
 
-		// Buy as much hull as needed
-		UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
-		UWORD uwRehullCost = g_ubHullPrice * (uwHullMax - pVehicle->wHullCurr);
-		vehicleHullRepair(pVehicle);
+		UWORD uwRehullCost = 0;
+		if(eProtestState < PROTEST_STATE_STRIKE) {
+			// Buy as much hull as needed
+			UWORD uwHullMax = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
+			if(eProtestState >= PROTEST_STATE_PROTEST) {
+				uwHullMax /= 2;
+			}
+			uwRehullCost = g_ubHullPrice * (uwHullMax - pVehicle->wHullCurr);
+			vehicleHullRepair(pVehicle, uwHullMax);
+		}
 
 		// Pay for your fuel & hull!
 		wRestockPrice = uwRefuelLiters * g_ubLiterPrice + uwRehullCost;
@@ -1440,7 +1450,10 @@ static void vehicleOnTeleportInEnd(void *pData) {
 static void vehicleOnTeleportInPeak(void *pData) {
 	tVehicle *pVehicle = pData;
 	vehicleSetState(pVehicle, VEHICLE_STATE_TELEPORTING_VISIBLE);
-	if(inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel == INVENTORY_LEVEL_TELEPORTER_WEAK) {
+	if(
+		inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel == INVENTORY_LEVEL_TELEPORTER_WEAK ||
+		protestsGetState() >= PROTEST_STATE_PROTEST
+	) {
 		UWORD uwMaxHealth = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
 		if(randUwMax(&g_sRand, 100) <= 5) {
 			vehicleHullDamage(pVehicle, (uwMaxHealth * 4) / 5);

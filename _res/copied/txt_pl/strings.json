@@ -181,6 +181,7 @@
 	},
 	"tricks": {
 		"noPlan": "Nie masz aktywnego planu! Co mam niby zrobić?",
+		"accoutingStrike": "Panie dyrektorze, w zakładzie źle się dzieje, komisarz wszystko kontroluje. Lepiej nie tym razem.",
 		"accountingPremise": "Zleć Kreatywną Księgowość aby natychmiast wykonać plan.",
 		"accountingDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
 		"bribePremise": "Wręćż łapówkę aby zyskać %hhu dni na realizację planu.",

@@ -9,6 +9,7 @@
 #include "../quest_crate.h"
 #include "../hud.h"
 #include "../heat.h"
+#include "../protests.h"
 
 static tPageEscapeScenario s_eScenario;
 
@@ -30,7 +31,12 @@ static void pageEscapeProcess(void) {
 		if(bButtonCurr == 0) {
 			switch(s_eScenario) {
 				case PAGE_ESCAPE_SCENARIO_AGENT:
-					heatTryIncrease(20);
+					UBYTE ubHeat = 20;
+					if(protestsGetState() >= PROTEST_STATE_STRIKE) {
+						ubHeat *= 2;
+					}
+
+					heatTryIncrease(ubHeat);
 					if(heatTryPassCheck()) {
 						commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_AGENT);
 					}

@@ -21,14 +21,6 @@
 #define PROTEST_BOB_X (32 + 232)
 #define PROTEST_BOB_Y 195
 
-typedef enum tProtestState {
-	PROTEST_STATE_NONE,
-	PROTEST_STATE_WARNING,
-	PROTEST_STATE_PROTEST,
-	PROTEST_STATE_STRIKE,
-	PROTEST_STATE_RIOTS,
-} tProtestState;
-
 static tBitMap *s_pProtestBitmap;
 static tBob s_sProtestBob;
 static tProtestState s_eProtestState;
@@ -146,4 +138,8 @@ void protestsDrawBobs(void) {
 		coreTransferBobToPristine(&s_sProtestBob);
 		++s_ubDrawCount;
 	}
+}
+
+tProtestState protestsGetState(void) {
+	return s_eProtestState;
 }
