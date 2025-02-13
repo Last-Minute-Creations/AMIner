@@ -86,8 +86,8 @@ void questGateProcess(void) {
 UBYTE questGateAddFragment(void) {
 	const UBYTE ubMaxFragmentCount = questGateGetMaxFragmentCount();
 	s_ubFoundFragments = MIN(s_ubFoundFragments + 1, ubMaxFragmentCount);
+	collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, s_ubFoundFragments);
 	if(s_ubFoundFragments < ubMaxFragmentCount) {
-		collectibleSetFoundCount(COLLECTIBLE_KIND_GATE, s_ubFoundFragments);
 		pageQuestioningTrySetPendingQuestioning(QUESTIONING_BIT_GATE, 0);
 	}
 	else {
