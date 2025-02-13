@@ -8,6 +8,7 @@
 #include "../vehicle.h"
 #include "../quest_crate.h"
 #include "../hud.h"
+#include "../protests.h"
 
 static tPageUseCratesScenario s_eScenario;
 
@@ -109,6 +110,7 @@ static void pageUseCratesProcess(void) {
 						if(questCrateTrySell()) {
 							g_pVehicles[0].lCash += 1000;
 							hudSetCash(0, g_pVehicles[0].lCash);
+							protestsProcess();
 						}
 						commEraseAll();
 						pageUseCratesDrawAll();

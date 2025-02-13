@@ -421,13 +421,13 @@ convertBitmaps(
 		${RES_DIR}/commrade/jay.png ${RES_DIR}/hud.png ${RES_DIR}/logo.png ${RES_DIR}/lang_select.png
 		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png ${RES_DIR}/commrade/news.png
 		${RES_DIR}/commrade/soko.png ${GEN_DIR}/workshop_icons.png ${RES_DIR}/commrade/achievements.png
-		${GEN_DIR}/bg_factory_drip.png ${RES_DIR}/mode_icons.png
+		${GEN_DIR}/bg_factory_drip.png ${RES_DIR}/mode_icons.png ${RES_DIR}/protests.png
 	DESTINATIONS
 		${DATA_DIR}/comm_bg.bm ${DATA_DIR}/comm_buttons.bm ${DATA_DIR}/comm_faces.bm
 		${DATA_DIR}/portrait.bm ${DATA_DIR}/hud.bm ${DATA_DIR}/logo.bm ${DATA_DIR}/lang_select.bm
 		${DATA_DIR}/comm_faces_office.bm ${DATA_DIR}/comm_office_selection.bm ${DATA_DIR}/comm_news.bm
 		${DATA_DIR}/soko.bm ${DATA_DIR}/comm_workshop_icons.bm ${DATA_DIR}/comm_achievements.bm
-		${DATA_DIR}/bg_factory_drip.bm ${DATA_DIR}/mode_icons.bm
+		${DATA_DIR}/bg_factory_drip.bm ${DATA_DIR}/mode_icons.bm ${DATA_DIR}/protests.bm
 )
 
 convertBitmaps(

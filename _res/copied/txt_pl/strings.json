@@ -167,7 +167,6 @@
 		"accept": "Akceptuj",
 		"exit": "Wyjdź",
 		"price": "Koszt",
-		"confirm": "Zatwierdź",
 		"gateOpening": [
 			"Tajemnicza brama lada chwila się aktywuje.",
 			"Wokół niej są ładunki wybuchowe. Czy chcesz ją zdetonować?"
@@ -264,6 +263,9 @@
 		"listSci": "Naukowiec",
 		"mietekFirstPlan": "Kariera",
 		"mietekPlanComplete": "Zawody",
+		"mietekProtestWarning": "Zaległe wypłaty",
+		"mietekProtestStart": "Protesty",
+		"mietekProtestStrike": "Strajkujemy",
 		"krystynaAccounting": "Kreatywna Księgowość",
 		"urzedasFirstPlan": "Pierwszy plan",
 		"planComplete": "Wykonanie planu",

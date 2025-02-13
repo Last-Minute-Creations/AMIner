@@ -35,6 +35,7 @@
 #include "mode_menu.h"
 #include "tile_variant.h"
 #include "base_teleporter.h"
+#include "protests.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
@@ -163,6 +164,7 @@ void coreProcessBeforeBobs(void) {
 	collectiblesProcess();
 	if(!gameIsCutsceneActive()) {
 		bobSequenceProcess();
+		protestsDrawBobs();
 		baseTeleporterProcess();
 	}
 }
@@ -330,6 +332,7 @@ static void coreGsCreate(void) {
 	baseTeleporterCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 65);
 	groundLayerCreate(s_pVpMain);
+	protestsCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 70);
 	coreBobSequencesCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 75);
@@ -401,6 +404,7 @@ static void coreGsDestroy(void) {
 	systemUse();
 
 	menuUnload();
+	protestsDestroy();
 	bitmapDestroy(s_pTiles);
 	collectiblesDestroy();
 	baseDestroy();

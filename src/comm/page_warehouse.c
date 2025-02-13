@@ -13,6 +13,7 @@
 #include "../hud.h"
 #include "../game.h"
 #include "../vehicle.h"
+#include "../protests.h"
 
 #define WAREHOUSE_COL_COUNT 4
 
@@ -136,7 +137,7 @@ static void pageWarehouseRedraw(void) {
 	UWORD uwBtnY = COMM_DISPLAY_HEIGHT - 2 * ubLineHeight - buttonGetHeight() + 2;
 	s_ubButtonCurrent = 0;
 	buttonReset(BUTTON_LAYOUT_HORIZONTAL, uwBtnY);
-	buttonAdd(g_pMsgs[MSG_COMM_CONFIRM]);
+	buttonAdd(g_pMsgs[MSG_COMM_ACCEPT]);
 	buttonAdd(g_pMsgs[MSG_COMM_MARKET]);
 	buttonAdd(g_pMsgs[MSG_COMM_EXIT]);
 	if(commShopGetTabNavigationState() != TAB_NAVIGATION_STATE_ENABLED) {
@@ -280,6 +281,7 @@ static void pageWarehouseProcess(void) {
 					s_pTmpPlan[ubMineral] = 0;
 					s_pTmpStock[ubMineral] = 0;
 					hudSetCash(0, g_pVehicles[0].lCash);
+					protestsProcess();
 				}
 
 				if(planIsCurrentFulfilled()) {

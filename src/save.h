@@ -48,6 +48,8 @@
 #define SAVE_TAG_WAREHOUSE_END "WHSE"
 #define SAVE_TAG_MARKET "MKT1"
 #define SAVE_TAG_MARKET_END "MKTE"
+#define SAVE_TAG_PROTEST "PRT1"
+#define SAVE_TAG_PROTEST_END "PRTE"
 
 UBYTE saveReadTag(tFile *pFile, const char *szHeader);
 

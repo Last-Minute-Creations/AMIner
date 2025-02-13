@@ -201,6 +201,7 @@ Optimizations:
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
 	☐ Pakfile + compression of data files?
 	☐ Shrinkler for exe?
+	☐ Use pristine buffer for twister buffers
 
 Dino quest:
 	✔ Figure out the final flow @done(23-10-05)
@@ -279,18 +280,18 @@ Deadline mode:
 	☐ Add intro text
 
 Protests:
-	☐ Warning message on 1st negative cash threshold
-	☐ Protest phase on 2nd negative cash threshold
-		☐ Display banner
-		☐ Commrade message
-	☐ Strike phase on 3rd negative cash threshold
-		☐ Display banner
-		☐ Commrade message
+	✔ Warning message on 1st negative cash threshold @done(25-02-13)
+	✔ Protest phase on 2nd negative cash threshold @done(25-02-13)
+		✔ Display banner @done(25-02-13)
+		✔ Commrade message @done(25-02-13)
+	✔ Strike phase on 3rd negative cash threshold @done(25-02-13)
+		✔ Display banner @done(25-02-13)
+		✔ Commrade message @done(25-02-13)
 	☐ Turmoil phase on 4th negative cash threshold
 		☐ Display extra gfx
-		☐ Trigger ending
-	☐ Make sure that messages retrigger after re-entering phase
-	☐ Make sure that graphics (un)load on re-entering phases
+		✔ Trigger ending @done(25-02-13)
+	✔ Make sure that messages retrigger after re-entering phase @done(25-02-13)
+	✔ Make sure that graphics (un)load on re-entering phases @done(25-02-13)
 
 Missing message texts:
 	✔ Prisoner grateful on destroying gate @done(24-02-01)
@@ -304,10 +305,10 @@ Missing message texts:
 	✘ Commissar furious on destroying if knows about gate @cancelled(24-02-08)
 
 Missing graphics:
+	✔ Protest banners on factory @done(25-02-12)
 	☐ Scientist portrait
 	☐ Jay portrait small
 	☐ Jay portrait large final
 	☐ After-invasion newscaster
-	☐ Protest banners on factory
 	☐ Sci base final
 	☐ News slides for each ending

@@ -272,6 +272,15 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PLAN_COMPLETE:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_plan_complete", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_WARNING:
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_protest_warning", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START:
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_protest_start", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE:
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_protest_strike", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER:
 			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "krystyna_dossier", onBack);
 			break;
@@ -435,13 +444,19 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageNewsCreate(NEWS_KIND_GATE_RED);
 			break;
 		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_AGENT:
+			achievementUnlock(ACHIEVEMENT_ESCAPE);
 			pageNewsCreate(NEWS_KIND_ESCAPE_AGENT);
 			break;
 		case COMM_SHOP_PAGE_NEWS_ESCAPE_FAIL:
 			pageNewsCreate(NEWS_KIND_ESCAPE_FAIL);
 			break;
 		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_TELEPORT:
+			achievementUnlock(ACHIEVEMENT_ESCAPE);
 			pageNewsCreate(NEWS_KIND_ESCAPE_TELEPORT);
+			break;
+		case COMM_SHOP_PAGE_NEWS_RIOTS:
+			achievementUnlock(ACHIEVEMENT_PROTESTS);
+			pageNewsCreate(NEWS_KIND_RIOTS);
 			break;
 		case COMM_SHOP_PAGE_SOKOBAN:
 			pageSokobanCreate();

@@ -112,7 +112,6 @@ const char * s_pLangDom[] = {
 	[MSG_COMM_ESCAPE_OFFER] = "shop.escapeOffer",
 	[MSG_COMM_ESCAPE] = "shop.escape",
 	[MSG_COMM_EXIT] = "shop.exit",
-	[MSG_COMM_CONFIRM] = "shop.confirm",
 	[MSG_COMM_MARKET] = "shop.market",
 	// Workshop
 	[MSG_COMM_WORKSHOP_TNT_0] = "workshop.tnt0",
@@ -225,6 +224,9 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_MIETEK_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_MIETEK_FIRST_PLAN] = "officePages.mietekFirstPlan",
 	[MSG_PAGE_MIETEK_PLAN_COMPLETE] = "officePages.mietekPlanComplete",
+	[MSG_PAGE_MIETEK_PROTEST_WARNING] = "officePages.mietekProtestWarning",
+	[MSG_PAGE_MIETEK_PROTEST_START] = "officePages.mietekProtestStart",
+	[MSG_PAGE_MIETEK_PROTEST_STRIKE] = "officePages.mietekProtestStrike",
 	[MSG_PAGE_KRYSTYNA_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_KRYSTYNA_ACCOUNTING] = "officePages.krystynaAccounting",
 	[MSG_PAGE_URZEDAS_DOSSIER] = "officePages.commonDossier",

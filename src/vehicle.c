@@ -23,6 +23,7 @@
 #include "assets.h"
 #include "blitter_mutex.h"
 #include "base_teleporter.h"
+#include "protests.h"
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -855,6 +856,7 @@ UBYTE vehicleTrySpendCash(UBYTE ubPlayerIndex, LONG lCost) {
 	if(pVehicle->lCash >= lCost) {
 		pVehicle->lCash -= lCost;
 		hudSetCash(ubPlayerIndex, pVehicle->lCash);
+		protestsProcess();
 		return 1;
 	}
 	logWrite("Not enough cash\n");
@@ -1146,6 +1148,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 				pVehicle->sBobBody.sPos.uwY,
 				pVehicle->sBobBody.sPos.uwY - 48, 1
 			);
+			protestsProcess();
 		}
 	}
 }

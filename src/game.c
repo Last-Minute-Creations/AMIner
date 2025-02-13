@@ -41,6 +41,7 @@
 #include "mode_menu.h"
 #include "tile_variant.h"
 #include "twister.h"
+#include "protests.h"
 
 #define CAMERA_SPEED 4
 #define CAMERA_SHAKE_AMPLITUDE 2
@@ -449,6 +450,10 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+	else if(keyUse(KEY_2)) {
+		g_pVehicles[0].lCash -= 50;
+		protestsProcess();
+	}
 	else if(keyUse(KEY_3)) {
 		dinoAddBone();
 	}
@@ -459,6 +464,7 @@ static void gameProcessHotkeys(void) {
 		g_ubDrillingCost = 0;
 		g_pVehicles[0].lCash = 50000;
 		g_pVehicles[0].wHullCurr = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
+		protestsProcess();
 	}
 	else if(keyUse(KEY_6)) {
 		questCrateAdd();
@@ -469,6 +475,7 @@ static void gameProcessHotkeys(void) {
 	}
 	else if(keyUse(KEY_8)) {
 		g_pVehicles[0].lCash += 1000;
+		protestsProcess();
 	}
 	else if(keyUse(KEY_9)) {
 		questGateAddFragment();
@@ -1051,6 +1058,7 @@ static void gameSave(tFile *pFile) {
 	pageOfficeSave(pFile);
 	warehouseSave(pFile);
 	tileSave(pFile);
+	protestsSave(pFile);
 	inventorySave(pFile);
 	vehicleSave(&g_pVehicles[0], pFile);
 	vehicleSave(&g_pVehicles[1], pFile);
@@ -1284,6 +1292,7 @@ UBYTE gameLoad(tFile *pFile) {
 		pageOfficeLoad(pFile) &&
 		warehouseLoad(pFile) &&
 		tileLoad(pFile) &&
+		protestsLoad(pFile) &&
 		inventoryLoad(pFile) &&
 		vehicleLoad(&g_pVehicles[0], pFile) &&
 		vehicleLoad(&g_pVehicles[1], pFile) &&
@@ -1325,6 +1334,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	}
 	tileReset(g_isAtari, g_isChallenge);
 	inventoryReset();
+	protestsReset();
 	vehicleReset(&g_pVehicles[0]);
 	vehicleReset(&g_pVehicles[1]);
 	modeMenuReset(&s_pModeMenus[0], 0);

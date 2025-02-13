@@ -151,6 +151,7 @@ static void menuOnShowScores(void) {
 }
 
 static void menuOnExit(void) {
+	settingsFileSave();
 	statePopAll(g_pGameStateManager);
 }
 
@@ -878,6 +879,9 @@ void menuUnload(void) {
 }
 
 void menuGsEnter(UBYTE isScoreShow) {
+	// Save pending achievements in case user restarts amiga while being in menu
+	settingsFileSave();
+
 	// Switch to menu, after popping it will process gameGsLoop
 	s_isScoreShowAfterRollIn = isScoreShow;
 	// if(!isScoreShow) {

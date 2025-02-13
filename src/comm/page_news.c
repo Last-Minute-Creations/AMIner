@@ -32,6 +32,7 @@ static const char *s_pNewsFileNames[NEWS_KIND_COUNT] = {
 	[NEWS_KIND_INTRO_1] = "intro_1",
 	[NEWS_KIND_INTRO_2] = "intro_2",
 	[NEWS_KIND_INTRO_3] = "intro_3",
+	[NEWS_KIND_RIOTS] = "riots",
 };
 
 /**

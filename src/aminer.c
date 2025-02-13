@@ -34,14 +34,15 @@ void genericCreate(void) {
 }
 
 void genericProcess(void) {
+	gameExit();
 	keyProcess();
 	joyProcess();
 	stateProcess(g_pGameStateManager);
 }
 
 void genericDestroy(void) {
-	ptplayerDestroy();
 	fontDestroy(g_pFont);
+	ptplayerDestroy();
 
 	stateManagerDestroy(g_pGameStateManager);
 	keyDestroy();
