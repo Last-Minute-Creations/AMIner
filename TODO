@@ -151,10 +151,12 @@ From QA tests:
 	✔ Make the sideways drilling smooth between tiles @done(25-02-07)
 	✔ Improve contrast of selected item in commrade @done(25-02-07)
 	✔ It's not clear what to do with negative cash @done(25-02-14)
+	✔ Move teleporter to proper position @done(25-02-14)
+	✔ Add teleporter front graphics @done(25-02-14)
 	☐ Fix tutorial texts not triggering properly (plan instructions on office page)
+	☐ Add Commissar HUD msg on vehicle destroyed
 	☐ Make sure there is message for each accolade received (plans!)
 	☐ Display time on HUD instead of cash when in mine
-	☐ Move teleporter to proper position
 
 Bugs:
 	✔ Empty office after destroying gate @done(24-01-27)
@@ -170,7 +172,7 @@ Bugs:
 	✔ Quitting game after finishing game with gate, then doing challege, ends in endless state pop loop @done(25-02-11)
 	✔ Arch displaying on gate open bad ending, even if wasn't unlocked @done(25-02-11)
 	✔ Game doesn't launch properly from icon @done(25-02-11)
-	☐ Warehouse corruption (after entering accounting?)
+	✘ Warehouse corruption (after entering accounting?) @cancelled(25-02-14)
 
 Misc QoL refinements:
 	✔ Remove first base mineral pattern so that bricking it won't penalize new players? @done(24-07-07)

@@ -6,6 +6,7 @@
 #include "background_bob.h"
 #include "base.h"
 #include "inventory.h"
+#include "game.h"
 
 #define BASE_ANTENNA_WIDTH 32
 #define BASE_ANTENNA_HEIGHT 27
@@ -13,9 +14,12 @@
 #define BASE_WORKSHOP_HEIGHT 25
 #define BASE_WORKSHOP_OFFSET BASE_ANTENNA_HEIGHT
 #define BASE_TELEPORTER_IDLE_FRAME_HEIGHT 12
+#define BASE_TELEPORTER_FRONT_FRAME_HEIGHT 7
 #define BASE_TELEPORTER_IDLE_DELTA_Y (BASE_TELEPORTER_HEIGHT - BASE_TELEPORTER_IDLE_FRAME_HEIGHT)
+#define BASE_TELEPORTER_FRONT_DELTA_Y (BASE_TELEPORTER_HEIGHT - BASE_TELEPORTER_FRONT_FRAME_HEIGHT)
 
 static tBackgroundBob s_sBgBobTeleporter, s_sBgBobAntenna, s_sBgBobWarehouse;
+static tBob s_sBobTeleporterFront;
 static tBitMap *s_pTeleporterIdleFrame;
 static tBitMap *s_pTeleporterIdleMask;
 static tBitMap *s_pBaseUnlocksFrames;
@@ -45,6 +49,13 @@ void baseUnlocksCreate(void) {
 		bobCalcFrameAddress(s_pBaseUnlocksMasks, BASE_WORKSHOP_OFFSET), 0, 0
 	);
 	backgroundBobResetCounter(&s_sBgBobWarehouse);
+
+	bobInit(
+		&s_sBobTeleporterFront, BASE_TELEPORTER_WIDTH, BASE_TELEPORTER_FRONT_FRAME_HEIGHT, 0,
+		bobCalcFrameAddress(s_pTeleporterIdleFrame, BASE_TELEPORTER_IDLE_FRAME_HEIGHT),
+		bobCalcFrameAddress(s_pTeleporterIdleMask, BASE_TELEPORTER_IDLE_FRAME_HEIGHT),
+		0, 0
+	);
 }
 
 void baseUnlocksDrawBack(void) {
@@ -54,6 +65,8 @@ void baseUnlocksDrawBack(void) {
 		s_sBgBobTeleporter.sBob.sPos.ulYX = pBase->sPosTeleport.ulYX;
 		s_sBgBobTeleporter.sBob.sPos.uwY += BASE_TELEPORTER_IDLE_DELTA_Y;
 		backgroundBobResetCounter(&s_sBgBobTeleporter);
+		s_sBobTeleporterFront.sPos.ulYX = pBase->sPosTeleport.ulYX;
+		s_sBobTeleporterFront.sPos.uwY += BASE_TELEPORTER_FRONT_DELTA_Y;
 
 		s_sBgBobAntenna.sBob.sPos.ulYX = pBase->sPosAntenna.ulYX;
 		backgroundBobResetCounter(&s_sBgBobAntenna);
@@ -76,6 +89,10 @@ void baseUnlocksDrawBack(void) {
 	}
 
 	s_eBaseIdPrev = eBaseId;
+}
+
+void baseUnlocksDrawFront(void) {
+	gameTryPushBob(&s_sBobTeleporterFront);
 }
 
 void baseUnlocksDestroy(void) {

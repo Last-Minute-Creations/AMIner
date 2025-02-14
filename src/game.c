@@ -42,6 +42,7 @@
 #include "tile_variant.h"
 #include "twister.h"
 #include "protests.h"
+#include "base_unlocks.h"
 
 #define CAMERA_SPEED 4
 #define CAMERA_SHAKE_AMPLITUDE 2
@@ -1447,6 +1448,7 @@ static void gameGsLoop(void) {
 	debugColor(0x808);
 	flipbookManagerProcess();
 	if(!gameIsCutsceneActive()) {
+		baseUnlocksDrawFront();
 		modeMenuTryDisplay(&s_pModeMenus[0]);
 		modeMenuTryDisplay(&s_pModeMenus[1]);
 		gameDisplayModeTnt(0);

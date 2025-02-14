@@ -12,6 +12,8 @@ void baseUnlocksCreate(void);
 
 void baseUnlocksDrawBack(void);
 
+void baseUnlocksDrawFront(void);
+
 void baseUnlocksDestroy(void);
 
 #endif // _AMINER_BASE_UNLOCKS_H_

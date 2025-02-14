@@ -239,11 +239,13 @@ convertTileset(
 
 #--------------------------------------------------------------- BASE_TELEPORTER
 file(MAKE_DIRECTORY ${GEN_DIR}/base_teleporter)
+file(MAKE_DIRECTORY ${GEN_DIR}/base_teleporter_idle)
 
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/base_teleporter.png
 	GENERATED_FILE_LIST "BASE_TELEPORTER_IDLE_FRAMES"
 	DESTINATIONS
-		${GEN_DIR}/base_teleporter_idle.png 0 20 48 12
+		${GEN_DIR}/base_teleporter_idle/0.png 0 20 48 12
+		${GEN_DIR}/base_teleporter_idle/1.png 96 153 48 7
 )
 
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/base_teleporter.png
@@ -284,6 +286,11 @@ convertTileset(
 	TARGET ${GAME_EXECUTABLE} SIZE 48 HEIGHT 32 PALETTE ${palette_aminer_unique}
 	INTERLEAVED SOURCE ${GEN_DIR}/base_teleporter DESTINATION ${GEN_DIR}/base_teleporter.png
 	TILE_PATHS ${BASE_TELEPORTER_FRAMES}
+)
+convertTileset(
+	TARGET ${GAME_EXECUTABLE} SIZE 48 VARIABLE_HEIGHT PALETTE ${palette_aminer_unique}
+	INTERLEAVED SOURCE ${GEN_DIR}/base_teleporter_idle DESTINATION ${GEN_DIR}/base_teleporter_idle.png
+	TILE_PATHS ${BASE_TELEPORTER_IDLE_FRAMES}
 )
 
 #------------------------------------------------------------------------- BONES

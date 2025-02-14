@@ -43,7 +43,7 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 		},
 		.sPosTeleport = {
 			.uwX = 5 * TILE_SIZE,
-			.uwY = (BASE_TILE_DEPTH_GROUND + 7) * TILE_SIZE
+			.uwY = (BASE_TILE_DEPTH_GROUND + 7) * TILE_SIZE + 2,
 		},
 		.sPosAntenna = {
 			.uwX = 0,
