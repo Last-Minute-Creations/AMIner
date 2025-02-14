@@ -34,7 +34,7 @@
 #include "blitter_mutex.h"
 #include "mode_menu.h"
 #include "tile_variant.h"
-#include "base_teleporter.h"
+#include "base_unlocks.h"
 #include "protests.h"
 
 #define CORE_INIT_BAR_MARGIN 10
@@ -165,7 +165,7 @@ void coreProcessBeforeBobs(void) {
 	if(!gameIsCutsceneActive()) {
 		bobSequenceProcess();
 		protestsDrawBobs();
-		baseTeleporterProcess();
+		baseUnlocksDrawBack();
 	}
 }
 
@@ -329,7 +329,7 @@ static void coreGsCreate(void) {
 	);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 60);
 	flipbookManagerCreate();
-	baseTeleporterCreate();
+	baseUnlocksCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 65);
 	groundLayerCreate(s_pVpMain);
 	protestsCreate();
@@ -421,7 +421,7 @@ static void coreGsDestroy(void) {
 	modeMenuManagerDestroy();
 	assetsTileOverlayDestroy();
 	flipbookManagerDestroy();
-	baseTeleporterDestroy();
+	baseUnlocksDestroy();
 	coreBobSequencesDestroy();
 	defsDestroyLocale();
 

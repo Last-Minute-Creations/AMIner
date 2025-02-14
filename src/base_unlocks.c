@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "base_teleporter.h"
+#include "base_unlocks.h"
 #include "game.h"
 #include "base.h"
 #include "inventory.h"
@@ -21,7 +21,7 @@ static tBitMap *s_pTeleporterIdleMask;
 static tBitMap *s_pBaseUnlocksFrames;
 static tBitMap *s_pBaseUnlocksMasks;
 
-void baseTeleporterCreate(void) {
+void baseUnlocksCreate(void) {
 	s_pTeleporterIdleFrame = bitmapCreateFromPath("data/base_teleporter_idle.bm", 0);
 	s_pTeleporterIdleMask = bitmapCreateFromPath("data/base_teleporter_idle_mask.bm", 0);
 	s_pBaseUnlocksFrames = bitmapCreateFromPath("data/base_unlocks.bm", 0);
@@ -42,7 +42,7 @@ void baseTeleporterCreate(void) {
 	);
 }
 
-void baseTeleporterProcess(void) {
+void baseUnlocksDrawBack(void) {
 	tBaseId eBaseId = baseGetCurrentId();
 	const tBase *pBase = baseGetCurrent();
 	if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, eBaseId)) {
@@ -63,7 +63,7 @@ void baseTeleporterProcess(void) {
 	}
 }
 
-void baseTeleporterDestroy(void) {
+void baseUnlocksDestroy(void) {
 	bitmapDestroy(s_pTeleporterIdleFrame);
 	bitmapDestroy(s_pTeleporterIdleMask);
 	bitmapDestroy(s_pBaseUnlocksFrames);

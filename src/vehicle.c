@@ -22,7 +22,7 @@
 #include "quest_crate.h"
 #include "assets.h"
 #include "blitter_mutex.h"
-#include "base_teleporter.h"
+#include "base_unlocks.h"
 #include "protests.h"
 
 #define VEHICLE_BODY_HEIGHT 20
