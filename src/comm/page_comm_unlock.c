@@ -45,14 +45,21 @@ static void pageCommUnlockProcess(void) {
 		}
 
 		if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-			if(buttonGetSelected() == 0) {
-				if(vehicleTrySpendCash(0, s_uwCost)) {
-					inventorySetCommUnlock(baseGetCurrentId(), s_eTargetState);
-					commShopChangePage(s_eTargetPage, s_eTargetPage);
+			if(buttonGetCount() == 2) {
+				if(buttonGetSelected() == 0) {
+					if(vehicleTrySpendCash(0, s_uwCost)) {
+						inventorySetCommUnlock(baseGetCurrentId(), s_eTargetState);
+						commShopChangePage(s_eTargetPage, s_eTargetPage);
+					}
+				}
+				else {
+					commRegisterPage(0, 0);
 				}
 			}
 			else {
-				commRegisterPage(0, 0);
+				if(buttonGetSelected() == 0) {
+					commRegisterPage(0, 0);
+				}
 			}
 		}
 	}
@@ -80,10 +87,14 @@ void pageCommUnlockCreate(
 	uwPosY += ubLineHeight;
 
 	if(g_pVehicles[0].lCash >= uwCost) {
-		// uwPosY += ubLineHeight / 2;
-
 		buttonInitAcceptDecline(g_pMsgs[MSG_COMM_BUY], g_pMsgs[MSG_COMM_EXIT]);
-		buttonSelect(1);
+	}
+	else {
+		buttonInitOk(g_pMsgs[MSG_COMM_EXIT]);
+	}
+
+	if(commShopGetTabNavigationState() == TAB_NAVIGATION_STATE_ENABLED) {
+		buttonDeselectAll();
 	}
 
 	buttonDrawAll(commGetDisplayBuffer());
