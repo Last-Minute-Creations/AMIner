@@ -199,7 +199,7 @@ Optimizations:
 	✘ Excavated ground overlay - custom blitter code? @cancelled(25-01-26)
 	✔ Replace commrade undraw buffer with pristine buffer @done(25-02-08)
 	✘ Gate collectibles draw? @cancelled(25-02-09)
-	☐ Base unlocks draw
+	✔ Base unlocks draw @done(25-02-14)
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
 	☐ Pakfile + compression of data files?
 	☐ Shrinkler for exe?

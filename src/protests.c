@@ -3,13 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "protests.h"
-#include <ace/managers/bob.h>
 #include "comm/page_office.h"
 #include "comm/inbox.h"
-#include "game.h"
 #include "vehicle.h"
 #include "save.h"
-#include "core.h"
+#include "background_bob.h"
 
 #define PROTEST_THRESHOLD_WARNING -300
 #define PROTEST_THRESHOLD_PROTEST -500
@@ -22,9 +20,8 @@
 #define PROTEST_BOB_Y 195
 
 static tBitMap *s_pProtestBitmap;
-static tBob s_sProtestBob;
+static tBackgroundBob s_sBgBobProtest;
 static tProtestState s_eProtestState;
-static UBYTE s_ubDrawCount;
 static UBYTE *s_pOffsetNoProtest;
 static UBYTE *s_pOffsetProtest;
 static UBYTE *s_pOffsetStrike;
@@ -32,7 +29,7 @@ static UBYTE *s_pOffsetStrike;
 void protestsCreate(void) {
 	s_pProtestBitmap = bitmapCreateFromPath("data/protests.bm", 0);
 	bobInit(
-		&s_sProtestBob, PROTEST_BOB_WIDTH, PROTEST_BOB_HEIGHT, 0, 0, 0,
+		&s_sBgBobProtest.sBob, PROTEST_BOB_WIDTH, PROTEST_BOB_HEIGHT, 0, 0, 0,
 		PROTEST_BOB_X, PROTEST_BOB_Y
 	);
 	s_pOffsetNoProtest = bobCalcFrameAddress(s_pProtestBitmap, PROTEST_BOB_HEIGHT * 0);
@@ -47,8 +44,8 @@ void protestsDestroy(void) {
 
 void protestsReset(void) {
 	s_eProtestState = PROTEST_STATE_NONE;
-	s_ubDrawCount = 0;
-	bobSetFrame(&s_sProtestBob, s_pOffsetNoProtest, 0);
+	bobSetFrame(&s_sBgBobProtest.sBob, s_pOffsetNoProtest, 0);
+	backgroundBobResetCounter(&s_sBgBobProtest);
 }
 
 void protestsSave(tFile *pFile) {
@@ -83,22 +80,22 @@ void protestsProcess(void) {
 			case PROTEST_STATE_WARNING:
 				if(lCash < PROTEST_THRESHOLD_PROTEST) {
 					eNewState = PROTEST_STATE_PROTEST;
-					bobSetFrame(&s_sProtestBob, s_pOffsetProtest, 0);
-					s_ubDrawCount = 0;
+					bobSetFrame(&s_sBgBobProtest.sBob, s_pOffsetProtest, 0);
+					backgroundBobResetCounter(&s_sBgBobProtest);
 					pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START);
 					inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START, 1);
 				}
 				else if(lCash > PROTEST_THRESHOLD_WARNING) {
 					eNewState = PROTEST_STATE_NONE;
-					bobSetFrame(&s_sProtestBob, s_pOffsetNoProtest, 0);
-					s_ubDrawCount = 0;
+					bobSetFrame(&s_sBgBobProtest.sBob, s_pOffsetNoProtest, 0);
+					backgroundBobResetCounter(&s_sBgBobProtest);
 				}
 				break;
 			case PROTEST_STATE_PROTEST:
 				if(lCash < PROTEST_THRESHOLD_STRIKE) {
 					eNewState = PROTEST_STATE_STRIKE;
-					bobSetFrame(&s_sProtestBob, s_pOffsetStrike, 0);
-					s_ubDrawCount = 0;
+					bobSetFrame(&s_sBgBobProtest.sBob, s_pOffsetStrike, 0);
+					backgroundBobResetCounter(&s_sBgBobProtest);
 					pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE);
 					inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE, 1);
 				}
@@ -130,14 +127,7 @@ void protestsProcess(void) {
 }
 
 void protestsDrawBobs(void) {
-	if(!gameCanPushBob(&s_sProtestBob)) {
-		s_ubDrawCount = 0;
-	}
-	else if(s_ubDrawCount < 2) {
-		bobPush(&s_sProtestBob);
-		coreTransferBobToPristine(&s_sProtestBob);
-		++s_ubDrawCount;
-	}
+	backgroundBobPush(&s_sBgBobProtest);
 }
 
 tProtestState protestsGetState(void) {
