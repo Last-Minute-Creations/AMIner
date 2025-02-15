@@ -144,6 +144,7 @@ General:
 	☐ Add final default hi-scores
 	☐ Translate checkpoint text?
 	☐ Rebalance commissar reporting
+	☐ Add final credits
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)
@@ -318,3 +319,8 @@ Missing graphics:
 	☐ After-invasion newscaster
 	☐ Sci base final
 	☐ News slides for each ending
+
+Missing audio:
+	☐ Earthquake
+	☐ Gate rune activation
+	☐ Gate activation

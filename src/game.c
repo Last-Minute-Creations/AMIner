@@ -112,8 +112,8 @@ static UBYTE s_isCameraShake;
 //------------------------------------------------------------------ PUBLIC VARS
 
 UBYTE g_is2pPlaying;
-UBYTE g_isChallenge;
 UBYTE g_isAtari;
+tGameMode g_eGameMode;
 
 //------------------------------------------------------------ PRIVATE FNS: MODE
 // TODO: reformat somehow? Move to separate file?
@@ -256,7 +256,7 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	tModeMenu *pModeMenu = &s_pModeMenus[ubPlayer];
 
-	if(!g_isChallenge) {
+	if(g_eGameMode != GAME_MODE_CHALLENGE) {
 		tModePreset eNextPreset = s_pPlayerModePreset[ubPlayer];
 		switch(eNextPreset) {
 			case MODE_PRESET_COUNT:
@@ -422,7 +422,7 @@ static void gameProcessHotkeys(void) {
 		vPortWaitForEnd(s_pVpMain);
 	}
 
-	if(keyUse(KEY_F1) && !g_isChallenge) {
+	if(keyUse(KEY_F1) && g_eGameMode != GAME_MODE_CHALLENGE) {
 		if(!g_is2pPlaying) {
 			g_is2pPlaying = 1;
 			hudSet2pPlaying(1);
@@ -886,7 +886,7 @@ static UBYTE gameProcessGateCutscene(void) {
 }
 
 static void gameCameraProcess(void) {
-	if(g_isChallenge) {
+	if(g_eGameMode == GAME_MODE_CHALLENGE) {
 		const UWORD uwBottomPos = g_pMainBuffer->pCamera->uPos.uwY + g_pMainBuffer->sCommon.pVPort->uwHeight - 2 * TILE_SIZE;
 		if(
 			g_pVehicles[0].sBobBody.sPos.uwY >  uwBottomPos ||
@@ -1033,7 +1033,7 @@ static void gameSave(tFile *pFile) {
 	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
-	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
+	fileWrite(pFile, &g_eGameMode, sizeof(g_eGameMode));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
 
 	fileWrite(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
@@ -1271,7 +1271,7 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
 	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
-	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
+	fileRead(pFile, &g_eGameMode, sizeof(g_eGameMode));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
 
 	fileRead(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
@@ -1318,9 +1318,9 @@ UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary) {
 	return saveReadTag(pFile, SAVE_TAG_SUMMARY_END);
 }
 
-void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
+void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	s_ubChallengeCamCnt = 0;
-	g_isChallenge = isChallenge;
+	g_eGameMode = eGameMode;
 	s_pPlayerSteers[0] = sSteerP1;
 	s_pPlayerSteers[1] = sSteerP2;
 	inboxReset();
@@ -1331,10 +1331,10 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	tutorialReset();
 	pageOfficeReset();
 	warehouseReset();
-	if(g_isChallenge) {
+	if(g_eGameMode == GAME_MODE_CHALLENGE) {
 		baseTilesetPrepareForChallenge(g_isAtari);
 	}
-	tileReset(g_isAtari, g_isChallenge);
+	tileReset(g_isAtari, g_eGameMode);
 	inventoryReset();
 	protestsReset();
 	vehicleReset(&g_pVehicles[0]);
@@ -1352,7 +1352,7 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_wLastReminder = 0;
 	s_sTeleportReturn.ulYX = -1;
 	s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
-	hudReset(g_isChallenge, g_is2pPlaying);
+	hudReset(g_eGameMode, g_is2pPlaying);
 	heatReset();
 	groundLayerReset(1, 0);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
@@ -1414,7 +1414,7 @@ static void gameGsLoop(void) {
 		return;
 	}
 
-	if(!g_isChallenge) {
+	if(g_eGameMode != GAME_MODE_CHALLENGE) {
 		dinoProcess();
 		questGateProcess();
 		questCrateProcess();

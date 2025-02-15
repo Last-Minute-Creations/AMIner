@@ -94,11 +94,11 @@ static void menuEnableAtari(void) {
 	}
 }
 
-static void menuStartGame(UBYTE isChallenge) {
+static void menuStartGame(tGameMode eMode) {
 	commEraseAll();
 	commProgressInit();
 	gameStart(
-		isChallenge,
+		eMode,
 		g_sSettings.is1pKbd ? steerInitFromMode(STEER_MODE_KEY_WSAD) : steerInitFromMode(STEER_MODE_JOY_1),
 		g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_KEY_ARROWS) : steerInitFromMode(STEER_MODE_JOY_2)
 	);
@@ -112,7 +112,7 @@ static void menuLoadGame(const char *szSavePath) {
 	commEraseAll();
 	commProgressInit();
 	gameStart(
-		1, // challenge loading is faster due to less terrain prep
+		GAME_MODE_CHALLENGE, // challenge loading is faster due to less terrain prep
 		g_sSettings.is1pKbd ? steerInitFromMode(STEER_MODE_KEY_WSAD) : steerInitFromMode(STEER_MODE_JOY_1),
 		g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_KEY_ARROWS) : steerInitFromMode(STEER_MODE_JOY_2)
 	);
@@ -137,7 +137,7 @@ static void menuLoadGame(const char *szSavePath) {
 }
 
 static void menuOnStoryStart(void) {
-	menuStartGame(0);
+	menuStartGame(GAME_MODE_STORY);
 }
 
 static void menuOnStoryLoad(void) {
@@ -566,7 +566,7 @@ static void menuOnFreeLoad(void) {
 }
 
 static void menuOnChallengeStart(void) {
-	menuStartGame(1);
+	menuStartGame(GAME_MODE_CHALLENGE);
 }
 
 static void menuOnEnterCredits(void) {

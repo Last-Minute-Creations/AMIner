@@ -199,7 +199,7 @@ void hiScoreSetup(LONG lScore, const char *szResult) {
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
 		if(s_pScores[i].lScore < lScore) {
 			s_isEnteringHiScore = 1;
-			if(g_isChallenge) {
+			if(g_eGameMode == GAME_MODE_CHALLENGE) {
 				achievementUnlock(ACHIEVEMENT_RECORD_HOLDER);
 				if(g_isAtari) {
 					achievementUnlock(ACHIEVEMENT_MORE_COAL);

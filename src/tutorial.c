@@ -220,10 +220,12 @@ UBYTE tutorialLoad(tFile *pFile) {
 }
 
 UBYTE tutorialProcess(void) {
-	if(g_isChallenge) {
-		return tutorialProcessChallenge();
-	}
-	else {
-		return tutorialProcessStory();
+	switch(g_eGameMode) {
+		case GAME_MODE_CHALLENGE:
+			return tutorialProcessChallenge();
+		case GAME_MODE_STORY:
+			return tutorialProcessStory();
+		default:
+			return 0;
 	}
 }

@@ -14,6 +14,12 @@
 #define GAME_BPP 5
 #define GAME_TIME_PER_DAY 140
 
+typedef enum tGameMode {
+	GAME_MODE_STORY,
+	GAME_MODE_CHALLENGE,
+	GAME_MODE_DEADLINE,
+} tGameMode;
+
 typedef struct tGameSummary {
 	ULONG ulGameTime;
 	LONG lCash;
@@ -34,7 +40,7 @@ UBYTE tileIsSolid(UWORD uwX, UWORD uwY);
 
 void gameGsLoopChallengeEnd(void);
 
-void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2);
+void gameStart(tGameMode g_eGameMode, tSteer sSteerP1, tSteer sSteerP2);
 
 void gameTriggerSave(void);
 
@@ -86,8 +92,8 @@ void gameProcessBaseGate(void);
 
 // Game config
 extern UBYTE g_is2pPlaying;
-extern UBYTE g_isChallenge;
 extern UBYTE g_isAtari;
+extern tGameMode g_eGameMode;
 extern tState g_sStateGame;
 
 #endif // _GAME_H_

@@ -227,7 +227,7 @@ void baseDestroy(void) {
 
 void baseProcess(void) {
 	UWORD uwCamY = s_pManager->pCamera->uPos.uwY;
-	if(g_isChallenge) {
+	if(g_eGameMode == GAME_MODE_CHALLENGE) {
 		if(uwCamY >= TILE_ROW_CHALLENGE_CHECKPOINT_3 * TILE_SIZE) {
 			tileVariantChangeTo(TILE_VARIANT_FINISH);
 		}

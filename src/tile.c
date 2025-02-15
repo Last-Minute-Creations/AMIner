@@ -108,11 +108,11 @@ static UBYTE tileProgress(
 }
 
 static void tileGenerateTerrain(
-	UBYTE isCoalOnly, UBYTE isChallenge, UBYTE ubProgressMin, UBYTE ubProgressMax
+	UBYTE isCoalOnly, tGameMode eGameMode, UBYTE ubProgressMin, UBYTE ubProgressMax
 ) {
 	UWORD uwEndX = g_pMainBuffer->uTileBounds.uwX;
 	UWORD uwEndY = g_pMainBuffer->uTileBounds.uwY;
-	if(isChallenge) {
+	if(eGameMode == GAME_MODE_CHALLENGE) {
 		uwEndY = TILE_ROW_CHALLENGE_FINISH + 20; // generate a bit more to accomodate scroll
 	}
 
@@ -126,7 +126,7 @@ static void tileGenerateTerrain(
 			UWORD uwWhat = (randUw(&g_sRand) * 1000) / 65535;
 			UWORD uwChanceAir = 50;
 			UWORD uwChanceRock, uwChanceSilver, uwChanceGold, uwChanceEmerald, uwChanceRuby, uwChanceMoonstone, uwChanceMagma;
-			if(isChallenge) {
+			if(eGameMode == GAME_MODE_CHALLENGE) {
 				uwChanceRock = 75;
 				uwChanceSilver = chanceTrapezoid(
 					uwY, TILE_ROW_BASE_DIRT, TILE_ROW_BASE_DIRT+5,
@@ -281,13 +281,13 @@ UBYTE tileIsHardToDrill(UWORD uwX, UWORD uwY) {
 	return g_pMainBuffer->pTileData[uwX][uwY] >= TILE_STONE_1;
 }
 
-void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
+void tileReset(UBYTE isCoalOnly, tGameMode eGameMode) {
 	logBlockBegin(
-		"tileReset(isCoalOnly: %hhu, isChallenge: %hhu)", isCoalOnly, isChallenge
+		"tileReset(isCoalOnly: %hhu, eGameMOde: %d)", isCoalOnly, eGameMode
 	);
 	UWORD uwEndX = g_pMainBuffer->uTileBounds.uwX;
 	UWORD uwEndY = g_pMainBuffer->uTileBounds.uwY;
-	if(isChallenge) {
+	if(eGameMode == GAME_MODE_CHALLENGE) {
 		uwEndY = TILE_ROW_CHALLENGE_FINISH + 20; // generate a bit more to accomodate scroll
 	}
 
@@ -296,7 +296,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 
 	// Generate terrain
 	UBYTE ubProgressTerrainEnd = 30;
-	tileGenerateTerrain(isCoalOnly, isChallenge, 0, ubProgressTerrainEnd);
+	tileGenerateTerrain(isCoalOnly, eGameMode, 0, ubProgressTerrainEnd);
 
 	// Generate bases
 	UBYTE ubProgressBaseStart = ubProgressTerrainEnd;
@@ -316,7 +316,7 @@ void tileReset(UBYTE isCoalOnly, UBYTE isChallenge) {
 	}
 	commProgress(50, g_pMsgs[MSG_LOADING_FINISHING]);
 
-	if(isChallenge) {
+	if(eGameMode == GAME_MODE_CHALLENGE) {
 		for(UWORD x = 1; x < uwEndX; ++x) {
 			pTiles[x][TILE_ROW_CHALLENGE_CHECKPOINT_1] = TILE_CHECKPOINT_1 + x - 1;
 			pTiles[x][TILE_ROW_CHALLENGE_CHECKPOINT_2] = TILE_CHECKPOINT_1 + x - 1;

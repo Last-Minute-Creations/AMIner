@@ -275,10 +275,10 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 void vehicleResetPos(tVehicle *pVehicle) {
 	UWORD uwX;
 	if(pVehicle->ubPlayerIdx == PLAYER_1) {
-		uwX = g_isChallenge ? 0 : 96;
+		uwX = (g_eGameMode == GAME_MODE_CHALLENGE) ? 0 : 96;
 	}
 	else {
-		uwX = g_isChallenge ? 96 : 320-64;
+		uwX = (g_eGameMode == GAME_MODE_CHALLENGE) ? 96 : 320-64;
 	}
 	UWORD uwY = (TILE_ROW_BASE_DIRT - 1) * TILE_SIZE;
 	vehicleSetPos(pVehicle, uwX, uwY);
@@ -635,7 +635,7 @@ static inline UBYTE vehicleStartDrilling(
 	UBYTE ubDrillCost = g_ubDrillingCost * bDrillDuration;
 
 	// Check vehicle's drill depletion
-	if(!g_isChallenge) {
+	if(g_eGameMode != GAME_MODE_CHALLENGE) {
 		if(pVehicle->uwDrillCurr < ubDrillCost) {
 			if(!ubCooldown) {
 				textBobSet(
@@ -685,7 +685,7 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 	pVehicle->uwCargoScore = 0;
 	UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
 	if(
-		g_isChallenge ||
+		g_eGameMode == GAME_MODE_CHALLENGE ||
 		(eBaseId == BASE_ID_GROUND || inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, eBaseId))
 	) {
 		hudSetCargo(pVehicle->ubPlayerIdx, 0, uwCargoMax);
@@ -696,7 +696,7 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 	}
 
 	WORD wRestockPrice = 0;
-	if(g_isChallenge || inventoryGetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, eBaseId)) {
+	if(g_eGameMode == GAME_MODE_CHALLENGE || inventoryGetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, eBaseId)) {
 		tProtestState eProtestState = protestsGetState();
 		// Buy as much fuel as needed
 		// Start refueling if half a liter is spent
@@ -726,7 +726,7 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 
 		// Pay for your fuel & hull!
 		wRestockPrice = uwRefuelLiters * g_ubLiterPrice + uwRehullCost;
-		LONG *pCash = g_isChallenge ? &g_pVehicles[0].lCash : &pVehicle->lCash;
+		LONG *pCash = (g_eGameMode == GAME_MODE_CHALLENGE) ? &pVehicle->lCash : &g_pVehicles[0].lCash;
 		*pCash -= wRestockPrice;
 	}
 	return -wRestockPrice;
@@ -777,7 +777,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			pVehicle->sBobBody.sPos.uwY - 32, 1
 		);
 	}
-	else if(g_isChallenge) {
+	else if(g_eGameMode == GAME_MODE_CHALLENGE) {
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_10) {
 			if(uwTileY == TILE_ROW_CHALLENGE_FINISH) {
 				pVehicle->lCash += pVehicle->uwCargoScore;
@@ -898,7 +898,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 
 	// Challenge camera teleport
 	if(
-		g_isChallenge &&
+		g_eGameMode == GAME_MODE_CHALLENGE &&
 		fix16_to_int(pVehicle->fY) < g_pMainBuffer->pCamera->uPos.uwY
 	) {
 		UWORD uwTileY = (
@@ -928,7 +928,7 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->lCash -= uwTeleportPenalty;
 	}
 
-	if(g_isChallenge && !pVehicle->isChallengeEnded) {
+	if(g_eGameMode == GAME_MODE_CHALLENGE && !pVehicle->isChallengeEnded) {
 		UWORD uwTileY = fix16_to_int(pVehicle->fY) / 32;
 		if(uwTileY >= TILE_ROW_CHALLENGE_FINISH) {
 			vehicleEndChallenge(pVehicle);
