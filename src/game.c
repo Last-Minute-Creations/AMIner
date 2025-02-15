@@ -1167,8 +1167,10 @@ void gameAddRebuke(void) {
 		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3
 	);
 
-	pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, ePage);
-	inboxPushBack(ePage, 1);
+	// Skip duplicate inbox stuff if last rebuke pending + vehicle crashed
+	if(pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, ePage)) {
+		inboxPushBack(ePage, 1);
+	}
 }
 
 UBYTE gameGetAccolades(void) {

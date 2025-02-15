@@ -143,6 +143,7 @@ General:
 	☐ Add 2s pauses between music tracks?
 	☐ Add final default hi-scores
 	☐ Translate checkpoint text?
+	☐ Rebalance commissar reporting
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)
@@ -153,9 +154,9 @@ From QA tests:
 	✔ It's not clear what to do with negative cash @done(25-02-14)
 	✔ Move teleporter to proper position @done(25-02-14)
 	✔ Add teleporter front graphics @done(25-02-14)
+	✔ Add Commissar HUD msg on vehicle destroyed @done(25-02-15)
 	☐ Fix tutorial texts not triggering properly (plan instructions on office page)
-	☐ Add Commissar HUD msg on vehicle destroyed
-	☐ Make sure there is message for each accolade received (plans!)
+	☐ Make sure there is message for each accolade received (plans! reporting!)
 	☐ Display time on HUD instead of cash when in mine
 
 Bugs:

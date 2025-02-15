@@ -311,6 +311,7 @@ static void vehicleOnExplodePeak(void *pData) {
 	UBYTE ubPlayerIdx = (UBYTE)(ULONG)pData;
 	tVehicle *pVehicle = &g_pVehicles[ubPlayerIdx];
 	vehicleSetState(pVehicle, VEHICLE_STATE_SMOKING);
+	hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
 }
 
 static void vehicleCrash(tVehicle *pVehicle) {
@@ -327,6 +328,7 @@ static void vehicleCrash(tVehicle *pVehicle) {
 		vehicleOnExplodePeak, 0, (void*)(ULONG)(pVehicle->ubPlayerIdx), FLIPBOOK_KIND_BOOM
 	);
 	vehicleSetState(pVehicle, VEHICLE_STATE_EXPLODING);
+	gameAddRebuke();
 
 	s_ubBebCountdown = 200;
 }
