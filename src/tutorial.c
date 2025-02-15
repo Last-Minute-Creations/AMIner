@@ -23,7 +23,8 @@ typedef enum _tTutorialState {
 	TUTORIAL_GO_READ_PLAN,
 	TUTORIAL_WAITING_FOR_DIG,
 	TUTORIAL_WAITING_FOR_RESTOCK,
-	TUTORIAL_SHOW_PLAN_FILL_MSG,
+	TUTORIAL_SHOW_NAVIGATE_TO_WAREHOUSE_MSG,
+	TUTORIAL_WAITING_FOR_WAREHOUSE_ACTIVE,
 	TUTORIAL_WAITING_FOR_PLAN_DONE,
 	TUTORIAL_DONE
 } tTutorialState;
@@ -144,7 +145,7 @@ static UBYTE tutorialProcessStory(void) {
 					++s_eTutorialState;
 				}
 				else {
-					s_eTutorialState = TUTORIAL_SHOW_PLAN_FILL_MSG;
+					s_eTutorialState = TUTORIAL_SHOW_NAVIGATE_TO_WAREHOUSE_MSG;
 				}
 			}
 		} break;
@@ -157,9 +158,19 @@ static UBYTE tutorialProcessStory(void) {
 				++s_eTutorialState;
 			}
 		} break;
-		case TUTORIAL_SHOW_PLAN_FILL_MSG:
+		case TUTORIAL_SHOW_NAVIGATE_TO_WAREHOUSE_MSG:
 			if(commShopIsActive() && !hudIsShowingMessage()) {
 				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_IN_SHOP]);
+				++s_eTutorialState;
+			}
+			break;
+		case TUTORIAL_WAITING_FOR_WAREHOUSE_ACTIVE:
+			if(
+				commShopIsActive() &&
+				commShopGetCurrentPage() == COMM_SHOP_PAGE_WAREHOUSE &&
+				!hudIsShowingMessage()
+			) {
+				hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_TUTORIAL_IN_WAREHOUSE]);
 				++s_eTutorialState;
 			}
 			break;

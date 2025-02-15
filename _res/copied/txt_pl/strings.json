@@ -123,8 +123,12 @@
 			"i wykorzystajcie urobek do wykonania planu"
 		],
 		"inShop": [
-			"Panie Derektorze, przerzućcie surowce na plan. Ustawcie się",
-			"na nich, przesuńcie wihajstrem w prawo i wciśnijcie Potwierdź"
+			"Panie Derektorze, tera trza przejść do magazynu",
+			"co by dać minerały na plan"
+		],
+		"inWarehouse": [
+			"To tera Pan Derektor da surowce na plan. Ustawcie się",
+			"na srebrze, dajcie wihajstrem w prawo i zaakceptujcie"
 		],
 		"descriptionOffice": [
 			"Tu bedziecie rozmawiać z różnymi co Was",

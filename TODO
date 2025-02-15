@@ -155,7 +155,7 @@ From QA tests:
 	✔ Move teleporter to proper position @done(25-02-14)
 	✔ Add teleporter front graphics @done(25-02-14)
 	✔ Add Commissar HUD msg on vehicle destroyed @done(25-02-15)
-	☐ Fix tutorial texts not triggering properly (plan instructions on office page)
+	✔ Fix tutorial texts not triggering properly (plan instructions on office page) @done(25-02-15)
 	☐ Make sure there is message for each accolade received (plans! reporting!)
 	☐ Display time on HUD instead of cash when in mine
 

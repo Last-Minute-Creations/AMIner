@@ -52,6 +52,7 @@ const char * s_pLangDom[] = {
 	[MSG_TUTORIAL_GO_MEET_MIETEK] =  "tutorial.start",
 	[MSG_TUTORIAL_ON_DUG] =  "tutorial.onDugOut",
 	[MSG_TUTORIAL_IN_SHOP] = "tutorial.inShop",
+	[MSG_TUTORIAL_IN_WAREHOUSE] = "tutorial.inWarehouse",
 	[MSG_TUTORIAL_DESCRIPTION_TAB_OFFICE] = "tutorial.descriptionOffice",
 	[MSG_TUTORIAL_DESCRIPTION_TAB_WORKSHOP] = "tutorial.descriptionWorkshop",
 	[MSG_TUTORIAL_DESCRIPTION_TAB_WAREHOUSE] = "tutorial.descriptionWarehouse",
