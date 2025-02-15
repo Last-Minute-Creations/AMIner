@@ -92,7 +92,9 @@ void baseUnlocksDrawBack(void) {
 }
 
 void baseUnlocksDrawFront(void) {
-	gameTryPushBob(&s_sBobTeleporterFront);
+	if(inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, s_eBaseIdPrev)) {
+		gameTryPushBob(&s_sBobTeleporterFront);
+	}
 }
 
 void baseUnlocksDestroy(void) {
