@@ -226,17 +226,26 @@ static void pageWarehouseProcess(void) {
 	else if(s_ubPosCurr < s_ubPosCount) {
 		UBYTE ubMineral = s_pMineralsOnList[s_ubPosCurr];
 		// Process moving stock
-		if(commNavUse(DIRECTION_LEFT) && s_pTmpStock[ubMineral]) {
-			++s_pTmpSell[ubMineral];
-			--s_pTmpStock[ubMineral];
+		if(commNavUse(DIRECTION_LEFT)) {
+			if(s_pTmpPlan[ubMineral]) {
+				--s_pTmpPlan[ubMineral];
+				++s_pTmpStock[ubMineral];
+			}
+			else if(s_pTmpStock[ubMineral]) {
+				++s_pTmpSell[ubMineral];
+				--s_pTmpStock[ubMineral];
+			}
 			pageWarehouseDrawRow(ubPosPrev);
 		}
-		else if(
-			commNavUse(DIRECTION_RIGHT) && s_pTmpStock[ubMineral] &&
-			planManagerGet()->isPlanActive
-		) {
-			++s_pTmpPlan[ubMineral];
-			--s_pTmpStock[ubMineral];
+		else if(commNavUse(DIRECTION_RIGHT)) {
+			if(s_pTmpSell[ubMineral]) {
+				--s_pTmpSell[ubMineral];
+				++s_pTmpStock[ubMineral];
+			}
+			else if(s_pTmpStock[ubMineral] && planManagerGet()->isPlanActive) {
+				++s_pTmpPlan[ubMineral];
+				--s_pTmpStock[ubMineral];
+			}
 			pageWarehouseDrawRow(ubPosPrev);
 		}
 	}
