@@ -1139,6 +1139,8 @@ void gameCancelModeForPlayer(UBYTE ubPlayer) {
 void gameAdvanceAccolade(void) {
 	if(++s_ubAccoladesFract >= g_ubPlansPerAccolade) {
 		s_ubAccoladesFract = 0;
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_ACCOLADE);
+		inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_ACCOLADE, 1);
 		gameAddAccolade();
 	}
 }

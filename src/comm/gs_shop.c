@@ -302,6 +302,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED:
 			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_delayed", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_ACCOLADE:
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_accolade", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
 			break;
@@ -346,6 +349,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_AGENT:
 			pageQuestioningReport(QUESTIONING_BIT_AGENT, 1); // HACK HACK HACK
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_agent", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE:
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_questioning_accolade", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_DOSSIER:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_dossier", onBack);

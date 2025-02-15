@@ -219,6 +219,8 @@ void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily)
 	if(isVoluntarily) {
 		heatTryReduce(QUESTIONING_HEAT_DECREASE_REPORT);
 		gameAddAccolade();
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE);
+		inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE, 1);
 	}
 
 	if(s_eQuestioningsReported == QUESTIONING_FLAG_ALL) {
