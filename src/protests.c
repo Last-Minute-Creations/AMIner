@@ -7,6 +7,7 @@
 #include "comm/inbox.h"
 #include "vehicle.h"
 #include "save.h"
+#include "game.h"
 #include "background_bob.h"
 
 #define PROTEST_THRESHOLD_WARNING -300
@@ -64,6 +65,10 @@ UBYTE protestsLoad(tFile *pFile) {
 }
 
 void protestsProcess(void) {
+	if(g_eGameMode != GAME_MODE_STORY) {
+		return;
+	}
+
 	tProtestState eNewState = s_eProtestState;
 	LONG lCash = g_pVehicles[0].lCash;
 

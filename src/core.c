@@ -118,8 +118,12 @@ static void onTileDraw(
 			bOverlay += 1;
 		}
 
-		const tBase *pBase = baseGetCurrent();
-		if(uwTileY < pBase->uwTileDepth || pBase->uwTileDepth + BASE_CAVE_HEIGHT < uwTileY) {
+		tBaseId eBaseId = baseGetCurrentId();
+		const tBase *pBase = baseGetById(eBaseId);
+		if(
+			g_eGameMode != GAME_MODE_STORY || eBaseId == BASE_ID_GROUND ||
+			uwTileY < pBase->uwTileDepth || pBase->uwTileDepth + BASE_CAVE_HEIGHT < uwTileY
+		) {
 			if(tileIsSolid(uwTileX, uwTileY + 1)) {
 				bOverlay += 2;
 			}

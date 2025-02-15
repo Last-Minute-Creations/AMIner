@@ -311,7 +311,10 @@ static void vehicleOnExplodePeak(void *pData) {
 	UBYTE ubPlayerIdx = (UBYTE)(ULONG)pData;
 	tVehicle *pVehicle = &g_pVehicles[ubPlayerIdx];
 	vehicleSetState(pVehicle, VEHICLE_STATE_SMOKING);
-	hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
+	if(g_eGameMode == GAME_MODE_STORY) {
+		gameAddRebuke();
+		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
+	}
 }
 
 static void vehicleCrash(tVehicle *pVehicle) {
@@ -328,8 +331,6 @@ static void vehicleCrash(tVehicle *pVehicle) {
 		vehicleOnExplodePeak, 0, (void*)(ULONG)(pVehicle->ubPlayerIdx), FLIPBOOK_KIND_BOOM
 	);
 	vehicleSetState(pVehicle, VEHICLE_STATE_EXPLODING);
-	gameAddRebuke();
-
 	s_ubBebCountdown = 200;
 }
 
@@ -682,11 +683,10 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 	}
 
 	pVehicle->uwCargoCurr = 0;
-	pVehicle->uwCargoScore = 0;
 	UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
 	if(
-		g_eGameMode == GAME_MODE_CHALLENGE ||
-		(eBaseId == BASE_ID_GROUND || inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, eBaseId))
+		g_eGameMode == GAME_MODE_CHALLENGE || eBaseId == BASE_ID_GROUND ||
+		inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, eBaseId)
 	) {
 		hudSetCargo(pVehicle->ubPlayerIdx, 0, uwCargoMax);
 		for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
@@ -695,7 +695,8 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 		}
 	}
 
-	WORD wRestockPrice = 0;
+	WORD wCashDelta = (g_eGameMode == GAME_MODE_STORY) ? 0 : pVehicle->uwCargoScore;
+	pVehicle->uwCargoScore = 0;
 	if(g_eGameMode == GAME_MODE_CHALLENGE || inventoryGetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, eBaseId)) {
 		tProtestState eProtestState = protestsGetState();
 		// Buy as much fuel as needed
@@ -725,11 +726,15 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 		}
 
 		// Pay for your fuel & hull!
-		wRestockPrice = uwRefuelLiters * g_ubLiterPrice + uwRehullCost;
+		UWORD uwRestockCost = uwRefuelLiters * g_ubLiterPrice + uwRehullCost;
+		if(g_eGameMode == GAME_MODE_DEADLINE) {
+			uwRestockCost /= 2;
+		}
+		wCashDelta -= uwRestockCost;
 		LONG *pCash = (g_eGameMode == GAME_MODE_CHALLENGE) ? &pVehicle->lCash : &g_pVehicles[0].lCash;
-		*pCash -= wRestockPrice;
+		*pCash += wCashDelta;
 	}
-	return -wRestockPrice;
+	return wCashDelta;
 }
 
 static void vehicleEndChallenge(tVehicle *pVehicle) {
@@ -780,7 +785,6 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	else if(g_eGameMode == GAME_MODE_CHALLENGE) {
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_10) {
 			if(uwTileY == TILE_ROW_CHALLENGE_FINISH) {
-				pVehicle->lCash += pVehicle->uwCargoScore;
 				vehicleEndChallenge(pVehicle);
 			}
 			else {
@@ -795,7 +799,6 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 					pVehicle->sBobBody.sPos.uwY,
 					pVehicle->sBobBody.sPos.uwY - 32, 1
 				);
-				pVehicle->lCash += pVehicle->uwCargoScore;
 				vehicleRestock(pVehicle);
 			}
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);

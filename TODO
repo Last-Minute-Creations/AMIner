@@ -279,6 +279,9 @@ Crate quests:
 Deadline mode:
 	✔ Don't generate underground bases @done(25-02-15)
 	✔ Use separate save file @done(25-02-15)
+	✔ Restock on going near the base @done(25-02-15)
+	✔ Disable entering the commrade @done(25-02-15)
+	✔ Unlock the teleporter on start @done(25-02-15)
 	☐ End the game after some time
 	☐ Display time remaining on HUD
 	☐ Implement stopwatch gathering

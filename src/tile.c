@@ -214,7 +214,7 @@ static void tileGenerateTerrain(
 				pTiles[uwX][uwY] = TILE_DIRT_1 + ((uwX & 1) ^ (uwY & 1));
 			}
 			// For quick tests
-			g_pMainBuffer->pTileData[2][uwY] = TILE_CAVE_BG_1;
+			// g_pMainBuffer->pTileData[2][uwY] = TILE_CAVE_BG_1;
 		}
 	}
 }

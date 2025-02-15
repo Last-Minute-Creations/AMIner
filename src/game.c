@@ -264,7 +264,9 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				// fallthrough
 			case MODE_PRESET_OFF:
 				if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-					eNextPreset = MODE_PRESET_PROMPT_SHOP;
+					if(g_eGameMode == GAME_MODE_STORY) {
+						eNextPreset = MODE_PRESET_PROMPT_SHOP;
+					}
 				}
 				else if(
 					vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer]) &&
