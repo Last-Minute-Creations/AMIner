@@ -250,7 +250,7 @@ void baseProcess(void) {
 	}
 
 	const tBase *pBase = baseGetCurrent();
-	if(pBase->cbProcess) {
+	if(g_eGameMode == GAME_MODE_STORY && pBase->cbProcess) {
 		pBase->cbProcess();
 	}
 }

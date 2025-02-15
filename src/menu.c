@@ -38,17 +38,15 @@ typedef enum _tMenuState {
 
 //------------------------------------------------------------------- PROTOTYPES
 
-static void menuOnStoryStart(void);
+static void menuOnGameStart(void);
 static void menuOnStoryLoad(void);
 static void menuOnExit(void);
 static void menuOnShowScores(void);
 static void menuOnBackToMain();
-static void menuOnFreeStart();
-static void menuOnFreeLoad();
-static void menuOnChallengeStart();
+static void menuOnDeadlineLoad();
 static void menuOnBackToMainFromSettings();
 static void menuOnEnterStory();
-static void menuOnEnterFree();
+static void menuOnEnterDeadline();
 static void menuOnEnterChallenge();
 static void menuOnEnterAchievements();
 static void menuOnEnterSettings();
@@ -76,6 +74,7 @@ static UBYTE s_isScoreShowAfterRollIn;
 static UBYTE s_ubIndexAtari;
 static tSteer s_pMenuSteers[MENU_STEER_COUNT];
 static tGameSummary s_sSummary;
+static tGameMode s_eModeMenu;
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -136,10 +135,6 @@ static void menuLoadGame(const char *szSavePath) {
 	s_eMenuState = MENU_STATE_ROLL_OUT;
 }
 
-static void menuOnStoryStart(void) {
-	menuStartGame(GAME_MODE_STORY);
-}
-
 static void menuOnStoryLoad(void) {
 	menuLoadGame("save_story.dat");
 }
@@ -175,7 +170,7 @@ static void onMenuPosDraw(
 	);
 	*pUndrawWidth = fontMeasureText(g_pFont, szText).uwX;
 
-	if(szCaption == g_pMenuCaptions[MENU_CAPTION_CONTINUE]) {
+	if(szCaption == g_pMenuCaptions[MENU_CAPTION_CONTINUE] && s_eModeMenu == GAME_MODE_STORY) {
 		UBYTE ubLineHeight = commGetLineHeight();
 		UWORD uwY = COMM_DISPLAY_HEIGHT - 4 * ubLineHeight;
 		if(isActive) {
@@ -260,6 +255,7 @@ static UBYTE menuLoadSummaryFromSave(const char *szPath, tGameSummary *pSummary)
 }
 
 static void menuOnEnterStory(void) {
+	s_eModeMenu = GAME_MODE_STORY;
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
@@ -276,7 +272,7 @@ static void menuOnEnterStory(void) {
 		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
-		.sOptCb = {.cbSelect = menuOnStoryStart}
+		.sOptCb = {.cbSelect = menuOnGameStart}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
@@ -301,16 +297,17 @@ static void menuOnEnterStory(void) {
 	menuRedraw();
 }
 
-static void menuOnEnterFree(void) {
+static void menuOnEnterDeadline(void) {
+	s_eModeMenu = GAME_MODE_DEADLINE;
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
-	if(diskFileExists("save_free.dat")) {
+	if(diskFileExists("save_deadline.dat")) {
 		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
 			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
 			.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 			.isHidden = 0,
-			.sOptCb = {.cbSelect = menuOnFreeLoad}
+			.sOptCb = {.cbSelect = menuOnDeadlineLoad}
 		};
 	}
 
@@ -318,7 +315,7 @@ static void menuOnEnterFree(void) {
 		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
-		.sOptCb = {.cbSelect = menuOnFreeStart}
+		.sOptCb = {.cbSelect = menuOnGameStart}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
@@ -357,6 +354,7 @@ static void menuOnEnterFree(void) {
 }
 
 static void menuOnEnterChallenge(void) {
+	s_eModeMenu = GAME_MODE_CHALLENGE;
 	s_ubMenuOptionCount = 0;
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
@@ -364,7 +362,7 @@ static void menuOnEnterChallenge(void) {
 		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
-		.sOptCb = {.cbSelect = menuOnChallengeStart}
+		.sOptCb = {.cbSelect = menuOnGameStart}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
@@ -494,10 +492,10 @@ static void menuOnEnterMain(void) {
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_FREE],
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_DEADLINE],
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
-		.sOptCb = {.cbSelect = menuOnEnterFree}
+		.sOptCb = {.cbSelect = menuOnEnterDeadline}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
@@ -557,16 +555,12 @@ static void menuOnBackToMainFromSettings(void) {
 	menuOnEnterMain();
 }
 
-static void menuOnFreeStart(void) {
-	logWrite("TODO: implement menuOnFreeStart");
+static void menuOnGameStart(void) {
+	menuStartGame(s_eModeMenu);
 }
 
-static void menuOnFreeLoad(void) {
-	menuLoadGame("save_free.dat");
-}
-
-static void menuOnChallengeStart(void) {
-	menuStartGame(GAME_MODE_CHALLENGE);
+static void menuOnDeadlineLoad(void) {
+	menuLoadGame("save_deadline.dat");
 }
 
 static void menuOnEnterCredits(void) {

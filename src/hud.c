@@ -100,7 +100,8 @@ static tHudPlayerData s_pPlayerData[2];
 static tHudState s_eState;
 static tHudPlayer s_ePlayer;
 static UBYTE s_ubHudOffsY;
-static UBYTE s_isChallenge, s_is2pPlaying;
+static UBYTE s_is2pPlaying;
+static tGameMode s_eGameMode;
 static UWORD s_uwFrameDelay, s_uwStateCounter;
 static tHudPage s_ePageCurrent = HUD_PAGE_MAIN;
 
@@ -120,7 +121,7 @@ static UBYTE s_ubHudShowStack;
 
 static void hudResetStateMachine(void) {
 	s_eState = (
-		s_isChallenge ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH
+		(s_eGameMode == GAME_MODE_CHALLENGE) ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH
 	);
 	s_ePlayer = PLAYER_1;
 	s_ubHudOffsY = ROW_1_Y;
@@ -137,7 +138,7 @@ static void hudRefresh(void) {
 	const UBYTE ubLabelWidth = fontMeasureText(
 		s_pFont, g_pMsgs[MSG_HUD_DEPTH]
 	).uwX;
-	if(s_isChallenge) {
+	if(s_eGameMode == GAME_MODE_CHALLENGE) {
 		// Clear depth label and use it as cash
 		blitRect(
 			s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1 - ubLabelWidth, ROW_2_Y,
@@ -280,8 +281,8 @@ void hudSet2pPlaying(UBYTE isPlaying) {
 	s_is2pPlaying = isPlaying;
 }
 
-void hudReset(UBYTE isChallenge, UBYTE is2pPlaying) {
-	s_isChallenge = isChallenge;
+void hudReset(tGameMode eGameMode, UBYTE is2pPlaying) {
+	s_eGameMode = eGameMode;
 	s_is2pPlaying = is2pPlaying;
 
 	for(UBYTE ubPlayer = PLAYER_1; ubPlayer <= PLAYER_2; ++ubPlayer) {
@@ -306,7 +307,7 @@ void hudSave(tFile *pFile) {
 	fileWrite(pFile, &s_eState, sizeof(s_eState));
 	fileWrite(pFile, &s_ePlayer, sizeof(s_ePlayer));
 	fileWrite(pFile, &s_ubHudOffsY, sizeof(s_ubHudOffsY));
-	fileWrite(pFile, &s_isChallenge, sizeof(s_isChallenge));
+	fileWrite(pFile, &s_eGameMode, sizeof(s_eGameMode));
 	fileWrite(pFile, &s_is2pPlaying, sizeof(s_is2pPlaying));
 	fileWrite(pFile, &s_uwFrameDelay, sizeof(s_uwFrameDelay));
 	fileWrite(pFile, &s_uwStateCounter, sizeof(s_uwStateCounter));
@@ -334,7 +335,7 @@ UBYTE hudLoad(tFile *pFile) {
 	fileRead(pFile, &s_eState, sizeof(s_eState));
 	fileRead(pFile, &s_ePlayer, sizeof(s_ePlayer));
 	fileRead(pFile, &s_ubHudOffsY, sizeof(s_ubHudOffsY));
-	fileRead(pFile, &s_isChallenge, sizeof(s_isChallenge));
+	fileRead(pFile, &s_eGameMode, sizeof(s_eGameMode));
 	fileRead(pFile, &s_is2pPlaying, sizeof(s_is2pPlaying));
 	fileRead(pFile, &s_uwFrameDelay, sizeof(s_uwFrameDelay));
 	fileRead(pFile, &s_uwStateCounter, sizeof(s_uwStateCounter));
@@ -446,7 +447,7 @@ void hudProcess(void) {
 			}
 			// fallthrough if doesn't need to draw new value
 		case STATE_MAIN_PREPARE_CASH:
-			if(s_isChallenge) {
+			if(s_eGameMode == GAME_MODE_CHALLENGE) {
 				lCash = s_pPlayerData[s_ePlayer].lCash;
 			}
 			else {
@@ -488,7 +489,7 @@ void hudProcess(void) {
 		case STATE_MAIN_DRAW_CASH:
 			if(isDrawPending) {
 				// decreased clear height 'cuz digits are smaller than whole font
-				UBYTE ubY = (s_isChallenge ? s_ubHudOffsY : ROW_1_Y);
+				UBYTE ubY = ((s_eGameMode == GAME_MODE_CHALLENGE) ? s_ubHudOffsY : ROW_1_Y);
 				blitRect(
 					s_pHudBuffer->pBack, GAUGE_CASH_X, ubY,
 					320 - (GAUGE_CASH_X + HUD_ORIGIN_X + MSG_ICON_WIDTH),
@@ -575,12 +576,12 @@ void hudProcess(void) {
 			if(s_ePlayer == PLAYER_1) {
 				s_ePlayer = PLAYER_2;
 				s_ubHudOffsY = ROW_2_Y;
-				s_eState = (s_isChallenge ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_DRAW_FUEL);
+				s_eState = ((s_eGameMode == GAME_MODE_CHALLENGE) ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_DRAW_FUEL);
 			}
 			else {
 				s_ePlayer = PLAYER_1;
 				s_ubHudOffsY = ROW_1_Y;
-				s_eState = (s_isChallenge ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH);
+				s_eState = ((s_eGameMode == GAME_MODE_CHALLENGE) ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH);
 			}
 			break;
 		case STATE_MSG_NOISE_IN:
@@ -724,7 +725,7 @@ void hudProcess(void) {
 					FONT_COOKIE | FONT_HCENTER
 				);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[s_isChallenge ? MSG_HUD_QUIT : MSG_HUD_SAVE_QUIT]);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[(s_eGameMode == GAME_MODE_CHALLENGE) ? MSG_HUD_QUIT : MSG_HUD_SAVE_QUIT]);
 				fontDrawTextBitMap(
 					s_pHudBuffer->pBack, s_pLineBuffer,
 					HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,

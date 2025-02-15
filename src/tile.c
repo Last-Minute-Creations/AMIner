@@ -143,6 +143,15 @@ static void tileGenerateTerrain(
 				uwChanceMoonstone = 10;
 				uwChanceMagma = 10;
 			}
+			else if(eGameMode == GAME_MODE_DEADLINE) {
+				uwChanceSilver = 75;
+				uwChanceGold = (uwY > 60) ? 75 : 0;
+				uwChanceEmerald = (uwY > 200) ? 75 : 0;
+				uwChanceRuby = (uwY > 175) ? 75 : 0;
+				uwChanceMoonstone = (uwY > 400) ? 75 : 0;
+				uwChanceRock = CLAMP(uwY * 500 / 2000, 0, 500);
+				uwChanceMagma = chanceTrapezoid(uwY, 50, 900, 1000, 1100, 0, 75);
+			}
 			else {
 				uwChanceGold = 0;
 				uwChanceEmerald = 0;
@@ -205,7 +214,7 @@ static void tileGenerateTerrain(
 				pTiles[uwX][uwY] = TILE_DIRT_1 + ((uwX & 1) ^ (uwY & 1));
 			}
 			// For quick tests
-			// g_pMainBuffer->pTileData[2][y] = TILE_CAVE_BG_1;
+			g_pMainBuffer->pTileData[2][uwY] = TILE_CAVE_BG_1;
 		}
 	}
 }
@@ -298,10 +307,11 @@ void tileReset(UBYTE isCoalOnly, tGameMode eGameMode) {
 	UBYTE ubProgressTerrainEnd = 30;
 	tileGenerateTerrain(isCoalOnly, eGameMode, 0, ubProgressTerrainEnd);
 
+	tBaseId eBaseCount = (eGameMode == GAME_MODE_STORY) ? BASE_ID_COUNT : BASE_ID_GROUND + 1;
 	// Generate bases
 	UBYTE ubProgressBaseStart = ubProgressTerrainEnd;
 	UBYTE ubProgressBaseEnd = 40;
-	for(tBaseId eBaseId = 0; eBaseId < BASE_ID_COUNT; ++eBaseId) {
+	for(tBaseId eBaseId = 0; eBaseId < eBaseCount; ++eBaseId) {
 		const tBase *pBase = baseGetById(eBaseId);
 		if(pBase->uwTileDepth != BASE_TILE_DEPTH_VARIANT) {
 			UBYTE ubProgress = tileProgress(ubProgressBaseStart, ubProgressBaseEnd, eBaseId, BASE_ID_COUNT_UNIQUE);
@@ -326,7 +336,7 @@ void tileReset(UBYTE isCoalOnly, tGameMode eGameMode) {
 		}
 		commProgress(90, g_pMsgs[MSG_LOADING_FINISHING]);
 	}
-	else {
+	else if(eGameMode == GAME_MODE_STORY) {
 		// Rock bottom
 		for(UWORD x = 1; x < uwEndX; ++x) {
 			pTiles[x][uwEndY - 1] = TILE_STONE_1 + (x & 3);

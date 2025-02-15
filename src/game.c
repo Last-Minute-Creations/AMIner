@@ -1362,10 +1362,9 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 void gameTriggerSave(void) {
 	logWrite("game save");
 	systemUse();
-	UBYTE isStory = 1;
 	char szPathTmp[20], szPathDat[20];
 	char *pEndTmp = stringCopy("save_", szPathTmp);
-	pEndTmp = stringCopy(isStory ? "story" : "deadline", pEndTmp);
+	pEndTmp = stringCopy((g_eGameMode == GAME_MODE_STORY) ? "story" : "deadline", pEndTmp);
 	char *pEndDat = stringCopy(szPathTmp, szPathDat);
 	pEndTmp = stringCopy(".tmp", pEndTmp);
 	pEndDat = stringCopy(".dat", pEndDat);
