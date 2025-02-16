@@ -282,11 +282,11 @@ Deadline mode:
 	✔ Restock on going near the base @done(25-02-15)
 	✔ Disable entering the commrade @done(25-02-15)
 	✔ Unlock the teleporter on start @done(25-02-15)
-	☐ End the game after some time
-	☐ Display time remaining on HUD
-	☐ Implement stopwatch gathering
+	✔ End the game after some time @done(25-02-16)
+	✔ Display time remaining on HUD @done(25-02-16)
+	✔ Add intro text @done(25-02-16)
 	☐ Use separate high scores
-	☐ Add intro text
+	☐ Implement stopwatch gathering
 
 Protests:
 	✔ Warning message on 1st negative cash threshold @done(25-02-13)
@@ -327,3 +327,5 @@ Missing audio:
 	☐ Earthquake
 	☐ Gate rune activation
 	☐ Gate activation
+	☐ Minor thud
+	☐ Major thud

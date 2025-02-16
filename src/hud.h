@@ -32,6 +32,8 @@ UBYTE hudLoad(tFile *pFile);
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth);
 
+void hudSetTime(UWORD uwTime);
+
 void hudSetCash(UBYTE ubPlayer, LONG lCash);
 
 void hudSetCargo(UBYTE ubPlayer, UBYTE ubCargo, UBYTE ubCargoMax);

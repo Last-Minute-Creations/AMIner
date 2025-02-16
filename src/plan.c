@@ -22,7 +22,12 @@ static void planReset(UBYTE isPlanActive) {
 
 	s_sPlanManager.wTimeMax = 25 * GAME_TIME_PER_DAY;
 
-	s_sPlanManager.wTimeRemaining = isPlanActive ? s_sPlanManager.wTimeMax : (GAME_TIME_PER_DAY * 5);
+	if(g_eGameMode == GAME_MODE_DEADLINE) {
+		s_sPlanManager.wTimeRemaining = (GAME_TIME_PER_DAY * 20);
+	}
+	else {
+		s_sPlanManager.wTimeRemaining = isPlanActive ? s_sPlanManager.wTimeMax : (GAME_TIME_PER_DAY * 5);
+	}
 	s_sPlanManager.isExtendedTimeByFavor = 0;
 	s_sPlanManager.eProlongState = PLAN_PROLONG_NONE;
 	s_sPlanManager.isPlanActive = isPlanActive;

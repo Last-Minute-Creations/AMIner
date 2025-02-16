@@ -32,6 +32,7 @@
 #define GAUGE_HULL_X (HUD_ORIGIN_X + 182)
 #define GAUGE_DEPTH_X (HUD_ORIGIN_X + 248)
 #define GAUGE_CASH_X (HUD_ORIGIN_X + 248)
+#define GAUGE_TIME_X (HUD_ORIGIN_X + 248)
 
 #define ROW_1_Y (HUD_ORIGIN_Y + 0)
 #define ROW_2_Y (HUD_ORIGIN_Y + 9)
@@ -56,6 +57,7 @@ typedef enum _tHudPage {
 
 typedef enum _tHudState {
 	// State machine for drawing main HUD
+	STATE_MAIN_PREPARE_TIME,
 	STATE_MAIN_PREPARE_DEPTH,
 	STATE_MAIN_DRAW_DEPTH,
 	STATE_MAIN_PREPARE_CASH,
@@ -79,6 +81,7 @@ typedef enum _tHudState {
 
 typedef struct _tHudPlayerData {
 	UWORD uwDepth, uwDepthDisp;
+	UWORD uwTime, uwTimeDisp;
 	LONG lCash, lCashDisp;
 	UWORD uwDrill, uwDrillMax;
 	UBYTE ubCargo, ubCargoMax;
@@ -120,9 +123,11 @@ static UBYTE s_ubHudShowStack;
 //----------------------------------------------------------------------- STATIC
 
 static void hudResetStateMachine(void) {
-	s_eState = (
-		(s_eGameMode == GAME_MODE_CHALLENGE) ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH
-	);
+	switch(s_eGameMode) {
+		case GAME_MODE_CHALLENGE: s_eState = STATE_MAIN_PREPARE_CASH; break;
+		case GAME_MODE_STORY: s_eState = STATE_MAIN_PREPARE_DEPTH; break;
+		case GAME_MODE_DEADLINE: s_eState = STATE_MAIN_PREPARE_TIME; break;
+	}
 	s_ePlayer = PLAYER_1;
 	s_ubHudOffsY = ROW_1_Y;
 	s_isBitmapFilled = 0;
@@ -138,12 +143,20 @@ static void hudRefresh(void) {
 	const UBYTE ubLabelWidth = fontMeasureText(
 		s_pFont, g_pMsgs[MSG_HUD_DEPTH]
 	).uwX;
-	if(s_eGameMode == GAME_MODE_CHALLENGE) {
-		// Clear depth label and use it as cash
+	if(s_eGameMode != GAME_MODE_STORY) {
+		// Clear depth label and use it as cash/time
 		blitRect(
 			s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1 - ubLabelWidth, ROW_2_Y,
 			ubLabelWidth, s_ubLineHeight, HUD_COLOR_BG
 		);
+		if(s_eGameMode == GAME_MODE_DEADLINE) {
+			// Time instead of 2p cash
+			fontDrawStr(
+				s_pFont, s_pHudBuffer->pBack, GAUGE_TIME_X - 1, ROW_2_Y - 3,
+				g_pMsgs[MSG_HUD_TIME], HUD_COLOR_BAR_FULL,
+				FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
+			);
+		}
 	}
 	else {
 		// Depth instead of 2p cash
@@ -358,6 +371,10 @@ void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth) {
 	s_pPlayerData[ubPlayer].uwDepth = uwDepth;
 }
 
+void hudSetTime(UWORD uwTime) {
+	s_pPlayerData[0].uwTime = uwTime;
+}
+
 void hudSetCash(UBYTE ubPlayer, LONG lCash) {
 	if(lCash > 99999) {
 		lCash = 99999;
@@ -407,6 +424,18 @@ void hudProcess(void) {
 	static UBYTE isDrawPending = 0;
 	static UBYTE isLineOverflow = 0;
 	switch(s_eState) {
+		case STATE_MAIN_PREPARE_TIME:
+			if(s_pPlayerData[0].uwTime != s_pPlayerData[0].uwTimeDisp) {
+				s_pPlayerData[0].uwTimeDisp = s_pPlayerData[0].uwTime;
+				stringDecimalFromULong(s_pPlayerData[0].uwTime, szBfr);
+				fontFillTextBitMap(s_pFont, s_pLineBuffer, szBfr);
+				s_isBitmapFilled = 1;
+				isDrawPending = 1;
+				s_eState = STATE_MAIN_DRAW_DEPTH;
+				break;
+			}
+			s_eState = STATE_MAIN_DRAW_DEPTH;
+			break;
 		case STATE_MAIN_PREPARE_DEPTH:
 			if(s_is2pPlaying) {
 				uwDepth = (s_pPlayerData[0].uwDepth + s_pPlayerData[1].uwDepth) / 2;
@@ -452,8 +481,8 @@ void hudProcess(void) {
 			}
 			else {
 				lCash = s_pPlayerData[0].lCash + s_pPlayerData[1].lCash;
-				lCash = MIN(lCash, 99999); // Prevent trashing inbox icon
 			}
+			lCash = MIN(lCash, 99999); // Prevent trashing inbox icon
 			if(lCash != pData->lCashDisp) {
 				ULONG ulDisp;
 				char *pEnd = szBfr;
@@ -579,9 +608,7 @@ void hudProcess(void) {
 				s_eState = ((s_eGameMode == GAME_MODE_CHALLENGE) ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_DRAW_FUEL);
 			}
 			else {
-				s_ePlayer = PLAYER_1;
-				s_ubHudOffsY = ROW_1_Y;
-				s_eState = ((s_eGameMode == GAME_MODE_CHALLENGE) ? STATE_MAIN_PREPARE_CASH : STATE_MAIN_PREPARE_DEPTH);
+				hudResetStateMachine();
 			}
 			break;
 		case STATE_MSG_NOISE_IN:

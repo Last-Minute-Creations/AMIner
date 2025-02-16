@@ -487,7 +487,7 @@ static void gameProcessHotkeys(void) {
 		gameElapseDay();
 	}
 	else if(keyUse(KEY_EQUALS)) {
-		hudShowMessage(0, g_pMsgs[MSG_HUD_NEW_PLAN]);
+		hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_NEW_PLAN]);
 		warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 	}
 	else if(keyUse(KEY_0)) {
@@ -949,37 +949,6 @@ static void onSongEnd(void) {
 	ptplayerEnableMusic(1);
 }
 
-static void processPlan(void) {
-	if(!planManagerGet()->isPlanActive) {
-		return;
-	}
-
-	WORD wRemainingDays = planGetRemainingDays();
-	if(wRemainingDays <= 0) {
-		if(!planManagerGet()->isExtendedTimeByFavor && planTryProlong()) {
-			char szBfr[100];
-			sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
-			hudShowMessage(0, szBfr);
-		}
-		else {
-			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
-			gameAddRebuke();
-			planFailDeadline();
-		}
-	}
-	else if(wRemainingDays == 10 || wRemainingDays == 5 || wRemainingDays == 3) {
-		if(wRemainingDays != s_wLastReminder) {
-			s_wLastReminder = wRemainingDays;
-			char szBuffer[50];
-			sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
-			hudShowMessage(0, szBuffer);
-		}
-	}
-	else {
-		s_wLastReminder = 0;
-	}
-}
-
 static void gameChallengeResult(void) {
 	if(!g_is2pPlaying) {
 		char szBfr[30];
@@ -1004,6 +973,71 @@ static void gameChallengeResult(void) {
 		}
 		hiScoreSetup(0, pMsg);
 		menuGsEnter(1);
+	}
+}
+
+static void gameDeadlineResult(void) {
+	char szBfr[30];
+	sprintf(
+		szBfr, "%s: %ld",
+		g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
+	);
+	if(!g_is2pPlaying) {
+		hiScoreSetup(g_pVehicles[0].lCash, szBfr);
+	}
+	else {
+		// No entering hi score for 2 players, just summary of score
+		hiScoreSetup(0, szBfr);
+	}
+	menuGsEnter(1);
+}
+
+static void gameProcessPlan(void) {
+	if(g_eGameMode == GAME_MODE_DEADLINE) {
+		WORD wRemainingDays = planGetRemainingDays();
+		if(wRemainingDays <= 0) {
+			gameDeadlineResult();
+		}
+		else if(wRemainingDays == 10 || wRemainingDays == 5 || wRemainingDays == 3) {
+			if(wRemainingDays != s_wLastReminder) {
+				s_wLastReminder = wRemainingDays;
+				hudShowMessage(FACE_ID_SCIENTIST, g_pMsgs[MSG_HUD_DEADLINE_REMAINING]);
+			}
+		}
+		else {
+			s_wLastReminder = 0;
+		}
+		hudSetTime(wRemainingDays);
+	}
+	else if(g_eGameMode == GAME_MODE_STORY) {
+		if(!planManagerGet()->isPlanActive) {
+			return;
+		}
+
+		WORD wRemainingDays = planGetRemainingDays();
+		if(wRemainingDays <= 0) {
+			if(!planManagerGet()->isExtendedTimeByFavor && planTryProlong()) {
+				char szBfr[100];
+				sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
+				hudShowMessage(FACE_ID_MIETEK, szBfr);
+			}
+			else {
+				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
+				gameAddRebuke();
+				planFailDeadline();
+			}
+		}
+		else if(wRemainingDays == 10 || wRemainingDays == 5 || wRemainingDays == 3) {
+			if(wRemainingDays != s_wLastReminder) {
+				s_wLastReminder = wRemainingDays;
+				char szBuffer[50];
+				sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
+				hudShowMessage(FACE_ID_MIETEK, szBuffer);
+			}
+		}
+		else {
+			s_wLastReminder = 0;
+		}
 	}
 }
 
@@ -1436,7 +1470,7 @@ static void gameGsLoop(void) {
 			return;
 		}
 		vehicleProcessText();
-		processPlan();
+		gameProcessPlan();
 	}
 
 	coreProcessBeforeBobs();
