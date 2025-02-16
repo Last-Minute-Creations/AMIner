@@ -1022,7 +1022,7 @@ static void gameProcessPlan(void) {
 				planFailDeadline();
 			}
 		}
-		else if(wRemainingDays == 10 || wRemainingDays == 5 || wRemainingDays == 3) {
+		else if(wRemainingDays == 10 || wRemainingDays == 3) {
 			if(wRemainingDays != s_wLastReminder) {
 				s_wLastReminder = wRemainingDays;
 				char szBuffer[50];
