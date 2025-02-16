@@ -112,8 +112,8 @@ static UBYTE s_isCameraShake;
 //------------------------------------------------------------------ PUBLIC VARS
 
 UBYTE g_is2pPlaying;
-UBYTE g_isChallenge;
 UBYTE g_isAtari;
+tGameMode g_eGameMode;
 
 //------------------------------------------------------------ PRIVATE FNS: MODE
 // TODO: reformat somehow? Move to separate file?
@@ -256,7 +256,7 @@ static void gameProcessModeTeleport(UBYTE ubPlayer) {
 static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 	tModeMenu *pModeMenu = &s_pModeMenus[ubPlayer];
 
-	if(!g_isChallenge) {
+	if(g_eGameMode != GAME_MODE_CHALLENGE) {
 		tModePreset eNextPreset = s_pPlayerModePreset[ubPlayer];
 		switch(eNextPreset) {
 			case MODE_PRESET_COUNT:
@@ -264,7 +264,9 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 				// fallthrough
 			case MODE_PRESET_OFF:
 				if(vehicleIsNearShop(&g_pVehicles[ubPlayer])) {
-					eNextPreset = MODE_PRESET_PROMPT_SHOP;
+					if(g_eGameMode == GAME_MODE_STORY) {
+						eNextPreset = MODE_PRESET_PROMPT_SHOP;
+					}
 				}
 				else if(
 					vehicleIsNearBaseTeleporter(&g_pVehicles[ubPlayer]) &&
@@ -422,7 +424,7 @@ static void gameProcessHotkeys(void) {
 		vPortWaitForEnd(s_pVpMain);
 	}
 
-	if(keyUse(KEY_F1) && !g_isChallenge) {
+	if(keyUse(KEY_F1) && g_eGameMode != GAME_MODE_CHALLENGE) {
 		if(!g_is2pPlaying) {
 			g_is2pPlaying = 1;
 			hudSet2pPlaying(1);
@@ -485,7 +487,7 @@ static void gameProcessHotkeys(void) {
 		gameElapseDay();
 	}
 	else if(keyUse(KEY_EQUALS)) {
-		hudShowMessage(0, g_pMsgs[MSG_HUD_NEW_PLAN]);
+		hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_NEW_PLAN]);
 		warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 	}
 	else if(keyUse(KEY_0)) {
@@ -886,7 +888,7 @@ static UBYTE gameProcessGateCutscene(void) {
 }
 
 static void gameCameraProcess(void) {
-	if(g_isChallenge) {
+	if(g_eGameMode == GAME_MODE_CHALLENGE) {
 		const UWORD uwBottomPos = g_pMainBuffer->pCamera->uPos.uwY + g_pMainBuffer->sCommon.pVPort->uwHeight - 2 * TILE_SIZE;
 		if(
 			g_pVehicles[0].sBobBody.sPos.uwY >  uwBottomPos ||
@@ -947,37 +949,6 @@ static void onSongEnd(void) {
 	ptplayerEnableMusic(1);
 }
 
-static void processPlan(void) {
-	if(!planManagerGet()->isPlanActive) {
-		return;
-	}
-
-	WORD wRemainingDays = planGetRemainingDays();
-	if(wRemainingDays <= 0) {
-		if(!planManagerGet()->isExtendedTimeByFavor && planTryProlong()) {
-			char szBfr[100];
-			sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
-			hudShowMessage(0, szBfr);
-		}
-		else {
-			hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
-			gameAddRebuke();
-			planFailDeadline();
-		}
-	}
-	else if(wRemainingDays == 10 || wRemainingDays == 5 || wRemainingDays == 3) {
-		if(wRemainingDays != s_wLastReminder) {
-			s_wLastReminder = wRemainingDays;
-			char szBuffer[50];
-			sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
-			hudShowMessage(0, szBuffer);
-		}
-	}
-	else {
-		s_wLastReminder = 0;
-	}
-}
-
 static void gameChallengeResult(void) {
 	if(!g_is2pPlaying) {
 		char szBfr[30];
@@ -985,7 +956,7 @@ static void gameChallengeResult(void) {
 			szBfr, "%s: %ld",
 			g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
 		);
-		hiScoreSetup(g_pVehicles[0].lCash, szBfr);
+		hiScoreSetup(g_pVehicles[0].lCash, szBfr, SCORE_MODE_CHALLENGE);
 		menuGsEnter(1);
 	}
 	else {
@@ -1000,8 +971,68 @@ static void gameChallengeResult(void) {
 		else {
 			pMsg = g_pMsgs[MSG_HI_SCORE_DRAW];
 		}
-		hiScoreSetup(0, pMsg);
+		hiScoreSetup(0, pMsg, SCORE_MODE_CHALLENGE);
 		menuGsEnter(1);
+	}
+}
+
+static void gameDeadlineResult(void) {
+	char szBfr[30];
+	sprintf(
+		szBfr, "%s: %ld",
+		g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
+	);
+	// No entering hi score for 2 players, just summary of score
+	hiScoreSetup(g_is2pPlaying ? 0 : g_pVehicles[0].lCash, szBfr, SCORE_MODE_DEADLINE);
+	menuGsEnter(1);
+}
+
+static void gameProcessPlan(void) {
+	if(g_eGameMode == GAME_MODE_DEADLINE) {
+		WORD wRemainingDays = planGetRemainingDays();
+		if(wRemainingDays <= 0) {
+			g_pVehicles[0].isChallengeEnded = 1;
+		}
+		else if(wRemainingDays == 10 || wRemainingDays == 5 || wRemainingDays == 3) {
+			if(wRemainingDays != s_wLastReminder) {
+				s_wLastReminder = wRemainingDays;
+				hudShowMessage(FACE_ID_SCIENTIST, g_pMsgs[MSG_HUD_DEADLINE_REMAINING]);
+			}
+		}
+		else {
+			s_wLastReminder = 0;
+		}
+		hudSetTime(wRemainingDays);
+	}
+	else if(g_eGameMode == GAME_MODE_STORY) {
+		if(!planManagerGet()->isPlanActive) {
+			return;
+		}
+
+		WORD wRemainingDays = planGetRemainingDays();
+		if(wRemainingDays <= 0) {
+			if(!planManagerGet()->isExtendedTimeByFavor && planTryProlong()) {
+				char szBfr[100];
+				sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
+				hudShowMessage(FACE_ID_MIETEK, szBfr);
+			}
+			else {
+				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
+				gameAddRebuke();
+				planFailDeadline();
+			}
+		}
+		else if(wRemainingDays == 10 || wRemainingDays == 3) {
+			if(wRemainingDays != s_wLastReminder) {
+				s_wLastReminder = wRemainingDays;
+				char szBuffer[50];
+				sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
+				hudShowMessage(FACE_ID_MIETEK, szBuffer);
+			}
+		}
+		else {
+			s_wLastReminder = 0;
+		}
 	}
 }
 
@@ -1033,7 +1064,7 @@ static void gameSave(tFile *pFile) {
 	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
-	fileWrite(pFile, &g_isChallenge, sizeof(g_isChallenge));
+	fileWrite(pFile, &g_eGameMode, sizeof(g_eGameMode));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
 
 	fileWrite(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
@@ -1271,7 +1302,7 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
 	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
-	fileRead(pFile, &g_isChallenge, sizeof(g_isChallenge));
+	fileRead(pFile, &g_eGameMode, sizeof(g_eGameMode));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
 
 	fileRead(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
@@ -1318,9 +1349,9 @@ UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary) {
 	return saveReadTag(pFile, SAVE_TAG_SUMMARY_END);
 }
 
-void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
+void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	s_ubChallengeCamCnt = 0;
-	g_isChallenge = isChallenge;
+	g_eGameMode = eGameMode;
 	s_pPlayerSteers[0] = sSteerP1;
 	s_pPlayerSteers[1] = sSteerP2;
 	inboxReset();
@@ -1331,10 +1362,10 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	tutorialReset();
 	pageOfficeReset();
 	warehouseReset();
-	if(g_isChallenge) {
+	if(g_eGameMode == GAME_MODE_CHALLENGE) {
 		baseTilesetPrepareForChallenge(g_isAtari);
 	}
-	tileReset(g_isAtari, g_isChallenge);
+	tileReset(g_isAtari, g_eGameMode);
 	inventoryReset();
 	protestsReset();
 	vehicleReset(&g_pVehicles[0]);
@@ -1352,20 +1383,22 @@ void gameStart(UBYTE isChallenge, tSteer sSteerP1, tSteer sSteerP2) {
 	s_wLastReminder = 0;
 	s_sTeleportReturn.ulYX = -1;
 	s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
-	hudReset(g_isChallenge, g_is2pPlaying);
+	hudReset(g_eGameMode, g_is2pPlaying);
 	heatReset();
 	groundLayerReset(1, 0);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
 	tileVariantChangeTo(TILE_VARIANT_CAMPAIGN);
+	if(g_eGameMode == GAME_MODE_DEADLINE) {
+		tileVariantChangeTo(TILE_VARIANT_FINISH);
+	}
 }
 
 void gameTriggerSave(void) {
 	logWrite("game save");
 	systemUse();
-	UBYTE isStory = 1;
 	char szPathTmp[20], szPathDat[20];
 	char *pEndTmp = stringCopy("save_", szPathTmp);
-	pEndTmp = stringCopy(isStory ? "story" : "deadline", pEndTmp);
+	pEndTmp = stringCopy((g_eGameMode == GAME_MODE_STORY) ? "story" : "deadline", pEndTmp);
 	char *pEndDat = stringCopy(szPathTmp, szPathDat);
 	pEndTmp = stringCopy(".tmp", pEndTmp);
 	pEndDat = stringCopy(".dat", pEndDat);
@@ -1414,7 +1447,7 @@ static void gameGsLoop(void) {
 		return;
 	}
 
-	if(!g_isChallenge) {
+	if(g_eGameMode == GAME_MODE_STORY) {
 		dinoProcess();
 		questGateProcess();
 		questCrateProcess();
@@ -1435,7 +1468,7 @@ static void gameGsLoop(void) {
 			return;
 		}
 		vehicleProcessText();
-		processPlan();
+		gameProcessPlan();
 	}
 
 	coreProcessBeforeBobs();
@@ -1461,7 +1494,12 @@ static void gameGsLoop(void) {
 		g_pVehicles[0].isChallengeEnded &&
 		(!g_is2pPlaying || g_pVehicles[1].isChallengeEnded)
 	) {
-		gameChallengeResult();
+		if(g_eGameMode == GAME_MODE_CHALLENGE) {
+			gameChallengeResult();
+		}
+		else {
+			gameDeadlineResult();
+		}
 	}
 }
 

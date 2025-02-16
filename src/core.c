@@ -118,8 +118,12 @@ static void onTileDraw(
 			bOverlay += 1;
 		}
 
-		const tBase *pBase = baseGetCurrent();
-		if(uwTileY < pBase->uwTileDepth || pBase->uwTileDepth + BASE_CAVE_HEIGHT < uwTileY) {
+		tBaseId eBaseId = baseGetCurrentId();
+		const tBase *pBase = baseGetById(eBaseId);
+		if(
+			g_eGameMode != GAME_MODE_STORY || eBaseId == BASE_ID_GROUND ||
+			uwTileY < pBase->uwTileDepth || pBase->uwTileDepth + BASE_CAVE_HEIGHT < uwTileY
+		) {
 			if(tileIsSolid(uwTileX, uwTileY + 1)) {
 				bOverlay += 2;
 			}
@@ -269,7 +273,7 @@ static void coreGsCreate(void) {
 	TAG_END);
 	s_pPristineBuffer = bitmapCreate(
 		bitmapGetByteWidth(g_pMainBuffer->pScroll->pBack) * 8,
-		g_pMainBuffer->pScroll->pBack->Rows, GAME_BPP, BMF_INTERLEAVED
+		g_pMainBuffer->pScroll->pBack->Rows, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);
 
 	// Load the view and draw the progress bar

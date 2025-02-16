@@ -4,6 +4,7 @@
 
 #include "inventory.h"
 #include "save.h"
+#include "game.h"
 
 tInventory s_sInventory;
 
@@ -25,6 +26,10 @@ void inventoryReset(void) {
 	// default base unlocks
 	inventorySetBasePartLevel(INVENTORY_PART_BASE_WORKSHOP, BASE_ID_GROUND, 2);
 	inventorySetCommUnlock(BASE_ID_GROUND, COMM_UNLOCK_STATE_WAREHOUSE);
+	if(g_eGameMode == GAME_MODE_DEADLINE) {
+		inventorySetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_GROUND, INVENTORY_LEVEL_PLATFORM_ALL);
+		inventorySetPartLevel(INVENTORY_PART_TELEPORT, INVENTORY_LEVEL_TELEPORTER_RETURN);
+	}
 }
 
 void inventorySave(tFile *pFile) {
@@ -75,4 +80,17 @@ void inventorySetCommUnlock(tBaseId eBase, tCommUnlockState eState) {
 
 tCommUnlockState inventoryGetCommUnlockState(tBaseId eBase) {
 	return s_sInventory.pCommUnlock[eBase];
+}
+
+UBYTE inventoryGetPartMaxLevel(tPartKind ePart) {
+	if(
+		ePart == INVENTORY_PART_TELEPORT ||
+		ePart == INVENTORY_PART_BASE_PLATFORM
+	) {
+		return 3;
+	}
+	else if(ePart == INVENTORY_PART_BASE_WORKSHOP) {
+		return 2;
+	}
+	return g_ubUpgradeLevels;
 }

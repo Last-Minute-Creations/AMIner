@@ -144,6 +144,8 @@ General:
 	☐ Add final default hi-scores
 	☐ Translate checkpoint text?
 	☐ Rebalance commissar reporting
+	☐ Add final credits
+	☐ Add float text on restock with only minerals taken without repair
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)
@@ -276,13 +278,16 @@ Crate quests:
 		✔ Screen with text and capsule contents @done(24-12-15)
 
 Deadline mode:
-	☐ Don't generate underground bases
-	☐ End the game after some time
-	☐ Display time remaining in commrade's warehouse
-	☐ Implement stopwatch gathering
-	☐ Use separate save file
-	☐ Use separate high scores
-	☐ Add intro text
+	✔ Don't generate underground bases @done(25-02-15)
+	✔ Use separate save file @done(25-02-15)
+	✔ Restock on going near the base @done(25-02-15)
+	✔ Disable entering the commrade @done(25-02-15)
+	✔ Unlock the teleporter on start @done(25-02-15)
+	✔ End the game after some time @done(25-02-16)
+	✔ Display time remaining on HUD @done(25-02-16)
+	✔ Add intro text @done(25-02-16)
+	✔ Use separate high scores @done(25-02-16)
+	✔ Implement bonus gathering @done(25-02-16)
 
 Protests:
 	✔ Warning message on 1st negative cash threshold @done(25-02-13)
@@ -312,9 +317,16 @@ Missing message texts:
 
 Missing graphics:
 	✔ Protest banners on factory @done(25-02-12)
-	☐ Scientist portrait
+	✔ Scientist portrait @done(25-02-16)
 	☐ Jay portrait small
 	☐ Jay portrait large final
 	☐ After-invasion newscaster
 	☐ Sci base final
 	☐ News slides for each ending
+
+Missing audio:
+	☐ Earthquake
+	☐ Gate rune activation
+	☐ Gate activation
+	☐ Minor thud
+	☐ Major thud

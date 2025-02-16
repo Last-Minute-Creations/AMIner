@@ -19,24 +19,38 @@
 #define SCORE_CURSOR_BLINK_TICKS 25 // 25 ticks = 500ms
 #define SCORE_RESULT_MSG_MAX 40
 
-typedef struct _tHiScore {
+typedef struct tHiScore {
 	LONG lScore;
 	char szName[SCORE_NAME_LENGTH];
 } tHiScore;
 
-static tHiScore s_pScores[SCORE_COUNT];
+static tHiScore s_pScores[SCORE_MODE_COUNT][SCORE_COUNT];
 
-static tHiScore s_pPrevScores[SCORE_COUNT] = {
-	{.lScore = 10, .szName = "Bestest"},
-	{.lScore = 9, .szName = "Best"},
-	{.lScore = 8, .szName = "Better"},
-	{.lScore = 7, .szName = "Good"},
-	{.lScore = 6, .szName = "Moderate"},
-	{.lScore = 5, .szName = "Bad"},
-	{.lScore = 4, .szName = "Awful"},
-	{.lScore = 3, .szName = "Too"},
-	{.lScore = 2, .szName = "Small"},
-	{.lScore = 1, .szName = "Score"},
+static tHiScore s_pPrevScores[SCORE_MODE_COUNT][SCORE_COUNT] = {
+	{
+		{.lScore = 10, .szName = "Bestest"},
+		{.lScore = 9,  .szName = "Best"},
+		{.lScore = 8,  .szName = "Better"},
+		{.lScore = 7,  .szName = "Good"},
+		{.lScore = 6,  .szName = "Moderate"},
+		{.lScore = 5,  .szName = "Bad"},
+		{.lScore = 4,  .szName = "Awful"},
+		{.lScore = 3,  .szName = "Too"},
+		{.lScore = 2,  .szName = "Small"},
+		{.lScore = 1,  .szName = "Score"},
+	},
+	{
+		{.lScore = 2500, .szName = "D_First"},
+		{.lScore = 2000,  .szName = "D_Second"},
+		{.lScore = 1800,  .szName = "D_Third"},
+		{.lScore = 1600,  .szName = "D_4th"},
+		{.lScore = 1400,  .szName = "D_5th"},
+		{.lScore = 1200,  .szName = "D_6th"},
+		{.lScore = 1000,  .szName = "D_7th"},
+		{.lScore = 500,  .szName = "D_8th"},
+		{.lScore = 200,  .szName = "D_9th"},
+		{.lScore = 100,  .szName = "D_10th"},
+	},
 };
 
 static UBYTE s_ubNewNameLength;
@@ -46,13 +60,16 @@ static UBYTE s_isShift = 0;
 static UBYTE s_isCursor = 0;
 static UBYTE s_ubBlinkTicks = 0;
 static char s_szResultMsg[SCORE_RESULT_MSG_MAX];
+static tScoreMode s_eScoreMode;
 
 void hiScoreLoad(void) {
 	systemUse();
 	if(diskFileExists("scores.dat")) {
 		tFile *pFile = diskFileOpen("scores.dat", "r");
-		for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-			fileRead(pFile, &s_pScores[i], sizeof(s_pScores[i]));
+		for(UBYTE ubMode = 0; ubMode < SCORE_MODE_COUNT; ++ubMode) {
+			for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
+				fileRead(pFile, &s_pScores[ubMode][i], sizeof(s_pScores[ubMode][i]));
+			}
 		}
 		fileClose(pFile);
 		memcpy(s_pPrevScores, s_pScores, sizeof(s_pPrevScores));
@@ -67,8 +84,10 @@ static void hiScoreSave(void) {
 	systemUse();
 	tFile *pFile = diskFileOpen("scores.dat", "w");
 	if(pFile) {
-		for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-			fileWrite(pFile, &s_pScores[i], sizeof(s_pScores[i]));
+		for(UBYTE ubMode = 0; ubMode < SCORE_MODE_COUNT; ++ubMode) {
+			for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
+				fileWrite(pFile, &s_pScores[ubMode][i], sizeof(s_pScores[ubMode][i]));
+			}
 		}
 		fileClose(pFile);
 		memcpy(s_pPrevScores, s_pScores, sizeof(s_pPrevScores));
@@ -87,13 +106,13 @@ static void hiScoreDrawPosition(UBYTE ubPos) {
 
 	// Score name
 	char szBfr[SCORE_NAME_LENGTH + 5];
-	sprintf(szBfr, "%hhu. %s", ubPos + 1, s_pScores[ubPos].szName);
+	sprintf(szBfr, "%hhu. %s", ubPos + 1, s_pScores[s_eScoreMode][ubPos].szName);
 	commDrawText(
 		16, uwY, szBfr, FONT_LAZY | FONT_COOKIE | FONT_SHADOW, ubColor
 	);
 
 	// Score count
-	stringDecimalFromULong(s_pScores[ubPos].lScore, szBfr);
+	stringDecimalFromULong(s_pScores[s_eScoreMode][ubPos].lScore, szBfr);
 	commDrawText(
 		COMM_DISPLAY_WIDTH - 16, uwY, szBfr,
 		FONT_LAZY | FONT_COOKIE | FONT_RIGHT | FONT_SHADOW, ubColor
@@ -111,11 +130,13 @@ void hiScoreDrawAll(void) {
 		COMM_DISPLAY_WIDTH, g_pFont->uwHeight * 2
 	);
 
-	commDrawText(
-		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT - g_pFont->uwHeight, s_szResultMsg,
-		FONT_LAZY | FONT_COOKIE | FONT_HCENTER | FONT_BOTTOM,
-		COMM_DISPLAY_COLOR_TEXT
-	);
+	if(!stringIsEmpty(s_szResultMsg)) {
+		commDrawText(
+			COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT - g_pFont->uwHeight, s_szResultMsg,
+			FONT_LAZY | FONT_COOKIE | FONT_HCENTER | FONT_BOTTOM,
+			COMM_DISPLAY_COLOR_TEXT
+		);
+	}
 	const char *szMsg = (
 		g_pMsgs[hiScoreIsEnteringNew() ? MSG_HI_SCORE_NEW : MSG_HI_SCORE_PRESS]
 	);
@@ -164,13 +185,13 @@ void hiScoreEnteringProcess(void) {
 			(wInput >= '0' && wInput <= '9')
 		) {
 			if(s_ubNewNameLength < SCORE_NAME_LENGTH) {
-				s_pScores[s_ubNewScorePos].szName[s_ubNewNameLength] = wInput;
+				s_pScores[s_eScoreMode][s_ubNewScorePos].szName[s_ubNewNameLength] = wInput;
 				++s_ubNewNameLength;
 			}
 		}
 		else if(g_sKeyManager.ubLastKey == KEY_BACKSPACE && s_ubNewNameLength){
 			--s_ubNewNameLength;
-			s_pScores[s_ubNewScorePos].szName[s_ubNewNameLength] = '\0';
+			s_pScores[s_eScoreMode][s_ubNewScorePos].szName[s_ubNewNameLength] = '\0';
 		}
 		else {
 			isUpdateNeeded = 0;
@@ -192,14 +213,17 @@ UBYTE hiScoreIsEnteringNew(void) {
 	return s_isEnteringHiScore;
 }
 
-void hiScoreSetup(LONG lScore, const char *szResult) {
-	stringCopyLimited(szResult, s_szResultMsg, SCORE_RESULT_MSG_MAX);
+void hiScoreSetup(LONG lScore, const char *szResult, tScoreMode eScoreMode) {
+	s_eScoreMode = eScoreMode;
+	if(szResult) {
+		stringCopyLimited(szResult, s_szResultMsg, SCORE_RESULT_MSG_MAX);
+	}
 	s_isEnteringHiScore = 0;
 	s_ubNewNameLength = 0;
 	for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-		if(s_pScores[i].lScore < lScore) {
+		if(s_pScores[s_eScoreMode][i].lScore < lScore) {
 			s_isEnteringHiScore = 1;
-			if(g_isChallenge) {
+			if(g_eGameMode == GAME_MODE_CHALLENGE) {
 				achievementUnlock(ACHIEVEMENT_RECORD_HOLDER);
 				if(g_isAtari) {
 					achievementUnlock(ACHIEVEMENT_MORE_COAL);
@@ -212,12 +236,12 @@ void hiScoreSetup(LONG lScore, const char *szResult) {
 
 			// Move worse score down
 			for(BYTE j = SCORE_COUNT-2; j >= s_ubNewScorePos; --j) {
-				strcpy(s_pScores[j+1].szName, s_pScores[j].szName);
-				s_pScores[j+1].lScore = s_pScores[j].lScore;
+				strcpy(s_pScores[s_eScoreMode][j+1].szName, s_pScores[s_eScoreMode][j].szName);
+				s_pScores[s_eScoreMode][j+1].lScore = s_pScores[s_eScoreMode][j].lScore;
 			}
 			// Make room for new score
-			s_pScores[s_ubNewScorePos].lScore = lScore;
-			memset(s_pScores[s_ubNewScorePos].szName, '\0', SCORE_NAME_LENGTH);
+			s_pScores[s_eScoreMode][s_ubNewScorePos].lScore = lScore;
+			memset(s_pScores[s_eScoreMode][s_ubNewScorePos].szName, '\0', SCORE_NAME_LENGTH);
 			break;
 		}
 	}

@@ -9,6 +9,7 @@
 #include <ace/utils/font.h>
 #include "string_array.h"
 #include "face_id.h"
+#include "game.h"
 
 #define HUD_HEIGHT 31
 
@@ -23,13 +24,15 @@ void hudDestroy(void);
 
 void hudSet2pPlaying(UBYTE isPlaying);
 
-void hudReset(UBYTE isChallenge, UBYTE is2pPlaying);
+void hudReset(tGameMode eGameMode, UBYTE is2pPlaying);
 
 void hudSave(tFile *pFile);
 
 UBYTE hudLoad(tFile *pFile);
 
 void hudSetDepth(UBYTE ubPlayer, UWORD uwDepth);
+
+void hudSetTime(UWORD uwTime);
 
 void hudSetCash(UBYTE ubPlayer, LONG lCash);
 

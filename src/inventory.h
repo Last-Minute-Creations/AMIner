@@ -15,8 +15,8 @@
 #define INVENTORY_LEVEL_PLATFORM_ALL 3
 
 #define INVENTORY_LEVEL_TELEPORTER_WEAK 1
-#define INVENTORY_LEVEL_TELEPORTER_RETURN 3
 #define INVENTORY_LEVEL_TELEPORTER_NODMG 2
+#define INVENTORY_LEVEL_TELEPORTER_RETURN 3
 
 typedef enum tPartKind {
 	INVENTORY_PART_DRILL,
@@ -68,5 +68,7 @@ void inventoryInit(const UWORD *pPartsBase, const UWORD *pPartsAddPerLevel);
 void inventorySetCommUnlock(tBaseId eBase, tCommUnlockState eState);
 
 tCommUnlockState inventoryGetCommUnlockState(tBaseId eBase);
+
+UBYTE inventoryGetPartMaxLevel(tPartKind ePart);
 
 #endif // _INVENTORY_H_

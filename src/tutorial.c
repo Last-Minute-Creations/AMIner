@@ -35,6 +35,24 @@ static ULONG s_ulStartTime;
 
 //------------------------------------------------------------------ PRIVATE FNS
 
+static UBYTE tutorialProcessDeadline(void) {
+	UBYTE isEarlyReturn = 0;
+	switch(s_eTutorialState) {
+		case TUTORIAL_SHOW_MESSAGE_INTRO:
+			gsMsgInit(FACE_ID_SCIENTIST, "intro_deadline", g_pMsgs[MSG_TUTORIAL_INTRODUCTION]);
+			statePush(g_pGameStateManager, &g_sStateMsg);
+			s_eTutorialState = TUTORIAL_DONE;
+			isEarlyReturn = 1;
+			break;
+		case TUTORIAL_DONE:
+			break;
+		default:
+			break;
+	}
+
+	return isEarlyReturn;
+}
+
 static UBYTE tutorialProcessChallenge(void) {
 	UBYTE isEarlyReturn = 0;
 	switch(s_eTutorialState) {
@@ -220,10 +238,14 @@ UBYTE tutorialLoad(tFile *pFile) {
 }
 
 UBYTE tutorialProcess(void) {
-	if(g_isChallenge) {
-		return tutorialProcessChallenge();
-	}
-	else {
-		return tutorialProcessStory();
+	switch(g_eGameMode) {
+		case GAME_MODE_CHALLENGE:
+			return tutorialProcessChallenge();
+		case GAME_MODE_STORY:
+			return tutorialProcessStory();
+		case GAME_MODE_DEADLINE:
+			return tutorialProcessDeadline();
+		default:
+			return 0;
 	}
 }

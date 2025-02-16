@@ -8,6 +8,7 @@
 #include <ace/types.h>
 #include "vehicle.h"
 #include "base.h"
+#include "game.h"
 
 #define TILE_SHIFT 5
 #define TILE_SIZE (1 << TILE_SHIFT)
@@ -56,7 +57,7 @@ UBYTE tileIsDrillable(UWORD uwX, UWORD uwY);
 
 UBYTE tileIsHardToDrill(UWORD uwX, UWORD uwY);
 
-void tileReset(UBYTE isCoalOnly, UBYTE isChallenge);
+void tileReset(UBYTE isCoalOnly, tGameMode eGameMode);
 
 void tileSave(tFile *pFile);
 

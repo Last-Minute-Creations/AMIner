@@ -6,6 +6,7 @@
 		"achievementUnlocked": "Osiągnięcie zdobyte",
 		"newPlan": "Panie Derektorze, dostaliście nowy plan.",
 		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan.",
+		"deadlineRemaining": "Uważaj, zostało Ci mało czasu!",
 		"extending": [
 			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
 			"niewykonany. Dał nam jeszcze %hhu dni."
@@ -86,7 +87,7 @@
 		"enumPlayerCount": ["Jeden", "Dwóch"],
 		"captions": [
 			"600% normy",
-			"Swobodny",
+			"Piaskownica",
 			"Zawody",
 			"Osiągnięcia",
 			"Ustawienia",
@@ -247,6 +248,7 @@
 		"hull": "Kadł.:",
 		"cash": "Kasa:",
 		"depth": "Poziom:",
+		"time": "Dni:",
 		"paused": "Pauza gry",
 		"resume": "Wznów",
 		"saveQuit": "Zapisz i wyjdź",
