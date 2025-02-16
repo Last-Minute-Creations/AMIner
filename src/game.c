@@ -43,6 +43,7 @@
 #include "twister.h"
 #include "protests.h"
 #include "base_unlocks.h"
+#include "achievement.h"
 
 #define CAMERA_SPEED 4
 #define CAMERA_SHAKE_AMPLITUDE 2
@@ -982,8 +983,8 @@ static void gameDeadlineResult(void) {
 		szBfr, "%s: %ld",
 		g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
 	);
-	// No entering hi score for 2 players, just summary of score
-	hiScoreSetup(g_is2pPlaying ? 0 : g_pVehicles[0].lCash, szBfr, SCORE_MODE_DEADLINE);
+	achievementUnlock(ACHIEVEMENT_DEADLINE);
+	hiScoreSetup(g_pVehicles[0].lCash, szBfr, SCORE_MODE_DEADLINE);
 	menuGsEnter(1);
 }
 
