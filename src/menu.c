@@ -141,7 +141,7 @@ static void menuOnStoryLoad(void) {
 
 static void menuOnShowScores(void) {
 	commEraseAll();
-	hiScoreSetup(0, 0);
+	hiScoreSetup(0, 0, (s_eModeMenu == GAME_MODE_CHALLENGE) ? SCORE_MODE_CHALLENGE : SCORE_MODE_DEADLINE);
 	statePush(g_pGameStateManager, &s_sStateMenuScore);
 }
 
@@ -341,6 +341,13 @@ static void menuOnEnterDeadline(void) {
 			.isCyclic = 0,
 			.pEnumLabels = (const char **)g_pMenuEnumOnOff
 		}
+	};
+
+	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+		.szCaption = g_pMenuCaptions[MENU_CAPTION_HI_SCORES],
+		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
+		.isHidden = 0,
+		.sOptCb = {.cbSelect = menuOnShowScores}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {

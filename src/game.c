@@ -956,7 +956,7 @@ static void gameChallengeResult(void) {
 			szBfr, "%s: %ld",
 			g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
 		);
-		hiScoreSetup(g_pVehicles[0].lCash, szBfr);
+		hiScoreSetup(g_pVehicles[0].lCash, szBfr, SCORE_MODE_CHALLENGE);
 		menuGsEnter(1);
 	}
 	else {
@@ -971,7 +971,7 @@ static void gameChallengeResult(void) {
 		else {
 			pMsg = g_pMsgs[MSG_HI_SCORE_DRAW];
 		}
-		hiScoreSetup(0, pMsg);
+		hiScoreSetup(0, pMsg, SCORE_MODE_CHALLENGE);
 		menuGsEnter(1);
 	}
 }
@@ -982,13 +982,8 @@ static void gameDeadlineResult(void) {
 		szBfr, "%s: %ld",
 		g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
 	);
-	if(!g_is2pPlaying) {
-		hiScoreSetup(g_pVehicles[0].lCash, szBfr);
-	}
-	else {
-		// No entering hi score for 2 players, just summary of score
-		hiScoreSetup(0, szBfr);
-	}
+	// No entering hi score for 2 players, just summary of score
+	hiScoreSetup(g_is2pPlaying ? 0 : g_pVehicles[0].lCash, szBfr, SCORE_MODE_DEADLINE);
 	menuGsEnter(1);
 }
 

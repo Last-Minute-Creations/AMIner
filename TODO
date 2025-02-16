@@ -145,6 +145,7 @@ General:
 	☐ Translate checkpoint text?
 	☐ Rebalance commissar reporting
 	☐ Add final credits
+	☐ Add float text on restock with only minerals taken without repair
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)
@@ -285,7 +286,7 @@ Deadline mode:
 	✔ End the game after some time @done(25-02-16)
 	✔ Display time remaining on HUD @done(25-02-16)
 	✔ Add intro text @done(25-02-16)
-	☐ Use separate high scores
+	✔ Use separate high scores @done(25-02-16)
 	☐ Implement stopwatch gathering
 
 Protests:
