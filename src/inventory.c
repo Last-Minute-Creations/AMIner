@@ -29,8 +29,6 @@ void inventoryReset(void) {
 	if(g_eGameMode == GAME_MODE_DEADLINE) {
 		inventorySetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_GROUND, INVENTORY_LEVEL_PLATFORM_ALL);
 		inventorySetPartLevel(INVENTORY_PART_TELEPORT, INVENTORY_LEVEL_TELEPORTER_RETURN);
-		inventorySetPartLevel(INVENTORY_PART_TNT, g_ubUpgradeLevels);
-		inventorySetPartLevel(INVENTORY_PART_DRILL, 2);
 	}
 }
 
@@ -82,4 +80,17 @@ void inventorySetCommUnlock(tBaseId eBase, tCommUnlockState eState) {
 
 tCommUnlockState inventoryGetCommUnlockState(tBaseId eBase) {
 	return s_sInventory.pCommUnlock[eBase];
+}
+
+UBYTE inventoryGetPartMaxLevel(tPartKind ePart) {
+	if(
+		ePart == INVENTORY_PART_TELEPORT ||
+		ePart == INVENTORY_PART_BASE_PLATFORM
+	) {
+		return 3;
+	}
+	else if(ePart == INVENTORY_PART_BASE_WORKSHOP) {
+		return 2;
+	}
+	return g_ubUpgradeLevels;
 }

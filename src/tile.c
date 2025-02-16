@@ -233,6 +233,9 @@ static UBYTE tileTryPlaceQuestItemInRow(UBYTE **pTiles, UWORD uwY, tTile eTile) 
 		if(s_ubNextRowPatternPos >= ARRAY_SIZE(s_pRowSpawnPattern)) {
 			s_ubNextRowPatternPos = 0;
 		}
+		if(ubX == 1 || ubX == 10) {
+			continue;
+		}
 		if(pTiles[ubX][uwY] == TILE_DIRT_1 || pTiles[ubX][uwY] == TILE_DIRT_2) {
 			pTiles[ubX][uwY] = eTile;
 			return ubX;
@@ -307,6 +310,14 @@ void tileReset(UBYTE isCoalOnly, tGameMode eGameMode) {
 	UBYTE ubProgressTerrainEnd = 30;
 	tileGenerateTerrain(isCoalOnly, eGameMode, 0, ubProgressTerrainEnd);
 
+	if(eGameMode == GAME_MODE_DEADLINE) {
+		for(UWORD uwY = BASE_PATTERN_HEIGHT + 5; uwY < g_pMainBuffer->uTileBounds.uwY; uwY += 15) {
+			if(!tileTryPlaceQuestItemInRow(pTiles, uwY, TILE_CRATE_1)) {
+				pTiles[5][uwY] = TILE_CRATE_1;
+			}
+		}
+	}
+
 	tBaseId eBaseCount = (eGameMode == GAME_MODE_STORY) ? BASE_ID_COUNT : BASE_ID_GROUND + 1;
 	// Generate bases
 	UBYTE ubProgressBaseStart = ubProgressTerrainEnd;
@@ -335,6 +346,12 @@ void tileReset(UBYTE isCoalOnly, tGameMode eGameMode) {
 			pTiles[x][TILE_ROW_CHALLENGE_FINISH+1] = TILE_STONE_1 + (x & 1);
 		}
 		commProgress(90, g_pMsgs[MSG_LOADING_FINISHING]);
+	}
+	else if(eGameMode == GAME_MODE_DEADLINE) {
+		for(UWORD x = 1; x < uwEndX; ++x) {
+			pTiles[x][uwEndY - 2 ] = TILE_CHECKPOINT_1 + x - 1;
+			pTiles[x][uwEndY - 2 +1] = TILE_STONE_1 + (x & 1);
+		}
 	}
 	else if(eGameMode == GAME_MODE_STORY) {
 		// Rock bottom

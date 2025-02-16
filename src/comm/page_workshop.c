@@ -34,19 +34,6 @@ static UBYTE pageWorkshopIsPartAcquirable(tPartKind ePart) {
 	return isAcquirable;
 }
 
-static UBYTE pageWorkshopGetPartMaxLevel(void) {
-	if(
-		s_eSelectedPart == INVENTORY_PART_TELEPORT ||
-		s_eSelectedPart == INVENTORY_PART_BASE_PLATFORM
-	) {
-		return 3;
-	}
-	else if(s_eSelectedPart == INVENTORY_PART_BASE_WORKSHOP) {
-		return 2;
-	}
-	return g_ubUpgradeLevels;
-}
-
 static UBYTE pageWorkshopGetPartCurrentLevel(void) {
 	if(inventoryIsBasePart(s_eSelectedPart)) {
 		return inventoryGetBasePartLevel(s_eSelectedPart, baseGetCurrentId());
@@ -90,7 +77,7 @@ static void pageWorkshopUpdateText(void) {
 	char szBfr[50];
 	UBYTE isAcquirable = pageWorkshopIsPartAcquirable(s_eSelectedPart);
 	UBYTE ubLevel = pageWorkshopGetPartCurrentLevel();
-	UBYTE ubMaxLevel = pageWorkshopGetPartMaxLevel();
+	UBYTE ubMaxLevel = inventoryGetPartMaxLevel(s_eSelectedPart);
 
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
@@ -213,7 +200,7 @@ static void pageWorkshopProcess(void) {
 			if(s_eSelectedPart < INVENTORY_PART_COUNT) {
 				UBYTE ubLevel = pageWorkshopGetPartCurrentLevel();
 				if(
-					!pageWorkshopBuyIsMax(ubLevel, pageWorkshopGetPartMaxLevel()) &&
+					!pageWorkshopBuyIsMax(ubLevel, inventoryGetPartMaxLevel(s_eSelectedPart)) &&
 					vehicleTrySpendCash(0, pageWorkshopGetPartUpgradeCost(ubLevel))
 				) {
 					pageWorkshopSetPartCurrentLevel(ubLevel+1);

@@ -24,6 +24,7 @@
 #include "blitter_mutex.h"
 #include "base_unlocks.h"
 #include "protests.h"
+#include <comm/page_workshop.h>
 
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
@@ -377,6 +378,9 @@ void vehicleReset(tVehicle *pVehicle) {
 	pVehicle->isChallengeEnded = 0;
 	pVehicle->lCash = g_lInitialCash;
 	pVehicle->eLastVisitedTeleportableBase = BASE_ID_COUNT_UNIQUE;
+	if(g_eGameMode == GAME_MODE_DEADLINE) {
+		pVehicle->eLastVisitedTeleportableBase = BASE_ID_GROUND;
+	}
 	vehicleRespawn(pVehicle);
 }
 
@@ -488,6 +492,10 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 }
 
 UBYTE vehicleIsNearShop(const tVehicle *pVehicle) {
+	if(g_eGameMode == GAME_MODE_DEADLINE && baseGetCurrentId() != BASE_ID_GROUND) {
+		return 0;
+	}
+
 	const tBase *pBase = baseGetCurrent();
 
 	UWORD uwCenterX = pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2;
@@ -802,6 +810,40 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				vehicleRestock(pVehicle);
 			}
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+		}
+	}
+	else if(g_eGameMode == GAME_MODE_DEADLINE) {
+		if(ubTile == TILE_CRATE_1) {
+			if(g_eGameMode == GAME_MODE_DEADLINE) {
+				planAddDays(10, 0);
+				tPartKind ePart = randUwMinMax(&g_sRand, INVENTORY_PART_DRILL, INVENTORY_PART_TNT);
+				const tPartDef *pPartDef = inventoryGetPartDef(ePart);
+				char szMessage[50];
+				char *pEnd = szMessage;
+				if(pPartDef->ubLevel < inventoryGetPartMaxLevel(ePart)) {
+					inventorySetPartLevel(ePart, pPartDef->ubLevel + 1);
+					pEnd = stringCopy("Bonus: ", szMessage);
+					pEnd = stringCopy(g_pShopNames[ePart], pEnd);
+					*(pEnd++) = ',';
+					*(pEnd++) = ' ';
+				}
+				stringCopy("T +10", pEnd);
+				textBobSet(
+					&pVehicle->sTextBob, szMessage, COLOR_GREEN,
+					pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+					pVehicle->sBobBody.sPos.uwY,
+					pVehicle->sBobBody.sPos.uwY - 32, 1
+				);
+			}
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+		}
+		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_10) {
+			vehicleRestock(&g_pVehicles[0]);
+			if(g_is2pPlaying) {
+				vehicleRestock(&g_pVehicles[1]);
+			}
+			g_pVehicles[0].lCash += 5000;
+			g_pVehicles[0].isChallengeEnded = 1;
 		}
 	}
 	else {

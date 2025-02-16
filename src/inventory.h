@@ -69,4 +69,6 @@ void inventorySetCommUnlock(tBaseId eBase, tCommUnlockState eState);
 
 tCommUnlockState inventoryGetCommUnlockState(tBaseId eBase);
 
+UBYTE inventoryGetPartMaxLevel(tPartKind ePart);
+
 #endif // _INVENTORY_H_

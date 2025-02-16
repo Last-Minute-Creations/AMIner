@@ -991,7 +991,7 @@ static void gameProcessPlan(void) {
 	if(g_eGameMode == GAME_MODE_DEADLINE) {
 		WORD wRemainingDays = planGetRemainingDays();
 		if(wRemainingDays <= 0) {
-			gameDeadlineResult();
+			g_pVehicles[0].isChallengeEnded = 1;
 		}
 		else if(wRemainingDays == 10 || wRemainingDays == 5 || wRemainingDays == 3) {
 			if(wRemainingDays != s_wLastReminder) {
@@ -1388,6 +1388,9 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	groundLayerReset(1, 0);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
 	tileVariantChangeTo(TILE_VARIANT_CAMPAIGN);
+	if(g_eGameMode == GAME_MODE_DEADLINE) {
+		tileVariantChangeTo(TILE_VARIANT_FINISH);
+	}
 }
 
 void gameTriggerSave(void) {
@@ -1444,7 +1447,7 @@ static void gameGsLoop(void) {
 		return;
 	}
 
-	if(g_eGameMode != GAME_MODE_CHALLENGE) {
+	if(g_eGameMode == GAME_MODE_STORY) {
 		dinoProcess();
 		questGateProcess();
 		questCrateProcess();
@@ -1491,7 +1494,12 @@ static void gameGsLoop(void) {
 		g_pVehicles[0].isChallengeEnded &&
 		(!g_is2pPlaying || g_pVehicles[1].isChallengeEnded)
 	) {
-		gameChallengeResult();
+		if(g_eGameMode == GAME_MODE_CHALLENGE) {
+			gameChallengeResult();
+		}
+		else {
+			gameDeadlineResult();
+		}
 	}
 }
 
