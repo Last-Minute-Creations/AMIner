@@ -273,7 +273,7 @@ static void coreGsCreate(void) {
 	TAG_END);
 	s_pPristineBuffer = bitmapCreate(
 		bitmapGetByteWidth(g_pMainBuffer->pScroll->pBack) * 8,
-		g_pMainBuffer->pScroll->pBack->Rows, GAME_BPP, BMF_INTERLEAVED
+		g_pMainBuffer->pScroll->pBack->Rows, GAME_BPP, BMF_INTERLEAVED | BMF_CLEAR
 	);
 
 	// Load the view and draw the progress bar
