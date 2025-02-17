@@ -1495,6 +1495,8 @@ static void gameGsLoop(void) {
 		g_pVehicles[0].isChallengeEnded &&
 		(!g_is2pPlaying || g_pVehicles[1].isChallengeEnded)
 	) {
+		vehicleStopLoopAudio(0);
+		vehicleStopLoopAudio(1);
 		if(g_eGameMode == GAME_MODE_CHALLENGE) {
 			gameChallengeResult();
 		}

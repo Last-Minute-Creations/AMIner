@@ -824,10 +824,10 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 					inventorySetPartLevel(ePart, pPartDef->ubLevel + 1);
 					pEnd = stringCopy("Bonus: ", szMessage);
 					pEnd = stringCopy(g_pShopNames[ePart], pEnd);
-					*(pEnd++) = ',';
-					*(pEnd++) = ' ';
 				}
-				stringCopy("T +10", pEnd);
+				else {
+					stringCopy("T +10", pEnd);
+				}
 				textBobSet(
 					&pVehicle->sTextBob, szMessage, COLOR_GREEN,
 					pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
