@@ -146,6 +146,7 @@ General:
 	☐ Rebalance commissar reporting
 	☐ Add final credits
 	☐ Add float text on restock with only minerals taken without repair
+	☐ Block drilling past the mine
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)
