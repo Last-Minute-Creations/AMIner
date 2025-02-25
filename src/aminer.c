@@ -19,11 +19,13 @@ void genericCreate(void) {
 	joyOpen();
 	g_pGameStateManager = stateManagerCreate();
 
+	g_pPakFile = pakFileOpen("data.pak");
+
 	// Bare minimum
 	ptplayerCreate(1);
 	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
-	g_pFont = fontCreateFromPath("data/uni54.fnt");
+	g_pFont = fontCreateFromFd(pakFileGetFile(g_pPakFile, "uni54.fnt"));
 
 	if(memGetChipSize() < (1024+512) * 1024) {
 		statePush(g_pGameStateManager, &g_sStateSorry);
@@ -43,6 +45,8 @@ void genericProcess(void) {
 void genericDestroy(void) {
 	fontDestroy(g_pFont);
 	ptplayerDestroy();
+
+	pakFileClose(g_pPakFile);
 
 	stateManagerDestroy(g_pGameStateManager);
 	keyDestroy();

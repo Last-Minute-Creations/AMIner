@@ -129,12 +129,12 @@ void pageNewsCreate(tNewsKind eNewsKind) {
 	commRegisterPage(pageNewsProcess, pageNewsDestroy);
 
 	char szPath[50];
-	sprintf(szPath, "data/txt_%s/news_%s.txt", languageGetPrefix(), s_pNewsFileNames[eNewsKind]);
+	sprintf(szPath, "txt_%s/news_%s.txt", languageGetPrefix(), s_pNewsFileNames[eNewsKind]);
 	s_szScroll = remapFile(szPath, g_pRemap, &s_uwScrollBufferLength, 0);
 	s_isScrollDone = 0;
 
 	tUwCoordYX sOrigin = commGetOrigin();
-	tBitMap *pBitmapNews = bitmapCreateFromPath("data/comm_news.bm", 0);
+	tBitMap *pBitmapNews = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_news.bm"), 0);
 	blitCopy(
 		pBitmapNews, 0, 0, commGetDisplayBuffer(), sOrigin.uwX + 25, sOrigin.uwY + 28,
 		bitmapGetByteWidth(pBitmapNews) * 8, pBitmapNews->Rows, MINTERM_COOKIE

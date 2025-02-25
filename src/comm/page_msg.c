@@ -154,7 +154,7 @@ void pageMsgCreate(
 	s_cbOnClose = cbOnClose;
 	s_uwLineCount = 0;
 	char szPath[100];
-	sprintf(szPath, "data/txt_%s/%s.txt", languageGetPrefix(), szFile);
+	sprintf(szPath, "txt_%s/%s.txt", languageGetPrefix(), szFile);
 	readLines(g_pRemap, szPath, COMM_DISPLAY_WIDTH);
 
 	s_ubCurrPage = 0;

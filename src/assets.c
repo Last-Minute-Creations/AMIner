@@ -17,20 +17,21 @@ tBitMap *g_pBombMarkerMask;
 tBitMap *g_pTileOverlays;
 tBitMap *g_pTileOverlayMasks;
 tFont *g_pFont;
+tPakFile *g_pPakFile;
 
 void assetsAudioCreate(void) {
-	g_pSfxFlyLoop = ptplayerSfxCreateFromPath("data/sfx/fly_loop.sfx", 1);
-	g_pSfxDrill = ptplayerSfxCreateFromPath("data/sfx/drill1.sfx", 1);
-	g_pSfxOre = ptplayerSfxCreateFromPath("data/sfx/ore2.sfx", 1);
-	g_pSfxPenalty = ptplayerSfxCreateFromPath("data/sfx/penalty.sfx", 1);
+	g_pSfxFlyLoop = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/fly_loop.sfx"), 1);
+	g_pSfxDrill = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/drill1.sfx"), 1);
+	g_pSfxOre = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/ore2.sfx"), 1);
+	g_pSfxPenalty = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/penalty.sfx"), 1);
 
 	for(UBYTE i = 0; i < ASSETS_GAME_MOD_COUNT; ++i) {
 		char szModPath[30];
-		sprintf(szModPath, "data/music/game%hhu.mod", i);
-		g_pGameMods[i] = ptplayerModCreateFromPath(szModPath);
+		sprintf(szModPath, "music/game%hhu.mod", i);
+		g_pGameMods[i] = ptplayerModCreateFromFd(pakFileGetFile(g_pPakFile, szModPath));
 	}
-	g_pMenuMod = ptplayerModCreateFromPath("data/music/menu.mod");
-	g_pModSampleData = ptplayerSampleDataCreateFromPath("data/music/samples.samplepack");
+	g_pMenuMod = ptplayerModCreateFromFd(pakFileGetFile(g_pPakFile, "music/menu.mod"));
+	g_pModSampleData = ptplayerSampleDataCreateFromFd(pakFileGetFile(g_pPakFile, "music/samples.samplepack"));
 }
 
 void assetsAudioDestroy(void) {
@@ -47,8 +48,8 @@ void assetsAudioDestroy(void) {
 }
 
 void assetsMarkersCreate(void) {
-	g_pBombMarker = bitmapCreateFromPath("data/bomb_marker.bm", 0);
-	g_pBombMarkerMask = bitmapCreateFromPath("data/bomb_marker_mask.bm", 0);
+	g_pBombMarker = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "bomb_marker.bm"), 0);
+	g_pBombMarkerMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "bomb_marker_mask.bm"), 0);
 }
 
 void assetsMarkersDestroy(void) {
@@ -57,8 +58,8 @@ void assetsMarkersDestroy(void) {
 }
 
 void assetsTileOverlayCreate(void) {
-	g_pTileOverlays = bitmapCreateFromPath("data/tiles_overlay.bm", 0);
-	g_pTileOverlayMasks = bitmapCreateFromPath("data/tiles_overlay_masks.bm", 0);
+	g_pTileOverlays = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tiles_overlay.bm"), 0);
+	g_pTileOverlayMasks = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tiles_overlay_masks.bm"), 0);
 }
 
 void assetsTileOverlayDestroy(void) {

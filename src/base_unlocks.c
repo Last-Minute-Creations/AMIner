@@ -7,6 +7,7 @@
 #include "base.h"
 #include "inventory.h"
 #include "game.h"
+#include "assets.h"
 
 #define BASE_ANTENNA_WIDTH 32
 #define BASE_ANTENNA_HEIGHT 27
@@ -27,10 +28,10 @@ static tBitMap *s_pBaseUnlocksMasks;
 static tBaseId s_eBaseIdPrev;
 
 void baseUnlocksCreate(void) {
-	s_pTeleporterIdleFrame = bitmapCreateFromPath("data/base_teleporter_idle.bm", 0);
-	s_pTeleporterIdleMask = bitmapCreateFromPath("data/base_teleporter_idle_mask.bm", 0);
-	s_pBaseUnlocksFrames = bitmapCreateFromPath("data/base_unlocks.bm", 0);
-	s_pBaseUnlocksMasks = bitmapCreateFromPath("data/base_unlocks_mask.bm", 0);
+	s_pTeleporterIdleFrame = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_teleporter_idle.bm"), 0);
+	s_pTeleporterIdleMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_teleporter_idle_mask.bm"), 0);
+	s_pBaseUnlocksFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_unlocks.bm"), 0);
+	s_pBaseUnlocksMasks = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_unlocks_mask.bm"), 0);
 	s_eBaseIdPrev = BASE_ID_COUNT;
 
 	bobInit(

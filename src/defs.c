@@ -306,7 +306,7 @@ const tCodeRemap g_pRemap[19] = {
 };
 
 void defsInit(void) {
-	tJson *pJson = jsonCreate("data/game.json");
+	tJson *pJson = jsonCreate("game.json");
 
 	g_lInitialCash = jsonTokToUlong(pJson, jsonGetDom(pJson, "initialCash"));
 	g_ubPlansPerAccolade = jsonTokToUlong(pJson, jsonGetDom(pJson, "plansPerAccolade"));
@@ -403,7 +403,7 @@ void defsInit(void) {
 void defsCreateLocale(const char *szLangPrefix) {
 	logBlockBegin("defsCreateLocale(szLangPrefix: %s)", szLangPrefix);
 	char szPath[100];
-	sprintf(szPath, "data/txt_%s/strings.json", szLangPrefix);
+	sprintf(szPath, "txt_%s/strings.json", szLangPrefix);
 	tJson *pJson = jsonCreate(szPath);
 	if(!pJson) {
 		logWrite("ERR: %s not found\n", szPath);

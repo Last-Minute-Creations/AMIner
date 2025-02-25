@@ -9,13 +9,14 @@
 #include <ace/managers/system.h>
 #include <ace/utils/disk_file.h>
 #include "utf8.h"
+#include "../assets.h"
 
 tJson *jsonCreate(const char *szFilePath) {
 	systemUse();
 	logBlockBegin("jsonCreate(szFilePath: '%s')", szFilePath);
 
 	// Open file and get its size
-	tFile *pFile = diskFileOpen(szFilePath, "rb");
+	tFile *pFile = pakFileGetFile(g_pPakFile, szFilePath);
 	if(!pFile) {
 		logWrite("ERR: File doesn't exist\n");
 		logBlockEnd("jsonCreate()");

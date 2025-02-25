@@ -7,6 +7,7 @@
 #include "vehicle.h"
 #include "mode_menu.h"
 #include "game.h"
+#include "assets.h"
 
 #define MODE_ICON_WIDTH 16
 #define MODE_ICON_HEIGHT 12
@@ -30,8 +31,8 @@ static UBYTE *s_pModeMaskOffsets[MODE_OPTION_COUNT];
 //------------------------------------------------------------------- PUBLIC FNS
 
 void modeMenuManagerCreate(void) {
-	s_pModeIcons = bitmapCreateFromPath("data/mode_icons.bm", 0);
-	s_pModeIconMask = bitmapCreateFromPath("data/mode_icon_mask.bm", 0);
+	s_pModeIcons = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "mode_icons.bm"), 0);
+	s_pModeIconMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "mode_icon_mask.bm"), 0);
 
 	for(tModeOption eOption = 0; eOption < MODE_OPTION_COUNT; ++eOption) {
 		s_pModeIconOffsets[eOption] = bobCalcFrameAddress(s_pModeIcons, eOption * MODE_ICON_HEIGHT);

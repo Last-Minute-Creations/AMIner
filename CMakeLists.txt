@@ -58,6 +58,7 @@ endif()
 
 set(RES_DIR ${CMAKE_CURRENT_LIST_DIR}/_res)
 set(DATA_DIR ${CMAKE_CURRENT_BINARY_DIR}/data)
+set(DATA_PAK_PATH ${CMAKE_CURRENT_BINARY_DIR}/data.pak)
 set(GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 file(MAKE_DIRECTORY ${DATA_DIR})
@@ -610,6 +611,12 @@ mergeMods(
 		${DATA_DIR}/music/game8.mod
 		${DATA_DIR}/music/game9.mod
 	SAMPLE_PACK ${DATA_DIR}/music/samples.samplepack
+)
+
+packDirectory(
+	TARGET ${GAME_EXECUTABLE}
+	SOURCE_DIR ${DATA_DIR}
+	DEST_FILE ${DATA_PAK_PATH}
 )
 
 # Version stuff

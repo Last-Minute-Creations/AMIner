@@ -9,6 +9,7 @@
 #include "save.h"
 #include "game.h"
 #include "background_bob.h"
+#include "assets.h"
 
 #define PROTEST_THRESHOLD_WARNING -300
 #define PROTEST_THRESHOLD_PROTEST -500
@@ -28,7 +29,7 @@ static UBYTE *s_pOffsetProtest;
 static UBYTE *s_pOffsetStrike;
 
 void protestsCreate(void) {
-	s_pProtestBitmap = bitmapCreateFromPath("data/protests.bm", 0);
+	s_pProtestBitmap = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "protests.bm"), 0);
 	bobInit(
 		&s_sBgBobProtest.sBob, PROTEST_BOB_WIDTH, PROTEST_BOB_HEIGHT, 0, 0, 0,
 		PROTEST_BOB_X, PROTEST_BOB_Y

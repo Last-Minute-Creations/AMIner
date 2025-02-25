@@ -155,29 +155,29 @@ static void vehicleSetState(tVehicle *pVehicle, tVehicleState eNewState) {
 
 void vehicleManagerCreate(void) {
 	// Load gfx
-	s_pBodyFrames[0] = bitmapCreateFromPath("data/drill.bm", 0);
-	s_pBodyFrames[1] = bitmapCreateFromPath("data/drill_2.bm", 0);
-	s_pBodyMask = bitmapCreateFromPath("data/drill_mask.bm", 0);
+	s_pBodyFrames[0] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "drill.bm"), 0);
+	s_pBodyFrames[1] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "drill_2.bm"), 0);
+	s_pBodyMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "drill_mask.bm"), 0);
 
-	s_pTrackFrames = bitmapCreateFromPath("data/track.bm", 0);
-	s_pTrackMask = bitmapCreateFromPath("data/track_mask.bm", 0);
+	s_pTrackFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "track.bm"), 0);
+	s_pTrackMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "track_mask.bm"), 0);
 
-	s_pJetFrames = bitmapCreateFromPath("data/jet.bm", 0);
-	s_pJetMask = bitmapCreateFromPath("data/jet_mask.bm", 0);
+	s_pJetFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "jet.bm"), 0);
+	s_pJetMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "jet_mask.bm"), 0);
 
-	s_pToolFrames[0] = bitmapCreateFromPath("data/tool.bm", 0);
-	s_pToolFrames[1] = bitmapCreateFromPath("data/tool_2.bm", 0);
-	s_pToolMask = bitmapCreateFromPath("data/tool_mask.bm", 0);
+	s_pToolFrames[0] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tool.bm"), 0);
+	s_pToolFrames[1] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tool_2.bm"), 0);
+	s_pToolMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tool_mask.bm"), 0);
 
-	s_pWreckFrames[0] = bitmapCreateFromPath("data/wreck.bm", 0);
-	s_pWreckFrames[1] = bitmapCreateFromPath("data/wreck_2.bm", 0);
-	s_pWreckMask = bitmapCreateFromPath("data/wreck_mask.bm", 0);
+	s_pWreckFrames[0] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "wreck.bm"), 0);
+	s_pWreckFrames[1] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "wreck_2.bm"), 0);
+	s_pWreckMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "wreck_mask.bm"), 0);
 
-	s_pSmokeFrames = bitmapCreateFromPath("data/smoke.bm", 0);
-	s_pSmokeMask = bitmapCreateFromPath("data/smoke_mask.bm", 0);
+	s_pSmokeFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "smoke.bm"), 0);
+	s_pSmokeMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "smoke_mask.bm"), 0);
 
-	s_pPlayerMarkerFrames = bitmapCreateFromPath("data/player_markers.bm", 0);
-	s_pPlayerMarkerMask = bitmapCreateFromPath("data/player_marker_mask.bm", 0);
+	s_pPlayerMarkerFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "player_markers.bm"), 0);
+	s_pPlayerMarkerMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "player_marker_mask.bm"), 0);
 
 	for(UBYTE ubDir = 0; ubDir < 2; ++ubDir) {
 		for(UBYTE ubPlayerIndex = 0; ubPlayerIndex < 2; ++ubPlayerIndex) {

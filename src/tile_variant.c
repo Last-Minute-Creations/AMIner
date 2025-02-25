@@ -2,6 +2,7 @@
 #include <ace/utils/bitmap.h>
 #include "core.h"
 #include "tile.h"
+#include "assets.h"
 
 #define TILE_VARIANT_COUNT 10
 #define BYTES_PER_TILE (TILE_SIZE * (TILE_SIZE / 8) * 5)
@@ -10,7 +11,7 @@ static tBitMap *s_pCheckpointTiles;
 static tTileVariant s_eCurrentVariant;
 
 void tileVariantManagerCreate(void) {
-	s_pCheckpointTiles = bitmapCreateFromPath("data/checkpoint.bm", 1);
+	s_pCheckpointTiles = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "checkpoint.bm"), 1);
 	s_eCurrentVariant = TILE_VARIANT_DEFAULT;
 }
 
@@ -39,8 +40,8 @@ void tileVariantChangeTo(tTileVariant eVariant) {
 			);
 			break;
 		case TILE_VARIANT_CAMPAIGN:
-			bitmapLoadFromPath(
-				g_pMainBuffer->pTileSet, "data/campaign.bm",
+			bitmapLoadFromFd(
+				g_pMainBuffer->pTileSet, pakFileGetFile(g_pPakFile, "campaign.bm"),
 				0, TILE_CHECKPOINT_1 * TILE_SIZE
 			);
 			break;

@@ -7,6 +7,7 @@
 #include <ace/managers/log.h>
 #include <ace/managers/system.h>
 #include <ace/utils/disk_file.h>
+#include "../assets.h"
 
 char remapChar(const tCodeRemap *pRemap, ULONG ulCodepoint) {
 	if(ulCodepoint < 128) {
@@ -26,7 +27,7 @@ char *remapFile(
 ) {
 	systemUse();
 	// Read whole file to plain buffer
-	tFile *pFileContents = diskFileOpen(szFilePath, "r");
+	tFile *pFileContents = pakFileGetFile(g_pPakFile, szFilePath);
 
 	if(!pFileContents) {
 		logWrite("ERR: Couldn't read contents of '%s'\n", szFilePath);

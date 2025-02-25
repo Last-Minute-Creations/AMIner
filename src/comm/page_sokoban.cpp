@@ -6,6 +6,7 @@
 #include <ace/types.h>
 #include <ace/managers/key.h>
 #include <comm/gs_shop.h>
+#include "assets.h"
 
 namespace {
 
@@ -584,7 +585,7 @@ void tLevelState::drawDirty(void) {
 
 void pageSokobanCreate(void) {
 	s_ubCurrentLevelIndex = 0;
-	s_pBmTiles = bitmapCreateFromPath("data/soko.bm", 0);
+	s_pBmTiles = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "soko.bm"), 0);
 	commRegisterPage(pageSokobanProcess, pageSokobanDestroy);
 	loadLevel(0);
 }

@@ -7,6 +7,11 @@
 
 #include <ace/managers/ptplayer.h>
 #include <ace/utils/bitmap.h>
+#include <ace/utils/pak_file.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define ASSETS_GAME_MOD_COUNT 10
 
@@ -23,6 +28,7 @@ extern tBitMap *g_pBombMarkerMask;
 extern tBitMap *g_pTileOverlays;
 extern tBitMap *g_pTileOverlayMasks;
 extern tFont *g_pFont;
+extern tPakFile *g_pPakFile;
 
 void assetsAudioCreate(void);
 
@@ -35,5 +41,10 @@ void assetsMarkersDestroy(void);
 void assetsTileOverlayCreate(void);
 
 void assetsTileOverlayDestroy(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // ASSETS_H

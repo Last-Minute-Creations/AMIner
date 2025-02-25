@@ -22,7 +22,7 @@ void pagePortraitCreate(void) {
 	commRegisterPage(pagePortraitProcess, 0);
 
 	tUwCoordYX sOrigin = commGetOrigin();
-	tBitMap *pPortrait = bitmapCreateFromPath("data/portrait.bm", 0);
+	tBitMap *pPortrait = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "portrait.bm"), 0);
 	UWORD uwPortraitWidth = bitmapGetByteWidth(pPortrait) * 8;
 	UWORD uwPortraitHeight = pPortrait->Rows;
 	blitCopy(

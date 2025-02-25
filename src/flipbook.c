@@ -7,6 +7,7 @@
 #include "game.h"
 #include <ace/managers/ptplayer.h>
 #include <ace/contrib/managers/audio_mixer.h>
+#include "assets.h"
 
 #define FLIPBOOK_NARROW_MAX 6
 #define FLIPBOOK_WIDE_MAX 2
@@ -111,15 +112,15 @@ static tBob *flipbookBobRingGetNext(tFlipbookBobRing *pRing) {
 }
 
 void flipbookManagerCreate(void) {
-	s_pBoomFrames = bitmapCreateFromPath("data/explosion.bm", 0);
-	s_pBoomFramesMask = bitmapCreateFromPath("data/explosion_mask.bm", 0);
-	s_pTpFrames = bitmapCreateFromPath("data/teleport.bm", 0);
-	s_pTpFramesMask = bitmapCreateFromPath("data/teleport_mask.bm", 0);
-	s_pTeleporterFrames = bitmapCreateFromPath("data/base_teleporter.bm", 0);
-	s_pTeleporterFramesMask = bitmapCreateFromPath("data/base_teleporter_mask.bm", 0);
+	s_pBoomFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "explosion.bm"), 0);
+	s_pBoomFramesMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "explosion_mask.bm"), 0);
+	s_pTpFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "teleport.bm"), 0);
+	s_pTpFramesMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "teleport_mask.bm"), 0);
+	s_pTeleporterFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_teleporter.bm"), 0);
+	s_pTeleporterFramesMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_teleporter_mask.bm"), 0);
 
-	s_pSfxBoom = ptplayerSfxCreateFromPath("data/sfx/explosion.sfx", 1);
-	s_pSfxTeleport = ptplayerSfxCreateFromPath("data/sfx/teleport.sfx", 1);
+	s_pSfxBoom = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/explosion.sfx"), 1);
+	s_pSfxTeleport = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/teleport.sfx"), 1);
 
 
 	flipbookBobRingInit(

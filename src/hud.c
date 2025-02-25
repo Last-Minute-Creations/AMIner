@@ -13,6 +13,7 @@
 #include "save.h"
 #include "blitter_mutex.h"
 #include "comm/inbox.h"
+#include "assets.h"
 
 #define HUD_COLOR_BG 11
 #define HUD_COLOR_BAR_FULL 14
@@ -233,10 +234,10 @@ void hudCreate(tVPort *pVpHud, const tFont *pFont) {
 		TAG_SIMPLEBUFFER_BOUND_HEIGHT, HUD_HEIGHT * HUD_PAGE_COUNT,
   TAG_END);
 
-	bitmapLoadFromPath(s_pHudBuffer->pBack, "data/hud.bm", 0, 0);
-	s_pFaces = bitmapCreateFromPath("data/comm_faces.bm", 0);
-	s_pSfxNoise = ptplayerSfxCreateFromPath("data/sfx/hud_noise.sfx", 1);
-	s_pSfxMsg = ptplayerSfxCreateFromPath("data/sfx/hud_msg.sfx", 1);
+	bitmapLoadFromFd(s_pHudBuffer->pBack, pakFileGetFile(g_pPakFile, "hud.bm"), 0, 0);
+	s_pFaces = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_faces.bm"), 0);
+	s_pSfxNoise = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/hud_noise.sfx"), 1);
+	s_pSfxMsg = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/hud_msg.sfx"), 1);
 
 	s_pFont = pFont;
 	s_ubLineHeight = 7;

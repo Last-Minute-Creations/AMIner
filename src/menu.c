@@ -787,7 +787,7 @@ static void menuDrawCurrentAchievementDescription(void) {
 
 static void menuAchievementsGsCreate(void) {
 	commEraseAll();
-	s_pAchievementIcons = bitmapCreateFromPath("data/comm_achievements.bm", 0);
+	s_pAchievementIcons = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_achievements.bm"), 0);
 	s_ubSelectedAchievement = 0;
 
 	for(UBYTE i = 0; i < 18; ++i) {
@@ -861,8 +861,8 @@ static void menuAchievementsGsDestroy(void) {
 //------------------------------------------------------------------- PUBLIC FNS
 
 void menuPreload(void) {
-	s_pLogo = bitmapCreateFromPath("data/logo.bm", 0);
-	s_pSfxAtari = ptplayerSfxCreateFromPath("data/sfx/atari.sfx", 1);
+	s_pLogo = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "logo.bm"), 0);
+	s_pSfxAtari = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/atari.sfx"), 1);
 
 	settingsFileLoad();
 	// menuUpdateVolume();

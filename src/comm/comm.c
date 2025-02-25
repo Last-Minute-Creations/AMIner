@@ -150,24 +150,24 @@ static void fixBackgroundEdges(void) {
 void commCreate(tBitMap *pPristineBuffer) {
 	systemUse();
 	s_pPristineBuffer = pPristineBuffer;
-	s_pBg = bitmapCreateFromPath("data/comm_bg.bm", 0);
-	s_pButtons = bitmapCreateFromPath("data/comm_buttons.bm", 0);
+	s_pBg = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_bg.bm"), 0);
+	s_pButtons = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_buttons.bm"), 0);
 	s_pLineBuffer = fontCreateTextBitMap(
 		CEIL_TO_FACTOR(COMM_DISPLAY_WIDTH, 16), g_pFont->uwHeight
 	);
-	s_pBmEdgesMask = bitmapCreateFromPath("data/comm_edges_mask.bm", 0);
+	s_pBmEdgesMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_edges_mask.bm"), 0);
 
 	for(UBYTE i = 0; i < 4; ++i) {
 		char szPath[40];
-		sprintf(szPath, "data/sfx/key_press_%hhu.sfx", i);
-		s_pSfxKeyPress[i] = ptplayerSfxCreateFromPath(szPath, 1);
-		sprintf(szPath, "data/sfx/key_release_%hhu.sfx", i);
-		s_pSfxKeyRelease[i] = ptplayerSfxCreateFromPath(szPath, 1);
+		sprintf(szPath, "sfx/key_press_%hhu.sfx", i);
+		s_pSfxKeyPress[i] = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, szPath), 1);
+		sprintf(szPath, "sfx/key_release_%hhu.sfx", i);
+		s_pSfxKeyRelease[i] = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, szPath), 1);
 	}
 
-	g_pCommBmFaces = bitmapCreateFromPath("data/comm_faces_office.bm", 0);
-	g_pCommBmSelection = bitmapCreateFromPath("data/comm_office_selection.bm", 0);
-	g_pCommWorkshopIcons = bitmapCreateFromPath("data/comm_workshop_icons.bm", 0);
+	g_pCommBmFaces = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_faces_office.bm"), 0);
+	g_pCommBmSelection = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_office_selection.bm"), 0);
+	g_pCommWorkshopIcons = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_workshop_icons.bm"), 0);
 	systemUnuse();
 
 	s_isCommShown = 0;
