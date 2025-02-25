@@ -616,7 +616,7 @@ mergeMods(
 packDirectory(
 	TARGET ${GAME_EXECUTABLE}
 	SOURCE_DIR ${DATA_DIR}
-	DEST_FILE ${DATA_PAK_PATH}
+	COMPRESS DEST_FILE ${DATA_PAK_PATH}
 )
 
 # Version stuff

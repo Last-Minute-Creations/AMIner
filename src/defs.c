@@ -402,7 +402,7 @@ void defsInit(void) {
 
 void defsCreateLocale(const char *szLangPrefix) {
 	logBlockBegin("defsCreateLocale(szLangPrefix: %s)", szLangPrefix);
-	char szPath[100];
+	char szPath[30];
 	sprintf(szPath, "txt_%s/strings.json", szLangPrefix);
 	tJson *pJson = jsonCreate(szPath);
 	if(!pJson) {
