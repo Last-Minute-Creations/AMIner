@@ -206,8 +206,8 @@ Optimizations:
 	✔ Replace commrade undraw buffer with pristine buffer @done(25-02-08)
 	✘ Gate collectibles draw? @cancelled(25-02-09)
 	✔ Base unlocks draw @done(25-02-14)
+	✔ Pakfile + compression of data files? @done(25-03-01)
 	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
-	☐ Pakfile + compression of data files?
 	☐ Shrinkler for exe?
 	☐ Use pristine buffer for twister buffers
 
