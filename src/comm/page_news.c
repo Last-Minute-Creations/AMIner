@@ -66,23 +66,24 @@ static void pageNewsFillScrollWithText(void) {
 static void pageNewsProcess(void) {
 	UBYTE ubSpeed = SCROLL_SPEED_SLOW; //commNavCheck(DIRECTION_FIRE) ? SCROLL_SPEED_FAST : SCROLL_SPEED_SLOW;
 
-	// Shift scroll contents right
-	tBitMap *pBitmap = s_pNewsTextBitmap->pBitMap;
-	UBYTE *pStart = &pBitmap->Planes[0][pBitmap->BytesPerRow * pBitmap->Rows - sizeof(UWORD)];
-	UWORD uwBlitSize = (g_pFont->uwHeight << HSIZEBITS) | (SCROLL_WIDTH_BUFFER / 16);
-	UWORD uwBltCon0 = (ubSpeed << ASHIFTSHIFT) | USEA|USED | MINTERM_A;
-	blitWait();
-	g_pCustom->bltcon0 = uwBltCon0;
-	g_pCustom->bltcon1 = BC1F_DESC;
-	g_pCustom->bltafwm = 0xFFFF;
-	g_pCustom->bltalwm = 0xFFFF;
-	g_pCustom->bltamod = 0;
-	g_pCustom->bltdmod = 0;
-	g_pCustom->bltapt = pStart;
-	g_pCustom->bltdpt = pStart;
-	g_pCustom->bltsize = uwBlitSize;
 
 	if(s_wDrawnTextEnd > 0) {
+		// Shift scroll contents right
+		tBitMap *pBitmap = s_pNewsTextBitmap->pBitMap;
+		UBYTE *pStart = &pBitmap->Planes[0][pBitmap->BytesPerRow * pBitmap->Rows - sizeof(UWORD)];
+		UWORD uwBlitSize = (g_pFont->uwHeight << HSIZEBITS) | (SCROLL_WIDTH_BUFFER / 16);
+		UWORD uwBltCon0 = (ubSpeed << ASHIFTSHIFT) | USEA|USED | MINTERM_A;
+		blitWait();
+		g_pCustom->bltcon0 = uwBltCon0;
+		g_pCustom->bltcon1 = BC1F_DESC;
+		g_pCustom->bltafwm = 0xFFFF;
+		g_pCustom->bltalwm = 0xFFFF;
+		g_pCustom->bltamod = 0;
+		g_pCustom->bltdmod = 0;
+		g_pCustom->bltapt = pStart;
+		g_pCustom->bltdpt = pStart;
+		g_pCustom->bltsize = uwBlitSize;
+
 		s_wDrawnTextEnd -= ubSpeed;
 		s_wClearedBgEnd -= ubSpeed;
 		pageNewsFillScrollWithText();
