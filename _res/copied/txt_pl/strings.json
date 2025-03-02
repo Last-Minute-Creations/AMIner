@@ -4,12 +4,18 @@
 	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
 	"hudMessages": {
 		"achievementUnlocked": "Osiągnięcie zdobyte",
-		"newPlan": "Panie Derektorze, dostaliście nowy plan.",
-		"remaining": "Panie Derektorze, zostało %hd dni coby wysłać plan.",
+		"newPlan": [
+			"Towarzyszu Dyrektorze, otrzymaliście z Ministerstwa",
+			"nowy plan wydobycia."
+		],
+		"remaining": [
+			"Towarzyszu Dyrektorze, przypominam, za %hd dni",
+			"musicie mieć zrealizowany plan."
+		],
 		"deadlineRemaining": "Uważaj, zostało Ci mało czasu!",
 		"extending": [
-			"Panie Derektorze, Urzędas zaczyna marudzić że plan",
-			"niewykonany. Dał nam jeszcze %hhu dni."
+			"Macie opóźnienie! Dostajecie dodatkowe %hhu dni.",
+			"Jeśli się nie wyrobicie, będzie Nagana z wpisem do akt!"
 		],
 		"waitingKomisarz": [
 			"Panie Dyrektorze, Komisarz Putienko wzywa do gabinetu.",
@@ -190,7 +196,11 @@
 	},
 	"tricks": {
 		"noPlan": "Nie masz aktywnego planu! Co mam niby zrobić?",
-		"accoutingStrike": "Panie dyrektorze, w zakładzie źle się dzieje, komisarz wszystko kontroluje. Lepiej nie tym razem.",
+		"accoutingStrike": [
+			"Panie Dyrektorze, debet nam się robi w kasie i to może pójść w złą stronę. Chyba nawet Mietek kiedyś Panu mówił coś?",
+			"",
+			"Pan Dyrektor wie jak jest, dobre rady są w cenie, a mnie oczko w jedwabnych rajstopach poszło... i dzieci by morze zobaczyły... nie wiem, w Bułgarii?"
+		],
 		"accountingPremise": "Zleć Kreatywną Księgowość aby natychmiast wykonać plan.",
 		"accountingDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
 		"bribePremise": "Wręćż łapówkę aby zyskać %hhu dni na realizację planu.",

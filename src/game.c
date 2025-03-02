@@ -496,7 +496,7 @@ static void gameProcessHotkeys(void) {
 		gameElapseDay();
 	}
 	else if(keyUse(KEY_EQUALS)) {
-		hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_NEW_PLAN]);
+		hudShowMessage(FACE_ID_URZEDAS, g_pMsgs[MSG_HUD_NEW_PLAN]);
 		warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 	}
 	else if(keyUse(KEY_0)) {
@@ -1031,7 +1031,7 @@ static void gameProcessPlan(void) {
 			if(!planManagerGet()->isExtendedTimeByBribe && planTryProlong()) {
 				char szBfr[100];
 				sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
-				hudShowMessage(FACE_ID_MIETEK, szBfr);
+				hudShowMessage(FACE_ID_URZEDAS, szBfr);
 			}
 			else {
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
@@ -1044,7 +1044,7 @@ static void gameProcessPlan(void) {
 				s_wLastReminder = wRemainingDays;
 				char szBuffer[50];
 				sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
-				hudShowMessage(FACE_ID_MIETEK, szBuffer);
+				hudShowMessage(FACE_ID_URZEDAS, szBuffer);
 			}
 		}
 		else {
@@ -1280,7 +1280,7 @@ void gameElapseTime(UWORD uwTime) {
 	planElapseTime(uwTime);
 	if(!planManagerGet()->isPlanActive && planManagerGet()->wTimeRemaining == 0 && planManagerGet()->ubCurrentPlanIndex > 0) {
 		// first plan start (index 0) is handled by tutorial
-		hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_NEW_PLAN]);
+		hudShowMessage(FACE_ID_URZEDAS, g_pMsgs[MSG_HUD_NEW_PLAN]);
 		planStart();
 	}
 }

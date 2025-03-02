@@ -271,9 +271,6 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PLAN_COMPLETE:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_plan_complete", onBack);
 			break;
-		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_WARNING:
-			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_protest_warning", onBack);
-			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_protest_start", onBack);
 			break;
@@ -288,6 +285,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING:
 			pageAccountingCreate();
+			break;
+		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_PROTEST_WARNING:
+			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "krystyna_protest_warning", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER:
 			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_dossier", onBack);
@@ -428,6 +428,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			g_sSettings.ubSokoUnlock = SETTINGS_SOKO_UNLOCK_ON;
 			pageMsgCreate(FACE_ID_CRYO, szTitle, "cryo_success", onBack);
 			break;
+
 		case COMM_SHOP_PAGE_JAY_DOSSIER:
 			pageMsgCreate(FACE_ID_JAY, szTitle, "jay_dossier", onBack);
 			break;

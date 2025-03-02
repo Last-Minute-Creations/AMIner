@@ -714,14 +714,16 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 		if(eProtestState >= PROTEST_STATE_PROTEST) {
 			uwDrillMax /= 2;
 		}
-		UWORD uwRefuelLiters = (
-			uwDrillMax - pVehicle->uwDrillCurr + g_ubFuelInLiter / 2
-		) / g_ubFuelInLiter;
+		WORD wDeltaPart = uwDrillMax - pVehicle->uwDrillCurr;
+		UWORD uwRefuelLiters = 0;
+		if(wDeltaPart > 0) {
+			uwRefuelLiters = ((UWORD)wDeltaPart + g_ubFuelInLiter / 2) / g_ubFuelInLiter;
+			// It's possible to buy more fuel than needed (last liter) - fill up to max
+			pVehicle->uwDrillCurr = MIN(
+				pVehicle->uwDrillCurr + uwRefuelLiters * g_ubFuelInLiter, uwDrillMax
+			);
+		}
 
-		// It's possible to buy more fuel than needed (last liter) - fill up to max
-		pVehicle->uwDrillCurr = MIN(
-			pVehicle->uwDrillCurr + uwRefuelLiters * g_ubFuelInLiter, uwDrillMax
-		);
 
 		UWORD uwRehullCost = 0;
 		if(eProtestState < PROTEST_STATE_STRIKE) {
@@ -730,8 +732,11 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 			if(eProtestState >= PROTEST_STATE_PROTEST) {
 				uwHullMax /= 2;
 			}
-			uwRehullCost = g_ubHullPrice * (uwHullMax - pVehicle->wHullCurr);
-			vehicleHullRepair(pVehicle, uwHullMax);
+			wDeltaPart = uwHullMax - pVehicle->wHullCurr;
+			if(wDeltaPart > 0) {
+				uwRehullCost = g_ubHullPrice * (UWORD)wDeltaPart;
+				vehicleHullRepair(pVehicle, uwHullMax);
+			}
 		}
 
 		// Pay for your fuel & hull!
