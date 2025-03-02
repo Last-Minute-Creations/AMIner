@@ -29,7 +29,7 @@ typedef struct tPlanManager {
 	WORD wTimeMax;
 	WORD wTimeRemaining;
 	UBYTE ubCurrentPlanIndex;
-	UBYTE isExtendedTimeByFavor;
+	UBYTE isExtendedTimeByBribe;
 	tPlanProlongState eProlongState;
 	UBYTE isPlanActive;
 	UBYTE ubPlanCount;
@@ -61,7 +61,7 @@ void planUnlockMineral(tMineralType eMineral);
 
 WORD planGetRemainingDays(void);
 
-void planAddDays(UBYTE ubDays, UBYTE isFavor);
+void planAddDays(UBYTE ubDays, UBYTE isBribe);
 
 void planSpendMinerals(UBYTE ubMineralType, UBYTE ubCount);
 

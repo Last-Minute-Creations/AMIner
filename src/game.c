@@ -1012,7 +1012,7 @@ static void gameProcessPlan(void) {
 
 		WORD wRemainingDays = planGetRemainingDays();
 		if(wRemainingDays <= 0) {
-			if(!planManagerGet()->isExtendedTimeByFavor && planTryProlong()) {
+			if(!planManagerGet()->isExtendedTimeByBribe && planTryProlong()) {
 				char szBfr[100];
 				sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
 				hudShowMessage(FACE_ID_MIETEK, szBfr);

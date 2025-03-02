@@ -192,11 +192,7 @@
 		"bribePremise": "Wręćż łapówkę aby zyskać %hhu dni na realizację planu.",
 		"bribeDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
 		"bribeUsed": "Towarzyszu, nie teraz... Już Ci pomogłem przy obecnym planie!",
-		"bribePrice": "Będzie Cię to kosztować %hu%c.",
-		"favorFlavor": "Towarzyszu, uwielbiam z Tobą pracować. Słyszałem że obecny plan jest ciężki. Jeśli chcesz, mogę zadzwonić tu i tam i może coś załatwić.",
-		"favorPremise": "Urzędas może zamienić obecny plan na inny.",
-		"favorLeft": "Zostało %hhu przysług.",
-		"favorNone": "Prosisz mnie o zbyt wiele, Towarzyszu. Przestań się ociągać!"
+		"bribePrice": "Będzie Cię to kosztować %hu%c."
 	},
 	"workshop": {
 		"tnt0": "Pojedynczy ładunek pozwalający na zniszczenie prostej przeszkody terenowej. Niszczy surowce zawarte w terenie.",
@@ -279,7 +275,6 @@
 		"planDelayed": "Przedłużony plan",
 		"planAccolade": "Pochwała za wydobycia",
 		"urzedasBribe": "Łapówka",
-		"urzedasFavor": "Przysługa",
 		"komisarzDinoIntro": "Archeolodzy",
 		"komisarzRebuke_1": "Pierwsza nagana",
 		"komisarzRebuke_2": "Druga nagana",

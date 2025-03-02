@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "page_office.h"
-#include <comm/page_favor.h>
 #include <comm/page_bribe.h>
 #include <comm/page_accounting.h>
 #include <comm/page_questioning.h>
@@ -196,7 +195,6 @@ void pageOfficeReset(void) {
 	pageOfficeTryUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING);
 
 	// Reset counters
-	pageFavorReset();
 	pageBribeReset();
 	pageAccountingReset();
 	pageQuestioningReset();
@@ -209,7 +207,6 @@ void pageOfficeSave(tFile *pFile) {
 	fileWrite(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
 	fileWrite(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
 	fileWrite(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
-	pageFavorSave(pFile);
 	pageBribeSave(pFile);
 	pageAccountingSave(pFile);
 	pageQuestioningSave(pFile);
@@ -226,8 +223,7 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 	fileRead(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
 	fileRead(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
 	fileRead(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
-	return pageFavorLoad(pFile) &&
-		pageBribeLoad(pFile) &&
+	return pageBribeLoad(pFile) &&
 		pageAccountingLoad(pFile) &&
 		pageQuestioningLoad(pFile) &&
 		pageMarketLoad(pFile) &&

@@ -8,7 +8,6 @@
 #include <comm/page_office.h>
 #include <comm/page_msg.h>
 #include <comm/page_bribe.h>
-#include <comm/page_favor.h>
 #include <comm/page_accounting.h>
 #include "gs_shop.h"
 #include "../defs.h"

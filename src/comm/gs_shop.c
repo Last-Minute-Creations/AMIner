@@ -12,7 +12,6 @@
 #include <comm/page_msg.h>
 #include <comm/page_accounting.h>
 #include <comm/page_bribe.h>
-#include <comm/page_favor.h>
 #include <comm/page_gate_dilemma.h>
 #include <comm/page_questioning.h>
 #include <comm/page_use_crates.h>
@@ -307,9 +306,6 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
-			break;
-		case COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR:
-			pageFavorCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER:
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_dossier", onBack);

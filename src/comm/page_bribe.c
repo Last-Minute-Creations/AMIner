@@ -36,7 +36,6 @@ static void pageBribeProcess(void) {
 				if(bButtonCurr == 0 && vehicleTrySpendCash(0, s_uwBribeCost)) {
 					if(randUwMinMax(&g_sRand, 1, 100) > heatGetPercent()) {
 						// Success
-						pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_FAVOR);
 						heatTryIncrease(5);
 						++s_uwBribeCount;
 						planAddDays(14, 1);
@@ -73,7 +72,7 @@ void pageBribeCreate(void) {
 		) * ubLineHeight;
 		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
-	else if(!planManagerGet()->isExtendedTimeByFavor) {
+	else if(!planManagerGet()->isExtendedTimeByBribe) {
 		sprintf(szBfr, g_pMsgs[MSG_TRICKS_BRIBE_PREMISE], 14);
 		uwPosY += commDrawMultilineText(szBfr,0, uwPosY) * ubLineHeight;
 		uwPosY += ubLineHeight / 2;

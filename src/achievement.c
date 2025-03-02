@@ -8,7 +8,6 @@
 #include "hud.h"
 #include <comm/page_accounting.h>
 #include <comm/page_bribe.h>
-#include <comm/page_favor.h>
 #include <comm/page_questioning.h>
 #include <comm/page_market.h>
 
@@ -29,7 +28,7 @@ UBYTE achievementTryUnlockRighteous(void) {
 	if(
 		!pageQuestioningIsAnyReported() && pageQuestioningGetLiesCount() == 0 &&
 		pageAccountingGetUses() == 0 && pageBribeGetCount() == 0 &&
-		pageFavorGetUses() == 0 && pageMarketGetResourcesTraded() == 0
+		pageMarketGetResourcesTraded() == 0
 	) {
 		return 1;
 	}

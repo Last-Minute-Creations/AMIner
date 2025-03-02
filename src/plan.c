@@ -28,7 +28,7 @@ static void planReset(UBYTE isPlanActive) {
 	else {
 		s_sPlanManager.wTimeRemaining = isPlanActive ? s_sPlanManager.wTimeMax : (GAME_TIME_PER_DAY * 5);
 	}
-	s_sPlanManager.isExtendedTimeByFavor = 0;
+	s_sPlanManager.isExtendedTimeByBribe = 0;
 	s_sPlanManager.eProlongState = PLAN_PROLONG_NONE;
 	s_sPlanManager.isPlanActive = isPlanActive;
 	logBlockEnd("planReset()");
@@ -142,9 +142,9 @@ WORD planGetRemainingDays(void) {
 	return wRemainingDays;
 }
 
-void planAddDays(UBYTE ubDays, UBYTE isFavor) {
-	if(isFavor) {
-		s_sPlanManager.isExtendedTimeByFavor = 1;
+void planAddDays(UBYTE ubDays, UBYTE isBribe) {
+	if(isBribe) {
+		s_sPlanManager.isExtendedTimeByBribe = 1;
 	}
 	s_sPlanManager.wTimeRemaining += ubDays * GAME_TIME_PER_DAY;
 }
