@@ -585,7 +585,7 @@ void tLevelState::drawDirty(void) {
 
 void pageSokobanCreate(void) {
 	s_ubCurrentLevelIndex = 0;
-	s_pBmTiles = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "soko.bm"), 0);
+	s_pBmTiles = bitmapCreateFromFd(GET_SUBFILE_PREFIX("soko.bm"), 0);
 	commRegisterPage(pageSokobanProcess, pageSokobanDestroy);
 	loadLevel(0);
 }

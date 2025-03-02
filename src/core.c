@@ -83,7 +83,7 @@ static void coreBobSequencesCreate(void) {
 	blitRect(s_pDripMask, 0, 0, 16, 20, (1 << GAME_BPP) - 1);
 	bobSequenceReset(s_pDripMask->Planes[0]);
 
-	s_pDripBitmap = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "bg_factory_drip.bm"), 0);
+	s_pDripBitmap = bitmapCreateFromFd(GET_SUBFILE_PREFIX("bg_factory_drip.bm"), 0);
 	for(UBYTE i = 0; i < DRIP_ANIM_LENGTH; ++i) {
 		s_pDripFrames[i].pAddrFrame = bobCalcFrameAddress(s_pDripBitmap, i * 20);
 	}
@@ -259,7 +259,7 @@ static void coreGsCreate(void) {
 
 	// It should be fine with 1 extra on TAG_TILEBUFFER_BOUND_TILE_X to the left -
 	// if something gets drawn to the right it will flow to the offscreen left.
-	s_pTiles = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tiles.bm"), 0);
+	s_pTiles = bitmapCreateFromFd(GET_SUBFILE_PREFIX("tiles.bm"), 0);
 	g_pMainBuffer = tileBufferCreate(0,
 		TAG_TILEBUFFER_VPORT, s_pVpMain,
 		TAG_TILEBUFFER_BITMAP_FLAGS, BMF_CLEAR | BMF_INTERLEAVED,
@@ -277,7 +277,7 @@ static void coreGsCreate(void) {
 	);
 
 	// Load the view and draw the progress bar
-	paletteLoadFromFd(pakFileGetFile(g_pPakFile, "aminer.plt"), s_pPaletteRef, 1 << GAME_BPP);
+	paletteLoadFromFd(GET_SUBFILE_PREFIX("aminer.plt"), s_pPaletteRef, 1 << GAME_BPP);
 	memcpy(pVpHud->pPalette, s_pPaletteRef, sizeof(pVpHud->pPalette));
 	defsCreateLocale(languageGetPrefix());
 	commCreate(s_pPristineBuffer);

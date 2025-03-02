@@ -77,7 +77,7 @@ void twisterEnable(void) {
 	s_ps = 0;
 	s_pBitmaps[0] = bitmapCreate(TWISTER_BITMAP_WIDTH, TWISTER_BITMAP_HEIGHT, 5, BMF_CLEAR | BMF_INTERLEAVED);
 	s_pBitmaps[1] = bitmapCreate(TWISTER_BITMAP_WIDTH, TWISTER_BITMAP_HEIGHT, 5, BMF_CLEAR | BMF_INTERLEAVED);
-	s_pEyeMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "gate_eye_mask.bm"), 0);
+	s_pEyeMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("gate_eye_mask.bm"), 0);
 	s_ubBackBuffer = 0;
 
 	UWORD uwDestY = (GATE_DEPTH_PX & (512 - 1));

@@ -212,10 +212,10 @@ static void baseTileLoad(tBaseId eBaseId) {
 
 void baseCreate(tTileBufferManager *pManager) {
 	s_pManager = pManager;
-	s_pBaseTiles[BASE_ID_GROUND] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base0.bm"), 1);
-	s_pBaseTiles[BASE_ID_DINO] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base1.bm"), 1);
-	s_pBaseTiles[BASE_ID_GATE] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base2.bm"), 1);
-	s_pBaseTiles[BASE_ID_WESTERN] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base3.bm"), 1);
+	s_pBaseTiles[BASE_ID_GROUND] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base0.bm"), 1);
+	s_pBaseTiles[BASE_ID_DINO] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base1.bm"), 1);
+	s_pBaseTiles[BASE_ID_GATE] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base2.bm"), 1);
+	s_pBaseTiles[BASE_ID_WESTERN] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base3.bm"), 1);
 	baseTileLoad(BASE_ID_GROUND);
 }
 
@@ -270,11 +270,11 @@ tBaseId baseGetCurrentId(void) {
 
 void baseUpdateDinoTileset(UBYTE isPopulated) {
 	if(isPopulated) {
-		bitmapLoadFromFd(s_pBaseTiles[BASE_ID_DINO], pakFileGetFile(g_pPakFile, "base1_populated.bm"), 0, 20 * TILE_SIZE);
+		bitmapLoadFromFd(s_pBaseTiles[BASE_ID_DINO], GET_SUBFILE_PREFIX("base1_populated.bm"), 0, 20 * TILE_SIZE);
 	}
 	else {
 		// Sub-optimal speed, but whatever
-		bitmapLoadFromFd(s_pBaseTiles[BASE_ID_DINO], pakFileGetFile(g_pPakFile, "base1.bm"), 0, 0);
+		bitmapLoadFromFd(s_pBaseTiles[BASE_ID_DINO], GET_SUBFILE_PREFIX("base1.bm"), 0, 0);
 	}
 }
 

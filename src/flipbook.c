@@ -112,15 +112,15 @@ static tBob *flipbookBobRingGetNext(tFlipbookBobRing *pRing) {
 }
 
 void flipbookManagerCreate(void) {
-	s_pBoomFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "explosion.bm"), 0);
-	s_pBoomFramesMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "explosion_mask.bm"), 0);
-	s_pTpFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "teleport.bm"), 0);
-	s_pTpFramesMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "teleport_mask.bm"), 0);
-	s_pTeleporterFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_teleporter.bm"), 0);
-	s_pTeleporterFramesMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_teleporter_mask.bm"), 0);
+	s_pBoomFrames = bitmapCreateFromFd(GET_SUBFILE_PREFIX("explosion.bm"), 0);
+	s_pBoomFramesMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("explosion_mask.bm"), 0);
+	s_pTpFrames = bitmapCreateFromFd(GET_SUBFILE_PREFIX("teleport.bm"), 0);
+	s_pTpFramesMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("teleport_mask.bm"), 0);
+	s_pTeleporterFrames = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base_teleporter.bm"), 0);
+	s_pTeleporterFramesMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base_teleporter_mask.bm"), 0);
 
-	s_pSfxBoom = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/explosion.sfx"), 1);
-	s_pSfxTeleport = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/teleport.sfx"), 1);
+	s_pSfxBoom = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/explosion.sfx"), 1);
+	s_pSfxTeleport = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/teleport.sfx"), 1);
 
 
 	flipbookBobRingInit(

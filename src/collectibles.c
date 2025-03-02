@@ -58,8 +58,8 @@ static const tCollectiblesZoneDef s_pZones[COLLECTIBLE_KIND_COUNT] = {
 			{.uwX = 80, .uwY = 45},
 			{.uwX = 80, .uwY = 22},
 		},
-		.szFramesFile = "bones.bm",
-		.szMasksFile = "bones_mask.bm",
+		.szFramesFile = SUBFILE_PREFIX "bones.bm",
+		.szMasksFile = SUBFILE_PREFIX "bones_mask.bm",
 	},
 	[COLLECTIBLE_KIND_GATE] = {
 		.uwDepthTop = 180 * TILE_SIZE,
@@ -102,8 +102,8 @@ static const tCollectiblesZoneDef s_pZones[COLLECTIBLE_KIND_COUNT] = {
 			{.uwX = 32, .uwY = 18},
 			{.uwX = 32, .uwY = 11},
 		},
-		.szFramesFile = "gate.bm",
-		.szMasksFile = "gate_mask.bm",
+		.szFramesFile = SUBFILE_PREFIX "gate.bm",
+		.szMasksFile = SUBFILE_PREFIX "gate_mask.bm",
 	},
 };
 
@@ -164,8 +164,8 @@ static void collectibleDrawNext(void) {
 
 void collectiblesCreate(void) {
 	for(tCollectibleKind eKind = 0; eKind < COLLECTIBLE_KIND_COUNT; ++eKind) {
-		s_pZoneDatas[eKind].pBitmapFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, s_pZones[eKind].szFramesFile), 0);
-		s_pZoneDatas[eKind].pBitmapMasks = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, s_pZones[eKind].szMasksFile), 0);
+		s_pZoneDatas[eKind].pBitmapFrames = bitmapCreateFromFd(GET_SUBFILE(s_pZones[eKind].szFramesFile), 0);
+		s_pZoneDatas[eKind].pBitmapMasks = bitmapCreateFromFd(GET_SUBFILE(s_pZones[eKind].szMasksFile), 0);
 
 		s_pZoneDatas[eKind].ubFoundCount = 0;
 		UWORD uwOffsY = 0;

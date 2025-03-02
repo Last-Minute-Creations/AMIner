@@ -146,9 +146,9 @@ static void logoGsDestroy(void) {
 
 static void logoLmcCreate(void) {
 	systemUse();
-	paletteLoadFromFd(pakFileGetFile(g_pPakFile, "logo/lmc.plt"), s_pPaletteRef, 1 << s_pVp->ubBpp);
-	tBitMap *pLogo = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "logo/lmc.bm"), 0);
-	s_pSfxLmc = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "logo/lmc.sfx"), 0);
+	paletteLoadFromFd(GET_SUBFILE_PREFIX("logo/lmc.plt"), s_pPaletteRef, 1 << s_pVp->ubBpp);
+	tBitMap *pLogo = bitmapCreateFromFd(GET_SUBFILE_PREFIX("logo/lmc.bm"), 0);
+	s_pSfxLmc = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("logo/lmc.sfx"), 0);
 	systemUnuse();
 
 	s_sLogoRect.uwWidth = bitmapGetByteWidth(pLogo) * 8;
@@ -224,7 +224,7 @@ static void logoAceCreate(void) {
 		s_pPaletteRef[i] = 0;
 	}
 
-	tBitMap *pLogoAce = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "logo/ace.bm"), 0);
+	tBitMap *pLogoAce = bitmapCreateFromFd(GET_SUBFILE_PREFIX("logo/ace.bm"), 0);
 	s_sLogoRect.uwWidth = bitmapGetByteWidth(pLogoAce) * 8;
 	s_sLogoRect.uwHeight = pLogoAce->Rows;
 	UWORD uwLogoOffsY = (256 - s_sLogoRect.uwHeight) / 2;
@@ -242,7 +242,7 @@ static void logoAceCreate(void) {
 	s_bRatioFlashE = FLASH_RATIO_INACTIVE;
 	s_bRatioFlashPwr = FLASH_RATIO_INACTIVE;
 
-	s_pSfxAce = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "logo/ace.sfx"), 0);
+	s_pSfxAce = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("logo/ace.sfx"), 0);
 	systemUnuse();
 
 	blitCopy(
@@ -374,8 +374,8 @@ static void drawLangNames(void) {
 void logoLangCreate(void) {
 	systemUse();
 	s_pLineBuffer = fontCreateTextBitMap(320, g_pFont->uwHeight);
-	paletteLoadFromFd(pakFileGetFile(g_pPakFile, "aminer.plt"), s_pPaletteRef, 1 << s_pVp->ubBpp);
-	tBitMap *pFaces = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "lang_select.bm"), 0);
+	paletteLoadFromFd(GET_SUBFILE_PREFIX("aminer.plt"), s_pPaletteRef, 1 << s_pVp->ubBpp);
+	tBitMap *pFaces = bitmapCreateFromFd(GET_SUBFILE_PREFIX("lang_select.bm"), 0);
 	systemUnuse();
 
 	// Set first color to black, fill rest with colors from layer 1

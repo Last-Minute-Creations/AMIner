@@ -8,6 +8,7 @@
 #include <ace/managers/ptplayer.h>
 #include <ace/utils/bitmap.h>
 #include <ace/utils/pak_file.h>
+#include <ace/utils/disk_file.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +20,7 @@ extern tPtplayerSfx *g_pSfxDrill;
 extern tPtplayerSfx *g_pSfxOre;
 extern tPtplayerSfx *g_pSfxPenalty;
 extern tPtplayerSfx *g_pSfxFlyLoop;
+extern tPtplayerSfx *g_pSfxThud;
 extern tPtplayerMod *g_pGameMods[ASSETS_GAME_MOD_COUNT];
 extern tPtplayerMod *g_pMenuMod;
 extern tPtplayerSamplePack *g_pModSampleData;
@@ -28,7 +30,16 @@ extern tBitMap *g_pBombMarkerMask;
 extern tBitMap *g_pTileOverlays;
 extern tBitMap *g_pTileOverlayMasks;
 extern tFont *g_pFont;
+
+#if defined(USE_PAK_FILE)
 extern tPakFile *g_pPakFile;
+#define SUBFILE_PREFIX ""
+#define GET_SUBFILE(szPath) pakFileGetFile(g_pPakFile, szPath)
+#else
+#define SUBFILE_PREFIX "data/"
+#define GET_SUBFILE(szPath) diskFileOpen(szPath, "rb")
+#endif
+#define GET_SUBFILE_PREFIX(szPath) GET_SUBFILE(SUBFILE_PREFIX szPath)
 
 void assetsAudioCreate(void);
 

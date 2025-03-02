@@ -155,29 +155,29 @@ static void vehicleSetState(tVehicle *pVehicle, tVehicleState eNewState) {
 
 void vehicleManagerCreate(void) {
 	// Load gfx
-	s_pBodyFrames[0] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "drill.bm"), 0);
-	s_pBodyFrames[1] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "drill_2.bm"), 0);
-	s_pBodyMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "drill_mask.bm"), 0);
+	s_pBodyFrames[0] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("drill.bm"), 0);
+	s_pBodyFrames[1] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("drill_2.bm"), 0);
+	s_pBodyMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("drill_mask.bm"), 0);
 
-	s_pTrackFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "track.bm"), 0);
-	s_pTrackMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "track_mask.bm"), 0);
+	s_pTrackFrames = bitmapCreateFromFd(GET_SUBFILE_PREFIX("track.bm"), 0);
+	s_pTrackMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("track_mask.bm"), 0);
 
-	s_pJetFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "jet.bm"), 0);
-	s_pJetMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "jet_mask.bm"), 0);
+	s_pJetFrames = bitmapCreateFromFd(GET_SUBFILE_PREFIX("jet.bm"), 0);
+	s_pJetMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("jet_mask.bm"), 0);
 
-	s_pToolFrames[0] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tool.bm"), 0);
-	s_pToolFrames[1] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tool_2.bm"), 0);
-	s_pToolMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "tool_mask.bm"), 0);
+	s_pToolFrames[0] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("tool.bm"), 0);
+	s_pToolFrames[1] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("tool_2.bm"), 0);
+	s_pToolMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("tool_mask.bm"), 0);
 
-	s_pWreckFrames[0] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "wreck.bm"), 0);
-	s_pWreckFrames[1] = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "wreck_2.bm"), 0);
-	s_pWreckMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "wreck_mask.bm"), 0);
+	s_pWreckFrames[0] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("wreck.bm"), 0);
+	s_pWreckFrames[1] = bitmapCreateFromFd(GET_SUBFILE_PREFIX("wreck_2.bm"), 0);
+	s_pWreckMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("wreck_mask.bm"), 0);
 
-	s_pSmokeFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "smoke.bm"), 0);
-	s_pSmokeMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "smoke_mask.bm"), 0);
+	s_pSmokeFrames = bitmapCreateFromFd(GET_SUBFILE_PREFIX("smoke.bm"), 0);
+	s_pSmokeMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("smoke_mask.bm"), 0);
 
-	s_pPlayerMarkerFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "player_markers.bm"), 0);
-	s_pPlayerMarkerMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "player_marker_mask.bm"), 0);
+	s_pPlayerMarkerFrames = bitmapCreateFromFd(GET_SUBFILE_PREFIX("player_markers.bm"), 0);
+	s_pPlayerMarkerMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("player_marker_mask.bm"), 0);
 
 	for(UBYTE ubDir = 0; ubDir < 2; ++ubDir) {
 		for(UBYTE ubPlayerIndex = 0; ubPlayerIndex < 2; ++ubPlayerIndex) {
@@ -349,6 +349,7 @@ static void vehicleHullDamage(tVehicle *pVehicle, UWORD uwDmg) {
 			uwHullMax
 		);
 		vehicleUpdateBodyBob(pVehicle);
+		audioMixerPlaySfx(g_pSfxThud, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PENALTY, 0);
 	}
 	hudSetHull(pVehicle->ubPlayerIdx, pVehicle->wHullCurr, uwHullMax);
 }

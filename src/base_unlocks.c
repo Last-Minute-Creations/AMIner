@@ -28,10 +28,10 @@ static tBitMap *s_pBaseUnlocksMasks;
 static tBaseId s_eBaseIdPrev;
 
 void baseUnlocksCreate(void) {
-	s_pTeleporterIdleFrame = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_teleporter_idle.bm"), 0);
-	s_pTeleporterIdleMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_teleporter_idle_mask.bm"), 0);
-	s_pBaseUnlocksFrames = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_unlocks.bm"), 0);
-	s_pBaseUnlocksMasks = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "base_unlocks_mask.bm"), 0);
+	s_pTeleporterIdleFrame = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base_teleporter_idle.bm"), 0);
+	s_pTeleporterIdleMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base_teleporter_idle_mask.bm"), 0);
+	s_pBaseUnlocksFrames = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base_unlocks.bm"), 0);
+	s_pBaseUnlocksMasks = bitmapCreateFromFd(GET_SUBFILE_PREFIX("base_unlocks_mask.bm"), 0);
 	s_eBaseIdPrev = BASE_ID_COUNT;
 
 	bobInit(

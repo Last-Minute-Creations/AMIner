@@ -11,7 +11,7 @@ static tBitMap *s_pCheckpointTiles;
 static tTileVariant s_eCurrentVariant;
 
 void tileVariantManagerCreate(void) {
-	s_pCheckpointTiles = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "checkpoint.bm"), 1);
+	s_pCheckpointTiles = bitmapCreateFromFd(GET_SUBFILE_PREFIX("checkpoint.bm"), 1);
 	s_eCurrentVariant = TILE_VARIANT_DEFAULT;
 }
 
@@ -41,7 +41,7 @@ void tileVariantChangeTo(tTileVariant eVariant) {
 			break;
 		case TILE_VARIANT_CAMPAIGN:
 			bitmapLoadFromFd(
-				g_pMainBuffer->pTileSet, pakFileGetFile(g_pPakFile, "campaign.bm"),
+				g_pMainBuffer->pTileSet, GET_SUBFILE_PREFIX("campaign.bm"),
 				0, TILE_CHECKPOINT_1 * TILE_SIZE
 			);
 			break;

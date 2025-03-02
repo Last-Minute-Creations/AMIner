@@ -8,6 +8,8 @@ endif()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 23)
 
+set(USE_PAK_FILE OFF)
+
 # ACE
 set(AUDIO_MIXER_HW_CHANNEL_MODE "SINGLE")
 set(AUDIO_MIXER_WORD_SIZED ON)
@@ -54,6 +56,10 @@ target_compile_options(${GAME_EXECUTABLE} PRIVATE -Werror -Wno-error=unused-para
 target_link_libraries(${GAME_EXECUTABLE} ace_audio_mixer ace)
 if(GAME_DEBUG)
   target_compile_definitions(${GAME_EXECUTABLE} PRIVATE GAME_DEBUG)
+endif()
+
+if(USE_PAK_FILE)
+  target_compile_definitions(${GAME_EXECUTABLE} PRIVATE USE_PAK_FILE)
 endif()
 
 set(RES_DIR ${CMAKE_CURRENT_LIST_DIR}/_res)
@@ -488,11 +494,17 @@ file(MAKE_DIRECTORY ${DATA_DIR}/sfx ${DATA_DIR}/logo)
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/fly_loop.wav
-	DESTINATION ${DATA_DIR}/sfx/fly_loop.sfx
-	)
+	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/thud.wav
+	DESTINATION ${DATA_DIR}/sfx/thud.sfx
+)
 
-	convertAudio(
+convertAudio(
+	TARGET ${GAME_EXECUTABLE}
+	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/fly_loop.wav
+	DESTINATION ${DATA_DIR}/sfx/fly_loop.sfx
+)
+
+convertAudio(
 	TARGET ${GAME_EXECUTABLE}
 	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/atari.wav
 	DESTINATION ${DATA_DIR}/sfx/atari.sfx
@@ -581,6 +593,22 @@ convertAudio(
 	DESTINATION ${DATA_DIR}/sfx/hud_msg.sfx
 )
 
+convertAudio(
+	TARGET ${GAME_EXECUTABLE}
+	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 4 SOURCE ${RES_DIR}/audio/gate_quake.wav
+	DESTINATION ${DATA_DIR}/sfx/gate_quake.sfx
+)
+convertAudio(
+	TARGET ${GAME_EXECUTABLE}
+	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 4 SOURCE ${RES_DIR}/audio/gate_opened.wav
+	DESTINATION ${DATA_DIR}/sfx/gate_opened.sfx
+)
+convertAudio(
+	TARGET ${GAME_EXECUTABLE}
+	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/gate_rune.wav
+	DESTINATION ${DATA_DIR}/sfx/gate_rune.sfx
+)
+
 #------------------------------------------------------------------------- MUSIC
 file(MAKE_DIRECTORY ${DATA_DIR}/music)
 
@@ -613,11 +641,13 @@ mergeMods(
 	SAMPLE_PACK ${DATA_DIR}/music/samples.samplepack
 )
 
+if(USE_PAK_FILE)
 packDirectory(
 	TARGET ${GAME_EXECUTABLE}
 	SOURCE_DIR ${DATA_DIR}
 	COMPRESS DEST_FILE ${DATA_PAK_PATH}
 )
+endif()
 
 # Version stuff
 string(TIMESTAMP YEAR "%y")

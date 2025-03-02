@@ -27,7 +27,7 @@ char *remapFile(
 ) {
 	systemUse();
 	// Read whole file to plain buffer
-	tFile *pFileContents = pakFileGetFile(g_pPakFile, szFilePath);
+	tFile *pFileContents = GET_SUBFILE(szFilePath);
 
 	if(!pFileContents) {
 		logWrite("ERR: Couldn't read contents of '%s'\n", szFilePath);

@@ -16,7 +16,7 @@ tJson *jsonCreate(const char *szFilePath) {
 	logBlockBegin("jsonCreate(szFilePath: '%s')", szFilePath);
 
 	// Open file and get its size
-	tFile *pFile = pakFileGetFile(g_pPakFile, szFilePath);
+	tFile *pFile = GET_SUBFILE(szFilePath);
 	if(!pFile) {
 		logWrite("ERR: File doesn't exist\n");
 		logBlockEnd("jsonCreate()");

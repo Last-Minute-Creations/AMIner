@@ -17,6 +17,7 @@
 #include "tile.h"
 #include "inventory.h"
 #include "hud.h"
+#include "assets.h"
 
 LONG g_lInitialCash;
 UBYTE g_ubUpgradeLevels;
@@ -301,7 +302,7 @@ const tCodeRemap g_pRemap[19] = {
 };
 
 void defsInit(void) {
-	tJson *pJson = jsonCreate("game.json");
+	tJson *pJson = jsonCreate(SUBFILE_PREFIX "game.json");
 
 	g_lInitialCash = jsonTokToUlong(pJson, jsonGetDom(pJson, "initialCash"));
 	g_ubPlansPerAccolade = jsonTokToUlong(pJson, jsonGetDom(pJson, "plansPerAccolade"));
@@ -398,7 +399,7 @@ void defsInit(void) {
 void defsCreateLocale(const char *szLangPrefix) {
 	logBlockBegin("defsCreateLocale(szLangPrefix: %s)", szLangPrefix);
 	char szPath[30];
-	sprintf(szPath, "txt_%s/strings.json", szLangPrefix);
+	sprintf(szPath, SUBFILE_PREFIX "txt_%s/strings.json", szLangPrefix);
 	tJson *pJson = jsonCreate(szPath);
 	if(!pJson) {
 		logWrite("ERR: %s not found\n", szPath);

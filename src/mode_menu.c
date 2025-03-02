@@ -31,8 +31,8 @@ static UBYTE *s_pModeMaskOffsets[MODE_OPTION_COUNT];
 //------------------------------------------------------------------- PUBLIC FNS
 
 void modeMenuManagerCreate(void) {
-	s_pModeIcons = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "mode_icons.bm"), 0);
-	s_pModeIconMask = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "mode_icon_mask.bm"), 0);
+	s_pModeIcons = bitmapCreateFromFd(GET_SUBFILE_PREFIX("mode_icons.bm"), 0);
+	s_pModeIconMask = bitmapCreateFromFd(GET_SUBFILE_PREFIX("mode_icon_mask.bm"), 0);
 
 	for(tModeOption eOption = 0; eOption < MODE_OPTION_COUNT; ++eOption) {
 		s_pModeIconOffsets[eOption] = bobCalcFrameAddress(s_pModeIcons, eOption * MODE_ICON_HEIGHT);

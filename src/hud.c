@@ -40,7 +40,7 @@
 #define HUD_MSG_BFR_SIZE 250
 #define HUD_MSG_WAIT_CNT 200
 
-#define HUD_ICON_INBOX_SRC_OFFS_Y 144
+#define HUD_ICON_INBOX_SRC_OFFS_Y (FACE_ID_COUNT * 16)
 #define HUD_NOISE_DURATION 25
 
 #define SFX_CHANNEL_HUD 2
@@ -234,10 +234,10 @@ void hudCreate(tVPort *pVpHud, const tFont *pFont) {
 		TAG_SIMPLEBUFFER_BOUND_HEIGHT, HUD_HEIGHT * HUD_PAGE_COUNT,
   TAG_END);
 
-	bitmapLoadFromFd(s_pHudBuffer->pBack, pakFileGetFile(g_pPakFile, "hud.bm"), 0, 0);
-	s_pFaces = bitmapCreateFromFd(pakFileGetFile(g_pPakFile, "comm_faces.bm"), 0);
-	s_pSfxNoise = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/hud_noise.sfx"), 1);
-	s_pSfxMsg = ptplayerSfxCreateFromFd(pakFileGetFile(g_pPakFile, "sfx/hud_msg.sfx"), 1);
+	bitmapLoadFromFd(s_pHudBuffer->pBack, GET_SUBFILE_PREFIX("hud.bm"), 0, 0);
+	s_pFaces = bitmapCreateFromFd(GET_SUBFILE_PREFIX("comm_faces.bm"), 0);
+	s_pSfxNoise = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/hud_noise.sfx"), 1);
+	s_pSfxMsg = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/hud_msg.sfx"), 1);
 
 	s_pFont = pFont;
 	s_ubLineHeight = 7;
