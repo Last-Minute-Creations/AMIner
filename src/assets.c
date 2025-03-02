@@ -9,6 +9,10 @@ tPtplayerSfx *g_pSfxOre;
 tPtplayerSfx *g_pSfxPenalty;
 tPtplayerSfx *g_pSfxFlyLoop;
 tPtplayerSfx *g_pSfxThud;
+tPtplayerSfx *g_pSfxGate;
+tPtplayerSfx *g_pSfxRune;
+tPtplayerSfx *g_pSfxQuake;
+
 tPtplayerMod *g_pGameMods[ASSETS_GAME_MOD_COUNT];
 tPtplayerMod *g_pMenuMod;
 tPtplayerSamplePack *g_pModSampleData;
@@ -25,9 +29,13 @@ tPakFile *g_pPakFile;
 
 void assetsAudioCreate(void) {
 	g_pSfxThud = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/thud.sfx"), 1);
+	g_pSfxFlyLoop = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/fly_loop.sfx"), 1);
 	g_pSfxDrill = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/drill1.sfx"), 1);
 	g_pSfxOre = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/ore2.sfx"), 1);
 	g_pSfxPenalty = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/penalty.sfx"), 1);
+	g_pSfxGate = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/gate_loop.sfx"), 1);
+	g_pSfxRune = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/gate_rune.sfx"), 1);
+	g_pSfxQuake = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/gate_quake.sfx"), 1);
 
 	for(UBYTE i = 0; i < ASSETS_GAME_MOD_COUNT; ++i) {
 		char szModPath[30];
@@ -41,8 +49,12 @@ void assetsAudioCreate(void) {
 void assetsAudioDestroy(void) {
 	ptplayerSfxDestroy(g_pSfxDrill);
 	ptplayerSfxDestroy(g_pSfxFlyLoop);
+	ptplayerSfxDestroy(g_pSfxThud);
 	ptplayerSfxDestroy(g_pSfxOre);
 	ptplayerSfxDestroy(g_pSfxPenalty);
+	ptplayerSfxDestroy(g_pSfxGate);
+	ptplayerSfxDestroy(g_pSfxRune);
+	ptplayerSfxDestroy(g_pSfxQuake);
 
 	for(UBYTE i = 0; i < ASSETS_GAME_MOD_COUNT; ++i) {
 		ptplayerModDestroy(g_pGameMods[i]);

@@ -10,6 +10,7 @@
 #include <ace/utils/chunky.h>
 #include <ace/utils/disk_file.h>
 #include <ace/utils/string.h>
+#include <ace/contrib/managers/audio_mixer.h>
 #include <comm/gs_shop.h>
 #include <comm/page_questioning.h>
 #include <comm/page_office.h>
@@ -47,6 +48,13 @@
 
 #define CAMERA_SPEED 4
 #define CAMERA_SHAKE_AMPLITUDE 2
+
+#define SFX_CHANNEL_QUAKE 0
+#define SFX_PRIORITY_QUAKE 10
+#define SFX_CHANNEL_GATE 1
+#define SFX_PRIORITY_GATE 10
+#define SFX_CHANNEL_RUNE 2
+#define SFX_PRIORITY_RUNE 5
 
 //------------------------------------------------------------------------ TYPES
 
@@ -584,6 +592,7 @@ static UBYTE gameProcessGateCutscene(void) {
 				s_ubGateCutsceneCooldown = 0;
 				++s_eGateCutsceneStep;
 				s_isCameraShake = 1;
+				audioMixerPlaySfx(g_pSfxQuake, SFX_CHANNEL_QUAKE, SFX_PRIORITY_QUAKE, 1);
 			}
 			break;
 		case GATE_CUTSCENE_OPEN_STEP_SHAKE_BEFORE_LIGHTS:
@@ -593,6 +602,7 @@ static UBYTE gameProcessGateCutscene(void) {
 				s_ubGateCutsceneUpdateCount = 0;
 				s_ubGateCutsceneColorIndex = 21;
 				s_ubGateCutsceneItemIndex = 0;
+				audioMixerPlaySfx(g_pSfxRune, SFX_CHANNEL_RUNE, SFX_PRIORITY_RUNE, 0);
 			}
 			break;
 		case GATE_CUTSCENE_OPEN_STEP_LIGHTS_BEFORE_TWIST:
@@ -776,6 +786,10 @@ static UBYTE gameProcessGateCutscene(void) {
 						if(++s_ubGateCutsceneItemIndex >= 16) {
 							++s_eGateCutsceneStep;
 							twisterEnable();
+							audioMixerPlaySfx(g_pSfxGate, SFX_CHANNEL_GATE, SFX_PRIORITY_GATE, 1);
+						}
+						else {
+							audioMixerPlaySfx(g_pSfxRune, SFX_CHANNEL_RUNE, SFX_PRIORITY_RUNE, 0);
 						}
 						s_ubGateCutsceneColorIndex = 21;
 					}
@@ -795,6 +809,8 @@ static UBYTE gameProcessGateCutscene(void) {
 				vehicleSetPos(&g_pVehicles[0], pBaseGround->sPosTeleport.uwX, pBaseGround->sPosTeleport.uwY);
 				vehicleSetPos(&g_pVehicles[1], pBaseGround->sPosTeleport.uwX, pBaseGround->sPosTeleport.uwY);
 				s_isCameraShake = 0;
+				audioMixerStopSfxOnChannel(SFX_CHANNEL_QUAKE);
+				audioMixerStopSfxOnChannel(SFX_CHANNEL_GATE);
 				twisterDisable();
 				++s_eGateCutsceneStep;
 			}

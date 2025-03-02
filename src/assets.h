@@ -21,6 +21,10 @@ extern tPtplayerSfx *g_pSfxOre;
 extern tPtplayerSfx *g_pSfxPenalty;
 extern tPtplayerSfx *g_pSfxFlyLoop;
 extern tPtplayerSfx *g_pSfxThud;
+extern tPtplayerSfx *g_pSfxGate;
+extern tPtplayerSfx *g_pSfxRune;
+extern tPtplayerSfx *g_pSfxQuake;
+
 extern tPtplayerMod *g_pGameMods[ASSETS_GAME_MOD_COUNT];
 extern tPtplayerMod *g_pMenuMod;
 extern tPtplayerSamplePack *g_pModSampleData;

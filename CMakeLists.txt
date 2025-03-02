@@ -500,7 +500,7 @@ convertAudio(
 
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/fly_loop.wav
+	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/fly_loop.wav
 	DESTINATION ${DATA_DIR}/sfx/fly_loop.sfx
 )
 
@@ -600,7 +600,7 @@ convertAudio(
 )
 convertAudio(
 	TARGET ${GAME_EXECUTABLE}
-	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 4 SOURCE ${RES_DIR}/audio/gate_opened.wav
+	STRICT COMPRESS NORMALIZE PAD 2 DIVIDE_AMPLITUDE 3 SOURCE ${RES_DIR}/audio/gate_opened.wav
 	DESTINATION ${DATA_DIR}/sfx/gate_opened.sfx
 )
 convertAudio(
