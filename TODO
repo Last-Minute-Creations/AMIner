@@ -277,6 +277,7 @@ Crate quests:
 		✔ Spend parts to build mega-teleporter @done(24-07-05)
 		✔ Spend parts to open capsule @done(24-07-05)
 		✔ Screen with text and capsule contents @done(24-12-15)
+	☐ Revised capsule quest flow
 
 Deadline mode:
 	✔ Don't generate underground bases @done(25-02-15)
@@ -319,15 +320,15 @@ Missing message texts:
 Missing graphics:
 	✔ Protest banners on factory @done(25-02-12)
 	✔ Scientist portrait @done(25-02-16)
-	☐ Jay portrait small
-	☐ Jay portrait large final
+	✔ Jay portrait small @done(25-03-02)
+	✘ Jay portrait large final @cancelled(25-03-02)
 	☐ After-invasion newscaster
 	☐ Sci base final
 	☐ News slides for each ending
 
 Missing audio:
-	☐ Earthquake
-	☐ Gate rune activation
-	☐ Gate activation
+	✔ Earthquake @done(25-03-02)
+	✔ Gate rune activation @done(25-03-02)
+	✔ Gate activation @done(25-03-02)
 	☐ Minor thud
 	☐ Major thud
