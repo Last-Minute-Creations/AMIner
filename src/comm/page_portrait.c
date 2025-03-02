@@ -21,17 +21,6 @@ void pagePortraitCreate(void) {
 	logBlockBegin("pagePortraitCreate()");
 	commRegisterPage(pagePortraitProcess, 0);
 
-	tUwCoordYX sOrigin = commGetOrigin();
-	tBitMap *pPortrait = bitmapCreateFromFd(GET_SUBFILE_PREFIX("portrait.bm"), 0);
-	UWORD uwPortraitWidth = bitmapGetByteWidth(pPortrait) * 8;
-	UWORD uwPortraitHeight = pPortrait->Rows;
-	blitCopy(
-		pPortrait, 0, 0, commGetDisplayBuffer(),
-		sOrigin.uwX + COMM_DISPLAY_X + (COMM_DISPLAY_WIDTH - uwPortraitWidth) / 2,
-		sOrigin.uwY + COMM_DISPLAY_Y + (COMM_DISPLAY_HEIGHT - uwPortraitHeight) / 2,
-		uwPortraitWidth, uwPortraitHeight, MINTERM_COOKIE
-	);
-	bitmapDestroy(pPortrait);
 	g_sSettings.ubSokoUnlock = SETTINGS_SOKO_UNLOCK_ON;
 
 	// TODO: play sound
