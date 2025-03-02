@@ -126,12 +126,20 @@ void questCrateSetCapsuleState(tCapsuleState eNewState) {
 		case CAPSULE_STATE_NOT_FOUND:
 			break;
 		case CAPSULE_STATE_FOUND:
-			pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_CAPSULE);
+			hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_CAPSULE_FOUND]);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_CAPSULE_FOUND);
+			inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_CAPSULE_FOUND, 0);
+			pageOfficeUnlockPerson(FACE_ID_CRYO);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_CRYO, COMM_SHOP_PAGE_OFFICE_CRYO_DOSSIER);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_CRYO, COMM_SHOP_PAGE_OFFICE_CRYO_TRAMIEL);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_CRYO, COMM_SHOP_PAGE_OFFICE_CRYO_CONSOLE);
 			break;
 		case CAPSULE_STATE_OPENED:
-			pageOfficeLockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_CAPSULE);
-			pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER_PORTRAIT);
-			commShopChangePage(COMM_SHOP_PAGE_OFFICE_LIST_SCI, COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER_PORTRAIT);
+			pageOfficeLockPerson(FACE_ID_CRYO);
+			pageOfficeUnlockPerson(FACE_ID_JAY);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_JAY, COMM_SHOP_PAGE_JAY_DOSSIER);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_JAY, COMM_SHOP_PAGE_JAY_CONGRATS);
+			commShopChangePage(COMM_SHOP_PAGE_OFFICE_LIST_JAY, COMM_SHOP_PAGE_CRYO_SUCCESS);
 			break;
 	}
 }

@@ -277,7 +277,15 @@ Crate quests:
 		✔ Spend parts to build mega-teleporter @done(24-07-05)
 		✔ Spend parts to open capsule @done(24-07-05)
 		✔ Screen with text and capsule contents @done(24-12-15)
-	☐ Revised capsule quest flow
+	✔ Revised capsule quest flow @done(25-03-02)
+		✔ Show Mietek hud msg on capsule found @done(25-03-02)
+		✔ Show Mietek msg on entering commrade @done(25-03-02)
+		✔ Unlock capsule NPC @done(25-03-02)
+		✔ Add Konami code hint to capsule NPC @done(25-03-02)
+		✔ Add status page to capsule NPC @done(25-03-02)
+		✔ unlock secret NPC on spending crates within capsule status @done(25-03-02)
+		✔ show thanks on opening the capsule @done(25-03-02)
+		✔ unlock the secret on opening the capsule @done(25-03-02)
 
 Deadline mode:
 	✔ Don't generate underground bases @done(25-02-15)

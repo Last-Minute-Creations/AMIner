@@ -140,6 +140,7 @@ const char * s_pLangDom[] = {
 	[MSG_CRATES_NOT_YET_SELL] = "crates.notYetSell",
 	[MSG_CRATES_GIVE] = "crates.give",
 	[MSG_CRATES_SELL] = "crates.sell",
+	[MSG_CRATES_USE] = "crates.use",
 	[MSG_CRATES_REMAINING] = "crates.remaining",
 	// Bonus
 	[MSG_BONUS_COMPLETE] = "bonus.complete",
@@ -207,6 +208,7 @@ const char * s_pLangDom[] = {
 	[MSG_HUD_WAITING_URZEDAS] = "hudMessages.waitingUrzedas",
 	[MSG_HUD_SCI_WELCOME] = "hudMessages.sciWelcome",
 	[MSG_HUD_PRISONER_FOUND] = "hudMessages.prisonerFound",
+	[MSG_HUD_CAPSULE_FOUND] = "hudMessages.capsuleFound",
 	// Loading
 	[MSG_LOADING_GEN_TERRAIN] = "loading.genTerrain",
 	[MSG_LOADING_GEN_BASES] = "loading.genBases",
@@ -221,6 +223,8 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_LIST_PRISONER] = "officePages.listPrisoner",
 	[MSG_PAGE_LIST_AGENT] = "officePages.listAgent",
 	[MSG_PAGE_LIST_SCI] = "officePages.listSci",
+	[MSG_PAGE_LIST_CRYO] = "officePages.listCryo",
+	[MSG_PAGE_LIST_JAY] = "officePages.listJay",
 	[MSG_PAGE_MIETEK_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_MIETEK_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_MIETEK_FIRST_PLAN] = "officePages.mietekFirstPlan",
@@ -228,6 +232,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_MIETEK_PROTEST_WARNING] = "officePages.mietekProtestWarning",
 	[MSG_PAGE_MIETEK_PROTEST_START] = "officePages.mietekProtestStart",
 	[MSG_PAGE_MIETEK_PROTEST_STRIKE] = "officePages.mietekProtestStrike",
+	[MSG_PAGE_MIETEK_CAPSULE_FOUND] = "officePages.mietekCapsuleFound",
 	[MSG_PAGE_KRYSTYNA_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_KRYSTYNA_ACCOUNTING] = "officePages.krystynaAccounting",
 	[MSG_PAGE_URZEDAS_DOSSIER] = "officePages.commonDossier",
@@ -269,10 +274,16 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_SCIENTIST_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_SCIENTIST_FIRST_CRATE] = "officePages.sciFirstCrate",
 	[MSG_PAGE_SCIENTIST_CRATE_TELEPORTER] = "officePages.sciCrateTeleporter",
-	[MSG_PAGE_SCIENTIST_CRATE_CAPSULE] = "officePages.sciCrateCapsule",
 	[MSG_PAGE_SCIENTIST_ESCAPE] = "officePages.commonEscape",
-	[MSG_PAGE_SCIENTIST_MINER_PORTRAIT] = "officePages.sciMiner",
-	[MSG_PAGE_SCIENTIST_MINER_TEXT] = "officePages.sciMiner",
+
+	[MSG_PAGE_CRYO_DOSSIER] = "officePages.commonDossier",
+	[MSG_PAGE_CRYO_TRAMIEL] = "officePages.cryoTramiel",
+	[MSG_PAGE_CRYO_CONSOLE] = "officePages.cryoConsole",
+	[MSG_PAGE_CRYO_SUCCESS] = "officePages.cryoConsole",
+
+	[MSG_PAGE_JAY_DOSSIER] = "officePages.commonDossier",
+	[MSG_PAGE_JAY_CONGRATS] = "officePages.jayCongrats",
+
 	// Count
 	[MSG_COUNT] = 0
 };

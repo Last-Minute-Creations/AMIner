@@ -70,6 +70,10 @@
 		"prisonerFound": [
 			"Panie derektorze, wygląda na wygłodzonego.",
 			"Przywiezie go Pan do bazy."
+		],
+		"capsuleFound": [
+			"Panie Derektorze, znaleźlimy coś dziwnego.",
+			"Pan Derektor pozwoli na chwile."
 		]
 	},
 	"hiScore": {
@@ -208,12 +212,21 @@
 	},
 	"crates": {
 		"premiseTeleport": "Aby naprawić teleporter potrzebujemy części z 5 skrzyń.",
-		"premiseCapsule": "Aby ustabilizować i otworzyć kapsułę potrzebujemy części z 5 skrzyń.",
+		"premiseCapsule": [
+			"AmigaDOS",
+			"© 1985 Commodore-Amiga, Inc.",
+			"All rights reserved.",
+			"Release 1.0",
+			"",
+			"BŁĄD: Urządzenie niekompletne.",
+			"Brakujące komponenty: 5"
+		],
 		"premiseSell": "Kupię od Ciebie każdą skrzynię za %hu%c.",
 		"notYetGive": "Daj znać jak je zbierzesz.",
 		"notYetSell": "Wróć jak będziesz miał coś na sprzedaż.",
 		"give": "Przekaż skrzynię",
 		"sell": "Sprzedaj skrzynię",
+		"use": "Wykorzystaj skrzynie",
 		"remaining": "Pozostałe skrzynie: %hhu"
 	},
 	"bonus": {
@@ -264,11 +277,14 @@
 		"listPrisoner": "Więzień",
 		"listAgent": "Agent",
 		"listSci": "Naukowiec",
+		"listCryo": "Kapsuła",
+		"listJay": "Jay Miner",
 		"mietekFirstPlan": "Kariera",
 		"mietekPlanComplete": "Zawody",
 		"mietekProtestWarning": "Zaległe wypłaty",
 		"mietekProtestStart": "Protesty",
 		"mietekProtestStrike": "Strajkujemy",
+		"mietekCapsuleFound": "Znaleziona kapsuła",
 		"krystynaAccounting": "Kreatywna Księgowość",
 		"urzedasFirstPlan": "Pierwszy plan",
 		"planComplete": "Wykonanie planu",
@@ -294,10 +310,11 @@
 		"prisonerRadio3": "Reminiscencja",
 		"sciFirstCrate": "Odnalezione części",
 		"sciCrateTeleporter": "Naprawa teleportera",
-		"sciCrateCapsule": "Stabilizacja kapsuły",
-		"sciMiner": "Jay Miner",
 		"agentSci": "Naukowcy",
-		"agentSellCrates": "Sprzedaż skrzyń"
+		"agentSellCrates": "Sprzedaż skrzyń",
+		"cryoTramiel": "Zemsta Trzmiela",
+		"cryoConsole": "Panel sterowania",
+		"jayCongrats": "Podziękowania"
 	},
 	"achievements": [
 		{"name": "OSTATNI SPRAWIEDLIWY", "description": "TODO"},

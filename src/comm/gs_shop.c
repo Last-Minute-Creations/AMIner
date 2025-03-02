@@ -19,7 +19,6 @@
 #include <comm/page_list.h>
 #include <comm/page_sokoban.h>
 #include <comm/page_market.h>
-#include <comm/page_portrait.h>
 #include <comm/page_comm_unlock.h>
 #include "core.h"
 #include "dino.h"
@@ -164,7 +163,8 @@ static void commGsShopLoop(void) {
 		}
 		else if(
 			commNavUse(DIRECTION_FIRE) && s_eTab == COMM_TAB_WAREHOUSE &&
-			g_sSettings.ubSokoUnlock == SETTINGS_SOKO_UNLOCK_ON
+			g_sSettings.ubSokoUnlock == SETTINGS_SOKO_UNLOCK_ON &&
+			s_eCurrentPage != COMM_SHOP_PAGE_SOKOBAN
 		) {
 			commShopChangePage(COMM_SHOP_PAGE_WAREHOUSE, COMM_SHOP_PAGE_SOKOBAN);
 			return;
@@ -279,6 +279,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_protest_strike", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_CAPSULE_FOUND:
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_capsule_found", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER:
 			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "krystyna_dossier", onBack);
@@ -408,27 +411,40 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER:
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_TELEPORTER);
 			break;
-		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_CAPSULE:
-			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_CAPSULE);
-			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_ESCAPE:
 			pageEscapeCreate(PAGE_ESCAPE_SCENARIO_TELEPORT);
 			break;
-		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER_PORTRAIT:
-			pagePortraitCreate();
+
+		case COMM_SHOP_PAGE_OFFICE_CRYO_DOSSIER:
+			pageMsgCreate(FACE_ID_CRYO, szTitle, "cryo_dossier", onBack);
 			break;
-		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_MINER_TEXT:
-			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_miner", onBack);
+		case COMM_SHOP_PAGE_OFFICE_CRYO_TRAMIEL:
+			pageMsgCreate(FACE_ID_CRYO, szTitle, "cryo_tramiel", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_CRYO_CONSOLE:
+			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_CAPSULE);
+			break;
+		case COMM_SHOP_PAGE_CRYO_SUCCESS:
+			g_sSettings.ubSokoUnlock = SETTINGS_SOKO_UNLOCK_ON;
+			pageMsgCreate(FACE_ID_CRYO, szTitle, "cryo_success", onBack);
+			break;
+		case COMM_SHOP_PAGE_JAY_DOSSIER:
+			pageMsgCreate(FACE_ID_JAY, szTitle, "jay_dossier", onBack);
+			break;
+		case COMM_SHOP_PAGE_JAY_CONGRATS:
+			pageMsgCreate(FACE_ID_JAY, szTitle, "jay_congrats", onBack);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KRYSTYNA:
 		case COMM_SHOP_PAGE_OFFICE_LIST_KOMISARZ:
+		case COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS: {
 		case COMM_SHOP_PAGE_OFFICE_LIST_ARCH:
 		case COMM_SHOP_PAGE_OFFICE_LIST_PRISONER:
 		case COMM_SHOP_PAGE_OFFICE_LIST_AGENT:
 		case COMM_SHOP_PAGE_OFFICE_LIST_SCI:
-		case COMM_SHOP_PAGE_OFFICE_LIST_URZEDAS: {
+		case COMM_SHOP_PAGE_OFFICE_LIST_CRYO:
+		case COMM_SHOP_PAGE_OFFICE_LIST_JAY:
 			tFaceId eFace = ePage - COMM_SHOP_PAGE_OFFICE_LIST_MIETEK + FACE_ID_MIETEK;
 			pageListCreate(eFace, officeGetPagesForFace(eFace));
 		} break;

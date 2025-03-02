@@ -42,8 +42,8 @@ static void pageUseCratesDrawAll(void) {
 			break;
 		case PAGE_USE_CRATES_SCENARIO_CAPSULE:
 			szMsgPremise = g_pMsgs[MSG_CRATES_PREMISE_CAPSULE];
-			szMsgNotYet = g_pMsgs[MSG_CRATES_NOT_YET_GIVE];
-			szMsgUse = g_pMsgs[MSG_CRATES_GIVE];
+			szMsgNotYet = 0;
+			szMsgUse = g_pMsgs[MSG_CRATES_USE];
 			break;
 		case PAGE_USE_CRATES_SCENARIO_SELL:
 			sprintf(szBfr, g_pMsgs[MSG_CRATES_PREMISE_SELL], 1000, '\x1F');
@@ -55,7 +55,9 @@ static void pageUseCratesDrawAll(void) {
 
 	uwPosY += commDrawMultilineText(szMsgPremise, 0, uwPosY) * ubLineHeight;
 	if(ubCrateCount < ubMinAmount) {
-		uwPosY += commDrawMultilineText(szMsgNotYet, 0, uwPosY) * ubLineHeight;
+		if(szMsgNotYet) {
+			uwPosY += commDrawMultilineText(szMsgNotYet, 0, uwPosY) * ubLineHeight;
+		}
 		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 	else {
