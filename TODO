@@ -134,6 +134,7 @@ General:
 		✔ Display achievement unlock text with achievement name + icon @done(25-02-07)
 		✔ Test if all achievements pop up properly on hud (especially ending ones) @done(25-02-07)
 	✔ Move all placeholder text from code to external files @done(25-02-09)
+	✔ Block drilling past the mine @done(25-03-02)
 	☐ Animated main base elements
 		✔ Leaking pipe @done(23-09-29)
 		☐ Workers
@@ -146,7 +147,6 @@ General:
 	☐ Rebalance commissar reporting
 	☐ Add final credits
 	☐ Add float text on restock with only minerals taken without repair
-	☐ Block drilling past the mine
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)

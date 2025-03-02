@@ -1170,7 +1170,8 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 			vehicleStartDrilling(pVehicle, uwTileLeft, uwTileMid, DRILL_DIR_H, -TILE_SIZE / 2 + VEHICLE_HALF_WIDTH);
 		}
 		else if(
-			pVehicle->sSteer.bY > 0 && tileIsDrillable(uwTileCenter, uwTileBottom)
+			pVehicle->sSteer.bY > 0 && uwTileBottom < TILE_MINE_DEPTH - 1 &&
+			tileIsDrillable(uwTileCenter, uwTileBottom)
 		) {
 			vehicleStartDrilling(pVehicle, uwTileCenter, uwTileBottom, DRILL_DIR_V, 0);
 		}
@@ -1371,7 +1372,8 @@ static void vehicleProcessDrilling(tVehicle *pVehicle) {
 					UWORD uwTileBottom = (pVehicle->sBobBody.sPos.uwY + VEHICLE_HEIGHT + ubAdd) >> TILE_SHIFT;
 					UWORD uwTileX = pVehicle->sBobBody.sPos.uwX >> TILE_SHIFT;
 					if(
-						pVehicle->sSteer.bY > 0 && tileIsDrillable(uwTileX, uwTileBottom) &&
+						pVehicle->sSteer.bY > 0 && uwTileBottom < TILE_MINE_DEPTH - 1 &&
+						tileIsDrillable(uwTileX, uwTileBottom) &&
 						vehicleStartDrilling(pVehicle, uwTileX, uwTileBottom, DRILL_DIR_V, 0)
 					) {
 						pVehicle->ubDrillState = DRILL_STATE_DRILLING;

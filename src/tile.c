@@ -298,7 +298,7 @@ void tileReset(UBYTE isCoalOnly, tGameMode eGameMode) {
 		"tileReset(isCoalOnly: %hhu, eGameMOde: %d)", isCoalOnly, eGameMode
 	);
 	UWORD uwEndX = g_pMainBuffer->uTileBounds.uwX;
-	UWORD uwEndY = g_pMainBuffer->uTileBounds.uwY;
+	UWORD uwEndY = TILE_MINE_DEPTH;
 	if(eGameMode == GAME_MODE_CHALLENGE) {
 		uwEndY = TILE_ROW_CHALLENGE_FINISH + 20; // generate a bit more to accomodate scroll
 	}
