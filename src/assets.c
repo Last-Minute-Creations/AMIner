@@ -33,7 +33,7 @@ void assetsAudioCreate(void) {
 	g_pSfxDrill = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/drill1.sfx"), 1);
 	g_pSfxOre = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/ore2.sfx"), 1);
 	g_pSfxPenalty = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/penalty.sfx"), 1);
-	g_pSfxGate = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/gate_loop.sfx"), 1);
+	g_pSfxGate = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/gate_opened.sfx"), 1);
 	g_pSfxRune = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/gate_rune.sfx"), 1);
 	g_pSfxQuake = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("sfx/gate_quake.sfx"), 1);
 
