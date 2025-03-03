@@ -27,7 +27,6 @@ extern tPtplayerSfx *g_pSfxQuake;
 
 extern tPtplayerMod *g_pGameMods[ASSETS_GAME_MOD_COUNT];
 extern tPtplayerMod *g_pMenuMod;
-extern tPtplayerMod *g_pCreditsMod;
 extern tPtplayerSamplePack *g_pModSampleData;
 
 extern tBitMap *g_pBombMarker;

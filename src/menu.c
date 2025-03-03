@@ -573,7 +573,6 @@ static void menuOnDeadlineLoad(void) {
 
 static void menuOnEnterCredits(void) {
 	commEraseAll();
-	creditsReset(0);
 	statePush(g_pGameStateManager, &g_sStateMenuCredits);
 }
 

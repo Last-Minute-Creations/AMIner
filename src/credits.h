@@ -9,7 +9,5 @@
 
 extern tState g_sStateMenuCredits;
 
-void creditsReset(UBYTE isOnGameEnd);
-
 #endif // _CREDITS_H_
 

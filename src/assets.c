@@ -15,7 +15,6 @@ tPtplayerSfx *g_pSfxQuake;
 
 tPtplayerMod *g_pGameMods[ASSETS_GAME_MOD_COUNT];
 tPtplayerMod *g_pMenuMod;
-tPtplayerMod *g_pCreditsMod;
 tPtplayerSamplePack *g_pModSampleData;
 
 tBitMap *g_pBombMarker;
@@ -44,7 +43,6 @@ void assetsAudioCreate(void) {
 		g_pGameMods[i] = ptplayerModCreateFromFd(GET_SUBFILE(szModPath));
 	}
 	g_pMenuMod = ptplayerModCreateFromFd(GET_SUBFILE_PREFIX("music/menu.mod"));
-	g_pCreditsMod = ptplayerModCreateFromFd(GET_SUBFILE_PREFIX("music/credits.mod"));
 	g_pModSampleData = ptplayerSampleDataCreateFromFd(GET_SUBFILE_PREFIX("music/samples.samplepack"));
 }
 
@@ -62,7 +60,6 @@ void assetsAudioDestroy(void) {
 		ptplayerModDestroy(g_pGameMods[i]);
 	}
 	ptplayerModDestroy(g_pMenuMod);
-	ptplayerModDestroy(g_pCreditsMod);
 	ptplayerSamplePackDestroy(g_pModSampleData);
 }
 
