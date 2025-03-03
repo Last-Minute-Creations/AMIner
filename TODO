@@ -135,18 +135,19 @@ General:
 		✔ Test if all achievements pop up properly on hud (especially ending ones) @done(25-02-07)
 	✔ Move all placeholder text from code to external files @done(25-02-09)
 	✔ Block drilling past the mine @done(25-03-02)
-	☐ Animated main base elements
+	✔ Animated main base elements @done(25-03-02)
 		✔ Leaking pipe @done(23-09-29)
-		☐ Workers
-		☐ Smoke
-		☐ Ufo?
-		☐ Clouds?
+		✘ Workers @cancelled(25-03-02)
+		✘ Smoke @cancelled(25-03-02)
+		✘ Ufo? @cancelled(25-03-02)
+		✘ Clouds? @cancelled(25-03-02)
 	☐ Add 2s pauses between music tracks?
 	☐ Add final default hi-scores
 	☐ Translate checkpoint text?
 	☐ Rebalance commissar reporting
 	☐ Add final credits
 	☐ Add float text on restock with only minerals taken without repair
+	☐ Final placement of base upgrades
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)
@@ -207,7 +208,7 @@ Optimizations:
 	✘ Gate collectibles draw? @cancelled(25-02-09)
 	✔ Base unlocks draw @done(25-02-14)
 	✔ Pakfile + compression of data files? @done(25-03-01)
-	☐ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx
+	✘ When audio mixer gets updated - comment-out sfx stuff from ptplayer, use mixer to play logo sfx @cancelled(25-03-02)
 	☐ Shrinkler for exe?
 	☐ Use pristine buffer for twister buffers
 
@@ -333,10 +334,10 @@ Missing graphics:
 	☐ After-invasion newscaster
 	☐ Sci base final
 	☐ News slides for each ending
+	☐ Achievement icons
 
 Missing audio:
 	✔ Earthquake @done(25-03-02)
 	✔ Gate rune activation @done(25-03-02)
 	✔ Gate activation @done(25-03-02)
-	☐ Minor thud
-	☐ Major thud
+	✔ Minor thud @done(25-03-02)
