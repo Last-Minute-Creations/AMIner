@@ -109,6 +109,12 @@ static void pageNewsProcess(void) {
 			if(g_is2pPlaying) {
 				achievementUnlock(ACHIEVEMENT_CO_OP);
 			}
+			if(gameGetRebukes() == 0) {
+				achievementUnlock(ACHIEVEMENT_NO_REBUKES);
+			}
+			if(gameGetAccolades() == 0) {
+				achievementUnlock(ACHIEVEMENT_NO_ACCOLADES);
+			}
 			commRegisterPage(0, 0);
 			statePop(g_pGameStateManager);
 			menuGsEnter(0);

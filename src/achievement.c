@@ -11,11 +11,17 @@
 #include <comm/page_questioning.h>
 #include <comm/page_market.h>
 
+#define NON_PLATINUM_MASK (BV(ACHIEVEMENT_PLATINUM) - 1)
+
 static char s_szAchievementMsgBuffer[50];
 
 void achievementUnlock(tAchievement eAchievement) {
 	if(settingsTryUnlockAchievement(eAchievement)) {
-		logWrite("Unlocking achievement %hu\n", eAchievement);
+		logWrite("Unlocked achievement %hu\n", eAchievement);
+		if((g_sSettings.ulAchievementsUnlocked & NON_PLATINUM_MASK) == NON_PLATINUM_MASK) {
+			settingsTryUnlockAchievement(ACHIEVEMENT_PLATINUM);
+			logWrite("Unlocked platinum achievmeent\n");
+		}
 		char *pEnd = stringCopy(g_pMsgs[MSG_HUD_ACHIEVEMENT_UNLOCKED], s_szAchievementMsgBuffer);
 		*(pEnd++) = ':';
 		*(pEnd++) = '\n';
