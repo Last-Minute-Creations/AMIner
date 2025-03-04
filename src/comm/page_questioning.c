@@ -13,6 +13,7 @@
 #include "../hud.h"
 #include "../achievement.h"
 #include "../protests.h"
+#include "../core.h"
 
 #define QUESTIONING_HEAT_INCREASE 5
 #define QUESTIONING_HEAT_DECREASE_TRUTH 5
@@ -25,6 +26,7 @@ static tQuestioningBit s_eQuestioningBitCurrent;
 static tQuestioningHandler s_pQuestioningHandlers[QUESTIONING_BIT_COUNT] = {0};
 static tCommShopPage s_pOfficeQuestioningPages[PAGE_OFFICE_SUBPAGES_PER_PERSON];
 static UWORD s_uwLiesCount;
+static UBYTE s_ubReportingAccoladeChance;
 
 static tCommShopPage pageQuestioningBitToShopPage(tQuestioningBit eBit) {
 	static const tCommShopPage pQuestioningPages[QUESTIONING_BIT_COUNT] = {
@@ -50,12 +52,12 @@ static void pageQuestioningProcess(void) {
 	}
 
 	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
-		UBYTE isShowReportMessage = 0;
 		if(bButtonCurr == 0) {
 			// Told the truth
 			heatTryReduce(QUESTIONING_HEAT_DECREASE_TRUTH);
-			pageQuestioningReport(s_eQuestioningBitCurrent, 0);
-			isShowReportMessage = 1;
+			s_eQuestioningsNotReported &= ~BV(s_eQuestioningBitCurrent);
+			pageQuestioningReport(s_eQuestioningBitCurrent);
+			inboxPushBack(pageQuestioningBitToShopPage(s_eQuestioningBitCurrent), 1);
 		}
 		else {
 			++s_uwLiesCount;
@@ -65,26 +67,15 @@ static void pageQuestioningProcess(void) {
 			else {
 				// Got caught
 				gameAddRebuke();
-				pageQuestioningReport(s_eQuestioningBitCurrent, 0);
-				isShowReportMessage = 1;
+				s_eQuestioningsNotReported &= ~BV(s_eQuestioningBitCurrent);
+				pageQuestioningReport(s_eQuestioningBitCurrent);
+				inboxPushBack(pageQuestioningBitToShopPage(s_eQuestioningBitCurrent), 1);
 			}
 		}
 
 		// Questioning has ended - clear pending and launch callback
 		s_eQuestioningsPending &= ~BV(s_eQuestioningBitCurrent);
-		if(s_pQuestioningHandlers[s_eQuestioningBitCurrent]) {
-			s_pQuestioningHandlers[s_eQuestioningBitCurrent](
-				s_eQuestioningBitCurrent, pageQuestioningIsReported(s_eQuestioningBitCurrent)
-			);
-		}
-
-		if(isShowReportMessage) {
-			tCommShopPage eNextPage = pageQuestioningBitToShopPage(s_eQuestioningBitCurrent);
-			commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, eNextPage);
-		}
-		else {
-			commShopGoBack();
-		}
+		commShopGoBack();
 	}
 }
 
@@ -140,6 +131,7 @@ void pageQuestioningReset(void) {
 	s_eQuestioningsReported = 0;
 	s_eQuestioningsNotReported = 0;
 	s_uwLiesCount = 0;
+	s_ubReportingAccoladeChance = 25;
 }
 
 void pageQuestioningSave(tFile *pFile) {
@@ -148,6 +140,7 @@ void pageQuestioningSave(tFile *pFile) {
 	fileWrite(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
 	fileWrite(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
 	fileWrite(pFile, &s_uwLiesCount, sizeof(s_uwLiesCount));
+	fileWrite(pFile, &s_ubReportingAccoladeChance, sizeof(s_ubReportingAccoladeChance));
 	saveWriteTag(pFile, SAVE_TAG_QUESTIONING_END);
 }
 
@@ -160,6 +153,7 @@ UBYTE pageQuestioningLoad(tFile *pFile) {
 	fileRead(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
 	fileRead(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
 	fileRead(pFile, &s_uwLiesCount, sizeof(s_uwLiesCount));
+	fileRead(pFile, &s_ubReportingAccoladeChance, sizeof(s_ubReportingAccoladeChance));
 	return saveReadTag(pFile, SAVE_TAG_QUESTIONING_END);
 }
 
@@ -211,20 +205,30 @@ const tCommShopPage *pageQuestioningGetNotReportedPages(void) {
 	return s_pOfficeQuestioningPages;
 }
 
-void pageQuestioningReport(tQuestioningBit eQuestioningBit, UBYTE isVoluntarily) {
+void pageQuestioningReport(tQuestioningBit eQuestioningBit) {
+	UBYTE isVoluntarily = (s_eQuestioningsNotReported & BV(eQuestioningBit)) != 0;
+
 	s_eQuestioningsReported |= BV(eQuestioningBit);
-	s_eQuestioningsNotReported &= ~BV(eQuestioningBit);
 	s_eQuestioningsPending &= ~BV(eQuestioningBit);
-
-	if(isVoluntarily) {
-		heatTryReduce(QUESTIONING_HEAT_DECREASE_REPORT);
-		gameAddAccolade();
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE);
-		inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE, 1);
-	}
-
 	if(s_eQuestioningsReported == QUESTIONING_FLAG_ALL) {
 		achievementUnlock(ACHIEVEMENT_CONFIDENT);
+	}
+
+	if(isVoluntarily) {
+		s_eQuestioningsNotReported &= ~BV(eQuestioningBit);
+		heatTryReduce(QUESTIONING_HEAT_DECREASE_REPORT);
+		if(s_ubReportingAccoladeChance < randUwMinMax(&g_sRand, 1, 100)) {
+			gameAddAccolade();
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE);
+			inboxPushBack(COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE, 1);
+		}
+		s_ubReportingAccoladeChance = MIN(100, s_ubReportingAccoladeChance + 25);
+	}
+
+	if(s_pQuestioningHandlers[eQuestioningBit]) {
+		s_pQuestioningHandlers[eQuestioningBit](
+			eQuestioningBit, pageQuestioningIsReported(eQuestioningBit)
+		);
 	}
 }
 

@@ -338,15 +338,15 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageListCreate(FACE_ID_KOMISARZ, pageQuestioningGetNotReportedPages());
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_GATE:
-			pageQuestioningReport(QUESTIONING_BIT_GATE, 1); // HACK HACK HACK
+			pageQuestioningReport(QUESTIONING_BIT_GATE); // HACK HACK HACK
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_gate", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_TELEPORT_PARTS:
-			pageQuestioningReport(QUESTIONING_BIT_TELEPORT_PARTS, 1); // HACK HACK HACK
+			pageQuestioningReport(QUESTIONING_BIT_TELEPORT_PARTS); // HACK HACK HACK
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_teleport", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_AGENT:
-			pageQuestioningReport(QUESTIONING_BIT_AGENT, 1); // HACK HACK HACK
+			pageQuestioningReport(QUESTIONING_BIT_AGENT); // HACK HACK HACK
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_agent", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE:
