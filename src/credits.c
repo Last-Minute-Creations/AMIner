@@ -20,7 +20,7 @@ static const char *s_pCreditsLines[] = {
 	"Luc3k: sounds, music",
 	"KaiN: code",
 	"",
-	"Tests: afroholic7, CptPusheen, Koyot1222, kuba_slonka, SzulcBryggeri",
+	"Tests: afroholic7, CptPusheen, Koyot1222, kuba_slonka, Saberman, SzulcBryggeri",
 	"",
 	"Special thanks to: Rav.En, JakubH",
 	"and two little RKLE18 testers!"
