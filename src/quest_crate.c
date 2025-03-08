@@ -38,6 +38,19 @@ static void questCrateOnQuestioningEnd(
 	}
 }
 
+UBYTE questCrateTryUnlockSciCrateTexts(void) {
+	if(s_isScientistUnlocked && pageOfficeTryUnlockPersonSubpage(
+		FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE
+	)) {
+		pageOfficeTryUnlockPersonSubpage(
+			FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER
+		);
+		inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE, 0);
+		return 1;
+	}
+	return 0;
+}
+
 void questCrateReset(void) {
 	s_ubCrateCount = 0;
 	s_ubCratesSold = 0;
@@ -84,9 +97,7 @@ void questCrateAdd(void) {
 	}
 	else {
 		s_isFirstCrateFound = 1;
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE);
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER);
-		inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE, 0);
+		questCrateTryUnlockSciCrateTexts();
 
 		pageOfficeUnlockPerson(FACE_ID_AGENT);
 		pageQuestioningAddReporting(QUESTIONING_BIT_AGENT);
@@ -157,6 +168,9 @@ void questCrateProcessBase(void) {
 			inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME, 0);
 			hudShowMessage(FACE_ID_SCIENTIST, g_pMsgs[MSG_HUD_SCI_WELCOME]);
 			s_isScientistUnlocked = 1;
+			if(s_isFirstCrateFound) {
+				questCrateTryUnlockSciCrateTexts();
+			}
 		}
 	}
 }
