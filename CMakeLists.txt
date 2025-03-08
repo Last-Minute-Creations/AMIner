@@ -646,6 +646,7 @@ packDirectory(
 	TARGET ${GAME_EXECUTABLE}
 	SOURCE_DIR ${DATA_DIR}
 	COMPRESS DEST_FILE ${DATA_PAK_PATH}
+	REORDER_FILE ${RES_DIR}/pak_order.txt
 )
 endif()
 
