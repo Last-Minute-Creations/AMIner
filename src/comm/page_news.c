@@ -21,6 +21,7 @@ static const char *s_pCurrentChar;
 static WORD s_wDrawnTextEnd;
 static WORD s_wClearedBgEnd;
 static UBYTE s_isScrollDone;
+static tBitMap s_sBitmapTextDraw;
 
 static const char *s_pNewsFileNames[NEWS_KIND_COUNT] = {
 	[NEWS_KIND_ACCOLADES] = "accolades",
@@ -66,7 +67,6 @@ static void pageNewsFillScrollWithText(void) {
 static void pageNewsProcess(void) {
 	UBYTE ubSpeed = SCROLL_SPEED_SLOW; //commNavCheck(DIRECTION_FIRE) ? SCROLL_SPEED_FAST : SCROLL_SPEED_SLOW;
 
-
 	if(s_wDrawnTextEnd > 0) {
 		// Shift scroll contents right
 		tBitMap *pBitmap = s_pNewsTextBitmap->pBitMap;
@@ -89,17 +89,17 @@ static void pageNewsProcess(void) {
 		pageNewsFillScrollWithText();
 
 		blitRect(
-			commGetDisplayBuffer(),
+			&s_sBitmapTextDraw,
 			commGetOriginDisplay().uwX + 2,
 			commGetOriginDisplay().uwY + COMM_DISPLAY_HEIGHT - g_pFont->uwHeight - 4,
 			SCROLL_WIDTH_VISIBLE,
 			g_pFont->uwHeight, 10
 		);
 		fontDrawTextBitMap(
-			commGetDisplayBuffer(), s_pNewsTextBitmap,
+			&s_sBitmapTextDraw, s_pNewsTextBitmap,
 			commGetOriginDisplay().uwX + 2,
 			commGetOriginDisplay().uwY + COMM_DISPLAY_HEIGHT - g_pFont->uwHeight - 4,
-			COMM_DISPLAY_COLOR_TEXT, FONT_COOKIE
+			1, FONT_COOKIE
 		);
 	}
 	else {
@@ -154,5 +154,12 @@ void pageNewsCreate(tNewsKind eNewsKind) {
 	s_pCurrentChar = s_szScroll;
 	s_wDrawnTextEnd = SCROLL_WIDTH_VISIBLE;
 	s_wClearedBgEnd = SCROLL_WIDTH_BUFFER;
+
+	s_sBitmapTextDraw.BytesPerRow = commGetDisplayBuffer()->BytesPerRow;
+	s_sBitmapTextDraw.Rows = commGetDisplayBuffer()->Rows;
+	s_sBitmapTextDraw.Depth = 1;
+	s_sBitmapTextDraw.Flags = 0;
+	s_sBitmapTextDraw.Planes[0] = commGetDisplayBuffer()->Planes[2]; // set only bit 3 (bg is color 10, text is color 14)
+
 	logBlockEnd("pageNewsCreate()");
 }
