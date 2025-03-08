@@ -316,23 +316,21 @@ static void coreGsCreate(void) {
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 30);
 	hudCreate(pVpHud, g_pFont);
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 35);
-	dinoReset();
-	questGateReset();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 40);
 	audioMixerCreate();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 45);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 40);
 	assetsAudioCreate();
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 50);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 45);
 
-	tileReset(0, 1);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 55);
+	tileReset(0, GAME_MODE_CHALLENGE);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 50);
 
 	bobManagerCreate(
 		g_pMainBuffer->pScroll->pFront, g_pMainBuffer->pScroll->pBack,
 		s_pPristineBuffer, g_pMainBuffer->pScroll->uwBmAvailHeight
 	);
-	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 60);
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 55);
 	flipbookManagerCreate();
+	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 60);
 	baseUnlocksCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 65);
 	groundLayerCreate(s_pVpMain);
@@ -353,7 +351,6 @@ static void coreGsCreate(void) {
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 95);
 	bobReallocateBuffers();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 100);
-	systemUnuse();
 
 	blitterMutexLock();
 	blitRect(
@@ -369,6 +366,7 @@ static void coreGsCreate(void) {
 	);
 	blitterMutexUnlock();
 	fontDestroyTextBitMap(pTextBm);
+	systemUnuse();
 
 	while(
 		!keyUse(KEY_RETURN) && !keyUse(KEY_SPACE) &&
