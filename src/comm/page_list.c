@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "page_list.h"
-#include "page_office.h"
+#include <ace/utils/string.h>
+#include <comm/page_office.h>
 #include <comm/comm.h>
 #include <comm/page_office.h>
 #include <comm/page_msg.h>
@@ -11,6 +12,7 @@
 #include <comm/page_accounting.h>
 #include "gs_shop.h"
 #include "../defs.h"
+#include "../protests.h"
 
 #define PORTRAIT_X 0
 #define PORTRAIT_Y 0
@@ -74,4 +76,15 @@ void pageListCreate(tFaceId eFace, const tCommShopPage *pPages) {
 		pageListDrawPos(eListPage, s_bPosCount);
 		++s_bPosCount;
 	} while(eListPage != COMM_SHOP_PAGE_OFFICE_MAIN);
+
+	// HACK HACK HACK
+	if(eFace == FACE_ID_KRYSTYNA) {
+		char szMorale[40];
+		char *pEnd = stringCopy(g_pMsgs[MSG_COMM_PROTESTS_LABEL], szMorale);
+		*(pEnd++) = ':';
+		*(pEnd++) = ' ';
+		pEnd = stringCopy(g_pMsgs[MSG_COMM_PROTESTS_OK + protestsGetState()], pEnd);
+
+		commDrawText(0, COMM_DISPLAY_HEIGHT, szMorale, FONT_BOTTOM | FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+	}
 }
