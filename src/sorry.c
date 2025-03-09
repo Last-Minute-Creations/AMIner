@@ -59,7 +59,7 @@ logBlockBegin("logoGsCreate()");
 	);
 	fontDrawStr(
 		g_pFont, s_pBfr->pBack, 160, 128 + 32 + 12,
-		"Min. 2MB CHIP RAM, sorry Ci\x84 bardzo!",
+		"Min. 1MB CHIP RAM + 1MB RAM, sorry Ci\x84 bardzo!",
 		14, FONT_TOP | FONT_HCENTER | FONT_LAZY, pTextBuffer
 	);
 	fontDrawStr(

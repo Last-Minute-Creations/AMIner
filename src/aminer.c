@@ -29,7 +29,7 @@ void genericCreate(void) {
 	ptplayerSetMasterVolume(8);
 	g_pFont = fontCreateFromFd(GET_SUBFILE_PREFIX("uni54.fnt"));
 
-	if(memGetChipSize() < (1024+512) * 1024) {
+	if(memGetFreeChipSize() < 900 * 1024 || memGetFreeSize() < 1600 * 1024) {
 		statePush(g_pGameStateManager, &g_sStateSorry);
 	}
 	else {
