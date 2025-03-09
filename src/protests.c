@@ -79,8 +79,10 @@ void protestsProcess(void) {
 			case PROTEST_STATE_NONE:
 				if(lCash < PROTEST_THRESHOLD_WARNING) {
 					eNewState = PROTEST_STATE_WARNING;
-					pageOfficeTryUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_PROTEST_WARNING);
-					inboxPushBack(COMM_SHOP_PAGE_OFFICE_KRYSTYNA_PROTEST_WARNING, 1);
+					if(eNewState > s_eProtestState) {
+						pageOfficeTryUnlockPersonSubpage(FACE_ID_KRYSTYNA, COMM_SHOP_PAGE_OFFICE_KRYSTYNA_PROTEST_WARNING);
+						inboxPushBack(COMM_SHOP_PAGE_OFFICE_KRYSTYNA_PROTEST_WARNING, 1);
+					}
 				}
 				break;
 			case PROTEST_STATE_WARNING:
@@ -88,8 +90,10 @@ void protestsProcess(void) {
 					eNewState = PROTEST_STATE_PROTEST;
 					bobSetFrame(&s_sBgBobProtest.sBob, s_pOffsetProtest, 0);
 					backgroundBobResetCounter(&s_sBgBobProtest);
-					pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START);
-					inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START, 1);
+					if(eNewState > s_eProtestState) {
+						pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START);
+						inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START, 1);
+					}
 				}
 				else if(lCash > PROTEST_THRESHOLD_WARNING) {
 					eNewState = PROTEST_STATE_NONE;
@@ -102,8 +106,10 @@ void protestsProcess(void) {
 					eNewState = PROTEST_STATE_STRIKE;
 					bobSetFrame(&s_sBgBobProtest.sBob, s_pOffsetStrike, 0);
 					backgroundBobResetCounter(&s_sBgBobProtest);
-					pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE);
-					inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE, 1);
+					if(eNewState > s_eProtestState) {
+						pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE);
+						inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE, 1);
+					}
 				}
 				else if(lCash > PROTEST_THRESHOLD_PROTEST) {
 					eNewState = PROTEST_STATE_WARNING;
@@ -112,7 +118,9 @@ void protestsProcess(void) {
 			case PROTEST_STATE_STRIKE:
 				if(lCash < PROTEST_THRESHOLD_RIOTS) {
 					eNewState = PROTEST_STATE_RIOTS;
-					inboxPushBack(COMM_SHOP_PAGE_NEWS_RIOTS, 1);
+					if(eNewState > s_eProtestState) {
+						inboxPushBack(COMM_SHOP_PAGE_NEWS_RIOTS, 1);
+					}
 				}
 				else if(lCash > PROTEST_THRESHOLD_STRIKE) {
 					eNewState = PROTEST_STATE_PROTEST;
