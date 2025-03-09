@@ -72,7 +72,11 @@ void pageBribeCreate(void) {
 		) * ubLineHeight;
 		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
-	else if(!planManagerGet()->isExtendedTimeByBribe) {
+	else if(planManagerGet()->isExtendedTimeByBribe) {
+		uwPosY += commDrawMultilineText(g_pMsgs[MSG_TRICKS_BRIBE_USED], 0, uwPosY) * ubLineHeight;
+		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
+	}
+	else {
 		sprintf(szBfr, g_pMsgs[MSG_TRICKS_BRIBE_PREMISE], 14);
 		uwPosY += commDrawMultilineText(szBfr,0, uwPosY) * ubLineHeight;
 		uwPosY += ubLineHeight / 2;
@@ -81,11 +85,14 @@ void pageBribeCreate(void) {
 		sprintf(szBfr, g_pMsgs[MSG_TRICKS_BRIBE_PRICE], s_uwBribeCost, '\x1F');
 		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
 
-		buttonInitAcceptDecline(g_pMsgs[MSG_COMM_ACCEPT], g_pMsgs[MSG_PAGE_BACK]);
-	}
-	else {
-		uwPosY += commDrawMultilineText(g_pMsgs[MSG_TRICKS_BRIBE_USED], 0, uwPosY) * ubLineHeight;
-		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
+		if(g_pVehicles[0].lCash < s_uwBribeCost) {
+			uwPosY += ubLineHeight;
+			uwPosY += commDrawMultilineText(g_pMsgs[MSG_TRICKS_BRIBE_NO_CASH], 0, uwPosY) * ubLineHeight;
+			buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
+		}
+		else {
+			buttonInitAcceptDecline(g_pMsgs[MSG_COMM_ACCEPT], g_pMsgs[MSG_PAGE_BACK]);
+		}
 	}
 
 	buttonDrawAll(commGetDisplayBuffer());

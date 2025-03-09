@@ -159,6 +159,7 @@ const char * s_pLangDom[] = {
 	[MSG_TRICKS_ACCOUNTING_DETAILS] = "tricks.accountingDetails",
 	[MSG_TRICKS_BRIBE_PREMISE] = "tricks.bribePremise",
 	[MSG_TRICKS_BRIBE_DETAILS] = "tricks.bribeDetails",
+	[MSG_TRICKS_BRIBE_NO_CASH] = "tricks.bribeNoCash",
 	[MSG_TRICKS_BRIBE_USED] = "tricks.bribeUsed",
 	[MSG_TRICKS_BRIBE_PRICE] = "tricks.bribePrice",
 	// Challenge

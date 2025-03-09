@@ -203,8 +203,9 @@
 		],
 		"accountingPremise": "Zleć Kreatywną Księgowość aby natychmiast wykonać plan.",
 		"accountingDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
-		"bribePremise": "Wręćż łapówkę aby zyskać %hhu dni na realizację planu.",
+		"bribePremise": "Wręcz łapówkę aby zyskać %hhu dni na realizację planu.",
 		"bribeDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
+		"bribeNoCash": "Brak pieniędzy na łapówkę.",
 		"bribeUsed": "Towarzyszu, nie teraz... Już Ci pomogłem przy obecnym planie!",
 		"bribePrice": "Będzie Cię to kosztować %hu%c."
 	},
