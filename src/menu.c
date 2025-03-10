@@ -734,17 +734,19 @@ static void menuScoreGsDestroy(void) {
 	menuInitialDraw(); // g_pMainBuffer->pScroll->pFront
 }
 
-#define ACHIEVEMENT_ICON_SIZE 24
-#define ACHIEVEMENT_SELECTION_BORDER_WIDTH 2
-#define ACHIEVEMENT_BORDERED_ICON_SIZE (ACHIEVEMENT_ICON_SIZE + 2 * ACHIEVEMENT_SELECTION_BORDER_WIDTH)
-#define ACHIEVEMENTS_PER_ROW (COMM_DISPLAY_WIDTH / ACHIEVEMENT_BORDERED_ICON_SIZE)
+#define ACHIEVEMENT_ICON_WIDTH 24
+#define ACHIEVEMENT_ICON_HEIGHT 22
+#define ACHIEVEMENT_SELECTION_BORDER_SIZE 2
+#define ACHIEVEMENT_BORDERED_ICON_WIDTH (ACHIEVEMENT_ICON_WIDTH + 2 * ACHIEVEMENT_SELECTION_BORDER_SIZE)
+#define ACHIEVEMENT_BORDERED_ICON_HEIGHT (ACHIEVEMENT_ICON_HEIGHT + 2 * ACHIEVEMENT_SELECTION_BORDER_SIZE)
+#define ACHIEVEMENTS_PER_ROW (COMM_DISPLAY_WIDTH / ACHIEVEMENT_BORDERED_ICON_WIDTH)
 
 static tBitMap *s_pAchievementIcons;
 static UBYTE s_ubSelectedAchievement;
 
 static void menuDrawAchievementIcon(UBYTE ubIndex) {
-	UWORD uwX = (ubIndex % ACHIEVEMENTS_PER_ROW) * ACHIEVEMENT_BORDERED_ICON_SIZE;
-	UWORD uwY = (ubIndex / ACHIEVEMENTS_PER_ROW) * ACHIEVEMENT_BORDERED_ICON_SIZE;
+	UWORD uwX = (ubIndex % ACHIEVEMENTS_PER_ROW) * ACHIEVEMENT_BORDERED_ICON_WIDTH;
+	UWORD uwY = (ubIndex / ACHIEVEMENTS_PER_ROW) * ACHIEVEMENT_BORDERED_ICON_HEIGHT;
 	tUwCoordYX sOrigin = commGetOriginDisplay();
 
 	if(ubIndex == s_ubSelectedAchievement) {
@@ -756,36 +758,36 @@ static void menuDrawAchievementIcon(UBYTE ubIndex) {
 		);
 		blitCopy(
 			g_pCommBmSelection, 9, 7,
-			commGetDisplayBuffer(), sOrigin.uwX + uwX + ACHIEVEMENT_BORDERED_ICON_SIZE - 7,
+			commGetDisplayBuffer(), sOrigin.uwX + uwX + ACHIEVEMENT_BORDERED_ICON_WIDTH - 7,
 			sOrigin.uwY + uwY,
 			7, 7, MINTERM_COOKIE
 		);
 		blitCopy(
 			g_pCommBmSelection, 9, 14,
 			commGetDisplayBuffer(), sOrigin.uwX + uwX,
-			sOrigin.uwY + uwY + ACHIEVEMENT_BORDERED_ICON_SIZE - 7,
+			sOrigin.uwY + uwY + ACHIEVEMENT_BORDERED_ICON_HEIGHT - 7,
 			7, 7, MINTERM_COOKIE
 		);
 		blitCopy(
 			g_pCommBmSelection, 9, 21,
-			commGetDisplayBuffer(), sOrigin.uwX + uwX + ACHIEVEMENT_BORDERED_ICON_SIZE - 7,
-			sOrigin.uwY + uwY + ACHIEVEMENT_BORDERED_ICON_SIZE - 7,
+			commGetDisplayBuffer(), sOrigin.uwX + uwX + ACHIEVEMENT_BORDERED_ICON_WIDTH - 7,
+			sOrigin.uwY + uwY + ACHIEVEMENT_BORDERED_ICON_HEIGHT - 7,
 			7, 7, MINTERM_COOKIE
 		);
 	}
 	else {
-		commErase(uwX, uwY, ACHIEVEMENT_BORDERED_ICON_SIZE, ACHIEVEMENT_BORDERED_ICON_SIZE);
+		commErase(uwX, uwY, ACHIEVEMENT_BORDERED_ICON_WIDTH, ACHIEVEMENT_BORDERED_ICON_HEIGHT);
 	}
 
 	blitCopy(
-		s_pAchievementIcons, achievementIsUnlocked(ubIndex) ? ACHIEVEMENT_ICON_SIZE : 0, 0,
+		s_pAchievementIcons, achievementIsUnlocked(ubIndex) ? ACHIEVEMENT_ICON_WIDTH : 0, 0,
 		commGetDisplayBuffer(), sOrigin.uwX + uwX + 2, sOrigin.uwY + uwY + 2,
-		ACHIEVEMENT_ICON_SIZE, ACHIEVEMENT_ICON_SIZE, MINTERM_COOKIE
+		ACHIEVEMENT_ICON_WIDTH, ACHIEVEMENT_ICON_HEIGHT, MINTERM_COOKIE
 	);
 }
 
 static void menuDrawCurrentAchievementDescription(void) {
-	UWORD uwDescriptionY = 3 * ACHIEVEMENT_BORDERED_ICON_SIZE;
+	UWORD uwDescriptionY = 3 * ACHIEVEMENT_BORDERED_ICON_HEIGHT;
 	commErase(0, uwDescriptionY, COMM_DISPLAY_WIDTH, commGetLineHeight() * 3 - 2);
 	commDrawTitle(0, uwDescriptionY, g_pMsgs[MSG_ACHIEVEMENT_TITLE_LAST_RIGHTEOUS + s_ubSelectedAchievement]);
 	uwDescriptionY += commGetLineHeight() - 2;
