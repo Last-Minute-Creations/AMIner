@@ -274,6 +274,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_PRISONER_RADIO_1] = "officePages.prisonerRadio1",
 	[MSG_PAGE_PRISONER_RADIO_2] = "officePages.prisonerRadio2",
 	[MSG_PAGE_PRISONER_RADIO_3] = "officePages.prisonerRadio3",
+	[MSG_PAGE_AGENT_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_AGENT_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_AGENT_SCIENTISTS] = "officePages.agentSci",
 	[MSG_PAGE_AGENT_SELL_CRATE] = "officePages.agentSellCrates",
