@@ -26,6 +26,7 @@
 #include "protests.h"
 #include <comm/page_workshop.h>
 
+#define RESTOCK_RESULT_ONLY_MINERALS 0x7FFF
 #define VEHICLE_BODY_HEIGHT 20
 #define VEHICLE_DESTRUCTION_FRAMES 4
 #define VEHICLE_TOOL_ANIM_FRAMES 2
@@ -691,12 +692,16 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 		pVehicle->eLastVisitedTeleportableBase = eBaseId;
 	}
 
-	pVehicle->uwCargoCurr = 0;
-	UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
+	UBYTE isRestockedMinerals = 0;
 	if(
 		g_eGameMode == GAME_MODE_CHALLENGE || eBaseId == BASE_ID_GROUND ||
 		inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, eBaseId)
 	) {
+		if(pVehicle->uwCargoCurr) {
+			isRestockedMinerals = 1;
+			pVehicle->uwCargoCurr = 0;
+		}
+		UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
 		hudSetCargo(pVehicle->ubPlayerIdx, 0, uwCargoMax);
 		for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
 			warehouseSetStock(i, warehouseGetStock(i) + pVehicle->pStock[i]);
@@ -747,6 +752,10 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 		wCashDelta -= uwRestockCost;
 		LONG *pCash = (g_eGameMode == GAME_MODE_CHALLENGE) ? &pVehicle->lCash : &g_pVehicles[0].lCash;
 		*pCash += wCashDelta;
+	}
+
+	if(!wCashDelta && isRestockedMinerals) {
+		wCashDelta = RESTOCK_RESULT_ONLY_MINERALS;
 	}
 	return wCashDelta;
 }
@@ -1200,11 +1209,16 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		// If restocked then play audio & display score
 		WORD wDeltaScore = vehicleRestock(pVehicle);
 		if(wDeltaScore) {
+			if(wDeltaScore == RESTOCK_RESULT_ONLY_MINERALS) {
+				textBobSetText(&pVehicle->sTextBob, "%s", g_pMsgs[MSG_MISC_RESTOCK]);
+			}
+			else {
+				textBobSetText(
+					&pVehicle->sTextBob, "%s %hd\x1F",
+					g_pMsgs[MSG_MISC_RESTOCK], wDeltaScore
+				);
+			}
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
-			textBobSetText(
-				&pVehicle->sTextBob, "%s %hd\x1F",
-				g_pMsgs[MSG_MISC_RESTOCK], wDeltaScore
-			);
 			textBobSetColor(&pVehicle->sTextBob, COLOR_GOLD);
 			textBobSetPos(
 				&pVehicle->sTextBob,
