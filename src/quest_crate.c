@@ -97,14 +97,17 @@ void questCrateAdd(void) {
 	}
 	else {
 		s_isFirstCrateFound = 1;
-		questCrateTryUnlockSciCrateTexts();
-
 		pageOfficeUnlockPerson(FACE_ID_AGENT);
 		pageQuestioningAddReporting(QUESTIONING_BIT_AGENT);
+		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_DOSSIER);
 		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_WELCOME);
-		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_SCIENTISTS);
 		pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_SELL_CRATES);
 		inboxPushBack(COMM_SHOP_PAGE_OFFICE_AGENT_WELCOME, 0);
+
+		questCrateTryUnlockSciCrateTexts();
+		if(pageOfficeHasPerson(FACE_ID_SCIENTIST) && pageOfficeHasPerson(FACE_ID_AGENT)) {
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_SCIENTISTS);
+		}
 	}
 }
 
@@ -170,6 +173,9 @@ void questCrateProcessBase(void) {
 			s_isScientistUnlocked = 1;
 			if(s_isFirstCrateFound) {
 				questCrateTryUnlockSciCrateTexts();
+				if(pageOfficeHasPerson(FACE_ID_SCIENTIST) && pageOfficeHasPerson(FACE_ID_AGENT)) {
+					pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_SCIENTISTS);
+				}
 			}
 		}
 	}
