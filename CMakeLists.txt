@@ -618,6 +618,7 @@ mergeMods(
 		${RES_DIR}/music/czolowka.mod
 		${RES_DIR}/music/coal-prelude.mod
 		${RES_DIR}/music/dumka.mod
+		${RES_DIR}/music/firefighter.mod
 		${RES_DIR}/music/inzynier.mod
 		${RES_DIR}/music/piesnoatari.mod
 		${RES_DIR}/music/popescu.mod
@@ -638,6 +639,7 @@ mergeMods(
 		${DATA_DIR}/music/game7.mod
 		${DATA_DIR}/music/game8.mod
 		${DATA_DIR}/music/game9.mod
+		${DATA_DIR}/music/game10.mod
 	SAMPLE_PACK ${DATA_DIR}/music/samples.samplepack
 )
 

@@ -127,7 +127,7 @@ static void vehicleCreate(tVehicle *pVehicle, UBYTE ubIdx) {
 
 	vehicleReset(pVehicle);
 
-	textBobCreate(&pVehicle->sTextBob, g_pFont, "Checkpoint! +1000\x1F");
+	textBobCreate(&pVehicle->sTextBob, g_pFont, "Teleportacja: +1000\x1F");
 	logBlockEnd("vehicleCreate()");
 }
 

@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-#define ASSETS_GAME_MOD_COUNT 10
+#define ASSETS_GAME_MOD_COUNT 11
 
 extern tPtplayerSfx *g_pSfxDrill;
 extern tPtplayerSfx *g_pSfxOre;
