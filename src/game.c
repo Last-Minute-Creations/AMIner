@@ -47,6 +47,8 @@
 #include "base_unlocks.h"
 #include "achievement.h"
 
+#define GAME_MUSIC_INTERVAL 100
+
 #define CAMERA_SPEED 4
 #define CAMERA_SHAKE_AMPLITUDE 2
 
@@ -118,6 +120,9 @@ static UWORD s_uwMaxTileY;
 static tModeMenu s_pModeMenus[2];
 static tGateCutsceneStep s_eGateCutsceneStep;
 static UBYTE s_isCameraShake;
+static UBYTE s_ubMusicCooldown;
+static UBYTE s_isMusicEnabled;
+static UBYTE s_isHandlingPause;
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -422,6 +427,7 @@ static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 
 static void gameProcessHotkeys(void) {
   if(keyUse(KEY_ESCAPE) || keyUse(KEY_P)) {
+		s_isHandlingPause = 1;
 		stateChange(g_pGameStateManager, &g_sStatePause);
 		return;
   }
@@ -527,6 +533,16 @@ static UBYTE s_ubGateCutsceneColorIndex;
 static UBYTE s_ubGateCutsceneItemIndex;
 static UBYTE s_ubGateCutsceneUpdateCount;
 
+static void gameSetMusic(UBYTE isEnabled) {
+	s_isMusicEnabled = isEnabled;
+	if(!isEnabled) {
+		ptplayerEnableMusic(0);
+	}
+	else if(!s_ubMusicCooldown) {
+		ptplayerEnableMusic(1);
+	}
+}
+
 static UBYTE gameProcessGateCutscene(void) {
 	if(s_eGateCutsceneStep == GATE_CUTSCENE_STEP_OFF) {
 		return 0;
@@ -587,7 +603,7 @@ static UBYTE gameProcessGateCutscene(void) {
 			// TODO: disable movement
 			// TODO: disable context menu
 			// TODO: disable entering pause
-			ptplayerEnableMusic(0);
+			gameSetMusic(0);
 			break;
 		case GATE_CUTSCENE_OPEN_STEP_WAIT_FOR_SHAKE:
 			if(++s_ubGateCutsceneCooldown > 30) {
@@ -819,6 +835,7 @@ static UBYTE gameProcessGateCutscene(void) {
 			break;
 		case GATE_CUTSCENE_OPEN_STEP_FADE_IN:
 			if(fadeGetState() == FADE_STATE_IN) {
+				gameSetMusic(1);
 				++s_eGateCutsceneStep;
 				if(dinoIsQuestStarted()) {
 					inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED, 0);
@@ -839,7 +856,7 @@ static UBYTE gameProcessGateCutscene(void) {
 			s_ubGateCutsceneCooldown = 0;
 			s_ubGateCutsceneItemIndex = 0;
 			++s_eGateCutsceneStep;
-			ptplayerEnableMusic(0);
+			gameSetMusic(0);
 			break;
 		case GATE_CUTSCENE_DESTROY_STEP_EXPLODING:
 		case GATE_CUTSCENE_DESTROY_STEP_FADE_OUT:
@@ -895,7 +912,7 @@ static UBYTE gameProcessGateCutscene(void) {
 			break;
 
 		case GATE_CUTSCENE_DESTROY_STEP_END:
-			ptplayerEnableMusic(1);
+			gameSetMusic(1);
 			[[fallthrough]];
 		case GATE_CUTSCENE_OPEN_STEP_OPEN_END:
 		case GATE_CUTSCENE_STEP_OFF:
@@ -964,8 +981,8 @@ static void onSongEnd(void) {
 	if(++s_ubCurrentMod >= ASSETS_GAME_MOD_COUNT) {
 		s_ubCurrentMod = 0;
 	}
-	ptplayerLoadMod(g_pGameMods[s_ubCurrentMod], g_pModSampleData, 0);
-	ptplayerEnableMusic(1);
+	logWrite("Song ended, next: %hhu", s_ubCurrentMod);
+	s_ubMusicCooldown = GAME_MUSIC_INTERVAL;
 }
 
 static void gameChallengeResult(void) {
@@ -1369,6 +1386,7 @@ UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary) {
 }
 
 void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
+	s_isHandlingPause = 0;
 	s_ubChallengeCamCnt = 0;
 	g_eGameMode = eGameMode;
 	s_pPlayerSteers[0] = sSteerP1;
@@ -1395,7 +1413,7 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	gameResetModePreset(1);
 	s_ulGameTime = 0;
 	s_uwMaxTileY = 0;
-	s_ubCurrentMod = ASSETS_GAME_MOD_COUNT;
+	s_ubCurrentMod = 0;
 	s_ubRebukes = 0;
 	s_ubAccolades = 0;
 	s_ubAccoladesFract = 0;
@@ -1457,8 +1475,17 @@ void gameTriggerCutscene(tGameCutscene eCutscene) {
 //-------------------------------------------------------------------- GAMESTATE
 
 static void gameGsCreate(void) {
-	ptplayerConfigureSongRepeat(0, onSongEnd);
-	onSongEnd();
+	if(s_isHandlingPause) {
+		ptplayerEnableMusic(1);
+		s_isHandlingPause = 0;
+	}
+	else {
+		ptplayerConfigureSongRepeat(0, onSongEnd);
+		s_isMusicEnabled = 1;
+		s_ubMusicCooldown = 0;
+		ptplayerLoadMod(g_pGameMods[s_ubCurrentMod], g_pModSampleData, 0);
+		ptplayerEnableMusic(1);
+	}
 }
 
 static void gameGsLoop(void) {
@@ -1509,6 +1536,13 @@ static void gameGsLoop(void) {
 	}
 	coreProcessAfterBobs();
 
+	if(s_ubMusicCooldown && s_isMusicEnabled) {
+		if(--s_ubMusicCooldown == 0) {
+			ptplayerLoadMod(g_pGameMods[s_ubCurrentMod], g_pModSampleData, 0);
+			ptplayerEnableMusic(1);
+		}
+	}
+
 	if(
 		g_pVehicles[0].isChallengeEnded &&
 		(!g_is2pPlaying || g_pVehicles[1].isChallengeEnded)
@@ -1525,7 +1559,7 @@ static void gameGsLoop(void) {
 }
 
 static void gameGsDestroy(void) {
-	ptplayerStop();
+	ptplayerEnableMusic(0);
 }
 
 tState g_sStateGame = {
