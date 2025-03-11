@@ -12,6 +12,7 @@
 #include <ace/utils/string.h>
 #include <ace/contrib/managers/audio_mixer.h>
 #include <comm/gs_shop.h>
+#include <comm/gs_msg.h>
 #include <comm/page_questioning.h>
 #include <comm/page_office.h>
 #include <comm/inbox.h>
@@ -572,7 +573,8 @@ static UBYTE gameProcessGateCutscene(void) {
 					++s_eGateCutsceneStep;
 				}
 				else {
-					// TODO: commissar text before cutscene?
+					gsMsgInit(FACE_ID_KOMISARZ, "komisarz_gate_opening", g_pMsgs[MSG_KOMISARZ_GATE_OPENING]);
+					statePush(g_pGameStateManager, &g_sStateMsg);
 					gameTriggerCutscene(GAME_CUTSCENE_GATE_OPEN);
 					// Don't push step here bacause cutscene trigger changes it already
 				}

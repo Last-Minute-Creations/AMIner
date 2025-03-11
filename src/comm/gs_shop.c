@@ -352,6 +352,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE:
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_questioning_accolade", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_GATE_OPENING:
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_gate_opening", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_DOSSIER:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_dossier", onBack);
 			break;

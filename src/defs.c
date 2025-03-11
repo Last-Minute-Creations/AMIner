@@ -262,6 +262,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_KOMISARZ_REPORTING_AGENT] = "officePages.komisarzReportAgent",
 	[MSG_PAGE_KOMISARZ_ARCH_ACCOLADE] = "officePages.komisarzArchAccolade",
 	[MSG_PAGE_KOMISARZ_QUESTIONING_ACCOLADE] = "officePages.questioningAccolade",
+	[MSG_KOMISARZ_GATE_OPENING] = "officePages.gateOpening",
 	[MSG_PAGE_ARCH_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_ARCH_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_ARCH_PLAN_FAIL] = "officePages.archPlanFail",
