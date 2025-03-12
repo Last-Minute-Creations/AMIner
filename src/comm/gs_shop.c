@@ -367,8 +367,11 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_ARCH_PLAN_FAIL:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_plan_fail", onBack);
 			break;
-		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_opened", onBack);
+		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED_DINO_INCOMPLETE:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_opened_dino_incomplete", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED_DINO_COMPLETE:
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_opened_dino_complete", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_DESTROYED:
 			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_destroyed", onBack);

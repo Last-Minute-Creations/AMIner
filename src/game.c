@@ -838,7 +838,12 @@ static UBYTE gameProcessGateCutscene(void) {
 				gameSetMusic(1);
 				++s_eGateCutsceneStep;
 				if(dinoIsQuestStarted()) {
-					inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED, 0);
+					if(dinoIsAllFound()) {
+						inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED_DINO_COMPLETE, 0);
+					}
+					else {
+						inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED_DINO_INCOMPLETE, 0);
+					}
 				}
 				tCommShopPage ePage = (
 					pageQuestioningIsReported(QUESTIONING_BIT_GATE) ?
