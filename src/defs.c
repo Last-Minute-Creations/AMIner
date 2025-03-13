@@ -280,6 +280,7 @@ const char * s_pLangDom[] = {
 	[MSG_PAGE_AGENT_SCIENTISTS] = "officePages.agentSci",
 	[MSG_PAGE_AGENT_SELL_CRATE] = "officePages.agentSellCrates",
 	[MSG_PAGE_AGENT_ESCAPE] = "officePages.commonEscape",
+	[MSG_PAGE_AGENT_EPILOGUE] = "officePages.commonEpilogue",
 	[MSG_PAGE_SCIENTIST_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_SCIENTIST_FIRST_CRATE] = "officePages.sciFirstCrate",
 	[MSG_PAGE_SCIENTIST_CRATE_TELEPORTER] = "officePages.sciCrateTeleporter",

@@ -244,7 +244,7 @@
 		"give": "Przekaż skrzynię",
 		"sell": "Sprzedaj skrzynię",
 		"use": "Wykorzystaj skrzynie",
-		"remaining": "Pozostałe skrzynie: %hhu"
+		"remaining": "Posiadane skrzynie: %hhu"
 	},
 	"bonus": {
 		"complete": "Poziom ukończony!",
@@ -285,6 +285,7 @@
 		"commonDossier": "Dossier",
 		"commonGateDestroyed": "Zniszczenie portalu",
 		"commonEscape": "Ucieczka na Zachód",
+		"commonEpilogue": "Epilog",
 		"commonBack": "Powrót",
 		"listMietek": "Mietek",
 		"listKrystyna": "Krystyna",

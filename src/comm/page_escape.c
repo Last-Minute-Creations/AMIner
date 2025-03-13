@@ -38,7 +38,7 @@ static void pageEscapeProcess(void) {
 
 					heatTryIncrease(ubHeat);
 					if(heatTryPassCheck()) {
-						commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_AGENT);
+						commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_OFFICE_AGENT_EPILOGUE);
 					}
 					else {
 						commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_NEWS_ESCAPE_FAIL);

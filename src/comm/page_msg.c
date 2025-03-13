@@ -88,10 +88,20 @@ static void commMsgDrawCurrentPage(void) {
 	UWORD uwLineY = 0;
 
 	if(s_ubCurrPage == 0) {
-		commDrawFaceAt(s_eFace, 0, 0);
-		commDrawTitle(48, 0, g_pMsgs[MSG_PAGE_LIST_MIETEK + s_eFace]);
-		if(!stringIsEmpty(s_szTitle)) {
-			commDrawText(48, ubLineHeight, s_szTitle, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+		if(s_eFace != FACE_ID_COUNT) {
+			commDrawFaceAt(s_eFace, 0, 0);
+			commDrawTitle(48, 0, g_pMsgs[MSG_PAGE_LIST_MIETEK + s_eFace]);
+			if(!stringIsEmpty(s_szTitle)) {
+				commDrawText(48, ubLineHeight, s_szTitle, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+			}
+		}
+		else {
+			if(!stringIsEmpty(s_szTitle)) {
+				commDrawText(
+					(COMM_DISPLAY_WIDTH - fontMeasureText(g_pFont, s_szTitle).uwX) / 2,
+					ubLineHeight, s_szTitle, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT
+				);
+			}
 		}
 		uwLineY = LINES_OCCUPIED_BY_FACE * ubLineHeight;
 		ubLinesPerPage -= LINES_OCCUPIED_BY_FACE;

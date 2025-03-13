@@ -424,6 +424,10 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE:
 			pageEscapeCreate(PAGE_ESCAPE_SCENARIO_AGENT);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_AGENT_EPILOGUE:
+			achievementUnlock(ACHIEVEMENT_ESCAPE);
+			pageMsgCreate(FACE_ID_COUNT, szTitle, "agent_epilogue", onBackFromEpilogueText);
+			break;
 
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_welcome", onBack);
@@ -484,10 +488,6 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_NEWS_GATE_RED:
 			achievementUnlock(ACHIEVEMENT_BATTLE_OF_CENTURY);
 			pageNewsCreate(NEWS_KIND_GATE_RED);
-			break;
-		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_AGENT:
-			achievementUnlock(ACHIEVEMENT_ESCAPE);
-			pageNewsCreate(NEWS_KIND_ESCAPE_AGENT);
 			break;
 		case COMM_SHOP_PAGE_NEWS_ESCAPE_FAIL:
 			pageNewsCreate(NEWS_KIND_ESCAPE_FAIL);
