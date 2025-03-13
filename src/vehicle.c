@@ -252,10 +252,11 @@ void vehicleSetPos(tVehicle *pVehicle, UWORD uwX, UWORD uwY) {
 	pVehicle->ubSmokeAnimFrame = 0;
 	pVehicle->ubSmokeAnimCnt = 0;
 
-	pVehicle->sBobBody.sPos.ulYX = 0;
 
 	pVehicle->fX = fix16_from_int(uwX);
 	pVehicle->fY = fix16_from_int(uwY);
+	pVehicle->sBobBody.sPos.uwX = fix16_to_int(pVehicle->fX);
+	pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 	pVehicle->fDx = 0;
 	pVehicle->fDy = 0;
 
@@ -329,7 +330,7 @@ static void vehicleCrash(tVehicle *pVehicle) {
 	pVehicle->sBobSmoke.sPos.uwX = fix16_to_int(pVehicle->fX);
 
 	flipbookAdd(
-		pVehicle->sBobBody.sPos.uwX, pVehicle->sBobBody.sPos.uwY,
+		pVehicle->sBobWreck.sPos.uwX, pVehicle->sBobWreck.sPos.uwY,
 		vehicleOnExplodePeak, 0, (void*)(ULONG)(pVehicle->ubPlayerIdx), FLIPBOOK_KIND_BOOM
 	);
 	vehicleSetState(pVehicle, VEHICLE_STATE_EXPLODING);
@@ -1513,7 +1514,9 @@ uint8_t vehiclesAreClose(void) {
 
 static void vehicleOnTeleportInEnd(void *pData) {
 	tVehicle *pVehicle = pData;
-	vehicleSetState(pVehicle, VEHICLE_STATE_MOVING);
+	if(pVehicle->ubVehicleState == VEHICLE_STATE_TELEPORTING_VISIBLE) {
+		vehicleSetState(pVehicle, VEHICLE_STATE_MOVING);
+	}
 }
 
 static void vehicleOnTeleportInPeak(void *pData) {
