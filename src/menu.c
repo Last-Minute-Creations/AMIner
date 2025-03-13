@@ -87,9 +87,11 @@ char **g_pMenuEnumPlayerCount;
 char **	g_pMenuEnumVolume;
 
 static void menuEnableAtari(void) {
-	if(s_ubIndexAtari != INDEX_ATARI_INVALID && g_sSettings.isAtariHidden) {
+	if(g_sSettings.isAtariHidden) {
 		g_sSettings.isAtariHidden = 0;
-		menuListSetPosHidden(s_ubIndexAtari, 0); // TODO: find option
+		if(s_ubIndexAtari != INDEX_ATARI_INVALID) {
+			menuListSetPosHidden(s_ubIndexAtari, 0); // TODO: find option
+		}
 		audioMixerPlaySfx(s_pSfxAtari, SFX_CHANNEL_ATARI, 1, 0);
 	}
 }
