@@ -41,7 +41,7 @@ static void pageBribeProcess(void) {
 						planAddDays(14, 1);
 					}
 					else {
-						gameAddRebuke();
+						gameAddRebuke(REBUKE_BRIBE);
 					}
 				}
 			}

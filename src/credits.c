@@ -9,10 +9,7 @@
 #include "aminer.h"
 #include "core.h"
 
-#define LINES_PER_PAGE 2
-#define STRINGS_PER_LINE 6
-
-static const char *s_pCreditsLines[] = {
+static const char * const s_pCreditsLines[] = {
 	"Aminer by Last Minute Creations",
 	"lastminutecreations.itch.io/aminer",
 	"",

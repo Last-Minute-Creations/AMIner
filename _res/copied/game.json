@@ -42,7 +42,6 @@
 	"extraPlanMoney": 50,
 	"plansPerAccolade": 10,
 	"accoladesInMainStory": 5,
-	"rebukesInMainStory": 3,
 	"planIncreaseRatioSingleplayer": 0.25,
 	"planIncreaseRatioMultiplayer": 0.5
 }

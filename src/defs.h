@@ -282,7 +282,6 @@ extern LONG g_lInitialCash;
 extern UBYTE g_ubUpgradeLevels;
 extern UBYTE g_ubPlansPerAccolade;
 extern UBYTE g_ubAccoladesInMainStory;
-extern UBYTE g_ubRebukesInMainStory;
 extern UBYTE g_ubDrillingCost;
 extern UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 extern fix16_t g_fPlanIncreaseRatioSingleplayer;

@@ -58,6 +58,7 @@
 #define SFX_PRIORITY_GATE 10
 #define SFX_CHANNEL_RUNE 2
 #define SFX_PRIORITY_RUNE 5
+#define REBUKES_MAX 3
 
 //------------------------------------------------------------------------ TYPES
 
@@ -112,7 +113,7 @@ static tSteer s_pPlayerSteers[2];
 static tCameraType s_eCameraType = CAMERA_TYPE_P1;
 static UBYTE s_ubChallengeCamCnt;
 static tVPort *s_pVpMain;
-static UBYTE s_ubRebukes, s_ubAccolades, s_ubAccoladesFract;
+static UBYTE s_ubRebukeCount, s_ubAccolades, s_ubAccoladesFract;
 static WORD s_wLastReminder;
 static UBYTE s_ubCurrentMod;
 static ULONG s_ulGameTime;
@@ -123,6 +124,7 @@ static UBYTE s_isCameraShake;
 static UBYTE s_ubMusicCooldown;
 static UBYTE s_isMusicEnabled;
 static UBYTE s_isHandlingPause;
+static UBYTE s_pRebukes[REBUKES_MAX];
 
 //------------------------------------------------------------------ PUBLIC VARS
 
@@ -904,9 +906,9 @@ static UBYTE gameProcessGateCutscene(void) {
 					pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_GATE_DESTROYED);
 					inboxPushBack(COMM_SHOP_PAGE_OFFICE_PRISONER_GATE_DESTROYED, 1);
 				}
-				if(pageOfficeHasPerson(FACE_ID_ARCH) && !pageQuestioningIsReported(QUESTIONING_BIT_GATE)) {
+				if(pageOfficeHasPerson(FACE_ID_ARCH)) {
 					inboxPushBack(COMM_SHOP_PAGE_OFFICE_ARCH_GATE_DESTROYED, 1);
-					gameAddRebuke();
+					gameAddRebuke(REBUKE_GATE_DESTROYED);
 				}
 
 				if(inboxGetState() == INBOX_STATE_URGENT) {
@@ -1059,7 +1061,7 @@ static void gameProcessPlan(void) {
 			}
 			else {
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
-				gameAddRebuke();
+				gameAddRebuke(REBUKE_PLAN_1);
 				planFailDeadline();
 			}
 		}
@@ -1084,7 +1086,7 @@ static void gameSaveSummary(tFile *pFile) {
 		.ubAccolades = s_ubAccolades,
 		.ubHeatPercent = heatGetPercent(),
 		.ubPlanIndex = planManagerGet()->ubCurrentPlanIndex,
-		.ubRebukes = s_ubRebukes,
+		.ubRebukes = s_ubRebukeCount,
 		.ulGameTime = s_ulGameTime,
 		.uwMaxDepth = s_uwMaxTileY,
 	};
@@ -1112,7 +1114,8 @@ static void gameSave(tFile *pFile) {
 	fileWrite(pFile, &s_eCameraType, sizeof(s_eCameraType));
 	fileWrite(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
 
-	fileWrite(pFile, &s_ubRebukes, sizeof(s_ubRebukes));
+	fileWrite(pFile, &s_ubRebukeCount, sizeof(s_ubRebukeCount));
+	fileWrite(pFile, s_pRebukes, sizeof(s_pRebukes));
 	fileWrite(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
 	fileWrite(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
 	fileWrite(pFile, &s_wLastReminder, sizeof(s_wLastReminder));
@@ -1228,28 +1231,40 @@ void gameAddAccolade(void) {
 	}
 }
 
-void gameAddRebuke(void) {
-	if(s_ubRebukes < g_ubRebukesInMainStory) {
-		++s_ubRebukes;
+void gameAddRebuke(tRebukeKind eRebuke) {
+	if(s_ubRebukeCount >= REBUKES_MAX) {
+		return;
 	}
-	tCommShopPage ePage = CLAMP(
-		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1 + s_ubRebukes - 1,
-		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1,
-		COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3
-	);
 
-	// Skip duplicate inbox stuff if last rebuke pending + vehicle crashed
+	if(s_ubRebukeCount == REBUKES_MAX - 1) {
+		eRebuke = REBUKE_FINAL;
+	}
+	else if(
+		eRebuke == REBUKE_PLAN_1 &&
+		(s_pRebukes[0] == REBUKE_PLAN_1 || s_pRebukes[1] == REBUKE_PLAN_2)
+	) {
+		eRebuke = REBUKE_PLAN_2;
+	}
+	s_pRebukes[s_ubRebukeCount] = eRebuke;
+
+	tCommShopPage ePage = COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1 + s_ubRebukeCount;
 	if(pageOfficeTryUnlockPersonSubpage(FACE_ID_KOMISARZ, ePage)) {
 		inboxPushBack(ePage, 1);
 	}
+
+	++s_ubRebukeCount;
 }
 
-UBYTE gameGetAccolades(void) {
+UBYTE gameGetAccoladeCount(void) {
 	return s_ubAccolades;
 }
 
-UBYTE gameGetRebukes(void) {
-	return s_ubRebukes;
+UBYTE gameGetRebukeCount(void) {
+	return s_ubRebukeCount;
+}
+
+tRebukeKind gameGetRebuke(UBYTE ubRebukeIndex) {
+	return s_pRebukes[ubRebukeIndex];
 }
 
 void gameInitBobs(void) {
@@ -1350,7 +1365,8 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &s_eCameraType, sizeof(s_eCameraType));
 	fileRead(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
 
-	fileRead(pFile, &s_ubRebukes, sizeof(s_ubRebukes));
+	fileRead(pFile, &s_ubRebukeCount, sizeof(s_ubRebukeCount));
+	fileRead(pFile, s_pRebukes, sizeof(s_pRebukes));
 	fileRead(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
 	fileRead(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
 	fileRead(pFile, &s_wLastReminder, sizeof(s_wLastReminder));
@@ -1419,7 +1435,7 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	s_ulGameTime = 0;
 	s_uwMaxTileY = 0;
 	s_ubCurrentMod = 0;
-	s_ubRebukes = 0;
+	s_ubRebukeCount = 0;
 	s_ubAccolades = 0;
 	s_ubAccoladesFract = 0;
 	s_wLastReminder = 0;

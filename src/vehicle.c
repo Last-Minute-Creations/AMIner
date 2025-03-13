@@ -137,7 +137,7 @@ static void vehicleDestroy(tVehicle *pVehicle) {
 
 static void vehicleSetState(tVehicle *pVehicle, tVehicleState eNewState) {
 #if defined(GAME_DEBUG)
-	static const char *pStateNames[VEHICLE_STATE_COUNT] = {
+	static const char * const pStateNames[VEHICLE_STATE_COUNT] = {
 		[VEHICLE_STATE_MOVING] = "MOVING",
 		[VEHICLE_STATE_DRILLING] = "DRILLING",
 		[VEHICLE_STATE_EXPLODING] = "EXPLODING",
@@ -314,7 +314,7 @@ static void vehicleOnExplodePeak(void *pData) {
 	tVehicle *pVehicle = &g_pVehicles[ubPlayerIdx];
 	vehicleSetState(pVehicle, VEHICLE_STATE_SMOKING);
 	if(g_eGameMode == GAME_MODE_STORY) {
-		gameAddRebuke();
+		gameAddRebuke(REBUKE_VEHICLE_DESTROYED);
 		hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
 	}
 }

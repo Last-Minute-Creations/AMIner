@@ -25,7 +25,6 @@ UBYTE g_ubDrillingCost;
 UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
 UBYTE g_ubPlansPerAccolade;
 UBYTE g_ubAccoladesInMainStory;
-UBYTE g_ubRebukesInMainStory;
 fix16_t g_fPlanIncreaseRatioSingleplayer;
 fix16_t g_fPlanIncreaseRatioMultiplayer;
 
@@ -328,7 +327,6 @@ void defsInit(void) {
 	g_lInitialCash = jsonTokToUlong(pJson, jsonGetDom(pJson, "initialCash"));
 	g_ubPlansPerAccolade = jsonTokToUlong(pJson, jsonGetDom(pJson, "plansPerAccolade"));
 	g_ubAccoladesInMainStory = jsonTokToUlong(pJson, jsonGetDom(pJson, "accoladesInMainStory"));
-	g_ubRebukesInMainStory = jsonTokToUlong(pJson, jsonGetDom(pJson, "rebukesInMainStory"));
 	g_fPlanIncreaseRatioSingleplayer = jsonTokToFix(pJson, jsonGetDom(pJson, "planIncreaseRatioSingleplayer"));
 	g_fPlanIncreaseRatioMultiplayer = jsonTokToFix(pJson, jsonGetDom(pJson, "planIncreaseRatioMultiplayer"));
 

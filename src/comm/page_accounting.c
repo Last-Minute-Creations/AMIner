@@ -47,7 +47,7 @@ static void pageAccountingProcess(void) {
 				}
 				else {
 					s_uwAccountingStreak = 0;
-					gameAddRebuke();
+					gameAddRebuke(REBUKE_ACCOUNTING);
 				}
 
 				UBYTE ubHeat = 5;

@@ -167,7 +167,7 @@ static void pageWarehouseRedraw(void) {
 	// Accolades
 	sprintf(
 		szBfr, "%s %hhu",
-		g_pMsgs[MSG_COMM_ACCOLADES], gameGetAccolades()
+		g_pMsgs[MSG_COMM_ACCOLADES], gameGetAccoladeCount()
 	);
 	commDrawText(
 		0, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight, szBfr,
@@ -176,7 +176,7 @@ static void pageWarehouseRedraw(void) {
 
 	// Rebukes
 	sprintf(
-		szBfr, "%s %hhu", g_pMsgs[MSG_COMM_REBUKES], gameGetRebukes()
+		szBfr, "%s %hhu", g_pMsgs[MSG_COMM_REBUKES], gameGetRebukeCount()
 	);
 	commDrawText(
 		0, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,

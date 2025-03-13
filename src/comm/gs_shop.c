@@ -40,6 +40,19 @@ static tTabNavigationState s_eTabNavigationState;
 static UBYTE s_ubLedBlinkCounter;
 static UBYTE s_ubLedBlinkState;
 
+static const char * const s_pRebukeToMessageFileName[] = {
+	[REBUKE_INVALID] = 0,
+	[REBUKE_ACCOUNTING] = "komisarz_rebuke_accounting",
+	[REBUKE_BRIBE] = "komisarz_rebuke_bribe",
+	[REBUKE_FINAL] = "komisarz_rebuke_final",
+	[REBUKE_GATE_DESTROYED] = "komisarz_rebuke_gate_destroyed",
+	[REBUKE_PLAN_1] = "komisarz_rebuke_plan_1",
+	[REBUKE_PLAN_2] = "komisarz_rebuke_plan_2",
+	[REBUKE_QUESTIONING_CRATE] = "komisarz_rebuke_questioning_crate",
+	[REBUKE_QUESTIONING_GATE] = "komisarz_rebuke_questioning_gate",
+	[REBUKE_VEHICLE_DESTROYED] = "komisarz_rebuke_vehicle_destroyed",
+};
+
 //------------------------------------------------------------------ PRIVATE FNS
 
 static tCommShopPage commShopTabToPage(tCommTab eTab) {
@@ -66,7 +79,8 @@ static void onBack(void) {
 	}
 }
 
-static void onBackFromLastRebuke(void) {
+static void onBackFromEpilogueText(void) {
+	statePop(g_pGameStateManager);
 	menuGsEnter(0);
 }
 
@@ -320,13 +334,13 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_dino_intro", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_1", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, s_pRebukeToMessageFileName[gameGetRebuke(0)], onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_2:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_2", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, s_pRebukeToMessageFileName[gameGetRebuke(1)], onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_3:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_rebuke_3", onBackFromLastRebuke);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, s_pRebukeToMessageFileName[gameGetRebuke(2)], onBackFromEpilogueText);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING:
 			pageQuestioningCreate();
@@ -339,15 +353,15 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_GATE:
 			pageQuestioningReport(QUESTIONING_BIT_GATE); // HACK HACK HACK
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_gate", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_reported_gate", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_TELEPORT_PARTS:
 			pageQuestioningReport(QUESTIONING_BIT_TELEPORT_PARTS); // HACK HACK HACK
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_teleport", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_reported_crate", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_AGENT:
 			pageQuestioningReport(QUESTIONING_BIT_AGENT); // HACK HACK HACK
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_report_agent", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_reported_agent", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE:
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_questioning_accolade", onBack);

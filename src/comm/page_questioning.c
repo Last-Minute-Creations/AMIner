@@ -66,10 +66,13 @@ static void pageQuestioningProcess(void) {
 			}
 			else {
 				// Got caught
-				gameAddRebuke();
+				gameAddRebuke(
+					(s_eQuestioningBitCurrent == QUESTIONING_BIT_GATE)
+						? REBUKE_QUESTIONING_GATE
+						: REBUKE_QUESTIONING_CRATE
+				);
 				s_eQuestioningsNotReported &= ~BV(s_eQuestioningBitCurrent);
 				pageQuestioningReport(s_eQuestioningBitCurrent);
-				inboxPushBack(pageQuestioningBitToShopPage(s_eQuestioningBitCurrent), 1);
 			}
 		}
 

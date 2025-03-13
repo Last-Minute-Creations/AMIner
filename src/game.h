@@ -14,6 +14,19 @@
 #define GAME_BPP 5
 #define GAME_TIME_PER_DAY 140
 
+typedef enum tRebukeKind {
+	REBUKE_INVALID,
+	REBUKE_ACCOUNTING,
+	REBUKE_BRIBE,
+	REBUKE_FINAL,
+	REBUKE_GATE_DESTROYED,
+	REBUKE_PLAN_1,
+	REBUKE_PLAN_2,
+	REBUKE_QUESTIONING_CRATE,
+	REBUKE_QUESTIONING_GATE,
+	REBUKE_VEHICLE_DESTROYED,
+} tRebukeKind;
+
 typedef enum tGameMode {
 	GAME_MODE_STORY,
 	GAME_MODE_CHALLENGE,
@@ -62,11 +75,13 @@ void gameAdvanceAccolade(void);
 
 void gameAddAccolade(void);
 
-void gameAddRebuke(void);
+void gameAddRebuke(tRebukeKind eRebuke);
 
-UBYTE gameGetAccolades(void);
+UBYTE gameGetAccoladeCount(void);
 
-UBYTE gameGetRebukes(void);
+UBYTE gameGetRebukeCount(void);
+
+tRebukeKind gameGetRebuke(UBYTE ubRebukeIndex);
 
 void gameElapseTime(UWORD uwTime);
 

@@ -344,7 +344,7 @@ static void logoAceDestroy(void) {
 
 //------------------------------------------------------------------------- LANG
 
-static const char *s_pLanguageNames[LANGUAGE_COUNT] = {
+static const char * const s_pLanguageNames[LANGUAGE_COUNT] = {
 	[LANGUAGE_ENGLISH] = "Johnny English",
 	[LANGUAGE_POLISH] = "Mietek Polisz",
 };
