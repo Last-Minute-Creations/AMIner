@@ -18,7 +18,7 @@
 
 static tButton s_pButtons[BUTTON_COUNT_MAX];
 static UBYTE s_ubButtonCount;
-static UBYTE s_ubSelected = BUTTON_INVALID;
+static UBYTE s_ubSelected;
 static tButtonPreset s_ePreset;
 static UWORD s_uwTopY;
 static tButtonLayout s_eLayout;

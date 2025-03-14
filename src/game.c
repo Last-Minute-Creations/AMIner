@@ -1144,7 +1144,7 @@ static void gameSave(tFile *pFile) {
 #define RADIO_MESSAGE_COUNT 3
 #define RADIO_MESSAGE_INTERVAL 150
 
-static UBYTE s_ubRadioMessageCounter = RADIO_MESSAGE_INTERVAL;
+static UBYTE s_ubRadioMessageCounter;
 static UBYTE s_ubRadioMessageIndex = 0;
 
 void gameProcessBaseWestern(void) {
@@ -1440,6 +1440,7 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	s_wLastReminder = 0;
 	s_sTeleportReturn.ulYX = -1;
 	s_eGateCutsceneStep = GATE_CUTSCENE_STEP_OFF;
+	s_ubRadioMessageCounter = RADIO_MESSAGE_INTERVAL;
 	hudReset(g_eGameMode, g_is2pPlaying);
 	heatReset();
 	groundLayerReset(1, 0);

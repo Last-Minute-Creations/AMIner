@@ -107,7 +107,7 @@ char **stringArrayCreateFromDom(
 }
 
 char **stringArrayCreateFromDomElements(
-	tJson *pJson, const tCodeRemap *pRemap, const char **pNames
+	tJson *pJson, const tCodeRemap *pRemap, const char * const *pNames
 ) {
 	logBlockBegin(
 		"stringArrayCreateFromDom(pJson: %p, pRemap: %p, pNames: %p)",
@@ -140,7 +140,7 @@ void stringArrayDestroy(char **pArray) {
 	logBlockEnd("stringArrayDestroy()");
 }
 
-UBYTE stringArrayGetCount(const char **pArray) {
+UBYTE stringArrayGetCount(const char * const *pArray) {
 	UBYTE ubCount;
 	for(ubCount = 0; pArray[ubCount] != STRING_ARRAY_TERMINATOR; ++ubCount) { }
 	return ubCount;

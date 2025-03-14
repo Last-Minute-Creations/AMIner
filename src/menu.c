@@ -64,7 +64,7 @@ static UBYTE s_ubMenuOptionCount;
 static tPtplayerSfx *s_pSfxAtari;
 
 static UBYTE s_pKeyHistory[8] = {0};
-static UBYTE s_pKeyKonami[8] = {
+static const UBYTE s_pKeyKonami[8] = {
 	KEY_RIGHT, KEY_LEFT, KEY_RIGHT, KEY_LEFT, KEY_DOWN, KEY_DOWN, KEY_UP, KEY_UP
 };
 

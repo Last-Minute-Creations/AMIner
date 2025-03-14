@@ -19,11 +19,11 @@ char **stringArrayCreateFromDom(
 );
 
 char **stringArrayCreateFromDomElements(
-	tJson *pJson, const tCodeRemap *pRemap, const char **pNames
+	tJson *pJson, const tCodeRemap *pRemap, const char * const *pNames
 );
 
 void stringArrayDestroy(char **pArray);
 
-UBYTE stringArrayGetCount(const char **pArray);
+UBYTE stringArrayGetCount(const char * const *pArray);
 
 #endif // _STRING_ARRAY_H_

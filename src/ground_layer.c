@@ -15,7 +15,7 @@ static UBYTE s_isCopperActive = 0, s_ubPrevLevel = 0;
 static UWORD s_uwVpHeight, s_uwVpStartY;
 static tCopList *s_pCopList;
 tCopBlock *s_pDisableNext = 0;
-static UBYTE s_ubLowerLayer = 1;
+static UBYTE s_ubLowerLayer;
 
 typedef struct _tGroundLayer {
 	UWORD pColors[LAYER_COLOR_COUNT];
@@ -95,6 +95,7 @@ void groundLayerCreate(const tVPort *pVp) {
 	s_pColorsBelow = copBlockCreate(pView->pCopList, LAYER_COLOR_COUNT, 0, 0);
 	s_pColorsAbove = copBlockCreate(pView->pCopList, LAYER_COLOR_COUNT, 0, 0);
 	s_ubPrevLevel = 0xF;
+	s_ubLowerLayer = 1;
 	groundLayerReset(1, 0);
 	logBlockEnd("groundLayerCreate()");
 }
