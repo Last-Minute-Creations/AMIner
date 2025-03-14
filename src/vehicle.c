@@ -766,7 +766,14 @@ static void vehicleEndChallenge(tVehicle *pVehicle) {
 	pVehicle->isChallengeEnded = 1;
 }
 
+typedef enum tPickupSfxKind {
+	PICKUP_SFX_KIND_NONE,
+	PICKUP_SFX_KIND_BONUS,
+	PICKUP_SFX_KIND_PENALTY,
+} tPickupSfxKind;
+
 void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
+	tPickupSfxKind ePickupKind = PICKUP_SFX_KIND_NONE;
 	// Load mineral to vehicle
 	UBYTE ubTile = g_pMainBuffer->pTileData[uwTileX][uwTileY];
 	if(g_pTileDefs[ubTile].ubSlots) {
@@ -780,30 +787,18 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		pVehicle->pStock[ubMineralType] += ubSlots;
 
 		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->uwCargoCurr, uwCargoMax);
-		char szMsg[40];
-		const char *szMessage;
-		UBYTE ubColor;
 		if(pVehicle->uwCargoCurr == uwCargoMax) {
-			szMessage = g_pMsgs[MSG_MISC_CARGO_FULL];
-			ubColor = COLOR_REDEST;
-			audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PENALTY, 0);
+			textBobSetText(&pVehicle->sTextBob, COLOR_REDEST, g_pMsgs[MSG_MISC_CARGO_FULL]);
+			ePickupKind = PICKUP_SFX_KIND_PENALTY;
 		}
 		else {
-			char *pEnd = szMsg;
-			pEnd = stringCopy(g_pMineralNames[g_pTileDefs[ubTile].ubMineral], pEnd);
-			*(pEnd++) = ' ';
-			*(pEnd++) = 'x';
-			pEnd = stringDecimalFromULong(g_pTileDefs[ubTile].ubSlots, pEnd);
-			szMessage = szMsg;
-			ubColor = pMineral->ubTitleColor;
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+			textBobSetTextVa(
+				&pVehicle->sTextBob, pMineral->ubTitleColor, "%s x%hhu",
+				g_pMineralNames[g_pTileDefs[ubTile].ubMineral],
+				g_pTileDefs[ubTile].ubSlots
+			);
+			ePickupKind = PICKUP_SFX_KIND_BONUS;
 		}
-		textBobSet(
-			&pVehicle->sTextBob, szMessage, ubColor,
-			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-			pVehicle->sBobBody.sPos.uwY,
-			pVehicle->sBobBody.sPos.uwY - 32, 1
-		);
 	}
 	else if(g_eGameMode == GAME_MODE_CHALLENGE) {
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_10) {
@@ -811,46 +806,28 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 				vehicleEndChallenge(pVehicle);
 			}
 			else {
-				textBobSetText(
-					&pVehicle->sTextBob, "%s %+hu\x1F",
+				textBobSetTextVa(
+					&pVehicle->sTextBob, COLOR_GREEN, "%s %+hu\x1F",
 					g_pMsgs[MSG_CHALLENGE_CHECKPOINT], pVehicle->uwCargoScore
-				);
-				textBobSetColor(&pVehicle->sTextBob, COLOR_GREEN);
-				textBobSetPos(
-					&pVehicle->sTextBob,
-					pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-					pVehicle->sBobBody.sPos.uwY,
-					pVehicle->sBobBody.sPos.uwY - 32, 1
 				);
 				vehicleRestock(pVehicle);
 			}
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+			ePickupKind = PICKUP_SFX_KIND_BONUS;
 		}
 	}
 	else if(g_eGameMode == GAME_MODE_DEADLINE) {
 		if(ubTile == TILE_CRATE_1) {
-			if(g_eGameMode == GAME_MODE_DEADLINE) {
-				planAddDays(10, 0);
-				tPartKind ePart = randUwMinMax(&g_sRand, INVENTORY_PART_DRILL, INVENTORY_PART_TNT);
-				const tPartDef *pPartDef = inventoryGetPartDef(ePart);
-				char szMessage[50];
-				char *pEnd = szMessage;
-				if(pPartDef->ubLevel < inventoryGetPartMaxLevel(ePart)) {
-					inventorySetPartLevel(ePart, pPartDef->ubLevel + 1);
-					pEnd = stringCopy("Bonus: ", szMessage);
-					pEnd = stringCopy(g_pShopNames[ePart], pEnd);
-				}
-				else {
-					stringCopy("T +10", pEnd);
-				}
-				textBobSet(
-					&pVehicle->sTextBob, szMessage, COLOR_GREEN,
-					pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-					pVehicle->sBobBody.sPos.uwY,
-					pVehicle->sBobBody.sPos.uwY - 32, 1
-				);
+			planAddDays(10, 0);
+			tPartKind ePart = randUwMinMax(&g_sRand, INVENTORY_PART_DRILL, INVENTORY_PART_TNT);
+			const tPartDef *pPartDef = inventoryGetPartDef(ePart);
+			if(pPartDef->ubLevel < inventoryGetPartMaxLevel(ePart)) {
+				inventorySetPartLevel(ePart, pPartDef->ubLevel + 1);
+				textBobSetTextVa(&pVehicle->sTextBob, COLOR_GREEN, "Bonus: %s", g_pShopNames[ePart]);
 			}
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+			else {
+				textBobSetText(&pVehicle->sTextBob, COLOR_GREEN, "T +10");
+			}
+			ePickupKind = PICKUP_SFX_KIND_BONUS;
 		}
 		if(TILE_CHECKPOINT_1 <= ubTile && ubTile <= TILE_CHECKPOINT_10) {
 			vehicleRestock(&g_pVehicles[0]);
@@ -863,64 +840,65 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 	}
 	else {
 		if(TILE_PRISONER_1 <= ubTile && ubTile <= TILE_PRISONER_8) {
-			textBobSet(
-				&pVehicle->sTextBob, g_pMsgs[MSG_PAGE_LIST_PRISONER], COLOR_GREEN,
-				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-				pVehicle->sBobBody.sPos.uwY,
-				pVehicle->sBobBody.sPos.uwY - 32, 1
+			textBobSetText(
+				&pVehicle->sTextBob, COLOR_GREEN, g_pMsgs[MSG_PAGE_LIST_PRISONER]
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+
+			ePickupKind = PICKUP_SFX_KIND_BONUS;
 			questGateUnlockPrisoner();
 		}
 		else if(ubTile == TILE_BONE_HEAD || ubTile == TILE_BONE_1) {
-			// TODO: other message when redundant bone found?
-			char szMessage[50];
 			UBYTE ubBoneIndex = dinoAddBone();
-			sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_BONE], ubBoneIndex);
-			textBobSet(
-				&pVehicle->sTextBob, szMessage, COLOR_GREEN,
-				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-				pVehicle->sBobBody.sPos.uwY,
-				pVehicle->sBobBody.sPos.uwY - 32, 1
+			textBobSetTextVa(
+				&pVehicle->sTextBob, COLOR_GREEN, g_pMsgs[MSG_MISC_FOUND_BONE],
+				ubBoneIndex
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+			ePickupKind = PICKUP_SFX_KIND_BONUS;
 		}
 		else if(ubTile == TILE_GATE_1 || ubTile == TILE_GATE_2) {
-			char szMessage[50];
 			UBYTE ubFragmentIndex = questGateAddFragment();
-			sprintf(szMessage, g_pMsgs[MSG_MISC_FOUND_GATE], ubFragmentIndex);
-			textBobSet(
-				&pVehicle->sTextBob, szMessage, COLOR_GREEN,
-				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-				pVehicle->sBobBody.sPos.uwY,
-				pVehicle->sBobBody.sPos.uwY - 32, 1
+			textBobSetTextVa(
+				&pVehicle->sTextBob, COLOR_GREEN, g_pMsgs[MSG_MISC_FOUND_GATE],
+				ubFragmentIndex
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+			ePickupKind = PICKUP_SFX_KIND_BONUS;
 		}
 		else if(ubTile == TILE_CRATE_1) {
 			questCrateAdd();
-			textBobSet(
-				&pVehicle->sTextBob, g_pMsgs[MSG_MISC_FOUND_CRATE], COLOR_GREEN,
-				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-				pVehicle->sBobBody.sPos.uwY,
-				pVehicle->sBobBody.sPos.uwY - 32, 1
+			textBobSetText(
+				&pVehicle->sTextBob, COLOR_GREEN, g_pMsgs[MSG_MISC_FOUND_CRATE]
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+			ePickupKind = PICKUP_SFX_KIND_BONUS;
 		}
 		else if(ubTile == TILE_CAPSULE) {
 			questCrateSetCapsuleState(CAPSULE_STATE_FOUND);
-			textBobSet(
-				&pVehicle->sTextBob, g_pMsgs[MSG_MISC_FOUND_CAPSULE], COLOR_GREEN,
-				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
-				pVehicle->sBobBody.sPos.uwY,
-				pVehicle->sBobBody.sPos.uwY - 32, 1
+			textBobSetText(
+				&pVehicle->sTextBob, COLOR_GREEN, g_pMsgs[MSG_MISC_FOUND_CAPSULE]
 			);
-			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+			ePickupKind = PICKUP_SFX_KIND_BONUS;
 		}
 	}
 
 	tileExcavate(uwTileX, uwTileY);
 	gameUpdateMaxDepth(uwTileY);
+
+	switch(ePickupKind) {
+		case PICKUP_SFX_KIND_NONE:
+			return;
+		case PICKUP_SFX_KIND_BONUS:
+			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
+			break;
+		case PICKUP_SFX_KIND_PENALTY:
+			audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PENALTY, 0);
+			break;
+	}
+
+	textBobSetPos(
+		&pVehicle->sTextBob,
+		pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
+		pVehicle->sBobBody.sPos.uwY,
+		pVehicle->sBobBody.sPos.uwY - 32, 1
+	);
 }
 
 UBYTE vehicleTrySpendCash(UBYTE ubPlayerIndex, LONG lCost) {
@@ -974,11 +952,10 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		pVehicle->sBobBody.sPos.uwY = fix16_to_int(pVehicle->fY);
 		audioMixerPlaySfx(g_pSfxPenalty, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PENALTY, 0);
 		UWORD uwTeleportPenalty = 50;
-		textBobSetText(
-			&pVehicle->sTextBob, "%s -%hu\x1F",
+		textBobSetTextVa(
+			&pVehicle->sTextBob, COLOR_REDEST, "%s -%hu\x1F",
 			g_pMsgs[MSG_CHALLENGE_TELEPORT], uwTeleportPenalty
 		);
-		textBobSetColor(&pVehicle->sTextBob, COLOR_REDEST);
 		textBobSetPos(
 			&pVehicle->sTextBob,
 			pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
@@ -1210,16 +1187,15 @@ static void vehicleProcessMovement(tVehicle *pVehicle) {
 		WORD wDeltaScore = vehicleRestock(pVehicle);
 		if(wDeltaScore) {
 			if(wDeltaScore == RESTOCK_RESULT_ONLY_MINERALS) {
-				textBobSetText(&pVehicle->sTextBob, "%s", g_pMsgs[MSG_MISC_RESTOCK]);
+				textBobSetText(&pVehicle->sTextBob, COLOR_GOLD, g_pMsgs[MSG_MISC_RESTOCK]);
 			}
 			else {
-				textBobSetText(
-					&pVehicle->sTextBob, "%s %hd\x1F",
+				textBobSetTextVa(
+					&pVehicle->sTextBob, COLOR_GOLD, "%s %hd\x1F",
 					g_pMsgs[MSG_MISC_RESTOCK], wDeltaScore
 				);
 			}
 			audioMixerPlaySfx(g_pSfxOre, SFX_CHANNEL_EFFECT, SFX_PRIORITY_PICKUP, 0);
-			textBobSetColor(&pVehicle->sTextBob, COLOR_GOLD);
 			textBobSetPos(
 				&pVehicle->sTextBob,
 				pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,

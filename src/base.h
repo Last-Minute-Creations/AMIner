@@ -53,6 +53,6 @@ tBaseId baseGetCurrentId(void);
 
 void baseUpdateDinoTileset(UBYTE isPopulated);
 
-void baseTilesetPrepareForChallenge(UBYTE isCoal);
+void baseTilesetPrepareForChallenge(void);
 
 #endif // _AMINER_BASE_H_

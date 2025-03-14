@@ -35,9 +35,9 @@ void textBobSet(
 	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY, UBYTE isCenterH
 );
 
-void textBobSetColor(tTextBob *pTextBob, UBYTE ubColor);
+void textBobSetTextVa(tTextBob *pTextBob, UBYTE ubColor, const char *szText, ...);
 
-void textBobSetText(tTextBob *pTextBob, const char *szText, ...);
+void textBobSetText(tTextBob *pTextBob, UBYTE ubColor, const char *szText);
 
 void textBobSetPos(
 	tTextBob *pTextBob, UWORD uwX, UWORD uwY, UWORD uwDestY, UBYTE isCenterH

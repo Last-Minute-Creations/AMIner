@@ -1420,7 +1420,7 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	pageOfficeReset();
 	warehouseReset();
 	if(g_eGameMode == GAME_MODE_CHALLENGE) {
-		baseTilesetPrepareForChallenge(g_isAtari);
+		baseTilesetPrepareForChallenge();
 	}
 	tileReset(g_isAtari, g_eGameMode);
 	inventoryReset();

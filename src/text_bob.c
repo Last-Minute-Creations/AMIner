@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "text_bob.h"
+#include <ace/utils/string.h>
 #include "game.h"
 
 static tTextBitMap *s_pTextBitmap;
@@ -46,21 +47,24 @@ void textBobSet(
 	tTextBob *pTextBob, const char *szText, UBYTE ubColor,
 	UWORD uwPosX, UWORD uwPosY, UWORD uwDestPosY, UBYTE isCenterH
 ) {
-	textBobSetText(pTextBob, szText);
-	textBobSetColor(pTextBob, ubColor);
+	textBobSetText(pTextBob, ubColor, szText);
 	textBobSetPos(pTextBob, uwPosX, uwPosY, uwDestPosY, isCenterH);
 }
 
-void textBobSetColor(tTextBob *pTextBob, UBYTE ubColor) {
-	pTextBob->ubColor = ubColor;
-	pTextBob->isUpdateRequired = 1;
-}
-
-void textBobSetText(tTextBob *pTextBob, const char *szText, ...) {
+void textBobSetTextVa(tTextBob *pTextBob, UBYTE ubColor, const char *szText, ...) {
 	va_list vaArgs;
 	va_start(vaArgs, szText);
 	vsprintf(pTextBob->szText, szText, vaArgs);
 	va_end(vaArgs);
+	pTextBob->ubColor = ubColor;
+	tUwCoordYX sSize = fontMeasureText(pTextBob->pFont, szText);
+	pTextBob->uwWidth = sSize.uwX;
+	pTextBob->isUpdateRequired = 1;
+}
+
+void textBobSetText(tTextBob *pTextBob, UBYTE ubColor, const char *szText) {
+	stringCopy(szText, pTextBob->szText);
+	pTextBob->ubColor = ubColor;
 	tUwCoordYX sSize = fontMeasureText(pTextBob->pFont, szText);
 	pTextBob->uwWidth = sSize.uwX;
 	pTextBob->isUpdateRequired = 1;

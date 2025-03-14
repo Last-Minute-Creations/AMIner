@@ -278,6 +278,6 @@ void baseUpdateDinoTileset(UBYTE isPopulated) {
 	}
 }
 
-void baseTilesetPrepareForChallenge(UBYTE isCoal) {
+void baseTilesetPrepareForChallenge(void) {
 	baseTileLoad(BASE_ID_GROUND);
 }
