@@ -176,9 +176,7 @@ void collectiblesCreate(void) {
 		}
 	}
 	for(UBYTE ubBobIndex = 0; ubBobIndex < COLLECTIBLES_BOB_MAX; ++ubBobIndex) {
-		bobInit(
-			&s_pBobs[ubBobIndex], 0, 0, 0, 0, 0, 0, 0
-		);
+		bobInit(&s_pBobs[ubBobIndex], 0, 0, 0, 0, 0, 0, 0);
 	}
 
 	collectiblesReset();
