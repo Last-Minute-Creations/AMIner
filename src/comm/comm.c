@@ -42,6 +42,8 @@ static UBYTE s_ubSteerCount;
 static tSteer *s_pSteers;
 static const char *s_szPrevProgressText;
 static UBYTE s_isIntro;
+static tPageProcess s_pPageProcess = 0;
+static tPageCleanup s_pPageCleanup = 0;
 
 static tProgressBarConfig s_sProgressBarConfig = {
 	.sBarPos = {.ulYX = 0},
@@ -348,8 +350,11 @@ void commHide(void) {
 		return;
 	}
 	s_isCommShown = 0;
-	tUwCoordYX sOrigin = commGetOrigin();
+
+	commRegisterPage(0, 0);
+
 	// Restore content beneath commrade
+	tUwCoordYX sOrigin = commGetOrigin();
 	blitCopyAligned(
 		s_pPristineBuffer, sOrigin.uwX, sOrigin.uwY,
 		s_pBmDraw, sOrigin.uwX, sOrigin.uwY,
@@ -568,15 +573,13 @@ UBYTE commBreakTextToWidth(const char *szInput, UWORD uwMaxLineWidth) {
 	return ubCharsInLine;
 }
 
-tPageProcess s_pPageProcess = 0;
-tPageCleanup s_pPageCleanup = 0;
-
 void commRegisterPage(tPageProcess cbProcess, tPageCleanup cbCleanup) {
 	logBlockBegin(
 		"commRegisterPage(cbProcess: %p, cbCleanup: %p)", cbProcess, cbCleanup
 	);
 	if(s_pPageCleanup) {
 		s_pPageCleanup();
+		s_pPageCleanup = 0;
 	}
 	commEraseAll();
 
