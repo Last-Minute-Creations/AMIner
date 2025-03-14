@@ -8,7 +8,10 @@
 
 tInventory s_sInventory;
 
-void inventoryInit(const UWORD *pPartsBase, const UWORD *pPartsAddPerLevel) {
+void inventoryInit(void) {
+	static const UWORD pPartsBase[INVENTORY_PART_COUNT] = {1000, 30, 100, 0, 0};
+	static const UWORD pPartsAddPerLevel[INVENTORY_PART_COUNT] = {250, 10, 20, 1, 1};
+
 	for(tPartKind ePart = 0; ePart < INVENTORY_PART_COUNT; ++ePart) {
 		s_sInventory.pParts[ePart].uwMaxBase = pPartsBase[ePart];
 		s_sInventory.pParts[ePart].uwMaxAddPerLevel = pPartsAddPerLevel[ePart];

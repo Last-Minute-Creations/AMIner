@@ -19,27 +19,34 @@
 #include "hud.h"
 #include "assets.h"
 
-LONG g_lInitialCash;
-UBYTE g_ubUpgradeLevels;
-UBYTE g_ubDrillingCost;
-UBYTE g_ubLiterPrice, g_ubFuelInLiter, g_ubHullPrice;
-UBYTE g_ubPlansPerAccolade;
-UBYTE g_ubAccoladesInMainStory;
-fix16_t g_fPlanIncreaseRatioSingleplayer;
-fix16_t g_fPlanIncreaseRatioMultiplayer;
 
-LONG g_pUpgradeCosts[10];
-UWORD g_pDinoDepths[DEFS_QUEST_DINO_BONE_COUNT];
-UWORD g_pGateDepths[DEFS_QUEST_GATE_PART_COUNT];
-UWORD g_pCrateDepths[DEFS_QUEST_CRATE_COUNT];
-UWORD g_uwCapsuleDepth;
-UWORD g_uwPrisonerDepth;
-UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
-UBYTE g_ubMinePercentForPlans;
-UBYTE g_ubTrailingMineralCountPercent;
-ULONG g_ulExtraPlanMoney;
+const LONG g_lInitialCash = 0;
+const UBYTE g_ubUpgradeLevels = 4;
+const UBYTE g_ubDrillingCost = 15;
+const UBYTE g_ubLiterPrice = 5, g_ubFuelInLiter = 100, g_ubHullPrice = 2;
+const UBYTE g_ubPlansPerAccolade = 10;
+const UBYTE g_ubAccoladesInMainStory = 5;
+const fix16_t g_fPlanIncreaseRatioSingleplayer = F16(0.25);
+const fix16_t g_fPlanIncreaseRatioMultiplayer = F16(0.5);
 
-const char * s_pLangDom[] = {
+const UWORD g_pUpgradeCosts[4] = {100, 300, 600, 1000};
+const UWORD g_pDinoDepths[DEFS_QUEST_DINO_BONE_COUNT] = {
+	80, 130, 170, 190, 220, 230, 250, 270, 290,
+};
+const UWORD g_pGateDepths[DEFS_QUEST_GATE_PART_COUNT] = {
+	235, 255, 275, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570, 600, 630, 660
+};
+const UWORD g_pCrateDepths[DEFS_QUEST_CRATE_COUNT] = {
+	350, 430, 470, 530, 590, 640, 680, 720, 770, 810,
+};
+const UWORD g_uwCapsuleDepth = 1020;
+const UWORD g_uwPrisonerDepth = 220;
+const UWORD g_pMineralPlans[MINERAL_TYPE_COUNT] = {0, 10, 30, 40, 20, 65535};
+const UBYTE g_ubMinePercentForPlans = 75;
+const UBYTE g_ubTrailingMineralCountPercent = 20;
+const ULONG g_ulExtraPlanMoney = 50;
+
+const char * const s_pLangDom[] = {
 	// Hi score
 	[MSG_HI_SCORE_NEW] = "hiScore.new",
 	[MSG_HI_SCORE_PRESS] = "hiScore.press",
@@ -322,100 +329,6 @@ const tCodeRemap g_pRemap[19] = {
 	{380, 128}, // "ż"
 	{0, 0} // Terminator
 };
-
-void defsInit(void) {
-	tJson *pJson = jsonCreate(SUBFILE_PREFIX "game.json");
-
-	g_lInitialCash = jsonTokToUlong(pJson, jsonGetDom(pJson, "initialCash"));
-	g_ubPlansPerAccolade = jsonTokToUlong(pJson, jsonGetDom(pJson, "plansPerAccolade"));
-	g_ubAccoladesInMainStory = jsonTokToUlong(pJson, jsonGetDom(pJson, "accoladesInMainStory"));
-	g_fPlanIncreaseRatioSingleplayer = jsonTokToFix(pJson, jsonGetDom(pJson, "planIncreaseRatioSingleplayer"));
-	g_fPlanIncreaseRatioMultiplayer = jsonTokToFix(pJson, jsonGetDom(pJson, "planIncreaseRatioMultiplayer"));
-
-	// Upgrade costs
-	UWORD uwIdxUpgradeCosts = jsonGetDom(pJson, "upgradeCosts");
-	g_ubUpgradeLevels = MIN(10, pJson->pTokens[uwIdxUpgradeCosts].size);
-
-	for(UBYTE i = 0; i < pJson->pTokens[uwIdxUpgradeCosts].size; ++i) {
-		UWORD uwIdxCost = jsonGetElementInArray(pJson, uwIdxUpgradeCosts, i);
-		g_pUpgradeCosts[i] = jsonTokToUlong(pJson, uwIdxCost);
-	}
-
-	g_ubDrillingCost = jsonTokToUlong(pJson, jsonGetDom(pJson, "drillingCost"));
-
-	// Restock
-	g_ubLiterPrice = jsonTokToUlong(pJson, jsonGetDom(pJson, "restock.literPrice"));
-	g_ubFuelInLiter = jsonTokToUlong(pJson, jsonGetDom(pJson, "restock.fuelInLiter"));
-	g_ubHullPrice = jsonTokToUlong(pJson, jsonGetDom(pJson, "restock.hullPrice"));
-
-	// Dino parts
-	UWORD uwIdxDinoDepths = jsonGetDom(pJson, "dinoDepths");
-	UBYTE ubDepthCount = pJson->pTokens[uwIdxDinoDepths].size;
-	if(ubDepthCount != DEFS_QUEST_DINO_BONE_COUNT) {
-		logWrite("ERR: Dino part count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_DINO_BONE_COUNT);
-	}
-	for(UBYTE i = 0; i < ubDepthCount; ++i) {
-		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxDinoDepths, i);
-		g_pDinoDepths[i] = jsonTokToUlong(pJson, uwIdx);
-	}
-
-	// Gate parts
-	UWORD uwIdxGateDepths = jsonGetDom(pJson, "gateDepths");
-	ubDepthCount = pJson->pTokens[uwIdxGateDepths].size;
-	if(ubDepthCount != DEFS_QUEST_GATE_PART_COUNT) {
-		logWrite("ERR: Gate part count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_GATE_PART_COUNT);
-	}
-	for(UBYTE i = 0; i < ubDepthCount; ++i) {
-		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxGateDepths, i);
-		g_pGateDepths[i] = jsonTokToUlong(pJson, uwIdx);
-	}
-
-	// Crate parts
-	UWORD uwIdxCrateDepths = jsonGetDom(pJson, "crateDepths");
-	ubDepthCount = pJson->pTokens[uwIdxCrateDepths].size;
-	if(ubDepthCount != DEFS_QUEST_CRATE_COUNT) {
-		logWrite("ERR: Crate count mismatch: got %d, expected %d\n", ubDepthCount, DEFS_QUEST_CRATE_COUNT);
-	}
-	for(UBYTE i = 0; i < ubDepthCount; ++i) {
-		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxCrateDepths, i);
-		g_pCrateDepths[i] = jsonTokToUlong(pJson, uwIdx);
-	}
-
-	// Single quest tiles
-	g_uwCapsuleDepth = jsonTokToUlong(pJson, jsonGetDom(pJson, "capsuleDepth"));
-	g_uwPrisonerDepth = jsonTokToUlong(pJson, jsonGetDom(pJson, "prisonerDepth"));
-
-	// Minerals
-	UWORD uwIdxMineralPlans = jsonGetDom(pJson, "mineralPlans");
-	for(UBYTE i = 0; i < MINERAL_TYPE_COUNT; ++i) {
-		UWORD uwIdx = jsonGetElementInArray(pJson, uwIdxMineralPlans, i);
-		g_pMineralPlans[i] = jsonTokToUlong(pJson, uwIdx);
-	}
-
-	g_ubMinePercentForPlans = jsonTokToUlong(pJson, jsonGetDom(pJson, "minePercentForPlans"));
-	g_ubTrailingMineralCountPercent = jsonTokToUlong(pJson, jsonGetDom(pJson, "trailingMineralCountPercent"));
-	g_ulExtraPlanMoney = jsonTokToUlong(pJson, jsonGetDom(pJson, "extraPlanMoney"));
-
-	UWORD pPartsBase[INVENTORY_PART_COUNT] = {
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.drill.base")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.cargo.base")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.hull.base")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.tnt.base")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.teleport.base")),
-	};
-
-	UWORD pPartsAddPerLevel[INVENTORY_PART_COUNT] = {
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.drill.addPerLevel")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.cargo.addPerLevel")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.hull.addPerLevel")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.tnt.addPerLevel")),
-		jsonTokToUlong(pJson, jsonGetDom(pJson, "inventory.parts.teleport.addPerLevel")),
-	};
-
-	inventoryInit(pPartsBase, pPartsAddPerLevel);
-
-	jsonDestroy(pJson);
-}
 
 void defsCreateLocale(const char *szLangPrefix) {
 	logBlockBegin("defsCreateLocale(szLangPrefix: %s)", szLangPrefix);

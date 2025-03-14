@@ -11,6 +11,7 @@
 #include <ace/contrib/managers/audio_mixer.h>
 #include "menu.h"
 #include "dino.h"
+#include "inventory.h"
 #include "quest_gate.h"
 #include "game.h"
 #include "hud.h"
@@ -301,7 +302,7 @@ static void coreGsCreate(void) {
 
 	systemSetInt(INTB_VERTB, &coreVblankHandler, 0);
 
-	defsInit();
+	inventoryInit();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 5);
 	assetsTileOverlayCreate();
 	progressBarAdvance(&s_sProgressBarConfig, g_pMainBuffer->pScroll->pFront, 10);

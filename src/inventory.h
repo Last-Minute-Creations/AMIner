@@ -63,7 +63,7 @@ void inventorySetBasePartLevel(tPartKind ePart, tBaseId eBaseId, UBYTE ubLevel);
 
 UBYTE inventoryIsBasePart(tPartKind ePart);
 
-void inventoryInit(const UWORD *pPartsBase, const UWORD *pPartsAddPerLevel);
+void inventoryInit(void);
 
 void inventorySetCommUnlock(tBaseId eBase, tCommUnlockState eState);
 
