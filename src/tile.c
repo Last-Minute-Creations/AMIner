@@ -739,7 +739,7 @@ void tileSave(tFile *pFile) {
 
 	fileWrite(pFile, &uwSizeX, sizeof(uwSizeX));
 	fileWrite(pFile, &uwSizeY, sizeof(uwSizeY));
-	for(UWORD uwX = 0; uwX < uwSizeX; ++uwX) {
+	for(UWORD uwX = 1; uwX < uwSizeX; ++uwX) {
 		fileWrite(pFile, &pTiles[uwX][0], sizeof(pTiles[0][0]) * uwSizeY);
 	}
 	fileWrite(pFile, &s_ubPrisonerX, sizeof(s_ubPrisonerX));
@@ -756,7 +756,10 @@ UBYTE tileLoad(tFile *pFile) {
 
 	fileRead(pFile, &uwSizeX, sizeof(uwSizeX));
 	fileRead(pFile, &uwSizeY, sizeof(uwSizeY));
-	for(UWORD uwX = 0; uwX < uwSizeX; ++uwX) {
+	for(UWORD uwY = 0; uwY < uwSizeY; ++uwY) {
+		pTiles[0][uwY] = TILE_DIRT_1;
+	}
+	for(UWORD uwX = 1; uwX < uwSizeX; ++uwX) {
 		fileRead(pFile, &pTiles[uwX][0], sizeof(pTiles[0][0]) * uwSizeY);
 	}
 	fileRead(pFile, &s_ubPrisonerX, sizeof(s_ubPrisonerX));

@@ -1104,8 +1104,6 @@ static void gameSave(tFile *pFile) {
 	gameSaveSummary(pFile);
 	saveWriteTag(pFile, SAVE_TAG_GAME);
 	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
-	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
-	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileWrite(pFile, &g_eGameMode, sizeof(g_eGameMode));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
 
@@ -1355,8 +1353,6 @@ UBYTE gameLoad(tFile *pFile) {
 	}
 
 	fileRead(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
-	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
-	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_eGameMode, sizeof(g_eGameMode));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
 
