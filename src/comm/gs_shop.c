@@ -429,6 +429,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageMsgCreate(FACE_ID_COUNT, szTitle, "agent_epilogue", onBackFromEpilogueText);
 			break;
 
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_DOSSIER:
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_dossier", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_welcome", onBack);
 			break;

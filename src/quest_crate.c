@@ -167,6 +167,7 @@ void questCrateProcessBase(void) {
 		const tBase *pBase = baseGetCurrent();
 		if(gameIsRangeVisibleOnCamera(pBase->sPosTeleport.uwY, pBase->sPosTeleport.uwY + 32)) {
 			pageOfficeUnlockPerson(FACE_ID_SCIENTIST);
+			pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_DOSSIER);
 			pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME);
 			inboxPushBack(COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME, 0);
 			hudShowMessage(FACE_ID_SCIENTIST, g_pMsgs[MSG_HUD_SCI_WELCOME]);
