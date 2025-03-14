@@ -42,15 +42,15 @@ static UBYTE s_ubLedBlinkState;
 
 static const char * const s_pRebukeToMessageFileName[] = {
 	[REBUKE_INVALID] = 0,
-	[REBUKE_ACCOUNTING] = "komisarz_rebuke_accounting",
-	[REBUKE_BRIBE] = "komisarz_rebuke_bribe",
-	[REBUKE_FINAL] = "komisarz_rebuke_final",
-	[REBUKE_GATE_DESTROYED] = "komisarz_rebuke_gate_destroyed",
-	[REBUKE_PLAN_1] = "komisarz_rebuke_plan_1",
-	[REBUKE_PLAN_2] = "komisarz_rebuke_plan_2",
-	[REBUKE_QUESTIONING_CRATE] = "komisarz_rebuke_questioning_crate",
-	[REBUKE_QUESTIONING_GATE] = "komisarz_rebuke_questioning_gate",
-	[REBUKE_VEHICLE_DESTROYED] = "komisarz_rebuke_vehicle_destroyed",
+	[REBUKE_ACCOUNTING] = "rebuke_accounting",
+	[REBUKE_BRIBE] = "rebuke_bribe",
+	[REBUKE_FINAL] = "rebuke_final",
+	[REBUKE_GATE_DESTROYED] = "rebuke_gate_destroyed",
+	[REBUKE_PLAN_1] = "rebuke_plan_1",
+	[REBUKE_PLAN_2] = "rebuke_plan_2",
+	[REBUKE_QUESTIONING_CRATE] = "rebuke_questioning_crate",
+	[REBUKE_QUESTIONING_GATE] = "rebuke_questioning_gate",
+	[REBUKE_VEHICLE_DESTROYED] = "rebuke_vehicle_destroyed",
 };
 
 //------------------------------------------------------------------ PRIVATE FNS
@@ -274,64 +274,64 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			}
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_DOSSIER:
-			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_dossier", onBack);
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_WELCOME:
-			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_welcome", onBack);
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_FIRST_PLAN:
-			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_first_plan", onBack);
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "first_plan", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PLAN_COMPLETE:
-			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_plan_complete", onBack);
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "plan_complete", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START:
-			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_protest_start", onBack);
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "protest_start", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_STRIKE:
-			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_protest_strike", onBack);
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "protest_strike", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_CAPSULE_FOUND:
-			pageMsgCreate(FACE_ID_MIETEK, szTitle, "mietek_capsule_found", onBack);
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "capsule_found", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_DOSSIER:
-			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "krystyna_dossier", onBack);
+			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_ACCOUNTING:
 			pageAccountingCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KRYSTYNA_PROTEST_WARNING:
-			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "krystyna_protest_warning", onBack);
+			pageMsgCreate(FACE_ID_KRYSTYNA, szTitle, "protest_warning", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_DOSSIER:
-			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_dossier", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_WELCOME:
-			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_welcome", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_FIRST_PLAN:
-			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_first_plan", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "first_plan", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE:
-			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_complete", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "plan_complete", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_DELAYED:
-			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_delayed", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "plan_delayed", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_ACCOLADE:
-			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "urzedas_plan_accolade", onBack);
+			pageMsgCreate(FACE_ID_URZEDAS, szTitle, "plan_accolade", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_URZEDAS_BRIBE:
 			pageBribeCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_DOSSIER:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_dossier", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_WELCOME:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_welcome", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_DINO_INTRO:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_dino_intro", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "dino_intro", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REBUKE_1:
 			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, s_pRebukeToMessageFileName[gameGetRebuke(0)], onBack);
@@ -346,77 +346,77 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageQuestioningCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_ARCH_ACCOLADE:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_arch_accolade", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "accolade", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_LIST:
 			pageListCreate(FACE_ID_KOMISARZ, pageQuestioningGetNotReportedPages());
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_GATE:
 			pageQuestioningReport(QUESTIONING_BIT_GATE); // HACK HACK HACK
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_reported_gate", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "reported_gate", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_TELEPORT_PARTS:
 			pageQuestioningReport(QUESTIONING_BIT_TELEPORT_PARTS); // HACK HACK HACK
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_reported_crate", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "reported_crate", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_AGENT:
 			pageQuestioningReport(QUESTIONING_BIT_AGENT); // HACK HACK HACK
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_reported_agent", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "reported_agent", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_QUESTIONING_ACCOLADE:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_questioning_accolade", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "questioning_accolade", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_GATE_OPENING:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "komisarz_gate_opening", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "gate_opening", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_DOSSIER:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_dossier", onBack);
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_WELCOME:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_welcome", onBack);
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_ACCOLADE:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_accolade", onBack);
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "accolade", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_PLAN_FAIL:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_plan_fail", onBack);
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "plan_fail", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED_DINO_INCOMPLETE:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_opened_dino_incomplete", onBack);
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "gate_opened_dino_incomplete", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_OPENED_DINO_COMPLETE:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_opened_dino_complete", onBack);
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "gate_opened_dino_complete", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_ARCH_GATE_DESTROYED:
-			pageMsgCreate(FACE_ID_ARCH, szTitle, "arch_gate_destroyed", onBack);
+			pageMsgCreate(FACE_ID_ARCH, szTitle, "gate_destroyed", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_DOSSIER:
-			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_dossier", onBack);
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_WELCOME:
-			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_welcome", onBack);
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_GATE_DESTROYED:
-			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_gate_destroyed", onBack);
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "gate_destroyed", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_RADIO_1:
-			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_1", onBack);
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "radio_1", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_RADIO_2:
-			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_2", onBack);
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "radio_2", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_PRISONER_RADIO_3:
-			pageMsgCreate(FACE_ID_PRISONER, szTitle, "prisoner_radio_3", onBack);
+			pageMsgCreate(FACE_ID_PRISONER, szTitle, "radio_3", onBack);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_AGENT_WELCOME:
-			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_welcome", onBack);
+			pageMsgCreate(FACE_ID_AGENT, szTitle, "welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_DOSSIER:
-			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_dossier", onBack);
+			pageMsgCreate(FACE_ID_AGENT, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_SCIENTISTS:
-			pageMsgCreate(FACE_ID_AGENT, szTitle, "agent_sci", onBack);
+			pageMsgCreate(FACE_ID_AGENT, szTitle, "sci", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_SELL_CRATES:
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_SELL);
@@ -426,17 +426,17 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_EPILOGUE:
 			achievementUnlock(ACHIEVEMENT_ESCAPE);
-			pageMsgCreate(FACE_ID_COUNT, szTitle, "agent_epilogue", onBackFromEpilogueText);
+			pageMsgCreate(FACE_ID_COUNT, szTitle, "epilogue", onBackFromEpilogueText);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_DOSSIER:
-			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_dossier", onBack);
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_WELCOME:
-			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_welcome", onBack);
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "welcome", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE:
-			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_first_crate", onBack);
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "first_crate", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER:
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_TELEPORTER);
@@ -446,28 +446,28 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_EPILOGUE:
 			achievementUnlock(ACHIEVEMENT_ESCAPE);
-			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_epilogue", onBackFromEpilogueText);
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "epilogue", onBackFromEpilogueText);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_CRYO_DOSSIER:
-			pageMsgCreate(FACE_ID_CRYO, szTitle, "cryo_dossier", onBack);
+			pageMsgCreate(FACE_ID_CRYO, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_CRYO_TRAMIEL:
-			pageMsgCreate(FACE_ID_CRYO, szTitle, "cryo_tramiel", onBack);
+			pageMsgCreate(FACE_ID_CRYO, szTitle, "tramiel", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_CRYO_CONSOLE:
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_CAPSULE);
 			break;
 		case COMM_SHOP_PAGE_CRYO_SUCCESS:
 			g_sSettings.ubSokoUnlock = SETTINGS_SOKO_UNLOCK_ON;
-			pageMsgCreate(FACE_ID_CRYO, szTitle, "cryo_success", onBack);
+			pageMsgCreate(FACE_ID_CRYO, szTitle, "success", onBack);
 			break;
 
 		case COMM_SHOP_PAGE_JAY_DOSSIER:
-			pageMsgCreate(FACE_ID_JAY, szTitle, "jay_dossier", onBack);
+			pageMsgCreate(FACE_ID_JAY, szTitle, "dossier", onBack);
 			break;
 		case COMM_SHOP_PAGE_JAY_CONGRATS:
-			pageMsgCreate(FACE_ID_JAY, szTitle, "jay_congrats", onBack);
+			pageMsgCreate(FACE_ID_JAY, szTitle, "congrats", onBack);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_LIST_MIETEK:
@@ -510,10 +510,10 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageMarketCreate();
 			break;
 		case COMM_SHOP_PAGE_ARCH_GATE_PLEA:
-			pageMsgCreate(FACE_ID_ARCH, "", "arch_gate_plea", onBack);
+			pageMsgCreate(FACE_ID_ARCH, "", "gate_plea", onBack);
 			break;
 		case COMM_SHOP_PAGE_PRISONER_GATE_PLEA:
-			pageMsgCreate(FACE_ID_PRISONER, "", "prisoner_gate_plea", onBack);
+			pageMsgCreate(FACE_ID_PRISONER, "", "gate_plea", onBack);
 			break;
 		case COMM_SHOP_PAGE_GATE_DILEMMA:
 			pageGateDilemmaCreate();

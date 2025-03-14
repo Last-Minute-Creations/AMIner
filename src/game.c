@@ -471,6 +471,7 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
+#if 0
 	else if(keyUse(KEY_2)) {
 		g_pVehicles[0].lCash -= 50;
 		protestsProcess();
@@ -510,6 +511,7 @@ static void gameProcessHotkeys(void) {
 	else if(keyUse(KEY_0)) {
 		gameElapseTime(planManagerGet()->wTimeRemaining);
 	}
+#endif
 }
 
 static UWORD gameGetCameraDestinationY(void) {
@@ -590,7 +592,7 @@ static UBYTE gameProcessGateCutscene(void) {
 					++s_eGateCutsceneStep;
 				}
 				else {
-					gsMsgInit(FACE_ID_KOMISARZ, "komisarz_gate_opening", g_pMsgs[MSG_KOMISARZ_GATE_OPENING]);
+					gsMsgInit(FACE_ID_KOMISARZ, "gate_opening", g_pMsgs[MSG_KOMISARZ_GATE_OPENING]);
 					statePush(g_pGameStateManager, &g_sStateMsg);
 					gameTriggerCutscene(GAME_CUTSCENE_GATE_OPEN);
 					// Don't push step here bacause cutscene trigger changes it already

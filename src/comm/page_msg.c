@@ -18,6 +18,21 @@ static UBYTE s_ubCurrPage, s_ubPageCount;
 static tFaceId s_eFace;
 static tOnClose s_cbOnClose;
 
+static const char * const s_pFaceToPrefix[FACE_ID_COUNT + 1] = {
+	[FACE_ID_MIETEK] = "mietek_",
+	[FACE_ID_KRYSTYNA] = "krystyna_",
+	[FACE_ID_KOMISARZ] = "komisarz_",
+	[FACE_ID_URZEDAS] = "urzedas_",
+	[FACE_ID_ARCH] = "arch_",
+	[FACE_ID_PRISONER] = "prisoner_",
+	[FACE_ID_AGENT] = "agent_",
+	[FACE_ID_SCIENTIST] = "sci_",
+	[FACE_ID_CRYO] = "cryo_",
+	[FACE_ID_JAY] = "jay_",
+	[FACE_ID_RADIO] = "radio_",
+	[FACE_ID_COUNT] = "",
+};
+
 static void freeLines(void) {
 	while(s_uwLineCount--) {
 		memFree(s_pLines[s_uwLineCount], strlen(s_pLines[s_uwLineCount]) + 1);
@@ -165,7 +180,7 @@ void pageMsgCreate(
 	s_cbOnClose = cbOnClose;
 	s_uwLineCount = 0;
 	char szPath[100];
-	sprintf(szPath, SUBFILE_PREFIX "txt_%s/%s.txt", languageGetPrefix(), szFile);
+	sprintf(szPath, SUBFILE_PREFIX "txt_%s/%s%s.txt", s_pFaceToPrefix[eFace], languageGetPrefix(), szFile);
 	readLines(g_pRemap, szPath, COMM_DISPLAY_WIDTH);
 
 	s_ubCurrPage = 0;
