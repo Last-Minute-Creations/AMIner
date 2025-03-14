@@ -31,12 +31,12 @@ static void pageEscapeProcess(void) {
 		if(bButtonCurr == 0) {
 			switch(s_eScenario) {
 				case PAGE_ESCAPE_SCENARIO_AGENT:
-					UBYTE ubHeat = 20;
+					UBYTE ubHeatAdd = 20;
 					if(protestsGetState() >= PROTEST_STATE_STRIKE) {
-						ubHeat *= 2;
+						ubHeatAdd *= 2;
 					}
 
-					heatTryIncrease(ubHeat);
+					heatTryIncrease(ubHeatAdd);
 					if(heatTryPassCheck()) {
 						commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_OFFICE_AGENT_EPILOGUE);
 					}
@@ -45,7 +45,7 @@ static void pageEscapeProcess(void) {
 					}
 					break;
 				case PAGE_ESCAPE_SCENARIO_TELEPORT:
-					commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_TELEPORT);
+					commShopChangePage(COMM_SHOP_PAGE_OFFICE_MAIN, COMM_SHOP_PAGE_OFFICE_SCIENTIST_EPILOGUE);
 					break;
 			}
 		}

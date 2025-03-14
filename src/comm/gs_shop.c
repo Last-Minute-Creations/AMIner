@@ -444,6 +444,10 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_ESCAPE:
 			pageEscapeCreate(PAGE_ESCAPE_SCENARIO_TELEPORT);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_EPILOGUE:
+			achievementUnlock(ACHIEVEMENT_ESCAPE);
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "sci_epilogue", onBackFromEpilogueText);
+			break;
 
 		case COMM_SHOP_PAGE_OFFICE_CRYO_DOSSIER:
 			pageMsgCreate(FACE_ID_CRYO, szTitle, "cryo_dossier", onBack);
@@ -494,10 +498,6 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_NEWS_ESCAPE_FAIL:
 			pageNewsCreate(NEWS_KIND_ESCAPE_FAIL);
-			break;
-		case COMM_SHOP_PAGE_NEWS_ESCAPE_SUCCESS_TELEPORT:
-			achievementUnlock(ACHIEVEMENT_ESCAPE);
-			pageNewsCreate(NEWS_KIND_ESCAPE_TELEPORT);
 			break;
 		case COMM_SHOP_PAGE_NEWS_RIOTS:
 			achievementUnlock(ACHIEVEMENT_PROTESTS);

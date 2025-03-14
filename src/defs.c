@@ -19,7 +19,6 @@
 #include "hud.h"
 #include "assets.h"
 
-
 const LONG g_lInitialCash = 0;
 const UBYTE g_ubUpgradeLevels = 4;
 const UBYTE g_ubDrillingCost = 15;
@@ -82,24 +81,24 @@ const char * const s_pLangDom[] = {
 	[MSG_ACHIEVEMENT_TITLE_NO_ACCOLADES] = "achievements[15].name",
 	[MSG_ACHIEVEMENT_TITLE_NO_REBUKES] = "achievements[16].name",
 	[MSG_ACHIEVEMENT_TITLE_PLATINUM] = "achievements[17].name",
-	[MSG_ACHIEVEMENT_DESC_LAST_RIGHTEOUS] = "achievements[0].description",
-	[MSG_ACHIEVEMENT_DESC_WORK_LEADER] = "achievements[1].description",
-	[MSG_ACHIEVEMENT_DESC_CONFIDENT] = "achievements[2].description",
-	[MSG_ACHIEVEMENT_DESC_SLACKER] = "achievements[3].description",
-	[MSG_ACHIEVEMENT_DESC_ARCHEO_ENTUSIAST] = "achievements[4].description",
-	[MSG_ACHIEVEMENT_DESC_ARCHEO_VICTIM] = "achievements[5].description",
-	[MSG_ACHIEVEMENT_DESC_BATTLE_OF_CENTURY] = "achievements[6].description",
-	[MSG_ACHIEVEMENT_DESC_LOST_WISDOM] = "achievements[7].description",
-	[MSG_ACHIEVEMENT_DESC_MORE_COAL] = "achievements[8].description",
-	[MSG_ACHIEVEMENT_DESC_RECORD_HOLDER] = "achievements[9].description",
-	[MSG_ACHIEVEMENT_DESC_CO_OP] = "achievements[10].description",
-	[MSG_ACHIEVEMENT_DESC_NO_WITNESSES] = "achievements[11].description",
-	[MSG_ACHIEVEMENT_DESC_TIME_PRESSURE] = "achievements[12].description",
-	[MSG_ACHIEVEMENT_DESC_PROTESTS] = "achievements[13].description",
-	[MSG_ACHIEVEMENT_DESC_ESCAPE] = "achievements[14].description",
-	[MSG_ACHIEVEMENT_DESC_NO_ACCOLADES] = "achievements[15].description",
-	[MSG_ACHIEVEMENT_DESC_NO_REBUKES] = "achievements[16].description",
-	[MSG_ACHIEVEMENT_DESC_PLATINUM] = "achievements[17].description",
+	[MSG_ACHIEVEMENT_DESC_LAST_RIGHTEOUS] = "achievements[0].desc",
+	[MSG_ACHIEVEMENT_DESC_WORK_LEADER] = "achievements[1].desc",
+	[MSG_ACHIEVEMENT_DESC_CONFIDENT] = "achievements[2].desc",
+	[MSG_ACHIEVEMENT_DESC_SLACKER] = "achievements[3].desc",
+	[MSG_ACHIEVEMENT_DESC_ARCHEO_ENTUSIAST] = "achievements[4].desc",
+	[MSG_ACHIEVEMENT_DESC_ARCHEO_VICTIM] = "achievements[5].desc",
+	[MSG_ACHIEVEMENT_DESC_BATTLE_OF_CENTURY] = "achievements[6].desc",
+	[MSG_ACHIEVEMENT_DESC_LOST_WISDOM] = "achievements[7].desc",
+	[MSG_ACHIEVEMENT_DESC_MORE_COAL] = "achievements[8].desc",
+	[MSG_ACHIEVEMENT_DESC_RECORD_HOLDER] = "achievements[9].desc",
+	[MSG_ACHIEVEMENT_DESC_CO_OP] = "achievements[10].desc",
+	[MSG_ACHIEVEMENT_DESC_NO_WITNESSES] = "achievements[11].desc",
+	[MSG_ACHIEVEMENT_DESC_TIME_PRESSURE] = "achievements[12].desc",
+	[MSG_ACHIEVEMENT_DESC_PROTESTS] = "achievements[13].desc",
+	[MSG_ACHIEVEMENT_DESC_ESCAPE] = "achievements[14].desc",
+	[MSG_ACHIEVEMENT_DESC_NO_ACCOLADES] = "achievements[15].desc",
+	[MSG_ACHIEVEMENT_DESC_NO_REBUKES] = "achievements[16].desc",
+	[MSG_ACHIEVEMENT_DESC_PLATINUM] = "achievements[17].desc",
 	// Shop
 	[MSG_COMM_PRESS_SKIP] = "shop.pressSkip",
 	[MSG_COMM_TIME_REMAINING] = "shop.timeRemaining",
@@ -293,6 +292,7 @@ const char * const s_pLangDom[] = {
 	[MSG_PAGE_SCIENTIST_FIRST_CRATE] = "officePages.sciFirstCrate",
 	[MSG_PAGE_SCIENTIST_CRATE_TELEPORTER] = "officePages.sciCrateTeleporter",
 	[MSG_PAGE_SCIENTIST_ESCAPE] = "officePages.commonEscape",
+	[MSG_PAGE_SCIENTIST_EPILOGUE] = "officePages.commonEpilogue",
 
 	[MSG_PAGE_CRYO_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_CRYO_TRAMIEL] = "officePages.cryoTramiel",
