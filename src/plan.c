@@ -71,7 +71,6 @@ void planManagerInit(void) {
 		);
 	}
 
-	s_sPlanManager.ulMineralsUnlocked = 0;
 	s_sPlanManager.ubCurrentPlanIndex = 0;
 	planReset(0);
 }
@@ -130,10 +129,6 @@ void planStart(void) {
 	s_sPlanManager.wTimeRemaining = s_sPlanManager.wTimeMax;
 }
 
-void planUnlockMineral(tMineralType eMineral) {
-	s_sPlanManager.ulMineralsUnlocked |= 1 << eMineral;
-}
-
 WORD planGetRemainingDays(void) {
 	WORD wRemainingDays = (
 		(s_sPlanManager.wTimeRemaining + GAME_TIME_PER_DAY - 1) /
@@ -188,24 +183,4 @@ void planAdvance(void) {
 
 void planFailDeadline(void) {
 	s_sPlanManager.wTimeRemaining += 14 * GAME_TIME_PER_DAY;
-}
-
-void planReroll(void) {
-	tPlan *pPlan = planGetCurrent();
-	UBYTE isDone = 0;
-	LONG lCostRemaining = pPlan->ulTargetSum;
-	do {
-		UBYTE ubMineral = randUwMax(&g_sRand, MINERAL_TYPE_COUNT - 1);
-		if(s_sPlanManager.ulMineralsUnlocked & (1 << ubMineral)) {
-			UBYTE ubReward = g_pMinerals[ubMineral].ubReward;
-			UWORD uwCount = randUwMax(&g_sRand, (lCostRemaining + ubReward - 1) / ubReward);
-			pPlan->pMineralsRequired[ubMineral] += uwCount;
-			lCostRemaining -= uwCount * ubReward;
-			if(lCostRemaining <= 0) {
-				isDone = 1;
-			}
-		}
-	} while(!isDone);
-
-	planReset(1);
 }

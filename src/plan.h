@@ -24,7 +24,6 @@ typedef enum tPlanProlongState {
 
 typedef struct tPlanManager {
 	tPlan pPlanSequence[PLAN_COUNT_MAX];
-	ULONG ulMineralsUnlocked; ///< Acts as bitfield with BV(MINERAL_TYPE_*)
 	UWORD pMineralsSpent[MINERAL_TYPE_COUNT];
 	WORD wTimeMax;
 	WORD wTimeRemaining;
@@ -57,8 +56,6 @@ void planElapseTime(UWORD uwTime);
 
 void planStart(void);
 
-void planUnlockMineral(tMineralType eMineral);
-
 WORD planGetRemainingDays(void);
 
 void planAddDays(UBYTE ubDays, UBYTE isBribe);
@@ -72,7 +69,5 @@ UWORD planGetRemainingCost(void);
 void planAdvance(void);
 
 void planFailDeadline(void);
-
-void planReroll(void);
 
 #endif // _PLAN_H_
