@@ -1450,6 +1450,14 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 void gameTriggerSave(void) {
 	logWrite("game save");
 	systemUse();
+
+	if(diskFileExists("save_story.tmp")) {
+		diskFileDelete("save_story.tmp");
+	}
+	if(diskFileExists("save_deadline.tmp")) {
+		diskFileDelete("save_deadline.tmp");
+	}
+
 	char szPathTmp[20], szPathDat[20];
 	char *pEndTmp = stringCopy("save_", szPathTmp);
 	pEndTmp = stringCopy((g_eGameMode == GAME_MODE_STORY) ? "story" : "deadline", pEndTmp);
