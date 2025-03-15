@@ -74,7 +74,7 @@ static BYTE s_bRatioFlashC;
 static BYTE s_bRatioFlashE;
 static BYTE s_bRatioFlashPwr;
 static tUwRect s_sLogoRect;
-static UWORD s_pPaletteRef[32];
+static UWORD s_pLogoPaletteRef[32];
 
 static void logoGsCreate(void) {
 	logBlockBegin("logoGsCreate()");
@@ -113,7 +113,7 @@ static void logoGsLoop(void) {
 	tFadeState eState = fadeGetState();
 	if(eState == FADE_STATE_IN_MORPHING || eState == FADE_STATE_OUT_MORPHING) {
 		UBYTE ubLevel = fadeGetLevel();
-		paletteDim(s_pPaletteRef, s_pVp->pPalette, 32, ubLevel);
+		paletteDim(s_pLogoPaletteRef, s_pVp->pPalette, 32, ubLevel);
 		viewUpdateGlobalPalette(s_pView);
 		vPortWaitForEnd(s_pVp);
 	}
@@ -146,7 +146,7 @@ static void logoGsDestroy(void) {
 
 static void logoLmcCreate(void) {
 	systemUse();
-	paletteLoadFromFd(GET_SUBFILE_PREFIX("logo/lmc.plt"), s_pPaletteRef, 1 << s_pVp->ubBpp);
+	paletteLoadFromFd(GET_SUBFILE_PREFIX("logo/lmc.plt"), s_pLogoPaletteRef, 1 << s_pVp->ubBpp);
 	tBitMap *pLogo = bitmapCreateFromFd(GET_SUBFILE_PREFIX("logo/lmc.bm"), 0);
 	s_pSfxLmc = ptplayerSfxCreateFromFd(GET_SUBFILE_PREFIX("logo/lmc.sfx"), 0);
 	systemUnuse();
@@ -221,7 +221,7 @@ static void logoAceCreate(void) {
 	systemUse();
 
 	for(UBYTE i = 0; i < 32; ++i) {
-		s_pPaletteRef[i] = 0;
+		s_pLogoPaletteRef[i] = 0;
 	}
 
 	tBitMap *pLogoAce = bitmapCreateFromFd(GET_SUBFILE_PREFIX("logo/ace.bm"), 0);
@@ -333,6 +333,8 @@ static void logoAceLoop(void) {
 	if (s_bAceFadeoutRatio <= 0)
 	{
 		stateChange(s_pStateMachineLogo, s_pNextState);
+		fadeSetLevel(0);
+		fadeMorphTo(FADE_STATE_IN, 0);
 		return;
 	}
 }
@@ -374,17 +376,17 @@ static void drawLangNames(void) {
 void logoLangCreate(void) {
 	systemUse();
 	s_pLineBuffer = fontCreateTextBitMap(320, g_pFont->uwHeight);
-	paletteLoadFromFd(GET_SUBFILE_PREFIX("aminer.plt"), s_pPaletteRef, 1 << s_pVp->ubBpp);
+	paletteLoadFromFd(GET_SUBFILE_PREFIX("aminer.plt"), s_pLogoPaletteRef, 1 << s_pVp->ubBpp);
 	tBitMap *pFaces = bitmapCreateFromFd(GET_SUBFILE_PREFIX("lang_select.bm"), 0);
 	systemUnuse();
 
 	// Set first color to black, fill rest with colors from layer 1
-	s_pPaletteRef[0] = 0x0000;
-	s_pPaletteRef[27] = RGB(51, 34, 0);
-	s_pPaletteRef[28] = RGB(102, 68, 0);
-	s_pPaletteRef[29] = RGB(153, 102, 17);
-	s_pPaletteRef[30] = RGB(204, 136, 34);
-	s_pPaletteRef[31] = RGB(255, 170, 51);
+	s_pLogoPaletteRef[0] = 0x0000;
+	s_pLogoPaletteRef[27] = RGB(51, 34, 0);
+	s_pLogoPaletteRef[28] = RGB(102, 68, 0);
+	s_pLogoPaletteRef[29] = RGB(153, 102, 17);
+	s_pLogoPaletteRef[30] = RGB(204, 136, 34);
+	s_pLogoPaletteRef[31] = RGB(255, 170, 51);
 
 	for(tLanguage eLang = 0; eLang < LANGUAGE_COUNT; ++eLang) {
 		blitCopy(

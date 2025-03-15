@@ -14,6 +14,8 @@ tFadeState fadeGetState(void);
 
 UBYTE fadeGetLevel(void);
 
+void fadeSetLevel(UBYTE ubLevel);
+
 UWORD fadeGetSecondaryColor(void);
 
 void fadeMorphTo(tFadeState eState, UWORD uwSecondaryColor);

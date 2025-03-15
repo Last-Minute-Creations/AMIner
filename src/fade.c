@@ -12,6 +12,10 @@ UBYTE fadeGetLevel(void) {
 	return s_ubLevel;
 }
 
+void fadeSetLevel(UBYTE ubLevel) {
+	s_ubLevel = ubLevel;
+}
+
 UWORD fadeGetSecondaryColor(void) {
 	return s_uwSecondaryColor;
 }
