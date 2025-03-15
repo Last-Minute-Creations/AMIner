@@ -119,7 +119,6 @@ static tFaceId s_eFaceToDraw;
 
 // Pause vars
 static UBYTE s_ubSelection, s_ubSelectionPrev;
-static UBYTE s_ubHudShowStack;
 
 //----------------------------------------------------------------------- STATIC
 
@@ -140,7 +139,6 @@ static void hudShowPage(tHudPage eHudPage) {
 }
 
 static void hudRefresh(void) {
-	s_ubHudShowStack = 0;
 	const UBYTE ubLabelWidth = fontMeasureText(
 		s_pFont, g_pMsgs[MSG_HUD_DEPTH]
 	).uwX;
@@ -315,7 +313,7 @@ void hudReset(tGameMode eGameMode, UBYTE is2pPlaying) {
 
 void hudSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_HUD);
-	fileWrite(pFile, &s_ubLineHeight, sizeof(s_ubLineHeight));
+	// fileWrite(pFile, &s_ubLineHeight, sizeof(s_ubLineHeight));
 	fileWrite(pFile, &s_isBitmapFilled, sizeof(s_isBitmapFilled));
 	fileWrite(pFile, s_pPlayerData, sizeof(s_pPlayerData));
 	fileWrite(pFile, &s_eState, sizeof(s_eState));
@@ -332,9 +330,8 @@ void hudSave(tFile *pFile) {
 	fileWrite(pFile, s_szMsg, sizeof(s_szMsg));
 	fileWrite(pFile, s_szLetter, sizeof(s_szLetter));
 	fileWrite(pFile, &s_eFaceToDraw, sizeof(s_eFaceToDraw));
-	fileWrite(pFile, &s_ubSelection, sizeof(s_ubSelection));
-	fileWrite(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
-	fileWrite(pFile, &s_ubHudShowStack, sizeof(s_ubHudShowStack));
+	// fileWrite(pFile, &s_ubSelection, sizeof(s_ubSelection));
+	// fileWrite(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
 	saveWriteTag(pFile, SAVE_TAG_HUD_END);
 }
 
@@ -343,7 +340,7 @@ UBYTE hudLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_ubLineHeight, sizeof(s_ubLineHeight));
+	// fileRead(pFile, &s_ubLineHeight, sizeof(s_ubLineHeight));
 	fileRead(pFile, &s_isBitmapFilled, sizeof(s_isBitmapFilled));
 	fileRead(pFile, s_pPlayerData, sizeof(s_pPlayerData));
 	fileRead(pFile, &s_eState, sizeof(s_eState));
@@ -360,9 +357,8 @@ UBYTE hudLoad(tFile *pFile) {
 	fileRead(pFile, s_szMsg, sizeof(s_szMsg));
 	fileRead(pFile, s_szLetter, sizeof(s_szLetter));
 	fileRead(pFile, &s_eFaceToDraw, sizeof(s_eFaceToDraw));
-	fileRead(pFile, &s_ubSelection, sizeof(s_ubSelection));
-	fileRead(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
-	fileRead(pFile, &s_ubHudShowStack, sizeof(s_ubHudShowStack));
+	// fileRead(pFile, &s_ubSelection, sizeof(s_ubSelection));
+	// fileRead(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
 
 	hudRefresh();
 	return saveReadTag(pFile, SAVE_TAG_HUD_END);
