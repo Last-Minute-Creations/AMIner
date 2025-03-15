@@ -7,7 +7,8 @@
 
 #include "aminer.h"
 #include <comm/comm.h>
-#include "defs.h"
+#include "../defs.h"
+#include "../msg.h"
 
 #ifdef __cplusplus
 extern "C" {

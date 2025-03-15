@@ -9,8 +9,6 @@
 
 #define WAREHOUSE_COL_COUNT 4
 
-extern char **g_pWarehouseColNames;
-
 void pageWarehouseCreate(void);
 
 #endif // _COMM_PAGE_WAREHOUSE_H_

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <ace/managers/system.h>
 #include <comm/comm.h>
-#include <json/utf8.h>
+#include "../utf8.h"
 #include "../defs.h"
 #include "../assets.h"
 #include "../language.h"

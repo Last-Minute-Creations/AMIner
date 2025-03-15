@@ -2,11 +2,12 @@
 #include <ace/managers/system.h>
 #include <ace/utils/string.h>
 #include <comm/comm.h>
-#include <json/utf8.h>
+#include "../utf8.h"
 #include "../defs.h"
 #include "../core.h"
 #include "../language.h"
 #include "../assets.h"
+#include "../msg.h"
 
 #define LINES_MAX 100
 #define LINES_OCCUPIED_BY_FACE 3
@@ -180,7 +181,7 @@ void pageMsgCreate(
 	s_cbOnClose = cbOnClose;
 	s_uwLineCount = 0;
 	char szPath[100];
-	sprintf(szPath, SUBFILE_PREFIX "txt_%s/%s%s.txt", s_pFaceToPrefix[eFace], languageGetPrefix(), szFile);
+	sprintf(szPath, SUBFILE_PREFIX "txt_%s/%s%s.txt", languageGetPrefix(), s_pFaceToPrefix[eFace],  szFile);
 	readLines(g_pRemap, szPath, COMM_DISPLAY_WIDTH);
 
 	s_ubCurrPage = 0;

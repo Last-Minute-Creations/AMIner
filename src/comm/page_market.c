@@ -87,7 +87,7 @@ static void drawRow(tMarketRow eRow) {
 
 	char szBfr[50];
 	if(eRow == MARKET_ROW_SOURCE_MINERAL) {
-		snprintf(szBfr, sizeof(szBfr), "%s: < %s >", g_pWarehouseColNames[0], g_pMineralNames[s_eSource]);
+		snprintf(szBfr, sizeof(szBfr), "%s: < %s >", g_pMsgs[MSG_WAREHOUSE_COL_MINERAL], g_pMsgs[MSG_MINERAL_SILVER + s_eSource]);
 		commDrawText(0, 0, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 	}
 	else if(MARKET_ROW_TARGET_FIRST <= eRow && eRow <= MARKET_ROW_TARGET_LAST) {
@@ -95,10 +95,10 @@ static void drawRow(tMarketRow eRow) {
 		const tTargetMineral *pTarget = &s_pTargets[ubTargetIndex];
 		UWORD uwY = MARKET_ROW_FIRST_TARGET_Y + ubTargetIndex * MARKET_LINE_HEIGHT;
 
-		snprintf(szBfr, sizeof(szBfr), "%hhux %s", pTarget->ubPrice, g_pMineralNames[s_eSource]);
+		snprintf(szBfr, sizeof(szBfr), "%hhux %s", pTarget->ubPrice, g_pMsgs[MSG_MINERAL_SILVER + s_eSource]);
 		commDrawText(0, uwY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 
-		snprintf(szBfr, sizeof(szBfr), "%hhux %s", 1, g_pMineralNames[pTarget->eMineral]);
+		snprintf(szBfr, sizeof(szBfr), "%hhux %s", 1, g_pMsgs[MSG_MINERAL_SILVER + pTarget->eMineral]);
 		commDrawText(MARKET_TRADE_COLUMN_WIDTH, uwY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 
 		drawRowStock(eRow);

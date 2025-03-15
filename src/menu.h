@@ -41,11 +41,4 @@ void menuGsEnter(UBYTE isScoreShow);
 
 extern tState g_sStateMenu;
 
-extern char **g_pMenuCaptions;
-extern char **g_pMenuEnumP1;
-extern char **g_pMenuEnumP2;
-extern char **g_pMenuEnumOnOff;
-extern char **g_pMenuEnumPlayerCount;
-extern char **g_pMenuEnumVolume;
-
 #endif // _MENU_H_

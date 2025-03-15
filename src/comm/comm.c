@@ -13,6 +13,8 @@
 #include "../core.h"
 #include "../game.h"
 #include "../progress_bar.h"
+#include "../defs.h"
+#include "../msg.h"
 #include "settings.h"
 
 #define SFX_CHANNEL_KEY 0
@@ -57,7 +59,6 @@ static tProgressBarConfig s_sProgressBarConfig = {
 tBitMap *g_pCommBmFaces;
 tBitMap *g_pCommBmSelection;
 tBitMap *g_pCommWorkshopIcons;
-char **g_pCommPageNames;
 
 //------------------------------------------------------------ PRIVATE FUNCTIONS
 
@@ -70,7 +71,7 @@ static void drawButtonLabels(void) {
 
 	tUwCoordYX sOrigin = commGetOrigin();
 	for(UBYTE i = 0; i < 3; ++i) {
-		fontFillTextBitMap(g_pFont, s_pLineBuffer,  g_pCommPageNames[i]);
+		fontFillTextBitMap(g_pFont, s_pLineBuffer,  g_pMsgs[MSG_TAB_NAME_OFFICE + i]);
 		UWORD uwTextWidth = s_pLineBuffer->uwActualWidth;
 
 		UWORD uwLabelX = sOrigin.uwX + s_pLabelOffsetsX[i] - 2;
