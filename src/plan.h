@@ -60,7 +60,7 @@ WORD planGetRemainingDays(void);
 
 void planAddDays(UBYTE ubDays, UBYTE isBribe);
 
-void planSpendMinerals(UBYTE ubMineralType, UBYTE ubCount);
+void planSetMinerals(UBYTE ubMineralType, UBYTE ubCount);
 
 UBYTE planTryProlong(void);
 

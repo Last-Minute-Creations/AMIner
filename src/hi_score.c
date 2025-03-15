@@ -226,9 +226,9 @@ void hiScoreSetup(LONG lScore, const char *szResult, tScoreMode eScoreMode) {
 			s_isEnteringHiScore = 1;
 			if(g_eGameMode == GAME_MODE_CHALLENGE) {
 				achievementUnlock(ACHIEVEMENT_RECORD_HOLDER);
-				if(g_isAtari) {
-					achievementUnlock(ACHIEVEMENT_MORE_COAL);
-				}
+			}
+			if(g_isAtari) {
+				achievementUnlock(ACHIEVEMENT_MORE_COAL);
 			}
 			s_isShift = 0;
 			s_isCursor = 0;

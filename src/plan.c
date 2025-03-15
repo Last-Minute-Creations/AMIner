@@ -144,8 +144,8 @@ void planAddDays(UBYTE ubDays, UBYTE isBribe) {
 	s_sPlanManager.wTimeRemaining += ubDays * GAME_TIME_PER_DAY;
 }
 
-void planSpendMinerals(UBYTE ubMineralType, UBYTE ubCount) {
-	s_sPlanManager.pMineralsSpent[ubMineralType] += ubCount;
+void planSetMinerals(UBYTE ubMineralType, UBYTE ubCount) {
+	s_sPlanManager.pMineralsSpent[ubMineralType] = ubCount;
 }
 
 UBYTE planTryProlong(void) {

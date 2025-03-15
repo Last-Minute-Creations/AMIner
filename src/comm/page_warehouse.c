@@ -282,14 +282,11 @@ static void pageWarehouseProcess(void) {
 				for(UBYTE i = 0; i < s_ubPosCount; ++i) {
 					UBYTE ubMineral = s_pMineralsOnList[i];
 					warehouseSetStock(ubMineral, s_pTmpStock[ubMineral]);
-					planSpendMinerals(ubMineral, s_pTmpPlan[ubMineral]);
+					planSetMinerals(ubMineral, s_pTmpPlan[ubMineral]);
 					g_pVehicles[0].lCash += g_pMinerals[ubMineral].ubReward * s_pTmpSell[ubMineral];
-					s_pTmpSell[ubMineral] = 0;
-					s_pTmpPlan[ubMineral] = 0;
-					s_pTmpStock[ubMineral] = 0;
-					hudSetCash(0, g_pVehicles[0].lCash);
-					protestsProcess();
 				}
+				hudSetCash(0, g_pVehicles[0].lCash);
+				protestsProcess();
 
 				if(planIsCurrentFulfilled()) {
 					UBYTE wasDelayed = (planManagerGet()->eProlongState == PLAN_PROLONG_CURRENT);
