@@ -426,7 +426,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_EPILOGUE:
 			achievementUnlock(ACHIEVEMENT_ESCAPE);
-			pageMsgCreate(FACE_ID_COUNT, szTitle, "epilogue", onBackFromEpilogueText);
+			pageMsgCreate(FACE_ID_COUNT, szTitle, "agent_epilogue", onBackFromEpilogueText);
 			break;
 
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_DOSSIER:

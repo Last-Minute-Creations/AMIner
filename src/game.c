@@ -471,7 +471,7 @@ static void gameProcessHotkeys(void) {
 			s_eCameraType = CAMERA_TYPE_P1;
 		}
 	}
-#if 0
+#if defined(GAME_DEBUG)
 	else if(keyUse(KEY_2)) {
 		g_pVehicles[0].lCash -= 50;
 		protestsProcess();
