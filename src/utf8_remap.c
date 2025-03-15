@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "utf8_remap.h"
-#include <json/utf8.h>
+#include "utf8.h"
 #include <ace/managers/log.h>
 #include <ace/managers/system.h>
 #include <ace/utils/disk_file.h>
-#include "../assets.h"
+#include "assets.h"
 
 char remapChar(const tCodeRemap *pRemap, ULONG ulCodepoint) {
 	if(ulCodepoint < 128) {

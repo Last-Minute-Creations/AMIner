@@ -24,6 +24,7 @@
 #include "blitter_mutex.h"
 #include "base_unlocks.h"
 #include "protests.h"
+#include "msg.h"
 #include <comm/page_workshop.h>
 
 #define RESTOCK_RESULT_ONLY_MINERALS 0x7FFF
@@ -794,7 +795,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		else {
 			textBobSetTextVa(
 				&pVehicle->sTextBob, pMineral->ubTitleColor, "%s x%hhu",
-				g_pMineralNames[g_pTileDefs[ubTile].ubMineral],
+				g_pMsgs[MSG_MINERAL_SILVER + g_pTileDefs[ubTile].ubMineral],
 				g_pTileDefs[ubTile].ubSlots
 			);
 			ePickupKind = PICKUP_SFX_KIND_BONUS;
@@ -822,7 +823,7 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 			const tPartDef *pPartDef = inventoryGetPartDef(ePart);
 			if(pPartDef->ubLevel < inventoryGetPartMaxLevel(ePart)) {
 				inventorySetPartLevel(ePart, pPartDef->ubLevel + 1);
-				textBobSetTextVa(&pVehicle->sTextBob, COLOR_GREEN, "Bonus: %s", g_pShopNames[ePart]);
+				textBobSetTextVa(&pVehicle->sTextBob, COLOR_GREEN, "Bonus: %s", g_pMsgs[MSG_PART_NAME_DRILL + ePart]);
 			}
 			else {
 				textBobSetText(&pVehicle->sTextBob, COLOR_GREEN, "T +10");

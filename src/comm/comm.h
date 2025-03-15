@@ -120,7 +120,6 @@ UBYTE commProcessPage(void);
 extern tBitMap *g_pCommBmFaces;
 extern tBitMap *g_pCommBmSelection;
 extern tBitMap *g_pCommWorkshopIcons;
-extern char **g_pCommPageNames;
 
 #ifdef __cplusplus
 }

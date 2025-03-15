@@ -17,8 +17,6 @@
 
 #define WAREHOUSE_COL_COUNT 4
 
-char **g_pWarehouseColNames;
-
 static UBYTE s_ubPosCurr = 0, s_ubPosCount = 0;
 static const UBYTE s_pColOffs[WAREHOUSE_COL_COUNT] = {0,  50, 85, 130};
 static UBYTE s_pMineralsOnList[MINERAL_TYPE_COUNT];
@@ -58,7 +56,7 @@ static void pageWarehouseDrawRow(UBYTE ubPos) {
 
 	// Name
 	commDrawText(
-		s_pColOffs[0], uwRowOffsY, g_pMineralNames[ubMineral],
+		s_pColOffs[0], uwRowOffsY, g_pMsgs[MSG_MINERAL_SILVER + ubMineral],
 		FONT_COOKIE | FONT_SHADOW, ubColor
 	);
 
@@ -69,7 +67,7 @@ static void pageWarehouseDrawRow(UBYTE ubPos) {
 	commDrawText(s_pColOffs[1], uwRowOffsY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
 
 	// Stock
-	UBYTE ubStockCenter = fontMeasureText(g_pFont, g_pWarehouseColNames[2]).uwX / 2;
+	UBYTE ubStockCenter = fontMeasureText(g_pFont, g_pMsgs[MSG_WAREHOUSE_COL_STOCK]).uwX / 2;
 	sprintf(szBfr, "%hu", s_pTmpStock[ubMineral]);
 	UBYTE ubValWidthHalf = fontMeasureText(g_pFont, szBfr).uwX / 2;
 
@@ -114,7 +112,7 @@ static void pageWarehouseDrawRow(UBYTE ubPos) {
 static void pageWarehouseRedraw(void) {
 	for(UBYTE ubCol = 0; ubCol < 4; ++ubCol) {
 		commDrawText(
-			s_pColOffs[ubCol], 0, g_pWarehouseColNames[ubCol],
+			s_pColOffs[ubCol], 0, g_pMsgs[MSG_WAREHOUSE_COL_MINERAL + ubCol],
 			FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 		);
 	}

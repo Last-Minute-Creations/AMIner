@@ -37,6 +37,7 @@
 #include "tile_variant.h"
 #include "base_unlocks.h"
 #include "protests.h"
+#include "msg.h"
 
 #define CORE_INIT_BAR_MARGIN 10
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)

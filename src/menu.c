@@ -23,6 +23,7 @@
 #include "assets.h"
 #include "achievement.h"
 #include "credits.h"
+#include "msg.h"
 
 #define SFX_CHANNEL_ATARI 1
 #define MENU_OPTIONS_MAX 10
@@ -78,13 +79,6 @@ static tGameSummary s_sSummary;
 static tGameMode s_eModeMenu;
 
 //------------------------------------------------------------------ PUBLIC VARS
-
-char **g_pMenuCaptions;
-char **g_pMenuEnumP1;
-char **g_pMenuEnumP2;
-char **g_pMenuEnumOnOff;
-char **g_pMenuEnumPlayerCount;
-char **	g_pMenuEnumVolume;
 
 static void menuEnableAtari(void) {
 	if(g_sSettings.isAtariHidden) {
@@ -162,6 +156,10 @@ static void onMenuPosUndraw(
 	commErase(uwX + (COMM_DISPLAY_WIDTH - uwWidth) / 2, uwY, uwWidth, uwHeight);
 }
 
+static const char* menuGetCaption(tMenuCaptionKind eCaptionKind) {
+	return g_pMsgs[MSG_MENU_CAPTION_CAMPAIGN + eCaptionKind];
+}
+
 static void onMenuPosDraw(
 	UWORD uwX, UWORD uwY, UNUSED_ARG const char *szCaption, const char *szText,
 	UBYTE isActive, UWORD *pUndrawWidth
@@ -173,7 +171,7 @@ static void onMenuPosDraw(
 	);
 	*pUndrawWidth = fontMeasureText(g_pFont, szText).uwX;
 
-	if(szCaption == g_pMenuCaptions[MENU_CAPTION_CONTINUE] && s_eModeMenu == GAME_MODE_STORY) {
+	if(szCaption == menuGetCaption(MENU_CAPTION_CONTINUE) && s_eModeMenu == GAME_MODE_STORY) {
 		UBYTE ubLineHeight = commGetLineHeight();
 		UWORD uwY = COMM_DISPLAY_HEIGHT - 4 * ubLineHeight;
 		if(isActive) {
@@ -264,7 +262,7 @@ static void menuOnEnterStory(void) {
 
 	if(menuLoadSummaryFromSave("save_story.dat", &s_sSummary)) {
 		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
+			.szCaption = menuGetCaption(MENU_CAPTION_CONTINUE),
 			.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 			.isHidden = 0,
 			.sOptCb = {.cbSelect = menuOnStoryLoad}
@@ -272,26 +270,26 @@ static void menuOnEnterStory(void) {
 	}
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
+		.szCaption = menuGetCaption(MENU_CAPTION_START),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnGameStart}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_PLAYER_COUNT],
+		.szCaption = menuGetCaption(MENU_CAPTION_PLAYER_COUNT),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
 			.pVar = &g_is2pPlaying,
 			.ubMax = 1,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumPlayerCount
+			.pEnumLabels = &g_pMsgs[MSG_PLAYER_COUNT_ONE]
 		}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_BACK],
+		.szCaption = menuGetCaption(MENU_CAPTION_BACK),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnBackToMain}
@@ -307,7 +305,7 @@ static void menuOnEnterDeadline(void) {
 
 	if(diskFileExists("save_deadline.dat")) {
 		s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-			.szCaption = g_pMenuCaptions[MENU_CAPTION_CONTINUE],
+			.szCaption = menuGetCaption(MENU_CAPTION_CONTINUE),
 			.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 			.isHidden = 0,
 			.sOptCb = {.cbSelect = menuOnDeadlineLoad}
@@ -315,46 +313,46 @@ static void menuOnEnterDeadline(void) {
 	}
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
+		.szCaption = menuGetCaption(MENU_CAPTION_START),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnGameStart}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_PLAYER_COUNT],
+		.szCaption = menuGetCaption(MENU_CAPTION_PLAYER_COUNT),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
 			.pVar = &g_is2pPlaying,
 			.ubMax = 1,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumPlayerCount
+			.pEnumLabels = &g_pMsgs[MSG_PLAYER_COUNT_ONE],
 		}
 	};
 	s_ubIndexAtari = s_ubMenuOptionCount;
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_ATARI_MODE],
+		.szCaption = menuGetCaption(MENU_CAPTION_ATARI_MODE),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = g_sSettings.isAtariHidden,
 		.sOptUb = {
 			.pVar = &g_isAtari,
 			.ubMax = 1,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumOnOff
+			.pEnumLabels = &g_pMsgs[MSG_BOOL_OFF],
 		}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_HI_SCORES],
+		.szCaption = menuGetCaption(MENU_CAPTION_HI_SCORES),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnShowScores}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_BACK],
+		.szCaption = menuGetCaption(MENU_CAPTION_BACK),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnBackToMain}
@@ -369,46 +367,46 @@ static void menuOnEnterChallenge(void) {
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_START],
+		.szCaption = menuGetCaption(MENU_CAPTION_START),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnGameStart}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_PLAYER_COUNT],
+		.szCaption = menuGetCaption(MENU_CAPTION_PLAYER_COUNT),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
 			.pVar = &g_is2pPlaying,
 			.ubMax = 1,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumPlayerCount
+			.pEnumLabels = &g_pMsgs[MSG_PLAYER_COUNT_ONE],
 		}
 	};
 	s_ubIndexAtari = s_ubMenuOptionCount;
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_ATARI_MODE],
+		.szCaption = menuGetCaption(MENU_CAPTION_ATARI_MODE),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = g_sSettings.isAtariHidden,
 		.sOptUb = {
 			.pVar = &g_isAtari,
 			.ubMax = 1,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumOnOff
+			.pEnumLabels = &g_pMsgs[MSG_BOOL_OFF],
 		}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_HI_SCORES],
+		.szCaption = menuGetCaption(MENU_CAPTION_HI_SCORES),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnShowScores}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_BACK],
+		.szCaption = menuGetCaption(MENU_CAPTION_BACK),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnBackToMain}
@@ -431,57 +429,57 @@ static void menuOnEnterSettings(void) {
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_VOLUME_SOUND],
+		.szCaption = menuGetCaption(MENU_CAPTION_VOLUME_SOUND),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
 			.pVar = &g_sSettings.ubSoundVolume,
 			.ubMax = 10,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumVolume,
+			.pEnumLabels = 0,
 			.cbOnValChange = menuUpdateVolume,
 		}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_VOLUME_MUSIC],
+		.szCaption = menuGetCaption(MENU_CAPTION_VOLUME_MUSIC),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
 			.pVar = &g_sSettings.ubMusicVolume,
 			.ubMax = 10,
 			.isCyclic = 0,
-			.pEnumLabels = (const char **)g_pMenuEnumVolume,
+			.pEnumLabels = 0,
 			.cbOnValChange = menuUpdateVolume,
 		}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_STEER_P1],
+		.szCaption = menuGetCaption(MENU_CAPTION_STEER_P1),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
 			.pVar = &g_sSettings.is1pKbd,
 			.ubMax = 1,
 			.isCyclic = 1,
-			.pEnumLabels = (const char **)g_pMenuEnumP1
+			.pEnumLabels = &g_pMsgs[MSG_CONTROLS_P1_JOY],
 		}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_STEER_P2],
+		.szCaption = menuGetCaption(MENU_CAPTION_STEER_P2),
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
 			.pVar = &g_sSettings.is2pKbd,
 			.ubMax = 1,
 			.isCyclic = 1,
-			.pEnumLabels = (const char **)g_pMenuEnumP2
+			.pEnumLabels = &g_pMsgs[MSG_CONTROLS_P2_JOY],
 		}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_BACK],
+		.szCaption = menuGetCaption(MENU_CAPTION_BACK),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnBackToMainFromSettings}
@@ -495,49 +493,49 @@ static void menuOnEnterMain(void) {
 	s_ubIndexAtari = INDEX_ATARI_INVALID;
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_STORY],
+		.szCaption = menuGetCaption(MENU_CAPTION_STORY),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnEnterStory}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_DEADLINE],
+		.szCaption = menuGetCaption(MENU_CAPTION_DEADLINE),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnEnterDeadline}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_CHALLENGE],
+		.szCaption = menuGetCaption(MENU_CAPTION_CHALLENGE),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnEnterChallenge}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_ACHIEVEMENTS],
+		.szCaption = menuGetCaption(MENU_CAPTION_ACHIEVEMENTS),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnEnterAchievements}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_SETTINGS],
+		.szCaption = menuGetCaption(MENU_CAPTION_SETTINGS),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnEnterSettings}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_CREDITS],
+		.szCaption = menuGetCaption(MENU_CAPTION_CREDITS),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnEnterCredits}
 	};
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = g_pMenuCaptions[MENU_CAPTION_EXIT],
+		.szCaption = menuGetCaption(MENU_CAPTION_EXIT),
 		.eOptionType = MENU_LIST_OPTION_TYPE_CALLBACK,
 		.isHidden = 0,
 		.sOptCb = {.cbSelect = menuOnExit}

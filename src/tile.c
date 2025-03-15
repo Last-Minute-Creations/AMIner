@@ -14,6 +14,7 @@
 #include "plan.h"
 #include "save.h"
 #include "base.h"
+#include "msg.h"
 
 #define ROWS_PER_PLAN_MAX 20
 // #define TILE_QUEST_DEBUG_PLACEMENT

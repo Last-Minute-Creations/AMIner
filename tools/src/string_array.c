@@ -16,13 +16,13 @@ static char *stringCreateFromTok(
 	char *szDestination = 0;
 	if(pJson->pTokens[uwTokIdx].type == JSMN_ARRAY) {
 		uint16_t uwAllocSize = 0;
-		for(uint8_t i = 0; i < pJson->pTokens[uwTokIdx].size; ++i) {
+		for(uint16_t i = 0; i < pJson->pTokens[uwTokIdx].size; ++i) {
 			uint16_t uwArrIdx = jsonGetElementInArray(pJson, uwTokIdx, i);
 			uwAllocSize += jsonStrLen(pJson, uwArrIdx) + 1;
 		}
 		szDestination = malloc(uwAllocSize);
 		uint16_t uwOffs = 0;
-		for(uint8_t i = 0; i < pJson->pTokens[uwTokIdx].size; ++i) {
+		for(uint16_t i = 0; i < pJson->pTokens[uwTokIdx].size; ++i) {
 			uint16_t uwArrIdx = jsonGetElementInArray(pJson, uwTokIdx, i);
 			uwOffs += jsonTokStrCpy(
 				pJson, pRemap, uwArrIdx, &szDestination[uwOffs], uwAllocSize - uwOffs
@@ -65,15 +65,15 @@ static void stringDestroy(char *szString) {
 
 //----------------------------------------------------------------- STRING ARRAY
 
-static char **stringArrayCreate(uint8_t ubCount) {
+static char **stringArrayCreate(uint16_t uwCount) {
 	char **pArray = 0;
-	if(ubCount) {
-		pArray = malloc((ubCount + 1) * sizeof(char*));
-		for(uint8_t i = 0; i < ubCount; ++i) {
+	if(uwCount) {
+		pArray = malloc((uwCount + 1) * sizeof(char*));
+		for(uint16_t i = 0; i < uwCount; ++i) {
 			pArray[i] = STRING_ARRAY_EMPTY_POS;
 		}
 	}
-	pArray[ubCount] = STRING_ARRAY_TERMINATOR;
+	pArray[uwCount] = STRING_ARRAY_TERMINATOR;
 	return pArray;
 }
 
@@ -85,10 +85,10 @@ char **stringArrayCreateFromDom(
 		printf("ERR: json not found: '%s'\n", szDom);
 		return stringArrayCreate(0);
 	}
-	uint8_t ubCount = pJson->pTokens[uwTokArray].size;
-	char **pArray = stringArrayCreate(ubCount);
+	uint16_t uwCount = pJson->pTokens[uwTokArray].size;
+	char **pArray = stringArrayCreate(uwCount);
 
-	for(uint16_t i = 0; i < ubCount; ++i) {
+	for(uint16_t i = 0; i < uwCount; ++i) {
 		uint16_t uwTokElement = jsonGetElementInArray(pJson, uwTokArray, i);
 		if(!uwTokElement) {
 			printf("ERR: json array element not found: '%s'[%hhu]", szDom, i);
@@ -103,9 +103,9 @@ char **stringArrayCreateFromDom(
 char **stringArrayCreateFromDomElements(
 	tJson *pJson, const tCodeRemap *pRemap, const char * const *pNames
 ) {
-	uint8_t ubCount = stringArrayGetCount(pNames);
-	char **pArray = stringArrayCreate(ubCount);
-	for(uint8_t i = 0; i < ubCount; ++i) {
+	uint16_t uwCount = stringArrayGetCount(pNames);
+	char **pArray = stringArrayCreate(uwCount);
+	for(uint16_t i = 0; i < uwCount; ++i) {
 		const char *szDom = pNames[i];
 		pArray[i] = stringCreateFromDom(pJson, pRemap, szDom);
 	}
@@ -113,18 +113,18 @@ char **stringArrayCreateFromDomElements(
 }
 
 void stringArrayDestroy(char **pArray) {
-	uint8_t ubCount;
-	for(ubCount = 0; pArray[ubCount] != STRING_ARRAY_TERMINATOR; ++ubCount) {
-		if(pArray[ubCount] != STRING_ARRAY_EMPTY_POS) {
-			stringDestroy(pArray[ubCount]);
+	uint16_t uwCount;
+	for(uwCount = 0; pArray[uwCount] != STRING_ARRAY_TERMINATOR; ++uwCount) {
+		if(pArray[uwCount] != STRING_ARRAY_EMPTY_POS) {
+			stringDestroy(pArray[uwCount]);
 		}
 	}
 	// Free string pointers + terminator
 	free(pArray);
 }
 
-uint8_t stringArrayGetCount(const char * const *pArray) {
-	uint8_t ubCount;
-	for(ubCount = 0; pArray[ubCount] != STRING_ARRAY_TERMINATOR; ++ubCount) { }
-	return ubCount;
+uint16_t stringArrayGetCount(const char * const *pArray) {
+	uint16_t uwCount;
+	for(uwCount = 0; pArray[uwCount] != STRING_ARRAY_TERMINATOR; ++uwCount) { }
+	return uwCount;
 }

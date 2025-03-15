@@ -5,7 +5,7 @@
 #ifndef _STRING_ARRAY_H_
 #define _STRING_ARRAY_H_
 
-#include "json/json.h"
+#include <ace/utils/file.h>
 
 /**
  * Array of string pointers terimnated with nullptr
@@ -14,16 +14,10 @@
 #define STRING_ARRAY_EMPTY_POS ((char*)-1)
 #define STRING_ARRAY_TERMINATOR ((char*)0)
 
-char **stringArrayCreateFromDom(
-	tJson *pJson, const tCodeRemap *pRemap, const char *szDom
-);
-
-char **stringArrayCreateFromDomElements(
-	tJson *pJson, const tCodeRemap *pRemap, const char * const *pNames
-);
+char **stringArrayCreateFromFd(tFile *pFile);
 
 void stringArrayDestroy(char **pArray);
 
-UBYTE stringArrayGetCount(const char * const *pArray);
+UWORD stringArrayGetCount(const char * const *pArray);
 
 #endif // _STRING_ARRAY_H_

@@ -257,6 +257,59 @@ const char * const g_pLangDom[MSG_COUNT + 1] = {
 	[MSG_PAGE_JAY_DOSSIER] = "officePages.commonDossier",
 	[MSG_PAGE_JAY_CONGRATS] = "officePages.jayCongrats",
 
+	[MSG_PART_NAME_DRILL] = "shopNames[0]",
+	[MSG_PART_NAME_CARGO] = "shopNames[1]",
+	[MSG_PART_NAME_HULL] = "shopNames[2]",
+	[MSG_PART_NAME_TNT] = "shopNames[3]",
+	[MSG_PART_NAME_TELEPORT] = "shopNames[4]",
+	[MSG_PART_NAME_PLATFORM] = "shopNames[5]",
+	[MSG_PART_NAME_WORKSHOP] = "shopNames[6]",
+
+	[MSG_TAB_NAME_OFFICE] = "commPageNames[0]",
+	[MSG_TAB_NAME_WORKSHOP] = "commPageNames[1]",
+	[MSG_TAB_NAME_WAREHOUSE] = "commPageNames[2]",
+
+	[MSG_WAREHOUSE_COL_MINERAL] = "warehouseColNames[0]",
+	[MSG_WAREHOUSE_COL_SELL] = "warehouseColNames[1]",
+	[MSG_WAREHOUSE_COL_STOCK] = "warehouseColNames[2]",
+	[MSG_WAREHOUSE_COL_PLAN] = "warehouseColNames[3]",
+
+	[MSG_PLAYER_COUNT_ONE] = "menu.enumPlayerCount[0]",
+	[MSG_PLAYER_COUNT_TWO] = "menu.enumPlayerCount[1]",
+
+	[MSG_CONTROLS_P1_JOY] = "menu.enumP1[0]",
+	[MSG_CONTROLS_P1_WSAD] = "menu.enumP1[1]",
+	[MSG_CONTROLS_P2_JOY] = "menu.enumP2[0]",
+	[MSG_CONTROLS_P2_ARROWS] = "menu.enumP2[1]",
+
+	[MSG_BOOL_OFF] = "menu.enumOnOff[0]",
+	[MSG_BOOL_ON] = "menu.enumOnOff[1]",
+
+	[MSG_MENU_CAPTION_CAMPAIGN] = "menu.captions[0]",
+	[MSG_MENU_CAPTION_DEADLINE] = "menu.captions[1]",
+	[MSG_MENU_CAPTION_CHALLENGE] = "menu.captions[2]",
+	[MSG_MENU_CAPTION_ACHIEVEMENTS] = "menu.captions[3]",
+	[MSG_MENU_CAPTION_SETTINGS] = "menu.captions[4]",
+	[MSG_MENU_CAPTION_EXIT] = "menu.captions[5]",
+	[MSG_MENU_CAPTION_NEW_GAME] = "menu.captions[6]",
+	[MSG_MENU_CAPTION_CONTINUE] = "menu.captions[7]",
+	[MSG_MENU_CAPTION_PLAYERS] = "menu.captions[8]",
+	[MSG_MENU_CAPTION_BACK] = "menu.captions[9]",
+	[MSG_MENU_CAPTION_MODE] = "menu.captions[10]",
+	[MSG_MENU_CAPTION_SCORES] = "menu.captions[11]",
+	[MSG_MENU_CAPTION_VOLUME_MOD] = "menu.captions[12]",
+	[MSG_MENU_CAPTION_VOLUME_SFX] = "menu.captions[13]",
+	[MSG_MENU_CAPTION_CONTROLS_P1] = "menu.captions[14]",
+	[MSG_MENU_CAPTION_CONTROLS_P2] = "menu.captions[15]",
+	[MSG_MENU_CAPTION_CREDITS] = "menu.captions[16]",
+
+	[MSG_MINERAL_SILVER] = "minerals[0]",
+	[MSG_MINERAL_GOLD] = "minerals[1]",
+	[MSG_MINERAL_SAPPHIRE] = "minerals[2]",
+	[MSG_MINERAL_RUBY] = "minerals[3]",
+	[MSG_MINERAL_MOONSTONE] = "minerals[4]",
+	[MSG_MINERAL_COAL] = "minerals[5]",
+
 	// Count
 	[MSG_COUNT] = 0
 };

@@ -7,141 +7,64 @@
 #include <ace/managers/memory.h>
 #include <ace/managers/log.h>
 
-//----------------------------------------------------------------- STRING ALLOC
-
-static char *stringCreateFromTok(
-	const tJson *pJson, const tCodeRemap *pRemap, UWORD uwTokIdx
-) {
-	char *szDestination = 0;
-	if(pJson->pTokens[uwTokIdx].type == JSMN_ARRAY) {
-		UWORD uwAllocSize = 0;
-		for(UBYTE i = 0; i < pJson->pTokens[uwTokIdx].size; ++i) {
-			UWORD uwArrIdx = jsonGetElementInArray(pJson, uwTokIdx, i);
-			uwAllocSize += jsonStrLen(pJson, uwArrIdx) + 1;
-		}
-		szDestination = memAllocFast(uwAllocSize);
-		UWORD uwOffs = 0;
-		for(UBYTE i = 0; i < pJson->pTokens[uwTokIdx].size; ++i) {
-			UWORD uwArrIdx = jsonGetElementInArray(pJson, uwTokIdx, i);
-			uwOffs += jsonTokStrCpy(
-				pJson, pRemap, uwArrIdx, &szDestination[uwOffs], uwAllocSize - uwOffs
-			);
-			szDestination[uwOffs++] = '\n';
-		}
-		szDestination[uwAllocSize - 1] = '\0';
-	}
-	else if(pJson->pTokens[uwTokIdx].type == JSMN_STRING) {
-		UWORD uwAllocSize = jsonStrLen(pJson, uwTokIdx) + 1;
-		szDestination = memAllocFast(uwAllocSize);
-		jsonTokStrCpy(pJson, pRemap, uwTokIdx, szDestination, uwAllocSize);
-	}
-	else {
-		logWrite("ERR: unknown json node type: %d\n", pJson->pTokens[uwTokIdx].type);
-	}
-	return szDestination;
-}
-
-static char *stringCreateFromDom(
-	const tJson *pJson, const tCodeRemap *pRemap, const char *szDom
-) {
-	char *szDestination;
-	UWORD uwIdx = jsonGetDom(pJson, szDom);
-	if(uwIdx == 0) {
-		logWrite("ERR: %s not found\n", szDom);
-		szDestination = memAllocFast(strlen(szDom) + 1);
-		strcpy(szDestination, szDom);
-	}
-	else {
-		szDestination = stringCreateFromTok(pJson, pRemap, uwIdx);
-	}
-	return szDestination;
-}
+//------------------------------------------------------------------ PRIVATE FNS
 
 static void stringDestroy(char *szString) {
 	memFree(szString, strlen(szString) + 1);
 }
 
-//----------------------------------------------------------------- STRING ARRAY
-
-static char **stringArrayCreate(UBYTE ubCount) {
-	logBlockBegin("stringArrayCreate(ubCount: %hu)", ubCount);
+static char **stringArrayCreate(UWORD uwCount) {
+	logBlockBegin("stringArrayCreate(uwCount: %hu)", uwCount);
 	char **pArray = 0;
-	if(ubCount) {
-		pArray = memAllocFast((ubCount + 1) * sizeof(char*));
-		for(UBYTE i = 0; i < ubCount; ++i) {
+	if(uwCount) {
+		pArray = memAllocFast((uwCount + 1) * sizeof(char*));
+		for(UWORD i = 0; i < uwCount; ++i) {
 			pArray[i] = STRING_ARRAY_EMPTY_POS;
 		}
 	}
-	pArray[ubCount] = STRING_ARRAY_TERMINATOR;
+	pArray[uwCount] = STRING_ARRAY_TERMINATOR;
 	logBlockEnd("stringArrayCreate()");
 	return pArray;
 }
 
-char **stringArrayCreateFromDom(
-	tJson *pJson, const tCodeRemap *pRemap, const char *szDom
-) {
-	logBlockBegin(
-		"stringArrayCreateFromDom(pJson: %p, pRemap: %p, szDom: '%s')",
-		pJson, pRemap, szDom
-	);
-	UWORD uwTokArray = jsonGetDom(pJson, szDom);
-	if(!uwTokArray) {
-		logWrite("ERR: json not found: '%s'\n", szDom);
-		logBlockEnd("stringArrayCreateFromDom()");
-		return stringArrayCreate(0);
-	}
-	UBYTE ubCount = pJson->pTokens[uwTokArray].size;
-	char **pArray = stringArrayCreate(ubCount);
+//------------------------------------------------------------------- PUBLIC FNS
 
-	for(UWORD i = 0; i < ubCount; ++i) {
-		UWORD uwTokElement = jsonGetElementInArray(pJson, uwTokArray, i);
-		if(!uwTokElement) {
-			logWrite("ERR: json array element not found: '%s'[%hhu]", szDom, i);
-		}
-		else {
-			pArray[i] = stringCreateFromTok(pJson, pRemap, uwTokElement);
-		}
-	}
-	logBlockEnd("stringArrayCreateFromDom()");
-	return pArray;
-}
+char **stringArrayCreateFromFd(tFile *pFile) {
+	UWORD uwCount;
+	fileRead(pFile, &uwCount, sizeof(uwCount));
 
-char **stringArrayCreateFromDomElements(
-	tJson *pJson, const tCodeRemap *pRemap, const char * const *pNames
-) {
-	logBlockBegin(
-		"stringArrayCreateFromDom(pJson: %p, pRemap: %p, pNames: %p)",
-		pJson, pRemap, pNames
-	);
-	UBYTE ubCount = stringArrayGetCount(pNames);
-	char **pArray = stringArrayCreate(ubCount);
-	for(UBYTE i = 0; i < ubCount; ++i) {
-		const char *szDom = pNames[i];
-		pArray[i] = stringCreateFromDom(pJson, pRemap, szDom);
+	char **pArray = stringArrayCreate(uwCount);
+	for(UWORD i = 0; i < uwCount; ++i) {
+		UBYTE ubStringLength;
+		fileRead(pFile, &ubStringLength, sizeof(ubStringLength));
+		pArray[i] = memAllocFast(ubStringLength + 1);
+		fileRead(pFile, pArray[i], ubStringLength);
+		pArray[i][ubStringLength] = '\0';
 	}
-	logBlockEnd("stringArrayCreateFromDomElements()");
+	fileClose(pFile);
+
 	return pArray;
 }
 
 void stringArrayDestroy(char **pArray) {
 	logBlockBegin("stringArrayDestroy(pArray: %p)", pArray);
-	UBYTE ubCount;
-	for(ubCount = 0; pArray[ubCount] != STRING_ARRAY_TERMINATOR; ++ubCount) {
-		if(pArray[ubCount] != STRING_ARRAY_EMPTY_POS) {
+	UWORD uwCount;
+	for(uwCount = 0; pArray[uwCount] != STRING_ARRAY_TERMINATOR; ++uwCount) {
+		if(pArray[uwCount] != STRING_ARRAY_EMPTY_POS) {
 			logWrite(
 				"Freeing string %hhu (0x%p): '%s'\n",
-				ubCount, pArray[ubCount], pArray[ubCount]
+				uwCount, pArray[uwCount], pArray[uwCount]
 			);
-			stringDestroy(pArray[ubCount]);
+			stringDestroy(pArray[uwCount]);
 		}
 	}
 	// Free string pointers + terminator
-	memFree(pArray, sizeof(char*) * (ubCount + 1));
+	memFree(pArray, sizeof(char*) * (uwCount + 1));
 	logBlockEnd("stringArrayDestroy()");
 }
 
-UBYTE stringArrayGetCount(const char * const *pArray) {
-	UBYTE ubCount;
-	for(ubCount = 0; pArray[ubCount] != STRING_ARRAY_TERMINATOR; ++ubCount) { }
-	return ubCount;
+UWORD stringArrayGetCount(const char * const *pArray) {
+	UWORD uwCount;
+	for(uwCount = 0; pArray[uwCount] != STRING_ARRAY_TERMINATOR; ++uwCount) { }
+	return uwCount;
 }

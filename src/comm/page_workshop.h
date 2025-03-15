@@ -5,10 +5,6 @@
 #ifndef _AMINER_COMM_PAGE_WORKSHOP_H_
 #define _AMINER_COMM_PAGE_WORKSHOP_H_
 
-#include "string_array.h"
-
-extern char **g_pShopNames;
-
 void pageWorkshopCreate(void);
 
 #endif // _AMINER_COMM_PAGE_WORKSHOP_H_

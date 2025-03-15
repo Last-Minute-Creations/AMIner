@@ -6,10 +6,9 @@
 #define _DEFS_H_
 
 #include <ace/types.h>
-#include "string_array.h"
+#include <fixmath/fix16.h>
 #include "mineral.h"
-#include "msg.h"
-#include <json/utf8_remap.h>
+#include "utf8_remap.h"
 
 #define DEFS_QUEST_DINO_BONE_COUNT 9
 #define DEFS_MINE_DIGGABLE_WIDTH 10
@@ -36,7 +35,7 @@ extern const UWORD g_uwCapsuleDepth;
 extern const UWORD g_uwPrisonerDepth;
 extern const UWORD g_pMineralPlans[MINERAL_TYPE_COUNT];
 
-extern char **g_pMsgs;
+extern const char **g_pMsgs;
 
 void defsCreateLocale(const char *szLangPrefix);
 

@@ -21,8 +21,6 @@ typedef enum tWorkshopRow {
 	WORKSHOP_ROW_NAV,
 } tWorkshopRow;
 
-char **g_pShopNames;
-
 static tPartKind s_eSelectedPart = 0;
 static tWorkshopRow s_eWorkshopRow;
 
@@ -81,10 +79,10 @@ static void pageWorkshopUpdateText(void) {
 
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
-		sprintf(szBfr, "%s %s%hhu", g_pShopNames[s_eSelectedPart], g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
+		sprintf(szBfr, "%s %s%hhu", g_pMsgs[MSG_PART_NAME_DRILL + s_eSelectedPart], g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
 	}
 	else {
-		strcpy(szBfr, g_pShopNames[s_eSelectedPart]);
+		strcpy(szBfr, g_pMsgs[MSG_PART_NAME_DRILL + s_eSelectedPart]);
 	}
 	commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColorText);
 	uwOffsY += ubRowSize;

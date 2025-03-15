@@ -30,7 +30,7 @@ char **stringArrayCreateFromDomElements(
 
 void stringArrayDestroy(char **pArray);
 
-uint8_t stringArrayGetCount(const char * const *pArray);
+uint16_t stringArrayGetCount(const char * const *pArray);
 
 #ifdef __cplusplus
 }

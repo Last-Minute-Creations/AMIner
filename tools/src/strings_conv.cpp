@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "../../src/msg.h"
+#include "../../deps/ACE/tools/src/common/endian.h"
 #include "lang_dom.h"
 #include "string_array.h"
 #include "utf8_remap.h"
@@ -48,6 +49,7 @@ int main(int lArgCount, const char *pArgs[]) {
 	}
 
 	g_pMsgs = stringArrayCreateFromDomElements(pJson, g_pRemap, g_pLangDom);
+	jsonDestroy(pJson);
 
 	std::ofstream FileOut;
 	FileOut.open(pArgs[2], std::ios::binary);
@@ -56,18 +58,16 @@ int main(int lArgCount, const char *pArgs[]) {
 		return EXIT_FAILURE;
 	}
 
-	std::uint16_t uwCount = tMsg::MSG_COUNT;
-	FileOut.write(reinterpret_cast<const char*>(&uwCount), sizeof(uwCount));
-	for(auto i = 0; i < uwCount; ++i) {
+	std::uint16_t uwCountBe = nEndian::toBig16(tMsg::MSG_COUNT);
+	FileOut.write(reinterpret_cast<const char*>(&uwCountBe), sizeof(uwCountBe));
+	for(auto i = 0; i < tMsg::MSG_COUNT; ++i) {
 		std::uint8_t ubLength = std::uint8_t(strlen(g_pMsgs[i]));
 		FileOut.write(reinterpret_cast<const char*>(&ubLength), sizeof(ubLength));
 		FileOut.write(g_pMsgs[i], ubLength);
 	}
 	FileOut.close();
-
 	stringArrayDestroy(g_pMsgs);
 
-	jsonDestroy(pJson);
-
+	printf("All done!\n");
 	return EXIT_SUCCESS;
 }
