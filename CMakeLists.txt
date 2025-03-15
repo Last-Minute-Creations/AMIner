@@ -10,6 +10,43 @@ set(CMAKE_CXX_STANDARD 23)
 
 set(USE_PAK_FILE OFF)
 
+function(getAminerToolPath TOOL_NAME TOOL_VAR)
+	# This should be called from other fns - `ACE_DIR` gets usually populated in parent scope
+	set(TOOLS_BIN ${CMAKE_CURRENT_SOURCE_DIR}/tools/bin/)
+
+	if(CMAKE_HOST_WIN32)
+		set(TOOL_PATHS "${TOOL_NAME}.exe" "Debug/${TOOL_NAME}.exe" "Release/${TOOL_NAME}.exe")
+	else()
+		set(TOOL_PATHS ${TOOL_NAME})
+	endif()
+
+	foreach(TOOL_CANDIDATE IN LISTS TOOL_PATHS)
+		set(${TOOL_VAR} ${TOOLS_BIN}${TOOL_CANDIDATE})
+		if(EXISTS "${${TOOL_VAR}}")
+			break()
+		endif()
+		unset(${TOOL_VAR})
+	endforeach()
+
+	if(NOT DEFINED ${TOOL_VAR})
+		message(FATAL_ERROR "Couldn't find ${TOOL_NAME} in ${TOOLS_BIN}${TOOL_PATHS} - have you built tools?")
+	endif()
+
+	# Return value
+	set(${TOOL_VAR} ${${TOOL_VAR}} PARENT_SCOPE)
+endfunction()
+
+function(convertStrings TARGET PATH_JSON_IN PATH_STR_OUT)
+	getAminerToolPath(strings_conv TOOL_PALETTE_CONV)
+	add_custom_command(
+		OUTPUT ${PATH_STR_OUT}
+		COMMAND ${TOOL_PALETTE_CONV} ${PATH_JSON_IN} ${PATH_STR_OUT}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		DEPENDS ${PATH_JSON_IN}
+	)
+	target_sources(${TARGET} PUBLIC ${PATH_STR_OUT})
+endfunction()
+
 # ACE
 set(AUDIO_MIXER_HW_CHANNEL_MODE "SINGLE")
 set(AUDIO_MIXER_WORD_SIZED ON)
@@ -71,13 +108,19 @@ file(MAKE_DIRECTORY ${DATA_DIR})
 file(MAKE_DIRECTORY ${GEN_DIR})
 
 # Copy already processed files
-file(GLOB COPY_FILES ${RES_DIR}/copied/*)
-file(COPY ${COPY_FILES} DESTINATION ${DATA_DIR})
+file(GLOB COPY_FILES_EN ${RES_DIR}/text/txt_en/*)
+file(GLOB COPY_FILES_PL ${RES_DIR}/text/txt_pl/*)
+file(COPY ${COPY_FILES_EN} DESTINATION ${DATA_DIR}/txt_en)
+file(COPY ${COPY_FILES_PL} DESTINATION ${DATA_DIR}/txt_pl)
 set(GAME_INFO_DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${GAME_OUTPUT_EXECUTABLE}.info")
 add_custom_command(
 	TARGET ${GAME_EXECUTABLE} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy ${RES_DIR}/aminer.info ${GAME_INFO_DESTINATION}
 )
+
+# Strings
+convertStrings(${GAME_EXECUTABLE} ${RES_DIR}/text/messages_pl.json ${DATA_DIR}/txt_pl/messages.str)
+convertStrings(${GAME_EXECUTABLE} ${RES_DIR}/text/messages_en.json ${DATA_DIR}/txt_en/messages.str)
 
 # Palette
 set(palette_aminer_unique "${RES_DIR}/palettes/aminer_editing.gpl")
