@@ -99,14 +99,30 @@ static void pageWorkshopUpdateText(void) {
 
 	const char *szDescription = 0;
 	if(ubLevel < ubMaxLevel) {
-		if(s_eSelectedPart == INVENTORY_PART_TNT) {
-			szDescription = g_pMsgs[MSG_COMM_WORKSHOP_TNT_0 + ubLevel];
-		}
-		else if(s_eSelectedPart == INVENTORY_PART_TELEPORT) {
-			szDescription = g_pMsgs[MSG_COMM_WORKSHOP_TELEPORT_0 + ubLevel];
-		}
-		else if(s_eSelectedPart == INVENTORY_PART_BASE_PLATFORM) {
-			szDescription = g_pMsgs[MSG_COMM_WORKSHOP_PLATFORM_0 + ubLevel];
+		switch(s_eSelectedPart) {
+			case INVENTORY_PART_DRILL:
+				szDescription = g_pMsgs[MSG_COMM_WORKSHOP_DRILL];
+				break;
+			case INVENTORY_PART_CARGO:
+				szDescription = g_pMsgs[MSG_COMM_WORKSHOP_CARGO];
+				break;
+			case INVENTORY_PART_HULL:
+				szDescription = g_pMsgs[MSG_COMM_WORKSHOP_HULL];
+				break;
+			case INVENTORY_PART_TNT:
+				szDescription = g_pMsgs[MSG_COMM_WORKSHOP_TNT_0 + ubLevel];
+				break;
+			case INVENTORY_PART_TELEPORT:
+				szDescription = g_pMsgs[MSG_COMM_WORKSHOP_TELEPORT_0 + ubLevel];
+				break;
+			case INVENTORY_PART_BASE_PLATFORM:
+				szDescription = g_pMsgs[MSG_COMM_WORKSHOP_PLATFORM_0 + ubLevel];
+				break;
+			case INVENTORY_PART_BASE_WORKSHOP:
+				szDescription = g_pMsgs[MSG_COMM_WORKSHOP_WORKSHOP_0 + ubLevel];
+				break;
+			default:
+				break;
 		}
 	}
 

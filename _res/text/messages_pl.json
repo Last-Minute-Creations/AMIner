@@ -216,6 +216,9 @@
 		"bribePrice": "Będzie Cię to kosztować %hu%c."
 	},
 	"workshop": {
+		"drill": "Zwiększa żywotność wiertła oraz ułatwia kopanie w głębszych warstwach ziemi.",
+		"hull": "Wzmocniona konstrukcja zwiększa żywotność pojazdu, uodparniając ją na upadki i niekorzystne warunki termiczne.",
+		"cargo": "Zwiększa efektywność rozdrabniarki i filtrowania urobku, co pozwala na magazynowanie większej liczby surowców.",
 		"tnt0": "Pojedynczy ładunek pozwalający na zniszczenie prostej przeszkody terenowej. Niszczy surowce zawarte w terenie.",
 		"tnt1": "Dwa ładunki pozwalające drążyc dłuższy tunel lub zniszczyć pojedynczą skałe. Niszczy surowce zawarte w terenie.",
 		"tnt2": "Trzy ładunki jeszcze bardziej zwiekszą długość tunelu. Niszczy surowce zawarte w terenie.",
@@ -225,7 +228,9 @@
 		"teleport2": "Wykorzystując splątanie kwantowe umożliwia powrót z platformy odbiorczej do ostatniego miejsca użycia teleportera.",
 		"platform0": "Pozwala na przesył urobku na powierzchnię między bazami oraz na powrót przenośnym teleporterem.",
 		"platform1": "Modernizacja pozwala na bezpieczną teleportację do sąsiedniej bazy, o ile ma platformę odbiorczą.",
-		"platform2": "Powiększony zasięg pozwala na przeskok do dowolnej bazy, o ile ma pl atformę odbiorczą."
+		"platform2": "Powiększony zasięg pozwala na przeskok do dowolnej bazy, o ile ma pl atformę odbiorczą.",
+		"workshop0": "Rozbudowuje bazę o warsztat, co pozwala na doraźne naprawy maszyny.",
+		"workshop1": "Sprowadza specjalistyczny sprzęt do warsztatu pozwalający na montaż usprawnień do maszyny."
 	},
 	"crates": {
 		"premiseTeleport": "Aby naprawić teleporter potrzebujemy części z 5 skrzyń.",
