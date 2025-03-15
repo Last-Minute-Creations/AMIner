@@ -434,8 +434,8 @@ void logoLangLoop(void) {
 	}
 
 	// HACK: auto-choose language
-	s_eLangCurr = LANGUAGE_POLISH;
-	s_isAnyPressed = 1;
+	// s_eLangCurr = LANGUAGE_POLISH;
+	// s_isAnyPressed = 1;
 
 	if(s_isAnyPressed) {
 		languageSet(s_eLangCurr);
