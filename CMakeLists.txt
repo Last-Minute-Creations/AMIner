@@ -721,8 +721,12 @@ add_custom_target(generateAdf
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${ADF_DIR}/s"
 	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${GAME_OUTPUT_EXECUTABLE}" "${ADF_DIR}"
 	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${GAME_OUTPUT_EXECUTABLE}.info" "${ADF_DIR}"
+	# COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/settings.dat" "${ADF_DIR}"
+	# COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/save_story.dat" "${ADF_DIR}"
+	# COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/save_deadline.dat" "${ADF_DIR}"
+	# COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/save_story.tmp" "${ADF_DIR}"
+	# COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/scores.dat" "${ADF_DIR}"
 	COMMAND ${CMAKE_COMMAND} -E copy "${DATA_PAK_PATH}" "${ADF_DIR}"
-	# COMMAND ${CMAKE_COMMAND} -E echo "c:add21k" > "${ADF_DIR}/s/startup-sequence"
 	COMMAND ${CMAKE_COMMAND} -E echo "${GAME_OUTPUT_EXECUTABLE}" > "${ADF_DIR}/s/startup-sequence"
 	COMMAND exe2adf -l ${CMAKE_PROJECT_NAME} -a "${GAME_PACKAGE_NAME}.adf" -d ${ADF_DIR}
 	COMMAND ${CMAKE_COMMAND} -E rm -rf "${ADF_DIR}"
