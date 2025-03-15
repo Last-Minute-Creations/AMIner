@@ -234,6 +234,7 @@ void pageOfficeUnlockPerson(tFaceId ePerson) {
 	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
 }
 
+__attribute__((optimize("Os")))
 void pageOfficeLockPerson(tFaceId ePerson) {
 	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
 		if(s_pActivePpl[i] == ePerson) {
@@ -246,6 +247,7 @@ void pageOfficeLockPerson(tFaceId ePerson) {
 	}
 }
 
+__attribute__((optimize("Os")))
 UBYTE pageOfficeHasPerson(tFaceId ePerson) {
 	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
 		if(s_pActivePpl[i] == ePerson) {
@@ -267,6 +269,7 @@ void pageOfficeLockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
 	}
 }
 
+__attribute__((optimize("Os")))
 UBYTE pageOfficeTryUnlockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
 	for(UBYTE i = 0; i < PAGE_OFFICE_SUBPAGES_PER_PERSON - 1; ++i) {
 		if(s_pOfficePages[ePerson][i] == eSubpage) {
