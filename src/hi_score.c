@@ -13,8 +13,9 @@
 #include "assets.h"
 #include "game.h"
 #include "achievement.h"
+#include "msg.h"
 
-#define SCORE_NAME_LENGTH 20
+#define SCORE_NAME_LENGTH 16
 #define SCORE_COUNT 10
 #define SCORE_CURSOR_BLINK_TICKS 25 // 25 ticks = 500ms
 #define SCORE_RESULT_MSG_MAX 40
