@@ -28,12 +28,22 @@ struct tLevelData {
 
 	tTile m_pTiles[s_ubWidth][s_ubHeight]; ///< [x, y]
 
-	constexpr tLevelData() = default;
+	consteval tLevelData() = default;
 
-	constexpr tLevelData(
+	consteval tLevelData(
 		const char *pRow1, const char *pRow2, const char *pRow3, const char *pRow4,
 		const char *pRow5, const char *pRow6, const char *pRow7
-	);
+	) {
+		for(UBYTE ubX = 0; ubX < s_ubWidth; ++ubX) {
+			m_pTiles[ubX][0] = static_cast<tTile>(pRow1[ubX]);
+			m_pTiles[ubX][1] = static_cast<tTile>(pRow2[ubX]);
+			m_pTiles[ubX][2] = static_cast<tTile>(pRow3[ubX]);
+			m_pTiles[ubX][3] = static_cast<tTile>(pRow4[ubX]);
+			m_pTiles[ubX][4] = static_cast<tTile>(pRow5[ubX]);
+			m_pTiles[ubX][5] = static_cast<tTile>(pRow6[ubX]);
+			m_pTiles[ubX][6] = static_cast<tTile>(pRow7[ubX]);
+		}
+	}
 };
 
 class tLevelState {
@@ -370,21 +380,7 @@ void pageSokobanDestroy(void) {
 	bitmapDestroy(s_pBmTiles);
 }
 
-constexpr tLevelData::tLevelData(
-	const char *pRow1, const char *pRow2, const char *pRow3, const char *pRow4,
-	const char *pRow5, const char *pRow6, const char *pRow7
-) {
-	for(UBYTE ubX = 0; ubX < s_ubWidth; ++ubX) {
-		m_pTiles[ubX][0] = static_cast<tTile>(pRow1[ubX]);
-		m_pTiles[ubX][1] = static_cast<tTile>(pRow2[ubX]);
-		m_pTiles[ubX][2] = static_cast<tTile>(pRow3[ubX]);
-		m_pTiles[ubX][3] = static_cast<tTile>(pRow4[ubX]);
-		m_pTiles[ubX][4] = static_cast<tTile>(pRow5[ubX]);
-		m_pTiles[ubX][5] = static_cast<tTile>(pRow6[ubX]);
-		m_pTiles[ubX][6] = static_cast<tTile>(pRow7[ubX]);
-	}
-}
-
+__attribute__((optimize("Os")))
 constexpr void tLevelState::load(const tLevelData &rLevelData) {
 	m_LevelData  = rLevelData;
 
