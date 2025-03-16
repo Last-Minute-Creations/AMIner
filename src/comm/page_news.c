@@ -140,6 +140,11 @@ void pageNewsCreate(tNewsKind eNewsKind) {
 
 	tUwCoordYX sOrigin = commGetOrigin();
 	tBitMap *pBitmapNews = bitmapCreateFromFd(GET_SUBFILE_PREFIX("comm_news.bm"), 0);
+	if(eNewsKind == NEWS_KIND_GATE_ENEMY) {
+		tBitMap *pBitmapAlt = bitmapCreateFromFd(GET_SUBFILE_PREFIX("comm_news_gate.bm"), 0);
+		blitCopy(pBitmapAlt, 0, 0, pBitmapNews, 18, 9, 64, 85, MINTERM_COOKIE);
+		bitmapDestroy(pBitmapAlt);
+	}
 	blitCopy(
 		pBitmapNews, 0, 0, commGetDisplayBuffer(), sOrigin.uwX + 25, sOrigin.uwY + 28,
 		bitmapGetByteWidth(pBitmapNews) * 8, pBitmapNews->Rows, MINTERM_COOKIE
