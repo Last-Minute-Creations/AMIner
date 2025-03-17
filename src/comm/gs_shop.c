@@ -285,6 +285,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PLAN_COMPLETE:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "plan_complete", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_MIETEK_MARKET:
+			pageMsgCreate(FACE_ID_MIETEK, szTitle, "market", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_MIETEK_PROTEST_START:
 			pageMsgCreate(FACE_ID_MIETEK, szTitle, "protest_start", onBack);
 			break;

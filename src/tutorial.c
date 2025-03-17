@@ -196,8 +196,10 @@ static UBYTE tutorialProcessStory(void) {
 			if(planManagerGet()->ubCurrentPlanIndex > 0) {
 				pageOfficeTryUnlockPersonSubpage(FACE_ID_URZEDAS, COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE);
 				pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_PLAN_COMPLETE);
+				pageOfficeTryUnlockPersonSubpage(FACE_ID_MIETEK, COMM_SHOP_PAGE_OFFICE_MIETEK_MARKET);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_URZEDAS_PLAN_COMPLETE, 0);
 				inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_PLAN_COMPLETE, 0);
+				inboxPushBack(COMM_SHOP_PAGE_OFFICE_MIETEK_MARKET, 0);
 				++s_eTutorialState;
 			}
 			break;

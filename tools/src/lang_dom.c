@@ -201,6 +201,7 @@ const char * const g_pLangDom[MSG_COUNT + 1] = {
 	[MSG_PAGE_MIETEK_WELCOME] = "officePages.commonWelcome",
 	[MSG_PAGE_MIETEK_FIRST_PLAN] = "officePages.mietekFirstPlan",
 	[MSG_PAGE_MIETEK_PLAN_COMPLETE] = "officePages.mietekPlanComplete",
+	[MSG_PAGE_MIETEK_MARKET] = "officePages.mietekMarket",
 	[MSG_PAGE_KRYSTYNA_PROTEST_WARNING] = "officePages.mietekProtestWarning",
 	[MSG_PAGE_MIETEK_PROTEST_START] = "officePages.mietekProtestStart",
 	[MSG_PAGE_MIETEK_PROTEST_STRIKE] = "officePages.mietekProtestStrike",
