@@ -179,35 +179,35 @@ static void tileGenerateTerrain(
 			else if(uwWhat < (uwChance += uwChanceSilver)) {
 				pTiles[uwX][uwY] = (
 					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_3)
 						: randUwMinMax(&g_sRand, TILE_SILVER_1, TILE_SILVER_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceGold)) {
 				pTiles[uwX][uwY] = (
 					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_3)
 						: randUwMinMax(&g_sRand, TILE_GOLD_1, TILE_GOLD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceEmerald)) {
 				pTiles[uwX][uwY] = (
 					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_3)
 						: randUwMinMax(&g_sRand, TILE_EMERALD_1, TILE_EMERALD_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceRuby)) {
 				pTiles[uwX][uwY] = (
 					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_3)
 						: randUwMinMax(&g_sRand, TILE_RUBY_1, TILE_RUBY_3)
 				);
 			}
 			else if(uwWhat < (uwChance += uwChanceMoonstone)) {
 				pTiles[uwX][uwY] = (
 					isCoalOnly
-						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_2)
+						? randUwMinMax(&g_sRand, TILE_COAL_1, TILE_COAL_3)
 						: randUwMinMax(&g_sRand, TILE_MOONSTONE_1, TILE_MOONSTONE_3)
 				);
 			}
