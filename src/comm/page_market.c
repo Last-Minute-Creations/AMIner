@@ -232,6 +232,7 @@ void pageMarketCreate(void) {
 	commRegisterPage(pageMarketProcess, pageMarketDestroy);
 	buttonInitOk(g_pMsgs[MSG_COMM_EXIT]);
 	buttonDeselectAll();
+	s_eRow = MARKET_ROW_SOURCE_MINERAL;
 	setSource(MINERAL_TYPE_SILVER);
 }
 
