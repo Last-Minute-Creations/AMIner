@@ -511,7 +511,7 @@ static void gameProcessHotkeys(void) {
 		warehouseNextPlan(NEXT_PLAN_REASON_FULFILLED);
 	}
 	else if(keyUse(KEY_0)) {
-		gameElapseTime(planManagerGet()->wTimeRemaining);
+		heatTryReduce(5);
 	}
 #endif
 }
