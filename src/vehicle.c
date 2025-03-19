@@ -424,6 +424,7 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	// fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
 	fileWrite(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
 	fileWrite(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
+	fileWrite(pFile, &pVehicle->eTeleportKind, sizeof(pVehicle->eTeleportKind));
 	fileWrite(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
 	fileWrite(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
 	// fileWrite(pFile, &pVehicle->eTeleportInFlipbook, sizeof(pVehicle->eTeleportInFlipbook));
@@ -479,6 +480,7 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	// fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
 	fileRead(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
 	fileRead(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
+	fileRead(pFile, &pVehicle->eTeleportKind, sizeof(pVehicle->eTeleportKind));
 	fileRead(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
 	fileRead(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
 	// fileRead(pFile, &pVehicle->eTeleportInFlipbook, sizeof(pVehicle->eTeleportInFlipbook));
@@ -1498,10 +1500,11 @@ static void vehicleOnTeleportInEnd(void *pData) {
 static void vehicleOnTeleportInPeak(void *pData) {
 	tVehicle *pVehicle = pData;
 	vehicleSetState(pVehicle, VEHICLE_STATE_TELEPORTING_VISIBLE);
-	if(
+
+	if(pVehicle->eTeleportKind == TELEPORT_KIND_MINE_TO_BASE && (
 		inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel == INVENTORY_LEVEL_TELEPORTER_WEAK ||
 		protestsGetState() >= PROTEST_STATE_PROTEST
-	) {
+	)) {
 		UWORD uwMaxHealth = inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax;
 		if(randUwMax(&g_sRand, 100) <= 5) {
 			vehicleHullDamage(pVehicle, (uwMaxHealth * 4) / 5);
@@ -1536,6 +1539,8 @@ void vehicleTeleport(
 		eTeleportKind == TELEPORT_KIND_MINE_TO_BASE &&
 		inventoryGetPartDef(INVENTORY_PART_TELEPORT)->ubLevel == INVENTORY_LEVEL_TELEPORTER_WEAK
 	);
+
+	pVehicle->eTeleportKind = eTeleportKind;
 	pVehicle->uwTeleportX = uwX;
 	pVehicle->uwTeleportY = uwY;
 	if(isWeakTeleporter) {

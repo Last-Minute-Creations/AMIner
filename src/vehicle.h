@@ -92,6 +92,7 @@ typedef struct _tVehicle {
 	UBYTE ubSmokeAnimFrame;
 	UBYTE ubSmokeAnimCnt;
 	UBYTE ubDrillState;
+	tTeleportKind eTeleportKind;
 	UWORD uwTeleportX;
 	UWORD uwTeleportY;
 	tFlipbookKind eTeleportInFlipbook;
