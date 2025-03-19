@@ -28,7 +28,6 @@ static void pageUseCratesDrawAll(void) {
 	const UBYTE ubLineHeight = commGetLineHeight();
 	UWORD uwPosY = 0;
 	UBYTE ubCrateCount = questCrateGetCount();
-	char szBfr[150];
 
 	const char *szMsgPremise = 0;
 	const char *szMsgNotYet = 0;
@@ -46,8 +45,8 @@ static void pageUseCratesDrawAll(void) {
 			szMsgUse = g_pMsgs[MSG_CRATES_USE];
 			break;
 		case PAGE_USE_CRATES_SCENARIO_SELL:
-			sprintf(szBfr, g_pMsgs[MSG_CRATES_PREMISE_SELL], 1000, '\x1F');
-			szMsgPremise = szBfr;
+			snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, g_pMsgs[MSG_CRATES_PREMISE_SELL], 1000, '\x1F');
+			szMsgPremise = gameGetMessageBuffer();
 			szMsgNotYet = g_pMsgs[MSG_CRATES_NOT_YET_SELL];
 			szMsgUse = g_pMsgs[MSG_CRATES_SELL];
 			break;
@@ -64,9 +63,9 @@ static void pageUseCratesDrawAll(void) {
 		buttonInitAcceptDecline(szMsgUse, g_pMsgs[MSG_PAGE_BACK]);
 	}
 
-	sprintf(szBfr, g_pMsgs[MSG_CRATES_REMAINING], ubCrateCount);
+	snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, g_pMsgs[MSG_CRATES_REMAINING], ubCrateCount);
 	uwPosY += ubLineHeight;
-	uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
+	uwPosY += commDrawMultilineText(gameGetMessageBuffer(), 0, uwPosY) * ubLineHeight;
 
 	buttonDrawAll(commGetDisplayBuffer());
 }

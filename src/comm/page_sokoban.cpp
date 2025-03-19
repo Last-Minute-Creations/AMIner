@@ -6,7 +6,8 @@
 #include <ace/types.h>
 #include <ace/managers/key.h>
 #include <comm/gs_shop.h>
-#include "assets.h"
+#include "../assets.h"
+#include "../game.h"
 
 namespace {
 
@@ -540,16 +541,14 @@ void tLevelState::drawTileAt(UBYTE ubX, UBYTE ubY) {
 }
 
 void tLevelState::drawLevelIndex(void) {
-	char szLevelText[15];
-	sprintf(szLevelText, g_pMsgs[MSG_BONUS_LEVEL], s_ubCurrentLevelIndex + 1);
-	commDrawText(COMM_DISPLAY_WIDTH - 60, COMM_DISPLAY_HEIGHT - 10, szLevelText, FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
+	snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, g_pMsgs[MSG_BONUS_LEVEL], s_ubCurrentLevelIndex + 1);
+	commDrawText(COMM_DISPLAY_WIDTH - 60, COMM_DISPLAY_HEIGHT - 10, gameGetMessageBuffer(), FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
 }
 
 void tLevelState::drawStepCount(void) {
-	char szStepText[15];
-	sprintf(szStepText, g_pMsgs[MSG_BONUS_STEPS], m_uwStepCount);
+	snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, g_pMsgs[MSG_BONUS_STEPS], m_uwStepCount);
 	commErase(20, COMM_DISPLAY_HEIGHT - 10, 60, 10);
-	commDrawText(20, COMM_DISPLAY_HEIGHT - 10, szStepText, FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
+	commDrawText(20, COMM_DISPLAY_HEIGHT - 10, gameGetMessageBuffer(), FONT_COOKIE | FONT_LAZY, COMM_DISPLAY_COLOR_TEXT_DARK);
 }
 
 void tLevelState::drawAll(void) {

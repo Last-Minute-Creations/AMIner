@@ -126,6 +126,8 @@ static UBYTE s_isMusicEnabled;
 static UBYTE s_isHandlingPause;
 static UBYTE s_pRebukes[REBUKES_MAX];
 
+static char s_szMessageBuffer[GAME_MESSAGE_BUFFER_SIZE];
+
 //------------------------------------------------------------------ PUBLIC VARS
 
 UBYTE g_is2pPlaying;
@@ -996,8 +998,8 @@ static void onSongEnd(void) {
 static void gameChallengeResult(void) {
 	if(!g_is2pPlaying) {
 		char szBfr[30];
-		sprintf(
-			szBfr, "%s: %ld",
+		snprintf(
+			s_szMessageBuffer, GAME_MESSAGE_BUFFER_SIZE, "%s: %ld",
 			g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
 		);
 		hiScoreSetup(g_pVehicles[0].lCash, szBfr, SCORE_MODE_CHALLENGE);
@@ -1022,8 +1024,8 @@ static void gameChallengeResult(void) {
 
 static void gameDeadlineResult(void) {
 	char szBfr[30];
-	sprintf(
-		szBfr, "%s: %ld",
+	snprintf(
+		s_szMessageBuffer, GAME_MESSAGE_BUFFER_SIZE, "%s: %ld",
 		g_pMsgs[MSG_HI_SCORE_WIN_SCORE], g_pVehicles[0].lCash
 	);
 	achievementUnlock(ACHIEVEMENT_DEADLINE);
@@ -1056,9 +1058,7 @@ static void gameProcessPlan(void) {
 		WORD wRemainingDays = planGetRemainingDays();
 		if(wRemainingDays <= 0) {
 			if(!planManagerGet()->isExtendedTimeByBribe && planTryProlong()) {
-				char szBfr[100];
-				sprintf(szBfr, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
-				hudShowMessage(FACE_ID_URZEDAS, szBfr);
+				hudShowMessageVa(FACE_ID_URZEDAS, g_pMsgs[MSG_HUD_PLAN_EXTENDING], 14);
 			}
 			else {
 				hudShowMessage(FACE_ID_KRYSTYNA, g_pMsgs[MSG_HUD_WAITING_KOMISARZ]);
@@ -1069,9 +1069,7 @@ static void gameProcessPlan(void) {
 		else if(wRemainingDays == 10 || wRemainingDays == 3) {
 			if(wRemainingDays != s_wLastReminder) {
 				s_wLastReminder = wRemainingDays;
-				char szBuffer[50];
-				sprintf(szBuffer, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
-				hudShowMessage(FACE_ID_URZEDAS, szBuffer);
+				hudShowMessageVa(FACE_ID_URZEDAS, g_pMsgs[MSG_HUD_PLAN_REMAINING], wRemainingDays);
 			}
 		}
 		else {
@@ -1202,6 +1200,10 @@ void gameProcessBaseGate(void) {
 	else {
 		--s_ubRadioMessageCounter;
 	}
+}
+
+char *gameGetMessageBuffer(void) {
+	return s_szMessageBuffer;
 }
 
 void gameCancelModeForPlayer(UBYTE ubPlayer) {
@@ -1460,7 +1462,10 @@ void gameTriggerSave(void) {
 		diskFileDelete("save_deadline.tmp");
 	}
 
-	char szPathTmp[20], szPathDat[20];
+	char *szPathTmp = gameGetMessageBuffer();
+	*szPathTmp = '\0';
+	char *szPathDat = &gameGetMessageBuffer()[GAME_MESSAGE_BUFFER_SIZE / 2];
+	*szPathDat = '\0';
 	char *pEndTmp = stringCopy("save_", szPathTmp);
 	pEndTmp = stringCopy((g_eGameMode == GAME_MODE_STORY) ? "story" : "deadline", pEndTmp);
 	char *pEndDat = stringCopy(szPathTmp, szPathDat);

@@ -37,7 +37,7 @@
 
 #define ROW_1_Y (HUD_ORIGIN_Y + 0)
 #define ROW_2_Y (HUD_ORIGIN_Y + 9)
-#define HUD_MSG_BFR_SIZE 250
+#define HUD_MESSAGE_BUFFER_SIZE 250
 #define HUD_MSG_WAIT_CNT 200
 
 #define HUD_ICON_INBOX_SRC_OFFS_Y (FACE_ID_COUNT * 16)
@@ -113,7 +113,7 @@ static tHudPage s_ePageCurrent = HUD_PAGE_MAIN;
 static UWORD s_uwMsgLen;
 static tUwCoordYX s_sMsgCharPos;
 static UBYTE s_ubMsgCharIdx;
-static char s_szMsg[HUD_MSG_BFR_SIZE];
+static char s_szMsg[HUD_MESSAGE_BUFFER_SIZE];
 static char s_szLetter[2] = {'\0'};
 static tFaceId s_eFaceToDraw;
 
@@ -191,6 +191,13 @@ static void hudRefresh(void) {
 	}
 
 	hudResetStateMachine();
+}
+
+static void hudTriggerMessage(void) {
+	s_eState = STATE_MSG_NOISE_IN;
+	s_uwFrameDelay = HUD_NOISE_DURATION;
+	s_uwStateCounter = 0;
+	audioMixerPlaySfx(s_pSfxNoise, SFX_CHANNEL_HUD, SFX_PRIORITY_HUD, 0);
 }
 
 //------------------------------------------------------------------------ PAUSE
@@ -281,12 +288,19 @@ UBYTE hudIsShowingMessage(void) {
 
 void hudShowMessage(tFaceId eFace, const char *szMsg) {
 	logWrite("hudShowMessage(eFace: %d, szMsg: '%s')\n", eFace, szMsg);
-	stringCopyLimited(szMsg, s_szMsg, HUD_MSG_BFR_SIZE);
-	s_eState = STATE_MSG_NOISE_IN;
-	s_uwFrameDelay = HUD_NOISE_DURATION;
-	s_uwStateCounter = 0;
+	stringCopyLimited(szMsg, s_szMsg, HUD_MESSAGE_BUFFER_SIZE);
 	s_eFaceToDraw = eFace;
-	audioMixerPlaySfx(s_pSfxNoise, SFX_CHANNEL_HUD, SFX_PRIORITY_HUD, 0);
+	hudTriggerMessage();
+}
+
+void hudShowMessageVa(tFaceId eFace, const char *szFormat, ...) {
+	logWrite("hudShowMessageVa(eFace: %d, szFormat: '%s')\n", eFace, szFormat);
+	va_list vaArgs;
+	va_start(vaArgs, szFormat);
+	vsnprintf(s_szMsg, HUD_MESSAGE_BUFFER_SIZE, szFormat, vaArgs);
+	va_end(vaArgs);
+	s_eFaceToDraw = eFace;
+	hudTriggerMessage();
 }
 
 void hudSet2pPlaying(UBYTE isPlaying) {

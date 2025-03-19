@@ -124,10 +124,7 @@ UBYTE questGateGetMaxFragmentCount(void) {
 
 void questGateUnlockPrisoner(void) {
 	s_isPrisonerFound = 1;
-	hudShowMessage(
-		FACE_ID_MIETEK,
-		g_pMsgs[MSG_HUD_PRISONER_FOUND]
-	);
+	hudShowMessage(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_PRISONER_FOUND]);
 	pageOfficeUnlockPerson(FACE_ID_PRISONER);
 	pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_DOSSIER);
 	pageOfficeTryUnlockPersonSubpage(FACE_ID_PRISONER, COMM_SHOP_PAGE_OFFICE_PRISONER_WELCOME);

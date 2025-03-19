@@ -13,8 +13,6 @@
 
 #define NON_PLATINUM_MASK (BV(ACHIEVEMENT_PLATINUM) - 1)
 
-static char s_szAchievementMsgBuffer[50];
-
 void achievementUnlock(tAchievement eAchievement) {
 	if(settingsTryUnlockAchievement(eAchievement)) {
 		logWrite("Unlocked achievement %hu\n", eAchievement);
@@ -22,11 +20,7 @@ void achievementUnlock(tAchievement eAchievement) {
 			settingsTryUnlockAchievement(ACHIEVEMENT_PLATINUM);
 			logWrite("Unlocked platinum achievmeent\n");
 		}
-		char *pEnd = stringCopy(g_pMsgs[MSG_HUD_ACHIEVEMENT_UNLOCKED], s_szAchievementMsgBuffer);
-		*(pEnd++) = ':';
-		*(pEnd++) = '\n';
-		stringCopy(g_pMsgs[MSG_ACHIEVEMENT_TITLE_LAST_RIGHTEOUS + eAchievement], pEnd);
-		hudShowMessage(FACE_ID_MIETEK, s_szAchievementMsgBuffer);
+		hudShowMessageVa(FACE_ID_MIETEK, g_pMsgs[MSG_HUD_ACHIEVEMENT_UNLOCKED], g_pMsgs[MSG_ACHIEVEMENT_TITLE_LAST_RIGHTEOUS + eAchievement]);
 	}
 }
 

@@ -61,15 +61,14 @@ static void pageWarehouseDrawRow(UBYTE ubPos) {
 	);
 
 	// Sell
-	char szBfr[10];
 	UWORD uwMineralReward = s_pTmpSell[ubMineral] * g_pMinerals[ubMineral].ubReward;
-	sprintf(szBfr, "%hu\x1F", uwMineralReward);
-	commDrawText(s_pColOffs[1], uwRowOffsY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
+	snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%hu\x1F", uwMineralReward);
+	commDrawText(s_pColOffs[1], uwRowOffsY, gameGetMessageBuffer(), FONT_COOKIE | FONT_SHADOW, ubColor);
 
 	// Stock
 	UBYTE ubStockCenter = fontMeasureText(g_pFont, g_pMsgs[MSG_WAREHOUSE_COL_STOCK]).uwX / 2;
-	sprintf(szBfr, "%hu", s_pTmpStock[ubMineral]);
-	UBYTE ubValWidthHalf = fontMeasureText(g_pFont, szBfr).uwX / 2;
+	snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%hu", s_pTmpStock[ubMineral]);
+	UBYTE ubValWidthHalf = fontMeasureText(g_pFont, gameGetMessageBuffer()).uwX / 2;
 
 	if(ubPos == s_ubPosCurr) {
 		commDrawText(
@@ -92,21 +91,21 @@ static void pageWarehouseDrawRow(UBYTE ubPos) {
 		);
 	}
 	commDrawText(
-		s_pColOffs[2] + ubStockCenter - ubValWidthHalf, uwRowOffsY, szBfr,
+		s_pColOffs[2] + ubStockCenter - ubValWidthHalf, uwRowOffsY, gameGetMessageBuffer(),
 		FONT_COOKIE | FONT_SHADOW, ubColor
 	);
 
 	// Plan
 	if(planManagerGet()->isPlanActive) {
-		sprintf(
-			szBfr, "%hu/%hu",
+		snprintf(
+			gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%hu/%hu",
 			s_pTmpPlan[ubMineral], planGetCurrent()->pMineralsRequired[ubMineral]
 		);
 	}
 	else {
-		stringCopy("-", szBfr);
+		stringCopy("-", gameGetMessageBuffer());
 	}
-	commDrawText(s_pColOffs[3], uwRowOffsY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
+	commDrawText(s_pColOffs[3], uwRowOffsY, gameGetMessageBuffer(), FONT_COOKIE | FONT_SHADOW, ubColor);
 }
 
 static void pageWarehouseRedraw(void) {
@@ -148,36 +147,34 @@ static void pageWarehouseRedraw(void) {
 	buttonRowApply();
 	buttonDrawAll(pBmDraw);
 
-	char szBfr[40];
-
 	// Time remaining
 	if(planManagerGet()->isPlanActive) {
-		sprintf(
-			szBfr, g_pMsgs[MSG_COMM_TIME_REMAINING],
+		snprintf(
+			gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, g_pMsgs[MSG_COMM_TIME_REMAINING],
 			planGetRemainingDays()
 		);
 		commDrawText(
-			COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,
+			COMM_DISPLAY_WIDTH, COMM_DISPLAY_HEIGHT - ubLineHeight, gameGetMessageBuffer(),
 			FONT_COOKIE | FONT_SHADOW | FONT_RIGHT, COMM_DISPLAY_COLOR_TEXT
 		);
 	}
 
 	// Accolades
-	sprintf(
-		szBfr, "%s %hhu",
+	snprintf(
+		gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%s %hhu",
 		g_pMsgs[MSG_COMM_ACCOLADES], gameGetAccoladeCount()
 	);
 	commDrawText(
-		0, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight, szBfr,
+		0, COMM_DISPLAY_HEIGHT - 2 * ubLineHeight, gameGetMessageBuffer(),
 		FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 	);
 
 	// Rebukes
-	sprintf(
-		szBfr, "%s %hhu", g_pMsgs[MSG_COMM_REBUKES], gameGetRebukeCount()
+	snprintf(
+		gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%s %hhu", g_pMsgs[MSG_COMM_REBUKES], gameGetRebukeCount()
 	);
 	commDrawText(
-		0, COMM_DISPLAY_HEIGHT - ubLineHeight, szBfr,
+		0, COMM_DISPLAY_HEIGHT - ubLineHeight, gameGetMessageBuffer(),
 		FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 	);
 }

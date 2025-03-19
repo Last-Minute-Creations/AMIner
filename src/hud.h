@@ -50,6 +50,8 @@ UBYTE hudIsShowingMessage(void);
 
 void hudShowMessage(tFaceId eFace, const char *szMsg);
 
+void hudShowMessageVa(tFaceId eFace, const char *szFormat, ...);
+
 void hudShowMain(void);
 
 void hudPause(UBYTE isPaused);

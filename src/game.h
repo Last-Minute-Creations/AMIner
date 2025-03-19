@@ -11,8 +11,13 @@
 #include "string_array.h"
 #include "steer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define GAME_BPP 5
 #define GAME_TIME_PER_DAY 140
+#define GAME_MESSAGE_BUFFER_SIZE 500
 
 typedef enum tRebukeKind {
 	REBUKE_INVALID,
@@ -105,10 +110,16 @@ void gameProcessBaseWestern(void);
 
 void gameProcessBaseGate(void);
 
+char *gameGetMessageBuffer(void);
+
 // Game config
 extern UBYTE g_is2pPlaying;
 extern UBYTE g_isAtari;
 extern tGameMode g_eGameMode;
 extern tState g_sStateGame;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _GAME_H_

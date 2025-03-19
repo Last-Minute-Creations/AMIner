@@ -115,15 +115,14 @@ void pageQuestioningCreate(void) {
 	}
 
 	uwPosY += commDrawMultilineText(szMsg, 0, uwPosY) * ubLineHeight;
-	char szBfr[250];
 	uwPosY += ubLineHeight / 2;
-	sprintf(
-		szBfr,
+	snprintf(
+		gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE,
 		g_pMsgs[MSG_QUESTIONING_DESCRIPTION],
 		QUESTIONING_HEAT_DECREASE_TRUTH,
 		heatGetPercent()
 	);
-	uwPosY += commDrawMultilineText(szBfr,  0, uwPosY) * ubLineHeight;
+	uwPosY += commDrawMultilineText(gameGetMessageBuffer(),  0, uwPosY) * ubLineHeight;
 
 	buttonInitAcceptDecline(g_pMsgs[MSG_QUESTIONING_TRUTH], g_pMsgs[MSG_QUESTIONING_LIE]);
 	buttonDrawAll(commGetDisplayBuffer());

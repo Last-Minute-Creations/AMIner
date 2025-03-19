@@ -81,9 +81,8 @@ void pageCommUnlockCreate(
 	uwPosY += commDrawMultilineText(szMsg, 0, uwPosY) * ubLineHeight;
 	uwPosY += ubLineHeight;
 
-	char szPrice[15];
-	sprintf(szPrice, "%s: %hu\x1F", g_pMsgs[MSG_COMM_PRICE], s_uwCost);
-	commDrawText(0, uwPosY, szPrice, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+	snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%s: %hu\x1F", g_pMsgs[MSG_COMM_PRICE], s_uwCost);
+	commDrawText(0, uwPosY, gameGetMessageBuffer(), FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
 	uwPosY += ubLineHeight;
 
 	if(g_pVehicles[0].lCash >= uwCost) {

@@ -179,31 +179,31 @@ static void onMenuPosDraw(
 			const UWORD uwColumnWidth = COMM_DISPLAY_WIDTH / 2;
 
 			ULONG ulGameDays = (s_sSummary.ulGameTime + GAME_TIME_PER_DAY - 1) / GAME_TIME_PER_DAY;
-			sprintf(szBfr, "%s %lu", g_pMsgs[MSG_COMM_DAYS], ulGameDays);
+			snprintf(szBfr, sizeof(szBfr), "%s %lu", g_pMsgs[MSG_COMM_DAYS], ulGameDays);
 			commDrawText(0, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
 
-			sprintf(szBfr, "%s %ld\x1F", g_pMsgs[MSG_HUD_CASH], s_sSummary.lCash);
+			snprintf(szBfr, sizeof(szBfr), "%s %ld\x1F", g_pMsgs[MSG_HUD_CASH], s_sSummary.lCash);
 			commDrawText(uwColumnWidth, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
 
 			uwY += ubLineHeight;
 
-			sprintf(szBfr, "%s %hhu", g_pMsgs[MSG_COMM_ACCOLADES], s_sSummary.ubAccolades);
+			snprintf(szBfr, sizeof(szBfr), "%s %hhu", g_pMsgs[MSG_COMM_ACCOLADES], s_sSummary.ubAccolades);
 			commDrawText(0, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
 
-			sprintf(szBfr, "%s %hhu", g_pMsgs[MSG_COMM_REBUKES], s_sSummary.ubRebukes);
+			snprintf(szBfr, sizeof(szBfr), "%s %hhu", g_pMsgs[MSG_COMM_REBUKES], s_sSummary.ubRebukes);
 			commDrawText(uwColumnWidth, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
 
 			uwY += ubLineHeight;
 
-			sprintf(szBfr, "%s %hhu%%", g_pMsgs[MSG_COMM_PLANS], (100 * s_sSummary.ubPlanIndex) / 50);
+			snprintf(szBfr, sizeof(szBfr), "%s %hhu%%", g_pMsgs[MSG_COMM_PLANS], (100 * s_sSummary.ubPlanIndex) / 50);
 			commDrawText(0, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
 
 			uwY += ubLineHeight;
 
-			sprintf(szBfr, "%s %hu.%hhum", g_pMsgs[MSG_HUD_DEPTH], s_sSummary.uwMaxDepth / 10, s_sSummary.uwMaxDepth % 10);
+			snprintf(szBfr, sizeof(szBfr), "%s %hu.%hhum", g_pMsgs[MSG_HUD_DEPTH], s_sSummary.uwMaxDepth / 10, s_sSummary.uwMaxDepth % 10);
 			commDrawText(0, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
 
-			sprintf(szBfr, "%s %hu%%", g_pMsgs[MSG_COMM_HEAT], s_sSummary.ubHeatPercent);
+			snprintf(szBfr, sizeof(szBfr), "%s %hu%%", g_pMsgs[MSG_COMM_HEAT], s_sSummary.ubHeatPercent);
 			commDrawText(uwColumnWidth, uwY, szBfr, FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK);
 		}
 		else {

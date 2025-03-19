@@ -42,7 +42,7 @@ UBYTE buttonAdd(const char *szName) {
 
 	UBYTE ubButtonIndex = s_ubButtonCount++;
 	tButton *pButton = &s_pButtons[ubButtonIndex];
-	strcpy(pButton->szName, szName);
+	stringCopy(szName, pButton->szName);
 	pButton->uwWidth = buttonGetWidth(ubButtonIndex);
 	pButton->sPos.ulYX = 0;
 	s_ePreset = BUTTON_PRESET_CUSTOM;

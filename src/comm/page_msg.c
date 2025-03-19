@@ -8,6 +8,7 @@
 #include "../language.h"
 #include "../assets.h"
 #include "../msg.h"
+#include "../game.h"
 
 #define LINES_MAX 100
 #define LINES_OCCUPIED_BY_FACE 3
@@ -133,10 +134,9 @@ static void commMsgDrawCurrentPage(void) {
 		);
 		uwLineY += ubLineHeight;
 	}
-	char szPageCnt[8];
-	sprintf(szPageCnt, "%hhu/%hhu", s_ubCurrPage + 1, s_ubPageCount);
+	snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%hhu/%hhu", s_ubCurrPage + 1, s_ubPageCount);
 	commDrawText(
-		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, szPageCnt,
+		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT, gameGetMessageBuffer(),
 		FONT_HCENTER | FONT_BOTTOM | FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 }

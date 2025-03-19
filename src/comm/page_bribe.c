@@ -58,7 +58,6 @@ static void pageBribeProcess(void) {
 void pageBribeCreate(void) {
 	commRegisterPage(pageBribeProcess, 0);
 	const UBYTE ubLineHeight = commGetLineHeight();
-	char szBfr[150];
 	UWORD uwPosY = 0;
 
 	s_uwBribeCost = 100;
@@ -77,13 +76,13 @@ void pageBribeCreate(void) {
 		buttonInitOk(g_pMsgs[MSG_PAGE_BACK]);
 	}
 	else {
-		sprintf(szBfr, g_pMsgs[MSG_TRICKS_BRIBE_PREMISE], 14);
-		uwPosY += commDrawMultilineText(szBfr,0, uwPosY) * ubLineHeight;
+		snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, g_pMsgs[MSG_TRICKS_BRIBE_PREMISE], 14);
+		uwPosY += commDrawMultilineText(gameGetMessageBuffer(), 0, uwPosY) * ubLineHeight;
 		uwPosY += ubLineHeight / 2;
-		sprintf(szBfr, g_pMsgs[MSG_TRICKS_BRIBE_DETAILS], heatGetPercent());
-		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
-		sprintf(szBfr, g_pMsgs[MSG_TRICKS_BRIBE_PRICE], s_uwBribeCost, '\x1F');
-		uwPosY += commDrawMultilineText(szBfr, 0, uwPosY) * ubLineHeight;
+		snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, g_pMsgs[MSG_TRICKS_BRIBE_DETAILS], heatGetPercent());
+		uwPosY += commDrawMultilineText(gameGetMessageBuffer(), 0, uwPosY) * ubLineHeight;
+		snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, g_pMsgs[MSG_TRICKS_BRIBE_PRICE], s_uwBribeCost, '\x1F');
+		uwPosY += commDrawMultilineText(gameGetMessageBuffer(), 0, uwPosY) * ubLineHeight;
 
 		if(g_pVehicles[0].lCash < s_uwBribeCost) {
 			uwPosY += ubLineHeight;

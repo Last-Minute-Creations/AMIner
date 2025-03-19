@@ -107,7 +107,7 @@ static void hiScoreDrawPosition(UBYTE ubPos) {
 
 	// Score name
 	char szBfr[SCORE_NAME_LENGTH + 5];
-	sprintf(szBfr, "%hhu. %s", ubPos + 1, s_pScores[s_eScoreMode][ubPos].szName);
+	snprintf(szBfr, sizeof(szBfr), "%hhu. %s", ubPos + 1, s_pScores[s_eScoreMode][ubPos].szName);
 	commDrawText(
 		16, uwY, szBfr, FONT_LAZY | FONT_COOKIE | FONT_SHADOW, ubColor
 	);
@@ -237,7 +237,7 @@ void hiScoreSetup(LONG lScore, const char *szResult, tScoreMode eScoreMode) {
 
 			// Move worse score down
 			for(BYTE j = SCORE_COUNT-2; j >= s_ubNewScorePos; --j) {
-				strcpy(s_pScores[s_eScoreMode][j+1].szName, s_pScores[s_eScoreMode][j].szName);
+				stringCopy(s_pScores[s_eScoreMode][j].szName, s_pScores[s_eScoreMode][j+1].szName);
 				s_pScores[s_eScoreMode][j+1].lScore = s_pScores[s_eScoreMode][j].lScore;
 			}
 			// Make room for new score

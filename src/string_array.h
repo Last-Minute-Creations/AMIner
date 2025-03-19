@@ -7,6 +7,10 @@
 
 #include <ace/utils/file.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Array of string pointers terimnated with nullptr
  */
@@ -19,5 +23,9 @@ char **stringArrayCreateFromFd(tFile *pFile);
 void stringArrayDestroy(char **pArray);
 
 UWORD stringArrayGetCount(const char * const *pArray);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _STRING_ARRAY_H_

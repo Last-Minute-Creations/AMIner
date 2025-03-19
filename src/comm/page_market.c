@@ -11,6 +11,7 @@
 #include "defs.h"
 #include "warehouse.h"
 #include "save.h"
+#include "game.h"
 
 #define TARGET_ROW_COUNT 4
 #define MARKET_LINE_HEIGHT 9
@@ -53,10 +54,9 @@ static void drawSourceStock(void) {
 	UWORD uwY = MARKET_ROW_SOURCE_STOCK_Y;
 	UWORD uwX = 0;
 	commErase(uwX, uwY, MARKET_SOURCE_STOCK_WIDTH, MARKET_LINE_HEIGHT);
-	char szStock[20];
-	snprintf(szStock, sizeof(szStock), "%s: %hu", g_pMsgs[MSG_COMM_STOCK], warehouseGetStock(s_eSource));
+	snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%s: %hu", g_pMsgs[MSG_COMM_STOCK], warehouseGetStock(s_eSource));
 	commDrawText(
-		uwX, uwY, szStock, FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
+		uwX, uwY, gameGetMessageBuffer(), FONT_COOKIE | FONT_SHADOW, COMM_DISPLAY_COLOR_TEXT
 	);
 }
 
@@ -85,21 +85,20 @@ static void drawRow(tMarketRow eRow) {
 		COMM_DISPLAY_COLOR_TEXT_DARK
 	);
 
-	char szBfr[50];
 	if(eRow == MARKET_ROW_SOURCE_MINERAL) {
-		snprintf(szBfr, sizeof(szBfr), "%s: < %s >", g_pMsgs[MSG_WAREHOUSE_COL_MINERAL], g_pMsgs[MSG_MINERAL_SILVER + s_eSource]);
-		commDrawText(0, 0, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
+		snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%s: < %s >", g_pMsgs[MSG_WAREHOUSE_COL_MINERAL], g_pMsgs[MSG_MINERAL_SILVER + s_eSource]);
+		commDrawText(0, 0, gameGetMessageBuffer(), FONT_COOKIE | FONT_SHADOW, ubColor);
 	}
 	else if(MARKET_ROW_TARGET_FIRST <= eRow && eRow <= MARKET_ROW_TARGET_LAST) {
 		UBYTE ubTargetIndex = eRow - MARKET_ROW_TARGET_FIRST;
 		const tTargetMineral *pTarget = &s_pTargets[ubTargetIndex];
 		UWORD uwY = MARKET_ROW_FIRST_TARGET_Y + ubTargetIndex * MARKET_LINE_HEIGHT;
 
-		snprintf(szBfr, sizeof(szBfr), "%hhux %s", pTarget->ubPrice, g_pMsgs[MSG_MINERAL_SILVER + s_eSource]);
-		commDrawText(0, uwY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
+		snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%hhux %s", pTarget->ubPrice, g_pMsgs[MSG_MINERAL_SILVER + s_eSource]);
+		commDrawText(0, uwY, gameGetMessageBuffer(), FONT_COOKIE | FONT_SHADOW, ubColor);
 
-		snprintf(szBfr, sizeof(szBfr), "%hhux %s", 1, g_pMsgs[MSG_MINERAL_SILVER + pTarget->eMineral]);
-		commDrawText(MARKET_TRADE_COLUMN_WIDTH, uwY, szBfr, FONT_COOKIE | FONT_SHADOW, ubColor);
+		snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%hhux %s", 1, g_pMsgs[MSG_MINERAL_SILVER + pTarget->eMineral]);
+		commDrawText(MARKET_TRADE_COLUMN_WIDTH, uwY, gameGetMessageBuffer(), FONT_COOKIE | FONT_SHADOW, ubColor);
 
 		drawRowStock(eRow);
 	}

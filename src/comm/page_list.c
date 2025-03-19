@@ -13,6 +13,7 @@
 #include "gs_shop.h"
 #include "../defs.h"
 #include "../protests.h"
+#include "../game.h"
 
 #define PORTRAIT_X 0
 #define PORTRAIT_Y 0
@@ -79,12 +80,11 @@ void pageListCreate(tFaceId eFace, const tCommShopPage *pPages) {
 
 	// HACK HACK HACK
 	if(eFace == FACE_ID_KRYSTYNA) {
-		char szMorale[40];
-		char *pEnd = stringCopy(g_pMsgs[MSG_COMM_PROTESTS_LABEL], szMorale);
+		char *pEnd = stringCopy(g_pMsgs[MSG_COMM_PROTESTS_LABEL], gameGetMessageBuffer());
 		*(pEnd++) = ':';
 		*(pEnd++) = ' ';
 		pEnd = stringCopy(g_pMsgs[MSG_COMM_PROTESTS_OK + protestsGetState()], pEnd);
 
-		commDrawText(0, COMM_DISPLAY_HEIGHT, szMorale, FONT_BOTTOM | FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
+		commDrawText(0, COMM_DISPLAY_HEIGHT, gameGetMessageBuffer(), FONT_BOTTOM | FONT_COOKIE, COMM_DISPLAY_COLOR_TEXT);
 	}
 }

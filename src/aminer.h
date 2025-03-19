@@ -7,6 +7,14 @@
 
 #include <ace/managers/state.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern tStateManager *g_pGameStateManager;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _AMINER_AMINER_H_

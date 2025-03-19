@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "page_workshop.h"
+#include <ace/utils/string.h>
 #include <comm/comm.h>
 #include <comm/button.h>
 #include <comm/gs_shop.h>
@@ -72,28 +73,27 @@ static void pageWorkshopUpdateText(void) {
 	);
 	uwOffsY += ubRowSize;
 
-	char szBfr[50];
 	UBYTE isAcquirable = pageWorkshopIsPartAcquirable(s_eSelectedPart);
 	UBYTE ubLevel = pageWorkshopGetPartCurrentLevel();
 	UBYTE ubMaxLevel = inventoryGetPartMaxLevel(s_eSelectedPart);
 
 	UBYTE ubDisplayLevel = ubLevel + (isAcquirable ? 0 : 1);
 	if(!isAcquirable || ubLevel > 0) {
-		sprintf(szBfr, "%s %s%hhu", g_pMsgs[MSG_PART_NAME_DRILL + s_eSelectedPart], g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
+		snprintf(gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%s %s%hhu", g_pMsgs[MSG_PART_NAME_DRILL + s_eSelectedPart], g_pMsgs[MSG_COMM_MK], ubDisplayLevel);
 	}
 	else {
-		strcpy(szBfr, g_pMsgs[MSG_PART_NAME_DRILL + s_eSelectedPart]);
+		stringCopy(g_pMsgs[MSG_PART_NAME_DRILL + s_eSelectedPart], gameGetMessageBuffer());
 	}
-	commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColorText);
+	commDrawText(0, uwOffsY, gameGetMessageBuffer(), ubFontFlags, ubColorText);
 	uwOffsY += ubRowSize;
 
 	if(ubLevel < ubMaxLevel) {
-		sprintf(
-			szBfr, "%s%hhu: %lu\x1F",
+		snprintf(
+			gameGetMessageBuffer(), GAME_MESSAGE_BUFFER_SIZE, "%s%hhu: %lu\x1F",
 			g_pMsgs[MSG_COMM_UPGRADE_TO_MK],
 			ubDisplayLevel + 1, pageWorkshopGetPartUpgradeCost(ubLevel)
 		);
-		commDrawText(0, uwOffsY, szBfr, ubFontFlags, ubColorText);
+		commDrawText(0, uwOffsY, gameGetMessageBuffer(), ubFontFlags, ubColorText);
 	}
 	uwOffsY += 2 * ubRowSize;
 
