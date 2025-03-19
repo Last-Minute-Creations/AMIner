@@ -62,7 +62,12 @@ int main(int lArgCount, const char *pArgs[]) {
 	std::uint16_t uwCountBe = nEndian::toBig16(tMsg::MSG_COUNT);
 	FileOut.write(reinterpret_cast<const char*>(&uwCountBe), sizeof(uwCountBe));
 	for(auto i = 0; i < tMsg::MSG_COUNT; ++i) {
-		std::uint8_t ubLength = std::uint8_t(strlen(g_pMsgs[i]));
+		std::uint16_t uwLength = strlen(g_pMsgs[i]);
+		if(uwLength > 255) {
+			std::printf("ERR: msg %d length %hu is too long: '%s'", i, uwLength, g_pMsgs[i]);
+			return EXIT_FAILURE;
+		}
+		std::uint8_t ubLength = std::uint8_t(uwLength);
 		FileOut.write(reinterpret_cast<const char*>(&ubLength), sizeof(ubLength));
 		FileOut.write(g_pMsgs[i], ubLength);
 	}
