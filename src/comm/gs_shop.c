@@ -113,6 +113,7 @@ static void commGsShopLoop(void) {
 	commProcess();
 	tutorialProcess();
 	dinoProcess();
+	gameProcessMusicInterval();
 
 	hudProcess();
 	// Process only managers of HUD because we want single buffering on main one

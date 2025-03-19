@@ -1504,6 +1504,15 @@ void gameTriggerCutscene(tGameCutscene eCutscene) {
 	}
 }
 
+void gameProcessMusicInterval(void) {
+	if(s_ubMusicCooldown && s_isMusicEnabled) {
+		if(--s_ubMusicCooldown == 0) {
+			ptplayerLoadMod(g_pGameMods[s_ubCurrentMod], g_pModSampleData, 0);
+			ptplayerEnableMusic(1);
+		}
+	}
+}
+
 //-------------------------------------------------------------------- GAMESTATE
 
 static void gameGsCreate(void) {
@@ -1568,12 +1577,7 @@ static void gameGsLoop(void) {
 	}
 	coreProcessAfterBobs();
 
-	if(s_ubMusicCooldown && s_isMusicEnabled) {
-		if(--s_ubMusicCooldown == 0) {
-			ptplayerLoadMod(g_pGameMods[s_ubCurrentMod], g_pModSampleData, 0);
-			ptplayerEnableMusic(1);
-		}
-	}
+	gameProcessMusicInterval();
 
 	if(
 		g_pVehicles[0].isChallengeEnded &&

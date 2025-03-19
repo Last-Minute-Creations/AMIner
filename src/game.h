@@ -106,6 +106,8 @@ UBYTE gameIsCutsceneActive(void);
 
 void gameTriggerCutscene(tGameCutscene eCutscene);
 
+void gameProcessMusicInterval(void);
+
 void gameProcessBaseWestern(void);
 
 void gameProcessBaseGate(void);

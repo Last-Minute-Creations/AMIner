@@ -39,6 +39,7 @@ static void commGsMsgCreate(void) {
 }
 
 static void commGsMsgLoop(void) {
+	gameProcessMusicInterval();
 	commProcess();
 	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
 	if(!commProcessPage()) {
