@@ -40,6 +40,7 @@ typedef enum _tMenuState {
 
 //------------------------------------------------------------------- PROTOTYPES
 
+static void menuOnEnterMain(void);
 static void menuOnGameStart(void);
 static void menuOnStoryLoad(void);
 static void menuOnExit(void);
@@ -58,6 +59,7 @@ static void menuOnEnterCredits();
 
 static tState s_sStateMenuScore;
 static tState s_sStateMenuAchievements;
+static tState s_sStateCorruptedSave;
 
 static tMenuListOption s_pMenuOptions[MENU_OPTIONS_MAX];
 static UBYTE s_ubMenuOptionCount;
@@ -79,6 +81,10 @@ static tGameSummary s_sSummary;
 static tGameMode s_eModeMenu;
 
 //------------------------------------------------------------------ PUBLIC VARS
+
+static void menuOnEnterCorruptedSave(void) {
+	statePush(g_pGameStateManager, &s_sStateCorruptedSave);
+}
 
 static void menuEnableAtari(void) {
 	if(g_sSettings.isAtariHidden) {
@@ -113,10 +119,12 @@ static void menuLoadGame(const char *szSavePath) {
 		g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_KEY_ARROWS) : steerInitFromMode(STEER_MODE_JOY_2)
 	);
 
+	UBYTE isLoadSuccess = 0;
 	systemUse();
 	tFile *pSave = diskFileOpen(szSavePath, "rb");
 	if(pSave) {
-		if(!gameLoad(pSave)) {
+		isLoadSuccess = gameLoad(pSave);
+		if(!isLoadSuccess) {
 			logWrite("ERR: Failed to load game\n");
 		}
 		fileClose(pSave);
@@ -126,10 +134,15 @@ static void menuLoadGame(const char *szSavePath) {
 	}
 	systemUnuse();
 
-	commHide();
-	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
-	// copProcessBlocks();
-	s_eMenuState = MENU_STATE_ROLL_OUT;
+	if(isLoadSuccess) {
+		commHide();
+		// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
+		// copProcessBlocks();
+		s_eMenuState = MENU_STATE_ROLL_OUT;
+	}
+	else {
+		menuOnEnterCorruptedSave();
+	}
 }
 
 static void menuOnStoryLoad(void) {
@@ -886,6 +899,36 @@ static void menuAchievementsGsDestroy(void) {
 	menuInitialDraw();
 }
 
+static void menuCorruptedSaveGsCreate(void) {
+	commEraseAll();
+	hudShowMain();
+	commDrawMultilineText(g_pMsgs[MSG_SAVE_CORRUPTED], 0, 0);
+
+	commDrawText(
+		COMM_DISPLAY_WIDTH / 2, COMM_DISPLAY_HEIGHT - 1,
+		g_pMsgs[MSG_HI_SCORE_PRESS],
+		FONT_BOTTOM | FONT_HCENTER | FONT_SHADOW | FONT_COOKIE,
+		COMM_DISPLAY_COLOR_TEXT_HOVER
+	);
+}
+
+static void menuCorruptedSaveGsLoop(void) {
+	commProcess();
+	if(commNavExUse(COMM_NAV_EX_BTN_CLICK)) {
+		statePop(g_pGameStateManager);
+		return;
+	}
+
+	// Process only managers of HUD because we want single buffering on main one
+	vPortProcessManagers(g_pMainBuffer->sCommon.pVPort->pView->pFirstVPort);
+	copProcessBlocks();
+	vPortWaitForEnd(g_pMainBuffer->sCommon.pVPort);
+}
+
+static void menuCorruptedSaveGsDestroy(void) {
+	menuOnEnterMain();
+}
+
 //------------------------------------------------------------------- PUBLIC FNS
 
 void menuPreload(void) {
@@ -935,4 +978,10 @@ static tState s_sStateMenuAchievements = {
 	.cbCreate = menuAchievementsGsCreate,
 	.cbLoop = menuAchievementsGsLoop,
 	.cbDestroy = menuAchievementsGsDestroy
+};
+
+static tState s_sStateCorruptedSave = {
+	.cbCreate = menuCorruptedSaveGsCreate,
+	.cbLoop = menuCorruptedSaveGsLoop,
+	.cbDestroy = menuCorruptedSaveGsDestroy
 };

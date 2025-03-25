@@ -116,7 +116,8 @@
 			"Gracz 1 sterowanie",
 			"Gracz 2 sterowanie",
 			"Autorzy"
-		]
+		],
+		"saveCorrupted": "Błąd: Uszkodzony plik zapisu gry"
 	},
 	"minerals": [
 		"Srebro", "Złoto", "Szmaragd", "Rubin", "Amelinium", "Wongel"

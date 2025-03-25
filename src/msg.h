@@ -327,6 +327,8 @@ typedef enum tMsg {
 	MSG_MINERAL_MOONSTONE,
 	MSG_MINERAL_COAL,
 
+	MSG_SAVE_CORRUPTED,
+
 	// Count
 	MSG_COUNT
 } tMsg;

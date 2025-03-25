@@ -316,6 +316,8 @@ const char * const g_pLangDom[MSG_COUNT + 1] = {
 	[MSG_MINERAL_MOONSTONE] = "minerals[4]",
 	[MSG_MINERAL_COAL] = "minerals[5]",
 
+	[MSG_SAVE_CORRUPTED] = "menu.saveCorrupted",
+
 	// Count
 	[MSG_COUNT] = 0
 };
