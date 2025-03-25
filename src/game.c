@@ -951,7 +951,7 @@ static void gameCameraProcess(void) {
 		}
 		else {
 			++s_ubChallengeCamCnt;
-			if(s_ubChallengeCamCnt >= 2) {
+			if(s_ubChallengeCamCnt >= 3) {
 				g_pMainBuffer->pCamera->uPos.uwY += 1;
 				s_ubChallengeCamCnt = 0;
 			}
