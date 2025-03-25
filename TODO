@@ -147,8 +147,10 @@ General:
 	✔ Add float text on restock with only minerals taken without repair @done(25-03-10)
 	✔ Translate checkpoint text @done(25-03-11)
 	✔ Add 2s pauses between music tracks? @done(25-03-11)
+	✔ Fix deadline finish line tiles on game load @done(25-03-25)
 	☐ Add final default hi-scores
 	☐ Final placement of base upgrades
+	☐ Final optimize file order
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)

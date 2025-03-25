@@ -1376,7 +1376,8 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
 	fileRead(pFile, &s_uwMaxTileY, sizeof(s_uwMaxTileY));
 
-	return inboxLoad(pFile) &&
+	UBYTE isSuccess = (
+		inboxLoad(pFile) &&
 		dinoLoad(pFile) &&
 		questGateLoad(pFile) &&
 		questCrateLoad(pFile) &&
@@ -1390,7 +1391,16 @@ UBYTE gameLoad(tFile *pFile) {
 		vehicleLoad(&g_pVehicles[1], pFile) &&
 		hudLoad(pFile) &&
 		heatLoad(pFile) &&
-		saveReadTag(pFile, SAVE_TAG_GAME_END);
+		saveReadTag(pFile, SAVE_TAG_GAME_END)
+	);
+
+	if(g_eGameMode == GAME_MODE_DEADLINE) {
+		tileVariantChangeTo(TILE_VARIANT_FINISH);
+	}
+	else {
+		tileVariantChangeTo(TILE_VARIANT_CAMPAIGN);
+	}
+	return isSuccess;
 }
 
 UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary) {
@@ -1422,7 +1432,7 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	tutorialReset();
 	pageOfficeReset();
 	warehouseReset();
-	if(g_eGameMode == GAME_MODE_CHALLENGE) {
+	if(g_eGameMode != GAME_MODE_STORY) {
 		baseTilesetPrepareForChallenge();
 	}
 	tileReset(g_isAtari, g_eGameMode);
@@ -1448,9 +1458,11 @@ void gameStart(tGameMode eGameMode, tSteer sSteerP1, tSteer sSteerP2) {
 	heatReset();
 	groundLayerReset(1, 0);
 	s_pVpMain = g_pMainBuffer->sCommon.pVPort;
-	tileVariantChangeTo(TILE_VARIANT_CAMPAIGN);
 	if(g_eGameMode == GAME_MODE_DEADLINE) {
 		tileVariantChangeTo(TILE_VARIANT_FINISH);
+	}
+	else {
+		tileVariantChangeTo(TILE_VARIANT_CAMPAIGN);
 	}
 }
 
