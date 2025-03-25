@@ -1107,6 +1107,7 @@ static void gameSave(tFile *pFile) {
 	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
 	fileWrite(pFile, &g_eGameMode, sizeof(g_eGameMode));
 	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
+	fileWrite(pFile, &g_isSokoUnlock, sizeof(g_isSokoUnlock));
 
 	fileWrite(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
 	fileWrite(pFile, &s_eCameraType, sizeof(s_eCameraType));
@@ -1360,6 +1361,7 @@ UBYTE gameLoad(tFile *pFile) {
 	fileRead(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
 	fileRead(pFile, &g_eGameMode, sizeof(g_eGameMode));
 	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
+	fileRead(pFile, &g_isSokoUnlock, sizeof(g_isSokoUnlock));
 
 	fileRead(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
 	fileRead(pFile, &s_eCameraType, sizeof(s_eCameraType));
