@@ -19,7 +19,6 @@ static void settingsSave(tFile *pFile) {
 	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileWrite(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
-	fileWrite(pFile, &g_sSettings.ubSokoUnlock, sizeof(g_sSettings.ubSokoUnlock));
 	fileWrite(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
 	saveWriteTag(pFile, SAVE_TAG_SETTINGS_END);
 }
@@ -34,7 +33,6 @@ static UBYTE settingsLoad(tFile*pFile) {
 	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
 	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
 	fileRead(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
-	fileRead(pFile, &g_sSettings.ubSokoUnlock, sizeof(g_sSettings.ubSokoUnlock));
 	fileRead(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
 	return saveReadTag(pFile, SAVE_TAG_SETTINGS_END);
 }
@@ -45,7 +43,6 @@ static void settingsReset(void) {
 	g_sSettings.is1pKbd = 0;
 	g_sSettings.is2pKbd = 1;
 	g_sSettings.isAtariHidden = 1;
-	g_sSettings.ubSokoUnlock = 0;
 	g_sSettings.ulAchievementsUnlocked = 0;
 }
 

@@ -7,15 +7,12 @@
 
 #include <ace/utils/file.h>
 
-#define SETTINGS_SOKO_UNLOCK_ON 0xD0
-
 typedef struct tSettings {
 	UBYTE ubSoundVolume;
 	UBYTE ubMusicVolume;
 	UBYTE is1pKbd;
 	UBYTE is2pKbd;
 	UBYTE isAtariHidden;
-	UBYTE ubSokoUnlock;
 	ULONG ulAchievementsUnlocked;
 } tSettings;
 

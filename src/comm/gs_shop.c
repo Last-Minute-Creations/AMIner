@@ -178,8 +178,7 @@ static void commGsShopLoop(void) {
 		}
 		else if(
 			commNavUse(DIRECTION_FIRE) && s_eTab == COMM_TAB_WAREHOUSE &&
-			g_sSettings.ubSokoUnlock == SETTINGS_SOKO_UNLOCK_ON &&
-			s_eCurrentPage != COMM_SHOP_PAGE_SOKOBAN
+			g_isSokoUnlock && s_eCurrentPage != COMM_SHOP_PAGE_SOKOBAN
 		) {
 			commShopChangePage(COMM_SHOP_PAGE_WAREHOUSE, COMM_SHOP_PAGE_SOKOBAN);
 			return;
@@ -463,7 +462,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_CAPSULE);
 			break;
 		case COMM_SHOP_PAGE_CRYO_SUCCESS:
-			g_sSettings.ubSokoUnlock = SETTINGS_SOKO_UNLOCK_ON;
+			g_isSokoUnlock = 1;
 			pageMsgCreate(FACE_ID_CRYO, szTitle, "success", onBack);
 			break;
 

@@ -132,6 +132,7 @@ static char s_szMessageBuffer[GAME_MESSAGE_BUFFER_SIZE];
 
 UBYTE g_is2pPlaying;
 UBYTE g_isAtari;
+UBYTE g_isSokoUnlock;
 tGameMode g_eGameMode;
 
 //------------------------------------------------------------ PRIVATE FNS: MODE
