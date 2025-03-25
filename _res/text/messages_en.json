@@ -204,7 +204,7 @@
 	"tricks": {
 		"noPlan": "Nie masz aktywnego planu! Co mam niby zrobić?",
 		"accoutingStrike": [
-			"Panie Dyrektorze, debet nam się robi w kasie i to może pójść w złą stronę. Chyba nawet Mietek kiedyś Panu mówił coś?",
+			"Panie Dyrektorze, debet nam się robi w kasie i to może pójść w złą stronę.",
 			"",
 			"Pan Dyrektor wie jak jest, dobre rady są w cenie, a mnie oczko w jedwabnych rajstopach poszło... i dzieci by morze zobaczyły... nie wiem, w Bułgarii?"
 		],
@@ -231,7 +231,8 @@
 		"platform1": "Modernizacja pozwala na bezpieczną teleportację do sąsiedniej bazy, o ile ma platformę odbiorczą.",
 		"platform2": "Powiększony zasięg pozwala na przeskok do dowolnej bazy, o ile ma pl atformę odbiorczą.",
 		"workshop0": "Rozbudowuje bazę o warsztat, co pozwala na doraźne naprawy maszyny.",
-		"workshop1": "Sprowadza specjalistyczny sprzęt do warsztatu pozwalający na montaż usprawnień do maszyny."
+		"workshop1": "Sprowadza specjalistyczny sprzęt do warsztatu pozwalający na montaż usprawnień do maszyny.",
+		"maxLvl": "Osiągnięto maksymalny poziom rozbudowy."
 	},
 	"crates": {
 		"premiseTeleport": "Aby naprawić teleporter potrzebujemy części z 5 skrzyń.",

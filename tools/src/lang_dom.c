@@ -97,6 +97,7 @@ const char * const g_pLangDom[MSG_COUNT + 1] = {
 	[MSG_COMM_WORKSHOP_PLATFORM_2] = "workshop.platform2",
 	[	MSG_COMM_WORKSHOP_WORKSHOP_0] = "workshop.workshop0",
 	[	MSG_COMM_WORKSHOP_WORKSHOP_1] = "workshop.workshop1",
+	[	MSG_COMM_WORKSHOP_MAX_LVL] = "workshop.maxLvl",
 	// Unlock
 	[MSG_COMM_UNLOCK_OFFICE_WORKSHOP] = "shop.unlockOfficeWorkshop",
 	[MSG_COMM_UNLOCK_WAREHOUSE] = "shop.unlockWarehouse",

@@ -125,6 +125,9 @@ static void pageWorkshopUpdateText(void) {
 				break;
 		}
 	}
+	else {
+		szDescription = g_pMsgs[MSG_COMM_WORKSHOP_MAX_LVL];
+	}
 
 	uwOffsY = WORKSHOP_PART_ICON_HEIGHT;
 	if(szDescription) {
