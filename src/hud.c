@@ -142,22 +142,22 @@ static void hudRefresh(void) {
 	const UBYTE ubLabelWidth = fontMeasureText(
 		s_pFont, g_pMsgs[MSG_HUD_DEPTH]
 	).uwX;
-	if(s_eGameMode != GAME_MODE_STORY) {
-		// Clear depth label and use it as cash/time
-		blitRect(
-			s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1 - ubLabelWidth, ROW_2_Y,
-			ubLabelWidth, s_ubLineHeight, HUD_COLOR_BG
+
+	// Clear depth label and use it as cash/time/depth
+	blitRect(
+		s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1 - ubLabelWidth, ROW_2_Y,
+		ubLabelWidth, s_ubLineHeight, HUD_COLOR_BG
+	);
+
+	if(s_eGameMode == GAME_MODE_DEADLINE) {
+		// Time instead of 2p cash
+		fontDrawStr(
+			s_pFont, s_pHudBuffer->pBack, GAUGE_TIME_X - 1, ROW_2_Y - 3,
+			g_pMsgs[MSG_HUD_TIME], HUD_COLOR_BAR_FULL,
+			FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
 		);
-		if(s_eGameMode == GAME_MODE_DEADLINE) {
-			// Time instead of 2p cash
-			fontDrawStr(
-				s_pFont, s_pHudBuffer->pBack, GAUGE_TIME_X - 1, ROW_2_Y - 3,
-				g_pMsgs[MSG_HUD_TIME], HUD_COLOR_BAR_FULL,
-				FONT_LAZY | FONT_COOKIE | FONT_RIGHT, s_pLineBuffer
-			);
-		}
 	}
-	else {
+	else if(s_eGameMode == GAME_MODE_STORY) {
 		// Depth instead of 2p cash
 		fontDrawStr(
 			s_pFont, s_pHudBuffer->pBack, GAUGE_DEPTH_X - 1, ROW_2_Y - 3,
