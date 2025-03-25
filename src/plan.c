@@ -141,7 +141,10 @@ void planAddDays(UBYTE ubDays, UBYTE isBribe) {
 	if(isBribe) {
 		s_sPlanManager.isExtendedTimeByBribe = 1;
 	}
-	s_sPlanManager.wTimeRemaining += ubDays * GAME_TIME_PER_DAY;
+	s_sPlanManager.wTimeRemaining = MIN(
+		s_sPlanManager.wTimeRemaining + ubDays * GAME_TIME_PER_DAY,
+		200 * GAME_TIME_PER_DAY
+	);
 }
 
 void planSetMinerals(UBYTE ubMineralType, UBYTE ubCount) {
