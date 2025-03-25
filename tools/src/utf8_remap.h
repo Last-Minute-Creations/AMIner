@@ -18,11 +18,6 @@ typedef struct tCodeRemap {
 
 char remapChar(const tCodeRemap *pRemapCodes, uint32_t ulCodepoint);
 
-char *remapFile(
-	const char *szFilePath, const tCodeRemap *pRemap,
-	uint16_t *pOutAllocSize, uint16_t *pOutStringSize
-);
-
 #ifdef __cplusplus
 }
 #endif

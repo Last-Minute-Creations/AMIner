@@ -11,7 +11,7 @@
 #include "json.h"
 #include "jsmn.h"
 
-const tCodeRemap g_pRemap[19] = {
+const tCodeRemap g_pRemap[] = {
 	{323, 145}, // "Ń"
 	{377, 144}, // "Ź"
 	{260, 143}, // "Ą"
@@ -30,6 +30,7 @@ const tCodeRemap g_pRemap[19] = {
 	{322, 130}, // "ł"
 	{243, 129}, // "ó"
 	{380, 128}, // "ż"
+	{169, 169}, // "©"
 	{0, 0} // Terminator
 };
 

@@ -185,6 +185,7 @@ uint16_t jsonTokStrCpy(
 ) {
 	uint16_t uwLength = 0;
 	uint32_t ulCodepoint, ulState = 0;
+	uint8_t isIllegalChar = 0;
 	for(uint16_t i = pJson->pTokens[uwTok].start; i < pJson->pTokens[uwTok].end; ++i) {
 		uint8_t ubCharCode = (uint8_t)pJson->szData[i];
 		if(decode(&ulState, &ulCodepoint, ubCharCode) != UTF8_ACCEPT) {
@@ -193,7 +194,11 @@ uint16_t jsonTokStrCpy(
 
 		if(pRemap) {
 			// Remap if remap array has been passed
-			pDst[uwLength] = remapChar(pRemap, ulCodepoint);
+			char cRemap = remapChar(pRemap, ulCodepoint);
+			if(cRemap == '\xFF') {
+				isIllegalChar = 1;
+			}
+			pDst[uwLength] = cRemap;
 		}
 		else {
 			// By default, write codepoint truncated to byte
@@ -206,5 +211,9 @@ uint16_t jsonTokStrCpy(
 		}
 	}
 	pDst[uwLength] = '\0';
+	if(isIllegalChar) {
+		printf("ERR: Illegal char on string '%s'\n", pDst);
+		exit(EXIT_FAILURE);
+	}
 	return uwLength;
 }
