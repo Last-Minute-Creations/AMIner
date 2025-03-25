@@ -475,6 +475,12 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 #if defined(GAME_DEBUG)
+	else if(keyUse(KEY_1)) {
+		inventorySetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_GROUND, INVENTORY_LEVEL_PLATFORM_ALL);
+		inventorySetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_DINO, INVENTORY_LEVEL_PLATFORM_ALL);
+		inventorySetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_GATE, INVENTORY_LEVEL_PLATFORM_ALL);
+		inventorySetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, BASE_ID_WESTERN, INVENTORY_LEVEL_PLATFORM_ALL);
+	}
 	else if(keyUse(KEY_2)) {
 		g_pVehicles[0].lCash -= 50;
 		protestsProcess();
