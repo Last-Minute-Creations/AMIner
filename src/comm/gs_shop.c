@@ -421,6 +421,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 		case COMM_SHOP_PAGE_OFFICE_AGENT_SCIENTISTS:
 			pageMsgCreate(FACE_ID_AGENT, szTitle, "sci", onBack);
 			break;
+		case COMM_SHOP_PAGE_OFFICE_AGENT_ALL_CRATES:
+			pageMsgCreate(FACE_ID_AGENT, szTitle, "all_crates", onBack);
+			break;
 		case COMM_SHOP_PAGE_OFFICE_AGENT_SELL_CRATES:
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_SELL);
 			break;
@@ -440,6 +443,9 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_FIRST_CRATE:
 			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "first_crate", onBack);
+			break;
+		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_ALL_CRATES:
+			pageMsgCreate(FACE_ID_SCIENTIST, szTitle, "all_crates", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER:
 			pageUseCratesCreate(PAGE_USE_CRATES_SCENARIO_TELEPORTER);

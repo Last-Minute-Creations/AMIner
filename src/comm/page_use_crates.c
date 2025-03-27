@@ -92,8 +92,9 @@ static void pageUseCratesProcess(void) {
 					case PAGE_USE_CRATES_SCENARIO_TELEPORTER:
 						if(questCrateTryConsume(pageUseCratesGetMinAmount())) {
 							pageOfficeLockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_CRATE_TELEPORTER);
+							pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_ALL_CRATES);
 							pageOfficeTryUnlockPersonSubpage(FACE_ID_SCIENTIST, COMM_SHOP_PAGE_OFFICE_SCIENTIST_ESCAPE);
-							commShopChangePage(COMM_SHOP_PAGE_OFFICE_LIST_SCI, COMM_SHOP_PAGE_OFFICE_SCIENTIST_ESCAPE);
+							commShopChangePage(COMM_SHOP_PAGE_OFFICE_LIST_SCI, COMM_SHOP_PAGE_OFFICE_SCIENTIST_ALL_CRATES);
 						}
 						else {
 							commShopGoBack();
@@ -112,9 +113,16 @@ static void pageUseCratesProcess(void) {
 							g_pVehicles[0].lCash += 1000;
 							hudSetCash(0, g_pVehicles[0].lCash);
 							protestsProcess();
+							if(questCrateGetCratesSold() == QUEST_CRATE_MIN_SELLS_FOR_ESCAPE) {
+								pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_ALL_CRATES);
+								pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE);
+								commShopChangePage(COMM_SHOP_PAGE_OFFICE_LIST_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_ALL_CRATES);
+							}
+							else {
+								commEraseAll();
+								pageUseCratesDrawAll();
+							}
 						}
-						commEraseAll();
-						pageUseCratesDrawAll();
 						break;
 				}
 			}

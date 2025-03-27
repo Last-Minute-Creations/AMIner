@@ -7,6 +7,8 @@
 
 #include <ace/utils/file.h>
 
+#define QUEST_CRATE_MIN_SELLS_FOR_ESCAPE 5
+
 typedef enum tCapsuleState {
 	CAPSULE_STATE_NOT_FOUND,
 	CAPSULE_STATE_FOUND,
@@ -14,6 +16,8 @@ typedef enum tCapsuleState {
 } tCapsuleState;
 
 void questCrateReset(void);
+
+UBYTE questCrateGetCratesSold(void);
 
 void questCrateSave(tFile *pFile);
 

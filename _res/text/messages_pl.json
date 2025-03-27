@@ -339,9 +339,11 @@
 		"prisonerRadio2": "Mgliste wspomnienia",
 		"prisonerRadio3": "Reminiscencja",
 		"sciFirstCrate": "Odnalezione części",
+		"sciAllCrates": "Naprawy ukończone",
 		"sciCrateTeleporter": "Naprawa teleportera",
 		"agentSci": "Naukowcy",
 		"agentSellCrates": "Sprzedaż skrzyń",
+		"agentAllCrates": "Dług wdzięczności",
 		"cryoTramiel": "Zemsta Trzmiela",
 		"cryoConsole": "Panel sterowania",
 		"jayCongrats": "Podziękowania"

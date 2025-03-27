@@ -11,8 +11,6 @@
 #include "game.h"
 #include "base.h"
 
-#define QUEST_CRATE_MIN_SELLS_FOR_ESCAPE 5
-
 static UBYTE s_ubCrateCount;
 static UBYTE s_ubCratesSold;
 static UBYTE s_isScientistUnlocked;
@@ -58,6 +56,10 @@ void questCrateReset(void) {
 	s_isFirstCrateFound = 0;
 	pageQuestioningSetHandler(QUESTIONING_BIT_TELEPORT_PARTS, questCrateOnQuestioningEnd);
 	pageQuestioningSetHandler(QUESTIONING_BIT_AGENT, questCrateOnQuestioningEnd);
+}
+
+UBYTE questCrateGetCratesSold(void) {
+	return s_ubCratesSold;
 }
 
 void questCrateSave(tFile *pFile) {
@@ -126,9 +128,6 @@ UBYTE questCrateTryConsume(UBYTE ubAmount) {
 UBYTE questCrateTrySell(void) {
 	if(questCrateTryConsume(1)) {
 		s_ubCratesSold += 1;
-		if(s_ubCratesSold >= QUEST_CRATE_MIN_SELLS_FOR_ESCAPE) {
-			pageOfficeTryUnlockPersonSubpage(FACE_ID_AGENT, COMM_SHOP_PAGE_OFFICE_AGENT_ESCAPE);
-		}
 		return 1;
 	}
 	return 0;
