@@ -231,6 +231,12 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 }
 
 void pageOfficeUnlockPerson(tFaceId ePerson) {
+	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
+		if(s_pActivePpl[i] == ePerson) {
+			// Already unlocked
+			return;
+		}
+	}
 	s_pActivePpl[s_ubUnlockedPplCount++] = ePerson;
 }
 
