@@ -148,9 +148,9 @@ General:
 	✔ Translate checkpoint text @done(25-03-11)
 	✔ Add 2s pauses between music tracks? @done(25-03-11)
 	✔ Fix deadline finish line tiles on game load @done(25-03-25)
+	✔ Final optimize file order @done(25-03-28)
 	☐ Add final default hi-scores
 	☐ Final placement of base upgrades
-	☐ Final optimize file order
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)

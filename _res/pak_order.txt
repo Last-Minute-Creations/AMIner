@@ -4,10 +4,11 @@ logo/lmc.bm
 logo/lmc.sfx
 logo/ace.bm
 logo/ace.sfx
-aminer.plt
 lang_select.bm
 tiles.bm
-txt_pl/strings.json
+aminer.plt
+txt_en/messages.str
+txt_pl/messages.str
 comm_bg.bm
 comm_buttons.bm
 comm_edges_mask.bm
@@ -22,9 +23,13 @@ sfx/key_release_3.sfx
 comm_faces_office.bm
 comm_office_selection.bm
 comm_workshop_icons.bm
+txt_en/news_intro_1.txt
+txt_en/news_intro_2.txt
+txt_en/news_intro_3.txt
+txt_pl/news_intro_1.txt
 txt_pl/news_intro_2.txt
+txt_pl/news_intro_3.txt
 comm_news.bm
-game.json
 tiles_overlay.bm
 tiles_overlay_masks.bm
 base0.bm
@@ -40,7 +45,6 @@ hud.bm
 comm_faces.bm
 sfx/hud_noise.sfx
 sfx/hud_msg.sfx
-base1.bm
 sfx/thud.sfx
 sfx/fly_loop.sfx
 sfx/drill1.sfx
@@ -59,6 +63,7 @@ music/game6.mod
 music/game7.mod
 music/game8.mod
 music/game9.mod
+music/game10.mod
 music/menu.mod
 music/samples.samplepack
 explosion.bm
