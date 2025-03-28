@@ -437,10 +437,10 @@ static void menuUpdateVolume(void) {
 	audioMixerSetVolume((g_sSettings.ubSoundVolume * 64) / 10);
 }
 
-static UBYTE s_ubDebugDisplay;
-static void onDebugDisplay(void) {
-	hudShowMessage(FACE_ID_RADIO, g_pMsgs[s_ubDebugDisplay]);
-}
+// static UBYTE s_ubDebugDisplay;
+// static void onDebugDisplay(void) {
+// 	hudShowMessage(FACE_ID_RADIO, g_pMsgs[s_ubDebugDisplay]);
+// }
 
 static void menuOnEnterSettings(void) {
 	s_ubMenuOptionCount = 0;
@@ -496,19 +496,19 @@ static void menuOnEnterSettings(void) {
 		}
 	};
 
-	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
-		.szCaption = menuGetCaption(MENU_CAPTION_CREDITS),
-		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
-		.isHidden = 0,
-		.sOptUb = {
-			.pVar = &s_ubDebugDisplay,
-			.ubMin = MSG_HUD_ACHIEVEMENT_UNLOCKED,
-			.ubMax = MSG_HUD_CAPSULE_FOUND,
-			.isCyclic = 1,
-			.pEnumLabels = 0,
-			.cbOnValChange = onDebugDisplay
-		}
-	};
+	// s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
+	// 	.szCaption = menuGetCaption(MENU_CAPTION_CREDITS),
+	// 	.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
+	// 	.isHidden = 0,
+	// 	.sOptUb = {
+	// 		.pVar = &s_ubDebugDisplay,
+	// 		.ubMin = MSG_HUD_ACHIEVEMENT_UNLOCKED,
+	// 		.ubMax = MSG_HUD_CAPSULE_FOUND,
+	// 		.isCyclic = 1,
+	// 		.pEnumLabels = 0,
+	// 		.cbOnValChange = onDebugDisplay
+	// 	}
+	// };
 
 	s_pMenuOptions[s_ubMenuOptionCount++] = (tMenuListOption) {
 		.szCaption = menuGetCaption(MENU_CAPTION_BACK),
