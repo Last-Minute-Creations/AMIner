@@ -4,9 +4,9 @@
 	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
 	"hudMessages": {
 		"achievementUnlocked": [
-			"Osiągnięcie zdobyte:",
-			"%s"
-		],
+    "Osiągnięcie zdobyte:",
+    "%s"
+],
 		"newPlan": [
 			"Towarzyszu Dyrektorze, otrzymaliście z Ministerstwa",
 			"nowy plan wydobycia."
@@ -77,7 +77,7 @@
 		],
 		"sciWelcome": "Hej, Ty! W maszynie! Z nieba nam spadłeś!",
 		"prisonerFound": [
-			"Panie derektorze, wygląda na wygłodzonego.",
+			"Panie Derektorze, człowiek wygląda na wygłodzonego.",
 			"Przywiezie go Pan do bazy."
 		],
 		"capsuleFound": [
@@ -111,13 +111,13 @@
 			"Powrót",
 			"Tryb ATARI",
 			"Rekordy",
-			"Głośność muzyki",
-			"Głośność dźwięków",
-			"Gracz 1 sterowanie",
-			"Gracz 2 sterowanie",
+			"Muzyka",
+			"Dźwięki",
+			"Gracz 1",
+			"Gracz 2",
 			"Autorzy"
 		],
-		"saveCorrupted": "Błąd: Uszkodzony plik zapisu gry"
+		"saveCorrupted": "BŁĄD: Uszkodzony plik zapisu gry"
 	},
 	"minerals": [
 		"Srebro", "Złoto", "Szmaragd", "Rubin", "Amelinium", "Wongel"
@@ -147,7 +147,7 @@
 		],
 		"descriptionOffice": [
 			"Tu bedziecie rozmawiać z różnymi co Was",
-			"odwiedzą abo odbierać wiadomości."
+			"odwiedzom abo odbierać wiadomości."
 		],
 		"descriptionWorkshop": [
 			"Tu kupujecie różne treblinki i inne ulepszenia",
@@ -168,7 +168,7 @@
 		"restock": "Rozładunek!",
 		"foundBone": "Kość #%hhu",
 		"foundGate": "Fragment portalu #%hhu",
-		"foundCrate": "Skrzynia z częściami",
+		"foundCrate": "Skrzynia",
 		"foundCapsule": "Kapsuła"
 	},
 	"shop": {
@@ -180,11 +180,11 @@
 		"days": "Dni:",
 		"plans": "Plany:",
 		"protestsLabel": "Morale zakładowe",
-		"protestsOk": "stabilne",
-		"protestsWarning": "chwiejne",
-		"protestsProtests": "protesty",
-		"protestsStrike": "strajk",
-		"protestsRiots": "zamieszki",
+		"protestsOk": "Stabilne",
+		"protestsWarning": "Chwiejne",
+		"protestsProtests": "Protesty",
+		"protestsStrike": "STRAJK",
+		"protestsRiots": "Zamieszki!",
 		"mk": "Wz",
 		"upgradeToMk": "Ulepsz do Wz",
 		"stock": "Stan",
@@ -193,31 +193,31 @@
 		"exit": "Wyjdź",
 		"price": "Koszt",
 		"gateOpening": [
-			"Tajemnicza brama lada chwila się aktywuje.",
-			"Wokół niej są ładunki wybuchowe. Czy chcesz ją zdetonować?"
+			"Portal lada chwila się aktywuje.",
+			"Wokół są rozmieszczone ładunki wybuchowe. Czy chcesz je zdetonować?"
 		],
 		"detonate": "Detonuj",
 		"doNothing": "Nic nie rób",
-		"escapeOffer": "Za Twoje zasługi możemy Cię przetransportować na Zachód. Daj znać jak będziesz gotowy.",
+		"escapeOffer": "Wszystko gotowe do drogi. Proszę dać znać kiedy ruszamy.",
 		"escape": "Uciekaj",
 		"market": "Giełda",
 		"unlockOfficeWorkshop": "BŁĄD: Nie można połączyć z biurem. Wymagana zewnętrzna antena sygnałowa.",
 		"unlockWarehouse": "BŁĄD: Brak rąk do pracy. Wymagany zewnętrzny robotnik."
 	},
 	"tricks": {
-		"noPlan": "Nie masz aktywnego planu! Co mam niby zrobić?",
+		"noPlan": "Panie Dyrektorze, bez aktywnego planu nic nie poradzę.",
 		"accoutingStrike": [
-			"Panie Dyrektorze, debet nam się robi w kasie i to może pójść w złą stronę.",
+			"Panie Dyrektorze, debet nam się robi w kasie i to może pójść w złą stronę. Chyba nawet Mietek kiedyś Panu mówił coś?",
 			"",
-			"Pan Dyrektor wie jak jest, dobre rady są w cenie, a mnie oczko w jedwabnych rajstopach poszło... i dzieci by morze zobaczyły... nie wiem, w Bułgarii?"
+			"Dobre rady są w cenie Panie Dyrektorze, a mnie oczko w jedwabnych rajstopach poszło i dzieci by morze zobaczyły, nie wiem, w Bułgarii?"
 		],
 		"accountingPremise": "Zleć Kreatywną Księgowość aby natychmiast wykonać plan.",
-		"accountingDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
+		"accountingDetails": "Macie %hhu%% szans, że zostaniecie przyłapani, co spowoduje otrzymanie nagany.",
 		"bribePremise": "Wręcz łapówkę aby zyskać %hhu dni na realizację planu.",
-		"bribeDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
+		"bribeDetails": "Macie %hhu%% szans, że zostaniecie przyłapani, co spowoduje otrzymanie nagany.",
 		"bribeNoCash": "Brak pieniędzy na łapówkę.",
-		"bribeUsed": "Towarzyszu, nie teraz... Już Ci pomogłem przy obecnym planie!",
-		"bribePrice": "Będzie Cię to kosztować %hu%c."
+		"bribeUsed": "Towarzyszu, nie przeciągajcie struny! Pomogłem jak mogłem już.",
+		"bribePrice": "Będzie Was to kosztować %hu%c."
 	},
 	"workshop": {
 		"drill": "Zwiększa żywotność wiertła oraz ułatwia kopanie w głębszych warstwach ziemi.",
@@ -232,13 +232,13 @@
 		"teleport2": "Wykorzystując splątanie kwantowe umożliwia powrót z platformy odbiorczej do ostatniego miejsca użycia teleportera.",
 		"platform0": "Pozwala na przesył urobku na powierzchnię między bazami oraz na powrót przenośnym teleporterem.",
 		"platform1": "Modernizacja pozwala na bezpieczną teleportację do sąsiedniej bazy, o ile ma platformę odbiorczą.",
-		"platform2": "Powiększony zasięg pozwala na przeskok do dowolnej bazy, o ile ma pl atformę odbiorczą.",
+		"platform2": "Powiększony zasięg pozwala na przeskok do dowolnej bazy, o ile ma platformę odbiorczą.",
 		"workshop0": "Rozbudowuje bazę o warsztat, co pozwala na doraźne naprawy maszyny.",
 		"workshop1": "Sprowadza specjalistyczny sprzęt do warsztatu pozwalający na montaż usprawnień do maszyny.",
 		"maxLvl": "Osiągnięto maksymalny poziom rozbudowy."
 	},
 	"crates": {
-		"premiseTeleport": "Aby naprawić teleporter potrzebujemy części z 5 skrzyń.",
+		"premiseTeleport": "Do naprawy kapsuły potrzebujemy 5 skrzyń",
 		"premiseCapsule": [
 			"AmigaDOS",
 			"© 1985 Commodore-Amiga, Inc.",
@@ -248,9 +248,9 @@
 			"BŁĄD: Urządzenie niekompletne.",
 			"Brakujące komponenty: 5"
 		],
-		"premiseSell": "Kupię od Ciebie każdą skrzynię za %hu%c.",
-		"notYetGive": "Daj znać jak je zbierzesz.",
-		"notYetSell": "Wróć jak będziesz miał coś na sprzedaż.",
+		"premiseSell": "Odkupię od Pana Dyrektora skrzynie za %hu%c od sztuki.",
+		"notYetGive": "Proszę do mnie wrócić z kompletem.",
+		"notYetSell": "Proszę się do mnie zgłosić jak Pan Dyrektor jakąś wykopie.",
 		"give": "Przekaż skrzynię",
 		"sell": "Sprzedaj skrzynię",
 		"use": "Wykorzystaj skrzynie",
@@ -262,14 +262,14 @@
 		"steps": "Kroki: %hu"
 	},
 	"questioning": {
-		"gate": "Czy znalazłeś jakieś podejrzane kawałki bramy?",
-		"crate": "Czy znalazłeś jakieś podejrzane skrzynie?",
+		"gate": "Towarzyszu Dyrektorze, znaleźliście może coś ciekawego?",
+		"crate": "Towarzyszu Dyrektorze, znaleźliście może coś ciekawego?",
 		"description": [
-			"Jeśli powiesz prawdę, przypał spadnie o %d i nie dostaniesz nagany.",
+			"Jeśli się przyznasz, przypał spadnie o %d % i zyskasz w oczach Komisarza.",
 			"",
-			"Jeśli zaryzykujesz kłamstwo, masz %hhu%% szans na przyłapanie, po którym dostaniesz naganę i Komisarz odkryje prawdę."
+			"Jeśli skłamiesz, masz %hhu%% szans na przyłapanie, za co jest nagana a Komisarz pozna prawdę."
 		],
-		"truth": "Powiedz prawdę",
+		"truth": "Przyznaj się",
 		"lie": "Skłam"
 	},
 	"market": {
@@ -318,7 +318,7 @@
 		"urzedasFirstPlan": "Pierwszy plan",
 		"planComplete": "Wykonanie planu",
 		"planDelayed": "Przedłużony plan",
-		"planAccolade": "Pochwała za wydobycia",
+		"planAccolade": "Pochwała za wydobycie",
 		"urzedasBribe": "Łapówka",
 		"komisarzDinoIntro": "Archeolodzy",
 		"komisarzRebuke_1": "Pierwsza nagana",
@@ -331,7 +331,7 @@
 		"komisarzReportAgent": "Obcy agent",
 		"komisarzArchAccolade": "Kompletny dinozaur",
 		"questioningAccolade": "Pochwała za raporty",
-		"gateOpening": "Otarcie bramy",
+		"gateOpening": "Otwarcie bramy",
 		"archPlanFail": "Awans",
 		"archGateOpened": "Otwarcie portalu",
 		"archAccolade": "Kompletny dinozaur",
@@ -358,10 +358,10 @@
 		{"name": "BITWA STULECIA", "desc": "Dogrywka po Stalingradzie"},
 		{"name": "STRACONA WIEDZA", "desc": "Zburzył to, co odbudował"},
 		{"name": "WIĘCEJ WĘGLA", "desc": "Zawody dla fanów agrokomputerów"},
-		{"name": "REKORDZISTA", "desc": "Pobił rekord w trybie zawodów"},
+		{"name": "REKORDZISTA", "desc": "Pobił rekord w trybie Zawodów"},
 		{"name": "TAKICH 3 JAK NAS 2", "desc": "Za wzorowy podział obowiązków"},
 		{"name": "BEZ ŚWIADKÓW", "desc": "Nikt o tej eksplozji nie musi wiedzieć"},
-		{"name": "PRESJA CZASU", "desc": "Pobił rekord w trybie piaskownicy"},
+		{"name": "PRESJA CZASU", "desc": "Pobił rekord w trybie Piaskownicy"},
 		{"name": "PRECZ Z KOMUNĄ", "desc": "Przez przypadek obalił ustrój"},
 		{"name": "UCIECZKA DO TROPIKÓW", "desc": "Tam życie jest spokojne"},
 		{"name": "NIEPOCHLEBNY", "desc": "Robił swoje mimo braku pochwał"},

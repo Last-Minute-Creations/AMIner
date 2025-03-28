@@ -1,368 +1,370 @@
 {
-	"shopNames": ["Wiertło", "Ładownia", "Kadłub", "Karbid", "Przenośny teleport", "Platforma teleportacyjna", "Warsztat"],
-	"commPageNames": ["Biuro", "Warsztat", "Magazyn"],
-	"warehouseColNames": ["Minerał", "Handel", "Urobek", "Plan"],
+	"shopNames": ["Drill", "Cargo", "Hull", "Carbide", "Portable teleport", "Teleport platform", "Workshop"],
+	"commPageNames": ["Office", "Workshop", "Warehouse"],
+	"warehouseColNames": ["Mineral", "Sell", "Stock", "Plan"],
 	"hudMessages": {
-		"achievementUnlocked": "Osiągnięcie zdobyte",
+		"achievementUnlocked": [
+    "Achievement unlocked:",
+    "%s"
+],
 		"newPlan": [
-			"Towarzyszu Dyrektorze, otrzymaliście z Ministerstwa",
-			"nowy plan wydobycia."
+			"Comrade Director, you have received a new extraction plan",
+			"from the Ministry."
 		],
 		"remaining": [
-			"Towarzyszu Dyrektorze, przypominam, za %hd dni",
-			"musicie mieć zrealizowany plan."
+			"Comrade Director, allow me to remind you that in %hd days,",
+			"the plan must be fully executed."
 		],
-		"deadlineRemaining": "Uważaj, zostało Ci mało czasu!",
+		"deadlineRemaining": "Attention! Time is running out!",
 		"extending": [
-			"Macie opóźnienie! Dostajecie dodatkowe %hhu dni.",
-			"Jeśli się nie wyrobicie, będzie Nagana z wpisem do akt!"
+			"You are behind schedule! You receive additional %hhu days",
+			"to fulfill it. Failure will result in a Reprimand!"
 		],
 		"waitingKomisarz": [
-			"Panie Dyrektorze, Komisarz Putienko wzywa do gabinetu.",
-			"Natychmiast!"
+			"Boss, Kommissar Putienko requests your presence in his office.",
+			"Immediately!"
 		],
-		"guest": "Panie Dyrektorze, ma Pan gościa. Zapraszam do gabinetu.",
+		"guest": "Boss, You have a visitor. Please proceed to your office.",
 		"waitingUrzedas": [
-			"Panie Dyrektorze, przyszedł Urzędas. Mówi że to pilne.",
-			"Mówiłam że jest narada ale się uparł i czeka."
+			"Boss, Bureaucrat is here. Claims it's urgent. I told him",
+			"you are in a meeting, but he insisted on waiting."
 		],
 		"dinoFoundBone": [
-			"Doskonale! Odnaleźliście kolejny fragment szkieletu!"
+			"Excellent! You have discovered another skeleton fragment!"
 		],
 		"dinoComplete": [
-			"Towarzyszu Dyrektorze, pozwólcie na momencik.",
-			"Mam wspaniałą wiadomość!"
+			"Comrade Director, allow me a moment.",
+			"I bring splendid news!"
 		],
 		"radioStart": [
 			[
-				"Pomocy! .... naukowcami ... ...",
-				"eksperymenty ... ... ... Ziemi. ... ..."
+				"Help! .. ... scientists ....... .. .... experiments",
+				"...... ... Earth. ....... . ........... ......,"
 			],
 			[
-				"... ... ... wrócić ... ... ... ... ...",
-				"... ... ... ... - ... ... pomoc"
+				".. ...... return .... .. ... ......... ....... ........",
+				".... ....... ...... help .. ........ ... ......."
 			],
 			[
-				"... ... portalu. ... ... ... umieramy."
+				"....., .. ... dying ....."
 			]
 		],
 		"radioHalf": [
 			[
-				"Pomocy! ... naukowcami ... ...",
-				"eksperymenty nazistów ... wnętrzu Ziemi. Bez ..."
+				"Help! .. .. scientists ....... .. Nazi experiments",
+				"inside .. Earth. Without . ........... portal,"
 			],
 			[
-				"portalu ... możemy wrócić ... domu ... ... ...",
-				"Ktokolwiek ... ... wiadomość - ... ... pomoc"
+				".. ...... return home .. ... ......... Whoever ........",
+				".... message ...... help .. ........ ... portal."
 			],
 			[
-				"... uruchomieniu portalu. Pospiesz ... ... umieramy."
+				"Hurry, .. ... dying ....."
 			]
 		],
 		"radioFull": [
 			[
-				"Pomocy! Jesteśmy naukowcami uwięzionymi przez",
-				"eksperymenty nazistów we wnętrzu Ziemi. Bez działającego"
+				"Help! We are scientists trapped by Nazi experiments",
+				"inside the Earth. Without a functioning portal,"
 			],
 			[
-				"portalu nie możemy wrócić do domu i naszych rodzin.",
-				"Ktokolwiek odbierze tę wiadomość - prosimy o pomoc"
+				"we cannot return home to our families. Whoever receives",
+				"this message please help us activate the portal."
 			],
 			[
-				"w uruchomieniu portalu. Pospiesz się, tutaj umieramy."
+				"Hurry, we are dying here."
 			]
 		],
-		"sciWelcome": "Hej, Ty! W maszynie! Z nieba nam spadłeś!",
+		"sciWelcome": "Hey, you! In the machine! You're a godsend!",
 		"prisonerFound": [
-			"Panie derektorze, wygląda na wygłodzonego.",
-			"Przywiezie go Pan do bazy."
+			"Mr. Boss, the man looks starved.",
+			"Bring him to the base will ya?"
 		],
 		"capsuleFound": [
-			"Panie Derektorze, znaleźlimy coś dziwnego.",
-			"Pan Derektor pozwoli na chwile."
-		]
+			"Mr. Boss, we found somethin' weird. Come have a look.",
+					]
 	},
 	"hiScore": {
-		"new": "Nowy rekord! Wpisz imię.",
-		"press": "Naciśnij FIRE lub ENTER aby wyjść",
-		"score": "Wynik",
-		"winP1": "Gracz 1 wygrał!",
-		"winP2": "Gracz 2 wygrał!",
-		"draw": "Remis!"
+		"new": "New hi score! Enter name.",
+		"press": "Press FIRE or ENTER to exit",
+		"score": "Score",
+		"winP1": "Player 1 wins!",
+		"winP2": "Player 2 wins!",
+		"draw": "Draw!"
 	},
 	"menu": {
-		"enumP1": ["Dżoj", "WSAD + Shift"],
-		"enumP2": ["Dżoj", "Strzałki + Shift"],
-		"enumOnOff": ["WYŁ", "WŁ"],
-		"enumPlayerCount": ["Jeden", "Dwóch"],
+		"enumP1": ["Joystick", "WSAD + Shift"],
+		"enumP2": ["Joystick", "Arrows + Shift"],
+		"enumOnOff": ["OFF", "ON"],
+		"enumPlayerCount": ["One", "Two"],
 		"captions": [
-			"600% normy",
-			"Piaskownica",
-			"Zawody",
-			"Osiągnięcia",
-			"Ustawienia",
-			"Wyjście z gry",
-			"Nowa gra",
-			"Kontynuuj",
-			"Gracze",
-			"Powrót",
-			"Tryb ATARI",
-			"Rekordy",
-			"Głośność muzyki",
-			"Głośność dźwięków",
-			"Gracz 1 sterowanie",
-			"Gracz 2 sterowanie",
-			"Autorzy"
+			"600% Yield",
+			"Sandbox",
+			"Race",
+			"Achievements",
+			"Settings",
+			"Exit",
+			"New game",
+			"Continue",
+			"Players",
+			"Go back",
+			"ATARI mode",
+			"Hi score",
+			"Music",
+			"SFX",
+			"Player 1",
+			"Player 2",
+			"Credits"
 		],
-		"saveCorrupted": "Błąd: Uszkodzony plik zapisu gry"
+		"saveCorrupted": "ERROR: Save game file is corrupted"
 	},
 	"minerals": [
-		"Srebro", "Złoto", "Szmaragd", "Rubin", "Amelinium", "Wongel"
+		"Silver", "Gold", "Emerald", "Ruby", "Moonstone", "Coal"
 	],
 	"loading": {
-		"genTerrain": "Zakopywanie minerałów",
-		"genBases": "Generowanie problemów",
-		"finishing": "Ruchy tektoniczne"
+		"genTerrain": "Burrying minerals",
+		"genBases": "Generating problems",
+		"finishing": "Tectonic shifts"
 	},
 	"tutorial": {
-		"introduction": "Wprowadzenie",
+		"introduction": "Introduction",
 		"start": [
-			"Panie Derektorze, Kumbajnem podjedziecie",
-			"do bramy i wciśniecie guzik na wihajstrze"
+			"Mr. Boss, drive the machine to the gate",
+			"and hit the button on the thingamajig."
 		],
 		"onDugOut": [
-			"Panie Derektorze, podjedziecie kumbajnem do magazynu",
-			"i wykorzystajcie urobek do wykonania planu"
+			"Mr. Boss, drive the combine up to the warehouse",
+			"and use the mined stuff to get the plan done."
 		],
 		"inShop": [
-			"Panie Derektorze, tera trza przejść do magazynu",
-			"co by dać minerały na plan"
+			"Mr. Boss, now ya gotta head to the warehouse",
+			"to drop off the minerals for the plan."
 		],
 		"inWarehouse": [
-			"To tera Pan Derektor da surowce na plan. Ustawcie się",
-			"na srebrze, dajcie wihajstrem w prawo i zaakceptujcie"
+			"Alright, now Mr. Boss, time to put the materials into the plan.",
+			"Stand on the silver, flick the lever to the right, and hit accept."
 		],
 		"descriptionOffice": [
-			"Tu bedziecie rozmawiać z różnymi co Was",
-			"odwiedzą abo odbierać wiadomości."
+			"This here's where ya talk to folks droppin'",
+			"by or read yer messages."
 		],
 		"descriptionWorkshop": [
-			"Tu kupujecie różne treblinki i inne ulepszenia",
-			"do kumbajnu. Na dole potwierdzacie"
+			"This is where ya buy all sorts of doodads and upgrades",
+			"for the machine. Confirm at the bottom."
 		],
 		"descriptionWarehouse": [
-			"Tu w lewo szpszedajecie urobek a w prawo",
-			"bedziecie odkładać na plan. Na dole potwierdzacie."
+			"Left side's where ya sell the mined stuff, right side's",
+			"where ya stash it for the plan. Confirm at the bottom."
 		]
 	},
 	"challenge":{
-		"checkpoint": "Kontrola!",
-		"teleport": "Teleportacja:"
+		"checkpoint": "Checkpoint!",
+		"teleport": "Teleport:"
 	},
 	"misc": {
-		"drillDepleted": "Wiertło zużyte",
-		"cargoFull": "Ładownia pełna!",
-		"restock": "Rozładunek!",
-		"foundBone": "Kość #%hhu",
-		"foundGate": "Fragment portalu #%hhu",
-		"foundCrate": "Skrzynia z częściami",
-		"foundCapsule": "Kapsuła"
+		"drillDepleted": "Drill depleted!",
+		"cargoFull": "Cargo full!",
+		"restock": "Unloading!",
+		"foundBone": "Bone #%hhu",
+		"foundGate": "Portal fragment #%hhu",
+		"foundCrate": "Crate",
+		"foundCapsule": "Crio Capsule"
 	},
 	"shop": {
-		"pressSkip": "Naciśnij FIRE lub ENTER aby pominąć",
-		"timeRemaining": "Pozostało %d dni",
-		"accolades": "Pochwały:",
-		"rebukes": "Nagany:",
-		"heat": "Przypał:",
-		"days": "Dni:",
-		"plans": "Plany:",
-		"protestsLabel": "Morale zakładowe",
-		"protestsOk": "stabilne",
-		"protestsWarning": "chwiejne",
-		"protestsProtests": "protesty",
-		"protestsStrike": "strajk",
-		"protestsRiots": "zamieszki",
-		"mk": "Wz",
-		"upgradeToMk": "Ulepsz do Wz",
-		"stock": "Stan",
-		"buy": "Kup",
-		"accept": "Akceptuj",
-		"exit": "Wyjdź",
-		"price": "Koszt",
+		"pressSkip": "Press FIRE or ENTER to skip",
+		"timeRemaining": "%d days left",
+		"accolades": "Accolades:",
+		"rebukes": "Reprimands:",
+		"heat": "Heat:",
+		"days": "Days:",
+		"plans": "Plans:",
+		"protestsLabel": "Crew mood",
+		"protestsOk": "Solid",
+		"protestsWarning": "Shaky",
+		"protestsProtests": "Protests",
+		"protestsStrike": "STRIKE",
+		"protestsRiots": "Riots!",
+		"mk": "Mk",
+		"upgradeToMk": "Upgrade to Mk",
+		"stock": "Stock",
+		"buy": "Buy",
+		"accept": "Accept",
+		"exit": "Exit",
+		"price": "Cost",
 		"gateOpening": [
-			"Tajemnicza brama lada chwila się aktywuje.",
-			"Wokół niej są ładunki wybuchowe. Czy chcesz ją zdetonować?"
+			"The portal is about to activate.",
+			"Explosive charges have been placed around the area. Do you wish to detonate them?"
 		],
-		"detonate": "Detonuj",
-		"doNothing": "Nic nie rób",
-		"escapeOffer": "Za Twoje zasługi możemy Cię przetransportować na Zachód. Daj znać jak będziesz gotowy.",
-		"escape": "Uciekaj",
-		"market": "Giełda",
-		"unlockOfficeWorkshop": "BŁĄD: Nie można połączyć z biurem. Wymagana zewnętrzna antena sygnałowa.",
-		"unlockWarehouse": "BŁĄD: Brak rąk do pracy. Wymagany zewnętrzny robotnik."
+		"detonate": "Detonate",
+		"doNothing": "Do nothing",
+		"escapeOffer": "All set up. Ready when you are.",
+		"escape": "Escape",
+		"market": "Market",
+		"unlockOfficeWorkshop": "ERROR: Unable to connect with headquarters. An external signal antenna is required.",
+		"unlockWarehouse": "ERROR: Workforce shortage. An external labor force is required."
 	},
 	"tricks": {
-		"noPlan": "Nie masz aktywnego planu! Co mam niby zrobić?",
+		"noPlan": "Comrade Director, without active plan, my hands are tied.",
 		"accoutingStrike": [
-			"Panie Dyrektorze, debet nam się robi w kasie i to może pójść w złą stronę.",
+			"Boss, we are running a deficit, and this could turn ugly. I believe Mietek once mentioned something to you about this?",
 			"",
-			"Pan Dyrektor wie jak jest, dobre rady są w cenie, a mnie oczko w jedwabnych rajstopach poszło... i dzieci by morze zobaczyły... nie wiem, w Bułgarii?"
+			"Good advice are pricy Boss, and you see, I've got a tear in my silk stockings, children wants to see the sea someday. Perhaps Bulgaria?"
 		],
-		"accountingPremise": "Zleć Kreatywną Księgowość aby natychmiast wykonać plan.",
-		"accountingDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
-		"bribePremise": "Wręcz łapówkę aby zyskać %hhu dni na realizację planu.",
-		"bribeDetails": "Masz %hhu%% szans, że zostaniesz przyłapany, co spowoduje otrzymanie nagany.",
-		"bribeNoCash": "Brak pieniędzy na łapówkę.",
-		"bribeUsed": "Towarzyszu, nie teraz... Już Ci pomogłem przy obecnym planie!",
-		"bribePrice": "Będzie Cię to kosztować %hu%c."
+		"accountingPremise": "Assign Creative Accounting to execute the plan immediately.",
+		"accountingDetails": "You have a %hhu%% chance of getting caught, which will result in an official Reprimand.",
+		"bribePremise": "Bribe Bureaucrat to gain %hhu extra days to fulfill the plan.",
+		"bribeDetails": "You have a %hhu%% chance of getting caught, which will result in an official Reprimand.",
+		"bribeNoCash": "Insufficient funds for a bribe.",
+		"bribeUsed": "Dont push your luck Comrade! I already helped you here.",
+		"bribePrice": "This will cost you %hu%c."
 	},
 	"workshop": {
-		"drill": "Zwiększa żywotność wiertła oraz ułatwia kopanie w głębszych warstwach ziemi.",
-		"hull": "Wzmocniona konstrukcja zwiększa żywotność pojazdu, uodparniając ją na upadki i niekorzystne warunki termiczne.",
-		"cargo": "Zwiększa efektywność rozdrabniarki i filtrowania urobku, co pozwala na magazynowanie większej liczby surowców.",
-		"tnt0": "Pojedynczy ładunek pozwalający na zniszczenie prostej przeszkody terenowej. Niszczy surowce zawarte w terenie.",
-		"tnt1": "Dwa ładunki pozwalające drążyc dłuższy tunel lub zniszczyć pojedynczą skałe. Niszczy surowce zawarte w terenie.",
-		"tnt2": "Trzy ładunki jeszcze bardziej zwiekszą długość tunelu. Niszczy surowce zawarte w terenie.",
-		"tnt3": "Ulepszona formuła materialu wybuchowego pozwoli zachować surowce w detonowanym terenie.",
-		"teleport0": "Pozwala na powrót w okolice ostatnio odwiedzonej bazy z platformą odbiorczą. Teleportacja może uszkodzić maszynę.",
-		"teleport1": "Dodatkowy mechanizm naprowadzania pozwala na celne i bezbolesne teleportacje.",
-		"teleport2": "Wykorzystując splątanie kwantowe umożliwia powrót z platformy odbiorczej do ostatniego miejsca użycia teleportera.",
-		"platform0": "Pozwala na przesył urobku na powierzchnię między bazami oraz na powrót przenośnym teleporterem.",
-		"platform1": "Modernizacja pozwala na bezpieczną teleportację do sąsiedniej bazy, o ile ma platformę odbiorczą.",
-		"platform2": "Powiększony zasięg pozwala na przeskok do dowolnej bazy, o ile ma pl atformę odbiorczą.",
-		"workshop0": "Rozbudowuje bazę o warsztat, co pozwala na doraźne naprawy maszyny.",
-		"workshop1": "Sprowadza specjalistyczny sprzęt do warsztatu pozwalający na montaż usprawnień do maszyny.",
-		"maxLvl": "Osiągnięto maksymalny poziom rozbudowy."
+		"drill": "This upgrade increases durability of the drill and helps dig through deeper layers of soil.",
+		"hull": "Reinforced construction increases survivability of the machine and makes it less prone to fall and thermal damage.",
+		"cargo": "Increases effectiveness of crushing and sifting modules which gives better storage capabilities.",
+		"tnt0": "Single charge allows to detonate obstacle adjacent to machine. Destroys minerals within.",
+		"tnt1": "Double charge allows to clear longer tunnels or blow up single rock. Destroys minerals within.",
+		"tnt2": "triple charge increase the area of effect even more. Destroys minerals within.",
+		"tnt3": "Upgraded carbide formula keeps the minerals in blast area intact.",
+		"teleport0": "Teleports you to last visited base with teleport platform. May damage machine.",
+		"teleport1": "Improved homing device allows teleporting without risk of damaging the machine.",
+		"teleport2": "Use of advanced quantum entanglement allows return from teleport platform to last known coordinates.",
+		"platform0": "Allows to send yield to surface and use of portable teleport.",
+		"platform1": "Upgrade allows to teleport the machine to adjacent base if it is equipped with teleport platform.",
+		"platform2": "Increased range allows to teleport to any base if it is equipped with teleport platform.",
+		"workshop0": "Upgrades base with mobile workshop for making ad hoc repairs.",
+		"workshop1": "Equips workshop with advanced tools and modules allowing for machine upgrades.",
+		"maxLvl": "Maximum upgrade level reached."
 	},
 	"crates": {
-		"premiseTeleport": "Aby naprawić teleporter potrzebujemy części z 5 skrzyń.",
+		"premiseTeleport": "To fix the Capsule we need 5 crates with parts",
 		"premiseCapsule": [
 			"AmigaDOS",
 			"© 1985 Commodore-Amiga, Inc.",
 			"All rights reserved.",
 			"Release 1.0",
 			"",
-			"BŁĄD: Urządzenie niekompletne.",
-			"Brakujące komponenty: 5"
+			"ERROR: Device incomplete.",
+			"Missing components: 5"
 		],
-		"premiseSell": "Kupię od Ciebie każdą skrzynię za %hu%c.",
-		"notYetGive": "Daj znać jak je zbierzesz.",
-		"notYetSell": "Wróć jak będziesz miał coś na sprzedaż.",
-		"give": "Przekaż skrzynię",
-		"sell": "Sprzedaj skrzynię",
-		"use": "Wykorzystaj skrzynie",
-		"remaining": "Posiadane skrzynie: %hhu"
+		"premiseSell": "Mr. Director, I will buy crates from you for %hu%c apiece.",
+		"notYetGive": "Return when you collect full set.",
+		"notYetSell": "Report to me once you dig something up, Mr. Director.",
+		"give": "Give crate",
+		"sell": "Sell crate",
+		"use": "Use crates",
+		"remaining": "Remaining crates: %hhu"
 	},
 	"bonus": {
-		"complete": "Poziom ukończony!",
-		"level": "Poziom: %hhu",
-		"steps": "Kroki: %hu"
+		"complete": "Level completed!",
+		"level": "Level: %hhu",
+		"steps": "Steps: %hu"
 	},
 	"questioning": {
-		"gate": "Czy znalazłeś jakieś podejrzane kawałki bramy?",
-		"crate": "Czy znalazłeś jakieś podejrzane skrzynie?",
+		"gate": "Comrade Director, did you find anything interesting?",
+		"crate": "Comrade Director, did you find anything interesting?",
 		"description": [
-			"Jeśli powiesz prawdę, przypał spadnie o %d i nie dostaniesz nagany.",
+			"If you confess heat drops by %d and you will gain in Commissar eyes.",
 			"",
-			"Jeśli zaryzykujesz kłamstwo, masz %hhu%% szans na przyłapanie, po którym dostaniesz naganę i Komisarz odkryje prawdę."
+			"If you lie, there is %hhu%% chance you will get caught, receive a Reprimand and Commissar will know the truth."
 		],
-		"truth": "Powiedz prawdę",
-		"lie": "Skłam"
+		"truth": "Confess",
+		"lie": "Lie"
 	},
 	"market": {
-		"tradeCol": "Wymień...",
-		"forCol": "Za..."
+		"tradeCol": "Exchange...",
+		"forCol": "For..."
 	},
 	"hud": {
-		"p1": "Gracz 1",
-		"p2": "Gracz 2",
-		"drill": "Wiert.:",
-		"cargo": "Ład.:",
-		"hull": "Kadł.:",
-		"cash": "Kasa:",
-		"depth": "Poziom:",
-		"time": "Dni:",
-		"paused": "Pauza gry",
-		"resume": "Wznów",
-		"saveQuit": "Zapisz i wyjdź",
-		"quit": "Wyjdź"
+		"p1": "Player 1",
+		"p2": "Player 2",
+		"drill": "Drill:",
+		"cargo": "Cargo:",
+		"hull": "Hull:",
+		"cash": "Cash:",
+		"depth": "Depth:",
+		"time": "Days:",
+		"paused": "Pause",
+		"resume": "Resume",
+		"saveQuit": "Save & Quit",
+		"quit": "Quit"
 	},
 	"officePages": {
-		"commonWelcome": "Powitanie",
+		"commonWelcome": "Greetings",
 		"commonDossier": "Dossier",
-		"commonGateDestroyed": "Zniszczenie portalu",
-		"commonEscape": "Ucieczka na Zachód",
-		"commonEpilogue": "Epilog",
-		"commonBack": "Powrót",
+		"commonGateDestroyed": "Destruction of Portal",
+		"commonEscape": "Escape to the West",
+		"commonEpilogue": "Epilogue",
+		"commonBack": "Go back",
 		"listMietek": "Mietek",
 		"listKrystyna": "Krystyna",
-		"listPutin": "Komisarz Putienko",
-		"listUrzedas": "Urzędas",
-		"listArch": "Iwan Jensonow",
-		"listPrisoner": "Więzień",
+		"listPutin": "Kommissar Putienko",
+		"listUrzedas": "Bureaucrat",
+		"listArch": "Ivan Jensonov",
+		"listPrisoner": "Prisoner",
 		"listAgent": "Agent 0.7",
 		"listSci": "Emmet Lloyd",
-		"listCryo": "Kapsuła",
+		"listCryo": "Crio Capsule",
 		"listJay": "Jay Miner",
-		"mietekFirstPlan": "Kariera",
-		"mietekPlanComplete": "Zawody",
-		"mietekMarket": "Giełda",
-		"mietekProtestWarning": "Zaległe wypłaty",
-		"mietekProtestStart": "Protesty",
-		"mietekProtestStrike": "Strajkujemy",
-		"mietekCapsuleFound": "Znaleziona kapsuła",
-		"krystynaAccounting": "Kreatywna Księgowość",
-		"urzedasFirstPlan": "Pierwszy plan",
-		"planComplete": "Wykonanie planu",
-		"planDelayed": "Przedłużony plan",
-		"planAccolade": "Pochwała za wydobycia",
-		"urzedasBribe": "Łapówka",
-		"komisarzDinoIntro": "Archeolodzy",
-		"komisarzRebuke_1": "Pierwsza nagana",
-		"komisarzRebuke_2": "Druga nagana",
-		"komisarzRebuke_3": "Ostatnia nagana",
-		"komisarzQuestioning": "Przesłuchanie",
-		"komisarzReportList": "Raportowanie",
-		"komisarzReportGate": "Znaleziony Portal",
-		"komisarzReportParts": "Skrzynie z częściami",
-		"komisarzReportAgent": "Obcy agent",
-		"komisarzArchAccolade": "Kompletny dinozaur",
-		"questioningAccolade": "Pochwała za raporty",
-		"gateOpening": "Otarcie bramy",
-		"archPlanFail": "Awans",
-		"archGateOpened": "Otwarcie portalu",
-		"archAccolade": "Kompletny dinozaur",
-		"prisonerRadio1": "Złe przeczucia",
-		"prisonerRadio2": "Mgliste wspomnienia",
-		"prisonerRadio3": "Reminiscencja",
-		"sciFirstCrate": "Odnalezione części",
-		"sciAllCrates": "Naprawy ukończone",
-		"sciCrateTeleporter": "Naprawa teleportera",
-		"agentSci": "Naukowcy",
-		"agentSellCrates": "Sprzedaż skrzyń",
-		"agentAllCrates": "Dług wdzięczności",
-		"cryoTramiel": "Zemsta Trzmiela",
-		"cryoConsole": "Panel sterowania",
-		"jayCongrats": "Podziękowania"
+		"mietekFirstPlan": "Career",
+		"mietekPlanComplete": "Race",
+		"mietekMarket": "Market",
+		"mietekProtestWarning": "Overdue wages",
+		"mietekProtestStart": "Protests",
+		"mietekProtestStrike": "We are on strike",
+		"mietekCapsuleFound": "Crio Capsule discovered",
+		"krystynaAccounting": "Creative Accounting",
+		"urzedasFirstPlan": "First plan",
+		"planComplete": "Plan execution",
+		"planDelayed": "Plan extended",
+		"planAccolade": "Accolade for mining",
+		"urzedasBribe": "Bribe",
+		"komisarzDinoIntro": "Archaeologists",
+		"komisarzRebuke_1": "First Reprimand",
+		"komisarzRebuke_2": "Second Reprimand",
+		"komisarzRebuke_3": "Last Reprimand",
+		"komisarzQuestioning": "Interrogation",
+		"komisarzReportList": "Reporting",
+		"komisarzReportGate": "Portal found",
+		"komisarzReportParts": "Crates with parts",
+		"komisarzReportAgent": "Foreign agent",
+		"komisarzArchAccolade": "Complete dinosaur",
+		"questioningAccolade": "Accolade for reports",
+		"gateOpening": "Portal opening",
+		"archPlanFail": "Promotion",
+		"archGateOpened": "Portal opened",
+		"archAccolade": "Complete dinosaur",
+		"prisonerRadio1": "I got bad feelings about this",
+		"prisonerRadio2": "Hazy memories",
+		"prisonerRadio3": "Reminiscence",
+		"sciFirstCrate": "Recovered components",
+		"sciAllCrates": "Repairs finished",
+		"sciCrateTeleporter": "Time Capsule repair",
+		"agentSci": "Scientists",
+		"agentSellCrates": "Selling the crates",
+		"agentAllCrates": "Debt of gratitude",
+		"cryoTramiel": "Bumblebee revenge",
+		"cryoConsole": "Control panel",
+		"jayCongrats": "Congratulations"
 	},
 	"achievements": [
-		{"name": "OSTATNI SPRAWIEDLIWY", "desc": "Najuczciwszy pracownik w kraju"},
-		{"name": "PRZODOWNIK PRACY", "desc": "Za wykonanie 600% normy"},
-		{"name": "NAJWIĘKSZA KONFITURA", "desc": "Ulubiony współpracownik Komisarza"},
-		{"name": "NAJWIĘKSZY ŚLIZGACZ", "desc": "Kopanie minerałów jest dla niezaradnych"},
-		{"name": "ENTUZJASTA ARCHEOLOGII", "desc": "Dinozaur starszy od Amigowców"},
-		{"name": "OFIARA ARCHEOLOGII", "desc": "Uważaj, z czym igrasz"},
-		{"name": "BITWA STULECIA", "desc": "Dogrywka po Stalingradzie"},
-		{"name": "STRACONA WIEDZA", "desc": "Zburzył to, co odbudował"},
-		{"name": "WIĘCEJ WĘGLA", "desc": "Zawody dla fanów agrokomputerów"},
-		{"name": "REKORDZISTA", "desc": "Pobił rekord w trybie zawodów"},
-		{"name": "TAKICH 3 JAK NAS 2", "desc": "Za wzorowy podział obowiązków"},
-		{"name": "BEZ ŚWIADKÓW", "desc": "Nikt o tej eksplozji nie musi wiedzieć"},
-		{"name": "PRESJA CZASU", "desc": "Pobił rekord w trybie piaskownicy"},
-		{"name": "PRECZ Z KOMUNĄ", "desc": "Przez przypadek obalił ustrój"},
-		{"name": "UCIECZKA DO TROPIKÓW", "desc": "Tam życie jest spokojne"},
-		{"name": "NIEPOCHLEBNY", "desc": "Robił swoje mimo braku pochwał"},
-		{"name": "NIENAGANNY", "desc": "Robił swoje bez zastrzeżeń"},
-		{"name": "TYTAN PRACY", "desc": "Ostatni medal do kolekcji"}
+		{"name": "THE LAST RIGHTEOUS", "desc": "The most honest worker in the country"},
+		{"name": "LABOR CHAMPION", "desc": "For achieving 600% of the production quota"},
+		{"name": "THE GREATEST INFORMANT", "desc": "The Kommissar's favorite colleague"},
+		{"name": "THE BIGGEST SLACKER", "desc": "Mining minerals is for the incompetent"},
+		{"name": "ARCHAEOLOGY ENTHUSIAST", "desc": "A dinosaur older than Amiga users"},
+		{"name": "ARCHAEOLOGY VICTIM", "desc": "Beware of what you tamper with"},
+		{"name": "BATTLE OF THE CENTURY", "desc": "A rematch after Stalingrad"},
+		{"name": "LOST KNOWLEDGE", "desc": "Destroyed what he had rebuilt"},
+		{"name": "MORE COAL", "desc": "A competition for fans of agro-computers"},
+		{"name": "RECORD HOLDER", "desc": "Broke the record in Race mode"},
+		{"name": "THREE LIKE THE TWO OF US", "desc": "For exemplary division of duties"},
+		{"name": "NO WITNESSES", "desc": "No one needs to know about this explosion"},
+		{"name": "TIME PRESSURE", "desc": "Broke the record in Sandbox mode"},
+		{"name": "DOWN WITH COMMUNISM", "desc": "Accidentally overthrew the system"},
+		{"name": "ESCAPE TO THE TROPICS", "desc": "Life is peaceful there"},
+		{"name": "UNFLATTERED", "desc": "Did his job despite the lack of praise"},
+		{"name": "IMPECCABLE", "desc": "Did his job without complaints"},
+		{"name": "TITAN OF LABOR", "desc": "The final medal to complete the collection"}
 	]
 }
