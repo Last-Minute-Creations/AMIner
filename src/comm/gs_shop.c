@@ -349,7 +349,7 @@ void commShopChangePage(tCommShopPage eCameFrom, tCommShopPage ePage) {
 			pageQuestioningCreate();
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_ARCH_ACCOLADE:
-			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "accolade", onBack);
+			pageMsgCreate(FACE_ID_KOMISARZ, szTitle, "arch_accolade", onBack);
 			break;
 		case COMM_SHOP_PAGE_OFFICE_KOMISARZ_REPORTING_LIST:
 			pageListCreate(FACE_ID_KOMISARZ, pageQuestioningGetNotReportedPages());
