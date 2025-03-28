@@ -230,6 +230,7 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 		saveReadTag(pFile, SAVE_TAG_OFFICE_END);
 }
 
+__attribute__((optimize("Os")))
 void pageOfficeUnlockPerson(tFaceId ePerson) {
 	for(UBYTE i = 0; i < s_ubUnlockedPplCount; ++i) {
 		if(s_pActivePpl[i] == ePerson) {
@@ -263,6 +264,7 @@ UBYTE pageOfficeHasPerson(tFaceId ePerson) {
 	return 0;
 }
 
+__attribute__((optimize("Os")))
 void pageOfficeLockPersonSubpage(tFaceId ePerson, tCommShopPage eSubpage) {
 	for(UBYTE i = 0; i < PAGE_OFFICE_SUBPAGES_PER_PERSON - 1; ++i) {
 		if(s_pOfficePages[ePerson][i] == eSubpage) {
