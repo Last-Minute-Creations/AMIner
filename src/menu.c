@@ -121,7 +121,7 @@ static void menuLoadGame(const char *szSavePath) {
 
 	UBYTE isLoadSuccess = 0;
 	systemUse();
-	tFile *pSave = diskFileOpen(szSavePath, "rb");
+	tFile *pSave = diskFileOpen(szSavePath, DISK_FILE_MODE_READ);
 	if(pSave) {
 		isLoadSuccess = gameLoad(pSave);
 		if(!isLoadSuccess) {
@@ -252,7 +252,7 @@ static UBYTE menuLoadSummaryFromSave(const char *szPath, tGameSummary *pSummary)
 		return 0;
 	}
 
-	tFile *pFileSave = diskFileOpen(szPath, "rb");
+	tFile *pFileSave = diskFileOpen(szPath, DISK_FILE_MODE_READ);
 	if(!pFileSave) {
 		logWrite("ERR: Save file not found\n");
 		systemUnuse();

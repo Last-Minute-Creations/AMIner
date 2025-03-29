@@ -286,6 +286,7 @@
 		"time": "Days:",
 		"paused": "Pause",
 		"resume": "Resume",
+		"save": "Save",
 		"saveQuit": "Save & Quit",
 		"quit": "Quit"
 	},

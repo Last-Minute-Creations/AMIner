@@ -754,23 +754,53 @@ void hudProcess(void) {
 		case STATE_PAUSE_LOOP:
 			if(s_ubSelection != s_ubSelectionPrev) {
 				const UWORD uwPageOriginY = HUD_PAGE_PAUSE * HUD_HEIGHT + HUD_ORIGIN_Y;
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_RESUME]);
-				fontDrawTextBitMap(
-					s_pHudBuffer->pBack, s_pLineBuffer,
-					HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 3,
-					uwPageOriginY - 3 + s_ubLineHeight,
-					(s_ubSelection == 0) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
-					FONT_COOKIE | FONT_HCENTER
-				);
+				if(s_eGameMode == GAME_MODE_CHALLENGE) {
+					fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_RESUME]);
+					fontDrawTextBitMap(
+						s_pHudBuffer->pBack, s_pLineBuffer,
+						HUD_ORIGIN_X + (320 - HUD_ORIGIN_X) / 3,
+						uwPageOriginY - 3 + s_ubLineHeight,
+						(s_ubSelection == 0) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
+						FONT_COOKIE | FONT_HCENTER
+					);
 
-				fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[(s_eGameMode == GAME_MODE_CHALLENGE) ? MSG_HUD_QUIT : MSG_HUD_SAVE_QUIT]);
-				fontDrawTextBitMap(
-					s_pHudBuffer->pBack, s_pLineBuffer,
-					HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,
-					uwPageOriginY - 3 + s_ubLineHeight,
-					(s_ubSelection == 1) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
-					FONT_COOKIE | FONT_HCENTER
-				);
+					fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_QUIT]);
+					fontDrawTextBitMap(
+						s_pHudBuffer->pBack, s_pLineBuffer,
+						HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 3,
+						uwPageOriginY - 3 + s_ubLineHeight,
+						(s_ubSelection == 1) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
+						FONT_COOKIE | FONT_HCENTER
+					);
+				}
+				else {
+					fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_RESUME]);
+					fontDrawTextBitMap(
+						s_pHudBuffer->pBack, s_pLineBuffer,
+						HUD_ORIGIN_X + 1 * (320 - HUD_ORIGIN_X) / 4,
+						uwPageOriginY - 3 + s_ubLineHeight,
+						(s_ubSelection == 0) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
+						FONT_COOKIE | FONT_HCENTER
+					);
+
+					fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_SAVE]);
+					fontDrawTextBitMap(
+						s_pHudBuffer->pBack, s_pLineBuffer,
+						HUD_ORIGIN_X + 2 * (320 - HUD_ORIGIN_X) / 4,
+						uwPageOriginY - 3 + s_ubLineHeight,
+						(s_ubSelection == 1) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
+						FONT_COOKIE | FONT_HCENTER
+					);
+
+					fontFillTextBitMap(s_pFont, s_pLineBuffer, g_pMsgs[MSG_HUD_SAVE_QUIT]);
+					fontDrawTextBitMap(
+						s_pHudBuffer->pBack, s_pLineBuffer,
+						HUD_ORIGIN_X + 3 * (320 - HUD_ORIGIN_X) / 4,
+						uwPageOriginY - 3 + s_ubLineHeight,
+						(s_ubSelection == 2) ? HUD_COLOR_BAR_FULL : HUD_COLOR_BAR_EMPTY,
+						FONT_COOKIE | FONT_HCENTER
+					);
+				}
 				s_ubSelectionPrev = s_ubSelection;
 			}
 			break;

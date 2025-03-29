@@ -205,7 +205,7 @@ static void commGsShopLoop(void) {
 	}
 	else {
 		if(!commProcessPage()) {
-			gameTriggerSave();
+			// gameTriggerSave(); // Too slow for FDD!
 			logWrite("shop quit\n");
 			statePop(g_pGameStateManager);
 			return;

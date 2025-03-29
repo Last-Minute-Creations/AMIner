@@ -1568,7 +1568,7 @@ void gameTriggerSave(void) {
 	char *pEndDat = stringCopy(szPathTmp, szPathDat);
 	pEndTmp = stringCopy(".tmp", pEndTmp);
 	pEndDat = stringCopy(".dat", pEndDat);
-	tFile *pFileSave = diskFileOpen(szPathTmp, "wb");
+	tFile *pFileSave = diskFileOpen(szPathTmp, DISK_FILE_MODE_WRITE);
 	if(pFileSave) {
 		gameSave(pFileSave);
 		fileClose(pFileSave);

@@ -156,6 +156,7 @@ const char * const g_pLangDom[MSG_COUNT + 1] = {
 	[MSG_HUD_TIME] = "hud.time",
 	[MSG_HUD_PAUSED] = "hud.paused",
 	[MSG_HUD_RESUME] = "hud.resume",
+	[MSG_HUD_SAVE] = "hud.save",
 	[MSG_HUD_SAVE_QUIT] = "hud.saveQuit",
 	[MSG_HUD_QUIT] = "hud.quit",
 	// HUD: Misc

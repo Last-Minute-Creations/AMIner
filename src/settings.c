@@ -49,7 +49,7 @@ static void settingsReset(void) {
 //------------------------------------------------------------------- PUBLIC FNS
 
 void settingsFileSave(void) {
-	tFile *pFileSettings = diskFileOpen("settings.tmp", "wb");
+	tFile *pFileSettings = diskFileOpen("settings.tmp", DISK_FILE_MODE_WRITE);
 	if(pFileSettings) {
 		settingsSave(pFileSettings);
 		fileClose(pFileSettings);
@@ -60,7 +60,7 @@ void settingsFileSave(void) {
 }
 
 void settingsFileLoad(void) {
-	tFile *pFileSettings = diskFileOpen("settings.dat", "rb");
+	tFile *pFileSettings = diskFileOpen("settings.dat", DISK_FILE_MODE_READ);
 	if(pFileSettings) {
 		if(settingsLoad(pFileSettings)) {
 			logWrite("Loaded settings\n");
