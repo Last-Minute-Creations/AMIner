@@ -403,12 +403,12 @@ extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/commrade/workshop_ico
 	GENERATED_FILE_LIST "FRAMES_WORKSHOP_ICONS"
 	DESTINATIONS
 	${GEN_DIR}/workshop_icons/0.png 0    4 64 56 # drill
-	${GEN_DIR}/workshop_icons/1.png 0  258 64 56 # hull
-	${GEN_DIR}/workshop_icons/2.png 0   71 64 56 # cargo
+	${GEN_DIR}/workshop_icons/1.png 0  258 64 56 # cargo
+	${GEN_DIR}/workshop_icons/2.png 0   71 64 56 # hull
 	${GEN_DIR}/workshop_icons/3.png 0  323 64 56 # tnt
 	${GEN_DIR}/workshop_icons/4.png 0  200 64 56 # teleport
-	${GEN_DIR}/workshop_icons/5.png 64  22 64 56 # platform
-	${GEN_DIR}/workshop_icons/6.png 0  200 64 56 # workshop
+	${GEN_DIR}/workshop_icons/5.png 64   4 64 56 # platform
+	${GEN_DIR}/workshop_icons/6.png 64  67 64 56 # workshop
 )
 
 convertTileset(
