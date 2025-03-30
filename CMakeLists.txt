@@ -426,24 +426,6 @@ include("base3.cmake")
 include("tiles.cmake")
 include("checkpoint.cmake")
 
-convertTileset(
-	TARGET ${GAME_EXECUTABLE} SIZE 16 HEIGHT 20
-	INTERLEAVED SOURCE ${RES_DIR}/bg_anim/factory_drip
-	DESTINATION ${GEN_DIR}/bg_factory_drip.png
-	TILE_PATHS
-	${RES_DIR}/bg_anim/factory_drip/0.png
-	${RES_DIR}/bg_anim/factory_drip/1.png
-	${RES_DIR}/bg_anim/factory_drip/2.png
-	${RES_DIR}/bg_anim/factory_drip/3.png
-	${RES_DIR}/bg_anim/factory_drip/4.png
-	${RES_DIR}/bg_anim/factory_drip/5.png
-	${RES_DIR}/bg_anim/factory_drip/6.png
-	${RES_DIR}/bg_anim/factory_drip/7.png
-	${RES_DIR}/bg_anim/factory_drip/8.png
-	${RES_DIR}/bg_anim/factory_drip/9.png
-	${RES_DIR}/bg_anim/factory_drip/10.png
-)
-
 #------------------------------------------------------------------- LOGO ASSETS
 
 # Logo assets
@@ -478,7 +460,7 @@ convertBitmaps(
 		${RES_DIR}/hud.png ${RES_DIR}/logo.png ${RES_DIR}/lang_select.png ${RES_DIR}/commrade/news_gate.png
 		${RES_DIR}/commrade/faces_office.png ${RES_DIR}/commrade/office_selection.png ${RES_DIR}/commrade/news.png
 		${RES_DIR}/commrade/soko.png ${GEN_DIR}/workshop_icons.png ${RES_DIR}/commrade/achievements.png
-		${GEN_DIR}/bg_factory_drip.png ${RES_DIR}/mode_icons.png ${RES_DIR}/protests.png
+		${RES_DIR}/bg_anim/factory_drip.png ${RES_DIR}/mode_icons.png ${RES_DIR}/protests.png
 	DESTINATIONS
 		${DATA_DIR}/comm_bg.bm ${DATA_DIR}/comm_buttons.bm ${DATA_DIR}/comm_faces.bm
 		${DATA_DIR}/hud.bm ${DATA_DIR}/logo.bm ${DATA_DIR}/lang_select.bm ${DATA_DIR}/comm_news_gate.bm

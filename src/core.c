@@ -43,7 +43,7 @@
 #define CORE_INIT_BAR_WIDTH (SCREEN_PAL_WIDTH - 2 * CORE_INIT_BAR_MARGIN)
 #define CORE_INIT_BAR_HEIGHT 1
 #define CORE_INIT_BAR_BORDER_DISTANCE 2
-#define DRIP_ANIM_LENGTH 11
+#define DRIP_ANIM_LENGTH 10
 
 static tBitMap *s_pTiles;
 static UWORD s_pPaletteRef[1 << GAME_BPP];
