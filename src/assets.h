@@ -41,7 +41,7 @@ extern tPakFile *g_pPakFile;
 #define GET_SUBFILE(szPath) pakFileGetFile(g_pPakFile, szPath)
 #else
 #define SUBFILE_PREFIX "data/"
-#define GET_SUBFILE(szPath) diskFileOpen(szPath, DISK_FILE_MODE_READ)
+#define GET_SUBFILE(szPath) diskFileOpen(szPath, DISK_FILE_MODE_READ, 0)
 #endif
 #define GET_SUBFILE_PREFIX(szPath) GET_SUBFILE(SUBFILE_PREFIX szPath)
 
