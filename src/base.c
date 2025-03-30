@@ -81,12 +81,12 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwY = (BASE_TILE_DEPTH_DINO + 7) * TILE_SIZE
 		},
 		.sPosAntenna = {
-			.uwX = 2 * TILE_SIZE,
-			.uwY = (BASE_TILE_DEPTH_DINO + 7) * TILE_SIZE
+			.uwX = TILE_SIZE + 9,
+			.uwY = BASE_TILE_DEPTH_DINO * TILE_SIZE + 224
 		},
 		.sPosWorkshop = {
-			.uwX = 4 * TILE_SIZE,
-			.uwY = (BASE_TILE_DEPTH_DINO + 7) * TILE_SIZE
+			.uwX = TILE_SIZE + 98,
+			.uwY = BASE_TILE_DEPTH_DINO * TILE_SIZE + 224
 		},
 		.cbProcess = 0,
 	},
@@ -115,12 +115,12 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwY = (BASE_TILE_DEPTH_GATE + 7) * TILE_SIZE
 		},
 		.sPosAntenna = {
-			.uwX = 9 * TILE_SIZE,
-			.uwY = (BASE_TILE_DEPTH_GATE + 7) * TILE_SIZE
+			.uwX = TILE_SIZE + 274,
+			.uwY = BASE_TILE_DEPTH_GATE * TILE_SIZE + 170
 		},
 		.sPosWorkshop = {
-			.uwX = 7 * TILE_SIZE,
-			.uwY = (BASE_TILE_DEPTH_GATE + 7) * TILE_SIZE
+			.uwX = TILE_SIZE + 202,
+			.uwY = BASE_TILE_DEPTH_GATE * TILE_SIZE + 227
 		},
 		.cbProcess = gameProcessBaseGate,
 	},
@@ -149,12 +149,12 @@ static const tBase s_pBases[BASE_ID_COUNT] = {
 			.uwY = (BASE_TILE_DEPTH_WESTERN + 7) * TILE_SIZE
 		},
 		.sPosAntenna = {
-			.uwX = 1 * TILE_SIZE,
-			.uwY = (BASE_TILE_DEPTH_WESTERN + 7) * TILE_SIZE
+			.uwX = TILE_SIZE + 19,
+			.uwY = BASE_TILE_DEPTH_WESTERN * TILE_SIZE + 218
 		},
 		.sPosWorkshop = {
-			.uwX = 8 * TILE_SIZE,
-			.uwY = (BASE_TILE_DEPTH_WESTERN + 7) * TILE_SIZE
+			.uwX = TILE_SIZE + 129,
+			.uwY = BASE_TILE_DEPTH_WESTERN * TILE_SIZE + 222
 		},
 		.cbProcess = gameProcessBaseWestern,
 	},
