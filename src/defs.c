@@ -28,7 +28,7 @@ const UWORD g_pCrateDepths[DEFS_QUEST_CRATE_COUNT] = {
 	350, 430, 470, 530, 590, 640, 680, 720, 770, 810,
 };
 const UWORD g_uwCapsuleDepth = 1020;
-const UWORD g_uwPrisonerDepth = 220;
+const UWORD g_uwPrisonerDepth = 229;
 const UWORD g_pMineralPlans[MINERAL_TYPE_COUNT] = {0, 10, 30, 40, 20, 65535};
 const UBYTE g_ubMinePercentForPlans = 75;
 const UBYTE g_ubTrailingMineralCountPercent = 20;
