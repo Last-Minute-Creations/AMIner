@@ -20,7 +20,7 @@ void genericCreate(void) {
 	g_pGameStateManager = stateManagerCreate();
 
 #if defined(USE_PAK_FILE)
-	g_pPakFile = pakFileOpen("data.pak");
+	g_pPakFile = pakFileOpen("data.pak", 0);
 #endif
 
 	// Bare minimum
