@@ -28,8 +28,12 @@ void genericCreate(void) {
 	ptplayerSetChannelsForPlayer(0b0111);
 	ptplayerSetMasterVolume(8);
 	g_pFont = fontCreateFromFd(GET_SUBFILE_PREFIX("uni54.fnt"));
-
 	if(memGetFreeChipSize() < 900 * 1024 || memGetFreeSize() < 1600 * 1024) {
+		sorryReset(0);
+		statePush(g_pGameStateManager, &g_sStateSorry);
+	}
+	else if(!systemIsStartVolumeWritable()) {
+		sorryReset(1);
 		statePush(g_pGameStateManager, &g_sStateSorry);
 	}
 	else {
@@ -38,7 +42,6 @@ void genericCreate(void) {
 }
 
 void genericProcess(void) {
-	gameExit();
 	keyProcess();
 	joyProcess();
 	stateProcess(g_pGameStateManager);

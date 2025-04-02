@@ -10,12 +10,19 @@
 #include <ace/utils/font.h>
 #include <ace/utils/palette.h>
 #include "assets.h"
+#include "logo.h"
 
 #define RGB(r,g,b) ((((r) >> 4) << 8) | (((g) >> 4) << 4) | (((b) >> 4) << 0))
 
 static tView *s_pView;
 static tVPort *s_pVp;
 static tSimpleBufferManager *s_pBfr;
+static UBYTE s_isWriteProtected;
+
+
+void sorryReset(UBYTE isWriteProtected) {
+	s_isWriteProtected = isWriteProtected;
+}
 
 static void sorryGsCreate(void) {
 logBlockBegin("logoGsCreate()");
@@ -52,16 +59,30 @@ logBlockBegin("logoGsCreate()");
 	bitmapDestroy(pBitMap);
 
 	tTextBitMap *pTextBuffer = fontCreateTextBitMap(320, g_pFont->uwHeight);
-	fontDrawStr(
-		g_pFont, s_pBfr->pBack, 160, 128 - 32 - 12,
-		"Kiedy p\x82""aczesz (bo nie masz ramu), On to widzi",
-		18, FONT_BOTTOM | FONT_HCENTER | FONT_LAZY, pTextBuffer
-	);
-	fontDrawStr(
-		g_pFont, s_pBfr->pBack, 160, 128 + 32 + 12,
-		"Min. 1MB CHIP RAM + 1MB RAM, sorry Ci\x84 bardzo!",
-		14, FONT_TOP | FONT_HCENTER | FONT_LAZY, pTextBuffer
-	);
+	if(s_isWriteProtected) {
+		fontDrawStr(
+			g_pFont, s_pBfr->pBack, 160, 128 - 32 - 12,
+			"Kiedy p\x82""aczesz (bo nie mo\x80""esz zapisa\x83""), On to widzi",
+			18, FONT_BOTTOM | FONT_HCENTER | FONT_LAZY, pTextBuffer
+		);
+		fontDrawStr(
+			g_pFont, s_pBfr->pBack, 160, 128 + 32 + 12,
+			"Disk write protected, unlock please!",
+			14, FONT_TOP | FONT_HCENTER | FONT_LAZY, pTextBuffer
+		);
+	}
+	else {
+		fontDrawStr(
+			g_pFont, s_pBfr->pBack, 160, 128 - 32 - 12,
+			"Kiedy p\x82""aczesz (bo nie masz ramu), On to widzi",
+			18, FONT_BOTTOM | FONT_HCENTER | FONT_LAZY, pTextBuffer
+		);
+		fontDrawStr(
+			g_pFont, s_pBfr->pBack, 160, 128 + 32 + 12,
+			"Min. 1MB CHIP RAM + 1MB RAM, sorry Ci\x84 bardzo!",
+			14, FONT_TOP | FONT_HCENTER | FONT_LAZY, pTextBuffer
+		);
+	}
 	fontDrawStr(
 		g_pFont, s_pBfr->pBack, 160, 128 + 32 + 24,
 		"Press ENTER, SPACE, FIRE or ESCAPE...",

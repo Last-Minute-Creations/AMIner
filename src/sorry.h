@@ -7,6 +7,8 @@
 
 #include "aminer.h"
 
+void sorryReset(UBYTE isWriteProtected);
+
 extern tState g_sStateSorry;
 
 #endif // _SORRY_H_
