@@ -150,7 +150,7 @@ General:
 	✔ Fix deadline finish line tiles on game load @done(25-03-25)
 	✔ Final optimize file order @done(25-03-28)
 	✔ Final placement of base upgrades @done(25-03-30)
-	☐ Add final default hi-scores
+	✔ Add final default hi-scores @done(25-04-04)
 
 From QA tests:
 	✔ Audio settings not working @done(25-02-03)

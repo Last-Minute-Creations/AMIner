@@ -29,28 +29,28 @@ static tHiScore s_pScores[SCORE_MODE_COUNT][SCORE_COUNT];
 
 static tHiScore s_pPrevScores[SCORE_MODE_COUNT][SCORE_COUNT] = {
 	{
-		{.lScore = 10, .szName = "Bestest"},
-		{.lScore = 9,  .szName = "Best"},
-		{.lScore = 8,  .szName = "Better"},
-		{.lScore = 7,  .szName = "Good"},
-		{.lScore = 6,  .szName = "Moderate"},
-		{.lScore = 5,  .szName = "Bad"},
-		{.lScore = 4,  .szName = "Awful"},
-		{.lScore = 3,  .szName = "Too"},
-		{.lScore = 2,  .szName = "Small"},
-		{.lScore = 1,  .szName = "Score"},
+		{.lScore = 847, .szName = "Kanarki_rulez"},
+		{.lScore = 812, .szName = "afrokamil"},
+		{.lScore = 700, .szName = "Softiron"},
+		{.lScore = 600, .szName = "Luc3k"},
+		{.lScore = 500, .szName = "KaiN"},
+		{.lScore = 400, .szName = "Krycha666"},
+		{.lScore = 300, .szName = "MrNatas"},
+		{.lScore = 200, .szName = "Mietek"},
+		{.lScore = 100, .szName = "Tramiel"},
+		{.lScore =  50, .szName = "Sordan"},
 	},
 	{
-		{.lScore = 2500, .szName = "D_First"},
-		{.lScore = 2000,  .szName = "D_Second"},
-		{.lScore = 1800,  .szName = "D_Third"},
-		{.lScore = 1600,  .szName = "D_4th"},
-		{.lScore = 1400,  .szName = "D_5th"},
-		{.lScore = 1200,  .szName = "D_6th"},
-		{.lScore = 1000,  .szName = "D_7th"},
-		{.lScore = 500,  .szName = "D_8th"},
-		{.lScore = 200,  .szName = "D_9th"},
-		{.lScore = 100,  .szName = "D_10th"},
+		{.lScore = 20530, .szName = "afrokamil"},
+		{.lScore = 3097,  .szName = "Kanarki_rulez"},
+		{.lScore = 2500,  .szName = "Luc3k"},
+		{.lScore = 2000,  .szName = "Softiron"},
+		{.lScore = 1500,  .szName = "KaiN"},
+		{.lScore = 1000,  .szName = "Krycha666"},
+		{.lScore = 500,  .szName = "MrNatas"},
+		{.lScore = 300,  .szName = "Mietek"},
+		{.lScore = 200,  .szName = "Tramiel"},
+		{.lScore = 100,  .szName = "Sordan"},
 	},
 };
 
@@ -91,8 +91,8 @@ static void hiScoreSave(void) {
 			}
 		}
 		fileClose(pFile);
-		memcpy(s_pPrevScores, s_pScores, sizeof(s_pPrevScores));
 	}
+	memcpy(s_pPrevScores, s_pScores, sizeof(s_pPrevScores));
 	systemUnuse();
 }
 

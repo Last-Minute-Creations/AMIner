@@ -28,7 +28,12 @@ static void creditsGsCreate(void) {
 	UWORD uwOffsY = 0;
 	UBYTE ubLineHeight = commGetLineHeight() - 2;
 	for(UBYTE i = 0; i < ARRAY_SIZE(s_pCreditsLines); ++i) {
-		uwOffsY += commDrawMultilineText(s_pCreditsLines[i], 0, uwOffsY) * ubLineHeight;
+		if(stringIsEmpty(s_pCreditsLines[i])) {
+			uwOffsY += ubLineHeight;
+		}
+		else {
+			uwOffsY += commDrawMultilineText(s_pCreditsLines[i], 0, uwOffsY) * ubLineHeight;
+		}
 	}
 }
 
