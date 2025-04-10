@@ -96,8 +96,8 @@ logBlockBegin("logoGsCreate()");
 
 static void sorryGsLoop(void) {
 	if(
-		keyUse(KEY_RETURN) || keyUse(KEY_ESCAPE) || keyUse(KEY_SPACE) ||
-		joyUse(JOY1_FIRE) || joyUse(JOY2_FIRE)
+		keyUse(KEY_RETURN) || keyUse(KEY_NUMENTER) || keyUse(KEY_ESCAPE) ||
+		keyUse(KEY_SPACE) || joyUse(JOY1_FIRE)
 	) {
 		statePopAll(g_pGameStateManager);
 		return;

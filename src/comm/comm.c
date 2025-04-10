@@ -260,7 +260,7 @@ void commProcess(void) {
 		pTests[DIRECTION_RIGHT] |= steerDirCheck(pSteer, DIRECTION_RIGHT);
 		pTests[DIRECTION_FIRE] |= steerDirCheck(pSteer, DIRECTION_FIRE);
 	}
-	pTests[DIRECTION_FIRE] |= keyCheck(KEY_SPACE) | keyCheck(KEY_RETURN);
+	pTests[DIRECTION_FIRE] |= keyCheck(KEY_SPACE) | keyCheck(KEY_RETURN) | keyCheck(KEY_NUMENTER);
 
 	tUwCoordYX sOrigin = commGetOrigin();
 

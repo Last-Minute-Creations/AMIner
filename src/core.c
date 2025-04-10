@@ -371,7 +371,7 @@ static void coreGsCreate(void) {
 	systemUnuse();
 
 	while(
-		!keyUse(KEY_RETURN) && !keyUse(KEY_SPACE) &&
+		!keyUse(KEY_RETURN) && !keyUse(KEY_NUMENTER) && !keyUse(KEY_SPACE) &&
 		!keyUse(KEY_LSHIFT) && !keyUse(KEY_RSHIFT) &&
 		!joyUse(JOY1_FIRE) && !joyUse(JOY2_FIRE) && !pageNewsIsDone()
 	) {

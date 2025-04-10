@@ -339,3 +339,9 @@ Missing audio:
 	✔ Gate rune activation @done(25-03-02)
 	✔ Gate activation @done(25-03-02)
 	✔ Minor thud @done(25-03-02)
+
+Post-release patch 1:
+	✔ Add numpad enter for confirming @done(25-04-10)
+	✔ Disable joy2 in language selection @done(25-04-10)
+	☐ Add arrow controls for player 1
+	☐ Fix game startup for 060 configs

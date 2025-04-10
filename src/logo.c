@@ -105,8 +105,9 @@ static void logoGsCreate(void) {
 
 static void logoGsLoop(void) {
 	s_isAnyPressed = (
-		keyUse(KEY_RETURN) | keyUse(KEY_ESCAPE) | keyUse(KEY_SPACE) |
-		keyUse(KEY_LSHIFT) | keyUse(KEY_RSHIFT) | joyUse(JOY1_FIRE) | joyUse(JOY2_FIRE)
+		keyUse(KEY_RETURN) | keyUse(KEY_NUMENTER) | keyUse(KEY_ESCAPE) |
+		keyUse(KEY_SPACE) | keyUse(KEY_LSHIFT) | keyUse(KEY_RSHIFT) |
+		joyUse(JOY1_FIRE)
 	);
 
 	fadeProcess();
@@ -413,10 +414,7 @@ void logoLangCreate(void) {
 }
 
 void logoLangLoop(void) {
-	if(
-		keyUse(KEY_LEFT) || keyUse(KEY_A) ||
-		joyUse(JOY1_LEFT) || joyUse(JOY2_LEFT)
-	) {
+	if(keyUse(KEY_LEFT) || keyUse(KEY_A) || joyUse(JOY1_LEFT)) {
 		if(s_eLangCurr == 0) {
 			s_eLangCurr = LANGUAGE_COUNT - 1;
 		}
@@ -425,10 +423,7 @@ void logoLangLoop(void) {
 		}
 		drawLangNames();
 	}
-	else if(
-		keyUse(KEY_RIGHT) || keyUse(KEY_D) ||
-		joyUse(JOY1_RIGHT) || joyUse(JOY2_RIGHT)
-	) {
+	else if(keyUse(KEY_RIGHT) || keyUse(KEY_D) || joyUse(JOY1_RIGHT)) {
 		if(++s_eLangCurr == LANGUAGE_COUNT) {
 			s_eLangCurr = 0;
 		}

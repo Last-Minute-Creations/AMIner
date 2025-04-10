@@ -45,7 +45,7 @@ void pauseGsLoop(void) {
 	else if(
 		steerDirUse(&pSteers[0], DIRECTION_FIRE) ||
 		(g_is2pPlaying && steerDirUse(&pSteers[1], DIRECTION_FIRE)) ||
-		keyUse(KEY_SPACE) || keyUse(KEY_RETURN)
+		keyUse(KEY_SPACE) || keyUse(KEY_RETURN) || keyUse(KEY_NUMENTER)
 	) {
 		if(ubSelection == 0) {
 			stateChange(g_pGameStateManager, &g_sStateGame);
