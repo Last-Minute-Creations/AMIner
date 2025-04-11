@@ -7,11 +7,12 @@
 #include <ace/managers/log.h>
 
 void saveTagGet(tFile *pFile, char *szTagRead) {
-	fileRead(pFile, szTagRead, sizeof(szTagRead) - 1);
+	fileRead(pFile, szTagRead, sizeof(SAVE_TAG_ACCOUNTING) - 1);
+	szTagRead[sizeof(SAVE_TAG_ACCOUNTING) - 1] = '\0';
 }
 
 UBYTE saveTagIs(const char *szTagRead, const char *szTagRef) {
-	if(memcmp(szTagRead, szTagRef, sizeof(szTagRead) - 1)) {
+	if(memcmp(szTagRead, szTagRef, sizeof(SAVE_TAG_ACCOUNTING) - 1)) {
 		logWrite(
 			"ERR: Save tag mismatch, got %s, expected %s\n", szTagRead, szTag
 		);

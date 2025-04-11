@@ -30,7 +30,7 @@ static UBYTE settingsLoad(tFile*pFile) {
 	if(saveTagIs(szTag, SAVE_TAG_SETTINGS_V1)) {
 		ubVersion = 1;
 	}
-	if(saveTagIs(szTag, SAVE_TAG_SETTINGS_V2)) {
+	else if(saveTagIs(szTag, SAVE_TAG_SETTINGS_V2)) {
 		ubVersion = 2;
 	}
 	else {
