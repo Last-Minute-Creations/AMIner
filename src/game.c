@@ -461,17 +461,13 @@ static void gameProcessHotkeys(void) {
 		}
 	}
 	else if(keyUse(KEY_F2)) {
-		g_sSettings.is1pKbd = !g_sSettings.is1pKbd;
-	}
-	else if(keyUse(KEY_F3)) {
-		g_sSettings.is2pKbd = !g_sSettings.is2pKbd;
-	}
-	else if(keyUse(KEY_F4)) {
-		if(s_eCameraType == CAMERA_TYPE_P1) {
-			s_eCameraType = CAMERA_TYPE_P2;
-		}
-		else {
-			s_eCameraType = CAMERA_TYPE_P1;
+		if(g_eGameMode != GAME_MODE_CHALLENGE) {
+			if(s_eCameraType == CAMERA_TYPE_P1) {
+				s_eCameraType = CAMERA_TYPE_P2;
+			}
+			else {
+				s_eCameraType = CAMERA_TYPE_P1;
+			}
 		}
 	}
 #if defined(GAME_DEBUG)

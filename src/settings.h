@@ -7,11 +7,18 @@
 
 #include <ace/utils/file.h>
 
+typedef enum tSettingsPlayerSteer {
+	SETTINGS_PLAYER_STEER_JOY1,
+	SETTINGS_PLAYER_STEER_JOY2,
+	SETTINGS_PLAYER_STEER_WSAD,
+	SETTINGS_PLAYER_STEER_ARROWS,
+} tSettingsPlayerSteer;
+
 typedef struct tSettings {
 	UBYTE ubSoundVolume;
 	UBYTE ubMusicVolume;
-	UBYTE is1pKbd;
-	UBYTE is2pKbd;
+	UBYTE ubSteer1p;
+	UBYTE ubSteer2p;
 	UBYTE isAtariHidden;
 	ULONG ulAchievementsUnlocked;
 } tSettings;

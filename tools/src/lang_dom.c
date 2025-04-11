@@ -287,10 +287,10 @@ const char * const g_pLangDom[MSG_COUNT + 1] = {
 	[MSG_PLAYER_COUNT_ONE] = "menu.enumPlayerCount[0]",
 	[MSG_PLAYER_COUNT_TWO] = "menu.enumPlayerCount[1]",
 
-	[MSG_CONTROLS_P1_JOY] = "menu.enumP1[0]",
-	[MSG_CONTROLS_P1_WSAD] = "menu.enumP1[1]",
-	[MSG_CONTROLS_P2_JOY] = "menu.enumP2[0]",
-	[MSG_CONTROLS_P2_ARROWS] = "menu.enumP2[1]",
+	[MSG_CONTROLS_P1_JOY] = "menu.enumControls[0]",
+	[MSG_CONTROLS_P2_JOY] = "menu.enumControls[1]",
+	[MSG_CONTROLS_P1_WSAD] = "menu.enumControls[2]",
+	[MSG_CONTROLS_P2_ARROWS] = "menu.enumControls[3]",
 
 	[MSG_BOOL_OFF] = "menu.enumOnOff[0]",
 	[MSG_BOOL_ON] = "menu.enumOnOff[1]",

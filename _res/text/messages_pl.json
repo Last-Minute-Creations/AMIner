@@ -94,8 +94,7 @@
 		"draw": "Remis!"
 	},
 	"menu": {
-		"enumP1": ["Dżoj", "WSAD + Shift"],
-		"enumP2": ["Dżoj", "Strzałki + Shift"],
+		"enumControls": ["Dżoj 1", "Dżoj 2", "WSAD + Shift", "Strzałki + Shift"],
 		"enumOnOff": ["WYŁ", "WŁ"],
 		"enumPlayerCount": ["Jeden", "Dwóch"],
 		"captions": [

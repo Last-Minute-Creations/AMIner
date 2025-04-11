@@ -127,7 +127,7 @@ UBYTE menuListToggle(BYTE bDelta) {
 		*s_pOptions[s_ubActiveOption].sOptUb.pVar = wNewVal;
 		s_pOptions[s_ubActiveOption].eDirty |= MENU_LIST_DIRTY_VAL_CHANGE;
 		if(s_pOptions[s_ubActiveOption].sOptUb.cbOnValChange) {
-			s_pOptions[s_ubActiveOption].sOptUb.cbOnValChange();
+			s_pOptions[s_ubActiveOption].sOptUb.cbOnValChange(bDelta);
 		}
 		return 1;
 	}

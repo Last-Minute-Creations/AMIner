@@ -93,8 +93,7 @@
 		"draw": "Draw!"
 	},
 	"menu": {
-		"enumP1": ["Joystick", "WSAD + Shift"],
-		"enumP2": ["Joystick", "Arrows + Shift"],
+		"enumControls": ["Joystick 1", "Joystick 2", "WSAD + Shift", "Arrows + Shift"],
 		"enumOnOff": ["OFF", "ON"],
 		"enumPlayerCount": ["One", "Two"],
 		"captions": [

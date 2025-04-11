@@ -13,35 +13,51 @@ tSettings g_sSettings;
 //------------------------------------------------------------------ PRIVATE FNS
 
 static void settingsSave(tFile *pFile) {
-	saveWriteTag(pFile, SAVE_TAG_SETTINGS);
+	saveWriteTag(pFile, SAVE_TAG_SETTINGS_V2);
 	fileWrite(pFile, &g_sSettings.ubSoundVolume, sizeof(g_sSettings.ubSoundVolume));
 	fileWrite(pFile, &g_sSettings.ubMusicVolume, sizeof(g_sSettings.ubMusicVolume));
-	fileWrite(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
-	fileWrite(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
+	fileWrite(pFile, &g_sSettings.ubSteer1p, sizeof(g_sSettings.ubSteer1p));
+	fileWrite(pFile, &g_sSettings.ubSteer2p, sizeof(g_sSettings.ubSteer2p));
 	fileWrite(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
 	fileWrite(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
 	saveWriteTag(pFile, SAVE_TAG_SETTINGS_END);
 }
 
 static UBYTE settingsLoad(tFile*pFile) {
-	if(!saveReadTag(pFile, SAVE_TAG_SETTINGS)) {
+	UBYTE ubVersion;
+	char szTag[sizeof(SAVE_TAG_SETTINGS_V2)];
+	saveTagGet(pFile, szTag);
+	if(saveTagIs(szTag, SAVE_TAG_SETTINGS_V1)) {
+		ubVersion = 1;
+	}
+	if(saveTagIs(szTag, SAVE_TAG_SETTINGS_V2)) {
+		ubVersion = 2;
+	}
+	else {
 		return 0;
 	}
 
 	fileRead(pFile, &g_sSettings.ubSoundVolume, sizeof(g_sSettings.ubSoundVolume));
 	fileRead(pFile, &g_sSettings.ubMusicVolume, sizeof(g_sSettings.ubMusicVolume));
-	fileRead(pFile, &g_sSettings.is1pKbd, sizeof(g_sSettings.is1pKbd));
-	fileRead(pFile, &g_sSettings.is2pKbd, sizeof(g_sSettings.is2pKbd));
+	fileRead(pFile, &g_sSettings.ubSteer1p, sizeof(g_sSettings.ubSteer1p));
+	fileRead(pFile, &g_sSettings.ubSteer2p, sizeof(g_sSettings.ubSteer2p));
 	fileRead(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
 	fileRead(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
+
+	if(ubVersion == 1) {
+		// Migrate from is1pKbd/is2pKbd
+		g_sSettings.ubSteer1p = (g_sSettings.ubSteer1p ? SETTINGS_PLAYER_STEER_WSAD : SETTINGS_PLAYER_STEER_JOY1);
+		g_sSettings.ubSteer2p = (g_sSettings.ubSteer2p ? SETTINGS_PLAYER_STEER_ARROWS : SETTINGS_PLAYER_STEER_JOY2);
+	}
+
 	return saveReadTag(pFile, SAVE_TAG_SETTINGS_END);
 }
 
 static void settingsReset(void) {
 	g_sSettings.ubSoundVolume = 10;
 	g_sSettings.ubMusicVolume = 5;
-	g_sSettings.is1pKbd = 0;
-	g_sSettings.is2pKbd = 1;
+	g_sSettings.ubSteer1p = SETTINGS_PLAYER_STEER_JOY1;
+	g_sSettings.ubSteer2p = SETTINGS_PLAYER_STEER_WSAD;
 	g_sSettings.isAtariHidden = 1;
 	g_sSettings.ulAchievementsUnlocked = 0;
 }

@@ -96,13 +96,27 @@ static void menuEnableAtari(void) {
 	}
 }
 
+static tSteer menuSteerInitFromSettings(tSettingsPlayerSteer ePlayerSteer) {
+	switch(ePlayerSteer) {
+		case SETTINGS_PLAYER_STEER_JOY1:
+			return steerInitFromMode(STEER_MODE_JOY_1);
+		case SETTINGS_PLAYER_STEER_JOY2:
+			return steerInitFromMode(STEER_MODE_JOY_2);
+		case SETTINGS_PLAYER_STEER_WSAD:
+			return steerInitFromMode(STEER_MODE_KEY_WSAD);
+		case SETTINGS_PLAYER_STEER_ARROWS:
+			return steerInitFromMode(STEER_MODE_KEY_ARROWS);
+	}
+	return steerInitFromMode(STEER_MODE_IDLE);
+}
+
 static void menuStartGame(tGameMode eMode) {
 	commEraseAll();
 	commProgressInit();
 	gameStart(
 		eMode,
-		g_sSettings.is1pKbd ? steerInitFromMode(STEER_MODE_KEY_WSAD) : steerInitFromMode(STEER_MODE_JOY_1),
-		g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_KEY_ARROWS) : steerInitFromMode(STEER_MODE_JOY_2)
+		menuSteerInitFromSettings(g_sSettings.ubSteer1p),
+		menuSteerInitFromSettings(g_sSettings.ubSteer2p)
 	);
 	commHide();
 	// viewProcessManagers(g_pMainBuffer->sCommon.pVPort->pView);
@@ -115,8 +129,8 @@ static void menuLoadGame(const char *szSavePath) {
 	commProgressInit();
 	gameStart(
 		GAME_MODE_CHALLENGE, // challenge loading is faster due to less terrain prep
-		g_sSettings.is1pKbd ? steerInitFromMode(STEER_MODE_KEY_WSAD) : steerInitFromMode(STEER_MODE_JOY_1),
-		g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_KEY_ARROWS) : steerInitFromMode(STEER_MODE_JOY_2)
+		menuSteerInitFromSettings(g_sSettings.ubSteer1p),
+		menuSteerInitFromSettings(g_sSettings.ubSteer2p)
 	);
 
 	UBYTE isLoadSuccess = 0;
@@ -432,9 +446,32 @@ static void menuOnEnterAchievements(void) {
 	statePush(g_pGameStateManager, &s_sStateMenuAchievements);
 }
 
-static void menuUpdateVolume(void) {
+static void menuUpdateVolume(UNUSED_ARG BYTE bDelta) {
 	ptplayerSetMasterVolume((g_sSettings.ubMusicVolume * 16) / 10);
 	audioMixerSetVolume((g_sSettings.ubSoundVolume * 64) / 10);
+}
+
+static void menuSelectNextSteer(UBYTE *pSteer, BYTE bDelta) {
+	BYTE bNewValue = *pSteer + bDelta;
+	if(bNewValue > SETTINGS_PLAYER_STEER_ARROWS) {
+		bNewValue = SETTINGS_PLAYER_STEER_JOY1;
+	}
+	else if(bNewValue < SETTINGS_PLAYER_STEER_JOY1) {
+		bNewValue = SETTINGS_PLAYER_STEER_ARROWS;
+	}
+	*pSteer = bNewValue;
+}
+
+static void onSteerP1ValueChanged(BYTE bDelta) {
+	if(g_sSettings.ubSteer1p == g_sSettings.ubSteer2p) {
+		menuSelectNextSteer(&g_sSettings.ubSteer1p, bDelta);
+	}
+}
+
+static void onSteerP2ValueChanged(BYTE bDelta) {
+	if(g_sSettings.ubSteer1p == g_sSettings.ubSteer2p) {
+		menuSelectNextSteer(&g_sSettings.ubSteer2p, bDelta);
+	}
 }
 
 // static UBYTE s_ubDebugDisplay;
@@ -477,10 +514,12 @@ static void menuOnEnterSettings(void) {
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
-			.pVar = &g_sSettings.is1pKbd,
-			.ubMax = 1,
+			.pVar = &g_sSettings.ubSteer1p,
+			.ubMin = SETTINGS_PLAYER_STEER_JOY1,
+			.ubMax = SETTINGS_PLAYER_STEER_ARROWS,
 			.isCyclic = 1,
 			.pEnumLabels = &g_pMsgs[MSG_CONTROLS_P1_JOY],
+			.cbOnValChange = onSteerP1ValueChanged,
 		}
 	};
 
@@ -489,10 +528,12 @@ static void menuOnEnterSettings(void) {
 		.eOptionType = MENU_LIST_OPTION_TYPE_UINT8,
 		.isHidden = 0,
 		.sOptUb = {
-			.pVar = &g_sSettings.is2pKbd,
-			.ubMax = 1,
+			.pVar = &g_sSettings.ubSteer2p,
+			.ubMin = SETTINGS_PLAYER_STEER_JOY1,
+			.ubMax = SETTINGS_PLAYER_STEER_ARROWS,
 			.isCyclic = 1,
-			.pEnumLabels = &g_pMsgs[MSG_CONTROLS_P2_JOY],
+			.pEnumLabels = &g_pMsgs[MSG_CONTROLS_P1_JOY],
+			.cbOnValChange = onSteerP2ValueChanged,
 		}
 	};
 
@@ -588,8 +629,11 @@ static void menuOnBackToMain(void) {
 }
 
 static void menuOnBackToMainFromSettings(void) {
-	// Update the 2nd port steer to prevent interfering with mouse
-	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_IDLE) : steerInitFromMode(STEER_MODE_JOY_2);
+	// Use joy from mouse port only when selected to prevent interfering with mouse
+	s_pMenuSteers[2] = (
+		g_sSettings.ubSteer1p == SETTINGS_PLAYER_STEER_JOY2 ||
+		g_sSettings.ubSteer2p == SETTINGS_PLAYER_STEER_JOY2
+	) ? steerInitFromMode(STEER_MODE_JOY_2) : steerInitFromMode(STEER_MODE_IDLE);
 
 	settingsFileSave();
 	menuOnEnterMain();
@@ -941,7 +985,10 @@ void menuPreload(void) {
 	// Init all steers except joy2 if not explicitly selected, because mouse may be connected there
 	s_pMenuSteers[0] = steerInitFromMode(STEER_MODE_JOY_1);
 	s_pMenuSteers[1] = steerInitFromMode(STEER_MODE_KEY_WSAD);
-	s_pMenuSteers[2] = g_sSettings.is2pKbd ? steerInitFromMode(STEER_MODE_IDLE) : steerInitFromMode(STEER_MODE_JOY_2);
+	s_pMenuSteers[2] = (
+		g_sSettings.ubSteer1p == SETTINGS_PLAYER_STEER_JOY2 ||
+		g_sSettings.ubSteer2p == SETTINGS_PLAYER_STEER_JOY2
+	) ? steerInitFromMode(STEER_MODE_JOY_2) : steerInitFromMode(STEER_MODE_IDLE);
 	s_pMenuSteers[3] = steerInitFromMode(STEER_MODE_KEY_ARROWS);
 }
 

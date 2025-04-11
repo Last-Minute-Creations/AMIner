@@ -6,10 +6,12 @@
 #include <string.h>
 #include <ace/managers/log.h>
 
-UBYTE saveReadTag(tFile *pFile, const char *szTag) {
-	char szTagRead[5] = {'\0'};
+void saveTagGet(tFile *pFile, char *szTagRead) {
 	fileRead(pFile, szTagRead, sizeof(szTagRead) - 1);
-	if(memcmp(szTagRead, szTag, sizeof(szTagRead) - 1)) {
+}
+
+UBYTE saveTagIs(const char *szTagRead, const char *szTagRef) {
+	if(memcmp(szTagRead, szTagRef, sizeof(szTagRead) - 1)) {
 		logWrite(
 			"ERR: Save tag mismatch, got %s, expected %s\n", szTagRead, szTag
 		);
@@ -17,6 +19,12 @@ UBYTE saveReadTag(tFile *pFile, const char *szTag) {
 	}
 
 	return 1;
+}
+
+UBYTE saveReadTag(tFile *pFile, const char *szTag) {
+	char szTagRead[5] = {'\0'};
+	fileRead(pFile, szTagRead, sizeof(szTagRead) - 1);
+	return saveTagIs(szTagRead, szTag);
 }
 
 void saveWriteTag(tFile *pFile, const char *szTag) {

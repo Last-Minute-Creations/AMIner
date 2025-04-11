@@ -19,7 +19,7 @@ typedef enum tMenuListDirty {
 } tMenuListDirty;
 
 typedef void (*tOptionSelectCb)(void);
-typedef void (*tOptionValChangeCb)(void);
+typedef void (*tOptionValChangeCb)(BYTE bDelta);
 typedef void (*tOptionValDrawCb)(UBYTE ubIdx);
 
 typedef void (*tCbMenuListUndraw)(

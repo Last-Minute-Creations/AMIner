@@ -6,7 +6,8 @@
 #define SAVE_H
 
 #include <ace/utils/file.h>
-#define SAVE_TAG_SETTINGS "STG1"
+#define SAVE_TAG_SETTINGS_V1 "STG1"
+#define SAVE_TAG_SETTINGS_V2 "STG2"
 #define SAVE_TAG_SETTINGS_END "STGE"
 #define SAVE_TAG_INBOX "INB1"
 #define SAVE_TAG_INBOX_END "INBE"
@@ -48,6 +49,10 @@
 #define SAVE_TAG_MARKET_END "MKTE"
 #define SAVE_TAG_PROTEST "PRT1"
 #define SAVE_TAG_PROTEST_END "PRTE"
+
+void saveTagGet(tFile *pFile, char *szTagRead);
+
+UBYTE saveTagIs(const char *szTagRead, const char *szTagRef);
 
 UBYTE saveReadTag(tFile *pFile, const char *szHeader);
 
