@@ -654,7 +654,7 @@ static inline UBYTE vehicleStartDrilling(
 		if(pVehicle->uwDrillCurr < ubDrillCost) {
 			if(!ubCooldown) {
 				textBobSet(
-					&pVehicle->sTextBob, g_pMsgs[MSG_MISC_DRILL_DEPLETED], 6,
+					&pVehicle->sTextBob, g_pMsgs[MSG_MISC_DRILL_DEPLETED], COLOR_REDEST,
 					pVehicle->sBobBody.sPos.uwX + VEHICLE_WIDTH/2,
 					pVehicle->sBobBody.sPos.uwY,
 					pVehicle->sBobBody.sPos.uwY - 32, 1
