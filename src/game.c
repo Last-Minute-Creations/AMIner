@@ -389,6 +389,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 			eDirection = DIRECTION_RIGHT;
 		}
 		modeMenuProcess(pModeMenu, eDirection);
+		vehicleMove(&g_pVehicles[ubPlayer], 0, 0);
 	}
 	else {
 		BYTE bDirX = 0, bDirY = 0;
@@ -405,7 +406,7 @@ static UBYTE gameProcessModeDrill(UBYTE ubPlayer) {
 
 static UBYTE gameProcessSteer(UBYTE ubPlayer) {
 	UBYTE isReturnImmediately = 0;
-	if(!gameIsCutsceneActive() && (ubPlayer == 0 || g_is2pPlaying)) {
+	if(ubPlayer == 0 || g_is2pPlaying) {
 		if(s_pModeMenus[ubPlayer].isActive) {
 			isReturnImmediately = gameProcessModeDrill(ubPlayer);
 		}

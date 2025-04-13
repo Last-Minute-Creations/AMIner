@@ -14,7 +14,7 @@ void saveTagGet(tFile *pFile, char *szTagRead) {
 UBYTE saveTagIs(const char *szTagRead, const char *szTagRef) {
 	if(memcmp(szTagRead, szTagRef, sizeof(SAVE_TAG_ACCOUNTING) - 1)) {
 		logWrite(
-			"ERR: Save tag mismatch, got %s, expected %s\n", szTagRead, szTag
+			"ERR: Save tag mismatch, got %s, expected %s\n", szTagRead, szTagRef
 		);
 		return 0;
 	}

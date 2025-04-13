@@ -288,7 +288,8 @@ void vehicleResetPos(tVehicle *pVehicle) {
 	vehicleSetPos(pVehicle, uwX, uwY);
 }
 
-void vehicleUpdateBodyBob(tVehicle *pVehicle) {
+// Update body rotation as well as white frames
+static void vehicleUpdateBodyBob(tVehicle *pVehicle) {
 	UBYTE ubFrameOffs = VEHICLE_BODY_HEIGHT * pVehicle->ubHullDamageFrame;
 	if(!pVehicle->isFacingRight) {
 		ubFrameOffs += VEHICLE_BODY_HEIGHT * VEHICLE_DESTRUCTION_FRAMES;
@@ -558,7 +559,6 @@ void vehicleMove(tVehicle *pVehicle, BYTE bDirX, BYTE bDirY) {
 		}
 	}
 
-	// Update body rotation as well as white frames
 	vehicleUpdateBodyBob(pVehicle);
 }
 

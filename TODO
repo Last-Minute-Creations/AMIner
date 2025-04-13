@@ -344,4 +344,5 @@ Post-release patch 1:
 	✔ Add numpad enter for confirming @done(25-04-10)
 	✔ Disable joy2 in language selection @done(25-04-10)
 	✔ Add arrow controls for player 1 @done(25-04-11)
+	Prevent vehicle from continuing its movement when entering the tool menu
 	☐ Fix game startup for 060 configs
