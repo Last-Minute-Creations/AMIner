@@ -73,6 +73,8 @@ tBtnState commNavCheck(tDirection eNav);
 
 UBYTE commNavUse(tDirection eNav);
 
+void commNavUnuse(tDirection eDir);
+
 UBYTE commNavExUse(tCommNavEx eNavEx);
 
 tBitMap *commGetDisplayBuffer(void);

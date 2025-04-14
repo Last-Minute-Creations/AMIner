@@ -338,6 +338,12 @@ UBYTE commNavUse(tDirection eDir) {
 	return 0;
 }
 
+void commNavUnuse(tDirection eDir) {
+	if(s_pNav[eDir] == BTN_STATE_USED) {
+		s_pNav[eDir] = BTN_STATE_ACTIVE;
+	}
+}
+
 UBYTE commNavExUse(tCommNavEx eNavEx) {
 	if(s_pNavEx[eNavEx] == BTN_STATE_ACTIVE) {
 		s_pNavEx[eNavEx] = BTN_STATE_USED;

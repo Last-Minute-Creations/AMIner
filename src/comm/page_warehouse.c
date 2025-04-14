@@ -16,6 +16,8 @@
 #include "../protests.h"
 
 #define WAREHOUSE_COL_COUNT 4
+#define USE_COOLDOWN_NEXT 10
+#define USE_COOLDOWN_FIRST 25
 
 static UBYTE s_ubPosCurr = 0, s_ubPosCount = 0;
 static const UBYTE s_pColOffs[WAREHOUSE_COL_COUNT] = {0,  50, 85, 130};
@@ -25,6 +27,9 @@ static UWORD s_pTmpSell[MINERAL_TYPE_COUNT];
 static UWORD s_pTmpPlan[MINERAL_TYPE_COUNT];
 static UWORD s_pTmpStock[MINERAL_TYPE_COUNT];
 static UBYTE s_ubButtonCurrent;
+static UBYTE s_ubUseCooldown;
+static UBYTE s_ubUseCount;
+static tDirection s_eUseDirection;
 
 static UBYTE getMineralsOnList(UBYTE *pMineralsOnList) {
 	UBYTE ubCount = 0;
@@ -222,6 +227,9 @@ static void pageWarehouseProcess(void) {
 		UBYTE ubMineral = s_pMineralsOnList[s_ubPosCurr];
 		// Process moving stock
 		if(commNavUse(DIRECTION_LEFT)) {
+			s_eUseDirection = DIRECTION_LEFT;
+			s_ubUseCooldown = s_ubUseCount >= 1 ? USE_COOLDOWN_NEXT : USE_COOLDOWN_FIRST;
+			++s_ubUseCount;
 			if(s_pTmpPlan[ubMineral]) {
 				--s_pTmpPlan[ubMineral];
 				++s_pTmpStock[ubMineral];
@@ -233,6 +241,9 @@ static void pageWarehouseProcess(void) {
 			pageWarehouseDrawRow(ubPosPrev);
 		}
 		else if(commNavUse(DIRECTION_RIGHT)) {
+			s_eUseDirection = DIRECTION_RIGHT;
+			s_ubUseCooldown = s_ubUseCount >= 1 ? USE_COOLDOWN_NEXT : USE_COOLDOWN_FIRST;
+			++s_ubUseCount;
 			if(s_pTmpSell[ubMineral]) {
 				--s_pTmpSell[ubMineral];
 				++s_pTmpStock[ubMineral];
@@ -264,6 +275,19 @@ static void pageWarehouseProcess(void) {
 			s_ubButtonCurrent = 0;
 			buttonSelect(s_ubButtonCurrent);
 			isButtonRefresh = 1;
+		}
+	}
+
+	if(s_eUseDirection != DIRECTION_COUNT) {
+		if(!commNavCheck(s_eUseDirection)) {
+			s_eUseDirection = DIRECTION_COUNT;
+			s_ubUseCount = 0;
+			s_ubUseCooldown = 0;
+		}
+		else if(s_ubUseCooldown) {
+			if(--s_ubUseCooldown == 0) {
+				commNavUnuse(s_eUseDirection);
+			}
 		}
 	}
 
@@ -314,4 +338,7 @@ static void pageWarehouseProcess(void) {
 void pageWarehouseCreate(void) {
 	commRegisterPage(pageWarehouseProcess, 0);
 	pageWarehouseRedraw();
+	s_ubUseCooldown = 0;
+	s_ubUseCount = 0;
+	s_eUseDirection = DIRECTION_COUNT;
 }
