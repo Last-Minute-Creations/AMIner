@@ -46,7 +46,7 @@ endif()
 
 set(CFG_MIXER_HQ_MODE 0)
 if(AUDIO_MIXER_HQ_MODE)
-	set(CFG_MIXER_SINGLE 1)
+	set(CFG_MIXER_HQ_MODE 1)
 endif()
 
 set(CFG_MIXER_WORDSIZED 0)
@@ -118,3 +118,4 @@ set(CFG_mixer_sw_channels ${AUDIO_MIXER_SW_CHANNEL_COUNT})
 set(CFG_mixer_period ${AUDIO_MIXER_PERIOD})
 
 configure_file(src/mixer_config.i.in mixer_config.i @ONLY)
+configure_file(src/mixer_config.h.in mixer_config.h)

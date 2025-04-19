@@ -243,7 +243,7 @@ MIXER_EXTERNAL_IRQ_DMA	EQU 1
 ; rather than providing a full mask containing all relevant bits in one call.
 ;
 ; Note: this feature only has an effect if MIXER_EXTERNAL_IRQ_DMA is set to 1.
-MIXER_EXTERNAL_BITWISE	EQU 1
+MIXER_EXTERNAL_BITWISE	EQU 0
 
 ; Set define below to 1 to revert the mixer's behaviour when
 ; MIXER_EXTERNAL_IRQ_DMA is set to 1 to using an RTE to end the interrupt

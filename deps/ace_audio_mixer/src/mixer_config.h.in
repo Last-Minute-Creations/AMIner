@@ -1,0 +1,22 @@
+#ifndef MIXER_CONFIG_H
+#define MIXER_CONFIG_H
+
+#cmakedefine CFG_MIXER_SINGLE
+#cmakedefine CFG_MIXER_MULTI
+#cmakedefine CFG_MIXER_MULTI_PAIRED
+#cmakedefine CFG_MIXER_HQ_MODE
+#define CFG_MIXER_OUTPUT_CHANNELS (@CFG_mixer_output_channels@)
+#define CFG_MIXER_SW_CHANNELS @CFG_mixer_sw_channels@
+#define CFG_MIXER_PERIOD @CFG_mixer_period@
+#cmakedefine CFG_MIXER_NTSC
+#cmakedefine CFG_MIXER_68020
+#cmakedefine CFG_MIXER_WORDSIZED
+#cmakedefine CFG_MIXER_SIZEX32
+#cmakedefine CFG_MIXER_SIZEXBUF
+#cmakedefine CFG_MIXER_TIMING_BARS
+#cmakedefine CFG_MIXER_COUNTER
+#cmakedefine CFG_MIXER_ENABLE_CALLBACK
+#cmakedefine CFG_MIXER_ENABLE_PLUGINS
+#cmakedefine CFG_MIXER_ENABLE_RETURN_VECTOR
+
+#endif // MIXER_CONFIG_H

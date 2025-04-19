@@ -8,6 +8,7 @@
 #include <hardware/intbits.h>
 #include <hardware/dmabits.h>
 #include "mixer.h"
+#include "mixer_config.h"
 
 typedef void (*tCbMixerIrqHandler)();
 
@@ -31,39 +32,72 @@ void mixerSetIrqVector(void) {
 }
 
 __attribute__((used))
-void mixerSetIrqBits(void) {
-	register volatile ULONG reg_intena __asm("d0");
-	UWORD uwIntena = reg_intena;
-	if(uwIntena & INTF_AUD0) {
-		systemSetInt(INTB_AUD0, onChannelInterrupt, 0);
-	}
-	if(uwIntena & INTF_AUD1) {
-		systemSetInt(INTB_AUD1, onChannelInterrupt, 0);
-	}
-	if(uwIntena & INTF_AUD2) {
-		systemSetInt(INTB_AUD2, onChannelInterrupt, 0);
-	}
-	if(uwIntena & INTF_AUD3) {
-		systemSetInt(INTB_AUD3, onChannelInterrupt, 0);
-	}
+void mixerRemoveIrqVector(void) {
+	s_cbMixerIrqHandler = 0;
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD0)
+		systemSetInt(INTB_AUD0, 0, 0);
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD1)
+		systemSetInt(INTB_AUD1, 0, 0);
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD2)
+		systemSetInt(INTB_AUD2, 0, 0);
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD3)
+		systemSetInt(INTB_AUD3, 0, 0);
+#endif
 }
 
 __attribute__((used))
-void mixerRemoveIrqVectorOrClearIrqBits(void) {
+void mixerSetIrqBits(void) {
 	register volatile ULONG reg_intena __asm("d0");
 	UWORD uwIntena = reg_intena;
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD0)
+	if(uwIntena & DMAF_AUD0) {
+		systemSetInt(INTB_AUD0, onChannelInterrupt, 0);
+	}
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD1)
+	if(uwIntena & INTF_AUD1) {
+		systemSetInt(INTB_AUD1, onChannelInterrupt, 0);
+	}
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD2)
+	if(uwIntena & INTF_AUD2) {
+		systemSetInt(INTB_AUD2, onChannelInterrupt, 0);
+	}
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD3)
+	if(uwIntena & INTF_AUD3) {
+		systemSetInt(INTB_AUD3, onChannelInterrupt, 0);
+	}
+#endif
+}
+
+__attribute__((used))
+void mixerClearIrqBits(void) {
+	register volatile ULONG reg_intena __asm("d0");
+	UWORD uwIntena = reg_intena;
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD0)
 	if(uwIntena & INTF_AUD0) {
 		systemSetInt(INTB_AUD0, 0, 0);
 	}
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD1)
 	if(uwIntena & INTF_AUD1) {
 		systemSetInt(INTB_AUD1, 0, 0);
 	}
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD2)
 	if(uwIntena & INTF_AUD2) {
 		systemSetInt(INTB_AUD2, 0, 0);
 	}
+#endif
+#if (CFG_MIXER_OUTPUT_CHANNELS & DMAF_AUD3)
 	if(uwIntena & INTF_AUD3) {
 		systemSetInt(INTB_AUD3, 0, 0);
 	}
+#endif
 }
 
 __attribute__((used))
@@ -80,9 +114,9 @@ void mixerSetDmaCon(void) {
 
 static MXIRQDMACallbacks s_sCallbacks = {
 	.mxicb_set_irq_vector = mixerSetIrqVector,
-	.mxicb_remove_irq_vector = mixerRemoveIrqVectorOrClearIrqBits,
+	.mxicb_remove_irq_vector = mixerRemoveIrqVector,
 	.mxicb_set_irq_bits = mixerSetIrqBits,
-	.mxicb_disable_irq = mixerRemoveIrqVectorOrClearIrqBits,
+	.mxicb_disable_irq = mixerClearIrqBits,
 	.mxicb_acknowledge_irq = mixerAcknowledgeIrq,
 	.mxicb_set_dmacon = mixerSetDmaCon,
 };

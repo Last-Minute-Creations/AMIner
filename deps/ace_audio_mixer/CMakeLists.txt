@@ -16,10 +16,4 @@ if(AUDIO_MIXER_68020)
 	target_compile_definitions(ace_audio_mixer PUBLIC MIXER_68020)
 endif()
 
-if(AUDIO_MIXER_HW_CHANNEL_MODE STREQUAL "SINGLE")
-	target_compile_definitions(ace_audio_mixer PUBLIC MIXER_SINGLE)
-elseif(AUDIO_MIXER_HW_CHANNEL_MODE STREQUAL "MULTI_PAIRED")
-	target_compile_definitions(ace_audio_mixer PUBLIC MIXER_MULTI_PAIRED)
-endif()
-
 target_sources(ace_audio_mixer INTERFACE ${MIXER_OBJ_FILE})
