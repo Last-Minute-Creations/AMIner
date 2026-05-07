@@ -114,7 +114,7 @@ static void logoGsLoop(void) {
 	tFadeState eState = fadeGetState();
 	if(eState == FADE_STATE_IN_MORPHING || eState == FADE_STATE_OUT_MORPHING) {
 		UBYTE ubLevel = fadeGetLevel();
-		paletteDim(s_pLogoPaletteRef, s_pVp->pPalette, 32, ubLevel);
+		paletteDimOcs(s_pLogoPaletteRef, s_pVp->pPalette, 32, ubLevel);
 		viewUpdateGlobalPalette(s_pView);
 		vPortWaitForEnd(s_pVp);
 	}

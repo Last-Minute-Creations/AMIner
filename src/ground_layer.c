@@ -81,7 +81,7 @@ static void groundLayerSetColorRegs(
 ) {
 	volatile UWORD *pColorRegs = &g_pCustom->color[LAYER_COLOR_START];
 	for(UBYTE i = 0; i < LAYER_COLOR_COUNT; ++i) {
-		pColorRegs[i] = paletteColorMix(pLayer->pColors[i], uwSecondaryColor, ubColorLevel);
+		pColorRegs[i] = paletteColorMixOcs(pLayer->pColors[i], uwSecondaryColor, ubColorLevel);
 	}
 }
 
@@ -115,7 +115,7 @@ static void layerCopyColorsToBlock(
 	for(UBYTE i = 0; i < LAYER_COLOR_COUNT; ++i) {
 		copMove(
 			s_pCopList, pBlock, &pColorRegs[i],
-			paletteColorDim(pLayer->pColors[i], ubColorLevel)
+			paletteColorDimOcs(pLayer->pColors[i], ubColorLevel)
 		);
 	}
 }

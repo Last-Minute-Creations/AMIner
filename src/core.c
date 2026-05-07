@@ -73,9 +73,9 @@ static const tProgressBarConfig s_sProgressBarConfig = {
 static void mainPaletteProcess(UBYTE ubFadeLevel) {
 	tFadeState eState = fadeGetState();
 	if(eState == FADE_STATE_IN_MORPHING || eState == FADE_STATE_OUT_MORPHING) {
-		*s_pColorBg = paletteColorMix(s_pPaletteRef[0], fadeGetSecondaryColor(), ubFadeLevel);
+		*s_pColorBg = paletteColorMixOcs(s_pPaletteRef[0], fadeGetSecondaryColor(), ubFadeLevel);
 		for(UBYTE i = 0; i < 27; ++i) {
-			g_pCustom->color[i] = paletteColorMix(s_pPaletteRef[i], fadeGetSecondaryColor(), ubFadeLevel);
+			g_pCustom->color[i] = paletteColorMixOcs(s_pPaletteRef[i], fadeGetSecondaryColor(), ubFadeLevel);
 		}
 	}
 }
@@ -102,7 +102,7 @@ static void coreVblankHandler(
 	UNUSED_ARG REGARG(volatile tCustom *pCustom, "a0"),
 	UNUSED_ARG REGARG(volatile void *pData, "a1")
 ) {
-	if(systemBlitterIsUsed() || !blitterMutexTryLock()) {
+	if(systemBlitterIsReleasedToOs() || !blitterMutexTryLock()) {
 		return;
 	}
 
@@ -280,7 +280,7 @@ static void coreGsCreate(void) {
 
 	// Load the view and draw the progress bar
 	paletteLoadFromFd(GET_SUBFILE_PREFIX("aminer.plt"), s_pPaletteRef, 1 << GAME_BPP);
-	memcpy(pVpHud->pPalette, s_pPaletteRef, sizeof(pVpHud->pPalette));
+	memcpy(pVpHud->pPalette, s_pPaletteRef, (1 << GAME_BPP) * sizeof(UWORD));
 	defsCreateLocale(languageGetPrefix());
 	commCreate(s_pPristineBuffer);
 	viewLoad(s_pView);
@@ -384,7 +384,7 @@ static void coreGsCreate(void) {
 
 	// Prepare for game display
 	g_pMainBuffer->pCamera->uPos.uwX = 32;
-	memset(pVpHud->pPalette, 0, sizeof(pVpHud->pPalette));
+	memset(pVpHud->pPalette, 0, (1 << GAME_BPP) * sizeof(UWORD));
 	s_pColorBg = &pVpHud->pPalette[0];
 	viewUpdateGlobalPalette(s_pView);
 
