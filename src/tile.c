@@ -738,12 +738,12 @@ void tileSave(tFile *pFile) {
 	UWORD uwSizeX = g_pMainBuffer->uTileBounds.uwX;
 	UWORD uwSizeY = g_pMainBuffer->uTileBounds.uwY;
 
-	fileWrite(pFile, &uwSizeX, sizeof(uwSizeX));
-	fileWrite(pFile, &uwSizeY, sizeof(uwSizeY));
+	fileWriteWords(pFile, &uwSizeX, 1);
+	fileWriteWords(pFile, &uwSizeY, 1);
 	for(UWORD uwX = 1; uwX < uwSizeX; ++uwX) {
-		fileWrite(pFile, &pTiles[uwX][0], sizeof(pTiles[0][0]) * uwSizeY);
+		fileWriteBytes(pFile, &pTiles[uwX][0], uwSizeY);
 	}
-	fileWrite(pFile, &s_ubPrisonerX, sizeof(s_ubPrisonerX));
+	fileWriteBytes(pFile, &s_ubPrisonerX, 1);
 	saveWriteTag(pFile, SAVE_TAG_TILE_END);
 }
 
@@ -755,15 +755,15 @@ UBYTE tileLoad(tFile *pFile) {
 	UBYTE **pTiles = g_pMainBuffer->pTileData;
 	UWORD uwSizeX, uwSizeY;
 
-	fileRead(pFile, &uwSizeX, sizeof(uwSizeX));
-	fileRead(pFile, &uwSizeY, sizeof(uwSizeY));
+	fileReadWords(pFile, &uwSizeX, 1);
+	fileReadWords(pFile, &uwSizeY, 1);
 	for(UWORD uwY = 0; uwY < uwSizeY; ++uwY) {
 		pTiles[0][uwY] = TILE_DIRT_1;
 	}
 	for(UWORD uwX = 1; uwX < uwSizeX; ++uwX) {
-		fileRead(pFile, &pTiles[uwX][0], sizeof(pTiles[0][0]) * uwSizeY);
+		fileReadBytes(pFile, &pTiles[uwX][0], uwSizeY);
 	}
-	fileRead(pFile, &s_ubPrisonerX, sizeof(s_ubPrisonerX));
+	fileReadBytes(pFile, &s_ubPrisonerX, 1);
 	return saveReadTag(pFile, SAVE_TAG_TILE_END);
 }
 

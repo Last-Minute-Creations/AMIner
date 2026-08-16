@@ -64,11 +64,11 @@ UBYTE questCrateGetCratesSold(void) {
 
 void questCrateSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_CRATE);
-	fileWrite(pFile, &s_ubCrateCount, sizeof(s_ubCrateCount));
-	fileWrite(pFile, &s_ubCratesSold, sizeof(s_ubCratesSold));
-	fileWrite(pFile, &s_isScientistUnlocked, sizeof(s_isScientistUnlocked));
-	fileWrite(pFile, &s_isFirstCrateFound, sizeof(s_isFirstCrateFound));
-	fileWrite(pFile, &s_eCapsuleState, sizeof(s_eCapsuleState));
+	fileWriteBytes(pFile, &s_ubCrateCount, 1);
+	fileWriteBytes(pFile, &s_ubCratesSold, 1);
+	fileWriteBytes(pFile, &s_isScientistUnlocked, 1);
+	fileWriteBytes(pFile, &s_isFirstCrateFound, 1);
+	fileWriteLongs(pFile, (ULONG*)&s_eCapsuleState, 1);
 	saveWriteTag(pFile, SAVE_TAG_CRATE_END);
 }
 
@@ -77,11 +77,11 @@ UBYTE questCrateLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_ubCrateCount, sizeof(s_ubCrateCount));
-	fileRead(pFile, &s_ubCratesSold, sizeof(s_ubCratesSold));
-	fileRead(pFile, &s_isScientistUnlocked, sizeof(s_isScientistUnlocked));
-	fileRead(pFile, &s_isFirstCrateFound, sizeof(s_isFirstCrateFound));
-	fileRead(pFile, &s_eCapsuleState, sizeof(s_eCapsuleState));
+	fileReadBytes(pFile, &s_ubCrateCount, 1);
+	fileReadBytes(pFile, &s_ubCratesSold, 1);
+	fileReadBytes(pFile, &s_isScientistUnlocked, 1);
+	fileReadBytes(pFile, &s_isFirstCrateFound, 1);
+	fileReadLongs(pFile, (ULONG*)&s_eCapsuleState, 1);
 
 	return saveReadTag(pFile, SAVE_TAG_CRATE_END);
 }

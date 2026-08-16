@@ -327,25 +327,27 @@ void hudReset(tGameMode eGameMode, UBYTE is2pPlaying) {
 
 void hudSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_HUD);
-	// fileWrite(pFile, &s_ubLineHeight, sizeof(s_ubLineHeight));
-	fileWrite(pFile, &s_isBitmapFilled, sizeof(s_isBitmapFilled));
-	fileWrite(pFile, s_pPlayerData, sizeof(s_pPlayerData));
-	fileWrite(pFile, &s_eState, sizeof(s_eState));
-	fileWrite(pFile, &s_ePlayer, sizeof(s_ePlayer));
-	fileWrite(pFile, &s_ubHudOffsY, sizeof(s_ubHudOffsY));
-	fileWrite(pFile, &s_eGameMode, sizeof(s_eGameMode));
-	fileWrite(pFile, &s_is2pPlaying, sizeof(s_is2pPlaying));
-	fileWrite(pFile, &s_uwFrameDelay, sizeof(s_uwFrameDelay));
-	fileWrite(pFile, &s_uwStateCounter, sizeof(s_uwStateCounter));
-	fileWrite(pFile, &s_ePageCurrent, sizeof(s_ePageCurrent));
-	fileWrite(pFile, &s_uwMsgLen, sizeof(s_uwMsgLen));
-	fileWrite(pFile, &s_sMsgCharPos, sizeof(s_sMsgCharPos));
-	fileWrite(pFile, &s_ubMsgCharIdx, sizeof(s_ubMsgCharIdx));
-	fileWrite(pFile, s_szMsg, sizeof(s_szMsg));
-	fileWrite(pFile, s_szLetter, sizeof(s_szLetter));
-	fileWrite(pFile, &s_eFaceToDraw, sizeof(s_eFaceToDraw));
-	// fileWrite(pFile, &s_ubSelection, sizeof(s_ubSelection));
-	// fileWrite(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
+
+	// fileWriteBytes(pFile, &s_ubLineHeight, 1);
+	fileWriteBytes(pFile, &s_isBitmapFilled, 1);
+	fileWriteBytes(pFile, (UBYTE*)s_pPlayerData, sizeof(s_pPlayerData)); // TODO: serialize properly
+	fileWriteLongs(pFile, (ULONG*)&s_eState, 1);
+	fileWriteLongs(pFile, (ULONG*)&s_ePlayer, 1);
+	fileWriteBytes(pFile, &s_ubHudOffsY, 1);
+	fileWriteLongs(pFile, (ULONG*)&s_eGameMode, 1);
+	fileWriteBytes(pFile, &s_is2pPlaying, 1);
+	fileWriteWords(pFile, &s_uwFrameDelay, 1);
+	fileWriteWords(pFile, &s_uwStateCounter, 1);
+	fileWriteLongs(pFile, (ULONG*)&s_ePageCurrent, 1);
+	fileWriteWords(pFile, &s_uwMsgLen, 1);
+	fileWriteLongs(pFile, &s_sMsgCharPos.ulYX, 1);
+	fileWriteBytes(pFile, &s_ubMsgCharIdx, 1);
+	fileWriteBytes(pFile, (UBYTE*)s_szMsg, sizeof(s_szMsg));
+	fileWriteBytes(pFile, (UBYTE*)s_szLetter, sizeof(s_szLetter));
+	fileWriteLongs(pFile, (ULONG*)&s_eFaceToDraw, 1);
+	// fileWriteBytes(pFile, &s_ubSelection, 1);
+	// fileWriteBytes(pFile, &s_ubSelectionPrev, 1);
+
 	saveWriteTag(pFile, SAVE_TAG_HUD_END);
 }
 
@@ -354,25 +356,25 @@ UBYTE hudLoad(tFile *pFile) {
 		return 0;
 	}
 
-	// fileRead(pFile, &s_ubLineHeight, sizeof(s_ubLineHeight));
-	fileRead(pFile, &s_isBitmapFilled, sizeof(s_isBitmapFilled));
-	fileRead(pFile, s_pPlayerData, sizeof(s_pPlayerData));
-	fileRead(pFile, &s_eState, sizeof(s_eState));
-	fileRead(pFile, &s_ePlayer, sizeof(s_ePlayer));
-	fileRead(pFile, &s_ubHudOffsY, sizeof(s_ubHudOffsY));
-	fileRead(pFile, &s_eGameMode, sizeof(s_eGameMode));
-	fileRead(pFile, &s_is2pPlaying, sizeof(s_is2pPlaying));
-	fileRead(pFile, &s_uwFrameDelay, sizeof(s_uwFrameDelay));
-	fileRead(pFile, &s_uwStateCounter, sizeof(s_uwStateCounter));
-	fileRead(pFile, &s_ePageCurrent, sizeof(s_ePageCurrent));
-	fileRead(pFile, &s_uwMsgLen, sizeof(s_uwMsgLen));
-	fileRead(pFile, &s_sMsgCharPos, sizeof(s_sMsgCharPos));
-	fileRead(pFile, &s_ubMsgCharIdx, sizeof(s_ubMsgCharIdx));
-	fileRead(pFile, s_szMsg, sizeof(s_szMsg));
-	fileRead(pFile, s_szLetter, sizeof(s_szLetter));
-	fileRead(pFile, &s_eFaceToDraw, sizeof(s_eFaceToDraw));
-	// fileRead(pFile, &s_ubSelection, sizeof(s_ubSelection));
-	// fileRead(pFile, &s_ubSelectionPrev, sizeof(s_ubSelectionPrev));
+	// fileReadBytes(pFile, &s_ubLineHeight, 1);
+	fileReadBytes(pFile, &s_isBitmapFilled, 1);
+	fileReadBytes(pFile, (UBYTE*)s_pPlayerData, sizeof(s_pPlayerData)); // TODO: serialize properly
+	fileReadLongs(pFile, (ULONG*)&s_eState, 1);
+	fileReadLongs(pFile, (ULONG*)&s_ePlayer, 1);
+	fileReadBytes(pFile, &s_ubHudOffsY, 1);
+	fileReadLongs(pFile, (ULONG*)&s_eGameMode, 1);
+	fileReadBytes(pFile, &s_is2pPlaying, 1);
+	fileReadWords(pFile, &s_uwFrameDelay, 1);
+	fileReadWords(pFile, &s_uwStateCounter, 1);
+	fileReadLongs(pFile, (ULONG*)&s_ePageCurrent, 1);
+	fileReadWords(pFile, &s_uwMsgLen, 1);
+	fileReadLongs(pFile, &s_sMsgCharPos.ulYX, 1);
+	fileReadBytes(pFile, &s_ubMsgCharIdx, 1);
+	fileReadBytes(pFile, (UBYTE*)s_szMsg, sizeof(s_szMsg));
+	fileReadBytes(pFile, (UBYTE*)s_szLetter, sizeof(s_szLetter));
+	fileReadLongs(pFile, (ULONG*)&s_eFaceToDraw, 1);
+	// fileReadBytes(pFile, &s_ubSelection, 1);
+	// fileReadBytes(pFile, &s_ubSelectionPrev, 1);
 
 	hudRefresh();
 	return saveReadTag(pFile, SAVE_TAG_HUD_END);

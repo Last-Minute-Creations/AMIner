@@ -34,7 +34,7 @@ void heatReset(void) {
 
 void heatSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_HEAT);
-	fileWrite(pFile, &s_ubHeat, sizeof(s_ubHeat));
+	fileWriteBytes(pFile, &s_ubHeat, 1);
 	saveWriteTag(pFile, SAVE_TAG_HEAT_END);
 }
 
@@ -43,7 +43,7 @@ UBYTE heatLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_ubHeat, sizeof(s_ubHeat));
+	fileReadBytes(pFile, &s_ubHeat, 1);
 	return saveReadTag(pFile, SAVE_TAG_HEAT_END);
 }
 

@@ -138,11 +138,11 @@ void pageQuestioningReset(void) {
 
 void pageQuestioningSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_QUESTIONING);
-	fileWrite(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
-	fileWrite(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
-	fileWrite(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
-	fileWrite(pFile, &s_uwLiesCount, sizeof(s_uwLiesCount));
-	fileWrite(pFile, &s_ubReportingAccoladeChance, sizeof(s_ubReportingAccoladeChance));
+	fileWriteLongs(pFile, (ULONG*)&s_eQuestioningsPending, 1);
+	fileWriteLongs(pFile, (ULONG*)&s_eQuestioningsReported, 1);
+	fileWriteLongs(pFile, (ULONG*)&s_eQuestioningsNotReported, 1);
+	fileWriteWords(pFile, &s_uwLiesCount, 1);
+	fileWriteBytes(pFile, &s_ubReportingAccoladeChance, 1);
 	saveWriteTag(pFile, SAVE_TAG_QUESTIONING_END);
 }
 
@@ -151,11 +151,11 @@ UBYTE pageQuestioningLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_eQuestioningsPending, sizeof(s_eQuestioningsPending));
-	fileRead(pFile, &s_eQuestioningsReported, sizeof(s_eQuestioningsReported));
-	fileRead(pFile, &s_eQuestioningsNotReported, sizeof(s_eQuestioningsNotReported));
-	fileRead(pFile, &s_uwLiesCount, sizeof(s_uwLiesCount));
-	fileRead(pFile, &s_ubReportingAccoladeChance, sizeof(s_ubReportingAccoladeChance));
+	fileReadLongs(pFile, (ULONG*)&s_eQuestioningsPending, 1);
+	fileReadLongs(pFile, (ULONG*)&s_eQuestioningsReported, 1);
+	fileReadLongs(pFile, (ULONG*)&s_eQuestioningsNotReported, 1);
+	fileReadWords(pFile, &s_uwLiesCount, 1);
+	fileReadBytes(pFile, &s_ubReportingAccoladeChance, 1);
 	return saveReadTag(pFile, SAVE_TAG_QUESTIONING_END);
 }
 

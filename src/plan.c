@@ -77,7 +77,7 @@ void planManagerInit(void) {
 
 void planManagerSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_PLAN);
-	fileWrite(pFile, &s_sPlanManager, sizeof(s_sPlanManager));
+	fileWriteBytes(pFile, (UBYTE*)&s_sPlanManager, sizeof(s_sPlanManager)); // TODO: serialize properly
 	saveWriteTag(pFile, SAVE_TAG_PLAN_END);
 }
 
@@ -86,7 +86,7 @@ UBYTE planManagerLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_sPlanManager, sizeof(s_sPlanManager));
+	fileReadBytes(pFile, (UBYTE*)&s_sPlanManager, sizeof(s_sPlanManager));
 	return saveReadTag(pFile, SAVE_TAG_PLAN_END);
 }
 

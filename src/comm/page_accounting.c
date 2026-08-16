@@ -98,8 +98,8 @@ void pageAccountingReset(void) {
 
 void pageAccountingSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_ACCOUNTING);
-	fileWrite(pFile, &s_uwAccountingStreak, sizeof(s_uwAccountingStreak));
-	fileWrite(pFile, &s_ubAccountingUses, sizeof(s_ubAccountingUses));
+	fileWriteWords(pFile, &s_uwAccountingStreak, 1);
+	fileWriteBytes(pFile, &s_ubAccountingUses, 1);
 	saveWriteTag(pFile, SAVE_TAG_ACCOUNTING_END);
 }
 
@@ -107,8 +107,8 @@ UBYTE pageAccountingLoad(tFile *pFile) {
 	if(!saveReadTag(pFile, SAVE_TAG_ACCOUNTING)) {
 		return 0;
 	}
-	fileRead(pFile, &s_uwAccountingStreak, sizeof(s_uwAccountingStreak));
-	fileRead(pFile, &s_ubAccountingUses, sizeof(s_ubAccountingUses));
+	fileReadWords(pFile, &s_uwAccountingStreak, 1);
+	fileReadBytes(pFile, &s_ubAccountingUses, 1);
 	return saveReadTag(pFile, SAVE_TAG_ACCOUNTING_END);
 }
 

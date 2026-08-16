@@ -1170,36 +1170,36 @@ static void gameSaveSummary(tFile *pFile) {
 		.uwMaxDepth = s_uwMaxTileY,
 	};
 
-	fileWrite(pFile, &sSummary.ulGameTime, sizeof(sSummary.ulGameTime));
-	fileWrite(pFile, &sSummary.lCash, sizeof(sSummary.lCash));
-	fileWrite(pFile, &sSummary.uwMaxDepth, sizeof(sSummary.uwMaxDepth));
-	fileWrite(pFile, &sSummary.ubRebukes, sizeof(sSummary.ubRebukes));
-	fileWrite(pFile, &sSummary.ubAccolades, sizeof(sSummary.ubAccolades));
-	fileWrite(pFile, &sSummary.ubHeatPercent, sizeof(sSummary.ubHeatPercent));
-	fileWrite(pFile, &sSummary.ubPlanIndex, sizeof(sSummary.ubPlanIndex));
+	fileWriteLongs(pFile, &sSummary.ulGameTime, 1);
+	fileWriteLongs(pFile, (ULONG*)&sSummary.lCash, 1);
+	fileWriteWords(pFile, &sSummary.uwMaxDepth, 1);
+	fileWriteBytes(pFile, &sSummary.ubRebukes, 1);
+	fileWriteBytes(pFile, &sSummary.ubAccolades, 1);
+	fileWriteBytes(pFile, &sSummary.ubHeatPercent, 1);
+	fileWriteBytes(pFile, &sSummary.ubPlanIndex, 1);
 	saveWriteTag(pFile, SAVE_TAG_SUMMARY_END);
 }
 
 static void gameSave(tFile *pFile) {
 	gameSaveSummary(pFile);
 	saveWriteTag(pFile, SAVE_TAG_GAME);
-	fileWrite(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
-	fileWrite(pFile, &g_eGameMode, sizeof(g_eGameMode));
-	fileWrite(pFile, &g_isAtari, sizeof(g_isAtari));
-	fileWrite(pFile, &g_isSokoUnlock, sizeof(g_isSokoUnlock));
+	fileWriteBytes(pFile, &g_is2pPlaying, 1);
+	fileWriteLongs(pFile, (ULONG*)&g_eGameMode, 1);
+	fileWriteBytes(pFile, &g_isAtari, 1);
+	fileWriteBytes(pFile, &g_isSokoUnlock, 1);
 
-	fileWrite(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
-	fileWrite(pFile, &s_eCameraType, sizeof(s_eCameraType));
-	fileWrite(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
+	fileWriteLongs(pFile, &s_sTeleportReturn.ulYX, 1);
+	fileWriteLongs(pFile, (ULONG*)&s_eCameraType, 1);
+	fileWriteBytes(pFile, &s_ubChallengeCamCnt, 1);
 
-	fileWrite(pFile, &s_ubRebukeCount, sizeof(s_ubRebukeCount));
-	fileWrite(pFile, s_pRebukes, sizeof(s_pRebukes));
-	fileWrite(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
-	fileWrite(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
-	fileWrite(pFile, &s_wLastReminder, sizeof(s_wLastReminder));
-	fileWrite(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
-	fileWrite(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
-	fileWrite(pFile, &s_uwMaxTileY, sizeof(s_uwMaxTileY));
+	fileWriteBytes(pFile, &s_ubRebukeCount, 1);
+	fileWriteBytes(pFile, s_pRebukes, ARRAY_SIZE(s_pRebukes));
+	fileWriteBytes(pFile, &s_ubAccolades, 1);
+	fileWriteBytes(pFile, &s_ubAccoladesFract, 1);
+	fileWriteWords(pFile, (UWORD*)&s_wLastReminder, 1);
+	fileWriteBytes(pFile, &s_ubCurrentMod, 1);
+	fileWriteLongs(pFile, &s_ulGameTime, 1);
+	fileWriteWords(pFile, &s_uwMaxTileY, 1);
 
 	inboxSave(pFile);
 	dinoSave(pFile);
@@ -1437,23 +1437,23 @@ UBYTE gameLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &g_is2pPlaying, sizeof(g_is2pPlaying));
-	fileRead(pFile, &g_eGameMode, sizeof(g_eGameMode));
-	fileRead(pFile, &g_isAtari, sizeof(g_isAtari));
-	fileRead(pFile, &g_isSokoUnlock, sizeof(g_isSokoUnlock));
+	fileReadBytes(pFile, &g_is2pPlaying, 1);
+	fileReadLongs(pFile, (ULONG*)&g_eGameMode, 1);
+	fileReadBytes(pFile, &g_isAtari, 1);
+	fileReadBytes(pFile, &g_isSokoUnlock, 1);
 
-	fileRead(pFile, &s_sTeleportReturn.ulYX, sizeof(s_sTeleportReturn.ulYX));
-	fileRead(pFile, &s_eCameraType, sizeof(s_eCameraType));
-	fileRead(pFile, &s_ubChallengeCamCnt, sizeof(s_ubChallengeCamCnt));
+	fileReadLongs(pFile, &s_sTeleportReturn.ulYX, 1);
+	fileReadLongs(pFile, (ULONG*)&s_eCameraType, 1);
+	fileReadBytes(pFile, &s_ubChallengeCamCnt, 1);
 
-	fileRead(pFile, &s_ubRebukeCount, sizeof(s_ubRebukeCount));
-	fileRead(pFile, s_pRebukes, sizeof(s_pRebukes));
-	fileRead(pFile, &s_ubAccolades, sizeof(s_ubAccolades));
-	fileRead(pFile, &s_ubAccoladesFract, sizeof(s_ubAccoladesFract));
-	fileRead(pFile, &s_wLastReminder, sizeof(s_wLastReminder));
-	fileRead(pFile, &s_ubCurrentMod, sizeof(s_ubCurrentMod));
-	fileRead(pFile, &s_ulGameTime, sizeof(s_ulGameTime));
-	fileRead(pFile, &s_uwMaxTileY, sizeof(s_uwMaxTileY));
+	fileReadBytes(pFile, &s_ubRebukeCount, 1);
+	fileReadBytes(pFile, s_pRebukes, ARRAY_SIZE(s_pRebukes));
+	fileReadBytes(pFile, &s_ubAccolades, 1);
+	fileReadBytes(pFile, &s_ubAccoladesFract, 1);
+	fileReadWords(pFile, (UWORD*)&s_wLastReminder, 1);
+	fileReadBytes(pFile, &s_ubCurrentMod, 1);
+	fileReadLongs(pFile, &s_ulGameTime, 1);
+	fileReadWords(pFile, &s_uwMaxTileY, 1);
 
 	UBYTE isSuccess = (
 		inboxLoad(pFile) &&
@@ -1487,13 +1487,13 @@ UBYTE gameLoadSummary(tFile *pFile, tGameSummary *pSummary) {
 		return 0;
 	}
 
-	fileRead(pFile, &pSummary->ulGameTime, sizeof(pSummary->ulGameTime));
-	fileRead(pFile, &pSummary->lCash, sizeof(pSummary->lCash));
-	fileRead(pFile, &pSummary->uwMaxDepth, sizeof(pSummary->uwMaxDepth));
-	fileRead(pFile, &pSummary->ubRebukes, sizeof(pSummary->ubRebukes));
-	fileRead(pFile, &pSummary->ubAccolades, sizeof(pSummary->ubAccolades));
-	fileRead(pFile, &pSummary->ubHeatPercent, sizeof(pSummary->ubHeatPercent));
-	fileRead(pFile, &pSummary->ubPlanIndex, sizeof(pSummary->ubPlanIndex));
+	fileReadLongs(pFile, &pSummary->ulGameTime, 1);
+	fileReadLongs(pFile, (ULONG*)&pSummary->lCash, 1);
+	fileReadWords(pFile, &pSummary->uwMaxDepth, 1);
+	fileReadBytes(pFile, &pSummary->ubRebukes, 1);
+	fileReadBytes(pFile, &pSummary->ubAccolades, 1);
+	fileReadBytes(pFile, &pSummary->ubHeatPercent, 1);
+	fileReadBytes(pFile, &pSummary->ubPlanIndex, 1);
 	return saveReadTag(pFile, SAVE_TAG_SUMMARY_END);
 }
 

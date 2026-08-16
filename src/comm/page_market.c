@@ -241,7 +241,7 @@ void pageMarketReset(void) {
 
 void pageMarketSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_MARKET);
-	fileWrite(pFile, &s_uwResourcesTraded, sizeof(s_uwResourcesTraded));
+	fileWriteWords(pFile, &s_uwResourcesTraded, 1);
 	saveWriteTag(pFile, SAVE_TAG_MARKET_END);
 }
 
@@ -249,7 +249,7 @@ UBYTE pageMarketLoad(tFile *pFile) {
 	if(!saveReadTag(pFile, SAVE_TAG_MARKET)) {
 		return 0;
 	}
-	fileRead(pFile, &s_uwResourcesTraded, sizeof(s_uwResourcesTraded));
+	fileReadWords(pFile, &s_uwResourcesTraded, 1);
 	return saveReadTag(pFile, SAVE_TAG_MARKET_END);
 }
 

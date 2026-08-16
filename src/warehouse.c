@@ -24,7 +24,7 @@ void warehouseReset(void) {
 
 void warehouseSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_WAREHOUSE);
-	fileWrite(pFile, s_pStock, sizeof(s_pStock[0]) * MINERAL_TYPE_COUNT);
+	fileWriteWords(pFile, s_pStock, MINERAL_TYPE_COUNT);
 	planManagerSave(pFile);
 	saveWriteTag(pFile, SAVE_TAG_WAREHOUSE_END);
 }
@@ -34,7 +34,7 @@ UBYTE warehouseLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, s_pStock, sizeof(s_pStock[0]) * MINERAL_TYPE_COUNT);
+	fileReadWords(pFile, s_pStock, MINERAL_TYPE_COUNT);
 	return planManagerLoad(pFile) &&
 		saveReadTag(pFile, SAVE_TAG_WAREHOUSE_END);
 }

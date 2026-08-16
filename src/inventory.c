@@ -37,7 +37,7 @@ void inventoryReset(void) {
 
 void inventorySave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_INVENTORY);
-	fileWrite(pFile, &s_sInventory, sizeof(s_sInventory));
+	fileWriteBytes(pFile, (UBYTE*)&s_sInventory, sizeof(s_sInventory)); // TODO: serialize properly
 	saveWriteTag(pFile, SAVE_TAG_INVENTORY_END);
 }
 
@@ -46,7 +46,7 @@ UBYTE inventoryLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_sInventory, sizeof(s_sInventory));
+	fileReadBytes(pFile, (UBYTE*)&s_sInventory, sizeof(s_sInventory));
 	return saveReadTag(pFile, SAVE_TAG_INVENTORY_END);
 }
 

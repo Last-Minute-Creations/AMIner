@@ -203,10 +203,10 @@ void pageOfficeReset(void) {
 
 void pageOfficeSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_OFFICE);
-	fileWrite(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
-	fileWrite(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
-	fileWrite(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
-	fileWrite(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
+	fileWriteLongs(pFile, (ULONG*)s_pActivePpl, FACE_ID_COUNT);
+	fileWriteLongs(pFile, (ULONG*)s_pOfficePages, FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
+	fileWriteBytes(pFile, (UBYTE*)&s_bSelectionCurr, 1);
+	fileWriteBytes(pFile, &s_ubUnlockedPplCount, 1);
 	pageBribeSave(pFile);
 	pageAccountingSave(pFile);
 	pageQuestioningSave(pFile);
@@ -219,10 +219,10 @@ UBYTE pageOfficeLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, s_pActivePpl, sizeof(s_pActivePpl[0]) * FACE_ID_COUNT);
-	fileRead(pFile, s_pOfficePages, sizeof(s_pOfficePages[0][0]) * FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
-	fileRead(pFile, &s_bSelectionCurr, sizeof(s_bSelectionCurr));
-	fileRead(pFile, &s_ubUnlockedPplCount, sizeof(s_ubUnlockedPplCount));
+	fileReadLongs(pFile, (ULONG*)s_pActivePpl, FACE_ID_COUNT);
+	fileReadLongs(pFile, (ULONG*)s_pOfficePages, FACE_ID_COUNT * PAGE_OFFICE_SUBPAGES_PER_PERSON);
+	fileReadBytes(pFile, (UBYTE*)&s_bSelectionCurr, 1);
+	fileReadBytes(pFile, &s_ubUnlockedPplCount, 1);
 	return pageBribeLoad(pFile) &&
 		pageAccountingLoad(pFile) &&
 		pageQuestioningLoad(pFile) &&

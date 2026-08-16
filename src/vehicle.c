@@ -367,7 +367,7 @@ static void vehicleHullRepair(tVehicle *pVehicle, UWORD uwNewValue) {
 
 void vehicleRespawn(tVehicle *pVehicle) {
 	pVehicle->eDrillMode = MODE_OPTION_DRILL;
-	pVehicle->uwCargoCurr = 0;
+	pVehicle->ubCargoCurr = 0;
 	pVehicle->uwCargoScore = 0;
 	pVehicle->uwDrillCurr = inventoryGetPartDef(INVENTORY_PART_DRILL)->uwMax;
 	vehicleHullRepair(pVehicle, inventoryGetPartDef(INVENTORY_PART_HULL)->uwMax);
@@ -391,7 +391,8 @@ void vehicleReset(tVehicle *pVehicle) {
 
 void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_VEHICLE);
-	fileWrite(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
+
+	fileWriteBytes(pFile, (UBYTE*)&pVehicle->sSteer, sizeof(pVehicle->sSteer));
 	// textBobSave(&pVehicle->sTextBob, pFile);
 	// bobSave(&pVehicle->sBobBody, pFile);
 	// bobSave(&pVehicle->sBobTrack, pFile);
@@ -399,46 +400,47 @@ void vehicleSave(tVehicle *pVehicle, tFile *pFile) {
 	// bobSave(&pVehicle->sBobTool, pFile);
 	// bobSave(&pVehicle->sBobWreck, pFile);
 	// bobSave(&pVehicle->sBobSmoke, pFile);
-	fileWrite(pFile, &pVehicle->fX, sizeof(pVehicle->fX));
-	fileWrite(pFile, &pVehicle->fY, sizeof(pVehicle->fY));
-	fileWrite(pFile, &pVehicle->fDx, sizeof(pVehicle->fDx));
-	fileWrite(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
-	fileWrite(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
-	fileWrite(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
-	// fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
-	// fileWrite(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
-	fileWrite(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
-	fileWrite(pFile, &pVehicle->isJetting, sizeof(pVehicle->isJetting));
-	fileWrite(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
-	fileWrite(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
-	fileWrite(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
-	fileWrite(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
-	// fileWrite(pFile, &pVehicle->eDrillMode, sizeof(pVehicle->eDrillMode));
-	fileWrite(pFile, &pVehicle->eLastVisitedTeleportableBase, sizeof(pVehicle->eLastVisitedTeleportableBase));
-	fileWrite(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
-	fileWrite(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
-	fileWrite(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
-	fileWrite(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
-	fileWrite(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
-	fileWrite(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
-	fileWrite(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
-	// fileWrite(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
-	fileWrite(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
-	fileWrite(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
-	fileWrite(pFile, &pVehicle->eTeleportKind, sizeof(pVehicle->eTeleportKind));
-	fileWrite(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
-	fileWrite(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
-	// fileWrite(pFile, &pVehicle->eTeleportInFlipbook, sizeof(pVehicle->eTeleportInFlipbook));
-	fileWrite(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
-	fileWrite(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
-	fileWrite(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
-	fileWrite(pFile, &pVehicle->lCash, sizeof(pVehicle->lCash));
-	fileWrite(pFile, &pVehicle->uwDrillCurr, sizeof(pVehicle->uwDrillCurr));
-	fileWrite(pFile, &pVehicle->wHullCurr, sizeof(pVehicle->wHullCurr));
-	fileWrite(pFile, &pVehicle->ubPlayerIdx, sizeof(pVehicle->ubPlayerIdx));
-	fileWrite(pFile, &pVehicle->ubHullDamageFrame, sizeof(pVehicle->ubHullDamageFrame));
-	fileWrite(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
-	fileWrite(pFile, &pVehicle->ubDamageBlinkCooldown, sizeof(pVehicle->ubDamageBlinkCooldown));
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->fX, 1);
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->fY, 1);
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->fDx, 1);
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->fDy, 1);
+	fileWriteBytes(pFile, &pVehicle->ubVehicleState, 1);
+	fileWriteBytes(pFile, &pVehicle->isFacingRight, 1);
+	// fileWriteBytes(pFile, &pVehicle->ubTrackFrame, 1);
+	// fileWriteLongs(pFile, (ULONG*)&pVehicle->fTrackAnimCnt, 1);
+	fileWriteBytes(pFile, &pVehicle->ubBodyShakeCnt, 1);
+	fileWriteBytes(pFile, &pVehicle->isJetting, 1);
+	fileWriteBytes(pFile, &pVehicle->ubJetShowFrame, 1);
+	fileWriteBytes(pFile, &pVehicle->ubJetAnimFrame, 1);
+	fileWriteBytes(pFile, &pVehicle->ubJetAnimCnt, 1);
+	fileWriteBytes(pFile, &pVehicle->ubToolAnimCnt, 1);
+	// fileWriteLongs(pFile, (ULONG*)&pVehicle->eDrillMode, 1);
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->eLastVisitedTeleportableBase, 1);
+	fileWriteBytes(pFile, (UBYTE*)&pVehicle->ubDrillDir, 1);
+	fileWriteBytes(pFile, (UBYTE*)&pVehicle->ubDrillVAnimCnt, 1);
+	fileWriteBytes(pFile, (UBYTE*)&pVehicle->ubDrillState, 1);
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->fDrillDestX, 1);
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->fDrillDestY, 1);
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->fDrillDelta, 1);
+	fileWriteLongs(pFile, &pVehicle->sDrillTile.ulYX, 1);
+	// fileWriteBytes(pFile, &pVehicle->ubTrackFrame, 1);
+	fileWriteBytes(pFile, &pVehicle->ubSmokeAnimFrame, 1);
+	fileWriteBytes(pFile, &pVehicle->ubSmokeAnimCnt, 1);
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->eTeleportKind, 1);
+	fileWriteWords(pFile, &pVehicle->uwTeleportX, 1);
+	fileWriteWords(pFile, &pVehicle->uwTeleportY, 1);
+	// fileWriteLongs(pFile, &pVehicle->eTeleportInFlipbook, 1);
+	fileWriteBytes(pFile, &pVehicle->ubCargoCurr, 1);
+	fileWriteWords(pFile, &pVehicle->uwCargoScore, 1);
+	fileWriteWords(pFile, pVehicle->pStock, ARRAY_SIZE(pVehicle->pStock));
+	fileWriteLongs(pFile, (ULONG*)&pVehicle->lCash, 1);
+	fileWriteWords(pFile, &pVehicle->uwDrillCurr, 1);
+	fileWriteWords(pFile, &pVehicle->wHullCurr, 1);
+	fileWriteBytes(pFile, &pVehicle->ubPlayerIdx, 1);
+	fileWriteBytes(pFile, &pVehicle->ubHullDamageFrame, 1);
+	fileWriteBytes(pFile, (UBYTE*)&pVehicle->sDynamite, sizeof(pVehicle->sDynamite)); // TODO: serialize properly
+	fileWriteBytes(pFile, &pVehicle->ubDamageBlinkCooldown, 1);
+
 	saveWriteTag(pFile, SAVE_TAG_VEHICLE_END);
 }
 
@@ -447,7 +449,7 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &pVehicle->sSteer, sizeof(pVehicle->sSteer));
+	fileReadBytes(pFile, (UBYTE*)&pVehicle->sSteer, sizeof(pVehicle->sSteer));
 	// textBobLoad(&pVehicle->sTextBob, pFile);
 	// bobLoad(&pVehicle->sBobBody, pFile);
 	// bobLoad(&pVehicle->sBobTrack, pFile);
@@ -455,46 +457,47 @@ UBYTE vehicleLoad(tVehicle *pVehicle, tFile *pFile) {
 	// bobLoad(&pVehicle->sBobTool, pFile);
 	// bobLoad(&pVehicle->sBobWreck, pFile);
 	// bobLoad(&pVehicle->sBobSmoke, pFile);
-	fileRead(pFile, &pVehicle->fX, sizeof(pVehicle->fX));
-	fileRead(pFile, &pVehicle->fY, sizeof(pVehicle->fY));
-	fileRead(pFile, &pVehicle->fDx, sizeof(pVehicle->fDx));
-	fileRead(pFile, &pVehicle->fDy, sizeof(pVehicle->fDy));
-	fileRead(pFile, &pVehicle->ubVehicleState, sizeof(pVehicle->ubVehicleState));
-	fileRead(pFile, &pVehicle->isFacingRight, sizeof(pVehicle->isFacingRight));
-	// fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
-	// fileRead(pFile, &pVehicle->fTrackAnimCnt, sizeof(pVehicle->fTrackAnimCnt));
-	fileRead(pFile, &pVehicle->ubBodyShakeCnt, sizeof(pVehicle->ubBodyShakeCnt));
-	fileRead(pFile, &pVehicle->isJetting, sizeof(pVehicle->isJetting));
-	fileRead(pFile, &pVehicle->ubJetShowFrame, sizeof(pVehicle->ubJetShowFrame));
-	fileRead(pFile, &pVehicle->ubJetAnimFrame, sizeof(pVehicle->ubJetAnimFrame));
-	fileRead(pFile, &pVehicle->ubJetAnimCnt, sizeof(pVehicle->ubJetAnimCnt));
-	fileRead(pFile, &pVehicle->ubToolAnimCnt, sizeof(pVehicle->ubToolAnimCnt));
-	// fileRead(pFile, &pVehicle->eDrillMode, sizeof(pVehicle->eDrillMode));
-	fileRead(pFile, &pVehicle->eLastVisitedTeleportableBase, sizeof(pVehicle->eLastVisitedTeleportableBase));
-	fileRead(pFile, &pVehicle->ubDrillDir, sizeof(pVehicle->ubDrillDir));
-	fileRead(pFile, &pVehicle->ubDrillVAnimCnt, sizeof(pVehicle->ubDrillVAnimCnt));
-	fileRead(pFile, &pVehicle->ubDrillState, sizeof(pVehicle->ubDrillState));
-	fileRead(pFile, &pVehicle->fDrillDestX, sizeof(pVehicle->fDrillDestX));
-	fileRead(pFile, &pVehicle->fDrillDestY, sizeof(pVehicle->fDrillDestY));
-	fileRead(pFile, &pVehicle->fDrillDelta, sizeof(pVehicle->fDrillDelta));
-	fileRead(pFile, &pVehicle->sDrillTile, sizeof(pVehicle->sDrillTile));
-	// fileRead(pFile, &pVehicle->ubTrackFrame, sizeof(pVehicle->ubTrackFrame));
-	fileRead(pFile, &pVehicle->ubSmokeAnimFrame, sizeof(pVehicle->ubSmokeAnimFrame));
-	fileRead(pFile, &pVehicle->ubSmokeAnimCnt, sizeof(pVehicle->ubSmokeAnimCnt));
-	fileRead(pFile, &pVehicle->eTeleportKind, sizeof(pVehicle->eTeleportKind));
-	fileRead(pFile, &pVehicle->uwTeleportX, sizeof(pVehicle->uwTeleportX));
-	fileRead(pFile, &pVehicle->uwTeleportY, sizeof(pVehicle->uwTeleportY));
-	// fileRead(pFile, &pVehicle->eTeleportInFlipbook, sizeof(pVehicle->eTeleportInFlipbook));
-	fileRead(pFile, &pVehicle->uwCargoCurr, sizeof(pVehicle->uwCargoCurr));
-	fileRead(pFile, &pVehicle->uwCargoScore, sizeof(pVehicle->uwCargoScore));
-	fileRead(pFile, pVehicle->pStock, sizeof(pVehicle->pStock));
-	fileRead(pFile, &pVehicle->lCash, sizeof(pVehicle->lCash));
-	fileRead(pFile, &pVehicle->uwDrillCurr, sizeof(pVehicle->uwDrillCurr));
-	fileRead(pFile, &pVehicle->wHullCurr, sizeof(pVehicle->wHullCurr));
-	fileRead(pFile, &pVehicle->ubPlayerIdx, sizeof(pVehicle->ubPlayerIdx));
-	fileRead(pFile, &pVehicle->ubHullDamageFrame, sizeof(pVehicle->ubHullDamageFrame));
-	fileRead(pFile, &pVehicle->sDynamite, sizeof(pVehicle->sDynamite));
-	fileRead(pFile, &pVehicle->ubDamageBlinkCooldown, sizeof(pVehicle->ubDamageBlinkCooldown));
+	fileReadLongs(pFile, (ULONG*)&pVehicle->fX, 1);
+	fileReadLongs(pFile, (ULONG*)&pVehicle->fY, 1);
+	fileReadLongs(pFile, (ULONG*)&pVehicle->fDx, 1);
+	fileReadLongs(pFile, (ULONG*)&pVehicle->fDy, 1);
+	fileReadBytes(pFile, &pVehicle->ubVehicleState, 1);
+	fileReadBytes(pFile, &pVehicle->isFacingRight, 1);
+	// fileReadBytes(pFile, &pVehicle->ubTrackFrame, 1);
+	// fileReadLongs(pFile, (ULONG*)&pVehicle->fTrackAnimCnt, 1);
+	fileReadBytes(pFile, &pVehicle->ubBodyShakeCnt, 1);
+	fileReadBytes(pFile, &pVehicle->isJetting, 1);
+	fileReadBytes(pFile, &pVehicle->ubJetShowFrame, 1);
+	fileReadBytes(pFile, &pVehicle->ubJetAnimFrame, 1);
+	fileReadBytes(pFile, &pVehicle->ubJetAnimCnt, 1);
+	fileReadBytes(pFile, &pVehicle->ubToolAnimCnt, 1);
+	// fileReadLongs(pFile, (ULONG*)&pVehicle->eDrillMode, 1);
+	fileReadLongs(pFile, (ULONG*)&pVehicle->eLastVisitedTeleportableBase, 1);
+	fileReadBytes(pFile, (UBYTE*)&pVehicle->ubDrillDir, 1);
+	fileReadBytes(pFile, (UBYTE*)&pVehicle->ubDrillVAnimCnt, 1);
+	fileReadBytes(pFile, (UBYTE*)&pVehicle->ubDrillState, 1);
+	fileReadLongs(pFile, (ULONG*)&pVehicle->fDrillDestX, 1);
+	fileReadLongs(pFile, (ULONG*)&pVehicle->fDrillDestY, 1);
+	fileReadLongs(pFile, (ULONG*)&pVehicle->fDrillDelta, 1);
+	fileReadLongs(pFile, &pVehicle->sDrillTile.ulYX, 1);
+	// fileReadBytes(pFile, &pVehicle->ubTrackFrame, 1);
+	fileReadBytes(pFile, &pVehicle->ubSmokeAnimFrame, 1);
+	fileReadBytes(pFile, &pVehicle->ubSmokeAnimCnt, 1);
+	fileReadLongs(pFile, (ULONG*)&pVehicle->eTeleportKind, 1);
+	fileReadWords(pFile, &pVehicle->uwTeleportX, 1);
+	fileReadWords(pFile, &pVehicle->uwTeleportY, 1);
+	// fileReadLongs(pFile, &pVehicle->eTeleportInFlipbook, 1);
+	fileReadBytes(pFile, &pVehicle->ubCargoCurr, 1);
+	fileReadWords(pFile, &pVehicle->uwCargoScore, 1);
+	fileReadWords(pFile, pVehicle->pStock, ARRAY_SIZE(pVehicle->pStock));
+	fileReadLongs(pFile, (ULONG*)&pVehicle->lCash, 1);
+	fileReadWords(pFile, &pVehicle->uwDrillCurr, 1);
+	fileReadWords(pFile, &pVehicle->wHullCurr, 1);
+	fileReadBytes(pFile, &pVehicle->ubPlayerIdx, 1);
+	fileReadBytes(pFile, &pVehicle->ubHullDamageFrame, 1);
+	fileReadBytes(pFile, (UBYTE*)&pVehicle->sDynamite, sizeof(pVehicle->sDynamite)); // TODO: serialize properly
+	fileReadBytes(pFile, &pVehicle->ubDamageBlinkCooldown, 1);
+
 	return saveReadTag(pFile, SAVE_TAG_VEHICLE_END);
 }
 
@@ -701,9 +704,9 @@ static WORD vehicleRestock(tVehicle *pVehicle) {
 		g_eGameMode == GAME_MODE_CHALLENGE || eBaseId == BASE_ID_GROUND ||
 		inventoryGetBasePartLevel(INVENTORY_PART_BASE_PLATFORM, eBaseId)
 	) {
-		if(pVehicle->uwCargoCurr) {
+		if(pVehicle->ubCargoCurr) {
 			isRestockedMinerals = 1;
-			pVehicle->uwCargoCurr = 0;
+			pVehicle->ubCargoCurr = 0;
 		}
 		UWORD uwCargoMax = inventoryGetPartDef(INVENTORY_PART_CARGO)->uwMax;
 		hudSetCargo(pVehicle->ubPlayerIdx, 0, uwCargoMax);
@@ -784,13 +787,13 @@ void vehicleExcavateTile(tVehicle *pVehicle, UWORD uwTileX, UWORD uwTileY) {
 		UBYTE ubMineralType = g_pTileDefs[ubTile].ubMineral;
 		const tMineralDef *pMineral = &g_pMinerals[ubMineralType];
 		UBYTE ubSlots = g_pTileDefs[ubTile].ubSlots;
-		ubSlots = MIN(ubSlots, uwCargoMax - pVehicle->uwCargoCurr);
+		ubSlots = MIN(ubSlots, uwCargoMax - pVehicle->ubCargoCurr);
 		pVehicle->uwCargoScore += pMineral->ubReward * ubSlots;
-		pVehicle->uwCargoCurr += ubSlots;
+		pVehicle->ubCargoCurr += ubSlots;
 		pVehicle->pStock[ubMineralType] += ubSlots;
 
-		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->uwCargoCurr, uwCargoMax);
-		if(pVehicle->uwCargoCurr == uwCargoMax) {
+		hudSetCargo(pVehicle->ubPlayerIdx, pVehicle->ubCargoCurr, uwCargoMax);
+		if(pVehicle->ubCargoCurr == uwCargoMax) {
 			textBobSetText(&pVehicle->sTextBob, COLOR_REDEST, g_pMsgs[MSG_MISC_CARGO_FULL]);
 			ePickupKind = PICKUP_SFX_KIND_PENALTY;
 		}

@@ -31,14 +31,14 @@ static char **stringArrayCreate(UWORD uwCount) {
 
 char **stringArrayCreateFromFd(tFile *pFile) {
 	UWORD uwCount;
-	fileRead(pFile, &uwCount, sizeof(uwCount));
+	fileReadWords(pFile, &uwCount, 1);
 
 	char **pArray = stringArrayCreate(uwCount);
 	for(UWORD i = 0; i < uwCount; ++i) {
 		UBYTE ubStringLength;
-		fileRead(pFile, &ubStringLength, sizeof(ubStringLength));
+		fileReadBytes(pFile, &ubStringLength, 1);
 		pArray[i] = memAllocFast(ubStringLength + 1);
-		fileRead(pFile, pArray[i], ubStringLength);
+		fileReadBytes(pFile, (UBYTE*)pArray[i], ubStringLength);
 		pArray[i][ubStringLength] = '\0';
 	}
 	fileClose(pFile);

@@ -69,7 +69,8 @@ void hiScoreLoad(void) {
 		tFile *pFile = diskFileOpen("scores.dat", DISK_FILE_MODE_READ, 0);
 		for(UBYTE ubMode = 0; ubMode < SCORE_MODE_COUNT; ++ubMode) {
 			for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-				fileRead(pFile, &s_pScores[ubMode][i], sizeof(s_pScores[ubMode][i]));
+				fileReadLongs(pFile, (ULONG*)&s_pScores[ubMode][i].lScore, 1);
+				fileReadBytes(pFile, (UBYTE*)&s_pScores[ubMode][i].szName, sizeof(s_pScores[ubMode][i].szName));
 			}
 		}
 		fileClose(pFile);
@@ -87,7 +88,8 @@ static void hiScoreSave(void) {
 	if(pFile) {
 		for(UBYTE ubMode = 0; ubMode < SCORE_MODE_COUNT; ++ubMode) {
 			for(UBYTE i = 0; i < SCORE_COUNT; ++i) {
-				fileWrite(pFile, &s_pScores[ubMode][i], sizeof(s_pScores[ubMode][i]));
+				fileWriteLongs(pFile, (ULONG*)&s_pScores[ubMode][i].lScore, 1);
+				fileWriteBytes(pFile, (UBYTE*)&s_pScores[ubMode][i].szName, sizeof(s_pScores[ubMode][i].szName));
 			}
 		}
 		fileClose(pFile);

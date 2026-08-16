@@ -7,7 +7,7 @@
 #include <ace/managers/log.h>
 
 void saveTagGet(tFile *pFile, char *szTagRead) {
-	fileRead(pFile, szTagRead, sizeof(SAVE_TAG_ACCOUNTING) - 1);
+	fileReadBytes(pFile, (UBYTE*)szTagRead, sizeof(SAVE_TAG_ACCOUNTING) - 1);
 	szTagRead[sizeof(SAVE_TAG_ACCOUNTING) - 1] = '\0';
 }
 
@@ -24,10 +24,10 @@ UBYTE saveTagIs(const char *szTagRead, const char *szTagRef) {
 
 UBYTE saveReadTag(tFile *pFile, const char *szTag) {
 	char szTagRead[5] = {'\0'};
-	fileRead(pFile, szTagRead, sizeof(szTagRead) - 1);
+	fileReadBytes(pFile, (UBYTE*)szTagRead, sizeof(szTagRead) - 1);
 	return saveTagIs(szTagRead, szTag);
 }
 
 void saveWriteTag(tFile *pFile, const char *szTag) {
-	fileWrite(pFile, szTag, strlen(szTag));
+	fileWriteStr(pFile, szTag);
 }

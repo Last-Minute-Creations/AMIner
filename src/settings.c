@@ -14,12 +14,12 @@ tSettings g_sSettings;
 
 static void settingsSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_SETTINGS_V2);
-	fileWrite(pFile, &g_sSettings.ubSoundVolume, sizeof(g_sSettings.ubSoundVolume));
-	fileWrite(pFile, &g_sSettings.ubMusicVolume, sizeof(g_sSettings.ubMusicVolume));
-	fileWrite(pFile, &g_sSettings.ubSteer1p, sizeof(g_sSettings.ubSteer1p));
-	fileWrite(pFile, &g_sSettings.ubSteer2p, sizeof(g_sSettings.ubSteer2p));
-	fileWrite(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
-	fileWrite(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
+	fileWriteBytes(pFile, &g_sSettings.ubSoundVolume, 1);
+	fileWriteBytes(pFile, &g_sSettings.ubMusicVolume, 1);
+	fileWriteBytes(pFile, &g_sSettings.ubSteer1p, 1);
+	fileWriteBytes(pFile, &g_sSettings.ubSteer2p, 1);
+	fileWriteBytes(pFile, &g_sSettings.isAtariHidden, 1);
+	fileWriteLongs(pFile, &g_sSettings.ulAchievementsUnlocked, 1);
 	saveWriteTag(pFile, SAVE_TAG_SETTINGS_END);
 }
 
@@ -37,12 +37,12 @@ static UBYTE settingsLoad(tFile*pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &g_sSettings.ubSoundVolume, sizeof(g_sSettings.ubSoundVolume));
-	fileRead(pFile, &g_sSettings.ubMusicVolume, sizeof(g_sSettings.ubMusicVolume));
-	fileRead(pFile, &g_sSettings.ubSteer1p, sizeof(g_sSettings.ubSteer1p));
-	fileRead(pFile, &g_sSettings.ubSteer2p, sizeof(g_sSettings.ubSteer2p));
-	fileRead(pFile, &g_sSettings.isAtariHidden, sizeof(g_sSettings.isAtariHidden));
-	fileRead(pFile, &g_sSettings.ulAchievementsUnlocked, sizeof(g_sSettings.ulAchievementsUnlocked));
+	fileReadBytes(pFile, &g_sSettings.ubSoundVolume, 1);
+	fileReadBytes(pFile, &g_sSettings.ubMusicVolume, 1);
+	fileReadBytes(pFile, &g_sSettings.ubSteer1p, 1);
+	fileReadBytes(pFile, &g_sSettings.ubSteer2p, 1);
+	fileReadBytes(pFile, &g_sSettings.isAtariHidden, 1);
+	fileReadLongs(pFile, &g_sSettings.ulAchievementsUnlocked, 1);
 
 	if(ubVersion == 1) {
 		// Migrate from is1pKbd/is2pKbd

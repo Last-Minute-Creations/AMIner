@@ -38,7 +38,7 @@ char *remapFile(
 	UWORD uwRemainingChars = fileGetSize(pFileContents);
 	UWORD uwFileContentsBufferSize = uwRemainingChars + 1;
 	char *szFileContents = memAllocFast(uwFileContentsBufferSize);
-	fileRead(pFileContents, szFileContents, uwFileContentsBufferSize);
+	fileReadBytes(pFileContents, (UBYTE*)szFileContents, uwFileContentsBufferSize);
 	fileClose(pFileContents);
 	systemUnuse();
 

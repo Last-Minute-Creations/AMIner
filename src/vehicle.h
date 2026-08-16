@@ -97,7 +97,7 @@ typedef struct _tVehicle {
 	UWORD uwTeleportY;
 	tFlipbookKind eTeleportInFlipbook;
 	// Cargo
-	UBYTE uwCargoCurr;
+	UBYTE ubCargoCurr;
 	UWORD uwCargoScore;
 	UWORD pStock[MINERAL_TYPE_COUNT];
 	// Cash, drill, hull

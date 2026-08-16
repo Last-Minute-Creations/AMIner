@@ -37,8 +37,8 @@ void dinoReset(void) {
 
 void dinoSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_DINO);
-	fileWrite(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
-	fileWrite(pFile, &s_eQuestState, sizeof(s_eQuestState));
+	fileWriteBytes(pFile, &s_ubDinoBonesFound, 1);
+	fileWriteLongs(pFile, (ULONG*)&s_eQuestState, 1);
 	saveWriteTag(pFile, SAVE_TAG_DINO_END);
 }
 
@@ -47,8 +47,8 @@ UBYTE dinoLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_ubDinoBonesFound, sizeof(s_ubDinoBonesFound));
-	fileRead(pFile, &s_eQuestState, sizeof(s_eQuestState));
+	fileReadBytes(pFile, &s_ubDinoBonesFound, 1);
+	fileReadLongs(pFile, (ULONG*)&s_eQuestState, 1);
 	UBYTE isBasePopulated = s_eQuestState > DINO_STATE_WAITING_FOR_READING_BRIEFING;
 	baseUpdateDinoTileset(isBasePopulated);
 	collectibleSetFoundCount(COLLECTIBLE_KIND_DINO, s_ubDinoBonesFound);

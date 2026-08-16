@@ -52,7 +52,7 @@ void protestsReset(void) {
 
 void protestsSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_PROTEST);
-	fileWrite(pFile, &s_eProtestState, sizeof(s_eProtestState));
+	fileWriteLongs(pFile, (ULONG*)&s_eProtestState, 1);
 	saveWriteTag(pFile, SAVE_TAG_PROTEST_END);
 }
 
@@ -61,7 +61,7 @@ UBYTE protestsLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_eProtestState, sizeof(s_eProtestState));
+	fileReadLongs(pFile, (ULONG*)&s_eProtestState, 1);
 	return saveReadTag(pFile, SAVE_TAG_PROTEST_END);
 }
 

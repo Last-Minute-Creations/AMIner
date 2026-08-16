@@ -103,7 +103,7 @@ void pageBribeReset(void) {
 
 void pageBribeSave(tFile *pFile) {
 	saveWriteTag(pFile, SAVE_TAG_BRIBE);
-	fileWrite(pFile, &s_uwBribeCount, sizeof(s_uwBribeCount));
+	fileWriteWords(pFile, &s_uwBribeCount, 1);
 	saveWriteTag(pFile, SAVE_TAG_BRIBE_END);
 }
 
@@ -112,7 +112,7 @@ UBYTE pageBribeLoad(tFile *pFile) {
 		return 0;
 	}
 
-	fileRead(pFile, &s_uwBribeCount, sizeof(s_uwBribeCount));
+	fileReadWords(pFile, &s_uwBribeCount, 1);
 	return saveReadTag(pFile, SAVE_TAG_BRIBE_END);
 }
 
